@@ -1,0 +1,194 @@
+32
+Added bounding box parameters in env.txt.
+
+31
+Some updates in interval (interval.cpp/.h still not fully updated w.r.t. version with separators).
+Removed obsolete information in mission_spec.txt.
+Minor modifications in MDM.
+Added specific acoustic messages (ASK, SPWT, SHH).
+
+30
+Preliminary support of daisy-chained echosounder on sonar (but not currently activated).
+Added possibility to restart SwarmonDevice like others.
+Image-related functions moved from Globals.h to CvProc.h.
+Added altitude w.r.t. sea floor control.
+Added and modified options related to bBrake in the missions.
+Changed the order of some parameters in ballconfig.
+Added alpha_max_err, d_max_err parameters in the configuration file of Seanet.
+Added HorizontalBeam and VerticalBeam parameters in the configuration files of Seanet and Video, however they are not yet really used.
+Improved compatibility with Visual Studio 2015.
+
+29
+Removed printf() of acoustic messages.
+
+28
+Removed the expansion of the resulting box after contraction with modem distance as it was too pessimistic.
+Decreased x_max_err and y_max_err.
+Added setstateestimationwgs command.
+Added bottom camera handling for ball.
+Minor changes.
+
+27
+Changed modem commands.
+Added purge and corrected send/recv, sendall/recvall functions for the modem.
+SENDXY message is now sent twice so that only 2 identic RECVXY will be taken into account for the localization.
+
+26
+Corrected bug where fcopyload() failed while it was actually successful.
+Introduced modem commands.
+Corrected bug in the handling of MDM, MES, MT, NMEADevice, P33x, RazorAHRS, Seanet, SSC32 log files (should not have been set to NULL in Connect()).
+bGPSOK variable removed.
+A NMEADevice will no more be restarted just because it does not have the GPS fix.
+
+25
+Beginning of surfacevisualobstacleavoidance integration.
+
+24
+Removed some SSC-32 test code.
+Added option to enable/disable backwards for new motorboat (because of waterproofness issues of some moving parts).
+Minor reorganizations of some device commands.
+Preliminary RazorAHRS support.
+
+23
+GPS data can now be automatically taken into account if the MTi-G has a valid GPS signal.
+Corrected bug where invalid commands where sent to SSC-32 when there is no PWM to update.
+Changed SSC-32 thresholds as well as thrust and rudder computations.
+Added u and uw in observer log because u1,u2,u3 does not correspond correctly to motorboat outputs.
+Corrected side effects due to the modification of the function parameters inside SetAllPWMsSSC32().
+Corrected wrong updates of LastPWs in SetAllPWMsSSC32(), when the value for a channel was below the threshold while another one was above.
+Changed several SSC-32 default values.
+
+22
+Changed deque<vector<interval>> notation to deque< vector<interval> > do disambiguate >>.
+Added better support of socklen_t type in OSNet.h.
+Corrected some invalid return values in some threads.
+Added cast to int when saving values from timeval struct in MT and P33x.
+Corrected printf() call when echo is activated in Commands.h.
+Added missing critical sections in MissionLogThread.
+Added missing critical sections in Video around DisconnectVideo() because of non thread-safe OpenCV codec-related functions.
+Attempts to improve portability of OpenCVGUI.
+Corrected Makefile for Ubuntu 10.10.
+
+21
+Added a restart command for each device.
+Some minor reorganizations and harmonizations.
+
+20
+Corrected back some deadlocks in release due to KillThread().
+Added support of different resolution and captureperiod for each camera. They will be converted to the resolution and captureperiod used by OpenCVGUI.
+Improved compatibility for the DueTime in the timer of VideoRecord.
+Added rotation, scale and flip parameters for cameras.
+
+19
+Improved exit behavior.
+Improved workspace organization.
+Added delays to correct crash when reading 2 video files.
+Added preliminary remote camera support.
+
+18
+Corrected bug where stopwalltracking was interpreted as stop because of commands order test in Commands.h.
+
+17
+Added missing parameters for light in ballconfig.
+Corrected heading control bug in lateral ball tracking.
+
+16
+Corrected name of OpenCVGUI windows.
+Corrected bug where omega_mes was never set by MT.
+Corrected bug where the depth was meaningless in logmission.
+
+15
+Added O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization) keys related to localization.
+Corrected sign bug in WaypointControl.
+Corrected some missing critical sections in goto.
+
+14
+Added a key to enable/disable missions overlays.
+Restored SampleTimeFine column in MT logs to improve compatibility with MT Manager.
+Modified staticsonarlocalization to try to quickly solve contraction problems when the initial box is precise but totally inaccurate.
+Improved wall and visual obstacle avoidance to avoid on the right or the left depending on the obstacle relative position.
+Corrected display and log bugs for some values for wall.
+
+13
+Added time and GPS data support in MT log files.
+Added camera number in recorded video file name.
+Corrected bug in NMEADevice log files.
+
+12
+Updated SSC32.
+Modified period for controller and observer.
+Added temporarily thread period indication in some threads.
+
+11
+Added wall tracking.
+Minor modifications in the positions of the critical sections in the missions threads.
+Added temporary implementation of the command staticsonarlocalization.
+
+10
+Beginning of modem and echosounder integration.
+Corrected obstacle avoidance to save a picture of every obstacle.
+Added support of lateral camera for ball tracking, estimation of its absolute position, and detection of the light.
+Added keys to use the CISCREA OSD to set parameters of the camera.
+Added commands to go to relative positions.
+Activated some Seanet parts.
+Activated simulated sonar.
+Added command to change Seanet configuration file and restart it.
+
+9
+Some changes in high-level controls.
+Added depth control as an option for the ball tracking.
+Corrected mission log header.
+Corrected other logs header starting with a '%'.
+
+8
+Changed conversions related to CISCREA thrusters.
+Corrected possible sign error in SAUC'ISSE heading control.
+Changed text colors.
+Added different possibilities to try to estimate vxy and omega.
+Added the possibility to easily add omega as state variable and measurement in the simulator if necessary.
+Changed the name of some parameters of the observer and simulator.
+Corrections for boost mode to keep the same rotation speed at maximum speed than at null speed.
+Added voltage monitoring for CISCREA with a Li-ion battery.
+Corrected bug in ball tracking (sign in distance control).
+
+7
+Added line following.
+Added new command controlconfig to replace and extend thrustboost, as well as improve manual control.
+Changed light and tilt bounds.
+Added grouped CISCREA Modbus requests.
+Added sleep delays in CISCREA-related functions and corrections for Modbus TCP/RTU.
+Minor changes.
+
+6
+Added GPSOK variable to indicate when the GPS data are valid.
+Added and modified localization-related commands.
+Modified mission log format.
+Added conversion functions between different coordinate systems.
+Corrected bug where conversions between WGS and environment coordinate system work only in the case of an East - North - Up environment coordinate system.
+
+5
+Added support of bSaveRawData for NMEADevice, MT, P33x.
+Reorganization of include config.h in Hardware.
+Beginning of integration of Seanet.
+Added support of altitude for NMEADevice.
+Renamed GPSSurface to GPS.
+
+4
+Corrected problem with lights.
+Corrected bugs when checking modbus operations for CISCREA.
+Corrected uw sign for CISCREA.
+Corrected bug when parsing CISCREA configuration file.
+
+3
+Corrected possible bug in the use of wu instead of u for pipeline tracking.
+Added missing critical sections in control parts of ball, pipeline and visual obstacle.
+Corrected possible bug in distance control for ball tracking.
+Added preliminary support of visual obstacle avoidance and beginning of wall detection.
+Changed command naming conventions.
+Changed source files organization.
+
+2
+Minor updates in the display of the map.
+
+1
+Initial version.

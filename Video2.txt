@@ -1,0 +1,24 @@
+% 0..9 or a video filename or IP address and TCP port
+2
+%test3.wmv
+%dummy.wmv
+%127.0.0.1:4014
+%192.168.1.150:4014
+% videoimgwidth
+320
+% videoimgheight
+240
+% captureperiod (in ms)
+100
+% timeout for remote mode (in ms)
+5
+% rotation angle (in deg)
+0
+% scale
+1
+% bFlip
+0
+% HorizontalBeam (in ]0..360] deg)
+70
+% VerticalBeam (in ]0..360] deg)
+50

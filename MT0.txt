@@ -1,0 +1,31 @@
+% IP address and TCP port or local RS232 port
+%127.0.0.1:4010
+COM5
+% BaudRate
+115200
+% bSaveRawData
+1
+% rollorientation
+0.0
+% rollp1
+0.0
+% rollp2
+0.0
+% pitchorientation
+0.0
+% pitchp1
+0.0
+% pitchp2
+0.0
+% yaworientation
+3.065
+%3.065 for SAUC'ISSE
+%3.025 for SARDINE
+% yawp1
+0.29
+%0.29 for SAUC'ISSE
+%0.42 for SARDINE
+% yawp2
+0.55
+%0.55 for SAUC'ISSE
+%-0.2 for SARDINE

@@ -1,0 +1,53 @@
+% IP address and TCP port or local RS232 port
+%192.168.1.6:502
+%192.168.1.7:502
+%192.168.1.8:502
+%192.168.1.9:502
+COM8
+% BaudRate
+38400
+%%%%%%%%%%%%%%%%%%%%%%% NOT HANDLED %%%%%%%%%%%%%%%%%%%%%%%
+% Compass calibration
+% yawsign (1 or -1)
+1
+% yaworientation
+0
+% yawp1
+0
+% yawp2
+0
+% Forward right thruster (actuator 1)
+% Clockwise (1 or 0)
+1
+% Deadzone sup (in [0..250])
+140
+% Deadzone inf (in [0..250])
+110
+% Forward left thruster (actuator 2)
+% Clockwise (1 or 0)
+1
+% Deadzone sup (in [0..250])
+140
+% Deadzone inf (in [0..250])
+110
+% Backward right thruster (actuator 3)
+% Clockwise (1 or 0)
+1
+% Deadzone sup (in [0..250])
+140
+% Deadzone inf (in [0..250])
+110
+% Backward left thruster (actuator 4)
+% Clockwise (1 or 0)
+1
+% Deadzone sup (in [0..250])
+140
+% Deadzone inf (in [0..250])
+110
+% Vertical thrusters (actuator 5)
+% Clockwise (1 or 0)
+1
+% Deadzone sup (in [0..250])
+140
+% Deadzone inf (in [0..250])
+110

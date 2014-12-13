@@ -1,0 +1,256 @@
+%
+% MISSIONS
+%
+%wallconfig d0 beta delta dmin dmax gamma_infinite r bLat bBrake (d0 : double ]-oo,oo[ target distance in m, beta : double [-180,180] mod(360) beam width in deg, delta : double [-180,180] mod(360) beam direction in deg, 0 being the front of the robot, dmin : double ]-oo,oo[ min detection distance in m, dmax : double ]-oo,oo[ max detection distance in m, gamma_infinite : double ]-oo,oo[ angle to come closer to the line when far away in rad (for tracking) / double ]-oo,oo[ angle limit of the line to be considered as an obstacle to avoid in rad (for avoidance), r : double [0,oo[ distance at which the angle to the line to track will be gamma_infinite/2 in m, bLat : int [0,1] 1 if the wall to track is lateral, bBrake : int [0,1] brake if the wall is detected if 1 (only for detection and avoidance))
+%
+%walldetection t (t : double [0,oo[ timeout in s, the function blocks until the wall is detected or the timeout is reached)
+%
+%startwalltracking (modify headingreg when wall detected, keep any previous depthreg, thrust)
+%
+%stopwalltracking
+%
+%startwallavoidance (modify headingreg, thrust when wall detected, keep any previous depthreg)
+%
+%stopwallavoidance
+%
+%pipelineconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius d0 kh kv bBrake videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius (in pixels) greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object (in m), d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, bBrake : int [0,1] brake if the object is detected if 1 (no effect for tracking), videoid : int [0,oo] video id)
+%
+%pipelinedetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
+%
+%startpipelinetracking (modify headingreg when pipeline detected, keep any previous depthreg (might also change depth a little bit), thrust (could also reduce thrust when reaching the end of the pipeline (yellow center in the bottom of the camera image), could turn slowly in the direction where the pipeline was seen last time if lost))
+%
+%stoppipelinetracking
+%
+%ballconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius d0 kh kv lightMin lightPixRatio bDepth camdir bBrake videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius (in pixels) greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object (in m), d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, lightMin : int [0,255] min RGB value if there is a white light, lightPixRatio : double [0,1] we consider there is a white light if it covers that ratio of the picture, bDepth : int [0,1] 1 to activate depth control, camdir : int [-1,2] 0 if used with a front camera, 1 left, -1 right, 2 bottom, bBrake : int [0,1] brake if the object is detected if 1 (do not track for tracking), videoid : int [0,oo] video id)
+%
+%balldetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
+%
+%startballtracking (modify headingreg and depthreg when ball detected, keep any previous thrust, but reverse thrust to stop when the size of the ball on the webcam image is too big)
+%
+%stopballtracking
+%
+%visualobstacleconfig r- r+ g- g+ b- b+ obsPixRatio bBrake videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the lights if there is an obstacle, obsPixRatio : double [0,1] we consider there is an obstacle if lights cover that ratio of the picture, bBrake : int [0,1] brake if the obstacle is detected if 1, videoid : int [0,oo] video id)
+%
+%visualobstacledetection t (t : double [0,oo[ timeout in s, the function blocks until the obstacle is detected or the timeout is reached)
+%
+%startvisualobstacleavoidance (modify headingreg, thrust when obstacle detected, keep any previous depthreg)
+%
+%stopvisualobstacleavoidance
+%
+%surfacevisualobstacleconfig weather boatsize bBrake videoid (weather : c (cloudy) or s (sunny), boatsize : int [0,oo] height in pixels of the visible part of the boat on the camera, bBrake : int [0,1] brake if the obstacle is detected if 1, videoid : int [0,oo] video id)
+%
+%surfacevisualobstacledetection t (t : double [0,oo[ timeout in s, the function blocks until the obstacle is detected or the timeout is reached)
+%
+%startsurfacevisualobstacleavoidance (modify headingreg, thrust when obstacle detected, keep any previous depthreg)
+%
+%stopsurfacevisualobstacleavoidance
+%
+%%pingerconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius freq pulsepersec pulselen k kx ky bBrakeSurfaceEnd videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius (in pixels) greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object (in m), freq : int [0,48000] frequency of the pulse in Hz, pulsepersec : double [0,oo[ number of pulse per s, pulselen : double [0,oo[ pulse length in s, k, kx, ky : double [0,1] regulation coefficients, bBrakeSurfaceEnd : int [0,1] brake, surface and stop the mission if the object is detected if 1, videoid : int [0,oo] video id)
+% Other coefficients related to hydrophones to add...?
+%
+%%pingerdetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
+%
+%%startpingertracking (modify headingreg with pinger information from hydrophones, keep any previous depthreg, thrust)
+%
+%%stoppingertracking
+%
+% LOCALIZATION AND ADVANCED MOVING COMMANDS
+%
+%setenvcoord lat_env long_env alt_env orientation_env (lat_env, long_env, alt_env : double ]-oo,oo[ in decimal deg and m, orientation_env : double [0,360[ mod(360) angle of the x axis of the environment coordinate system to the North in deg, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference in deg in marine units)
+%
+%gpssetenvcoordposition t (double [0,oo[ timeout in s, the function blocks until the GPS is available or the timeout is reached. Set the position of the environment coordinate system from the current position using GPS. If the GPS is not available or reports that the data might be unreliable, the environment coordinate system is not modified.)
+%
+%gpslocalization t (double [0,oo[ timeout in s, the function blocks until the GPS is available or the timeout is reached. Estimation of the current position using GPS. If the GPS is not available or reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
+%
+%setstateestimationwgs lat lat_err_m long long_err_m alt alt_err_m orientation orientation_err speed speed_err rotation_speed rotation_speed_err (lat, long, alt : double ]-oo,oo[ current GPS position estimation in decimal deg and m to indicate to the default dead reckoning localization algorithm the current submarine state, lat_err_m, long_err_m, alt_err_m : double [0,oo[ error in m, orientation : double [0,360[ mod(360) current angle to the North in deg, orientation_err : double [0,360[ error in deg, speed : double ]-oo,oo[ current speed in m/s, speed_err : double [0,oo[ error in m/s, rotation_speed : double ]-oo,oo[ current rotation speed to the North in deg/s, rotation_speed_err : double [0,oo[ error in deg/s. Usually used in the beginning of a mission to indicate the starting point. This replaces any previously estimated position)
+%
+%setstateestimation x xerr y yerr z zerr theta thetaerr vxy vxyerr omega omegaerr (x, xerr, y, yerr, z, zerr, theta, thetaerr, vxy, vxyerr : double ]-oo,oo[ current state estimation and errors to indicate to the default dead reckoning localization algorithm the current submarine state in the environment coordinate system. Usually used in the beginning of a mission to indicate the starting point. This replaces any previously estimated position)
+%
+%staticsonarlocalization t [nbretries/delay, retryperiod? (nbretries : int [0,oo[ number of retries if the algorithm reports that the data might be unreliable, make the robot go backward and turn a little bit before a retry, this command can be used when the submarine is stopped to get a better estimation of the current position using sonar. If the algorithm reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)]
+%
+%acousticmodemlocalization t (double [0,oo[ timeout in s, the function blocks until the timeout is reached. Estimation of the current position using the last known acoustic modem position and range. If the acoustic modem position and range are not available or might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
+%
+%wpfollowingconfig r (r : double [0,oo[ validation radius in m)
+%
+%linefollowingconfig r gamma_infinite (r : double [0,oo[ distance at which the angle to the line to track will be gamma_infinite/2 in m, gamma_infinite : double ]-oo,oo[ angle to come closer to the line when far away in rad)
+%
+%gotoxy x y (x, y : double ]-oo,oo[ position in m in the environment coordinate system)
+%
+%gotoxyt x y t (x, y : double ]-oo,oo[ position in m in the environment coordinate system, t : double [0,oo[ timeout in s, the function blocks until the position or the timeout is reached)
+%
+%gotoxyrelative x y (x, y : double ]-oo,oo[ position in m from the current position in the environment coordinate system)
+%
+%gotoxytrelative x y t (x, y : double ]-oo,oo[ position in m from the current position in the environment coordinate system, t : double [0,oo[ timeout in s, the function blocks until the position or the timeout is reached)
+%
+%gotoxywgs lat long (lat, long : double ]-oo,oo[ position in decimal deg in WGS)
+%
+%gotoxytwgs lat long t (lat, long : double ]-oo,oo[ position in decimal deg in WGS, t : double [0,oo[ timeout in s, the function blocks until the position or the timeout is reached)
+%
+%linefollowing xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line)
+%
+%linefollowingt xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%
+%linefollowingrelative xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line)
+%
+%linefollowingtrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%
+%linefollowingwgs lata longa latb longb (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line)
+%
+%linefollowingtwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%
+% DEVICE COMMANDS
+%
+%ciscreaconfig CISCREA.txt
+%
+%mdmconfig MDM.txt
+%
+%mesconfig MES.txt
+%
+%seanetconfig Seanet.txt
+%
+%p33xconfig P33x.txt
+%
+%razorahrsconfig RazorAHRS.txt
+%
+%mtconfig MT.txt
+%
+%nmeadeviceconfig NMEADevice.txt
+%
+%swarmondeviceconfig SwarmonDevice.txt
+%
+%ue9aconfig UE9A.txt
+%
+%ssc32config SSC32.txt
+%
+%videoconfig videoid Video.txt
+%
+%%rngacousticmodem nbretries retryperiod (send rng and wait for the result)
+%
+%%sendxyzerracousticmodem nbretries retryperiod (send xyzerr)
+%
+%%recvxyzerracousticmodem nbretries retryperiod (wait for xyzerr)
+%
+%%startsendmsgacousticmodem (send repeatedly predefined messages to the acoustic modem)
+%
+%%stopsendmsgacousticmodem
+%
+%%startrecvmsgacousticmodem (listen to predefined messages from the acoustic modem)
+%
+%%stoprecvmsgacousticmodem
+%
+%startrngmsgacousticmodem
+%
+%stoprngmsgacousticmodem
+%
+%startsendxymsgacousticmodem
+%
+%stopsendxymsgacousticmodem
+%
+%startrecvxymsgacousticmodem
+%
+%stoprecvxymsgacousticmodem
+%
+%startsendaskmsgacousticmodem
+%
+%stopsendaskmsgacousticmodem
+%
+%startrecvaskmsgacousticmodem
+%
+%stoprecvaskmsgacousticmodem
+%
+% Partial implementation (without OK!\n acknowledgement)...
+%startsendspwtmsgacousticmodem
+%
+% Partial implementation (without OK!\n acknowledgement)...
+%stopsendspwtmsgacousticmodem
+%
+% Partial implementation (without OK!\n acknowledgement)...
+%startrecvspwtmsgacousticmodem
+%
+% Partial implementation (without OK!\n acknowledgement)...
+%stoprecvspwtmsgacousticmodem
+%
+% Partial implementation (without OK!\n acknowledgement)...
+%waitrecvspwtmsgacousticmodem t (double [0,oo[ timeout in s, the function blocks until the desired message is received or the timeout is reached)
+%
+% Maybe the shh\n message is not useful in practice...
+%startsendshhmsgacousticmodem
+%
+%stopsendshhmsgacousticmodem
+%
+%startrecvshhmsgacousticmodem
+%
+%stoprecvshhmsgacousticmodem
+%
+%waitrecvshhmsgacousticmodem t (double [0,oo[ timeout in s, the function blocks until the desired message is received or the timeout is reached)
+%
+%startrecvxyrngmsgacousticmodem
+%
+%stoprecvxyrngmsgacousticmodem
+%
+% GENERAL COMMANDS
+%
+%startopencvgui videoid (int)
+%
+%stopopencvgui videoid (int)
+%
+%startvideorecording videoid (int)
+%
+%stopvideorecording videoid (int)
+%
+%call mission.txt (only used from command-line)
+%
+%abort (abort the mission)
+%
+%exit
+%
+%setmissionaction name (string representing the current action name to store in the mission log file)
+%
+%wait t (double [0,oo[ timeout in s, the function blocks until the timeout is reached)
+%
+% SIMPLE MOVING COMMANDS
+%
+%depthreg z (double ]-oo,oo[ in m in marine units)
+%
+%asfreg z (double ]-oo,oo[ in m in marine units)
+%
+%headingreg orientation (double [0,360[ mod(360) in deg in marine units)
+%
+%headingrelativereg orientation (double [0,360[ mod(360) in deg in marine units)
+%
+%thrust u (double [-1,1])
+%
+%turn u (double [-1,1])
+%
+%verticalthrust u (double [-1,1])
+%
+%lateralthrust u (double [-1,1])
+%
+%brake (try to stop the robot taking into account horizontal thrusters speed)
+%
+%controlconfig u_max uw_max uv_max u_coef uw_coef (double [0,1])
+%
+%stop (stop only horizontal thrusters)
+%
+%generalstop
+%
+%-------------------------------------------------
+% OLD
+%
+%startDL (start dynamic localization. Overrides the default dead reckoning localization algorithm)
+%
+%stopDL (stop dynamic localization)
+%
+%replay filename
+%end
+%
+%movefromfile movement.txt option(#int)   (in folder mission_scripts/saved_movements)
+%---------------------options are------------------------------------------------
+%	#static const int LOAD_ALL					= 0;
+%	#static const int LOAD_NO_DEPTHCONTROL				= 1;
+%	#static const int LOAD_NO_DEPTHCONTROL_NO_ORIENTATION_REG	= 2;
+%	#static const int LOAD_THRUST_ONLY				= 3;
+%
+%
+%-----!!!empty line not handled in this version!!!
+%-------------------------------------------------

@@ -1,0 +1,5 @@
+% HTTP request or IP address and TCP port
+%127.0.0.1:3000
+%http://haggis.ensta-bretagne.fr:3000/rt/lastposition/robotTest
+http://193.52.45.70:3000/rt/lastposition/robotTest
+%http://172.17.1.47:3000/rt/lastposition/robotTest
