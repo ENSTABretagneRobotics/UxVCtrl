@@ -1,0 +1,22 @@
+generalstop
+headingreg 0
+depthreg -1
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+% rotate
+headingreg 180
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+generalstop

@@ -1,0 +1,356 @@
+setmissionaction INIT
+wpfollowingconfig 5
+linefollowingconfig 5 0.78
+startsendxymsgacousticmodem
+stop
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WPASV
+gotoxytwgs 44.095805 9.864939 240
+setmissionaction WPREACHED
+stop
+wait 90
+setmissionaction END
+stopsendxymsgacousticmodem
+generalstop

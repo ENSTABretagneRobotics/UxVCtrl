@@ -1,0 +1,89 @@
+setmissionaction INIT
+wpfollowingconfig 5
+linefollowingconfig 5 0.78
+gpslocalization 3
+%startvideorecording 0
+%wait 1
+%startvideorecording 1
+%wait 1
+startrecvxyrngmsgacousticmodem
+setmissionaction SUBMERGE
+stop
+headingreg 255
+depthreg -2.5
+wait 20
+setmissionaction W0
+thrust 1
+gotoxytwgs 44.095466 9.863079 31557600
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction SURFACE
+depthreg -0.3
+wait 60
+gpslocalization 3
+setmissionaction SUBMERGE
+stop
+depthreg -2.5
+wait 20
+setmissionaction W1
+thrust 1
+gotoxytwgs 44.094367 9.859000 31557600
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction SURFACE
+depthreg -0.3
+wait 60
+gpslocalization 3
+setmissionaction SUBMERGE
+stop
+depthreg -2.5
+wait 20
+setmissionaction W2
+thrust 1
+gotoxytwgs 44.093233 9.859550 31557600
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction SURFACE
+depthreg -0.3
+wait 60
+gpslocalization 3
+setmissionaction SUBMERGE
+stop
+depthreg -2.5
+wait 20
+setmissionaction W3
+thrust 1
+gotoxytwgs 44.094133 9.862567 31557600
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction SURFACE
+depthreg -0.3
+wait 60
+gpslocalization 3
+setmissionaction SUBMERGE
+stop
+depthreg -2.5
+wait 20
+setmissionaction W4
+thrust 1
+gotoxytwgs 44.095466 9.863079 31557600
+% stop
+thrust -1
+wait 3
+stop
+% stop and surface
+stop
+setmissionaction SURFACE
+depthreg 5
+wait 60
+gpslocalization 3
+stoprecvxyrngmsgacousticmodem
+wait 60

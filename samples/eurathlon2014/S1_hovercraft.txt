@@ -1,0 +1,38 @@
+setmissionaction INIT
+wpfollowingconfig 5
+linefollowingconfig 5 0.78
+startsendxymsgacousticmodem
+stop
+thrust 1
+setmissionaction W0
+gotoxytwgs 44.095466 9.863079 31557600
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction l0
+linefollowingtwgs 44.095466 9.863079 44.094367 9.859000 31557600.000000
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction l1
+linefollowingtwgs 44.094367 9.859000 44.093233 9.859550 31557600.000000
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction l2
+linefollowingtwgs 44.093233 9.859550 44.094133 9.862567 31557600.000000
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction l3
+linefollowingtwgs 44.094133 9.862567 44.095466 9.863079 31557600.000000
+setmissionaction WPREACHED
+stop
+wait 90
+setmissionaction END
+stopsendxymsgacousticmodem
+generalstop

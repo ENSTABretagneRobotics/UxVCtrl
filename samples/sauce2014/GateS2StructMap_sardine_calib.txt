@@ -1,0 +1,470 @@
+setmissionaction INIT
+wpfollowingconfig 0.25
+gpslocalization 3
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+setmissionaction SUBMERGE
+stop
+headingreg 343
+depthreg -1.25
+wait 20
+% go forward to reach middle
+setmissionaction GOMIDDLE
+thrust 1
+wait 90
+% stop
+thrust -1
+wait 3
+stop
+% 90 deg turn
+setmissionaction NINETYTURN
+headingreg 73
+wait 10
+% go forward to pass through the validation gate
+setmissionaction VALIDATIONGATE
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction CHANGE_HEADING
+stop
+headingreg 345
+depthreg -1.25
+wait 20
+setmissionaction WALL_TRACKING_BALL_DETECTION
+thrust 0.3
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 1.0 0 0 -1 0 220 0.05 1
+wallconfig 6 2 -1 0 15 0.78 2 1
+startwalltracking
+balldetection 120 0
+setmissionaction BALL_DETECTED_OR_TIMEOUT
+stopwalltracking
+% stop
+thrust -0.3
+wait 1
+stop
+setmissionaction BALL_TRACKING
+startballtracking
+startsendmsgacousticmodem
+wait 20
+stopsendmsgacousticmodem
+stopballtracking
+setmissionaction RESET_HEADING
+stop
+headingreg 345
+depthreg -1.25
+wait 20
+setmissionaction WALL_TRACKING
+thrust 0.3
+wallconfig 3 2 -1 0 10 0.78 2 1
+startwalltracking
+wait 210
+stopwalltracking
+setmissionaction CHANGE_HEADING_AND_SONAR
+stop
+headingreg 165
+depthreg -1.5
+seanetconfig Seanet0_loc.txt
+wait 30
+setmissionaction WPSTRUCT
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 25 12.5 120
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 25 12.5 120
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 25 12.5 120
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction GO_DEEP
+stop
+headingreg 255
+wait 10
+depthreg -3.0
+wait 3
+setmissionaction STRUCT
+thrust 0.25
+pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 1 0.4 0 0
+startpipelinetracking
+wait 180
+stoppipelinetracking
+setmissionaction CHANGE_HEADING_AND_DEPTH
+stop
+headingreg 345
+depthreg -2.5
+wait 20
+setmissionaction WP1
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 20 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 20 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 20 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP2
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 20 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 20 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 20 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 17.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 17.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 17.5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP4
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 17.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 17.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 17.5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP5
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 15 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 15 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 15 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP6
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 15 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 15 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 15 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP7
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 12.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 12.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 12.5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP8
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 12.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 12.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 12.5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP9
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 10 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 10 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 10 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP10
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 10 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 10 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 10 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP11
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 7.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 7.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 7.5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP12
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 7.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 7.5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 7.5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP13
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 30 5 60
+thrust -1
+wait 2
+stop
+wait 3
+setmissionaction WP14
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 5 60
+thrust -1
+wait 2
+stop
+wait 3
+staticsonarlocalization 10
+wait 3
+thrust 0.7
+gotoxyt 45 5 60
+thrust -1
+wait 2
+stop
+wait 3
+% stop and surface
+stop
+setmissionaction SURFACE
+depthreg 5
+wait 60
+gpslocalization 3

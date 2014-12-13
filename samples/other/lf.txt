@@ -1,0 +1,16 @@
+setmissionaction init
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+%wait 3
+%wpfollowingconfig 5
+linefollowingconfig 5 0.78
+stop
+thrust 1
+setmissionaction l0
+linefollowingtwgs 53.265895 -9.040723 53.265528 -9.040351 120
+setmissionaction l1
+linefollowingtwgs 53.265528 -9.040351 53.265520 -9.041033 120
+setmissionaction l2
+linefollowingtwgs 53.265520 -9.041033 53.265895 -9.040723 120
+setmissionaction end
+generalstop

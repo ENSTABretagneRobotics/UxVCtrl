@@ -1,0 +1,17 @@
+setmissionaction init
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+%wait 3
+wpfollowingconfig 5
+linefollowingconfig 5 0.78
+stop
+thrust 0.5
+setmissionaction wpsquarecenter
+gotoxytwgs 53.260786 -9.034051 31557600
+setmissionaction stay
+gotoxywgs 53.260786 -9.034051
+wait 300
+setmissionaction wpoutside
+gotoxytwgs 53.260900 -9.034300 31557600
+setmissionaction end
+generalstop

@@ -1,0 +1,536 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Input Files">
+      <UniqueIdentifier>{1d4aa410-7e28-4c4c-8903-bc5b09b1ce83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OSUtils">
+      <UniqueIdentifier>{cda61208-08e3-4d59-a61a-1cd08c886a49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extensions">
+      <UniqueIdentifier>{0bc2a384-f9b2-41e2-ae72-cb6c1b66f60e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extensions\Img">
+      <UniqueIdentifier>{34e28a84-62f0-48e8-83d8-b737cbf732d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extensions\UE9Utils">
+      <UniqueIdentifier>{3610412b-19db-4567-807b-7624d0d2bc1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extensions\SurfaceVisualObstacle">
+      <UniqueIdentifier>{27e3fe74-ae02-4c54-ad62-1455d1d043ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interval">
+      <UniqueIdentifier>{364811c3-648b-4169-990b-7941cac89b0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="matrix_lib">
+      <UniqueIdentifier>{0d52e447-acb6-447b-85b4-e9c508998d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Hardware">
+      <UniqueIdentifier>{467dbf58-83ad-4cb5-8f73-959d6a7e8291}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Ball.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Computations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Observer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCVGUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SeanetProcessing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SurfaceVisualObstacle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VisualObstacle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Wall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSComputerRS232Port.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSCore.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSCriticalSection.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSEv.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSMisc.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSNet.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSSem.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSThread.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSTime.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSTimer.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Img\CvCore.c">
+      <Filter>Extensions\Img</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Img\CvDisp.c">
+      <Filter>Extensions\Img</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Img\CvDraw.c">
+      <Filter>Extensions\Img</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Img\CvFiles.c">
+      <Filter>Extensions\Img</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Img\CvProc.c">
+      <Filter>Extensions\Img</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.c">
+      <Filter>Extensions\UE9Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.c">
+      <Filter>Extensions\UE9Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.cpp">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.cpp">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.cpp">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.cpp">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\interval\box.cpp">
+      <Filter>interval</Filter>
+    </ClCompile>
+    <ClCompile Include="..\interval\iboolean.cpp">
+      <Filter>interval</Filter>
+    </ClCompile>
+    <ClCompile Include="..\interval\imatrix.cpp">
+      <Filter>interval</Filter>
+    </ClCompile>
+    <ClCompile Include="..\interval\interval.cpp">
+      <Filter>interval</Filter>
+    </ClCompile>
+    <ClCompile Include="..\interval\rmatrix.cpp">
+      <Filter>interval</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\CISCREA.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MDM.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MES.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MT.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\NMEADevice.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\P33x.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\RazorAHRS.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\RS232Port.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\Seanet.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\SSC32.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\SwarmonDevice.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\UE9A.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\Video.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Ball.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Computations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenCVGUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SeanetProcessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SurfaceVisualObstacle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VisualObstacle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Wall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSComputerRS232Port.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSCore.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSCriticalSection.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSEv.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSMisc.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSNet.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSSem.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSThread.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSTime.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSTimer.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSUtils.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\AxisOptions.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CoordSystem.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CoordSystem2Img.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CoordSystemChg.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvCore.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvDisp.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvDraw.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvFiles.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvProc.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvUtils.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.h">
+      <Filter>Extensions\UE9Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.h">
+      <Filter>Extensions\UE9Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.h">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.h">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.h">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.h">
+      <Filter>Extensions\SurfaceVisualObstacle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interval\box.h">
+      <Filter>interval</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interval\iboolean.h">
+      <Filter>interval</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interval\imatrix.h">
+      <Filter>interval</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interval\interval.h">
+      <Filter>interval</Filter>
+    </ClInclude>
+    <ClInclude Include="..\interval\rmatrix.h">
+      <Filter>interval</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\jama_cholesky.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\jama_eig.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\jama_lu.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\jama_qr.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\jama_svd.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_array1d.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_array1d_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_array2d.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_array2d_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_array3d.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_array3d_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_cmat.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array1d.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array1d_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array2d.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array2d_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array3d.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array3d_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_i_refvec.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_math_utils.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_sparse_matrix_csr.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_stopwatch.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_subscript.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_vec.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\matrix_lib\tnt_version.h">
+      <Filter>matrix_lib</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\CISCREA.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MDM.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MES.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MT.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\NMEADevice.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\P33x.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\RazorAHRS.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\RS232Port.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\Seanet.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\SwarmonDevice.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\UE9A.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\Video.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="AROVTest.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="CISCREA.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="env.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MDM0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MES0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="mission.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MT0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="NMEADevice0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="P33x0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="RazorAHRS0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="Sail0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="Seanet0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="SSC320.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="SwarmonDevice0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="UE9A0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="Video0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="Video1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="Video2.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="CHANGELOG.txt" />
+    <Text Include="mission_spec.txt" />
+    <Text Include="ReadMe.txt" />
+    <Text Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Hardware\SSC32.h">
+      <Filter>Hardware</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
