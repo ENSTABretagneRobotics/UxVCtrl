@@ -45,6 +45,7 @@ inline int LoadConfig()
 	bDisableSwarmonDevice = TRUE;
 	bDisableUE9A = TRUE;
 	bDisableSSC32 = TRUE;
+	bDisableMaestro = TRUE;
 	// Controller parameters.
 	u_max = 1;
 	uw_max = 1;
@@ -170,6 +171,8 @@ inline int LoadConfig()
 		if (sscanf(line, "%d", &bDisableUE9A) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableSSC32) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableMaestro) != 1) printf("Invalid configuration file.\n");
 
 		// Controller parameters.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

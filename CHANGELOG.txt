@@ -1,3 +1,6 @@
+34
+Beginning of Maestro integration.
+
 33
 Improved commands parsing by checking the null terminal character with strncmp().
 Added bPause parameter to deviceconfig commands.

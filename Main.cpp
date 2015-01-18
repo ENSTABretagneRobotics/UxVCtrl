@@ -26,6 +26,7 @@
 #include "SwarmonDevice.h"
 #include "UE9A.h"
 #include "SSC32.h"
+#include "Maestro.h"
 #include "CISCREA.h"
 #include "Observer.h"
 #include "Controller.h"
@@ -55,6 +56,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER SwarmonDeviceThreadId;
 	THREAD_IDENTIFIER UE9AThreadId;
 	THREAD_IDENTIFIER SSC32ThreadId;
+	THREAD_IDENTIFIER MaestroThreadId;
 	//THREAD_IDENTIFIER SailThreadId;
 	THREAD_IDENTIFIER CISCREAThreadId;
 	THREAD_IDENTIFIER ObserverThreadId;
@@ -96,6 +98,7 @@ int main(int argc, char* argv[])
 	if (!bDisableSwarmonDevice) CreateDefaultThread(SwarmonDeviceThread, NULL, &SwarmonDeviceThreadId);
 	if (!bDisableUE9A) CreateDefaultThread(UE9AThread, NULL, &UE9AThreadId);
 	if (!bDisableSSC32) CreateDefaultThread(SSC32Thread, NULL, &SSC32ThreadId);
+	if (!bDisableMaestro) CreateDefaultThread(MaestroThread, NULL, &MaestroThreadId);
 	if (robid & CISCREA_ROBID_MASK) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
@@ -169,6 +172,7 @@ int main(int argc, char* argv[])
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
 	if (robid & CISCREA_ROBID_MASK) WaitForThread(CISCREAThreadId);
+	if (!bDisableMaestro) WaitForThread(MaestroThreadId);
 	if (!bDisableSSC32) WaitForThread(SSC32ThreadId);
 	if (!bDisableUE9A) WaitForThread(UE9AThreadId);
 	if (!bDisableSwarmonDevice) WaitForThread(SwarmonDeviceThreadId);

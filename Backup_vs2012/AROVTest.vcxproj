@@ -53,8 +53,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.2\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OPENCV242;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;OPENCV249;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -64,8 +64,8 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.3-msvcd.lib;WS2_32.lib;opencv_core242d.lib;opencv_imgproc242d.lib;opencv_highgui242d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.2\x86\vc9\lib;$(ProgramFiles)\libmodbus-3.0.3-msvc\x86\vc9\lib;$(ProgramFiles)\LabJack\Drivers;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.6-msvcd.lib;WS2_32.lib;opencv_core249d.lib;opencv_imgproc249d.lib;opencv_highgui249d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.9\x86\vc11\lib;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc11\lib;$(ProgramFiles)\LabJack\Drivers;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -75,16 +75,16 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.2\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV242;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV249;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.3-msvc.lib;WS2_32.lib;opencv_core242.lib;opencv_imgproc242.lib;opencv_highgui242.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.2\x86\vc9\staticlib;$(ProgramFiles)\libmodbus-3.0.3-msvc\x86\vc9\staticlib;$(ProgramFiles)\LabJack\Drivers;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.6-msvc.lib;WS2_32.lib;opencv_core249.lib;opencv_imgproc249.lib;opencv_highgui249.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.9\x86\vc11\staticlib;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc11\staticlib;$(ProgramFiles)\LabJack\Drivers;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -101,6 +101,7 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hardware\Maestro.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pipeline.h" />
@@ -249,6 +251,7 @@
     <Text Include="AROVTest.txt" />
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />
+    <Text Include="Maestro0.txt" />
     <Text Include="MDM0.txt" />
     <Text Include="MES0.txt" />
     <Text Include="mission.txt" />

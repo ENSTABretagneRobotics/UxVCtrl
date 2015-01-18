@@ -1166,6 +1166,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartSSC32 = TRUE;
 		bPauseSSC32 = ival1;
 	}
+	else if (sscanf(line, "maestroconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "Maestro0.txt", strlen("Maestro0.txt")+1) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "Maestro0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartMaestro = TRUE;
+		bPauseMaestro = ival1;
+	}
 	else if (sscanf(line, "videoconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
 		if ((ival >= 0)&&(ival < nbvideo))

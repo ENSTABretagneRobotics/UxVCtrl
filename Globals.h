@@ -50,6 +50,7 @@
 
 #define MAX_UNCERTAINTY 10000
 
+// Acoustic modem messages.
 #define RNG_MSG 1
 #define SENDXY_MSG 6
 #define RECVXY_MSG 7
@@ -115,6 +116,7 @@ extern BOOL bDisableGPS;
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
+extern BOOL bDisableMaestro;
 
 // Controller parameters.
 extern double u_max, uw_max, uv_max, u_coef, uw_coef;
@@ -302,6 +304,10 @@ extern BOOL bRestartUE9A;
 // SSC32 variables.
 extern BOOL bPauseSSC32;
 extern BOOL bRestartSSC32;
+
+// Maestro variables.
+extern BOOL bPauseMaestro;
+extern BOOL bRestartMaestro;
 
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_CAM];

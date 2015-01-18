@@ -1,4 +1,3 @@
-pololu, faire un sorte que tout marche pour buggy, etas...
 
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 
@@ -118,6 +117,9 @@ pouvoir afficher period pour tous les threads
 reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte paramètres du fichier de config, voir noms/numérotation des moteurs, clockwise
 regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
 
+NMEA
+MT, WeatherStation specific messages...
+
 changer observer (et éventuellement simulator) pour que omegadot=alphaomega*(u1-u2)-alphafomega*omega (au lieu de thetadot=alphaomega*(u1-u2)...)
 si on a une IMU, on l'utilise pour omegahat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid, il faudrait rajouter le support des trames NMEA donnant la vitesse)
 vitesse GPS a priori bonne si dispo, par contre vaut mieux pas trop utiliser l'altitude du GPS (uniquement en dernier recours)
@@ -141,29 +143,18 @@ paramètre absolutebeginreplaytime dans chaque fichier de config au lieu de delay
 dans ce cas il suffirait de faire des sonarconfig log_with_date.csv au début et à chaque reconfig dans un fichier de mission inspiré de l'original, avec le mode spécial replay du sonar qui lit chaque ligne dès que le moment est bon en supposant que la date de début est celle dans le nom de fichier
 razor, es (indépendant ou via seanet), ssc sauvegardent données brutes sans indication de temps...
 
-deadlocks à cause de killthread? il faudrait plutôt utiliser quelques chsoe comme WaitForUserInput() au lieu de fgets...
+deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme WaitForUserInput() au lieu de fgets...
 
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
 
 image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
-
-arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, rmtcommand, remoteopencv gui
 
 robid log file?
 faire version de connect avec tout en paramètre (penser aussi à initialiser szCfgFilePath à 0...)
 un fichier de config pour décrire les périphériques du robot?
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
 gestion vagues et z, courants et vxy...
-
-un thread pour la prise de données de chaque périphérique, l'accès aux données par var globales (globals.h) doit être immédiat
-un thread de fichier log general?
-un timer pour enregistrement vidéo
-un timer pour enregistrement audio
-un thread pour chaque traitement long
-un thread boucle de régulations de base
-un thread lecture-interpréteur fichier de mission, entrées clavier (Commands.h)
-un thread GUI
-un thread simulateur
+arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, rmtcommand, remoteopencv gui
 
 
 
@@ -320,3 +311,13 @@ remettre à 0 integral si changement de consigne, revoir où on le remet à 0...
 doit afficher osd meme sans video
 osd:heading/regul(marin), depth/regul, x(+/-err), y(+/-err), 
 projet comet et MissionTest à regouper
+
+un thread pour la prise de données de chaque périphérique, l'accès aux données par var globales (globals.h) doit être immédiat
+un thread de fichier log general?
+un timer pour enregistrement vidéo
+un timer pour enregistrement audio
+un thread pour chaque traitement long
+un thread boucle de régulations de base
+un thread lecture-interpréteur fichier de mission, entrées clavier (Commands.h)
+un thread GUI
+un thread simulateur

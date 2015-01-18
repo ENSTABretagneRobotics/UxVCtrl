@@ -61,6 +61,7 @@ BOOL bDisableGPS = FALSE;
 BOOL bDisableSwarmonDevice = FALSE;
 BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
+BOOL bDisableMaestro = FALSE;
 
 // Controller parameters.
 double u_max = 0, uw_max = 0, uv_max = 0, u_coef = 0, uw_coef = 0;
@@ -248,6 +249,10 @@ BOOL bRestartUE9A = FALSE;
 // SSC32 variables.
 BOOL bPauseSSC32 = FALSE;
 BOOL bRestartSSC32 = FALSE;
+
+// Maestro variables.
+BOOL bPauseMaestro = FALSE;
+BOOL bRestartMaestro = FALSE;
 
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_CAM];

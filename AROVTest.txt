@@ -56,6 +56,8 @@
 1
 % bDisableSSC32
 1
+% bDisableMaestro
+1
 % Controller parameters
 % u_max (in [0;1])
 1

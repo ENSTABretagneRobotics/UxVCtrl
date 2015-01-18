@@ -122,6 +122,8 @@
 %
 %ssc32config SSC32.txt bPause
 %
+%maestroconfig Maestro.txt bPause
+%
 %videoconfig videoid Video.txt bPause
 %
 %%rngacousticmodem nbretries retryperiod (send rng and wait for the result)

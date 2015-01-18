@@ -207,6 +207,9 @@
     <ClCompile Include="Hardware\Video.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\Maestro.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -464,6 +467,9 @@
     <ClInclude Include="Hardware\Video.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\Maestro.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="AROVTest.txt">
@@ -524,6 +530,9 @@
     <Text Include="mission_spec.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
+    <Text Include="Maestro0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
