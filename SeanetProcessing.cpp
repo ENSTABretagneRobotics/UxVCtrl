@@ -49,7 +49,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 		free(wtfasort);
 		free(wtftsort);
 		free(anglestsort);
-		free(tvstsort);		
+		free(tvstsort);	
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
@@ -200,6 +201,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 	free(tvstsort);
 
 	cvReleaseImage(&overlayimage);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

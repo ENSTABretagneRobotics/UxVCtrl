@@ -1,0 +1,322 @@
+pololu, faire un sorte que tout marche pour buggy, etas...
+
+comment attendre la détection de ball OU un message acoustique dans les scripts?
+
+pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
+
+sonar, localisation, wf
+commencer à prévoir dl en utilisant staticloc avec la position des pings dessinée avec le dr, pour l'instant il faudrait juste appeler dl toutes les 10s par exemple et le seul avantage par rapport à static serait de ne pas devoir arrêter le robot...
+Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé, faire un peu pareil pour la partie affichage...
+simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores),wf complète puis passe par SeanetProcessing?
+c'est juste au niveau de l'affichage qu'on dessinera pareil...?
+Où mettre la partie dessin des images sonar en overlay, c'est commun en partie avec seanet et simulator... dans SeanetProcessing?
+statevars va être très ralenti à cause de dmes..., faire une cs spécifique?
+mindist, maxDist, threshold params... maintenant c'est peut-être plus sur adspan, adlow, gain qu'il faut jouer...
+0.1*omegas...
+options pour enlever les outliers avant, après...
+repère dans lequel dessiner image sonar vs detection d'obstacles
+temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
+
+Altitude sonar
+faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
+l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
+prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
+
+GUI, video
+pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
+plus petite police
+en mode suivi de wp/line et en option
+DST:25,5 (lat,lon)
+ETA=15:01:25 (ou mettre juste durée en s)
+DIS=23.5
+mettre aussi BRG de ball par rapport au nord?
+trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
+prévoir zoom sur la map, on a du mal à savoir son cap
+FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
+MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
+(walltracking overlay fait aussi walldetect, wallavoidance)
+bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
+pouvoir lancer un opencvgui independamment du nombre de cameras?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
+synchro gui etas_wheel à faire (touches et affichage pour u_max, uw_max...), synchro périph faite
+no opencvgui, hang after exit on linux? cvStartWindowThread()... now the keys are always received by the 2 windows, not independently...
+
+0 bizarres dans depth des logmission du harbor alors que pas de problèmes dans les données brutes pression...->manque statevariables cs dans MissionLogThread
+idem logwall? theta_wall... voir Ball...
+pas de setmissionaction init et end : peut-être que j'ai fait un copier coller sans eux? szAction non protégé...
+il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le nuc?
+zhat à 0 aussi dans logstate, mais rien vu dans pressure...
+
+reg cap pas assez rapide à cause dérivée, tester avec vieux code...
+régulation à grande vitesse saucisse à faire un peu comme sardine
+
+sauvegarder e,phi,delta_theta dans wall?
+faire aussi log spécifique suivi ligne avec mêmes info que vnavoutput et son log...
+synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
+
+
+acousticmodemlocalization
+commande comme setstateestimation/gpslocalization qui contracte la position par acoustique
+quand il y a incohérence, agrandir et recommencer à contracter 3 fois?
+toutes les 5-10 s quand sous-marin envoie ask\n 3 fois (avec au moins 2 cohérentes), surface envoie xyzerr (4 int16) 3 fois et si au moins 2 messages cohérents le sous-marin envoie rng\n puis attend la réponse (3 fois, la réponse semble de la forme \n\rRange=0.9m\n\r) et si au moins 2 distances cohérentes (ici c'est pas bit à bit, ça peut légèrement varier entre 2 rng...), il contracte sa position
+->mais c'est pas forcément robuste aux décalages, liés aux bouts de messages fantômes... s'il y en a...
+on peut peut-être s'en tirer aussi bien sans le ask\n, à réfléchir...
+dans la spec, il faudrait rajouter un message shh\n pour interrompre les sendxy provoqués par un ask\n... est-ce que c'est vraiment utilisable?
+cohérence des messages : il faut regarder bit par bit (il faut qu'au moins 2 bits sur 3 soient cohérents à chaque fois)
+(modems envoient probablement par paquet de 4 octets (sans doute complété par des octets nuls))
+flush du modem quand il reçoit des données invalides?
+pour pouvoir analyser toutes les données qui viennent du modem facilement et retirer les vieilles, il vaut mieux utiliser des messages qui ont une en-tête et fin prédéfinie...
+bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?
+add velocityofsound as env global param as necessary for echo message...
+
+Actuators
+ssc32 : rajouter un param midangle, et changer les formules de conversion entre uw et rudder pour que ça puisse ne pas être symétrique...
+reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer des données...
+revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms-> voir ssc32
+
+trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...
+
+touches z, s : ouvrir/fermer voile
+
+GPS, waypoints
+wpfollowingconfig radius file bWGS
+linefollowingconfig radius gamma_infinite file bWGS
+linefollowing xa ya xb yb
+linefollowingt xa ya xb yb timeout
+gotoxy x y
+gotoxyt x y t
+startlinefollowing
+stoplinefollowing
+startwpfollowing
+stopwpfollowing
+
+waypoints.csv avec colonnes optionnelles, radius, durée de station, durée de surface, bUseGPS, profondeur, gamma_infinite
+afficher position des waypoints dans l'interface
+
+mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status?
+régler bGPSOK en fonction de gpsstatus et status mti-g?->il faut 2 variables globales différentes, bGPSOKNMEADevice pour nmea et bGPSOKMT pour mt... et pour simu?
+
+commandes startgpslocalization/stopgpslocalization (dans observer?)
+
+Obstacle avoidance
+surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
+positionobstacleavoidance : faire tuto ajout step-by-step
+
+vectorfield?
+
+pour obstacle avoidance?
+configdistancecomputation
+distancecomputation
+commande waitdistanceless/more/wgs x y d
+
+attention aux valeurs au départ d'initialisation, attention au setstateestimation...
+surveiller divisions par 0..., vérifier cohérence paramètres par défaut
+surveiller le abort et abortmission...
+
+CISCREA
+après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
+pouvoir afficher period pour tous les threads
+reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte paramètres du fichier de config, voir noms/numérotation des moteurs, clockwise
+regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
+
+changer observer (et éventuellement simulator) pour que omegadot=alphaomega*(u1-u2)-alphafomega*omega (au lieu de thetadot=alphaomega*(u1-u2)...)
+si on a une IMU, on l'utilise pour omegahat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid, il faudrait rajouter le support des trames NMEA donnant la vitesse)
+vitesse GPS a priori bonne si dispo, par contre vaut mieux pas trop utiliser l'altitude du GPS (uniquement en dernier recours)
+utiliser les accéléros quand on a rien d'autre? refaire des tests...
+prendre en compte dans la localisation la position GPS de la bouée avec longueur du câble et profondeur du sous-marin?
+
+openal, pingertracking
+
+replay
+faire option lecture de fichier sonar qui lit les temps et attend de dt=t1-t0 avec t0 et t1 lus dans le fichier, voir comment c'est fait pour vidéo
+rajouter fonction replay arovtest, comment gérer mieux les histoires de conversions de temps?
+il faudrait sans doute faire des cas particuliers car les données sont parfois dans des fichiers séparés (caméra, sonar) et pour le sonar le temps de reconfiguration est variable donc c'est pas facile de manuellement choisir le moment où un fichier particulier doit être relu
+mais on peut éditer un peu les fichiers pour que ça colle bien... faire des programmes de concaténation qui remplissent avec des blancs quand il n'y a rien? et s'il y a changement de config, il y a eu appel à sonarconfig (quand il y a eu déconnexion intempestive, on peut concaténer car il n'y a pas de changement de paramètres)
+j'ai déja des commandes sonarconfig Seanet.txt, rajouter paramètres loop et delay?
+plutôt faire un programme qui regroupe les données de tous les fichiers capteurs (y compris sonar, nmea ou lognav?) en un gros fichier (video pourra être gérée indépendemment ou éclatée en fichiers)
+t;type;data
+mais il y a aussi des paramètres dans les fichiers de config...
+2 approches : un gros fichier qui contient tout ou plusieurs fichiers lus directement par les codes de gestion de périphériques correspondants (le problème est la synchro des temps)
+il faut qu'on puisse indiquer qui fixe la base de temps et qui doit se synchro dessus->il faut juste spécifier l'heure absolue de début pour que les différents replay sachent quand prendre des données des fichiers?
+paramètre absolutebeginreplaytime dans chaque fichier de config au lieu de delay? (il suffit de lire le nom du fichier en fait...)
+dans ce cas il suffirait de faire des sonarconfig log_with_date.csv au début et à chaque reconfig dans un fichier de mission inspiré de l'original, avec le mode spécial replay du sonar qui lit chaque ligne dès que le moment est bon en supposant que la date de début est celle dans le nom de fichier
+razor, es (indépendant ou via seanet), ssc sauvegardent données brutes sans indication de temps...
+
+deadlocks à cause de killthread? il faudrait plutôt utiliser quelques chsoe comme WaitForUserInput() au lieu de fgets...
+
+opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
+
+image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
+
+arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, rmtcommand, remoteopencv gui
+
+robid log file?
+faire version de connect avec tout en paramètre (penser aussi à initialiser szCfgFilePath à 0...)
+un fichier de config pour décrire les périphériques du robot?
+pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
+gestion vagues et z, courants et vxy...
+
+un thread pour la prise de données de chaque périphérique, l'accès aux données par var globales (globals.h) doit être immédiat
+un thread de fichier log general?
+un timer pour enregistrement vidéo
+un timer pour enregistrement audio
+un thread pour chaque traitement long
+un thread boucle de régulations de base
+un thread lecture-interpréteur fichier de mission, entrées clavier (Commands.h)
+un thread GUI
+un thread simulateur
+
+
+
+OLD
+
+sonarstaticlocdevice : merge à faire... a beaucoup servi pour débugger sonar au début, maintenant qu'est-ce qu'il a de plus?
+gui->sonarstaticlocstructured
+sonar device handling->arovtest, sonartest, sonardisptest
+localisation->sonarstaticlocstructuredsimu
+
+restaurer régulations et u après brake?-> mais le but du brake est de s'arrêter...
+dans bBallTrackingControl sauvegarder images et pouvoir juste faire un brake
+brake en option pour surfaceavoid?
+
+seanet : faire version de GetLatestMsgSeanet et GetMsgSeanet qui ne prennent pas en paramètre le mid mais retourne celui trouvé (pour pouvoir gérer les messages de l'echosondeur via le sonar)
+
+rubber boat : no sonar echo? c'est plutôt une ombre
+
+pour la ball en coop, il ne faut pas que les 2 robots utilisent leur sonar en même temps! l'investigator aurait droit à bouée GPS et Wi-Fi?
+
+visual obstacle paramètres pour autre algo ou nouvelles commandes? -> mieux vaut une nouvelle commande, il y a déjà assez de paramètres comme ça...
+
+#YPR=-71.64,21.12,-125.02 repère des marins avec 180/-180 au sud, nord vers connecteur ftdi
+
+prise en compte lat long mti-g si lat long différent de 0, support de bGPSOK...
+
+discontinuité hsl... singularité rouge : utiliser si hmin<hmax ou hmin>hmax pour gérer discontinuité->fait en dur...
+
+les vidéos ne sont pas lues à la bonne vitesse (mais on peut jouer sur captureperiod)
+
+CreateTimer(&timer, VideoRecordCallbackFunction, (void*)videoid, 1, captureperiod)->CreateTimer(&timer, VideoRecordCallbackFunction, (void*)videoid, captureperiod, captureperiod)?
+
+faire dossiers log, pic, vid, aud
+plante lorsque 2 fichiers vidéos sont ouverts?->résolu en rajoutant délai pour les 1ers cvqueryframe?
+dummy video (black) to be able to have gui when no camera
+
+pourquoi il avance? bug arrêt du wall tracking marche pas?->bug strncmp : stopxxx interprété par stop
+
+pourquoi en tracking tout devient vert->seuil à 0 parce que non géré
+
+log mti sans yaw? la configurer pour qu'elle envoie toujours euler, les accélérations et vitesses de rotation... ou faire en sorte que le code le fasse à chaque fois si pas possible pour vieille mti... le vieux mt software la déconfigure au lancement, utiliser plutôt mt manager...
+
+certaines portées du sonar ne seraient pas acceptées? a priori c'est juste seanet qui accepte pas...
+
+keys
+O orig GPS
+G pos GPS
+Z raz xy
+S pos sonar+-5,5 toujours...
+
+obstacle avoidance : uw=1 si obstacle à droite, -1 si à gauche, aléatoire si en face
+staticsonarloc ne semble plus avoir le droit de contracter dès qu'il a réussi à contracter
+$ dans l'aide, rajouter touche pour activer/désactiver osd mission courante
+ajout de utc dans mti : vérifier codage big/little endian...
+en dessous de thrust 0.5 en normal on n'avance pas...
+
+enregistrer aussi des images/vidéos avec les détections dessus tous les un certain temps, idem données sonar et wall following...
+
+il y a plein de 0 dans les données brutes gps loggées, sans doute parce qu'on s'est mis en mode wb...-> en fait je loggue pas les bonnes trames? ou alors il n'avait pas souvent le fix?->bug
+
+pouvoir synchro utc et temps ordinateur avec nmea : mais a priori la précision sera d'une s de toutes façons...
+
+revoir le log de la mti en prenant exemple sur les données prises avec mti-g
+
+modifier config ssc32 : voir servo.txt, la vérification des limites spécifiées sera faite à la config
+prendre en compte le fait que les PWM peuvent aller de 500 à 2500 pour aller plus loin avec certains servos
+faut que changement supérieur à certain seuil pour qu'on change l'actionneur pour éviter les tremblements (rudder, sail...)
+rajouter SetPWMsSSC32 qui fait plusieurs channel
+
+prévoir une commande spéciale comme setstateestimation/gpslocalization qui attende la réponse par acoustique (x,xerr,y,yerr,t,terr..., il y aurait demande de la position de l'autre modem et commande rng...)
+toutes les 5-10 s le robot de surface envoie xyzerr (4 int16) et en réponse le sous-marin répond rng (la correction d'erreur se fera par envoi de plusieurs)
+
+utilité du bError dans CISCREAThread, on risque de mettre à jour des données invalides... je voulais vérifier alarm, bExit...
+
+il tourne très vite quand il avance pas, par contre quand il avance à fond il tourne peu : à cause du boost!
+en fait en boost il a vraiment du mal à tourner comme on veut par rapport à l'arrêt...
+pour qu'il puisse avancer tout en tournant un peu, il faudra sans doute qu'il ait une vitesse minimale sinon ça fera n'importe quoi...
+
+couleurs texte gui, le vert c'est nul dans l'eau!!
+
+l'estimation de omegahat est très imprécise, voir pourquoi, tester avec vrai robot...? estimer par simu avec les entrées ou filtre passe bas...
+comment évaluer correctement la vitesse connaissant la position (par simu avec les entrées ou filtre passe bas...)
+le filtre passe-bas va sans doute retourner des vitesses très faibles, il vaut mieux encore estimer à partir des entrées...
+
+ciscrea tourne d'1 tr/s au moins
+
+les ordreX sont bizarres...
+
+ajouter partie calibration magnétique pour boussole interne CISCREA, rajouter signe (pour une boussole simple, le signe a du sens, pas vraiment pour une IMU...) et enlever roll et pitch par rapport à MT car c'est une simple boussole
+
+vitesse de la boucle du thread ciscrea? où mettre les sleep? temps d'attentes entre les requêtes modbus en cas d'échec? tester rtu et tcp
+ne pas faire plus de 60 requêtes/s environ? attention à ne pas bloquer aussi les autres threads avec les sections critiques pendant les requêtes modbus...
+2 requetes modbus avec des mSleep(10) (sous Windows mSleep() doit durer au moins 15 ms en réalité) entre chaque donne une période de thread d'un peu plus de 60 ms en RS485, un peu moins en TCP
+=> 1 requete modbus pour plusieurs registres d'un coup semble durer environ 10-15 ms
+si on met pas de mSleep entre les requêtes, il y a des Modbus retry, et ils durent en fonction des réglages de timeout modbus (en RS485, il semble que les timeouts soient *2, en TCP c'est comme réglé)
+
+démarrage rov avec trame de 1000 caractères (250 ms de com) nécessaire? le robot redémarre en boucle tout seul dès que le boitier est branché? Semble OK (en RS485 uniquement), bien envoyer une trame suffisamment longue/communiquer suffisamment longtemps...
+
+modbus tcp does not support req of more than 128 bytes? possible...
+
+rajouter proportionnellement à u_max, uw_max, uv_max quand on reste appuyé sur une touche?
+tester régulation boost mode avec vrai robot, c'est peut-être bien d'avoir un mode mi-vitesse et mode full (mode normal/mode rapide ou même mettre un coefficient réglable, séparer ce coef pour propulseurs horizontaux et verticaux) car le mode mi-vitesse pratique pour manoeuvres manuelles => u_coef, uw_coef
+
+pour les suivis de waypoints ou ligne, il faut des commandes qui prennent x,y et d'autres lat long (wgs)
+mettre valeurs par défaut pour gamma_infinite, r (r sera commun à wp et line) dans arovtest.txt
+plus besoin du r dans gotoxyrt
+cancelgotoxy?-> le stop fait déjà ça...
+log avec unix time, lat, long, depth (pour unixtime, on va faire juste avec t vu que de toute façon on n'a pas l'heure exacte...)
+faire variable depth, compass de la même façon que latitude et longitude pour ces unités classiques? pas forcément utile, risque de rajouter de la confusion?
+rajouter angle_env = M_PI/2.0-d0*M_PI/180.0; à setenvcoordposition
+gpslocalization t qui bloque jusqu'à ce qu'il ait le fix ou le timeout, en général il vaudra mieux entre sûr d'être en surface depuis longtemps pour améliorer la précision
+bGPSOK? pour simulator, le GPS fait des mesures quand z >= z_gps_lim
+distinction gpssurface, gpssubmarine, faire 2 commandes distinctes? plutôt gérer qu'un seul gps, la plupart du temps on n'en a qu'un, et on augmente l'erreur si sur bouée pour l'instant, si on rajoute le cas particulier bouée il faudra prendre en compte longueur du câble et profondeur pour que ça ait vraiment un intérêt de faire la distinction...
+
+organisation include config.h dans hardware (voir sonar...)
+
+visualobstacleavoidance/wallavoidance
+en fait le wall tracking est un line following avec une distance d0 au lieu de 0, généraliser line following avec d0 (voir sonar...)
+
+thrustboost marche pas à cause de u1u2u3 mis à jour tout le temps, en fait il n'a pas de sens si on fait une régulation avec boost en ne diminuant qu'un propulseur pour tourner
+mettre le nouveau type de régulation en cap : en fait c'est surtout l'estimation de omegahat avec sin qui est intéressante dedans
+
+bitmask pour les robid, simulateurs bit 1
+pb mti donnée aberrante constante de temps en temps?-0.261799=>-15 deg sans corrections mag et dans env_La_Spezia (345)=>yaw à 0 -> need more accurate buflen as input of findmtmessage, checking the checksum is not enough reliable!
+set MTi to EULER mode with software
+
+nmea device et faut qu'il puisse y avoir plusieurs nmeadevice différents sur un robot
+
+bug si 2 caméras configurées mais en fait 1 présente, bug arrêt du programme à cause de terminate thread?
+
+ajouter en coin et agrandi si touche 'm' la map avec option robot centré avec rotating map
+maintenant tout est exprimé in env coordinate system, on utilise EnvAngle quand il y a un calcul avec boussole, GPS...
+repères ENU, env, submarine...
+enlever les videoid_ball du fichier de config...
+bug lorsque la résolution de la video effective n'est pas celle voulue
+p fait abort command si pas de mission
+balldetection 30 1 tapé dans l'invite de commandes semble infini...
+paramètre uvmax pour la régul profondeur pour économiser bat
+arreter de tourner en avancant lorsqu'on est avec les touches sans regulation
+option disable video display dans opencvgui dans fichier de config et opencvgui
+fmod_2pi à la place du sin(asin())
+thread ciscrea bloquant quand echec connexion, missing lots of err check...
+bDistanceControl, u_ball = u pour cruisespeed
+mettre en option la caméra de opencvgui, ou un opencvgui pour chaque cam?
+regrouper log observer et controller en un même fichier
+touche pour call/abort mission.txt avec petit triangle vert clignotant
+en fait je suis dans repère nwu, changer les angles pas marins en enu
+estimation de omegahat
+fgets3, fscanf, sscanf?
+command prompt en option
+pouvoir lire une video en option
+des = 0 supprimés en bloc dans globals.h
+remettre à 0 integral si changement de consigne, revoir où on le remet à 0...
+doit afficher osd meme sans video
+osd:heading/regul(marin), depth/regul, x(+/-err), y(+/-err), 
+projet comet et MissionTest à regouper

@@ -27,6 +27,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	if (logstatefile == NULL)
 	{
 		printf("Unable to create log file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
@@ -161,6 +162,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	StopChrono(&chrono, &t);
 
 	fclose(logstatefile);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

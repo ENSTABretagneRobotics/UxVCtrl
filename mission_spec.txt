@@ -100,29 +100,29 @@
 %
 % DEVICE COMMANDS
 %
-%ciscreaconfig CISCREA.txt
+%ciscreaconfig CISCREA.txt bPause
 %
-%mdmconfig MDM.txt
+%mdmconfig MDM.txt bPause
 %
-%mesconfig MES.txt
+%mesconfig MES.txt bPause
 %
-%seanetconfig Seanet.txt
+%seanetconfig Seanet.txt bPause
 %
-%p33xconfig P33x.txt
+%p33xconfig P33x.txt bPause
 %
-%razorahrsconfig RazorAHRS.txt
+%razorahrsconfig RazorAHRS.txt bPause
 %
-%mtconfig MT.txt
+%mtconfig MT.txt bPause
 %
-%nmeadeviceconfig NMEADevice.txt
+%nmeadeviceconfig NMEADevice.txt bPause
 %
-%swarmondeviceconfig SwarmonDevice.txt
+%swarmondeviceconfig SwarmonDevice.txt bPause
 %
-%ue9aconfig UE9A.txt
+%ue9aconfig UE9A.txt bPause
 %
-%ssc32config SSC32.txt
+%ssc32config SSC32.txt bPause
 %
-%videoconfig videoid Video.txt
+%videoconfig videoid Video.txt bPause
 %
 %%rngacousticmodem nbretries retryperiod (send rng and wait for the result)
 %

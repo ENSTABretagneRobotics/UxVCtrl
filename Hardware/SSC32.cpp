@@ -34,6 +34,30 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 
 		mSleep(50);
 
+		if (bPauseSSC32) 
+		{
+			if (bConnected)
+			{
+				printf("SSC32 paused.\n");
+				bConnected = FALSE;
+				DisconnectSSC32(&ssc32);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartSSC32) 
+		{
+			if (bConnected)
+			{
+				printf("Restarting a SSC32.\n");
+				bConnected = FALSE;
+				DisconnectSSC32(&ssc32);
+			}
+			bRestartSSC32 = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectSSC32(&ssc32, "SSC320.txt") == EXIT_SUCCESS) 
@@ -126,14 +150,6 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}
 				break;
 			}
-
-			if (bRestartSSC32 && bConnected)
-			{
-				printf("Restarting a SSC32.\n");
-				bRestartSSC32 = FALSE;
-				bConnected = FALSE;
-				DisconnectSSC32(&ssc32);
-			}
 		}
 
 		//printf("SSC32Thread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
@@ -150,6 +166,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 	}
 
 	if (bConnected) DisconnectSSC32(&ssc32);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

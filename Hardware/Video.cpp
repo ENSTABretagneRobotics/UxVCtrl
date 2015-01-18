@@ -24,6 +24,34 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	{
 		//mSleep(captureperiod);
 
+		if (bPauseVideo[videoid])
+		{
+			if (bConnected)
+			{
+				printf("Camera or video file paused.\n");
+				bConnected = FALSE;
+				EnterCriticalSection(&OpenCVCS);
+				DisconnectVideo(&video);
+				LeaveCriticalSection(&OpenCVCS);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartVideo[videoid])
+		{
+			if (bConnected)
+			{
+				printf("Restarting a camera or video file.\n");
+				bConnected = FALSE;
+				EnterCriticalSection(&OpenCVCS);
+				DisconnectVideo(&video);
+				LeaveCriticalSection(&OpenCVCS);
+			}
+			bRestartVideo[videoid] = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			EnterCriticalSection(&OpenCVCS);
@@ -74,16 +102,6 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 				LeaveCriticalSection(&OpenCVCS);
 				mSleep(captureperiod);
 			}		
-
-			if (bRestartVideo[videoid] && bConnected)
-			{
-				printf("Restarting a camera or video file.\n");
-				bRestartVideo[videoid] = FALSE;
-				bConnected = FALSE;
-				EnterCriticalSection(&OpenCVCS);
-				DisconnectVideo(&video);
-				LeaveCriticalSection(&OpenCVCS);
-			}
 		}
 
 		if (bExit) break;
@@ -95,6 +113,8 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	EnterCriticalSection(&OpenCVCS);
 	if (bConnected) DisconnectVideo(&video);
 	LeaveCriticalSection(&OpenCVCS);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

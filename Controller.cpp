@@ -202,5 +202,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 	StopChrono(&chrono, &t);
 
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
+
 	return 0;
 }

@@ -28,6 +28,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	if (logsimufile == NULL)
 	{
 		printf("Unable to create log file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
@@ -154,6 +155,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	//bGPSOKSimulator = FALSE;
 
 	fclose(logsimufile);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

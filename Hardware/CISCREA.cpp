@@ -49,6 +49,30 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 		mSleep(10);
 
+		if (bPauseCISCREA)
+		{
+			if(bConnected)
+			{
+				printf("CISCREA paused.\n");
+				bConnected = FALSE;
+				DisconnectCISCREA(mb);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartCISCREA)
+		{
+			if(bConnected)
+			{
+				printf("Restarting a CISCREA.\n");
+				bConnected = FALSE;
+				DisconnectCISCREA(mb);
+			}
+			bRestartCISCREA = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			mb = ConnectCISCREA("CISCREA.txt");
@@ -119,14 +143,6 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectCISCREA(mb);
 			}	
-
-			if (bRestartCISCREA && bConnected)
-			{
-				printf("Restarting a CISCREA.\n");
-				bRestartCISCREA = FALSE;
-				bConnected = FALSE;
-				DisconnectCISCREA(mb);
-			}
 		}
 
 		//printf("CISCREAThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
@@ -143,6 +159,8 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 		mSleep(250);
 		DisconnectCISCREA(mb);
 	}
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

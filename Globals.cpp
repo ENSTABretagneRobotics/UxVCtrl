@@ -200,47 +200,59 @@ BOOL bPingerTrackingControl = FALSE;
 int pingertrackingvideoid = 0; 
 
 // CISCREA variables.
+BOOL bPauseCISCREA = FALSE;
 BOOL bRestartCISCREA = FALSE;
 
 // MDM variables.
 CRITICAL_SECTION MDMCS;
 int AcousticCommandMDM = 0;
+BOOL bPauseMDM = FALSE;
 BOOL bRestartMDM = FALSE;
 
 // MES variables.
+BOOL bPauseMES = FALSE;
 BOOL bRestartMES = FALSE;
 
 // Seanet variables.
 CRITICAL_SECTION SeanetOverlayImgCS;
 IplImage* SeanetOverlayImg = NULL;
+BOOL bPauseSeanet = FALSE;
 BOOL bRestartSeanet = FALSE;
 
 // P33x variables.
+BOOL bPauseP33x = FALSE;
 BOOL bRestartP33x = FALSE;
 
 // RazorAHRS variables.
+BOOL bPauseRazorAHRS = FALSE;
 BOOL bRestartRazorAHRS = FALSE;
 
 // MT variables.
+BOOL bPauseMT = FALSE;
 BOOL bRestartMT = FALSE;
 BOOL bGPSOKMT = FALSE;
 
 // NMEADevice variables.
+BOOL bPauseNMEADevice = FALSE;
 BOOL bRestartNMEADevice = FALSE;
 BOOL bGPSOKNMEADevice = FALSE;
 
 // SwarmonDevice variables.
+BOOL bPauseSwarmonDevice = FALSE;
 BOOL bRestartSwarmonDevice = FALSE;
 
 // UE9A variables.
+BOOL bPauseUE9A = FALSE;
 BOOL bRestartUE9A = FALSE;
 
 // SSC32 variables.
+BOOL bPauseSSC32 = FALSE;
 BOOL bRestartSSC32 = FALSE;
 
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_CAM];
 IplImage* imgs[MAX_NB_CAM];
+BOOL bPauseVideo[MAX_NB_CAM];
 BOOL bRestartVideo[MAX_NB_CAM];
 
 // Other.

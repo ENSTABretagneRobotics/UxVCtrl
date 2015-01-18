@@ -24,6 +24,30 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseSwarmonDevice) 
+		{
+			if (bConnected)
+			{
+				printf("SwarmonDevice paused.\n");
+				bConnected = FALSE;
+				DisconnectSwarmonDevice(&swarmondevice);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartSwarmonDevice) 
+		{
+			if (bConnected)
+			{
+				printf("Restarting a SwarmonDevice.\n");
+				bConnected = FALSE;
+				DisconnectSwarmonDevice(&swarmondevice);
+			}
+			bRestartSwarmonDevice = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectSwarmonDevice(&swarmondevice, "SwarmonDevice0.txt") == EXIT_SUCCESS) 
@@ -50,20 +74,14 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectSwarmonDevice(&swarmondevice);
 			}		
-
-			if (bRestartSwarmonDevice && bConnected)
-			{
-				printf("Restarting a SwarmonDevice.\n");
-				bRestartSwarmonDevice = FALSE;
-				bConnected = FALSE;
-				DisconnectSwarmonDevice(&swarmondevice);
-			}
 		}
 
 		if (bExit) break;
 	}
 
 	if (bConnected) DisconnectSwarmonDevice(&swarmondevice);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

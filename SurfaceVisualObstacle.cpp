@@ -206,5 +206,7 @@ bHeadingControl = bHeadingControl0;
 	cvReleaseImage(&overlayimage);
 	cvReleaseImage(&image);
 
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
+
 	return 0;
 }

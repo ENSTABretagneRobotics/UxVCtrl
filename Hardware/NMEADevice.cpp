@@ -29,6 +29,32 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseNMEADevice)
+		{
+			if (bConnected)
+			{
+				printf("NMEADevice paused.\n");
+				//bGPSOKNMEADevice = FALSE;
+				bConnected = FALSE;
+				DisconnectNMEADevice(&nmeadevice);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartNMEADevice)
+		{
+			if (bConnected)
+			{
+				printf("Restarting a NMEADevice.\n");
+				//bGPSOKNMEADevice = FALSE;
+				bConnected = FALSE;
+				DisconnectNMEADevice(&nmeadevice);
+			}
+			bRestartNMEADevice = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectNMEADevice(&nmeadevice, "NMEADevice0.txt") == EXIT_SUCCESS) 
@@ -100,15 +126,6 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}		
-
-			if (bRestartNMEADevice && bConnected)
-			{
-				printf("Restarting a NMEADevice.\n");
-				//bGPSOKNMEADevice = FALSE;
-				bRestartNMEADevice = FALSE;
-				bConnected = FALSE;
-				DisconnectNMEADevice(&nmeadevice);
-			}
 		}
 
 		if (bExit) break;
@@ -123,6 +140,8 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	}
 
 	if (bConnected) DisconnectNMEADevice(&nmeadevice);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

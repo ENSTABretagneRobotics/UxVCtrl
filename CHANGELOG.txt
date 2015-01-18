@@ -1,3 +1,7 @@
+33
+Improved commands parsing by checking the null terminal character with strncmp().
+Added bPause parameter to deviceconfig commands.
+
 32
 Added bounding box parameters in env.txt.
 

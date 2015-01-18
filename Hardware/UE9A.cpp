@@ -26,6 +26,30 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 	{
 		mSleep(50);
 
+		if (bPauseUE9A) 
+		{
+			if (bConnected)
+			{
+				printf("UE9A paused.\n");
+				bConnected = FALSE;
+				DisconnectUE9A(&ue9a);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartUE9A) 
+		{
+			if (bConnected)
+			{
+				printf("Restarting a UE9A.\n");
+				bConnected = FALSE;
+				DisconnectUE9A(&ue9a);
+			}
+			bRestartUE9A = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectUE9A(&ue9a, "UE9A0.txt") == EXIT_SUCCESS) 
@@ -61,20 +85,14 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectUE9A(&ue9a);
 			}		
-
-			if (bRestartUE9A && bConnected)
-			{
-				printf("Restarting a UE9A.\n");
-				bRestartUE9A = FALSE;
-				bConnected = FALSE;
-				DisconnectUE9A(&ue9a);
-			}
 		}
 
 		if (bExit) break;
 	}
 
 	if (bConnected) DisconnectUE9A(&ue9a);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

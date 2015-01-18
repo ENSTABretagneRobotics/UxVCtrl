@@ -254,47 +254,59 @@ extern BOOL bPingerTrackingControl;
 extern int pingertrackingvideoid;
 
 // CISCREA variables.
+extern BOOL bPauseCISCREA;
 extern BOOL bRestartCISCREA;
 
 // MDM variables.
 extern CRITICAL_SECTION MDMCS;
 extern int AcousticCommandMDM;
+extern BOOL bPauseMDM;
 extern BOOL bRestartMDM;
 
 // MES variables.
+extern BOOL bPauseMES;
 extern BOOL bRestartMES;
 
 // Seanet variables.
 extern CRITICAL_SECTION SeanetOverlayImgCS;
 extern IplImage* SeanetOverlayImg;
+extern BOOL bPauseSeanet;
 extern BOOL bRestartSeanet;
 
 // P33x variables.
+extern BOOL bPauseP33x;
 extern BOOL bRestartP33x;
 
 // RazorAHRS variables.
+extern BOOL bPauseRazorAHRS;
 extern BOOL bRestartRazorAHRS;
 
 // MT variables.
+extern BOOL bPauseMT;
 extern BOOL bRestartMT;
 extern BOOL bGPSOKMT;
 
 // NMEADevice variables.
+extern BOOL bPauseNMEADevice;
 extern BOOL bRestartNMEADevice;
 extern BOOL bGPSOKNMEADevice;
 
 // SwarmonDevice variables.
+extern BOOL bPauseSwarmonDevice;
 extern BOOL bRestartSwarmonDevice;
 
 // UE9A variables.
+extern BOOL bPauseUE9A;
 extern BOOL bRestartUE9A;
 
 // SSC32 variables.
+extern BOOL bPauseSSC32;
 extern BOOL bRestartSSC32;
 
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_CAM];
 extern IplImage* imgs[MAX_NB_CAM];
+extern BOOL bPauseVideo[MAX_NB_CAM];
 extern BOOL bRestartVideo[MAX_NB_CAM];
 
 // Other.
@@ -370,6 +382,7 @@ inline int InitGlobals(void)
 		VideoRecordRequests[i] = 0;
 		videorecordfiles[i] = 0;
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
+		bPauseVideo[i] = FALSE;
 		bRestartVideo[i] = FALSE;
 	}
 
@@ -454,6 +467,8 @@ inline int ReleaseGlobals(void)
 
 	for (i = nbvideo-1; i >= 0; i--)
 	{
+		bRestartVideo[i] = FALSE;
+		bPauseVideo[i] = FALSE;
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 		videorecordfiles[i] = 0;
 		VideoRecordRequests[i] = 0;

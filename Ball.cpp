@@ -92,6 +92,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	if (logballtaskfile == NULL)
 	{
 		printf("Unable to create log file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
@@ -632,6 +633,8 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	free(nbSelectedPixelsj);
 
 	cvReleaseImage(&SelectedPixelsImage);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

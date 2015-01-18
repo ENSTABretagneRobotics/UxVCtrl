@@ -34,6 +34,30 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 	{
 		//mSleep(100);
 
+		if (bPauseSeanet) 
+		{
+			if (bConnected)
+			{
+				printf("Seanet paused.\n");
+				bConnected = FALSE;
+				DisconnectSeanet(&seanet);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartSeanet) 
+		{
+			if (bConnected)
+			{
+				printf("Restarting a Seanet.\n");
+				bConnected = FALSE;
+				DisconnectSeanet(&seanet);
+			}
+			bRestartSeanet = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectSeanet(&seanet, "Seanet0.txt") == EXIT_SUCCESS) 
@@ -227,14 +251,6 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 				DisconnectSeanet(&seanet);
 				mSleep(100);
 			}
-
-			if (bRestartSeanet && bConnected)
-			{
-				printf("Restarting a Seanet.\n");
-				bRestartSeanet = FALSE;
-				bConnected = FALSE;
-				DisconnectSeanet(&seanet);
-			}
 		}
 
 		if (bExit) break;
@@ -256,6 +272,8 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 	LeaveCriticalSection(&SeanetConnectingCS);
 
 	if (bConnected) DisconnectSeanet(&seanet);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

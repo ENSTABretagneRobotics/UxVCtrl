@@ -28,6 +28,30 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseRazorAHRS) 
+		{ 
+			if (bConnected)
+			{
+				printf("RazorAHRS paused.\n");
+				bConnected = FALSE;
+				DisconnectRazorAHRS(&razorahrs);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartRazorAHRS) 
+		{ 
+			if (bConnected)
+			{
+				printf("Restarting a RazorAHRS.\n");
+				bConnected = FALSE;
+				DisconnectRazorAHRS(&razorahrs);
+			}
+			bRestartRazorAHRS = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectRazorAHRS(&razorahrs, "RazorAHRS0.txt") == EXIT_SUCCESS) 
@@ -93,14 +117,6 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectRazorAHRS(&razorahrs);
 			}
-
-			if (bRestartRazorAHRS && bConnected)
-			{
-				printf("Restarting a RazorAHRS.\n");
-				bRestartRazorAHRS = FALSE;
-				bConnected = FALSE;
-				DisconnectRazorAHRS(&razorahrs);
-			}
 		}
 
 		if (bExit) break;
@@ -113,6 +129,8 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 	}
 
 	if (bConnected) DisconnectRazorAHRS(&razorahrs);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

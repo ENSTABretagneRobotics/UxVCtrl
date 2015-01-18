@@ -641,5 +641,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	StopChronoQuick(&chrono_playing);
 	StopChronoQuick(&chrono_recording);
 
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
+
 	return 0;
 }

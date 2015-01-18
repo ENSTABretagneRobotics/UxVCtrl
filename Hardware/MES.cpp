@@ -27,6 +27,30 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseMES)
+		{
+			if (bConnected)
+			{
+				printf("MES paused.\n");
+				bConnected = FALSE;
+				DisconnectMES(&mes);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartMES)
+		{
+			if (bConnected)
+			{
+				printf("Restarting a MES.\n");
+				bConnected = FALSE;
+				DisconnectMES(&mes);
+			}
+			bRestartMES = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectMES(&mes, "MES0.txt") == EXIT_SUCCESS) 
@@ -86,14 +110,6 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectMES(&mes);
 			}
-
-			if (bRestartMES && bConnected)
-			{
-				printf("Restarting a MES.\n");
-				bRestartMES = FALSE;
-				bConnected = FALSE;
-				DisconnectMES(&mes);
-			}
 		}
 
 		if (bExit) break;
@@ -106,6 +122,8 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 	}
 
 	if (bConnected) DisconnectMES(&mes);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

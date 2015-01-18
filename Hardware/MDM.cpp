@@ -72,6 +72,30 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseMDM)
+		{
+			if (bConnected)
+			{
+				printf("MDM paused.\n");
+				bConnected = FALSE;
+				DisconnectMDM(&mdm);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartMDM)
+		{
+			if (bConnected)
+			{
+				printf("Restarting a MDM.\n");
+				bConnected = FALSE;
+				DisconnectMDM(&mdm);
+			}
+			bRestartMDM = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectMDM(&mdm, "MDM0.txt") == EXIT_SUCCESS) 
@@ -555,14 +579,6 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectMDM(&mdm);
 			}	
-
-			if (bRestartMDM && bConnected)
-			{
-				printf("Restarting a MDM.\n");
-				bRestartMDM = FALSE;
-				bConnected = FALSE;
-				DisconnectMDM(&mdm);
-			}
 		}
 
 		if (bExit) break;
@@ -575,6 +591,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 	}
 
 	if (bConnected) DisconnectMDM(&mdm);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

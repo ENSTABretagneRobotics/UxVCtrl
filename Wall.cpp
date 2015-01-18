@@ -46,6 +46,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 	if (logwalltaskfile == NULL)
 	{
 		printf("Unable to create log file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
@@ -283,6 +284,8 @@ bHeadingControl = bHeadingControl0;
 	fclose(logwalltaskfile);
 
 	cvReleaseImage(&overlayimage);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

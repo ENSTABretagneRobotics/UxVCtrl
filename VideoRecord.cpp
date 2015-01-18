@@ -85,5 +85,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 		bVideoRecording = FALSE;
 	}
 
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
+
 	return 0;
 }

@@ -90,6 +90,7 @@ THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam)
 	if (logpipelinetaskfile == NULL)
 	{
 		printf("Unable to create log file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
@@ -511,6 +512,8 @@ THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam)
 	free(nbSelectedPixelsj);
 
 	cvReleaseImage(&SelectedPixelsImage);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

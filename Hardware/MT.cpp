@@ -30,6 +30,32 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseMT)
+		{
+			if (bConnected)
+			{
+				printf("MT paused.\n");
+				//bGPSOKMT = FALSE;
+				bConnected = FALSE;
+				DisconnectMT(&mt);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartMT)
+		{
+			if (bConnected)
+			{
+				printf("Restarting a MT.\n");
+				//bGPSOKMT = FALSE;
+				bConnected = FALSE;
+				DisconnectMT(&mt);
+			}
+			bRestartMT = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectMT(&mt, "MT0.txt") == EXIT_SUCCESS) 
@@ -148,15 +174,6 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
-
-			if (bRestartMT && bConnected)
-			{
-				printf("Restarting a MT.\n");
-				//bGPSOKMT = FALSE;
-				bRestartMT = FALSE;
-				bConnected = FALSE;
-				DisconnectMT(&mt);
-			}
 		}
 
 		if (bExit) break;
@@ -171,6 +188,8 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	}
 
 	if (bConnected) DisconnectMT(&mt);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }

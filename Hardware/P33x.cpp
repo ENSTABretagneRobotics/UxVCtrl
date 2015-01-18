@@ -28,6 +28,30 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 	{
 		mSleep(100);
 
+		if (bPauseP33x)
+		{
+			if (bConnected)
+			{
+				printf("P33x Paused.\n");
+				bConnected = FALSE;
+				DisconnectP33x(&p33x);
+			}
+			if (bExit) break;
+			mSleep(100);
+			continue;
+		}
+
+		if (bRestartP33x)
+		{
+			if (bConnected)
+			{
+				printf("Restarting a P33x.\n");
+				bConnected = FALSE;
+				DisconnectP33x(&p33x);
+			}
+			bRestartP33x = FALSE;
+		}
+
 		if (!bConnected)
 		{
 			if (ConnectP33x(&p33x, "P33x0.txt") == EXIT_SUCCESS) 
@@ -99,14 +123,6 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectP33x(&p33x);
 			}		
-
-			if (bRestartP33x && bConnected)
-			{
-				printf("Restarting a P33x.\n");
-				bRestartP33x = FALSE;
-				bConnected = FALSE;
-				DisconnectP33x(&p33x);
-			}
 		}
 
 		if (bExit) break;
@@ -119,6 +135,8 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 	}
 
 	if (bConnected) DisconnectP33x(&p33x);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
 	return 0;
 }
