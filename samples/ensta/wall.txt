@@ -1,7 +1,8 @@
 setmissionaction wall
 %setstateestimation 0 2 0 2 0 10000 0 10000 0 0.1 0 0.1
 %wait 2
-thrust 0.6
+thrust 0.3
+rem thrust 0.6
 %wallconfig 3 2 0 0 10 0.78 2 0 0
 %wallconfig 3 2 -1 0 10 0.78 2 1 0
 wallconfig 1 2 -1 0 3 0.78 1 1 0

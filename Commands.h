@@ -135,7 +135,8 @@ inline int Commands(char* line)
 
 	if (bEcho) printf("%.255s", line);
 
-	// Warning : order might matter if short commands are compatible with longer commands...
+	// Warning : order might matter if short commands are compatible with longer commands 
+	// e.g. stop vs stopwalltracking (when strncmp() is used).
 
 #pragma region MISSIONS
 	if (sscanf(line, "wallconfig %lf %lf %lf %lf %lf %lf %lf %d %d", 
@@ -173,7 +174,7 @@ inline int Commands(char* line)
 		if (bBrake_wall) bBrakeControl = FALSE;
 		LeaveCriticalSection(&WallCS);
 	}
-	else if (strncmp(line, "startwalltracking", strlen("startwalltracking")+1) == 0)
+	else if (strncmp(line, "startwalltracking", strlen("startwalltracking")) == 0)
 	{
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
@@ -182,14 +183,14 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&WallCS);
 	}
-	else if (strncmp(line, "stopwalltracking", strlen("stopwalltracking")+1) == 0)
+	else if (strncmp(line, "stopwalltracking", strlen("stopwalltracking")) == 0)
 	{
 		EnterCriticalSection(&WallCS);
 		bWallTrackingControl = FALSE;
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&WallCS);
 	}
-	else if (strncmp(line, "startwallavoidance", strlen("startwallavoidance")+1) == 0)
+	else if (strncmp(line, "startwallavoidance", strlen("startwallavoidance")) == 0)
 	{
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
@@ -198,7 +199,7 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&WallCS);
 	}
-	else if (strncmp(line, "stopwallavoidance", strlen("stopwallavoidance")+1) == 0)
+	else if (strncmp(line, "stopwallavoidance", strlen("stopwallavoidance")) == 0)
 	{
 		EnterCriticalSection(&WallCS);
 		bWallAvoidanceControl = FALSE;
@@ -264,7 +265,7 @@ inline int Commands(char* line)
 		if (bBrake_pipeline) bBrakeControl = FALSE;
 		LeaveCriticalSection(&PipelineCS);
 	}
-	else if (strncmp(line, "startpipelinetracking", strlen("startpipelinetracking")+1) == 0)
+	else if (strncmp(line, "startpipelinetracking", strlen("startpipelinetracking")) == 0)
 	{
 		EnterCriticalSection(&PipelineCS);
 		EnterCriticalSection(&StateVariablesCS);
@@ -273,7 +274,7 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&PipelineCS);
 	}
-	else if (strncmp(line, "stoppipelinetracking", strlen("stoppipelinetracking")+1) == 0)
+	else if (strncmp(line, "stoppipelinetracking", strlen("stoppipelinetracking")) == 0)
 	{
 		EnterCriticalSection(&PipelineCS);
 		bPipelineTrackingControl = FALSE;
@@ -346,7 +347,7 @@ inline int Commands(char* line)
 		if (bBrake_ball) bBrakeControl = FALSE;
 		LeaveCriticalSection(&BallCS);
 	}
-	else if (strncmp(line, "startballtracking", strlen("startballtracking")+1) == 0)
+	else if (strncmp(line, "startballtracking", strlen("startballtracking")) == 0)
 	{
 		EnterCriticalSection(&BallCS);
 		EnterCriticalSection(&StateVariablesCS);
@@ -356,7 +357,7 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&BallCS);
 	}
-	else if (strncmp(line, "stopballtracking", strlen("stopballtracking")+1) == 0)
+	else if (strncmp(line, "stopballtracking", strlen("stopballtracking")) == 0)
 	{
 		EnterCriticalSection(&BallCS);
 		bBallTrackingControl = FALSE;
@@ -414,7 +415,7 @@ inline int Commands(char* line)
 		if (bBrake_visualobstacle) bBrakeControl = FALSE;
 		LeaveCriticalSection(&VisualObstacleCS);
 	}
-	else if (strncmp(line, "startvisualobstacleavoidance", strlen("startvisualobstacleavoidance")+1) == 0)
+	else if (strncmp(line, "startvisualobstacleavoidance", strlen("startvisualobstacleavoidance")) == 0)
 	{
 		EnterCriticalSection(&VisualObstacleCS);
 		EnterCriticalSection(&StateVariablesCS);
@@ -423,7 +424,7 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&VisualObstacleCS);
 	}
-	else if (strncmp(line, "stopvisualobstacleavoidance", strlen("stopvisualobstacleavoidance")+1) == 0)
+	else if (strncmp(line, "stopvisualobstacleavoidance", strlen("stopvisualobstacleavoidance")) == 0)
 	{
 		EnterCriticalSection(&VisualObstacleCS);
 		bVisualObstacleAvoidanceControl = FALSE;
@@ -476,7 +477,7 @@ inline int Commands(char* line)
 		if (bBrake_surfacevisualobstacle) bBrakeControl = FALSE;
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 	}
-	else if (strncmp(line, "startsurfacevisualobstacleavoidance", strlen("startsurfacevisualobstacleavoidance")+1) == 0)
+	else if (strncmp(line, "startsurfacevisualobstacleavoidance", strlen("startsurfacevisualobstacleavoidance")) == 0)
 	{
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		EnterCriticalSection(&StateVariablesCS);
@@ -485,7 +486,7 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 	}
-	else if (strncmp(line, "stopsurfacevisualobstacleavoidance", strlen("stopsurfacevisualobstacleavoidance")+1) == 0)
+	else if (strncmp(line, "stopsurfacevisualobstacleavoidance", strlen("stopsurfacevisualobstacleavoidance")) == 0)
 	{
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		bSurfaceVisualObstacleAvoidanceControl = FALSE;
@@ -926,7 +927,7 @@ inline int Commands(char* line)
 #pragma region DEVICE COMMANDS
 	else if (sscanf(line, "cicreaconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")+1) != 0)
+		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -948,7 +949,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "mdmconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MDM0.txt", strlen("MDM0.txt")+1) != 0)
+		if (strncmp(str, "MDM0.txt", strlen("MDM0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -970,7 +971,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "mesconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MES0.txt", strlen("MES0.txt")+1) != 0)
+		if (strncmp(str, "MES0.txt", strlen("MES0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -992,7 +993,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "seanetconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "Seanet0.txt", strlen("Seanet0.txt")+1) != 0)
+		if (strncmp(str, "Seanet0.txt", strlen("Seanet0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1014,7 +1015,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "P33x0.txt", strlen("P33x0.txt")+1) != 0)
+		if (strncmp(str, "P33x0.txt", strlen("P33x0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1036,7 +1037,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "razorahrsconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "RazorAHRS0.txt", strlen("RazorAHRS0.txt")+1) != 0)
+		if (strncmp(str, "RazorAHRS0.txt", strlen("RazorAHRS0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1058,7 +1059,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "mtconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MT0.txt", strlen("MT0.txt")+1) != 0)
+		if (strncmp(str, "MT0.txt", strlen("MT0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1080,7 +1081,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "nmeadeviceconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "NMEADevice0.txt", strlen("NMEADevice0.txt")+1) != 0)
+		if (strncmp(str, "NMEADevice0.txt", strlen("NMEADevice0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1102,7 +1103,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "swarmondeviceconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "SwarmonDevice0.txt", strlen("SwarmonDevice0.txt")+1) != 0)
+		if (strncmp(str, "SwarmonDevice0.txt", strlen("SwarmonDevice0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1124,7 +1125,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "ue9aconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "UE9A0.txt", strlen("UE9A0.txt")+1) != 0)
+		if (strncmp(str, "UE9A0.txt", strlen("UE9A0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1146,7 +1147,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "ssc32config %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "SSC320.txt", strlen("SSC320.txt")+1) != 0)
+		if (strncmp(str, "SSC320.txt", strlen("SSC320.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1168,7 +1169,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "maestroconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "Maestro0.txt", strlen("Maestro0.txt")+1) != 0)
+		if (strncmp(str, "Maestro0.txt", strlen("Maestro0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
@@ -1194,7 +1195,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "Video%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)+1) != 0)
+			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
 				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 				if (buf)
@@ -1219,85 +1220,85 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (strncmp(line, "startrngmsgacousticmodem", strlen("startrngmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startrngmsgacousticmodem", strlen("startrngmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = RNG_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stoprngmsgacousticmodem", strlen("stoprngmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stoprngmsgacousticmodem", strlen("stoprngmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startsendxymsgacousticmodem", strlen("startsendxymsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startsendxymsgacousticmodem", strlen("startsendxymsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = SENDXY_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stopsendxymsgacousticmodem", strlen("stopsendxymsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stopsendxymsgacousticmodem", strlen("stopsendxymsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startrecvxymsgacousticmodem", strlen("startrecvxymsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startrecvxymsgacousticmodem", strlen("startrecvxymsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = RECVXY_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stoprecvxymsgacousticmodem", strlen("stoprecvxymsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stoprecvxymsgacousticmodem", strlen("stoprecvxymsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startsendaskmsgacousticmodem", strlen("startsendaskmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startsendaskmsgacousticmodem", strlen("startsendaskmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = SENDASK_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stopsendaskmsgacousticmodem", strlen("stopsendaskmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stopsendaskmsgacousticmodem", strlen("stopsendaskmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startrecvaskmsgacousticmodem", strlen("startrecvaskmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startrecvaskmsgacousticmodem", strlen("startrecvaskmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = RECVASK_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stoprecvaskmsgacousticmodem", strlen("stoprecvaskmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stoprecvaskmsgacousticmodem", strlen("stoprecvaskmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startsendspwtmsgacousticmodem", strlen("startsendspwtmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startsendspwtmsgacousticmodem", strlen("startsendspwtmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = SENDSPWT_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stopsendspwtmsgacousticmodem", strlen("stopsendspwtmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stopsendspwtmsgacousticmodem", strlen("stopsendspwtmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startrecvspwtmsgacousticmodem", strlen("startrecvspwtmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startrecvspwtmsgacousticmodem", strlen("startrecvspwtmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = RECVSPWT_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stoprecvspwtmsgacousticmodem", strlen("stoprecvspwtmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stoprecvspwtmsgacousticmodem", strlen("stoprecvspwtmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
@@ -1335,25 +1336,25 @@ inline int Commands(char* line)
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startsendshhmsgacousticmodem", strlen("startsendshhmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startsendshhmsgacousticmodem", strlen("startsendshhmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = SENDSHH_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stopsendshhmsgacousticmodem", strlen("stopsendshhmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stopsendshhmsgacousticmodem", strlen("stopsendshhmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startrecvshhmsgacousticmodem", strlen("startrecvshhmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startrecvshhmsgacousticmodem", strlen("startrecvshhmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = RECVSHH_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stoprecvshhmsgacousticmodem", strlen("stoprecvshhmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stoprecvshhmsgacousticmodem", strlen("stoprecvshhmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
@@ -1391,13 +1392,13 @@ inline int Commands(char* line)
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "startrecvxyrngmsgacousticmodem", strlen("startrecvxyrngmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "startrecvxyrngmsgacousticmodem", strlen("startrecvxyrngmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = RECVXY_RNG_MSG;
 		LeaveCriticalSection(&MDMCS);
 	}
-	else if (strncmp(line, "stoprecvxyrngmsgacousticmodem", strlen("stoprecvxyrngmsgacousticmodem")+1) == 0)
+	else if (strncmp(line, "stoprecvxyrngmsgacousticmodem", strlen("stoprecvxyrngmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;
@@ -1457,11 +1458,11 @@ inline int Commands(char* line)
 	{
 		CallMission(str);
 	}
-	else if (strncmp(line, "abort", strlen("abort")+1) == 0)
+	else if (strncmp(line, "abort", strlen("abort")) == 0)
 	{
 		AbortMission();
 	}
-	else if (strncmp(line, "exit", strlen("exit")+1) == 0)
+	else if (strncmp(line, "exit", strlen("exit")) == 0)
 	{
 		bExit = TRUE;
 	}
@@ -1546,7 +1547,7 @@ inline int Commands(char* line)
 		bAltitudeSeaFloorControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (strncmp(line, "brake", strlen("brake")+1) == 0)
+	else if (strncmp(line, "brake", strlen("brake")) == 0)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		bDistanceControl = FALSE;
@@ -1560,11 +1561,11 @@ inline int Commands(char* line)
 		u_max = dval1; uw_max = dval2; uv_max = dval3; u_coef = dval4; uw_coef = dval5;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (strncmp(line, "stop", strlen("stop")+1) == 0)
+	else if (strncmp(line, "stop", strlen("stop")) == 0)
 	{
 		DisableAllHorizontalControls();
 	}
-	else if (strncmp(line, "generalstop", strlen("generalstop")+1) == 0)
+	else if (strncmp(line, "generalstop", strlen("generalstop")) == 0)
 	{
 		DisableAllControls();
 	}
