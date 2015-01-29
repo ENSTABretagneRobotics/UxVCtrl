@@ -1,0 +1,72 @@
+setmissionaction swarm_ar_goto
+setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+wait 3
+wpfollowingconfig 0.25
+stop
+waitrecvspwtmsgacousticmodem 600
+%
+staticsonarlocalization 10
+wait 3
+gotoxy 1.5 0.5
+wait 10
+thrust 0.7
+gotoxyt 1.5 0.5 30
+thrust -1
+wait 2
+stop
+wait 3
+%
+staticsonarlocalization 10
+wait 3
+gotoxy 1.5 3.5
+wait 10
+thrust 0.7
+gotoxyt 1.5 3.5 30
+thrust -1
+wait 2
+stop
+wait 3
+%
+staticsonarlocalization 10
+wait 3
+gotoxy 1.5 0.5
+wait 10
+thrust 0.7
+gotoxyt 1.5 0.5 30
+thrust -1
+wait 2
+stop
+wait 3
+%
+staticsonarlocalization 10
+wait 3
+gotoxy 1.5 3.5
+wait 10
+thrust 0.7
+gotoxyt 1.5 3.5 30
+thrust -1
+wait 2
+stop
+wait 3
+%
+staticsonarlocalization 10
+wait 3
+gotoxy 1.5 0.5
+wait 10
+thrust 0.7
+gotoxyt 1.5 0.5 30
+thrust -1
+wait 2
+stop
+wait 3
+%
+staticsonarlocalization 10
+wait 3
+gotoxy 1.5 3.5
+wait 10
+thrust 0.7
+gotoxyt 1.5 3.5 30
+thrust -1
+wait 2
+stop
+wait 3
