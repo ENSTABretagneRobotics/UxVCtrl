@@ -1486,6 +1486,28 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
+	else if (sscanf(line, "system %255s", str) == 1)
+	{
+		system(str);
+	}
+#ifdef _WIN32
+	else if (sscanf(line, "playsoundasync %255s", str) == 1)
+	{
+		PlaySound(str, NULL, SND_ASYNC);
+	}
+	else if (sscanf(line, "playsound %255s", str) == 1)
+	{
+		PlaySound(str, NULL, 0);
+	}
+	else if (sscanf(line, "loopsound %255s", str) == 1)
+	{
+		PlaySound(str, NULL, SND_ASYNC|SND_LOOP);
+	}
+	else if (strncmp(line, "stopsound", strlen("stopsound")) == 0)
+	{
+		PlaySound(NULL, NULL, 0);
+	}
+#endif // _WIN32
 #pragma endregion
 #pragma region SIMPLE MOVING COMMANDS
 	else if (sscanf(line, "depthreg %lf", &dval) == 1)

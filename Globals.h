@@ -17,6 +17,19 @@
 #include "RS232Port.h"
 #include "CoordSystem2Img.h"
 #include "CvUtils.h"
+
+#ifdef _WIN32
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4201) 
+#endif // _MSC_VER
+#include "MMSystem.h"
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4201) 
+#endif // _MSC_VER
+#endif // _WIN32
+
 #include "rmatrix.h"
 
 // Robot id masks.

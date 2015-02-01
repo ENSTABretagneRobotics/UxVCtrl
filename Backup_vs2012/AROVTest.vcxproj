@@ -64,7 +64,7 @@
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.6-msvcd.lib;WS2_32.lib;opencv_core249d.lib;opencv_imgproc249d.lib;opencv_highgui249d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.6-msvcd.lib;WinMM.lib;WS2_32.lib;opencv_core249d.lib;opencv_imgproc249d.lib;opencv_highgui249d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.9\x86\vc11\lib;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc11\lib;$(ProgramFiles)\LabJack\Drivers;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -83,7 +83,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.6-msvc.lib;WS2_32.lib;opencv_core249.lib;opencv_imgproc249.lib;opencv_highgui249.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>labjackud.lib;libmodbus-3.0.6-msvc.lib;WinMM.lib;WS2_32.lib;opencv_core249.lib;opencv_imgproc249.lib;opencv_highgui249.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.9\x86\vc11\staticlib;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc11\staticlib;$(ProgramFiles)\LabJack\Drivers;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>

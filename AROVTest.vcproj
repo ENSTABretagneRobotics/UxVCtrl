@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="labjackud.lib libmodbus-3.0.3-msvcd.lib WS2_32.lib opencv_core242d.lib opencv_imgproc242d.lib opencv_highgui242d.lib"
+				AdditionalDependencies="labjackud.lib libmodbus-3.0.3-msvcd.lib WinMM.lib WS2_32.lib opencv_core242d.lib opencv_imgproc242d.lib opencv_highgui242d.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SystemDrive)\OpenCV2.4.2\x86\vc9\lib;$(ProgramFiles)\libmodbus-3.0.3-msvc\x86\vc9\lib;$(ProgramFiles)\LabJack\Drivers;"
 				GenerateDebugInformation="true"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="labjackud.lib libmodbus-3.0.3-msvc.lib WS2_32.lib opencv_core242.lib opencv_imgproc242.lib opencv_highgui242.lib zlib.lib libjasper.lib libjpeg.lib libpng.lib libtiff.lib Vfw32.lib comctl32.lib"
+				AdditionalDependencies="labjackud.lib libmodbus-3.0.3-msvc.lib WinMM.lib WS2_32.lib opencv_core242.lib opencv_imgproc242.lib opencv_highgui242.lib zlib.lib libjasper.lib libjpeg.lib libpng.lib libtiff.lib Vfw32.lib comctl32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SystemDrive)\OpenCV2.4.2\x86\vc9\staticlib;$(ProgramFiles)\libmodbus-3.0.3-msvc\x86\vc9\staticlib;$(ProgramFiles)\LabJack\Drivers;"
 				GenerateDebugInformation="true"

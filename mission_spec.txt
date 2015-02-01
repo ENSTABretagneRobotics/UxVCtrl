@@ -210,6 +210,20 @@
 %
 %wait t (double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
+%system cmd (string representing the command or script file to run)
+%
+%Windows only...
+%playsoundasync sound.wav
+%
+%Windows only...
+%playsound sound.wav
+%
+%Windows only...
+%loopsound sound.wav
+%
+%Windows only...
+%stopsound
+%
 % SIMPLE MOVING COMMANDS
 %
 %depthreg z (double ]-oo,oo[ in m in marine units)

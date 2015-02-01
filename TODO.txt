@@ -1,6 +1,8 @@
 
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 
+rajouter heure, min, s avant auxbuf dans log sonar (voir leur calcul pour chaque ping...)
+
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 
 sonar, localisation, wf

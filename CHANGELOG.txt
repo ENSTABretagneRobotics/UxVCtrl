@@ -1,3 +1,7 @@
+36
+Added new system command.
+Added experimental sound commands for Windows (using WinMM).
+
 35
 Corrected bug introduced by the command parsing when checking the null terminal character with strncmp().
 
