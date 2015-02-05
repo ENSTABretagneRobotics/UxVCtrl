@@ -311,7 +311,7 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pRazorAHRS->RS232Port, pRazorAHRS->BaudRate, NOPARITY, FALSE, 8, 
-		TWOSTOPBITS, 1000) != EXIT_SUCCESS)
+		TWOSTOPBITS, 2000) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to RazorAHRS.\n");
 		CloseRS232Port(&pRazorAHRS->RS232Port);

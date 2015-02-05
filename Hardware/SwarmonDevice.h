@@ -73,7 +73,8 @@ inline int GetLatestDataLocalSwarmonDevice(SWARMONDEVICE* pSwarmonDevice, SWARMO
 		return EXIT_FAILURE;
 	}
 
-	recvbuflen = *((int*)recvbuf);
+	//recvbuflen = *((int*)recvbuf);
+	memcpy(&recvbuflen, (void*)recvbuf, sizeof(int));
 	if (recvbuflen > (int)sizeof(recvbuf)-1)
 	{
 		printf("Error receiving data from a SwarmonDevice : Invalid data. \n");

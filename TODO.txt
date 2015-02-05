@@ -1,3 +1,9 @@
+pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads
+
+rajouter paramètre timeout dans fichier de config de tous les périphériques série
+utiliser bCleanup dans tous les threads pour le cvSet()?
+
+update hovercraft_devices avec razor, maestro...
 
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 
@@ -161,6 +167,9 @@ arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, a
 
 
 OLD
+
+gcc -fpermissive
+destroywindow dans code théo->bCleanUp
 
 sonarstaticlocdevice : merge à faire... a beaucoup servi pour débugger sonar au début, maintenant qu'est-ce qu'il a de plus?
 gui->sonarstaticlocstructured

@@ -23,6 +23,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 	char picfilename[MAX_BUF_LEN];
 	int pic_counter = 0;
 	CHRONO chrono;
+	BOOL bCleanUp = FALSE;
 
 	// Missing error checking...
 	IplImage* image = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
@@ -45,19 +46,25 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 			cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 			LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 
-			cvDestroyWindow("debug");
-			cvDestroyWindow("coucou");
-			cvDestroyWindow("output");
-			cvDestroyWindow("horizon");
-			cvDestroyWindow("v");
-			cvDestroyWindow("s");
-			cvDestroyWindow("h");
-			cvDestroyWindow("HSV Filter");
-			cvDestroyWindow("Canny");
-			cvDestroyWindow("test");
+			if (bCleanUp)
+			{
+				cvDestroyWindow("debug");
+				cvDestroyWindow("coucou");
+				cvDestroyWindow("output");
+				cvDestroyWindow("horizon");
+				cvDestroyWindow("v");
+				cvDestroyWindow("s");
+				cvDestroyWindow("h");
+				cvDestroyWindow("HSV Filter");
+				cvDestroyWindow("Canny");
+				cvDestroyWindow("test");
+				bCleanUp = FALSE;
+			}
 
 			continue;
 		}
+
+		bCleanUp = TRUE;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 

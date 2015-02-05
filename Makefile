@@ -3,12 +3,13 @@
 #    sudo apt-get install build-essential
 # in a terminal.
 # Additionally, you need to install OpenCV 2.3.1/2.4.2/2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
+# (on some versions of Linux or OpenCV, set nbvideo to 1 in AROVTest.txt if the program stops immediately after opening OpenCV windows)
 
 PROGS = AROVTest
 
 CC = g++
-#CFLAGS += -g
-CFLAGS += -O3
+#CFLAGS += -g -fpermissive
+CFLAGS += -O3 -fpermissive
 CFLAGS += -Wall
 #CFLAGS += -Wextra -Winline
 
