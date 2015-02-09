@@ -1,13 +1,8 @@
-pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads
 
 rajouter paramètre timeout dans fichier de config de tous les périphériques série
 utiliser bCleanup dans tous les threads pour le cvSet()?
 
-update hovercraft_devices avec razor, maestro...
-
 comment attendre la détection de ball OU un message acoustique dans les scripts?
-
-rajouter heure, min, s avant auxbuf dans log sonar (voir leur calcul pour chaque ping...)
 
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 
@@ -46,6 +41,7 @@ bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer 
 pouvoir lancer un opencvgui independamment du nombre de cameras?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
 synchro gui etas_wheel à faire (touches et affichage pour u_max, uw_max...), synchro périph faite
 no opencvgui, hang after exit on linux? cvStartWindowThread()... now the keys are always received by the 2 windows, not independently...
+pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 
 0 bizarres dans depth des logmission du harbor alors que pas de problèmes dans les données brutes pression...->manque statevariables cs dans MissionLogThread
 idem logwall? theta_wall... voir Ball...
@@ -167,6 +163,8 @@ arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, a
 
 
 OLD
+
+rajouter heure, min, s avant auxbuf dans log sonar (voir leur calcul pour chaque ping...)
 
 gcc -fpermissive
 destroywindow dans code théo->bCleanUp

@@ -1,3 +1,6 @@
+38
+Daisy-chained echosounder support now activated by default and improved log file compatibility.
+
 37
 Improved compatibility with recent versions of gcc with -fpermissive.
 Improved compatibility with OpenCV versions built with Qt support.

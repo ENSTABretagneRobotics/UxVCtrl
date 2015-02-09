@@ -145,9 +145,14 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 		{
 			nbauxbytes = 0;
 			// Swap commented line to enable/disable Aux device support...
-			//if (GetHeadDataAndAuxDataSeanet(&seanet, scanline, &angle, auxbuf, &nbauxbytes) == EXIT_SUCCESS)
-			if (GetHeadDataSeanet(&seanet, scanline, &angle) == EXIT_SUCCESS)
+			//if (GetHeadDataSeanet(&seanet, scanline, &angle) == EXIT_SUCCESS)
+			if (GetHeadDataAndAuxDataSeanet(&seanet, scanline, &angle, auxbuf, &nbauxbytes) == EXIT_SUCCESS)
 			{
+				time_t tt = 0;
+				struct tm* timeptr = NULL;
+				int Hour = 0, Min = 0;
+				double Seconds = 0;
+
 				// Time...
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
 				{
@@ -155,13 +160,21 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 					tv.tv_usec = 0;
 				}
 
+				tt = tv.tv_sec;
+				timeptr = localtime(&tt);
+				if (timeptr != NULL)
+				{
+					Hour = timeptr->tm_hour;
+					Min = timeptr->tm_min;
+					Seconds = timeptr->tm_sec+0.000001*tv.tv_usec;
+				}
+
 				if (nbauxbytes > 0)
 				{
 					// Echosounder.
-					if (sscanf((char*)auxbuf, "%lfm\r\n", &distance) == 1)
+					if (sscanf((char*)auxbuf, "%lfm\r", &distance) == 1)
 					{
 						EnterCriticalSection(&StateVariablesCS);
-						//printf("%f\n", distance);
 
 						altitude_sea_floor = distance;
 
@@ -170,7 +183,10 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 
 					if (seanet.bSaveRawData)
 					{
-						fprintf(seanet.pfSaveFile, "%.100s\r\n", (char*)auxbuf);
+						// Should remove the final LF from auxbuf (maybe in HeadDataReplyAndAuxDataSeanet()...) 
+						// and end-of-line characters might be inconsistent with Seanet log files (especially on Linux)... 
+
+						fprintf(seanet.pfSaveFile, "%02d:%02d:%06.3f,%.100s\n", Hour, Min, Seconds, (char*)auxbuf);
 					}
 				}
 
@@ -195,22 +211,9 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 				if (seanet.bSaveRawData)
 				{
 					char SOf[3+1];
-					int Hour = 0, Min = 0;
-					double Seconds = 0;
 					int Bearing = 0;
-					time_t tt = 0;
-					struct tm* timeptr = NULL;
 
 					if (seanet.bDST) strcpy(SOf, "DIG"); else strcpy(SOf, "SON");
-
-					tt = tv.tv_sec;
-					timeptr = localtime(&tt);
-					if (timeptr != NULL)
-					{
-						Hour = timeptr->tm_hour;
-						Min = timeptr->tm_min;
-						Seconds = timeptr->tm_sec+0.000001*tv.tv_usec;
-					}
 
 					Bearing = ((int)(angle/0.05625+3200+6400))%6400; // Angle of the transducer (0..6399 in 1/16 Gradian units, 0.05625 = (1/16)*(9/10)).
 

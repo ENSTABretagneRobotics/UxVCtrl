@@ -1796,6 +1796,8 @@ inline int HeadDataReplyAndAuxDataSeanet(SEANET* pSeanet,
 
 		if (mid == mtAuxData)
 		{
+			// Should remove also the final LF...
+
 			//memcpy(auxdatabuf, databuf, nbdatabytes);
 			//*pNbauxdatabytes = nbdatabytes;
 			memcpy(strippedauxdatabuf, databuf+15, nbdatabytes-15);

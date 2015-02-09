@@ -98,7 +98,6 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 			if (GetLatestDataMES(&mes, &distance) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
-				//printf("%f\n", distance);
 
 				altitude_sea_floor = distance;
 
