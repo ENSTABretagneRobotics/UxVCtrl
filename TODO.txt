@@ -1,3 +1,4 @@
+minissc pas totalement intégrée...
 
 rajouter paramètre timeout dans fichier de config de tous les périphériques série
 utiliser bCleanup dans tous les threads pour le cvSet()?

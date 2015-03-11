@@ -208,7 +208,8 @@ inline int SetAllPWMsMaestro(MAESTRO* pMaestro, int* selectedchannels, int* pws)
 	{
 		if (!selectedchannels[channel]) continue;
 
-		if (channel > firstselectedchannel+1)
+		// To check...
+		if (channel > firstselectedchannel+nbselectedchannels)
 		{
 			printf("Maestro multiple channels must be continuous.\n");
 			return EXIT_FAILURE;
