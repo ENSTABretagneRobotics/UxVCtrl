@@ -104,6 +104,18 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 		{
 			switch (robid)
 			{
+			case BUGGY_ROBID:
+				EnterCriticalSection(&StateVariablesCS);
+				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
+				thrust = u;
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrustersFluxSSC32(&ssc32, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				{
+					printf("Connection to a SSC32 lost.\n");
+					bConnected = FALSE;
+					DisconnectSSC32(&ssc32);
+				}		
+				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);

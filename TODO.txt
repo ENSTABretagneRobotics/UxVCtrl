@@ -1,3 +1,4 @@
+
 minissc pas totalement intégrée...
 
 rajouter paramètre timeout dans fichier de config de tous les périphériques série
@@ -154,6 +155,7 @@ opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut 
 
 image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 
+robid, robid mask : regrouper sailboat et motorboat ensemble pour laisser de la place pour UGV et UAV?
 robid log file?
 faire version de connect avec tout en paramètre (penser aussi à initialiser szCfgFilePath à 0...)
 un fichier de config pour décrire les périphériques du robot?
@@ -164,6 +166,8 @@ arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, a
 
 
 OLD
+
+le fait qu'il revienne droit quand on va en marche av ou ar convient pas pour buggy, prévoir une touche pour activer/désactiver?->fait automatiquement selon robid
 
 rajouter heure, min, s avant auxbuf dans log sonar (voir leur calcul pour chaque ping...)
 

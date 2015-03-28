@@ -167,12 +167,28 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'z':
 			u += 0.1*u_max;
 			u = (u > u_max)? u_max: u;
-			if (!bHeadingControl) uw = 0;
+			switch (robid)
+			{
+			case NEW_MOTORBOAT_ROBID:
+			case BUGGY_ROBID:
+				break;
+			default:
+				if (!bHeadingControl) uw = 0;
+				break;
+			}
 			break;
 		case 's':
 			u -= 0.1*u_max;
 			u = (u < -u_max)? -u_max: u;
-			if (!bHeadingControl) uw = 0;
+			switch (robid)
+			{
+			case NEW_MOTORBOAT_ROBID:
+			case BUGGY_ROBID:
+				break;
+			default:
+				if (!bHeadingControl) uw = 0;
+				break;
+			}
 			break;
 		case 'q':
 			if (bHeadingControl)
@@ -199,33 +215,55 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 		case 'f':
-			if (bDepthControl)
+			switch (robid)
 			{
-				wz += 0.1;
-			}
-			else if (bAltitudeSeaFloorControl)
-			{
-				wasf += 0.1;
-			}
-			else
-			{
-				uv += 0.1*uv_max;
-				uv = (uv > uv_max)? uv_max: uv;
+			case OLD_MOTORBOAT_ROBID:
+			case NEW_MOTORBOAT_ROBID:
+			case BUGGY_ROBID:
+				u_max += 0.1;
+				u_max = (u_max > 1)? 1: u_max;
+				break;
+			default:
+				if (bDepthControl)
+				{
+					wz += 0.1;
+				}
+				else if (bAltitudeSeaFloorControl)
+				{
+					wasf += 0.1;
+				}
+				else
+				{
+					uv += 0.1*uv_max;
+					uv = (uv > uv_max)? uv_max: uv;
+				}
+				break;
 			}
 			break;
-		case 'v':
-			if (bDepthControl)
+		case 'v':			
+			switch (robid)
 			{
-				wz -= 0.1;
-			}
-			else if (bAltitudeSeaFloorControl)
-			{
-				wasf -= 0.1;
-			}
-			else
-			{
-				uv -= 0.1*uv_max;
-				uv = (uv < -uv_max)? -uv_max: uv;
+			case OLD_MOTORBOAT_ROBID:
+			case NEW_MOTORBOAT_ROBID:
+			case BUGGY_ROBID:
+				u_max -= 0.1;
+				u_max = (u_max < 0)? 0: u_max;
+				break;
+			default:
+				if (bDepthControl)
+				{
+					wz -= 0.1;
+				}
+				else if (bAltitudeSeaFloorControl)
+				{
+					wasf -= 0.1;
+				}
+				else
+				{
+					uv -= 0.1*uv_max;
+					uv = (uv < -uv_max)? -uv_max: uv;
+				}
+				break;
 			}
 			break;
 		case 'w':

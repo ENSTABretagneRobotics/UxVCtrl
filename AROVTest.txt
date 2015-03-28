@@ -12,6 +12,8 @@
 %0x00000200
 %Motorboat
 %0x00000400
+%Buggy
+%0x02000000
 % nbvideo (max 3)
 2
 % videoimgwidth

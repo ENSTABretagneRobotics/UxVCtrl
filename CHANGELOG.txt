@@ -1,3 +1,7 @@
+39
+Preliminary support of buggy via smartphone and IOIO.
+Improved controls for buggy and motorboats.
+
 38
 Daisy-chained echosounder support now activated by default and improved log file compatibility.
 

@@ -19,13 +19,7 @@ COM5
 0.0
 % yaworientation
 0
-%3.065 for SAUC'ISSE
-%3.025 for SARDINE
 % yawp1
 0
-%0.29 for SAUC'ISSE
-%0.42 for SARDINE
 % yawp2
 0
-%0.55 for SAUC'ISSE
-%-0.2 for SARDINE

@@ -1,4 +1,5 @@
 % 0..9 or a video filename or IP address and TCP port
+%127.0.0.1:4014
 %0
 test1.wmv
 %dummy_25min.wmv
