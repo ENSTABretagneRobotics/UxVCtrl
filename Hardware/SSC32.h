@@ -47,6 +47,7 @@ struct SSC32
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	int MinPWs[NB_CHANNELS_PWM_SSC32];
 	int MidPWs[NB_CHANNELS_PWM_SSC32];
@@ -343,6 +344,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 	memset(pSSC32->szDevPath, 0, sizeof(pSSC32->szDevPath));
 	sprintf(pSSC32->szDevPath, "COM1");
 	pSSC32->BaudRate = 115200;
+	pSSC32->timeout = 1000;
 	pSSC32->bSaveRawData = 1;
 	for (channel = 0; channel < NB_CHANNELS_PWM_SSC32; channel++)
 	{
@@ -371,6 +373,8 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pSSC32->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSSC32->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pSSC32->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSSC32->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 
@@ -481,7 +485,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pSSC32->RS232Port, pSSC32->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 1000) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pSSC32->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a SSC32.\n");
 		CloseRS232Port(&pSSC32->RS232Port);

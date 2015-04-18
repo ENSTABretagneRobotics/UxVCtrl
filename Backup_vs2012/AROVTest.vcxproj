@@ -166,6 +166,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hardware\Maestro.h" />
+    <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pipeline.h" />
@@ -254,6 +255,7 @@
     <Text Include="Maestro0.txt" />
     <Text Include="MDM0.txt" />
     <Text Include="MES0.txt" />
+    <Text Include="MiniSSC0.txt" />
     <Text Include="mission.txt" />
     <Text Include="MT0.txt" />
     <Text Include="NMEADevice0.txt" />

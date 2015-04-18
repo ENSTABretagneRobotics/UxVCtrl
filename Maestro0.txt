@@ -3,6 +3,8 @@
 COM6
 % BaudRate
 9600
+% Timeout (in ms)
+1000
 % bSaveRawData
 1
 % DeviceNumber (default is 12)

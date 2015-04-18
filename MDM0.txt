@@ -3,7 +3,9 @@
 COM10
 % BaudRate
 9600
-% bSaveRawData
-1
 % Timeout (in ms)
 8000
+% bSaveRawData
+1
+% DelayReadWriteEchoByte (in ms)
+20

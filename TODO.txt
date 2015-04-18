@@ -1,7 +1,11 @@
-
+add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
+add support of mt nmea sentences in nmeadevice
+ue9 supporte pas l'eth
 minissc pas totalement intégrée...
+hokuyo
 
-rajouter paramètre timeout dans fichier de config de tous les périphériques série
+changé ordre timeout mdm!
+
 utiliser bCleanup dans tous les threads pour le cvSet()?
 
 comment attendre la détection de ball OU un message acoustique dans les scripts?

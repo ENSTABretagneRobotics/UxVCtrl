@@ -1,3 +1,7 @@
+40
+Added EchoByte function in MDM and DelayReadWriteEchoByte parameter.
+Added timeout parameter for all serial devices.
+
 39
 Preliminary support of buggy via smartphone and IOIO.
 Improved controls for buggy and motorboats.

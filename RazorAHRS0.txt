@@ -3,6 +3,8 @@
 COM5
 % BaudRate
 57600
+% Timeout (in ms)
+2000
 % bSaveRawData
 1
 % rollorientation

@@ -63,6 +63,7 @@ struct MINISSC
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	int DeviceNumber;
 	int MinPWs[NB_CHANNELS_PWM_MINISSC];
@@ -418,6 +419,7 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 	memset(pMiniSSC->szDevPath, 0, sizeof(pMiniSSC->szDevPath));
 	sprintf(pMiniSSC->szDevPath, "COM1");
 	pMiniSSC->BaudRate = 115200;
+	pMiniSSC->timeout = 1000;
 	pMiniSSC->bSaveRawData = 1;
 	pMiniSSC->DeviceNumber = DEFAULT_DEVICE_NUMBER_MINISSC;
 	for (channel = 0; channel < NB_CHANNELS_PWM_MINISSC; channel++)
@@ -447,6 +449,8 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pMiniSSC->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMiniSSC->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMiniSSC->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMiniSSC->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -565,7 +569,7 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pMiniSSC->RS232Port, pMiniSSC->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 1000) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pMiniSSC->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a MiniSSC.\n");
 		CloseRS232Port(&pMiniSSC->RS232Port);

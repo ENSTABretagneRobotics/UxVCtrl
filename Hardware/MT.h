@@ -177,6 +177,7 @@ struct MT
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	double rollorientation;
 	double rollp1;
@@ -714,6 +715,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	memset(pMT->szDevPath, 0, sizeof(pMT->szDevPath));
 	sprintf(pMT->szDevPath, "COM1");
 	pMT->BaudRate = 115200;
+	pMT->timeout = 1000;
 	pMT->bSaveRawData = 1;
 	pMT->rollorientation = 0;
 	pMT->rollp1 = 0;
@@ -735,6 +737,8 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pMT->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMT->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMT->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMT->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -774,7 +778,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pMT->RS232Port, pMT->BaudRate, NOPARITY, FALSE, 8, 
-		TWOSTOPBITS, 1000) != EXIT_SUCCESS)
+		TWOSTOPBITS, (UINT)pMT->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to MT.\n");
 		CloseRS232Port(&pMT->RS232Port);

@@ -40,6 +40,7 @@ struct RAZORAHRS
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	double rollorientation;
 	double rollp1;
@@ -251,6 +252,7 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 	memset(pRazorAHRS->szDevPath, 0, sizeof(pRazorAHRS->szDevPath));
 	sprintf(pRazorAHRS->szDevPath, "COM1");
 	pRazorAHRS->BaudRate = 57600;
+	pRazorAHRS->timeout = 2000;
 	pRazorAHRS->bSaveRawData = 1;
 	pRazorAHRS->rollorientation = 0;
 	pRazorAHRS->rollp1 = 0;
@@ -272,6 +274,8 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pRazorAHRS->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pRazorAHRS->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pRazorAHRS->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pRazorAHRS->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -311,7 +315,7 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pRazorAHRS->RS232Port, pRazorAHRS->BaudRate, NOPARITY, FALSE, 8, 
-		TWOSTOPBITS, 2000) != EXIT_SUCCESS)
+		TWOSTOPBITS, (UINT)pRazorAHRS->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to RazorAHRS.\n");
 		CloseRS232Port(&pRazorAHRS->RS232Port);

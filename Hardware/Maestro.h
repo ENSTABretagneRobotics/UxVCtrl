@@ -63,6 +63,7 @@ struct MAESTRO
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	int DeviceNumber;
 	int MinPWs[NB_CHANNELS_PWM_MAESTRO];
@@ -433,6 +434,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 	memset(pMaestro->szDevPath, 0, sizeof(pMaestro->szDevPath));
 	sprintf(pMaestro->szDevPath, "COM1");
 	pMaestro->BaudRate = 115200;
+	pMaestro->timeout = 1000;
 	pMaestro->bSaveRawData = 1;
 	pMaestro->DeviceNumber = DEFAULT_DEVICE_NUMBER_MAESTRO;
 	for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
@@ -462,6 +464,8 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pMaestro->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMaestro->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMaestro->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMaestro->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -580,7 +584,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pMaestro->RS232Port, pMaestro->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 1000) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pMaestro->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a Maestro.\n");
 		CloseRS232Port(&pMaestro->RS232Port);

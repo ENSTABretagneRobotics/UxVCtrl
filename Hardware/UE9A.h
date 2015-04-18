@@ -54,7 +54,7 @@ inline int ConnectUE9A(UE9A* pUE9A, char* szCfgFilePath)
 
 	// Default values.
 	memset(pUE9A->szDevPath, 0, sizeof(pUE9A->szDevPath));
-	sprintf(pUE9A->szDevPath, "COM1");
+	sprintf(pUE9A->szDevPath, "1");
 	pUE9A->rightthrusterpwm = 0;
 	pUE9A->leftthrusterpwm = 1;
 	pUE9A->bottomthrusterpwm = 2;

@@ -31,6 +31,7 @@ struct MES
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 };
 typedef struct MES MES;
@@ -230,6 +231,7 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 	memset(pMES->szDevPath, 0, sizeof(pMES->szDevPath));
 	sprintf(pMES->szDevPath, "COM1");
 	pMES->BaudRate = 115200;
+	pMES->timeout = 500;
 	pMES->bSaveRawData = 1;
 
 	sprintf(pMES->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -242,6 +244,8 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pMES->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMES->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMES->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMES->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
@@ -263,7 +267,7 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pMES->RS232Port, pMES->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 500) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pMES->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to MES.\n");
 		CloseRS232Port(&pMES->RS232Port);

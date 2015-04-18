@@ -343,6 +343,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MiniSSC0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\mission.txt"
 				>
 			</File>
@@ -824,6 +828,10 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\MES.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\MiniSSC.h"
 				>
 			</File>
 			<File

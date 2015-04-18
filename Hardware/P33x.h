@@ -29,6 +29,7 @@ struct P33X
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 };
 typedef struct P33X P33X;
@@ -235,6 +236,7 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 	memset(pP33x->szDevPath, 0, sizeof(pP33x->szDevPath));
 	sprintf(pP33x->szDevPath, "COM1");
 	pP33x->BaudRate = 9600;
+	pP33x->timeout = 1000;
 	pP33x->bSaveRawData = 1;
 
 	sprintf(pP33x->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -247,6 +249,8 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pP33x->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pP33x->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pP33x->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pP33x->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
@@ -268,7 +272,7 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pP33x->RS232Port, pP33x->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 1000) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pP33x->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a P33x.\n");
 		CloseRS232Port(&pP33x->RS232Port);

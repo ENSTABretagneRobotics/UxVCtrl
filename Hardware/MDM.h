@@ -204,8 +204,9 @@ struct MDM
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
-	BOOL bSaveRawData;
 	int timeout;
+	BOOL bSaveRawData;
+	int DelayReadWriteEchoByte;
 };
 typedef struct MDM MDM;
 
@@ -574,6 +575,37 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 	return EXIT_SUCCESS;
 }
 
+inline int EchoByteMDM(MDM* pMDM, uint8* pb)
+{
+	int n = 0;
+
+	if (ReadRS232Port(&pMDM->RS232Port, pb, 1, &n) == EXIT_SUCCESS)
+	{
+#ifdef _DEBUG_MESSAGES_MDM
+		printf("%.2x \n", (int)*pb);
+#endif // _DEBUG_MESSAGES_MDM
+
+		//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+		//{
+		//	fwrite((unsigned char*)pb, 1, 1, pMDM->pfSaveFile);
+		//	fflush(pMDM->pfSaveFile);
+		//}
+
+		mSleep(pMDM->DelayReadWriteEchoByte);
+		if (WriteRS232Port(&pMDM->RS232Port, pb, 1, &n) != EXIT_SUCCESS)
+		{
+			printf("EchoMDM error (%s) : %s"
+				"(pMDM=%#x)\n", 
+				strtime_m(), 
+				"Error sending data with the device. ", 
+				(unsigned int)pMDM);
+			return EXIT_FAILURE;
+		}
+	}
+
+	return EXIT_SUCCESS;
+}
+
 // MDM must be initialized to 0 before (e.g. MDM mdm; memset(&mdm, 0, sizeof(MDM));)!
 inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 {
@@ -586,8 +618,9 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 	memset(pMDM->szDevPath, 0, sizeof(pMDM->szDevPath));
 	sprintf(pMDM->szDevPath, "COM1");
 	pMDM->BaudRate = 9600;
+	pMDM->timeout = 8000;
 	pMDM->bSaveRawData = 1;
-	pMDM->timeout = 1500;
+	pMDM->DelayReadWriteEchoByte = 20;
 
 	sprintf(pMDM->szCfgFilePath, "%.255s", szCfgFilePath);
 
@@ -600,9 +633,11 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMDM->BaudRate) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMDM->timeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMDM->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMDM->timeout) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMDM->DelayReadWriteEchoByte) != 1) printf("Invalid configuration file.\n");
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 	}
 	else

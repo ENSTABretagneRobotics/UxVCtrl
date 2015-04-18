@@ -66,6 +66,7 @@ struct NMEADEVICE
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	BOOL bEnableGPGGA;
 	BOOL bEnableHCHDG;
@@ -369,6 +370,7 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 	memset(pNMEADevice->szDevPath, 0, sizeof(pNMEADevice->szDevPath));
 	sprintf(pNMEADevice->szDevPath, "COM1");
 	pNMEADevice->BaudRate = 4800;
+	pNMEADevice->timeout = 1000;
 	pNMEADevice->bSaveRawData = 1;
 	pNMEADevice->bEnableGPGGA = 1;
 	pNMEADevice->bEnableHCHDG = 1;
@@ -384,6 +386,8 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pNMEADevice->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pNMEADevice->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pNMEADevice->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pNMEADevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -411,7 +415,7 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pNMEADevice->RS232Port, pNMEADevice->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 1000) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pNMEADevice->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a NMEADevice.\n");
 		CloseRS232Port(&pNMEADevice->RS232Port);

@@ -3,6 +3,10 @@
 COM7
 % BaudRate
 4800
+% Timeout (in ms)
+1000
+% bSaveRawData
+1
 % MinAngle (in rad)
 0.0
 % MaxAngle (in rad)

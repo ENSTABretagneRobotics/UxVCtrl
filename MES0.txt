@@ -3,5 +3,7 @@
 COM11
 % BaudRate
 9600
+% Timeout (in ms)
+500
 % bSaveRawData
 1

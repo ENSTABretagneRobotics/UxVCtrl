@@ -169,6 +169,7 @@ struct SEANET
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
+	int timeout;
 	BOOL bSaveRawData;
 	int RangeScale; // In m.
 	int Gain; // In %.
@@ -1965,6 +1966,7 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 	memset(pSeanet->szDevPath, 0, sizeof(pSeanet->szDevPath));
 	sprintf(pSeanet->szDevPath, "COM1");
 	pSeanet->BaudRate = 115200;
+	pSeanet->timeout = 1500;
 	pSeanet->bSaveRawData = 1;
 	pSeanet->RangeScale = 30;
 	pSeanet->Gain = 50;
@@ -1994,6 +1996,8 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 		if (sscanf(line, "%255s", pSeanet->szDevPath) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSeanet->BaudRate) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pSeanet->timeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSeanet->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -2073,7 +2077,7 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 	}
 
 	if (SetOptionsRS232Port(&pSeanet->RS232Port, pSeanet->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, 1500) != EXIT_SUCCESS)
+		ONESTOPBIT, (UINT)pSeanet->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to Seanet.\n");
 		CloseRS232Port(&pSeanet->RS232Port);

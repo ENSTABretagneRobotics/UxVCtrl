@@ -470,6 +470,9 @@
     <ClInclude Include="Hardware\Maestro.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\MiniSSC.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="AROVTest.txt">
@@ -531,6 +534,9 @@
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
     <Text Include="Maestro0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MiniSSC0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>
