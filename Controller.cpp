@@ -62,6 +62,87 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			e = norm_ma*sinalpha; // Distance to the line (signed).
 
 			wtheta = LineFollowing(phi, e, gamma_infinite, radius);
+
+#pragma region Sailboat supervisor
+/*
+			if (robid & SAILBOAT_ROBID_MASK) 
+			{
+				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
+				if (((state == STARBOARD_TACK_TRAJECTORY)&&(e > radius/2.0))||
+					((state == PORT_TACK_TRAJECTORY)&&(e < -radius/2.0)))
+				{
+					bForceCheckStrategy = 1;
+				}
+
+				// Check regularly if the strategy needs to be changed.
+				if ((GetTimeElapsedChronoQuick(&chrono_check_strategy) > check_strategy_period)||bForceCheckStrategy)
+				{
+					StopChronoQuick(&chrono_check_strategy);
+					bForceCheckStrategy = 0;
+					prevstate = state;
+					if ((cos(psi-wtheta)+cos(ksi) < 0)||
+						((cos(psi-phi)+cos(ksi) < 0)&&(fabs(e) < radius)))
+					{
+						if (e < 0)
+						{
+							if ((state == PORT_TACK_TRAJECTORY)&&(e > -radius/2.0))
+							{
+								printf("Port tack trajectory.\n");
+								state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
+							}
+							else
+							{
+								printf("Starboard tack trajectory.\n");
+								state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
+							}
+						}
+						else
+						{
+							if ((state == STARBOARD_TACK_TRAJECTORY)&&(e < radius/2.0))
+							{
+								printf("Starboard tack trajectory.\n");
+								state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
+							}
+							else
+							{
+								printf("Port tack trajectory.\n");
+								state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
+							}
+						}
+					}
+					else
+					{
+						printf("Direct trajectory.\n");
+						state = DIRECT_TRAJECTORY; // Suivi direct.
+					}
+					if (state != prevstate)
+					{
+						bForceSailUpdate = 1;
+					}
+					StartChrono(&chrono_check_strategy);
+				}
+
+				switch (state)
+				{
+				case STARBOARD_TACK_TRAJECTORY:
+					wtheta = psi+M_PI+ksi; // Heading command.
+					deltasmax = 0; // Sail command.
+					break;
+				case PORT_TACK_TRAJECTORY:
+					wtheta = psi+M_PI-ksi; // Heading command.
+					deltasmax = 0; // Sail command.
+					break;
+				default: // DIRECT_TRAJECTORY
+					//wtheta = wtheta; // Heading command.
+					deltasmax = q1*pow((cos(psi-(wtheta))+1.0)/2.0,q2); // Sail command.
+					//deltasmax = q1*pow((cos(psi-theta)+1.0)/2.0,q2); // Sail command.
+					break;
+				}
+			}
+			
+			// Periodic sail update...
+*/
+#pragma endregion
 		}
 
 		if (bWaypointControl)

@@ -51,9 +51,10 @@
 #define VEDI_ROBID 0x00000040
 #define VICI_ROBID 0x00000060
 #define JACK_ROBID 0x00000080
-#define OLD_MOTORBOAT_ROBID 0x00000200
-#define NEW_MOTORBOAT_ROBID 0x00000400
+#define HOVERCRAFT_ROBID 0x00000200
+#define MOTORBOAT_ROBID 0x00000400
 #define VAIMOS_ROBID 0x00020000
+#define SAILBOAT_ROBID 0x00040000
 #define BUGGY_ROBID 0x02000000
 
 #define LOG_FOLDER "log/"
@@ -80,10 +81,21 @@
 
 #define RECVXY_RNG_MSG 1024
 
+// Sailboat supervisor states.
+enum STATE
+{
+	INVALID_STATE = -1,
+	DIRECT_TRAJECTORY, // Suivi direct.
+	STARBOARD_TACK_TRAJECTORY, // Bateau au près avec vent de tribord.
+	PORT_TACK_TRAJECTORY // Bateau au près avec vent de babord.
+};
+typedef enum STATE STATE;
+
 // Observer variables.
 extern interval xhat, yhat, zhat, thetahat, vxyhat, omegahat;
 extern interval alphahat, dhat;
 extern interval vchat, psichat, hwhat;
+//extern interval vwindhat, psiwindhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
@@ -97,6 +109,8 @@ extern double dist;
 // GPS.
 extern double latitude, longitude;
 extern double altitude;
+// Weather station.
+extern double vwind, psiwind;
 // Sonar.
 extern double alpha_mes, d_mes;
 extern vector<interval> d_all_mes;
@@ -132,6 +146,8 @@ extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
 extern BOOL bDisableMaestro;
+extern BOOL bDisableMiniSSC;
+extern BOOL bDisableSail;
 
 // Controller parameters.
 extern double u_max, uw_max, uv_max, u_coef, uw_coef;
@@ -271,58 +287,52 @@ extern BOOL bPingerTrackingControl;
 extern int pingertrackingvideoid;
 
 // CISCREA variables.
-extern BOOL bPauseCISCREA;
-extern BOOL bRestartCISCREA;
+extern BOOL bPauseCISCREA, bRestartCISCREA;
 
 // MDM variables.
 extern CRITICAL_SECTION MDMCS;
 extern int AcousticCommandMDM;
-extern BOOL bPauseMDM;
-extern BOOL bRestartMDM;
+extern BOOL bPauseMDM, bRestartMDM;
 
 // MES variables.
-extern BOOL bPauseMES;
-extern BOOL bRestartMES;
+extern BOOL bPauseMES, bRestartMES;
 
 // Seanet variables.
 extern CRITICAL_SECTION SeanetOverlayImgCS;
 extern IplImage* SeanetOverlayImg;
-extern BOOL bPauseSeanet;
-extern BOOL bRestartSeanet;
+extern BOOL bPauseSeanet, bRestartSeanet;
 
 // P33x variables.
-extern BOOL bPauseP33x;
-extern BOOL bRestartP33x;
+extern BOOL bPauseP33x, bRestartP33x;
 
 // RazorAHRS variables.
-extern BOOL bPauseRazorAHRS;
-extern BOOL bRestartRazorAHRS;
+extern BOOL bPauseRazorAHRS, bRestartRazorAHRS;
 
 // MT variables.
-extern BOOL bPauseMT;
-extern BOOL bRestartMT;
 extern BOOL bGPSOKMT;
+extern BOOL bPauseMT, bRestartMT;
 
 // NMEADevice variables.
-extern BOOL bPauseNMEADevice;
-extern BOOL bRestartNMEADevice;
 extern BOOL bGPSOKNMEADevice;
+extern BOOL bPauseNMEADevice, bRestartNMEADevice;
 
 // SwarmonDevice variables.
-extern BOOL bPauseSwarmonDevice;
-extern BOOL bRestartSwarmonDevice;
+extern BOOL bPauseSwarmonDevice, bRestartSwarmonDevice;
 
 // UE9A variables.
-extern BOOL bPauseUE9A;
-extern BOOL bRestartUE9A;
+extern BOOL bPauseUE9A, bRestartUE9A;
 
 // SSC32 variables.
-extern BOOL bPauseSSC32;
-extern BOOL bRestartSSC32;
+extern BOOL bPauseSSC32, bRestartSSC32;
 
 // Maestro variables.
-extern BOOL bPauseMaestro;
-extern BOOL bRestartMaestro;
+extern BOOL bPauseMaestro, bRestartMaestro;
+
+// MiniSSC variables.
+extern BOOL bPauseMiniSSC, bRestartMiniSSC;
+
+// Sail variables.
+extern BOOL bPauseSail, bRestartSail;
 
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_CAM];
@@ -345,7 +355,7 @@ extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
 extern BOOL bDisableLiIonAlarmCISCREA;
 extern BOOL bShowVoltageCISCREA;
-extern BOOL bEnableBackwardsNEW_MOTORBOAT;
+extern BOOL bEnableBackwardsMotorboat;
 extern BOOL bExit;
 extern BOOL bWaiting;
 extern BOOL bMissionRunning;

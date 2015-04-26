@@ -101,7 +101,10 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hardware\Hokuyo.cpp" />
     <ClCompile Include="Hardware\Maestro.cpp" />
+    <ClCompile Include="Hardware\MiniSSC.cpp" />
+    <ClCompile Include="Hardware\Sail.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
@@ -165,8 +168,10 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Hardware\Hokuyo.h" />
     <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
+    <ClInclude Include="Hardware\Sail.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pipeline.h" />
@@ -252,6 +257,7 @@
     <Text Include="AROVTest.txt" />
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />
+    <Text Include="Hokuyo0.txt" />
     <Text Include="Maestro0.txt" />
     <Text Include="MDM0.txt" />
     <Text Include="MES0.txt" />

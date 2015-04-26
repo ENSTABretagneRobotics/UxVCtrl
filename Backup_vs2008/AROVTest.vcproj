@@ -331,6 +331,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hokuyo0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Maestro0.txt"
 				>
 			</File>
@@ -807,6 +811,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hardware\Hokuyo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\Hokuyo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hardware\Maestro.cpp"
 				>
 			</File>
@@ -828,6 +840,10 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\MES.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\MiniSSC.cpp"
 				>
 			</File>
 			<File
@@ -872,6 +888,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\RS232Port.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\Sail.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\Sail.h"
 				>
 			</File>
 			<File

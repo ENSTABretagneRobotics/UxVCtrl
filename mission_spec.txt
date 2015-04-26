@@ -124,6 +124,10 @@
 %
 %maestroconfig Maestro.txt bPause
 %
+%minisscconfig MiniSSC.txt bPause
+%
+%sailconfig Sail.txt bPause
+%
 %videoconfig videoid Video.txt bPause
 %
 %%rngacousticmodem nbretries retryperiod (send rng and wait for the result)

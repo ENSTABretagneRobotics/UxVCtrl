@@ -1,3 +1,6 @@
+41
+Beginning of sailboats integration.
+
 40
 Added EchoByte function in MDM and DelayReadWriteEchoByte parameter.
 Added timeout parameter for all serial devices.

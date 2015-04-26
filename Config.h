@@ -46,6 +46,8 @@ inline int LoadConfig()
 	bDisableUE9A = TRUE;
 	bDisableSSC32 = TRUE;
 	bDisableMaestro = TRUE;
+	bDisableMiniSSC = TRUE;
+	bDisableSail = TRUE;
 	// Controller parameters.
 	u_max = 1;
 	uw_max = 1;
@@ -173,6 +175,10 @@ inline int LoadConfig()
 		if (sscanf(line, "%d", &bDisableSSC32) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMaestro) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableMiniSSC) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableSail) != 1) printf("Invalid configuration file.\n");
 
 		// Controller parameters.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -434,8 +440,8 @@ inline int LoadConfig()
 	case VEDI_ROBID:
 	case VICI_ROBID:
 	case JACK_ROBID:
-	case OLD_MOTORBOAT_ROBID:
-	case NEW_MOTORBOAT_ROBID:
+	case HOVERCRAFT_ROBID:
+	case MOTORBOAT_ROBID:
 	case VAIMOS_ROBID:
 	case BUGGY_ROBID:
 		break;

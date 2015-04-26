@@ -115,11 +115,11 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 					DisconnectMiniSSC(&minissc);
 				}
 				break;
-			case NEW_MOTORBOAT_ROBID:
+			case MOTORBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
 				thrust = fabs(u);
-				if (bEnableBackwardsNEW_MOTORBOAT)
+				if (bEnableBackwardsMotorboat)
 				{
 					if (u < 0) flux = -1; else flux = 1;
 				}
@@ -136,7 +136,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 					DisconnectMiniSSC(&minissc);
 				}		
 				break;
-			case OLD_MOTORBOAT_ROBID:
+			case HOVERCRAFT_ROBID:
 			default:
 				EnterCriticalSection(&StateVariablesCS);
 				thrust1 = u1;

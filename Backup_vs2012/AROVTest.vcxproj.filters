@@ -210,6 +210,15 @@
     <ClCompile Include="Hardware\Maestro.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\Hokuyo.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\Sail.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MiniSSC.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -473,6 +482,12 @@
     <ClInclude Include="Hardware\MiniSSC.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\Sail.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\Hokuyo.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="AROVTest.txt">
@@ -537,6 +552,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="MiniSSC0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="Hokuyo0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

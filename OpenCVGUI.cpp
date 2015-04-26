@@ -169,7 +169,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = (u > u_max)? u_max: u;
 			switch (robid)
 			{
-			case NEW_MOTORBOAT_ROBID:
+			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
 				break;
 			default:
@@ -182,7 +182,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = (u < -u_max)? -u_max: u;
 			switch (robid)
 			{
-			case NEW_MOTORBOAT_ROBID:
+			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
 				break;
 			default:
@@ -217,8 +217,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'f':
 			switch (robid)
 			{
-			case OLD_MOTORBOAT_ROBID:
-			case NEW_MOTORBOAT_ROBID:
+			case HOVERCRAFT_ROBID:
+			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
 				u_max += 0.1;
 				u_max = (u_max > 1)? 1: u_max;
@@ -243,8 +243,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'v':			
 			switch (robid)
 			{
-			case OLD_MOTORBOAT_ROBID:
-			case NEW_MOTORBOAT_ROBID:
+			case HOVERCRAFT_ROBID:
+			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
 				u_max -= 0.1;
 				u_max = (u_max < 0)? 0: u_max;
@@ -449,7 +449,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bShowVoltageCISCREA = !bShowVoltageCISCREA;
 			break;
 		case 'B':
-			bEnableBackwardsNEW_MOTORBOAT = !bEnableBackwardsNEW_MOTORBOAT;
+			bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat;
 			break;
 		case 27: // ESC
 			bExit = TRUE;

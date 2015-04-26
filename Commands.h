@@ -1189,6 +1189,50 @@ inline int Commands(char* line)
 		if (!ival1) bRestartMaestro = TRUE;
 		bPauseMaestro = ival1;
 	}
+	else if (sscanf(line, "minisscconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "MiniSSC0.txt", strlen("MiniSSC0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "MiniSSC0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartMiniSSC = TRUE;
+		bPauseMiniSSC = ival1;
+	}
+	else if (sscanf(line, "sailconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "Sail0.txt", strlen("Sail0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "Sail0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartSail = TRUE;
+		bPauseSail = ival1;
+	}
 	else if (sscanf(line, "videoconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
 		if ((ival >= 0)&&(ival < nbvideo))
