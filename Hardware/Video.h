@@ -54,7 +54,7 @@ inline int recvdecode(VIDEO* pVideo)
 	int i = 0;
 	CvMat* mat = NULL;
 	IplImage* imagenew = pVideo->frame;
-	//char* databufnew = *pdatabuf;
+	//char* databufnew = pVideo->databuf;
 
 	if (recvall(pVideo->s, (char*)header, 3*sizeof(unsigned int)) != EXIT_SUCCESS)
 	{
@@ -67,6 +67,14 @@ inline int recvdecode(VIDEO* pVideo)
 	if (val == UINT_MAX)
 	{
 		// Full image data (with static compression).
+
+		// Quick checks...
+		if (((int)header[1] < 0)||((int)header[2] < 0))
+		{
+			printf("Bad compression or transmission error.\n");
+			return EXIT_FAILURE;
+		}
+
 		mat = cvCreateMat(header[1], header[2], CV_8UC1);
 		if (mat == NULL)
 		{
@@ -92,6 +100,7 @@ inline int recvdecode(VIDEO* pVideo)
 
 		cvReleaseMat(&mat);
 
+		// Resolution changed by server.
 		if ((pVideo->frame->width != pVideo->videoimgwidth)||(pVideo->frame->height != pVideo->videoimgheight))
 		{
 			printf("Unable to set desired video resolution.\n");
@@ -100,7 +109,9 @@ inline int recvdecode(VIDEO* pVideo)
 			//videoimgwidth = image->width;
 			//videoimgheight = image->height;
 
-			//databufnew = (char*)calloc(image->imageSize+7, sizeof(char));
+			//if (bDynamicWindowResizing) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+
+			//databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
 			//if (!databufnew)	
 			//{
 			//	printf("realloc() failed.\n");
@@ -112,16 +123,18 @@ inline int recvdecode(VIDEO* pVideo)
 	}
 	else
 	{
+		// Partial image data (dynamic time compression) or full image data without compression.
 
 		if (((int)header[1] != pVideo->videoimgwidth)||((int)header[2] != pVideo->videoimgheight))
 		{
-			printf("Unable to set desired video resolution.\n");
+			printf("Unable to set desired video resolution or transmission error.\n");
 			return EXIT_FAILURE;
 		}
 
 		//videoimgwidth = header[1];
 		//videoimgheight = header[2];
 
+		// Resolution changed by server.
 		//if ((image->width != videoimgwidth)||(image->height != videoimgheight))
 		//{
 		//	imagenew = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
@@ -133,7 +146,9 @@ inline int recvdecode(VIDEO* pVideo)
 		//	cvReleaseImage(&image);
 		//	image = imagenew;
 
-		//	databufnew = (char*)calloc(image->imageSize+7, sizeof(char));
+		//if (bDynamicWindowResizing) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+
+		//	databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
 		//	if (!databufnew)	
 		//	{
 		//		printf("realloc() failed.\n");
@@ -144,20 +159,39 @@ inline int recvdecode(VIDEO* pVideo)
 		//}
 
 		nbBytes = val-3*sizeof(unsigned int);
+		if (nbBytes > pVideo->frame->imageSize)
+		{
+			printf("Bad compression or transmission error.\n");
+			return EXIT_FAILURE;
+		}
 		if (nbBytes > 0)
 		{
 			if (recvall(pVideo->s, pVideo->databuf, nbBytes) != EXIT_SUCCESS)
 			{
 				return EXIT_FAILURE;
 			}
-
-			i = nbBytes;
-			while (i -= 7) // 7 for sizeof(unsigned int)+3*sizeof(char).
+			if (nbBytes == pVideo->frame->imageSize)
 			{
-				// Blue index value of the pixel.
-				memcpy((char*)&val, pVideo->databuf+i, sizeof(unsigned int)); 
-				// BGR values.
-				memcpy(pVideo->frame->imageData+val, pVideo->databuf+i+sizeof(unsigned int), 3*sizeof(char));
+				// Full image data without compression.
+				memcpy(pVideo->frame->imageData, pVideo->databuf, pVideo->frame->imageSize);
+			}
+			else
+			{
+				// Partial image data (dynamic time compression).
+				i = nbBytes;
+				while (i -= 7) // 7 for sizeof(unsigned int)+3*sizeof(char).
+				{
+					// Blue index value of the pixel.
+					memcpy((char*)&val, pVideo->databuf+i, sizeof(unsigned int)); 
+					// Check if index is valid.
+					if ((val < 0)||(val > pVideo->frame->imageSize-3*sizeof(char))) 
+					{
+						printf("Bad compression or transmission error.\n");
+						return EXIT_FAILURE;
+					}
+					// BGR values.
+					memcpy(pVideo->frame->imageData+val, pVideo->databuf+i+sizeof(unsigned int), 3*sizeof(char));
+				}
 			}
 		}
 	}
@@ -371,7 +405,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			return EXIT_FAILURE;
 		}
 
-		pVideo->databuf = (char*)calloc(pVideo->frame->imageSize+7, sizeof(char));
+		pVideo->databuf = (char*)calloc(pVideo->frame->imageSize+3*sizeof(unsigned int), sizeof(char));
 		if (!pVideo->databuf)	
 		{
 			printf("calloc() failed.\n");
