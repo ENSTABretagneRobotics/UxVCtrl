@@ -53,7 +53,7 @@ OSEv.o: ../OSUtils/OSEv.c ../OSUtils/OSEv.h OSThread.o
 OSMisc.o: ../OSUtils/OSMisc.c ../OSUtils/OSMisc.h OSTime.o
 	$(CC) $(CFLAGS) -c $<
 
-OSNet.o: ../OSUtils/OSNet.c ../OSUtils/OSNet.h OSTime.o
+OSNet.o: ../OSUtils/OSNet.c ../OSUtils/OSNet.h OSThread.o
 	$(CC) $(CFLAGS) -c $<
 
 OSSem.o: ../OSUtils/OSSem.c ../OSUtils/OSSem.h OSTime.o
