@@ -15,3 +15,55 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# Common Windows files
+*.txt eol=crlf
+*.TXT eol=crlf
+*.bat eol=crlf
+*.BAT eol=crlf
+*.cmd eol=crlf
+*.CMD eol=crlf
+*.csv -text
+*.CSV -text
+# Reg files are UTF-16 and this might cause problems...
+*.reg binary
+*.REG binary
+
+# Common Linux files
+*.sh eol=lf
+Makefile eol=lf
+
+# Common Visual Studio files
+*.sln eol=crlf
+*.vcproj eol=crlf
+*.vcxproj eol=crlf
+*.vcxproj.filters eol=crlf
+
+# Seanet
+*.v4log binary
+*.partheader binary
+*.userver binary
+
+# MOOS
+*.alog -text
+
+#
+*.kml eol=crlf
+*.KML eol=crlf
+*.xml eol=crlf
+*.XML eol=crlf
+*.java eol=crlf
+*.JAVA eol=crlf
+*.m eol=crlf
+*.M eol=crlf
+*.py eol=crlf
+*.PY eol=crlf
+*.c eol=crlf
+*.C eol=crlf
+*.cpp eol=crlf
+*.CPP eol=crlf
+*.h eol=crlf
+*.H eol=crlf
+*.hpp eol=crlf
+*.HPP eol=crlf
+*.pro eol=crlf
