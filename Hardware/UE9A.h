@@ -16,14 +16,37 @@
 #include "OSThread.h"
 #endif // DISABLE_UE9ATHREAD
 
+//// In us.
+//#define DEFAULT_ABSOLUTE_MIN_PW_UE9 500
+//
+//// In us.
+//#define DEFAULT_MIN_PW_UE9 1000
+//
+//// In us.
+//#define DEFAULT_MID_PW_UE9 1500
+//
+//// In us.
+//#define DEFAULT_MAX_PW_UE9 2000
+//
+//// In us.
+//#define DEFAULT_ABSOLUTE_MAX_PW_UE9 2500
+
 struct UE9A
 {
 	HUE9 hUE9;
+	//int LastPWs[MAX_NB_TIMERS_UE9];
 	char szCfgFilePath[256];
 	char szDevPath[256];
+	//int MinPWs[MAX_NB_TIMERS_UE9];
+	//int MidPWs[MAX_NB_TIMERS_UE9];
+	//int MaxPWs[MAX_NB_TIMERS_UE9];
+	//int ThresholdPWs[MAX_NB_TIMERS_UE9];
+	//double CoefPWs[MAX_NB_TIMERS_UE9];
+	//int bProportionalPWs[MAX_NB_TIMERS_UE9];
 	int rightthrusterpwm;
 	int leftthrusterpwm;
 	int bottomthrusterpwm;
+	// To be replaced by CoefPWs...
 	int rightthrustercoef;
 	int leftthrustercoef;
 	int bottomthrustercoef;

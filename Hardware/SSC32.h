@@ -65,6 +65,189 @@ struct SSC32
 };
 typedef struct SSC32 SSC32;
 
+// value = 0 or 1.
+inline int SetDigitalOutputSSC32(SSC32* pSSC32, int channel, int value)
+{
+	char sendbuf[MAX_NB_BYTES_SSC32];
+	int sendbuflen = 0;
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	if (value)
+		sprintf(sendbuf, "#%dH\r", channel);
+	else
+		sprintf(sendbuf, "#%dL\r", channel);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int GetDigitalInputSSC32(SSC32* pSSC32, int channel, int* pValue)
+{
+	char sendbuf[MAX_NB_BYTES_SSC32];
+	int sendbuflen = 0;
+	char recvbuf[1];
+	int recvbuflen = 0;
+	char c = 0;
+	char v = 0;
+
+	switch (channel)
+	{
+	case 0: c = 'A'; break;
+	case 1: c = 'B'; break;
+	case 2: c = 'C'; break;
+	case 3: c = 'D'; break;
+	default: 
+		printf("Invalid parameter : channel %d.\n", channel);
+		return EXIT_FAILURE;
+	}
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "%c\r", c);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+	
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 1;
+
+	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	v = recvbuf[0];
+	*pValue = (v == '0')?0:1;
+
+	return EXIT_SUCCESS;
+}
+
+inline int GetVoltageSSC32(SSC32* pSSC32, int channel, double* pVoltage)
+{
+	char sendbuf[MAX_NB_BYTES_SSC32];
+	int sendbuflen = 0;
+	char recvbuf[1];
+	int recvbuflen = 0;
+	char c = 0;
+	unsigned char v = 0;
+
+	switch (channel)
+	{
+	case 0: c = 'A'; break;
+	case 1: c = 'B'; break;
+	case 2: c = 'C'; break;
+	case 3: c = 'D'; break;
+	default: 
+		printf("Invalid parameter : channel %d.\n", channel);
+		return EXIT_FAILURE;
+	}
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "V%c\r", c);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+	
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 1;
+
+	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	v = (unsigned char)recvbuf[0];
+	*pVoltage = v*5.0/256.0;
+
+	return EXIT_SUCCESS;
+}
+
+// Only for IOIOSrv...
+// pw in us.
+inline int GetPWMSSC32(SSC32* pSSC32, int channel, int* pPw)
+{
+	char sendbuf[MAX_NB_BYTES_SSC32];
+	int sendbuflen = 0;
+	char recvbuf[2];
+	int recvbuflen = 0;
+	unsigned short pw = 0;
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "#%dPI\r", channel);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+	
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 2;
+
+	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	// pw in us as a 16 bit integer.
+	memcpy((char*)&pw, recvbuf, sizeof(unsigned short));
+	*pPw = pw;
+
+	return EXIT_SUCCESS;
+}
+
 // pw in us.
 inline int SetPWMSSC32(SSC32* pSSC32, int channel, int pw)
 {

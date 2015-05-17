@@ -1,5 +1,7 @@
 42
-Minor modifications in remote video.
+Updates in remote video.
+Added the possibility to specify an URL for cvCreateFileCapture() (OpenCV partially supports some IP cameras).
+Updates in actuators.
 
 41
 Beginning of sailboats integration.

@@ -49,6 +49,8 @@ typedef struct VIDEO VIDEO;
 inline int recvdecode(VIDEO* pVideo)
 {
 	unsigned int header[3];
+	char httpbuf[2048];
+	char* szContentLength = NULL;
 	unsigned int val = 0;
 	int nbBytes = 0;
 	int i = 0;
@@ -109,7 +111,92 @@ inline int recvdecode(VIDEO* pVideo)
 			//videoimgwidth = image->width;
 			//videoimgheight = image->height;
 
-			//if (bDynamicWindowResizing) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+			//if (bWindowResizedFromServer) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+
+			//databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
+			//if (!databufnew)	
+			//{
+			//	printf("realloc() failed.\n");
+			//	return EXIT_FAILURE;
+			//}
+			//free(databuf);
+			//databuf = databufnew;
+		}
+	}
+	else if (strncmp((char*)header, "--boundary\r\n", 3*sizeof(unsigned int)) == 0)
+	{
+		// MJPEG.
+
+		memset(httpbuf, 0, sizeof(httpbuf));
+		// Get "Content-Type: image/jpeg\r\nContent-Length:".
+		if (recvall(pVideo->s, (char*)httpbuf, 41) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		// Get "%d\r" with %d the JPEG image size, indicated in the HTTP Content-Length field.
+		if (recvuntil(pVideo->s, (char*)httpbuf+41, '\r', 10) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		// Get "\n\r\n" that indicates the end of the HTTP header.
+		if (recvall(pVideo->s, (char*)httpbuf+strlen(httpbuf), 3) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		szContentLength = strstr(httpbuf, "Content-Length");
+		if (szContentLength == NULL)
+		{
+			return EXIT_FAILURE;
+		}
+		if (sscanf(szContentLength, "Content-Length: %d\r\n", &nbBytes) != 1)
+		{
+			return EXIT_FAILURE;
+		}
+		header[1] = 1;
+		header[2] = nbBytes;
+
+		// Quick checks...
+		if (((int)header[1] < 0)||((int)header[2] < 0))
+		{
+			printf("Bad compression or transmission error.\n");
+			return EXIT_FAILURE;
+		}
+
+		mat = cvCreateMat(header[1], header[2], CV_8UC1);
+		if (mat == NULL)
+		{
+			printf("cvCreateMat() failed.\n");
+			return EXIT_FAILURE;
+		}
+
+		if (recvall(pVideo->s, (char*)mat->data.ptr, header[1]*header[2]) != EXIT_SUCCESS)
+		{
+			cvReleaseMat(&mat);
+			return EXIT_FAILURE;
+		}
+
+		imagenew = cvDecodeImage(mat, CV_LOAD_IMAGE_COLOR);
+		if (imagenew == NULL)
+		{
+			printf("cvDecodeImage() failed.\n");
+			cvReleaseMat(&mat);
+			return EXIT_FAILURE;
+		}
+		cvReleaseImage(&pVideo->frame);
+		pVideo->frame = imagenew;
+
+		cvReleaseMat(&mat);
+
+		// Resolution changed by server.
+		if ((pVideo->frame->width != pVideo->videoimgwidth)||(pVideo->frame->height != pVideo->videoimgheight))
+		{
+			printf("Unable to set desired video resolution.\n");
+			return EXIT_FAILURE;
+
+			//videoimgwidth = image->width;
+			//videoimgheight = image->height;
+
+			//if (bWindowResizedFromServer) cvResizeWindow("Client", videoimgwidth, videoimgheight);
 
 			//databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
 			//if (!databufnew)	
@@ -146,7 +233,7 @@ inline int recvdecode(VIDEO* pVideo)
 		//	cvReleaseImage(&image);
 		//	image = imagenew;
 
-		//if (bDynamicWindowResizing) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+		//if (bWindowResizedFromServer) cvResizeWindow("Client", videoimgwidth, videoimgheight);
 
 		//	databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
 		//	if (!databufnew)	
@@ -200,10 +287,9 @@ inline int recvdecode(VIDEO* pVideo)
 }
 
 inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
-{
-	// For rotation...
-	double m[6];
-	CvMat M = cvMat(2, 3, CV_64F, m);
+{	
+	double m[6]; // For rotation...
+	CvMat M = cvMat(2, 3, CV_64F, m); // For rotation...
 
 	switch (pVideo->DevType)
 	{
@@ -392,7 +478,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 
 	// Try to determine whether it is an IP address and TCP port, a filename or a local camera.
 	ptr = strchr(pVideo->szDevPath, ':');
-	if (ptr != NULL)
+	if ((ptr != NULL)&&(ptr[1] != '/'))
 	{
 		memcpy(pVideo->address, pVideo->szDevPath, ptr-pVideo->szDevPath);
 		strcpy(pVideo->port, ptr+1);

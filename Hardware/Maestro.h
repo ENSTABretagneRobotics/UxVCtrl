@@ -82,6 +82,7 @@ struct MAESTRO
 };
 typedef struct MAESTRO MAESTRO;
 
+// If analog input, voltage = value*5.0/1024. If digital input, bit = (value == 1023)? 1: 0;.
 inline int GetValueMaestro(MAESTRO* pMaestro, int channel, int* pValue)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_MAESTRO];
@@ -128,7 +129,8 @@ inline int GetValueMaestro(MAESTRO* pMaestro, int channel, int* pValue)
 	return EXIT_SUCCESS;
 }
 
-// pw in us.
+// If digital output, bit = (pw >= 1500)? 1 : 0;.
+// pw in us. 
 inline int SetPWMMaestro(MAESTRO* pMaestro, int channel, int pw)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_MAESTRO];
