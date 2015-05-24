@@ -1,5 +1,6 @@
 43
 Updated ResetWorkspace.bat/.sh to include ReadMe.txt in each output folder.
+Updated local repository.
 
 42
 Updates in remote video.
