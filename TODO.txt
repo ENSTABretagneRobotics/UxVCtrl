@@ -1,3 +1,5 @@
+rename to UxVCtrl as UxV is the usual designation of UAV, UGV, USV, UUV...
+
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 add support of mt nmea sentences in nmeadevice
 hokuyo
@@ -69,6 +71,7 @@ flush du modem quand il reçoit des données invalides?
 pour pouvoir analyser toutes les données qui viennent du modem facilement et retirer les vieilles, il vaut mieux utiliser des messages qui ont une en-tête et fin prédéfinie...
 bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?
 add velocityofsound as env global param as necessary for echo message...
+time-division method
 
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 
@@ -147,6 +150,7 @@ il faut qu'on puisse indiquer qui fixe la base de temps et qui doit se synchro d
 paramètre absolutebeginreplaytime dans chaque fichier de config au lieu de delay? (il suffit de lire le nom du fichier en fait...)
 dans ce cas il suffirait de faire des sonarconfig log_with_date.csv au début et à chaque reconfig dans un fichier de mission inspiré de l'original, avec le mode spécial replay du sonar qui lit chaque ligne dès que le moment est bon en supposant que la date de début est celle dans le nom de fichier
 razor, es (indépendant ou via seanet), ssc sauvegardent données brutes sans indication de temps...
+should add variable datacounter for each device?
 
 deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme WaitForUserInput() au lieu de fgets...
 

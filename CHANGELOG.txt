@@ -1,3 +1,6 @@
+43
+Updated ResetWorkspace.bat/.sh to include ReadMe.txt in each output folder.
+
 42
 Updates in remote video.
 Added the possibility to specify an URL for cvCreateFileCapture() (OpenCV partially supports some IP cameras).
