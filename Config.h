@@ -124,7 +124,7 @@ inline int LoadConfig()
 	simulatorperiod = 70;
 	outliers_ratio = 0.5;
 
-	file = fopen("AROVTest.txt", "r");
+	file = fopen("UxVCtrl.txt", "r");
 	if (file != NULL)
 	{
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="AROVTest"
+	Name="UxVCtrl"
 	ProjectGUID="{30A6807A-5214-4E51-9ECA-AAFA08F9F6D8}"
-	RootNamespace="AROVTest"
+	RootNamespace="UxVCtrl"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -319,7 +319,7 @@
 			Name="Input Files"
 			>
 			<File
-				RelativePath=".\AROVTest.txt"
+				RelativePath=".\UxVCtrl.txt"
 				>
 			</File>
 			<File

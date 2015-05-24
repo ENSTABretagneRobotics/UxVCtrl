@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{30A6807A-5214-4E51-9ECA-AAFA08F9F6D8}</ProjectGuid>
-    <RootNamespace>AROVTest</RootNamespace>
+    <RootNamespace>UxVCtrl</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -254,7 +254,7 @@
     <ClInclude Include="Hardware\Video.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="AROVTest.txt" />
+    <Text Include="UxVCtrl.txt" />
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />
     <Text Include="Hokuyo0.txt" />

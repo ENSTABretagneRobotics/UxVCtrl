@@ -1,3 +1,6 @@
+44
+Renamed to UxVCtrl as UxV is the usual designation of UAV, UGV, USV, UUV...
+
 43
 Updated ResetWorkspace.bat/.sh to include ReadMe.txt in each output folder.
 Updated local repository.

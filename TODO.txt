@@ -1,5 +1,3 @@
-rename to UxVCtrl as UxV is the usual designation of UAV, UGV, USV, UUV...
-
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 add support of mt nmea sentences in nmeadevice
 hokuyo
@@ -138,7 +136,7 @@ openal, pingertracking
 
 replay
 faire option lecture de fichier sonar qui lit les temps et attend de dt=t1-t0 avec t0 et t1 lus dans le fichier, voir comment c'est fait pour vidéo
-rajouter fonction replay arovtest, comment gérer mieux les histoires de conversions de temps?
+rajouter fonction replay uxvctrl, comment gérer mieux les histoires de conversions de temps?
 il faudrait sans doute faire des cas particuliers car les données sont parfois dans des fichiers séparés (caméra, sonar) et pour le sonar le temps de reconfiguration est variable donc c'est pas facile de manuellement choisir le moment où un fichier particulier doit être relu
 mais on peut éditer un peu les fichiers pour que ça colle bien... faire des programmes de concaténation qui remplissent avec des blancs quand il n'y a rien? et s'il y a changement de config, il y a eu appel à sonarconfig (quand il y a eu déconnexion intempestive, on peut concaténer car il n'y a pas de changement de paramètres)
 j'ai déja des commandes sonarconfig Seanet.txt, rajouter paramètres loop et delay?
@@ -179,7 +177,7 @@ destroywindow dans code théo->bCleanUp
 
 sonarstaticlocdevice : merge à faire... a beaucoup servi pour débugger sonar au début, maintenant qu'est-ce qu'il a de plus?
 gui->sonarstaticlocstructured
-sonar device handling->arovtest, sonartest, sonardisptest
+sonar device handling->uxvctrl, sonartest, sonardisptest
 localisation->sonarstaticlocstructuredsimu
 
 restaurer régulations et u après brake?-> mais le but du brake est de s'arrêter...
@@ -276,7 +274,7 @@ rajouter proportionnellement à u_max, uw_max, uv_max quand on reste appuyé sur u
 tester régulation boost mode avec vrai robot, c'est peut-être bien d'avoir un mode mi-vitesse et mode full (mode normal/mode rapide ou même mettre un coefficient réglable, séparer ce coef pour propulseurs horizontaux et verticaux) car le mode mi-vitesse pratique pour manoeuvres manuelles => u_coef, uw_coef
 
 pour les suivis de waypoints ou ligne, il faut des commandes qui prennent x,y et d'autres lat long (wgs)
-mettre valeurs par défaut pour gamma_infinite, r (r sera commun à wp et line) dans arovtest.txt
+mettre valeurs par défaut pour gamma_infinite, r (r sera commun à wp et line) dans uxvctrl.txt
 plus besoin du r dans gotoxyrt
 cancelgotoxy?-> le stop fait déjà ça...
 log avec unix time, lat, long, depth (pour unixtime, on va faire juste avec t vu que de toute façon on n'a pas l'heure exacte...)

@@ -490,7 +490,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="AROVTest.txt">
+    <Text Include="UxVCtrl.txt">
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="CISCREA.txt">
