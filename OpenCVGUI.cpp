@@ -55,7 +55,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	//cvWaitKey(100);
 	//cvDestroyWindow("Initializing...");
 
-	sprintf(windowname, "AROVOpenCVGUI%d", videoid);
+	sprintf(windowname, "UxVOpenCVGUI%d", videoid);
 	cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
 	cvMoveWindow(windowname, videoimgwidth*videoid, 0);
 	EnterCriticalSection(&dispimgsCS[videoid]);
@@ -79,7 +79,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		{
 			if (windowname[0] == 0)
 			{
-				sprintf(windowname, "AROVOpenCVGUI%d", videoid);
+				sprintf(windowname, "UxVOpenCVGUI%d", videoid);
 				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
 				cvMoveWindow(windowname, videoimgwidth*videoid, 0);
 			}

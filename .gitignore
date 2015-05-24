@@ -185,3 +185,4 @@ vid/*.mp4
 vid/*.MP4
 vid/*.avi
 vid/*.AVI
+!*ReadMe.txt
