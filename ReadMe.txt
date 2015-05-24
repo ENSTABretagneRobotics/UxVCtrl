@@ -1,4 +1,4 @@
-This folder contains the program used to control and configure the submarine during the SAUC-E and euRathlon competitions.
+This folder contains a program used to control and configure UGVs, USVs, UUVs used in WRSC, SAUC-E and euRathlon competitions.
 
 It is recommended to be connected with an administrator account, deactivate any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189. Under Windows 7-8, choose Work for the network type if asked when connecting to the different networks (avoid Public type, to check and change go to Network and Sharing Center and click on Public to be able to change to Work).
 In Windows Explorer Folder Options, View tab, activate hidden files display, known files extensions display, protected system files and folders display.
@@ -22,8 +22,8 @@ _ LabJack UD driver v3.15/v3.2X
 [_ Microsoft Office Excel 2003 (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3, see UDK\Software prerequisites\CISSAU_prereq)
 *** DEVEL ***
-_ Visual Studio 2008 SP1
-_ OpenCV 2.4.2
+_ Visual Studio 2008 SP1/Visual Studio 2012
+_ OpenCV 2.4.2/2.4.9
 [_ Qt SDK 2010.05 (Qt_mini)]
 
 It is also supposed to be compatible with Linux 2.6 with equivalent prerequisites, although not fully tested.
