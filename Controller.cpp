@@ -20,7 +20,21 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double delta_z = 0; // For depth control.
 	double delta_asf = 0; // For altitude w.r.t. sea floor control.
 
+#pragma region Sailboat supervisor
+	STATE state = INVALID_STATE;
+	STATE prevstate = INVALID_STATE;
+	int bForceCheckStrategy = 0, bForceSailUpdate = 0;
+	CHRONO chrono_check_strategy;
+#pragma endregion
+	
 	UNREFERENCED_PARAMETER(pParam);
+
+#pragma region Sailboat supervisor
+	bForceCheckStrategy = 1;
+	bForceSailUpdate = 1;
+
+	StartChrono(&chrono_check_strategy);
+#pragma endregion
 
 	StartChrono(&chrono);
 
@@ -64,9 +78,20 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			wtheta = LineFollowing(phi, e, gamma_infinite, radius);
 
 #pragma region Sailboat supervisor
-/*
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
+				//To add as parameters...
+
+				int check_strategy_period = 60; // Period in s.
+				double betatrav = 0.5; // Angle de la voile en vent de travers (en rad).
+				double betaarr = 1.5; // Angle de la voile en vent arrière (en rad).
+				double ksi = 0.87; // Angle de près (en rad).
+
+				double q1 = betaarr;
+				double q2 = (log(betaarr)-log(betatrav))/log(2.0);
+				double psi = Center(psiwindhat);
+				double deltasmax = 0;
+
 				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
 				if (((state == STARBOARD_TACK_TRAJECTORY)&&(e > radius/2.0))||
 					((state == PORT_TACK_TRAJECTORY)&&(e < -radius/2.0)))
@@ -138,10 +163,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					//deltasmax = q1*pow((cos(psi-theta)+1.0)/2.0,q2); // Sail command.
 					break;
 				}
+
+				// Periodic sail update...?
+				u = deltasmax/q1;
 			}
-			
-			// Periodic sail update...
-*/
 #pragma endregion
 		}
 

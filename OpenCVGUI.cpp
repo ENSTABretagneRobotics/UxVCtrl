@@ -170,6 +170,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
 			case BUGGY_ROBID:
 				break;
 			default:
@@ -183,6 +185,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
 			case BUGGY_ROBID:
 				break;
 			default:

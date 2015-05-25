@@ -105,6 +105,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			switch (robid)
 			{
 			case BUGGY_ROBID:
+			case SAILBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
 				thrust = u;

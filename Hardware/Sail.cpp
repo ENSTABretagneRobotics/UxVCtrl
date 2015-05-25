@@ -33,7 +33,7 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 
 		mSleep(50);
 
-		if (bPauseSSC32) 
+		if (bPauseSail) 
 		{
 			if (bConnected)
 			{
@@ -105,7 +105,8 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 			{
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				//angle = deltavmax;
+				//angle = deltasmax;
+				if (u > 0) angle = u*(sail.MaxAngle-sail.MinAngle)+sail.MinAngle; else u = 0;
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetMaxAngleSail(&sail, angle) != EXIT_SUCCESS)
 				{

@@ -1,7 +1,5 @@
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-add support of mt nmea sentences in nmeadevice
 hokuyo
-remplacer Sail par IM483I
 
 utiliser bCleanup dans tous les threads pour le cvSet()?
 
@@ -32,6 +30,7 @@ DST:25,5 (lat,lon)
 ETA=15:01:25 (ou mettre juste durée en s)
 DIS=23.5
 mettre aussi BRG de ball par rapport au nord?
+display wind data and other useful info for sailboats...
 trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
 prévoir zoom sur la map, on a du mal à savoir son cap
 FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
@@ -79,8 +78,7 @@ reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer 
 revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms-> voir ssc32
 ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-32/IOIOSrv...
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
-
-touches z, s : ouvrir/fermer voile
+remplacer Sail par IM483I
 
 GPS, waypoints
 wpfollowingconfig radius file bWGS
@@ -161,13 +159,14 @@ robid log file?
 faire version de connect avec tout en paramètre (penser aussi à initialiser szCfgFilePath à 0...)
 un fichier de config pour décrire les périphériques du robot?
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
-gestion vagues et z, courants et vxy...
+gestion vagues et z, courants et vxy, wind...
 arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, rmtcommand, remoteopencv gui
 
 
 
 OLD
 
+touches z, s : ouvrir/fermer voile
 le fait qu'il revienne droit quand on va en marche av ou ar convient pas pour buggy, prévoir une touche pour activer/désactiver?->fait automatiquement selon robid
 
 rajouter heure, min, s avant auxbuf dans log sonar (voir leur calcul pour chaque ping...)

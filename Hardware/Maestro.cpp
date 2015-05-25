@@ -105,6 +105,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			switch (robid)
 			{
 			case BUGGY_ROBID:
+			case SAILBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
 				thrust = u;

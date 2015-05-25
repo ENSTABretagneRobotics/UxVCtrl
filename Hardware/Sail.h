@@ -37,17 +37,19 @@ struct SAIL
 {
 	RS232PORT RS232Port;
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
+	int LastRval;
 	char szCfgFilePath[256];
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
-	double MinAngle;
-	double MaxAngle;
 	int CalibrationSpeed;
 	int CalibrationTime;
 	int CalibrationTorque;
 	int NormalTorque;
+	int ThresholdRval;
+	double MinAngle;
+	double MaxAngle;
 };
 typedef struct SAIL SAIL;
 
@@ -87,7 +89,7 @@ inline int SetMotorSpeedSail(SAIL* pSail, int val)
 	else if (val > MAX_MOTOR_SPEED_SAIL) val = MAX_MOTOR_SPEED_SAIL;
 	else if (val < -MAX_MOTOR_SPEED_SAIL) val = -MAX_MOTOR_SPEED_SAIL;
 
-	// Prepare data to send to server.
+	// Prepare data to send to device.
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "M%d\r", val);
 	sendbuflen = (int)strlen(sendbuf);
@@ -112,7 +114,7 @@ inline int SetMotorOriginSail(SAIL* pSail)
 	char sendbuf[MAX_NB_BYTES_SAIL];
 	int sendbuflen = 0;
 
-	// Prepare data to send to server.
+	// Prepare data to send to device.
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "O\r");
 	sendbuflen = (int)strlen(sendbuf);
@@ -144,7 +146,10 @@ inline int SetMaxAngleSail(SAIL* pSail, double angle)
 
 	val = max(min(val, MAX_SAIL), MIN_SAIL);
 
-	// Prepare data to send to server.
+	// The requested value is only applied if it is slightly different from the current value.
+	if (abs(val-pSail->LastRval) < pSail->ThresholdRval) return EXIT_SUCCESS;
+
+	// Prepare data to send to device.
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "R%d\r", -val);
 	sendbuflen = (int)strlen(sendbuf);
@@ -160,6 +165,9 @@ inline int SetMaxAngleSail(SAIL* pSail, double angle)
 	}
 
 	mSleep(20);
+
+	// Update last known value.
+	pSail->LastRval = val;
 
 	return EXIT_SUCCESS;
 }
@@ -211,12 +219,13 @@ inline int ConnectSail(SAIL* pSail, char* szCfgFilePath)
 	pSail->BaudRate = 4800;
 	pSail->timeout = 1000;
 	pSail->bSaveRawData = 1;
-	pSail->MinAngle = MIN_ANGLE_SAIL;
-	pSail->MaxAngle = MAX_ANGLE_SAIL;
 	pSail->CalibrationSpeed = CALIBRATION_SPEED_SAIL;
 	pSail->CalibrationTime = CALIBRATION_TIME_SAIL;
 	pSail->CalibrationTorque = CALIBRATION_TORQUE_SAIL;
 	pSail->NormalTorque = NORMAL_TORQUE_SAIL;
+	pSail->ThresholdRval = 0;
+	pSail->MinAngle = MIN_ANGLE_SAIL;
+	pSail->MaxAngle = MAX_ANGLE_SAIL;
 
 	sprintf(pSail->szCfgFilePath, "%.255s", szCfgFilePath);
 
@@ -233,10 +242,6 @@ inline int ConnectSail(SAIL* pSail, char* szCfgFilePath)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSail->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pSail->MinAngle) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pSail->MaxAngle) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSail->CalibrationSpeed) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSail->CalibrationTime) != 1) printf("Invalid configuration file.\n");
@@ -244,6 +249,12 @@ inline int ConnectSail(SAIL* pSail, char* szCfgFilePath)
 		if (sscanf(line, "%d", &pSail->CalibrationTorque) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pSail->NormalTorque) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pSail->ThresholdRval) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &pSail->MinAngle) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &pSail->MaxAngle) != 1) printf("Invalid configuration file.\n");
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 	}
 	else
@@ -269,6 +280,8 @@ inline int ConnectSail(SAIL* pSail, char* szCfgFilePath)
 
 	// Used to save raw data, should be handled specifically...
 	//pSail->pfSaveFile = NULL;
+
+	pSail->LastRval = -MAX_SAIL;
 
 	if (OpenRS232Port(&pSail->RS232Port, pSail->szDevPath) != EXIT_SUCCESS)
 	{

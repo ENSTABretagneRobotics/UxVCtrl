@@ -7,10 +7,6 @@ COM7
 1000
 % bSaveRawData
 1
-% MinAngle (in rad)
-0.0
-% MaxAngle (in rad)
-1.57
 % CalibrationSpeed
 2000
 % CalibrationTime (in ms)
@@ -19,3 +15,9 @@ COM7
 60
 % NormalTorque
 100
+% ThresholdRval
+5000
+% MinAngle (in rad)
+0.0
+% MaxAngle (in rad)
+1.57

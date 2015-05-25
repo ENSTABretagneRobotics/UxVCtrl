@@ -1,3 +1,7 @@
+45
+Added threshold parameter to Sail.
+Continuation of sailboats integration.
+
 44
 Renamed to UxVCtrl as UxV is the usual designation of UAV, UGV, USV, UUV...
 

@@ -116,28 +116,15 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				{
 					//bGPSOKNMEADevice = FALSE;
 				}
-/*
+
 				if (robid & SAILBOAT_ROBID_MASK)
 				{
 					if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
 
-					//psiwind = fmod_2PI(M_PI/2.0-(nmeadata.WindDir-M_PI));
-					//vwind = nmeadata.WindSpeed;
-
-					// Put the filter in observer and the results would be Center(psiwindhat), Center(vwindhat)...?
-					// Filter initialization...?
-
-					// Wind data filter.
-					cosfilteredwinddir = wind_filter_coef*cosfilteredwinddir+(1.0-wind_filter_coef)*cos(nmeadata.WindDir);
-					sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(nmeadata.WindDir);
-					filteredwinddir = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir)+M_PI)+M_PI;
-					filteredwindspeed = wind_filter_coef*filteredwindspeed+(1.0-wind_filter_coef)*nmeadata.WindSpeed;
-					// Conversions.
-					psiwind = fmod_2PI(M_PI/2.0-(filteredwinddir-M_PI));
-					vwind = filteredwindspeed;
-
+					psiwind = fmod_2PI(M_PI/2.0-(nmeadata.WindDir-M_PI));
+					vwind = nmeadata.WindSpeed;
 				}
-*/
+
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else

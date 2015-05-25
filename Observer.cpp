@@ -16,7 +16,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	CHRONO chrono_omega;
 	double dt = 0, t = 0, t0 = 0;
 	//double dt_chrono = 0;
-	interval xhat_prev_old, yhat_prev_old, thetahat_prev_old;
+	//interval xhat_prev_old, yhat_prev_old, thetahat_prev_old;
 
 	UNREFERENCED_PARAMETER(pParam);
 
@@ -63,6 +63,22 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		vchat = interval(vc_med-vc_var,vc_med+vc_var);
 		psichat = interval(psic_med-psic_var,psic_med+psic_var);
 		hwhat = interval(-hw_var,hw_var);
+
+		// Filter initialization...?
+/*
+		int wind_filter_coef = 0.99; // Wind filter coefficient, between 0 and 1.
+
+		// Wind data filter.
+		cosfilteredwinddir = wind_filter_coef*cosfilteredwinddir+(1.0-wind_filter_coef)*cos(psiwind);
+		sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(psiwind);
+		filteredwinddir = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir)+M_PI)+M_PI;
+		filteredwindspeed = wind_filter_coef*filteredwindspeed+(1.0-wind_filter_coef)*vwind;
+		psiwindhat = interval(filteredwinddir-psiwind_var,filteredwinddir+psiwind_var);
+		vwindhat = interval(filteredwindspeed-vwind_var,filteredwindspeed+vwind_var);
+*/
+		// Temporary without filter...
+		psiwindhat = interval(psiwind,psiwind);
+		vwindhat = interval(vwind,vwind);
 
 		if (robid & SUBMARINE_ROBID_MASK)
 		{
