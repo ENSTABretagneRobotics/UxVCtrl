@@ -1,11 +1,10 @@
 % 0..9 or a video filename or IP address and TCP port
-%0
-test1.wmv
-%dummy_25min.wmv
 %127.0.0.1:4014
-%192.168.1.10:4014
-%http://127.0.0.1:4014/video.mjpeg
-%http://192.168.1.10:4014/video.mjpeg
+%0
+%test1.wmv
+dummy_25min.wmv
+%127.0.0.1:4014
+%192.168.1.150:4014
 % videoimgwidth
 320
 % videoimgheight

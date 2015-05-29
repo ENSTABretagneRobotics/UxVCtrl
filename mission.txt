@@ -1,22 +1,14 @@
 generalstop
-headingreg 0
-depthreg -1
-wait 10
-% forward
-thrust 0.1
-wait 10
-% stop
-thrust -0.1
-wait 3
-stop
-% rotate
-headingreg 180
-wait 10
-% forward
-thrust 0.1
-wait 10
-% stop
-thrust -0.1
-wait 3
-stop
+setmissionaction init
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+%wait 3
+linefollowingconfig 25 0.78
+setmissionaction l0
+linefollowingtwgs 48.391382 -4.427361 48.390194 -4.424336 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.390194 -4.424336 48.389059 -4.427607 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.389059 -4.427607 48.391382 -4.427361 31557600.000000
+setmissionaction end
 generalstop

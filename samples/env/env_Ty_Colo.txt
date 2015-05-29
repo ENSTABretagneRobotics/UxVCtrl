@@ -1,9 +1,9 @@
 % Angle of the x axis of the environment coordinate system to the North, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference (in deg in marine units)
 90
 % Latitude, longitude, altitude of the environment coordinate system (in decimal deg and m)
-48.227294
--4.294991
-0
+48.431686
+-4.616921
+233
 % Number of circles
 0
 % x  y  r (in m)

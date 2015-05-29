@@ -1,3 +1,7 @@
+resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
+setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
+setwindestimation : command to set winddir and windspeed, also add for water current and waves?
+
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 hokuyo
 

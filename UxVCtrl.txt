@@ -1,7 +1,7 @@
 % Hexadecimal identifier of the robot (see Globals.h)
 % robid
 % Simulator
-0x00000001
+%0x00000001
 % SAUCISSE
 %0x00000002
 % SARDINE
@@ -12,10 +12,14 @@
 %0x00000200
 %Motorboat
 %0x00000400
+%VAIMOS
+0x00020000
+%Sailboat
+%0x00040000
 %Buggy
 %0x02000000
 % nbvideo (max 3)
-2
+1
 % videoimgwidth
 320
 % videoimgheight
@@ -25,7 +29,7 @@
 % bEnableOpenCVGUIs[0]
 1
 % bEnableOpenCVGUIs[1]
-1
+0
 % bEnableOpenCVGUIs[2]
 0
 % bShowVideoOpenCVGUIs[0]
@@ -49,38 +53,38 @@
 % bDisableRazorAHRS
 1
 % bDisableMT
-1
+0
 % bDisableGPS
-1
+0
 % bDisableSwarmonDevice
 1
 % bDisableUE9A
 1
 % bDisableSSC32
-1
+0
 % bDisableMaestro
 1
 % bDisableMiniSSC
 1
 % bDisableSail
-1
+0
 % Controller parameters
 % u_max (in [0;1])
 1
 % uw_max (in [0;1], (0.5 : boost, 1 : normal) for SAUC'ISSE, (0.35 (difficult to control...) : boost, 0.25 : normal) for CISCREA)
-0.5
+1
 % uv_max (in [0;1])
-0.75
+1
 % u_coef (1 : boost, 0.5 : normal)
-1
-% uw_coef (1 : boost, 0.5 : normal)
-1
-% Kp (1.0 : simu, 1.0 : SAUC'ISSE, 1.0 : SARDINE, 0.5 : CISCREA)
-1.0
-% Kd1 (0.5 : simu, 0.25 : SAUC'ISSE, 0.5 : SARDINE, 1.0 : CISCREA)
 0.5
+% uw_coef (1 : boost, 0.5 : normal)
+0.5
+% Kp (1.0 : simu, 1.0 : SAUC'ISSE, 1.0 : SARDINE, 0.5 : CISCREA)
+2.5
+% Kd1 (0.5 : simu, 0.25 : SAUC'ISSE, 0.5 : SARDINE, 1.0 : CISCREA)
+0
 % Kd2 (0.1 : simu, 0.05 : SAUC'ISSE, 0.1 : SARDINE, 0.1 : CISCREA)
-0.1
+0.05
 % Ki (0.1 : simu, 0.1 : SAUC'ISSE, 0.1 : SARDINE, 0.1 : CISCREA)
 0.1
 % uw_derivative_max
@@ -97,9 +101,9 @@
 % wdradius (accuracy of the distance control in m)
 0.25
 % vxymax (0.4 : simu, 0.4 : SAUC'ISSE, 0.4 : SARDINE, 1.5 : CISCREA, Hovecraft : 2)
-0.4
+2
 % omegamax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
-0.8
+1
 % gamma_infinite (in rad, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 0.78
 % r (accuracy of line/waypoint following in m, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
@@ -272,4 +276,4 @@
 % simulatorperiod (in ms)
 70
 % outliers_ratio
-0.25
+0.5

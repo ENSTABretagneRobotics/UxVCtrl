@@ -57,6 +57,12 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		{
 			double norm_ba = 0, norm_ma = 0, norm_bm = 0, sinalpha = 0, phi = 0, e = 0;
 
+
+			// when the line changes...
+			// bForceCheckStrategy = 1;
+			// and maybe do other things...
+
+
 			// Should only be computed when the line changes...
 			norm_ba = sqrt(pow(wxb-wxa,2)+pow(wyb-wya,2)); // Length of the line (norm of b-a).
 			phi = atan2(wyb-wya,wxb-wxa); // Angle of the line.

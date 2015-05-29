@@ -1,6 +1,6 @@
 % IP address and TCP port or local RS232 port
-%127.0.0.1:4004
-COM6
+127.0.0.1:4004
+%COM6
 % BaudRate
 9600
 % Timeout (in ms)
@@ -74,15 +74,15 @@ COM6
 1
 % For motorboat or sailboat...
 % rudderchan
-2
+0
 % rightthrusterchan
 1
 % leftthrusterchan
-0
+2
 % rightfluxchan
-4
-% leftfluxchan
 3
+% leftfluxchan
+4
 % MinAngle (in rad)
 -0.6
 % MaxAngle (in rad)
