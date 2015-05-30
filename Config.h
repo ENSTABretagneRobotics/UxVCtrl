@@ -443,6 +443,7 @@ inline int LoadConfig()
 	case HOVERCRAFT_ROBID:
 	case MOTORBOAT_ROBID:
 	case VAIMOS_ROBID:
+	case SAILBOAT_ROBID:
 	case BUGGY_ROBID:
 		break;
 	default:
