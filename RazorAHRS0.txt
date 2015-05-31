@@ -1,5 +1,5 @@
 % IP address and TCP port or local RS232 port
-%127.0.0.1:4010
+%127.0.0.1:4007
 COM5
 % BaudRate
 57600

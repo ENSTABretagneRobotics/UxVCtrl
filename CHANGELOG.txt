@@ -1,5 +1,6 @@
 46
 Corrected bug SAILBOAT_ROBID considered as invalid.
+RazorAHRS TCP port set to 4007.
 
 45
 Added threshold parameter to Sail.
