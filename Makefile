@@ -156,6 +156,9 @@ MDM.o: ./Hardware/MDM.cpp ./Hardware/MDM.h
 MES.o: ./Hardware/MES.cpp ./Hardware/MES.h
 	$(CC) $(CFLAGS) -c $<
 
+MiniSSC.o: ./Hardware/MiniSSC.cpp ./Hardware/MiniSSC.h
+	$(CC) $(CFLAGS) -c $<
+
 MT.o: ./Hardware/MT.cpp ./Hardware/MT.h
 	$(CC) $(CFLAGS) -c $<
 
@@ -169,6 +172,9 @@ RazorAHRS.o: ./Hardware/RazorAHRS.cpp ./Hardware/RazorAHRS.h
 	$(CC) $(CFLAGS) -c $<
 
 RS232Port.o: ./Hardware/RS232Port.cpp ./Hardware/RS232Port.h
+	$(CC) $(CFLAGS) -c $<
+
+Sail.o: ./Hardware/Sail.cpp ./Hardware/Sail.h
 	$(CC) $(CFLAGS) -c $<
 
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
@@ -236,7 +242,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CC) $(CFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pipeline.o OpenCVGUI.o Observer.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MES.o MDM.o Maestro.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pipeline.o OpenCVGUI.o Observer.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o Sail.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o Maestro.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

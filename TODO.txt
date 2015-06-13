@@ -1,9 +1,13 @@
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 setwindestimation : command to set winddir and windspeed, also add for water current and waves?
+faire aussi log spécifique suivi ligne avec mêmes info que vnavoutput et son log, ou pouvoir facilement convertir vers data.txt...
+rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire les données de chaque ligne (temps absolu ou relatif en option)
+ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-hokuyo
+hokuyo device like sonar
+mavlink device (ardupilot, pixhawk...)
 
 utiliser bCleanup dans tous les threads pour le cvSet()?
 
@@ -20,6 +24,7 @@ options pour enlever les outliers avant, après...
 repère dans lequel dessiner image sonar vs detection d'obstacles
 temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
+observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre)
 
 Altitude sonar
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
@@ -27,6 +32,10 @@ l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 
 GUI, video
+rajouter infos dans invite de commandes comme vctrl en option
+rajouter offset et mieux gérer les infos affichées selon le robot et selon le mode
+rajouter angle du vent (filtré, non filtré en plus clair...) dans le cercle
+mode actuel du voilier sur un côté
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
 plus petite police
 en mode suivi de wp/line et en option
@@ -34,7 +43,6 @@ DST:25,5 (lat,lon)
 ETA=15:01:25 (ou mettre juste durée en s)
 DIS=23.5
 mettre aussi BRG de ball par rapport au nord?
-display wind data and other useful info for sailboats...
 trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
 prévoir zoom sur la map, on a du mal à savoir son cap
 FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
@@ -56,7 +64,6 @@ reg cap pas assez rapide à cause dérivée, tester avec vieux code...
 régulation à grande vitesse saucisse à faire un peu comme sardine
 
 sauvegarder e,phi,delta_theta dans wall?
-faire aussi log spécifique suivi ligne avec mêmes info que vnavoutput et son log...
 synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
 
 acousticmodemlocalization
@@ -107,10 +114,10 @@ commandes startgpslocalization/stopgpslocalization (dans observer?)
 Obstacle avoidance
 surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 positionobstacleavoidance : faire tuto ajout step-by-step
+wallavoidance, visualobstacleavoidance : it is reactive behavior
+wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
+the control part of obstacle avoidance could be centralized to handle all the types of obstacles (punctual, line...), maybe using vector fields
 
-vectorfield?
-
-pour obstacle avoidance?
 configdistancecomputation
 distancecomputation
 commande waitdistanceless/more/wgs x y d
@@ -161,14 +168,19 @@ image : passer au log pour que les zoom, rotations... deviennent comme des trans
 robid, robid mask : regrouper sailboat et motorboat ensemble pour laisser de la place pour UGV et UAV?
 robid log file?
 faire version de connect avec tout en paramètre (penser aussi à initialiser szCfgFilePath à 0...)
-un fichier de config pour décrire les périphériques du robot?
+dans UxVCtrl.txt, ce serait peut-être plus logique de mettre des bEnableDevice au lieu de bDisableDevice...
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
 gestion vagues et z, courants et vxy, wind...
-arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, rmtcommand, remoteopencv gui
+arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, remoteopencv gui
+rmtcommand (client serait juste telnet)
+compiler UxVCtrl pour android (ne doit pas appeler opencgui, pas de timers...)
+rajouter un device qui communiquerait avec une MOOSDB
 
 
 
 OLD
+
+un fichier de config pour décrire les périphériques du robot?->c'est déjà un peu ce que fait UxVCtrl.txt
 
 touches z, s : ouvrir/fermer voile
 le fait qu'il revienne droit quand on va en marche av ou ar convient pas pour buggy, prévoir une touche pour activer/désactiver?->fait automatiquement selon robid
