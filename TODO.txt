@@ -1,13 +1,11 @@
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 setwindestimation : command to set winddir and windspeed, also add for water current and waves?
-faire aussi log spécifique suivi ligne avec mêmes info que vnavoutput et son log, ou pouvoir facilement convertir vers data.txt...
 rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire les données de chaque ligne (temps absolu ou relatif en option)
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 hokuyo device like sonar
-mavlink device (ardupilot, pixhawk...)
 
 utiliser bCleanup dans tous les threads pour le cvSet()?
 
@@ -32,7 +30,6 @@ l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 
 GUI, video
-rajouter infos dans invite de commandes comme vctrl en option
 rajouter offset et mieux gérer les infos affichées selon le robot et selon le mode
 rajouter angle du vent (filtré, non filtré en plus clair...) dans le cercle
 mode actuel du voilier sur un côté
@@ -86,10 +83,12 @@ comment attendre la détection de ball OU un message acoustique dans les scripts?
 Actuators
 ssc32 : rajouter un param midangle, et changer les formules de conversion entre uw et rudder pour que ça puisse ne pas être symétrique...
 reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer des données...
-revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms-> voir ssc32
+revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
 ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-32/IOIOSrv...
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
+quantification des actionneurs centrée en 0
 remplacer Sail par IM483I
+mavlink device (ardupilot, pixhawk...)
 
 GPS, waypoints
 wpfollowingconfig radius file bWGS

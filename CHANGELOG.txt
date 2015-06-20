@@ -1,3 +1,6 @@
+47
+Continuation of sailboats integration.
+
 46
 Corrected bug SAILBOAT_ROBID considered as invalid.
 RazorAHRS TCP port set to 4007.

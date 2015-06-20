@@ -15,6 +15,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	MAESTRO maestro;
 	double rudder = 0, thrust = 0, flux = 0;
 	double thrust1 = 0, thrust2 = 0;
+	int ivalue = 0;
+	double winddir = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -115,7 +117,20 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
-				}		
+					break; // Temporary...
+				}
+				// Temporary...
+				if (GetValueMaestro(&maestro, 11, &ivalue) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					break; // Temporary...
+				}
+				EnterCriticalSection(&StateVariablesCS);
+				winddir = ivalue*360.0/1024.0;
+				psiwind = fmod_2PI(M_PI/2.0-winddir*M_PI/180.0-angle_env);
+				LeaveCriticalSection(&StateVariablesCS);
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);

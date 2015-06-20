@@ -123,7 +123,6 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					{
 						if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
 					}
-
 					if (nmeadevice.bEnableWIMDA)
 					{
 						psiwind = fmod_2PI(M_PI/2.0-(nmeadata.WindDir-M_PI));
@@ -131,9 +130,9 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					}
 					else
 					{
-						// Temporary, should add new command and/or parameter...?
-						psiwind = fmod_2PI(M_PI/2.0-(0.0-M_PI));
-						vwind = 5;
+						//// Temporary, should add new command and/or parameter...?
+						//psiwind = fmod_2PI(M_PI/2.0-(0.0-M_PI));
+						//vwind = 5;
 					}
 				}
 
