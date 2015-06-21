@@ -129,7 +129,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				EnterCriticalSection(&StateVariablesCS);
 				winddir = ivalue*360.0/1024.0+180.0; // Offset...
-				psiwind = fmod_2PI(M_PI/2.0-winddir*M_PI/180.0); // Apparent wind (in robot coordinate system).
+				psiwind = fmod_2PI(M_PI/2.0-(winddir*M_PI/180.0)-M_PI); // Apparent wind (in robot coordinate system).
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
 			case VAIMOS_ROBID:

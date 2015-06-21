@@ -1,4 +1,4 @@
-offset capteur de vent, vent vrai vs vent apparent...
+offset capteur de vent, vent vrai vs vent apparent, commande de station automatique start/stopstation lat long dt...
 
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
@@ -35,6 +35,7 @@ GUI, video
 rajouter offset et mieux gérer les infos affichées selon le robot et selon le mode
 rajouter angle du vent (filtré, non filtré en plus clair...) dans le cercle
 mode actuel du voilier sur un côté
+afficher plut$ot u*q1 au lieu de deltasmax, qui est seulement à jour en linefollowing
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
 plus petite police
 en mode suivi de wp/line et en option
@@ -88,7 +89,7 @@ reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer 
 revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
 ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-32/IOIOSrv...
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
-quantification des actionneurs centrée en 0
+quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...)
 remplacer Sail par IM483I
 mavlink device (ardupilot, pixhawk...)
 

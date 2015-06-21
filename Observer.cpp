@@ -94,14 +94,14 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			// Robot speed not taken into account...
 			cosfilteredwinddir = wind_filter_coef*cosfilteredwinddir+(1.0-wind_filter_coef)*cos(psiwind+theta_mes);
 			sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(psiwind+theta_mes);
-			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir)+M_PI)+M_PI+interval(-0.1,0.1);//+interval(-psiwind_var,psiwind_var);
+			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-0.1,0.1);//+interval(-psiwind_var,psiwind_var);
 			vwindhat = wind_filter_coef*Center(vwindhat)+(1.0-wind_filter_coef)*vwind+interval(-0.1,0.1);//+interval(-vwind_var,vwind_var); // ?
 		}
 		else
 		{
 			cosfilteredwinddir = wind_filter_coef*cosfilteredwinddir+(1.0-wind_filter_coef)*cos(psiwind);
 			sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(psiwind);
-			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir)+M_PI)+M_PI+interval(-0.1,0.1);//+interval(-psiwind_var,psiwind_var);
+			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-0.1,0.1);//+interval(-psiwind_var,psiwind_var);
 			vwindhat = wind_filter_coef*Center(vwindhat)+(1.0-wind_filter_coef)*vwind+interval(-0.1,0.1);//+interval(-vwind_var,vwind_var);
 		}
 
