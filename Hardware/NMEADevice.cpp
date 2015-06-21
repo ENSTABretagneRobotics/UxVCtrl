@@ -104,7 +104,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 
-				if (nmeadata.GPS_quality_indicator > 0) 
+				if ((nmeadata.GPS_quality_indicator > 0)||(nmeadata.status == 'A'))
 				{
 					//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
 					latitude = nmeadata.Latitude;
@@ -117,23 +117,28 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					//bGPSOKNMEADevice = FALSE;
 				}
 
-				if (robid & SAILBOAT_ROBID_MASK)
+				// Should check better if valid...
+				if ((nmeadevice.bEnableGPRMC&&(nmeadata.status == 'A'))||nmeadevice.bEnableGPVTG)
 				{
-					if (nmeadevice.bEnableHCHDG)
-					{
-						if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
-					}
-					if (nmeadevice.bEnableWIMDA)
-					{
-						psiwind = fmod_2PI(M_PI/2.0-(nmeadata.WindDir-M_PI));
-						vwind = nmeadata.WindSpeed;
-					}
-					else
-					{
-						//// Temporary, should add new command and/or parameter...?
-						//psiwind = fmod_2PI(M_PI/2.0-(0.0-M_PI));
-						//vwind = 5;
-					}
+					sog = nmeadata.SOG;
+					cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+				}
+
+				if (nmeadevice.bEnableHCHDG)
+				{
+					if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+				}
+
+				if (nmeadevice.bEnableWIMDA)
+				{
+					psiwind = fmod_2PI(M_PI/2.0-(nmeadata.WindDir-M_PI));
+					vwind = nmeadata.WindSpeed;
+				}
+				else
+				{
+					//// Temporary, should add new command and/or parameter...?
+					//psiwind = fmod_2PI(M_PI/2.0-(0.0-M_PI));
+					//vwind = 5;
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);

@@ -33,7 +33,7 @@
 
 struct NMEADATA
 {
-	double utc;
+	double utc, date;
 	double pressure, temperature;
 	char cpressure, ctemperature;
 	double winddir, windspeed;
@@ -47,11 +47,15 @@ struct NMEADATA
 	int nbsat;
 	double hdop;
 	double height_geoid;
+	char status;
+	double sog, cog, mag_cog;
 	double heading, deviation, variation;
 	char dev_east, var_east;
 	double Latitude; // In decimal degrees.
 	double Longitude; // In decimal degrees.
 	double Altitude; // In m.
+	double SOG; // In m/s.
+	double COG; // In rad.
 	double Heading; // In rad.
 	double WindDir; // In rad.
 	double WindSpeed; // In m/s.
@@ -69,6 +73,8 @@ struct NMEADEVICE
 	int timeout;
 	BOOL bSaveRawData;
 	BOOL bEnableGPGGA;
+	BOOL bEnableGPRMC;
+	BOOL bEnableGPVTG;
 	BOOL bEnableHCHDG;
 	BOOL bEnableWIMDA;
 };
@@ -164,6 +170,8 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 	char savebuf[MAX_NB_BYTES_NMEADEVICE];
 	int BytesReceived = 0, Bytes = 0, recvbuflen = 0;
 	char* ptr_GPGGA = NULL;
+	char* ptr_GPRMC = NULL;
+	char* ptr_GPVTG = NULL;
 	char* ptr_HCHDG = NULL;
 	char* ptr_WIMDA = NULL;
 	// Temporary buffers for sscanf().
@@ -233,11 +241,15 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 	// for the desired message...
 
 	if (pNMEADevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
+	if (pNMEADevice->bEnableGPRMC) ptr_GPRMC = FindLatestNMEASentence("$GPRMC", recvbuf);
+	if (pNMEADevice->bEnableGPVTG) ptr_GPVTG = FindLatestNMEASentence("$GPVTG", recvbuf);
 	if (pNMEADevice->bEnableHCHDG) ptr_HCHDG = FindLatestNMEASentence("$HCHDG", recvbuf);
 	if (pNMEADevice->bEnableWIMDA) ptr_WIMDA = FindLatestNMEASentence("$WIMDA", recvbuf);
 
 	while (
 		(pNMEADevice->bEnableGPGGA&&!ptr_GPGGA)||
+		(pNMEADevice->bEnableGPRMC&&!ptr_GPRMC)||
+		(pNMEADevice->bEnableGPVTG&&!ptr_GPVTG)||
 		(pNMEADevice->bEnableHCHDG&&!ptr_HCHDG)||
 		(pNMEADevice->bEnableWIMDA&&!ptr_WIMDA)
 		)
@@ -265,6 +277,8 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		}
 		BytesReceived += Bytes;
 		if (pNMEADevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
+		if (pNMEADevice->bEnableGPRMC) ptr_GPRMC = FindLatestNMEASentence("$GPRMC", recvbuf);
+		if (pNMEADevice->bEnableGPVTG) ptr_GPVTG = FindLatestNMEASentence("$GPVTG", recvbuf);
 		if (pNMEADevice->bEnableHCHDG) ptr_HCHDG = FindLatestNMEASentence("$HCHDG", recvbuf);
 		if (pNMEADevice->bEnableWIMDA) ptr_WIMDA = FindLatestNMEASentence("$WIMDA", recvbuf);
 	}
@@ -273,7 +287,7 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 
 	memset(pNMEAData, 0, sizeof(NMEADATA));
 
-	// GPS data.
+	// GPS essential fix data.
 	if (pNMEADevice->bEnableGPGGA)
 	{
 		memset(pNMEAData->szlatdeg, 0, sizeof(pNMEAData->szlatdeg));
@@ -319,6 +333,71 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 			pNMEAData->Latitude = (pNMEAData->north == 'N')?(pNMEAData->latdeg+pNMEAData->latmin/60.0):-(pNMEAData->latdeg+pNMEAData->latmin/60.0);
 			pNMEAData->Longitude = (pNMEAData->east == 'E')?(pNMEAData->longdeg+pNMEAData->longmin/60.0):-(pNMEAData->longdeg+pNMEAData->longmin/60.0);
 		}
+	}
+
+	// GPS recommended minimum data.
+	if (pNMEADevice->bEnableGPRMC)
+	{
+		memset(pNMEAData->szlatdeg, 0, sizeof(pNMEAData->szlatdeg));
+		memset(pNMEAData->szlongdeg, 0, sizeof(pNMEAData->szlongdeg));
+
+		if (
+			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf", &pNMEAData->utc, &pNMEAData->status, 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
+			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date, &pNMEAData->variation, &pNMEAData->var_east) != 16)
+			&&
+			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,%lf,%c", &pNMEAData->utc, &pNMEAData->status, 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
+			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date) != 14)
+			&&
+			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c", &pNMEAData->utc, &pNMEAData->status, 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east) != 11)
+			&&
+			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c", &pNMEAData->utc, &pNMEAData->status) != 2)
+			&&
+			(sscanf(ptr_GPRMC, "$GPRMC,,%c", &pNMEAData->status) != 1)
+			)
+		{
+			printf("Error reading data from a NMEADevice : Invalid data. \n");
+			return EXIT_FAILURE;
+		}
+
+		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
+		{
+			pNMEAData->latdeg = atoi(pNMEAData->szlatdeg);
+			pNMEAData->longdeg = atoi(pNMEAData->szlongdeg);
+
+			// Convert GPS latitude and longitude in decimal.
+			pNMEAData->Latitude = (pNMEAData->north == 'N')?(pNMEAData->latdeg+pNMEAData->latmin/60.0):-(pNMEAData->latdeg+pNMEAData->latmin/60.0);
+			pNMEAData->Longitude = (pNMEAData->east == 'E')?(pNMEAData->longdeg+pNMEAData->longmin/60.0):-(pNMEAData->longdeg+pNMEAData->longmin/60.0);
+		}
+
+		// Convert SOG to speed in m/s and COG to angle in rad.
+		pNMEAData->SOG = pNMEAData->sog/1.94;
+		pNMEAData->COG = pNMEAData->cog*M_PI/180.0;
+	}
+
+	// GPS COG and SOG data.
+	if (pNMEADevice->bEnableGPVTG)
+	{
+		if (
+			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,%lf,M,%lf,N", &pNMEAData->cog, &pNMEAData->mag_cog, &pNMEAData->sog) != 3)
+			&&
+			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,M,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)
+			&&
+			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)
+			)
+		{
+			printf("Error reading data from a NMEADevice : Invalid data. \n");
+			return EXIT_FAILURE;
+		}
+
+		// Convert SOG to speed in m/s and COG to angle in rad.
+		pNMEAData->SOG = pNMEAData->sog/1.94;
+		pNMEAData->COG = pNMEAData->cog*M_PI/180.0;
 	}
 
 	// Heading data.
@@ -373,8 +452,10 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 	pNMEADevice->timeout = 1000;
 	pNMEADevice->bSaveRawData = 1;
 	pNMEADevice->bEnableGPGGA = 1;
-	pNMEADevice->bEnableHCHDG = 1;
-	pNMEADevice->bEnableWIMDA = 1;
+	pNMEADevice->bEnableGPRMC = 0;
+	pNMEADevice->bEnableGPVTG = 0;
+	pNMEADevice->bEnableHCHDG = 0;
+	pNMEADevice->bEnableWIMDA = 0;
 
 	sprintf(pNMEADevice->szCfgFilePath, "%.255s", szCfgFilePath);
 
@@ -392,6 +473,10 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 		if (sscanf(line, "%d", &pNMEADevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pNMEADevice->bEnableGPGGA) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pNMEADevice->bEnableGPRMC) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pNMEADevice->bEnableGPVTG) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pNMEADevice->bEnableHCHDG) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

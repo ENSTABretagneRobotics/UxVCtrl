@@ -109,6 +109,7 @@ extern double dist;
 // GPS.
 extern double latitude, longitude;
 extern double altitude;
+extern double sog, cog;
 // Weather station.
 extern double vwind, psiwind;
 // Sonar.

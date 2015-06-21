@@ -1,3 +1,5 @@
+offset capteur de vent, vent vrai vs vent apparent...
+
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 setwindestimation : command to set winddir and windspeed, also add for water current and waves?
@@ -22,7 +24,7 @@ options pour enlever les outliers avant, après...
 repère dans lequel dessiner image sonar vs detection d'obstacles
 temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
-observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre)
+observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...
 
 Altitude sonar
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible

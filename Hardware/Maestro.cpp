@@ -117,19 +117,19 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
-					break; // Temporary...
+					break;
 				}
-				// Temporary...
+				// Channel 11...
 				if (GetValueMaestro(&maestro, 11, &ivalue) != EXIT_SUCCESS)
 				{
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
-					break; // Temporary...
+					break;
 				}
 				EnterCriticalSection(&StateVariablesCS);
-				winddir = ivalue*360.0/1024.0;
-				psiwind = fmod_2PI(M_PI/2.0-winddir*M_PI/180.0-angle_env);
+				winddir = ivalue*360.0/1024.0+180.0; // Offset...
+				psiwind = fmod_2PI(M_PI/2.0-winddir*M_PI/180.0); // Apparent wind (in robot coordinate system).
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
 			case VAIMOS_ROBID:

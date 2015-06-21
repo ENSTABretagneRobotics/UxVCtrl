@@ -9,7 +9,11 @@
 1
 % bEnableGPGGA
 1
+% bEnableGPRMC
+0
+% bEnableGPVTG
+0
 % bEnableHCHDG
-1
+0
 % bEnableWIMDA
-1
+0

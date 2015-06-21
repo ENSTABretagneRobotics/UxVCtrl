@@ -38,6 +38,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 	if (robid & SAILBOAT_ROBID_MASK) 
 	{
+		// Temporary...
 		EnterCriticalSection(&strtimeCS);
 		sprintf(lognavfilename, LOG_FOLDER"lognav_%.64s.csv", strtime_fns());
 		LeaveCriticalSection(&strtimeCS);
@@ -202,7 +203,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					break;
 				default: // DIRECT_TRAJECTORY
 					//wtheta = wtheta; // Heading command.
-					deltasmax = q1*pow((cos(psi-(wtheta))+1.0)/2.0,q2); // Sail command.
+					deltasmax = q1*pow((cos(psi-wtheta)+1.0)/2.0,q2); // Sail command.
 					//deltasmax = q1*pow((cos(psi-theta)+1.0)/2.0,q2); // Sail command.
 					break;
 				}
@@ -211,6 +212,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				{
 					StopChronoQuick(&chrono_sail_update);
 					bForceSailUpdate = 0;
+					//if (bStdOutDetailedInfo)
 					printf("Sail update.\n");
 					u = deltasmax/q1;
 					StartChrono(&chrono_sail_update);
@@ -352,7 +354,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		u3 = (u3<1)?u3:1;
 		u3 = (u3>-1)?u3:-1;
 
-#pragma region stdout
+#pragma region Sailboat supervisor
 		if (robid & SAILBOAT_ROBID_MASK) 
 		{
 			// Should be key and configuration file option, command...
@@ -418,6 +420,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	StopChronoQuick(&chrono_check_strategy);
 	StopChronoQuick(&chrono_sail_update);
 
+	// Temporary...
 	if (robid & SAILBOAT_ROBID_MASK) fclose(lognavfile);
 #pragma endregion
 

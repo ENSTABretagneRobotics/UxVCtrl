@@ -28,6 +28,7 @@ double dist = 0;
 // GPS.
 double latitude = 0, longitude = 0;
 double altitude = 0;
+double sog = 0, cog = 0;
 // Weather station.
 double vwind = 0, psiwind = 0;
 // Sonar.
