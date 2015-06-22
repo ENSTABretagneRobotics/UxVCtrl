@@ -1,5 +1,11 @@
-offset capteur de vent, vent vrai vs vent apparent, commande de station automatique start/stopstation lat long dt...
+comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
+gouvernail plus violent?
+juste plus de positions car rafraichissement plus élevé donne l'impression?
+écart à la ligne?
 
+offset capteur de vent, faire filteredtruewinddir et filteredapparentwinddir et kalman pour retrouver vent vrai
+
+command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 setwindestimation : command to set winddir and windspeed, also add for water current and waves?
@@ -32,16 +38,16 @@ l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 
 GUI, video
+touche pour choisir wgs ou local
 rajouter offset et mieux gérer les infos affichées selon le robot et selon le mode
 rajouter angle du vent (filtré, non filtré en plus clair...) dans le cercle
-mode actuel du voilier sur un côté
-afficher plut$ot u*q1 au lieu de deltasmax, qui est seulement à jour en linefollowing
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
 plus petite police
 en mode suivi de wp/line et en option
 DST:25,5 (lat,lon)
 ETA=15:01:25 (ou mettre juste durée en s)
 DIS=23.5
+afficher position des waypoints dans l'interface
 mettre aussi BRG de ball par rapport au nord?
 trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
 prévoir zoom sur la map, on a du mal à savoir son cap
@@ -89,28 +95,14 @@ reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer 
 revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
 ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-32/IOIOSrv...
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
-quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...)
+quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
 remplacer Sail par IM483I
 mavlink device (ardupilot, pixhawk...)
 
 GPS, waypoints
-wpfollowingconfig radius file bWGS
-linefollowingconfig radius gamma_infinite file bWGS
-linefollowing xa ya xb yb
-linefollowingt xa ya xb yb timeout
-gotoxy x y
-gotoxyt x y t
-startlinefollowing
-stoplinefollowing
-startwpfollowing
-stopwpfollowing
-
-waypoints.csv avec colonnes optionnelles, radius, durée de station, durée de surface, bUseGPS, profondeur, gamma_infinite
-afficher position des waypoints dans l'interface
-
+pour la station, générer une croix autour du waypoint...
 mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status?
 régler bGPSOK en fonction de gpsstatus et status mti-g?->il faut 2 variables globales différentes, bGPSOKNMEADevice pour nmea et bGPSOKMT pour mt... et pour simu?
-
 commandes startgpslocalization/stopgpslocalization (dans observer?)
 
 Obstacle avoidance
@@ -126,7 +118,7 @@ commande waitdistanceless/more/wgs x y d
 
 attention aux valeurs au départ d'initialisation, attention au setstateestimation...
 surveiller divisions par 0..., vérifier cohérence paramètres par défaut
-surveiller le abort et abortmission...
+surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
 
 CISCREA
 après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
@@ -181,6 +173,17 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+wpfollowingfileconfig radius file bWGS
+linefollowingfileconfig radius gamma_infinite file bWGS
+startlinefollowingfile
+stoplinefollowingfile
+startwpfollowingfile
+stopwpfollowingfile
+
+waypoints.csv avec colonnes optionnelles, radius, durée de station, durée de surface, bUseGPS, profondeur, gamma_infinite
+
+affichage tous les counter==
 
 un fichier de config pour décrire les périphériques du robot?->c'est déjà un peu ce que fait UxVCtrl.txt
 

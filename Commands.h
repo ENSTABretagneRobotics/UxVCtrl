@@ -128,8 +128,8 @@ inline int Commands(char* line)
 	char str2[MAX_BUF_LEN];
 	unsigned char* buf = NULL;
 	size_t bytes = 0;
-	double delay = 0;
-	CHRONO chrono;
+	double delay = 0, delay_station = 0;
+	CHRONO chrono, chrono_station;
 
 	memset(str, 0, sizeof(str));
 
@@ -879,6 +879,62 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
+	else if (sscanf(line, "linefollowingstation %lf %lf %lf %lf", &dval1, &dval2, &delay_station, &delay) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		// Special situation : should follow the line between its current position and the waypoint specified.
+		// Therefore, the robot should remain near the waypoint specified.
+		wxa = Center(xhat); wya = Center(yhat); wxb = dval1; wyb = dval2;
+		bLineFollowingControl = TRUE;
+		bWaypointControl = FALSE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				// Wait a little bit after reaching the waypoint.
+				bLineFollowingControl = FALSE;
+				bWaypointControl = FALSE;
+				bHeadingControl = FALSE;
+				StartChrono(&chrono_station);
+				for (;;)
+				{
+					if (GetTimeElapsedChronoQuick(&chrono_station) > delay_station) break;
+					if (!bWaiting) break;
+					if (bExit) break;
+					// Wait at least delay/10 and at most around 100 ms for each loop.
+					mSleep((long)min(delay_station*100.0, 100.0));
+				}
+				StopChronoQuick(&chrono_station);
+				// Special situation : should follow the line between its current position and the waypoint specified.
+				// Therefore, the robot should remain near the waypoint specified.
+				EnterCriticalSection(&StateVariablesCS);
+				wxa = Center(xhat); wya = Center(yhat);
+				bLineFollowingControl = TRUE;
+				bWaypointControl = FALSE;
+				bHeadingControl = TRUE;
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
 	else if (sscanf(line, "linefollowingwgs %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -909,6 +965,63 @@ inline int Commands(char* line)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "linefollowingwgsstation %lf %lf %lf %lf", &dval1, &dval2, &delay_station, &delay) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		// Special situation : should follow the line between its current position and the waypoint specified.
+		// Therefore, the robot should remain near the waypoint specified.
+		wxa = Center(xhat); wya = Center(yhat);
+		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxb, &wyb, &dval);
+		bLineFollowingControl = TRUE;
+		bWaypointControl = FALSE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				// Wait a little bit after reaching the waypoint.
+				bLineFollowingControl = FALSE;
+				bWaypointControl = FALSE;
+				bHeadingControl = FALSE;
+				StartChrono(&chrono_station);
+				for (;;)
+				{
+					if (GetTimeElapsedChronoQuick(&chrono_station) > delay_station) break;
+					if (!bWaiting) break;
+					if (bExit) break;
+					// Wait at least delay/10 and at most around 100 ms for each loop.
+					mSleep((long)min(delay_station*100.0, 100.0));
+				}
+				StopChronoQuick(&chrono_station);
+				// Special situation : should follow the line between its current position and the waypoint specified.
+				// Therefore, the robot should remain near the waypoint specified.
+				EnterCriticalSection(&StateVariablesCS);
+				wxa = Center(xhat); wya = Center(yhat);
+				bLineFollowingControl = TRUE;
+				bWaypointControl = FALSE;
+				bHeadingControl = TRUE;
+				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
 			{

@@ -82,7 +82,7 @@ struct MAESTRO
 };
 typedef struct MAESTRO MAESTRO;
 
-// If analog input, voltage = value*5.0/1024. If digital input, bit = (value == 1023)? 1: 0;.
+// If analog input, voltage = value*5.0/1024.0. If digital input, bit = (value == 1023)? 1: 0;.
 inline int GetValueMaestro(MAESTRO* pMaestro, int channel, int* pValue)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_MAESTRO];

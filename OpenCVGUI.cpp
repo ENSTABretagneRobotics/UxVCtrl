@@ -28,6 +28,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispPlayingTriangle = FALSE;
 	CvPoint PlayingTrianglePoints[3];
 	int nbPlayingTrianglePoints = 3;
+	char s = 0;
 	char szText[MAX_BUF_LEN];
 	char windowname[MAX_BUF_LEN];
 	CvFont font;
@@ -426,7 +427,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				"o(osd),c(North and control),A(ASF),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"r(record),p(mission),x(abort),h(help),"
-				"bn(light),uj(tilt),46825(CISCREA OSD),!?(battery),"
+				"bn(light),uj(tilt),46825(CISCREA OSD),!?(battery or extra info),"
 				"B(motorboat backwards)\n");
 			break;
 		case '4':
@@ -451,6 +452,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case '?':
 			bShowVoltageCISCREA = !bShowVoltageCISCREA;
+			bStdOutDetailedInfo = !bStdOutDetailedInfo;
 			break;
 		case 'B':
 			bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat;
@@ -467,7 +469,18 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		if (bOSD)
 		{
 			// Rounding...
-			sprintf(szText, "%d%% %d%% %d%%", (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
+			if (robid & SAILBOAT_ROBID_MASK) 
+			{
+				switch (state)
+				{
+				case DIRECT_TRAJECTORY: s = 'D'; break;
+				case STARBOARD_TACK_TRAJECTORY: s = 'S'; break;
+				case PORT_TACK_TRAJECTORY: s = 'P'; break;
+				default: s = 'I'; break;
+				}
+				sprintf(szText, "%c %d%% %d%%", s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
+			}
+			else sprintf(szText, "%d%% %d%% %d%%", (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,16), &font, CV_RGB(255,0,128));
 			// In deg in marine units...
 			if (bHeadingControl) sprintf(szText, "%.1f/%.1f", 
@@ -492,6 +505,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bOrientationCircle)
 			{
 				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
+				if (robid & SAILBOAT_ROBID_MASK) cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
+					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+Center(psiwindhat)-M_PI-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+Center(psiwindhat)-M_PI-Center(thetahat)))), 
+					CV_RGB(0, 255, 255), 2, 8, 0);
 				if (bHeadingControl) cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
 					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+wtheta-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+wtheta-Center(thetahat)))), 
 					CV_RGB(0, 255, 0), 2, 8, 0);

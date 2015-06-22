@@ -10,5 +10,7 @@ setmissionaction l1
 linefollowingtwgs 48.390194 -4.424336 48.389059 -4.427607 31557600.000000
 setmissionaction l2
 linefollowingtwgs 48.389059 -4.427607 48.391382 -4.427361 31557600.000000
+setmissionaction station
+linefollowingwgsstation 48.391382 -4.427361 30 31557600.000000
 setmissionaction end
 generalstop

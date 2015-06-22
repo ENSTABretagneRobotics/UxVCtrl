@@ -24,13 +24,23 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double delta_z = 0; // For depth control.
 
 #pragma region Sailboat supervisor
-	STATE state = INVALID_STATE;
 	STATE prevstate = INVALID_STATE;
 	int bForceCheckStrategy = 0, bForceSailUpdate = 0;
 	CHRONO chrono_sail_update, chrono_check_strategy;
 	char lognavfilename[MAX_BUF_LEN];
 	FILE* lognavfile = NULL;
 	double deltasmax = 0;
+
+	// To add as parameters...
+
+	int sail_update_period = 20; // Period in s.
+	int check_strategy_period = 60; // Period in s.
+	double betatrav = 0.5; // Angle de la voile en vent de travers (en rad).
+	double betaarr = 1.5; // Angle de la voile en vent arrière (en rad).
+	double ksi = 0.87; // Angle de près (en rad).
+
+	double q1 = betaarr;
+	double q2 = (log(betaarr)-log(betatrav))/log(2.0);
 #pragma endregion
 
 	UNREFERENCED_PARAMETER(pParam);
@@ -119,16 +129,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
-				// To add as parameters...
-
-				int sail_update_period = 20; // Period in s.
-				int check_strategy_period = 60; // Period in s.
-				double betatrav = 0.5; // Angle de la voile en vent de travers (en rad).
-				double betaarr = 1.5; // Angle de la voile en vent arrière (en rad).
-				double ksi = 0.87; // Angle de près (en rad).
-
-				double q1 = betaarr;
-				double q2 = (log(betaarr)-log(betatrav))/log(2.0);
 				double psi = Center(psiwindhat);				
 
 				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
@@ -151,14 +151,12 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 						{
 							if ((state == PORT_TACK_TRAJECTORY)&&(e > -radius/2.0))
 							{
-								//if (bStdOutDetailedInfo)
-								printf("Port tack trajectory.\n");
+								if (bStdOutDetailedInfo) printf("Port tack trajectory.\n");
 								state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
 							}
 							else
 							{
-								//if (bStdOutDetailedInfo)
-								printf("Starboard tack trajectory.\n");
+								if (bStdOutDetailedInfo) printf("Starboard tack trajectory.\n");
 								state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
 							}
 						}
@@ -166,22 +164,19 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 						{
 							if ((state == STARBOARD_TACK_TRAJECTORY)&&(e < radius/2.0))
 							{
-								//if (bStdOutDetailedInfo)
-								printf("Starboard tack trajectory.\n");
+								if (bStdOutDetailedInfo) printf("Starboard tack trajectory.\n");
 								state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
 							}
 							else
 							{
-								//if (bStdOutDetailedInfo)
-								printf("Port tack trajectory.\n");
+								if (bStdOutDetailedInfo) printf("Port tack trajectory.\n");
 								state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
 							}
 						}
 					}
 					else
 					{
-						//if (bStdOutDetailedInfo)
-						printf("Direct trajectory.\n");
+						if (bStdOutDetailedInfo) printf("Direct trajectory.\n");
 						state = DIRECT_TRAJECTORY; // Suivi direct.
 					}
 					if (state != prevstate)
@@ -212,8 +207,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				{
 					StopChronoQuick(&chrono_sail_update);
 					bForceSailUpdate = 0;
-					//if (bStdOutDetailedInfo)
-					printf("Sail update.\n");
+					if (bStdOutDetailedInfo) printf("Sail update.\n");
 					u = deltasmax/q1;
 					StartChrono(&chrono_sail_update);
 				}			
@@ -358,53 +352,53 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		if (robid & SAILBOAT_ROBID_MASK) 
 		{
 			// Should be key and configuration file option, command...
-			//if (bStdOutDetailedInfo)
-			//{
-			int days = 0, hours = 0, minutes = 0, seconds = 0;
-			double deccsec = 0;
-
-			DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
-
-			printf("-------------------------------------------------------------------\n");
-			printf("Time is %f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
-			printf("GPS position of the reference coordinate system is (%f,%f).\n", lat_env, long_env);
-			printf("Heading (theta) is %f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
-			printf("Wind angle (psi) is %f deg in the reference coordinate system.\n", Center(psiwindhat)*180.0/M_PI);
-			printf("Wind direction w.r.t. North is %f deg (average %f deg), heading w.r.t. North is %f deg.\n", 
-				(fmod_2PI(-angle_env-psiwind-M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-				(fmod_2PI(-angle_env-Center(psiwindhat)-M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-				(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
-			printf("Position (x,y) is (%f,%f), GPS position (%f,%f).\n", Center(xhat), Center(yhat), latitude, longitude);
-			printf("Waypoint position (x,y) is (%f,%f), GPS position (%f,%f).\n", wxb, wyb, wlatb, wlongb);
-			printf("Distance to the waypoint is %f m, distance to the line is %f m.\n", norm_bm, e);
-			switch (state)
+			if ((bStdOutDetailedInfo)&&(counter%10 == 0))
 			{
-			case DIRECT_TRAJECTORY:
-				printf("State is %d (direct trajectory).\n", (int)state);
-				break;
-			case STARBOARD_TACK_TRAJECTORY:
-				printf("State is %d (starboard tack trajectory).\n", (int)state);
-				break;
-			case PORT_TACK_TRAJECTORY:
-				printf("State is %d (port tack trajectory).\n", (int)state);
-				break;
-			default: 
-				printf("State is %d (invalid state).\n", (int)state);
-				break;
+				int days = 0, hours = 0, minutes = 0, seconds = 0;
+				double deccsec = 0;
+
+				DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
+
+				printf("-------------------------------------------------------------------\n");
+				printf("Time is %f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
+				printf("GPS position of the reference coordinate system is (%f,%f).\n", lat_env, long_env);
+				printf("Heading (theta) is %f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
+				printf("Wind angle (psi) is %f deg in the reference coordinate system.\n", Center(psiwindhat)*180.0/M_PI);
+				printf("Wind direction w.r.t. North is %f deg (average %f deg), heading w.r.t. North is %f deg.\n", 
+					(fmod_2PI(-angle_env-psiwind-M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+					(fmod_2PI(-angle_env-Center(psiwindhat)-M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+					(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+				printf("Position (x,y) is (%f,%f), GPS position (%f,%f).\n", Center(xhat), Center(yhat), latitude, longitude);
+				printf("Waypoint position (x,y) is (%f,%f), GPS position (%f,%f).\n", wxb, wyb, wlatb, wlongb);
+				printf("Distance to the waypoint is %f m, distance to the line is %f m.\n", norm_bm, e);
+				switch (state)
+				{
+				case DIRECT_TRAJECTORY:
+					printf("State is %d (direct trajectory).\n", (int)state);
+					break;
+				case STARBOARD_TACK_TRAJECTORY:
+					printf("State is %d (starboard tack trajectory).\n", (int)state);
+					break;
+				case PORT_TACK_TRAJECTORY:
+					printf("State is %d (port tack trajectory).\n", (int)state);
+					break;
+				default: 
+					printf("State is %d (invalid state).\n", (int)state);
+					break;
+				}
+				printf("Rudder angle is %f deg.\n", -uw*0.7*180.0/M_PI); // Approx...
+				printf("Sail maximum angle is %f deg.\n", u*q1*180.0/M_PI);
+				printf("-------------------------------------------------------------------\n");
+				fflush(stdout);
 			}
-			printf("Rudder angle is %f deg.\n", -uw*0.7*180.0/M_PI); // Approx...
-			printf("Sail maximum angle is %f deg.\n", deltasmax*180.0/M_PI);
-			printf("-------------------------------------------------------------------\n");
-			fflush(stdout);
-			//}
 
 			// Temporary...
 			fprintf(lognavfile, "%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%f;%f;%f;%f;%f;%d;%f;%f;%f;\n", 
-				counter, t, lat_env, long_env, 0, 0, 0, 
-				fmod_2PI(-angle_env-psiwind-M_PI+3.0*M_PI/2.0)+M_PI, vwind, fmod_2PI(-angle_env-Center(psiwindhat)-M_PI+3.0*M_PI/2.0)+M_PI, Center(vwindhat), 0, Center(thetahat), Center(psiwindhat), 
+				counter, t, lat_env, long_env, 0.0, 0.0, 0.0, 
+				fmod_2PI(-angle_env-psiwind-M_PI+3.0*M_PI/2.0)+M_PI, vwind, fmod_2PI(-angle_env-Center(psiwindhat)-M_PI+3.0*M_PI/2.0)+M_PI, Center(vwindhat), 0.0, Center(thetahat), Center(psiwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
-				-uw*0.7, deltasmax, wtheta); // Approx...
+				-uw*0.7, u*q1, wtheta); // Approx...
 			fflush(lognavfile);
 		}
 #pragma endregion

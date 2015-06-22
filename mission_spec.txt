@@ -90,6 +90,8 @@
 %
 %linefollowingt xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
 %
+%linefollowingwgsstation xb yb t_station t (xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
+%
 %linefollowingrelative xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line)
 %
 %linefollowingtrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
@@ -97,6 +99,8 @@
 %linefollowingwgs lata longa latb longb (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line)
 %
 %linefollowingtwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%
+%linefollowingwgsstation latb longb t_station t (latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
 % DEVICE COMMANDS
 %

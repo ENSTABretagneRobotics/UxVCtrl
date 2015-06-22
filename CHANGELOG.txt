@@ -1,3 +1,7 @@
+49
+Added linefollowingwgsstation command.
+Continuation of sailboats integration.
+
 48
 Added support of GPRMC and GPVTG GPS sentences.
 Corrections w.r.t. apparent wind.
