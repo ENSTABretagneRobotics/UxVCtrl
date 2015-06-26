@@ -51,8 +51,14 @@
 #define STEP_ANGLE_SIZE_IN_DEGREES2RESOLUTION(StepAngleSize) ((int)((StepAngleSize)/0.05625))
 #define RESOLUTION2NUMBER_OF_STEPS(res) ((int)(360.0/RESOLUTION2STEP_ANGLE_SIZE_IN_DEGREES(res)))
 #define NUMBER_OF_STEPS2RESOLUTION(NSteps) ((int)(STEP_ANGLE_SIZE_IN_DEGREES2RESOLUTION(360.0/(NSteps))))
+
+#ifndef STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS
 #define STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS(StepAngleSize) ((int)(360.0/(StepAngleSize)))
+#endif // STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS
+
+#ifndef NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES
 #define NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES(NSteps) (360.0/(NSteps))
+#endif // NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES
 
 // Transducer Bearing is the position of the transducer for the current scanline (0..6399 in 1/16 Gradian units), 
 // ahead corresponds to 3200. 10 gradians = 9 degrees. 0.05625 = (1/16)*(9/10).

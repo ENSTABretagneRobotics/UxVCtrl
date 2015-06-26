@@ -4,6 +4,7 @@ juste plus de positions car rafraichissement plus élevé donne l'impression?
 écart à la ligne?
 
 offset capteur de vent, faire filteredtruewinddir et filteredapparentwinddir et kalman pour retrouver vent vrai
+lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
@@ -30,7 +31,9 @@ options pour enlever les outliers avant, après...
 repère dans lequel dessiner image sonar vs detection d'obstacles
 temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
+seanet : index_scanlines est peut-être moyennement géré si sector scan...
 observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...
+dans logstate rajouter tv_sec;tv_usec; pour pouvoir synchroniser temps mission
 
 Altitude sonar
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible

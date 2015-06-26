@@ -19,6 +19,7 @@
 #include "MES.h"
 #include "MDM.h"
 #include "Seanet.h"
+#include "Hokuyo.h"
 #include "P33x.h"
 #include "RazorAHRS.h"
 #include "MT.h"
@@ -51,6 +52,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MESThreadId;
 	THREAD_IDENTIFIER MDMThreadId;
 	THREAD_IDENTIFIER SeanetThreadId;
+	//THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
 	THREAD_IDENTIFIER RazorAHRSThreadId;
 	THREAD_IDENTIFIER MTThreadId;
@@ -94,6 +96,7 @@ int main(int argc, char* argv[])
 	if (!bDisableMES) CreateDefaultThread(MESThread, NULL, &MESThreadId);
 	if (!bDisableMDM) CreateDefaultThread(MDMThread, NULL, &MDMThreadId);
 	if (!bDisableSeanet) CreateDefaultThread(SeanetThread, NULL, &SeanetThreadId);
+	//if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
@@ -187,6 +190,7 @@ int main(int argc, char* argv[])
 	if (!bDisableMT) WaitForThread(MTThreadId);
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
+	//if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);
 	if (!bDisableSeanet) WaitForThread(SeanetThreadId);
 	if (!bDisableMDM) WaitForThread(MDMThreadId);
 	if (!bDisableMES) WaitForThread(MESThreadId);

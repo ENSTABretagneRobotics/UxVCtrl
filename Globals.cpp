@@ -58,6 +58,7 @@ BOOL bEcho = FALSE;
 BOOL bDisableMES = FALSE;
 BOOL bDisableMDM = FALSE;
 BOOL bDisableSeanet = FALSE;
+BOOL bDisableHokuyo = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
@@ -221,6 +222,9 @@ BOOL bPauseMES = FALSE, bRestartMES = FALSE;
 CRITICAL_SECTION SeanetOverlayImgCS;
 IplImage* SeanetOverlayImg = NULL;
 BOOL bPauseSeanet = FALSE, bRestartSeanet = FALSE;
+
+// Hokuyo variables.
+BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;
 
 // P33x variables.
 BOOL bPauseP33x = FALSE, bRestartP33x = FALSE;

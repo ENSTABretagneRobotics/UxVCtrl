@@ -1,3 +1,6 @@
+50
+Beginning of Hokuyo integration.
+
 49
 Added linefollowingwgsstation command.
 Continuation of sailboats integration.

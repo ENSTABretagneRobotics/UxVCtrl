@@ -112,6 +112,8 @@
 %
 %seanetconfig Seanet.txt bPause
 %
+%hokuyoconfig Hokuyo.txt bPause
+%
 %p33xconfig P33x.txt bPause
 %
 %razorahrsconfig RazorAHRS.txt bPause

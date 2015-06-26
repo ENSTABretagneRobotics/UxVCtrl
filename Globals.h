@@ -139,6 +139,7 @@ extern BOOL bEcho;
 extern BOOL bDisableMES;
 extern BOOL bDisableMDM;
 extern BOOL bDisableSeanet;
+extern BOOL bDisableHokuyo;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
@@ -302,6 +303,9 @@ extern BOOL bPauseMES, bRestartMES;
 extern CRITICAL_SECTION SeanetOverlayImgCS;
 extern IplImage* SeanetOverlayImg;
 extern BOOL bPauseSeanet, bRestartSeanet;
+
+// Hokuyo variables.
+extern BOOL bPauseHokuyo, bRestartHokuyo;
 
 // P33x variables.
 extern BOOL bPauseP33x, bRestartP33x;

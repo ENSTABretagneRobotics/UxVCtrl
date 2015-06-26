@@ -38,6 +38,7 @@ inline int LoadConfig()
 	bDisableMES = TRUE;
 	bDisableMDM = TRUE;
 	bDisableSeanet = TRUE;
+	//bDisableHokuyo = TRUE;
 	bDisableP33x = TRUE;
 	bDisableRazorAHRS = TRUE;
 	bDisableMT = TRUE;
@@ -159,6 +160,8 @@ inline int LoadConfig()
 		if (sscanf(line, "%d", &bDisableMDM) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableSeanet) != 1) printf("Invalid configuration file.\n");
+		//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		//if (sscanf(line, "%d", &bDisableHokuyo) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableP33x) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

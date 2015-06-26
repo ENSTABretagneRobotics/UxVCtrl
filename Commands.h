@@ -1126,6 +1126,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartSeanet = TRUE;
 		bPauseSeanet = ival1;
 	}
+	else if (sscanf(line, "hokuyoconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "Hokuyo0.txt", strlen("Hokuyo0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "Hokuyo0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartHokuyo = TRUE;
+		bPauseHokuyo = ival1;
+	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "P33x0.txt", strlen("P33x0.txt")) != 0)
