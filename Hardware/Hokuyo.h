@@ -53,12 +53,12 @@ typedef struct HOKUYO HOKUYO;
 
 inline double k2angleHokuyo(HOKUYO* pHokuyo, int k)
 {
-	return (k-pHokuyo->FrontStep+512)*pHokuyo->StepAngleSize*M_PI/180.0-M_PI;
+	return (k+pHokuyo->StartingStep-pHokuyo->FrontStep+pHokuyo->SlitDivision/2)*pHokuyo->StepAngleSize*M_PI/180.0-M_PI;
 }
 
 inline int angle2kHokuyo(HOKUYO* pHokuyo, double angle)
 {
-	return (int)((fmod_2PI(angle)+M_PI)*180.0/(pHokuyo->StepAngleSize*M_PI)+pHokuyo->FrontStep-512);
+	return (int)((fmod_2PI(angle)+M_PI)*180.0/(pHokuyo->StepAngleSize*M_PI)-pHokuyo->StartingStep+pHokuyo->FrontStep-pHokuyo->SlitDivision/2);
 }
 
 inline int CharacterDecodingHokuyo(char* buf, int buflen)
@@ -339,7 +339,7 @@ inline int GetLatestDataHokuyo(HOKUYO* pHokuyo, double* pDistances, double* pAng
 	k = 0;
 	for (i = 0; i < nbdatabytes; i += 3)
 	{
-		pAngles[k] = (k-pHokuyo->FrontStep+512)*pHokuyo->StepAngleSize*M_PI/180.0-M_PI;
+		pAngles[k] = (k+pHokuyo->StartingStep-pHokuyo->FrontStep+pHokuyo->SlitDivision/2)*pHokuyo->StepAngleSize*M_PI/180.0-M_PI;
 		pDistances[k] = CharacterDecodingHokuyo(databuf+i, 3)/1000.0;
 		k++;
 	}
@@ -439,8 +439,8 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		pHokuyo->ClusterCount = 0;
 	}
 		
-	pHokuyo->StepAngleSize = 360.0*(pHokuyo->ClusterCount + 1)/pHokuyo->SlitDivision;
-	pHokuyo->StepCount = (pHokuyo->EndStep - pHokuyo->StartingStep)/(pHokuyo->ClusterCount + 1);
+	pHokuyo->StepAngleSize = 360.0*(pHokuyo->ClusterCount+1)/pHokuyo->SlitDivision;
+	pHokuyo->StepCount = (pHokuyo->EndStep-pHokuyo->StartingStep+1)/(pHokuyo->ClusterCount+1);
 
 	// Used to save raw data, should be handled specifically...
 	//pHokuyo->pfSaveFile = NULL;
@@ -599,7 +599,9 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		}
 	}
 
-	if (pHokuyo->bContinuousNumberOfScans)
+	// Other mode not yet handled...
+
+	//if (pHokuyo->bContinuousNumberOfScans)
 	{
 		// MD command to start data acquisition.
 
@@ -648,10 +650,10 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 inline int DisconnectHokuyo(HOKUYO* pHokuyo)
 {		
-	char sendbuf[3];
+	char sendbuf[4];
 	int sendbuflen = 0;
-	char recvbuf[8];
-	int recvbuflen = 0;
+	//char recvbuf[9];
+	//int recvbuflen = 0;
 
 	// QT command to switch off the laser.
 
@@ -667,24 +669,24 @@ inline int DisconnectHokuyo(HOKUYO* pHokuyo)
 		return EXIT_FAILURE;
 	}
 	
-	// Prepare the buffers.
-	memset(recvbuf, 0, sizeof(recvbuf));
-	recvbuflen = 8;
+	//// Prepare the buffers.
+	//memset(recvbuf, 0, sizeof(recvbuf));
+	//recvbuflen = 8;
 
-	if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
-	{
-		printf("Hokuyo disconnection failed.\n");
-		CloseRS232Port(&pHokuyo->RS232Port);
-		return EXIT_FAILURE;
-	}
+	//if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	//{
+	//	printf("Hokuyo disconnection failed.\n");
+	//	CloseRS232Port(&pHokuyo->RS232Port);
+	//	return EXIT_FAILURE;
+	//}
 
-	// Check response.
-	if (strcmp(recvbuf, "QT\n00P\n\n") != 0)
-	{
-		printf("Hokuyo disconnection failed.\n");
-		CloseRS232Port(&pHokuyo->RS232Port);
-		return EXIT_FAILURE;
-	}
+	//// Check response.
+	//if (strcmp(recvbuf, "QT\n00P\n\n") != 0)
+	//{
+	//	printf("Hokuyo disconnection failed.\n");
+	//	CloseRS232Port(&pHokuyo->RS232Port);
+	//	return EXIT_FAILURE;
+	//}
 
 	if (CloseRS232Port(&pHokuyo->RS232Port) != EXIT_SUCCESS)
 	{

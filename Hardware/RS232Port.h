@@ -97,7 +97,7 @@ inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 
 	// Try to determine whether it is an IP address and TCP port or a local RS232 port.
 	ptr = strchr(szDevPath, ':');
-	if (ptr != NULL)
+	if ((ptr != NULL)&&(ptr[1] != 0))
 	{
 		memcpy(pRS232Port->address, szDevPath, ptr-szDevPath);
 		strcpy(pRS232Port->port, ptr+1);

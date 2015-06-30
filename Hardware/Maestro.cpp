@@ -119,6 +119,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					DisconnectMaestro(&maestro);
 					break;
 				}
+				mSleep(25);
 				// Channel 11...
 				if (GetValueMaestro(&maestro, 11, &ivalue) != EXIT_SUCCESS)
 				{
