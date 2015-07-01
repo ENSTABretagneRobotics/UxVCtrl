@@ -20,7 +20,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	double cosfilteredwinddir = 0, sinfilteredwinddir = 0;
 
 	// To add as parameter...
-	double wind_filter_coef = 0.99; // Wind filter coefficient, between 0 and 1.
+	double wind_filter_coef = 0.999; // Wind filter coefficient, between 0 and 1.
 	
 
 	UNREFERENCED_PARAMETER(pParam);

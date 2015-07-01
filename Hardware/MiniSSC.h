@@ -222,7 +222,7 @@ inline int SetAllPWMsMiniSSC(MINISSC* pMiniSSC, int* selectedchannels, int* pws)
 		//pws_tmp[channel] = max(min(pws_tmp[channel], DEFAULT_ABSOLUTE_MAX_PW_MINISSC), DEFAULT_ABSOLUTE_MIN_PW_MINISSC);
 
 		// The requested PWM is only applied if it is slightly different from the current value.
-		//if (abs(pws_tmp[channel]-pMiniSSC->LastPWs[channel]) < pMiniSSC->ThresholdPWs[channel]) continue;
+		if (abs(pws_tmp[channel]-pMiniSSC->LastPWs[channel]) < pMiniSSC->ThresholdPWs[channel]) continue;
 
 		//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pMiniSSC->LastPWs[channel], abs(pws_tmp[channel]-pMiniSSC->LastPWs[channel]), pMiniSSC->ThresholdPWs[channel]);
 
@@ -257,7 +257,7 @@ inline int SetAllPWMsMiniSSC(MINISSC* pMiniSSC, int* selectedchannels, int* pws)
 		if (!selectedchannels[channel]) continue;
 
 		// The requested PWM should have been only applied if it was slightly different from the current value.
-		//if (abs(pws_tmp[channel]-pMiniSSC->LastPWs[channel]) < pMiniSSC->ThresholdPWs[channel]) continue;
+		if (abs(pws_tmp[channel]-pMiniSSC->LastPWs[channel]) < pMiniSSC->ThresholdPWs[channel]) continue;
 
 		// Update last known value.
 		pMiniSSC->LastPWs[channel] = pws_tmp[channel];

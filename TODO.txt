@@ -1,3 +1,8 @@
+rajouter param dans uxvctrl.txt
+wind (en plus de la commande setwindestimation)
+windfiltercoef
+params linefollowing
+
 if szCfgFilePath == "::::xxx" prendre en compte les paramètres déjà dans la structure
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
@@ -5,16 +10,16 @@ gouvernail plus violent?
 juste plus de positions car rafraichissement plus élevé donne l'impression?
 écart à la ligne?
 
-pouvoir rentrer la vitesse du vent vrai
+setwindestimation : command to set winddir and windspeed, also add for water current and waves?
 offset capteur de vent, faire filteredtruewinddir et filteredapparentwinddir
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
+variable globale roulis tangage razor, rudderminangle/maxangle...
 roulis voilier et vent apparent...->étudiants
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
-setwindestimation : command to set winddir and windspeed, also add for water current and waves?
 rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire les données de chaque ligne (temps absolu ou relatif en option)
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 

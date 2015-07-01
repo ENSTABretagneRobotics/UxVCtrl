@@ -8,15 +8,15 @@
 %0x00000004
 % CISCREA
 %0x00000060
-%Hovercraft
+% Hovercraft
 %0x00000200
-%Motorboat
+% Motorboat
 %0x00000400
-%VAIMOS
-0x00020000
-%Sailboat
-%0x00040000
-%Buggy
+% VAIMOS
+%0x00020000
+% Sailboat
+0x00040000
+% Buggy
 %0x02000000
 % nbvideo (max 3)
 1
@@ -51,9 +51,9 @@
 % bDisableP33x
 1
 % bDisableRazorAHRS
-1
-% bDisableMT
 0
+% bDisableMT
+1
 % bDisableGPS
 0
 % bDisableSwarmonDevice
@@ -61,13 +61,13 @@
 % bDisableUE9A
 1
 % bDisableSSC32
-0
-% bDisableMaestro
 1
+% bDisableMaestro
+0
 % bDisableMiniSSC
 1
 % bDisableSail
-0
+1
 % Controller parameters
 % u_max (in [0;1])
 1
