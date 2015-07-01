@@ -30,15 +30,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	char lognavfilename[MAX_BUF_LEN];
 	FILE* lognavfile = NULL;
 	double deltasmax = 0;
-
-	// To add as parameters...
-
-	int sail_update_period = 20; // Period in s.
-	int check_strategy_period = 60; // Period in s.
-	double betatrav = 0.5; // Angle de la voile en vent de travers (en rad).
-	double betaarr = 1.5; // Angle de la voile en vent arrière (en rad).
-	double ksi = 0.87; // Angle de près (en rad).
-
 	double q1 = betaarr;
 	double q2 = (log(betaarr)-log(betatrav))/log(2.0);
 #pragma endregion

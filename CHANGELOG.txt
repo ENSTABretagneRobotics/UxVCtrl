@@ -1,3 +1,6 @@
+52
+Added parameters related to sailboats.
+
 51
 Corrections in Maestro.
 

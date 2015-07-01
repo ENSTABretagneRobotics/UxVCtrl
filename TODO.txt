@@ -1,8 +1,4 @@
-rajouter param dans uxvctrl.txt
-wind (en plus de la commande setwindestimation)
-windfiltercoef
-params linefollowing
-
+param hokuyo...
 if szCfgFilePath == "::::xxx" prendre en compte les paramètres déjà dans la structure
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
@@ -10,8 +6,9 @@ gouvernail plus violent?
 juste plus de positions car rafraichissement plus élevé donne l'impression?
 écart à la ligne?
 
+param offset capteur de vent dans Maestro
 setwindestimation : command to set winddir and windspeed, also add for water current and waves?
-offset capteur de vent, faire filteredtruewinddir et filteredapparentwinddir
+faire filteredtruewinddir et filteredapparentwinddir
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
 variable globale roulis tangage razor, rudderminangle/maxangle...

@@ -67,8 +67,13 @@ inline int LoadConfig()
 	wdradius = 0.25;
 	vxymax = 0.4;
 	omegamax = 0.8;
-	gamma_infinite = 0.75;
+	gamma_infinite = 0.78;
 	radius = 5;
+	betatrav = 0.5;
+	betaarr = 1.5;
+	ksi = 0.87;
+	check_strategy_period = 60;
+	sail_update_period = 20;
 	// Observer parameters.
 	x_max_err = 10;
 	y_max_err = 10;
@@ -95,7 +100,12 @@ inline int LoadConfig()
 	rangescale = 10;
 	sdir = 1;
 	nb_outliers = 25;
-	// Current and waves.
+	// Wind, current and waves.
+	vtwind_med = 0.01;
+	vtwind_var = 0.01;
+	psitwind_med = 0.0*M_PI/2.0;
+	psitwind_var = 1.0*M_PI/8.0;
+	wind_filter_coef = 0.999;
 	vc_med = 0.01;
 	vc_var = 0.01;
 	psic_med = 0.0*M_PI/2.0;
@@ -222,6 +232,16 @@ inline int LoadConfig()
 		if (sscanf(line, "%lf", &gamma_infinite) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &radius) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &betatrav) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &betaarr) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &ksi) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &check_strategy_period) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &sail_update_period) != 1) printf("Invalid configuration file.\n");
 
 		// Observer parameters.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -333,6 +353,16 @@ inline int LoadConfig()
 		if (sscanf(line, "%d", &nb_outliers) != 1) printf("Invalid configuration file.\n");
 
 		// Current and waves.
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vtwind_med) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vtwind_var) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &psitwind_med) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &psitwind_var) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &wind_filter_coef) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &vc_med) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -528,6 +558,51 @@ inline int LoadConfig()
 	{
 		printf("Invalid parameter : uw_integral_max.\n");
 		uw_integral_max = 0.1;
+	}
+	if ((gamma_infinite < -M_PI)||(gamma_infinite > M_PI))
+	{
+		printf("Invalid parameter : gamma_infinite.\n");
+		gamma_infinite = 0.78;
+	}
+	if ((betatrav < -M_PI)||(betatrav > M_PI))
+	{
+		printf("Invalid parameter : betatrav.\n");
+		betatrav = 0.5;
+	}
+	if ((betaarr < -M_PI)||(betaarr > M_PI))
+	{
+		printf("Invalid parameter : betaarr.\n");
+		betaarr = 1.5;
+	}
+	if ((ksi < -M_PI)||(ksi > M_PI))
+	{
+		printf("Invalid parameter : ksi.\n");
+		ksi = 0.87;
+	}
+	if ((psitwind_med < -M_PI)||(psitwind_med > M_PI))
+	{
+		printf("Invalid parameter : psitwind_med.\n");
+		psitwind_med = 0.0*M_PI/2.0;
+	}
+	if ((psitwind_var < -M_PI)||(psitwind_var > M_PI))
+	{
+		printf("Invalid parameter : psitwind_var.\n");
+		psitwind_var = 1.0*M_PI/8.0;
+	}
+	if ((wind_filter_coef < 0)||(wind_filter_coef > 1))
+	{
+		printf("Invalid parameter : wind_filter_coef.\n");
+		wind_filter_coef = 0.999;
+	}
+	if ((psic_med < -M_PI)||(psic_med > M_PI))
+	{
+		printf("Invalid parameter : psic_med.\n");
+		psic_med = 0.0*M_PI/2.0;
+	}
+	if ((psic_var < -M_PI)||(psic_var > M_PI))
+	{
+		printf("Invalid parameter : psic_var.\n");
+		psic_var = 1.0*M_PI/8.0;
 	}
 	if (simulatorperiod <= 0)
 	{

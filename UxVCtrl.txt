@@ -108,6 +108,16 @@
 0.78
 % r (accuracy of line/waypoint following in m, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
+% betatrav (angle de la voile en vent de travers (in rad))
+0.5
+% betaarr (angle de la voile en vent arrière (in rad))
+1.5
+% ksi (angle de près (in rad))
+0.87
+% check_strategy_period (in s)
+60
+% sail_update_period (in s)
+20
 % Observer parameters
 % x_max_err (in m)
 5.0
@@ -193,7 +203,17 @@
 %-1 for SAUCISSE and SARDINE
 % nb_outliers
 25
-% Current and waves
+% Wind, current and waves
+% vtwind_med (true wind speed in m/s)
+4
+% vtwind_var (true wind speed max variation in m/s)
+2
+% psitwind_med (true wind direction in rad)
+0
+% psitwind_var (true wind direction max variation in rad)
+0
+% wind_filter_coef (wind filter coefficient, between 0 and 1)
+0.999
 % vc_med (vitesse du courant en m/s)
 0
 % vc_var (variation de vitesse max du courant en m/s)

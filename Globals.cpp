@@ -82,6 +82,11 @@ double vxymax = 0;
 double omegamax = 0;
 double gamma_infinite = 0;
 double radius = 0;
+double betatrav = 0;
+double betaarr = 0;
+double ksi = 0;
+int check_strategy_period = 0;
+int sail_update_period = 0;
 
 // Observer parameters.
 double x_max_err = 0, y_max_err = 0, z_max_err = 0, theta_max_err = 0, vxy_max_err = 0, omega_max_err = 0;
@@ -92,7 +97,8 @@ xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
 
-// Current and waves.
+// Wind, current and waves.
+double vtwind_med = 0, vtwind_var = 0, psitwind_med = 0, psitwind_var = 0, wind_filter_coef = 0;
 double vc_med = 0, vc_var = 0, psic_med = 0, psic_var = 0, hw_var = 0;
 
 // Simulator initial state.

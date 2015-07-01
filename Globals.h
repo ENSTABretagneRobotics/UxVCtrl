@@ -163,6 +163,11 @@ extern double vxymax; // Max submarine speed in rad/s.
 extern double omegamax; // Max submarine rotation speed in rad/s.
 extern double gamma_infinite; // Angle to go towards the line when far, for line following in rad.
 extern double radius; // Accuracy of line/waypoint following in m.
+extern double betatrav;
+extern double betaarr;
+extern double ksi;
+extern int check_strategy_period;
+extern int sail_update_period;
 
 // Observer parameters.
 extern double x_max_err, y_max_err, z_max_err, theta_max_err, vxy_max_err, omega_max_err;
@@ -173,7 +178,8 @@ xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
 extern int rangescale, sdir;
 extern int nb_outliers;
 
-// Current and waves.
+// Wind, current and waves.
+extern double vtwind_med, vtwind_var, psitwind_med, psitwind_var, wind_filter_coef;
 extern double vc_med, vc_var, psic_med, psic_var, hw_var;
 
 // Simulator initial state.
