@@ -120,8 +120,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					break;
 				}
 				mSleep(25);
-				// Channel 11...
-				if (GetValueMaestro(&maestro, 11, &ivalue) != EXIT_SUCCESS)
+				if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
 				{
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
@@ -129,7 +128,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					break;
 				}
 				EnterCriticalSection(&StateVariablesCS);
-				winddir = ivalue*360.0/1024.0+0.0; // Offset...
+				winddir = ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset;
 				psiwind = fmod_2PI(M_PI/2.0-(winddir*M_PI/180.0)-M_PI); // Apparent wind (in robot coordinate system).
 				LeaveCriticalSection(&StateVariablesCS);
 				break;

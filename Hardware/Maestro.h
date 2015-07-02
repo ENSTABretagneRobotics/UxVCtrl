@@ -77,8 +77,11 @@ struct MAESTRO
 	int leftthrusterchan;
 	int rightfluxchan;
 	int leftfluxchan;
+	int analoginputchan;
 	double MinAngle;
 	double MaxAngle;
+	double analoginputvalueoffset;
+	double analoginputvaluecoef;
 };
 typedef struct MAESTRO MAESTRO;
 
@@ -453,8 +456,11 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 	pMaestro->leftthrusterchan = 0;
 	pMaestro->rightfluxchan = 4;
 	pMaestro->leftfluxchan = 3;
+	pMaestro->analoginputchan = 11;
 	pMaestro->MinAngle = -0.5;
 	pMaestro->MaxAngle = 0.5;
+	pMaestro->analoginputvalueoffset = 0;
+	pMaestro->analoginputvaluecoef = 1;
 
 	sprintf(pMaestro->szCfgFilePath, "%.255s", szCfgFilePath);
 
@@ -499,11 +505,18 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		if (sscanf(line, "%d", &pMaestro->rightfluxchan) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &pMaestro->leftfluxchan) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &pMaestro->analoginputchan) != 1) printf("Invalid configuration file.\n");
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &pMaestro->MinAngle) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &pMaestro->MaxAngle) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &pMaestro->analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &pMaestro->analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
 
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 	}
@@ -562,6 +575,11 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 	{
 		printf("Invalid parameter : leftfluxchan.\n");
 		pMaestro->leftfluxchan = 3;
+	}
+	if ((pMaestro->analoginputchan < 0)||(pMaestro->analoginputchan >= 32))
+	{
+		printf("Invalid parameter : analoginputchan.\n");
+		pMaestro->analoginputchan = 11;
 	}
 
 	if (pMaestro->MaxAngle-pMaestro->MinAngle <= 0.001)

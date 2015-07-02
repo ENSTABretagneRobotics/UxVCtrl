@@ -1,3 +1,6 @@
+53
+Added analog input parameters for Maestro.
+
 52
 Added parameters related to sailboats.
 

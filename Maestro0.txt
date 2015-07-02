@@ -85,7 +85,13 @@ COM6
 4
 % leftfluxchan
 3
+% analoginputchan
+11
 % MinAngle (in rad)
--0.6
+-0.7
 % MaxAngle (in rad)
-0.6
+0.7
+% analoginputvalueoffset
+10.0
+% analoginputvaluecoef
+0.333

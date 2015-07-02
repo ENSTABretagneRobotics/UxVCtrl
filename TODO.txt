@@ -6,12 +6,11 @@ gouvernail plus violent?
 juste plus de positions car rafraichissement plus élevé donne l'impression?
 écart à la ligne?
 
-param offset capteur de vent dans Maestro
 setwindestimation : command to set winddir and windspeed, also add for water current and waves?
 faire filteredtruewinddir et filteredapparentwinddir
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
-variable globale roulis tangage razor, rudderminangle/maxangle...
+variable globale roulis phi razor, rudderminangle/maxangle...
 roulis voilier et vent apparent...->étudiants
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
