@@ -128,8 +128,9 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					break;
 				}
 				EnterCriticalSection(&StateVariablesCS);
-				winddir = ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset;
-				psiwind = fmod_2PI(M_PI/2.0-(winddir*M_PI/180.0)-M_PI); // Apparent wind (in robot coordinate system).
+				winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset-180.0)+180.0;
+				//printf("%f\n", winddir);
+				psiwind = fmod_2PI(-winddir*M_PI/180.0+M_PI); // Apparent wind (in robot coordinate system).
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
 			case VAIMOS_ROBID:

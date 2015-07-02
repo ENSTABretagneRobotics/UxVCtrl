@@ -506,7 +506,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
 				if (robid & SAILBOAT_ROBID_MASK) cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
-					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+Center(psiwindhat)-M_PI-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+Center(psiwindhat)-M_PI-Center(thetahat)))), 
+					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+Center(psiwindhat)+M_PI-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+Center(psiwindhat)-M_PI-Center(thetahat)))), 
 					CV_RGB(0, 255, 255), 2, 8, 0);
 				if (bHeadingControl) cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
 					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+wtheta-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+wtheta-Center(thetahat)))), 

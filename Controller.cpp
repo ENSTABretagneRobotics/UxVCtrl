@@ -355,9 +355,9 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("GPS position of the reference coordinate system is (%f,%f).\n", lat_env, long_env);
 				printf("Heading (theta) is %f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
 				printf("Wind angle (psi) is %f deg in the reference coordinate system.\n", Center(psiwindhat)*180.0/M_PI);
-				printf("Wind direction w.r.t. North is %f deg (average %f deg), heading w.r.t. North is %f deg.\n", 
-					(fmod_2PI(-angle_env-psiwind-M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-					(fmod_2PI(-angle_env-Center(psiwindhat)-M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+				printf("Wind direction w.r.t. North is %f deg (filtered %f deg), heading w.r.t. North is %f deg.\n", 
+					(fmod_2PI(-psiwind+M_PI+M_PI)+M_PI)*180.0/M_PI, 
+					(fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 					(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				printf("Position (x,y) is (%f,%f), GPS position (%f,%f).\n", Center(xhat), Center(yhat), latitude, longitude);
 				printf("Waypoint position (x,y) is (%f,%f), GPS position (%f,%f).\n", wxb, wyb, wlatb, wlongb);
@@ -386,7 +386,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			// Temporary...
 			fprintf(lognavfile, "%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%f;%f;%f;%f;%f;%d;%f;%f;%f;\n", 
 				counter, t, lat_env, long_env, 0.0, 0.0, 0.0, 
-				fmod_2PI(-angle_env-psiwind-M_PI+3.0*M_PI/2.0)+M_PI, vwind, fmod_2PI(-angle_env-Center(psiwindhat)-M_PI+3.0*M_PI/2.0)+M_PI, Center(vwindhat), 0.0, Center(thetahat), Center(psiwindhat), 
+				fmod_2PI(-psiwind+M_PI+M_PI)+M_PI, vwind, fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vwindhat), 0.0, Center(thetahat), Center(psiwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
 				-uw*0.7, u*q1, wtheta); // Approx...
