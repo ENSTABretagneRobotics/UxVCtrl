@@ -124,6 +124,10 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
+				yaw = mtdata.Yaw;
+				pitch = mtdata.Pitch;
+				roll = mtdata.Roll;
+
 				theta_mes = fmod_2PI(M_PI/2.0+mtdata.Yaw-angle_env);
 				omega_mes = mtdata.gyrZ;
 

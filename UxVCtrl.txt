@@ -211,7 +211,7 @@
 % psitwind_med (true wind direction in rad)
 0
 % psitwind_var (true wind direction max variation in rad)
-0
+0.1
 % wind_filter_coef (wind filter coefficient, between 0 and 1)
 0.995
 % vc_med (vitesse du courant en m/s)

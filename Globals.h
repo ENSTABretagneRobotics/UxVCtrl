@@ -93,9 +93,9 @@ typedef enum STATE STATE;
 
 // Observer variables.
 extern interval xhat, yhat, zhat, thetahat, vxyhat, omegahat;
-extern interval alphahat, dhat;
 extern interval vchat, psichat, hwhat;
 extern interval vwindhat, psiwindhat;
+extern interval alphahat, dhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
@@ -106,6 +106,8 @@ extern double wasf; // altitude_sea_floor.
 // Measurements
 extern double x_mes, y_mes, z_mes, theta_mes, vxy_mes, omega_mes;
 extern double dist;
+// AHRS.
+extern double yaw, pitch, roll;
 // GPS.
 extern double latitude, longitude;
 extern double altitude;

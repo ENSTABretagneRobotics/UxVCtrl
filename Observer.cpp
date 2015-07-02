@@ -37,6 +37,11 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		); 
 	fflush(logstatefile);
 
+	EnterCriticalSection(&StateVariablesCS);
+	// Not exact for SAILBOAT...
+	psiwind = psitwind_med;
+	vwind = vtwind_med;
+
 	// Initialize wind data filter. Should take some time before getting a correct value...
 	if (robid == SAILBOAT_ROBID)
 	{
@@ -44,16 +49,17 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		// Robot speed not taken into account...
 		cosfilteredwinddir = cos(psiwind+theta_mes);
 		sinfilteredwinddir = sin(psiwind+theta_mes);
-		psiwindhat = atan2(sinfilteredwinddir,cosfilteredwinddir);
+		psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir));
 		vwindhat = vwind; // ?
 	}
 	else
 	{
 		cosfilteredwinddir = cos(psiwind);
 		sinfilteredwinddir = sin(psiwind);
-		psiwindhat = atan2(sinfilteredwinddir,cosfilteredwinddir);
+		psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir));
 		vwindhat = vwind;
 	}
+	LeaveCriticalSection(&StateVariablesCS);
 
 	t = 0;
 
@@ -90,15 +96,15 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			// Robot speed not taken into account...
 			cosfilteredwinddir = wind_filter_coef*cosfilteredwinddir+(1.0-wind_filter_coef)*cos(psiwind+theta_mes);
 			sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(psiwind+theta_mes);
-			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-0.1,0.1);//+interval(-psiwind_var,psiwind_var);
-			vwindhat = wind_filter_coef*Center(vwindhat)+(1.0-wind_filter_coef)*vwind+interval(-0.1,0.1);//+interval(-vwind_var,vwind_var); // ?
+			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-psitwind_var,psitwind_var); // Bounds might go outside modulo...
+			vwindhat = wind_filter_coef*Center(vwindhat)+(1.0-wind_filter_coef)*vwind+interval(-vtwind_var,vtwind_var); // ?
 		}
 		else
 		{
 			cosfilteredwinddir = wind_filter_coef*cosfilteredwinddir+(1.0-wind_filter_coef)*cos(psiwind);
 			sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(psiwind);
-			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-0.1,0.1);//+interval(-psiwind_var,psiwind_var);
-			vwindhat = wind_filter_coef*Center(vwindhat)+(1.0-wind_filter_coef)*vwind+interval(-0.1,0.1);//+interval(-vwind_var,vwind_var);
+			psiwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-psitwind_var,psitwind_var); // Bounds might go outside modulo...
+			vwindhat = wind_filter_coef*Center(vwindhat)+(1.0-wind_filter_coef)*vwind+interval(-vtwind_var,vtwind_var);
 		}
 
 		//// Temporary without filter...

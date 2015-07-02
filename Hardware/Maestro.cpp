@@ -119,19 +119,22 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					DisconnectMaestro(&maestro);
 					break;
 				}
-				mSleep(25);
-				if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
+				if (maestro.analoginputchan != 24) // Special value to indicate to disable the wind sensor...
 				{
-					printf("Connection to a Maestro lost.\n");
-					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
-					break;
+					mSleep(50);
+					if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						break;
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset+180.0)+180.0;
+					//printf("%f\n", winddir);
+					psiwind = fmod_2PI(-winddir*M_PI/180.0+M_PI); // Apparent wind (in robot coordinate system).
+					LeaveCriticalSection(&StateVariablesCS);
 				}
-				EnterCriticalSection(&StateVariablesCS);
-				winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset-180.0)+180.0;
-				//printf("%f\n", winddir);
-				psiwind = fmod_2PI(-winddir*M_PI/180.0+M_PI); // Apparent wind (in robot coordinate system).
-				LeaveCriticalSection(&StateVariablesCS);
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);

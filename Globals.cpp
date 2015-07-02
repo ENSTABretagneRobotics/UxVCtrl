@@ -12,9 +12,9 @@
 // Observer variables.
 interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
 thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vxyhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psiwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
@@ -25,6 +25,8 @@ double wasf = 0;
 // Measurements
 double x_mes = 0, y_mes = 0, z_mes = 0, theta_mes = 0, vxy_mes = 0, omega_mes = 0;
 double dist = 0;
+// AHRS.
+double yaw = 0, pitch = 0, roll = 0;
 // GPS.
 double latitude = 0, longitude = 0;
 double altitude = 0;
