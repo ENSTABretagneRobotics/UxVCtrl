@@ -202,6 +202,8 @@
 %
 % GENERAL COMMANDS
 %
+%showdetailedinfo bStdOutDetailedInfo
+%
 %startopencvgui videoid (int)
 %
 %stopopencvgui videoid (int)

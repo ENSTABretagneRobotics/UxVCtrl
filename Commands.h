@@ -1585,6 +1585,10 @@ inline int Commands(char* line)
 	}
 #pragma endregion
 #pragma region GENERAL COMMANDS
+	else if (sscanf(line, "showdetailedinfo %d", &ival) == 1)
+	{
+		bStdOutDetailedInfo = ival? TRUE: FALSE;
+	}
 	else if (sscanf(line, "startopencvgui %d", &ival) == 1)
 	{
 		if ((ival >= 0)&&(ival < nbvideo))

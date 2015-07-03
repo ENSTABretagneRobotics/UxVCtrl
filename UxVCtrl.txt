@@ -48,6 +48,8 @@
 1
 % bDisableSeanet
 1
+% bDisableHokuyo
+1
 % bDisableP33x
 1
 % bDisableRazorAHRS

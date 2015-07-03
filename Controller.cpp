@@ -342,7 +342,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 		if (robid & SAILBOAT_ROBID_MASK) 
 		{
-			// Should be key and configuration file option, command...
 			if ((bStdOutDetailedInfo)&&(counter%10 == 0))
 			{
 				int days = 0, hours = 0, minutes = 0, seconds = 0;

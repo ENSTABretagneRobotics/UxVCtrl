@@ -1,4 +1,3 @@
-param hokuyo...
 if szCfgFilePath == "::::xxx" prendre en compte les paramètres déjà dans la structure
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
@@ -20,7 +19,7 @@ rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-hokuyo device like sonar, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
+hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 
 utiliser bCleanup dans tous les threads pour le cvSet()?
 
