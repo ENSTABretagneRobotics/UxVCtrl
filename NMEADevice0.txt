@@ -4,7 +4,7 @@ COM3
 % BaudRate
 4800
 % Timeout (in ms)
-1000
+1500
 % bSaveRawData
 1
 % bEnableGPGGA

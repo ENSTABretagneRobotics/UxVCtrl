@@ -3,7 +3,7 @@
 % Latitude, longitude, altitude of the environment coordinate system (in decimal deg and m)
 48.417976
 -4.472551
-164
+90
 % Number of circles
 0
 % x  y  r (in m)
