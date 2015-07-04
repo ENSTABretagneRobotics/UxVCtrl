@@ -1,16 +1,13 @@
 if szCfgFilePath == "::::xxx" prendre en compte les paramètres déjà dans la structure
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
-gouvernail plus violent?
-juste plus de positions car rafraichissement plus élevé donne l'impression?
-écart à la ligne?
+juste plus de positions car rafraichissement plus élevé donne l'impression, timing...?
+écart à la ligne,gouvernail plus violent?
 
-setwindestimation : command to set winddir and windspeed, also add for water current and waves? (mais comment ne pas interférer avec valeur Maestro?->analoginput=24 to disable... mais pour sailboat  c'est le vent apparent->réfléchir à option indiquant si on mesure vent apparent ou réel, e.g. bTrueWindMeasured...)
-faire filteredtruewinddir et filteredapparentwinddir
+setwindestimation : command to set winddir and windspeed, also add for water current and waves? (mais comment ne pas interférer avec valeur Maestro?->analoginput=24 to disable... mais pour sailboat c'est le vent apparent->réfléchir à option indiquant si on mesure vent apparent ou réel, e.g. bTrueWindMeasured...)
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
 roulis voilier et vent apparent...->étudiants
-variable globale rudderminangle/maxangle...
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
@@ -46,17 +43,10 @@ l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 
 GUI, video
-touche pour choisir wgs ou local
-rajouter offset, une variable angle dans le orientation circle et mieux gérer les infos affichées selon le robot et selon le mode
-rajouter angle du vent (filtré, non filtré en plus clair...) dans le cercle
+mieux gérer les infos affichées selon le robot et selon le mode
+alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
-plus petite police
-en mode suivi de wp/line et en option
-DST:25,5
-DIS=23.5
-ETA=15:01:25 (ou mettre juste durée en s)
-afficher SOG, COG, roll when available?
 afficher position des waypoints dans l'interface
 mettre aussi BRG de ball par rapport au nord?
 trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)

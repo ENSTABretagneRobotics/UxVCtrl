@@ -109,6 +109,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			case BUGGY_ROBID:
 			case SAILBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
@@ -138,6 +139,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderMaestro(&maestro, rudder) != EXIT_SUCCESS)
@@ -149,6 +151,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				break;
 			case MOTORBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
 				thrust = fabs(u);
 				if (bEnableBackwardsMotorboat)

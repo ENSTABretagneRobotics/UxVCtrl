@@ -106,6 +106,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 			{
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = minissc.MinAngle; ruddermaxangle = minissc.MaxAngle;
 				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderMiniSSC(&minissc, rudder) != EXIT_SUCCESS)
@@ -117,6 +118,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 				break;
 			case MOTORBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = minissc.MinAngle; ruddermaxangle = minissc.MaxAngle;
 				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
 				thrust = fabs(u);
 				if (bEnableBackwardsMotorboat)

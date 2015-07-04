@@ -12,11 +12,16 @@
 THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 {
 	int videoid = (int)pParam;
-	int c = 0;
-	int i = 0;
+	int c = 0, i = 0, offset = 0;
+	double angle = 0, d0 = 0, d1 = 0, d2 = 0;
+	int days = 0, hours = 0, minutes = 0, seconds = 0;
+	double deccsec = 0;
 	BOOL bOSD = TRUE;
 	BOOL bOrientationCircle = TRUE;
+	BOOL bDispLLA = FALSE;
 	BOOL bDispAltitudeSeaFloor = FALSE;
+	BOOL bDispSOG = TRUE;
+	BOOL bDispYPR = TRUE;
 	BOOL bMap = TRUE;
 	BOOL bFullMap = FALSE;
 	BOOL bRotatingMap = FALSE;
@@ -307,15 +312,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			tilt -= 0.1;
 			tilt = (tilt < -1)? -1: tilt;
 			break;
-		case 'o':
-			bOSD = !bOSD;
-			break;
-		case 'c':
-			bOrientationCircle = !bOrientationCircle;
-			break;
-		case 'A':
-			bDispAltitudeSeaFloor = !bDispAltitudeSeaFloor;
-			break;
+		case 'o': bOSD = !bOSD; break;
+		case 'c': bOrientationCircle = !bOrientationCircle; break;
+		case 'L': bDispLLA = !bDispLLA; break;
+		case 'A': bDispAltitudeSeaFloor = !bDispAltitudeSeaFloor; break;
+		case 'V': bDispSOG = !bDispSOG; break;
+		case 'R': bDispYPR = !bDispYPR; break;
 		case 'm':
 			bFullMap = FALSE;
 			bMap = !bMap;
@@ -324,38 +326,30 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bMap = FALSE;
 			bFullMap = !bFullMap;
 			break;
-		case '*':
-			bRotatingMap = !bRotatingMap;
-			break;
-		case 'i':
-			bShowVideoOpenCVGUIs[videoid] = !bShowVideoOpenCVGUIs[videoid];
-			break;
-		case '$':
-			bShowSonar = !bShowSonar;
-			break;
-		case ';':
-			bShowOtherOverlays = !bShowOtherOverlays;
-			break;
+		case '*': bRotatingMap = !bRotatingMap; break;
+		case 'i': bShowVideoOpenCVGUIs[videoid] = !bShowVideoOpenCVGUIs[videoid]; break;
+		case '$': bShowSonar = !bShowSonar; break;
+		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
 		case 'O':
 			// gpssetenvcoordposition
 			//if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKSimulator)
 			//{
-				// We do not use GPS altitude for that as it is not reliable...
-				lat_env = latitude; long_env = longitude;
+			// We do not use GPS altitude for that as it is not reliable...
+			lat_env = latitude; long_env = longitude;
 			//}
 			break;
 		case 'G':
 			// gpslocalization
 			//if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKSimulator)
 			//{
-				// Should add speed...?
-				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
-				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
-				if (xhat.isEmpty || yhat.isEmpty)
-				{
-					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-				}
+			// Should add speed...?
+			xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
+			yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
+			if (xhat.isEmpty || yhat.isEmpty)
+			{
+				xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+				yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+			}
 			//}
 			break;
 		case 'Z':
@@ -424,27 +418,17 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'h':
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
-				"o(osd),c(North and control),A(ASF),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
+				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"r(record),p(mission),x(abort),h(help),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),!?(battery or extra info),"
 				"B(motorboat backwards)\n");
 			break;
-		case '4':
-			OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE;
-			break;
-		case '6':
-			OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE;
-			break;
-		case '8':
-			OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE;
-			break;
-		case '2':
-			OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE;
-			break;
-		case '5':
-			OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE;
-			break;
+		case '4': OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; break;
+		case '6': OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; break;
+		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;
+		case '2': OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; break;
+		case '5': OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '!':
 			bDisableLiIonAlarmCISCREA = !bDisableLiIonAlarmCISCREA;
 			if (bDisableLiIonAlarmCISCREA) printf("CISCREA Li-ion battery alarm disabled.\n");
@@ -468,6 +452,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 		if (bOSD)
 		{
+			offset = 0;
 			// Rounding...
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
@@ -481,38 +466,148 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "%c %d%% %d%%", s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
 			}
 			else sprintf(szText, "%d%% %d%% %d%%", (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,16), &font, CV_RGB(255,0,128));
+			offset += 16;
+			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
 			// In deg in marine units...
 			if (bHeadingControl) sprintf(szText, "%.1f/%.1f", 
 				(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 				(fmod_2PI(-angle_env-wtheta+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
 			else sprintf(szText, "%.1f/--", (fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,32), &font, CV_RGB(255,0,128));
-			// In m in marine units...
-			if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz); 
-			else sprintf(szText, "%.1f/--", Center(zhat)); 
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,48), &font, CV_RGB(255,0,128));
-			sprintf(szText, "x=%.1f (+/-%.1f)", Center(xhat), Width(xhat)/2.0); 
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,64), &font, CV_RGB(255,0,128));
-			sprintf(szText, "y=%.1f (+/-%.1f)", Center(yhat), Width(yhat)/2.0); 
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,80), &font, CV_RGB(255,0,128));
-			if (bDispAltitudeSeaFloor)
+			offset += 16;
+			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			if (robid & SUBMARINE_ROBID_MASK) 
 			{
-				if (bAltitudeSeaFloorControl) sprintf(szText, "ASF=%.1f/%.1f", altitude_sea_floor, wasf); 
-				else sprintf(szText, "ASF=%.1f/--", altitude_sea_floor); 
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,96), &font, CV_RGB(255,0,128));
+				// In m in marine units...
+				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz); 
+				else sprintf(szText, "%.1f/--", Center(zhat)); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				if (bDispAltitudeSeaFloor)
+				{
+					if (bAltitudeSeaFloorControl) sprintf(szText, "ASF=%.1f/%.1f", altitude_sea_floor, wasf); 
+					else sprintf(szText, "ASF=%.1f/--", altitude_sea_floor); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
+			}
+			if (robid & SAILBOAT_ROBID_MASK) 
+			{
+				sprintf(szText, "%.1f/%.1f", 
+					(fmod_2PI(-psiwind+M_PI+M_PI)+M_PI)*180.0/M_PI, // Apparent wind for SAILBOAT, true wind for VAIMOS (should have -angle_env for true wind but it should be 0 most of the time...).
+					(fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			}
+			if (bDispLLA)
+			{
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
+				sprintf(szText, "POS:%.6f,%.6f", d0, d1); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			}
+			else
+			{
+				sprintf(szText, "POS:%.1f,%.1f", Center(xhat), Center(yhat)); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			}
+			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
+			offset += 16;
+			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			if (bDispSOG)
+			{
+				sprintf(szText, "SOG:%.1f", sog); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				sprintf(szText, "COG:%.1f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			}
+			if (bDispYPR)
+			{
+				sprintf(szText, "YPR:%d,%d,%d", (int)(yaw*180.0/M_PI), (int)(pitch*180.0/M_PI), (int)(roll*180.0/M_PI)); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+			}
+			if (bWaypointControl)
+			{
+				if (bDispLLA)
+				{
+					EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wx, wy, wz, &d0, &d1, &d2);
+					sprintf(szText, "WPT:%.6f,%.6f", d0, d1); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
+				else
+				{
+					sprintf(szText, "WPT:%.1f,%.1f", wx, wy); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
+				d0 = sqrt(pow(wx-Center(xhat),2)+pow(wy-Center(yhat),2));
+				sprintf(szText, "DIS:%.1f", d0); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				if (bDispSOG)
+				{
+					if (sog > 0) d1 = d0/sog; else d1 = 0;
+					DecSec2DaysHoursMinSec(d1, &days, &hours, &minutes, &seconds, &deccsec);
+					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
+			}
+			if (bLineFollowingControl)
+			{
+				if (bDispLLA)
+				{
+					EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxb, wyb, wz, &d0, &d1, &d2);
+					sprintf(szText, "WPT:%.6f,%.6f", d0, d1); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
+				else
+				{
+					sprintf(szText, "WPT:%.1f,%.1f", wxb, wyb); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
+				sprintf(szText, "XTE:%.1f", xte); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				d0 = sqrt(pow(wxb-Center(xhat),2)+pow(wyb-Center(yhat),2));
+				sprintf(szText, "DIS:%.1f", d0); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				if (bDispSOG)
+				{
+					if (sog > 0) d1 = d0/sog; else d1 = 0;
+					DecSec2DaysHoursMinSec(d1, &days, &hours, &minutes, &seconds, &deccsec);
+					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
+				}
 			}
 			if (bOrientationCircle)
 			{
 				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
-				if (robid & SAILBOAT_ROBID_MASK) cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
-					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+Center(psiwindhat)+M_PI-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+Center(psiwindhat)+M_PI-Center(thetahat)))), 
-					CV_RGB(0, 255, 255), 2, 8, 0);
-				if (bHeadingControl) cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
-					cvPoint((int)(videoimgwidth-16+12*cos(M_PI/2.0+wtheta-Center(thetahat))), (int)(32-12*sin(M_PI/2.0+wtheta-Center(thetahat)))), 
-					CV_RGB(0, 255, 0), 2, 8, 0);
+				if (robid & SAILBOAT_ROBID_MASK) 
+				{
+					angle = M_PI/2.0+Center(psiwindhat)+M_PI-Center(thetahat);
+					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
+						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
+						CV_RGB(0, 255, 255), 2, 8, 0);
+				}
+				if (bHeadingControl) 
+				{
+					angle = M_PI/2.0+wtheta-Center(thetahat);
+					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
+						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
+						CV_RGB(0, 255, 0), 2, 8, 0);
+				}
+				angle = M_PI-angle_env-Center(thetahat);
 				cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
-					cvPoint((int)(videoimgwidth-16+12*cos(M_PI-angle_env-Center(thetahat))), (int)(32-12*sin(M_PI-angle_env-Center(thetahat)))), 
+					cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 					CV_RGB(0, 0, 255), 2, 8, 0);
 			}
 			if (bMap)

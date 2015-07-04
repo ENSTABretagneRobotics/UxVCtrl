@@ -50,6 +50,10 @@ double u1 = 0, u2 = 0, u3 = 0;
 
 double light = 0, tilt = 0;
 
+double rudderminangle = 0, ruddermaxangle = 0;
+
+double xte = 0;
+
 // Parameters.
 int robid = 0, nbvideo = 0, 
 videoimgwidth = 0, videoimgheight = 0, captureperiod = 0; 

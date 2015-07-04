@@ -12,7 +12,7 @@ COM3
 % bEnableGPRMC
 0
 % bEnableGPVTG
-0
+1
 % bEnableHCHDG
 0
 % bEnableWIMDA

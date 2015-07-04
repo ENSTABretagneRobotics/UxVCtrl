@@ -1,3 +1,6 @@
+57
+Small improvements in GUI.
+
 56
 Continuation of Hokuyo integration.
 

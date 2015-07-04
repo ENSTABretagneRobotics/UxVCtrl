@@ -105,15 +105,13 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			norm_bm = sqrt(pow(wxb-Center(xhat),2)+pow(wyb-Center(yhat),2)); // Distance to the destination waypoint of the line (norm of b-m).	
 
 			if ((norm_ma != 0)&&(norm_ba != 0))
-			{
 				sinalpha = ((wxb-wxa)*(Center(yhat)-wya)-(wyb-wya)*(Center(xhat)-wxa))/(norm_ma*norm_ba);
-			}
-			else
-			{
+			else 
 				sinalpha = 0;
-			}
 
 			e = norm_ma*sinalpha; // Distance to the line (signed).
+
+			xte = e; // XTE as in GPS...
 
 			wtheta = LineFollowing(phi, e, gamma_infinite, radius);
 
@@ -354,8 +352,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("GPS position of the reference coordinate system is (%f,%f).\n", lat_env, long_env);
 				printf("Heading (theta) is %f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
 				printf("Wind angle (psi) is %f deg in the reference coordinate system.\n", Center(psiwindhat)*180.0/M_PI);
-				printf("Yaw is %f deg in the NWU coordinate system, pitch is %f deg, roll is %f deg.\n", 
-					yaw*180.0/M_PI, pitch*180.0/M_PI, roll*180.0/M_PI);
+				printf("Yaw is %d deg in the NWU coordinate system, pitch is %d deg, roll is %d deg.\n", 
+					(int)(yaw*180.0/M_PI), (int)(pitch*180.0/M_PI), (int)(roll*180.0/M_PI));
 				printf("Wind direction w.r.t. North is %f deg (filtered %f deg), "
 					"wind speed is %f m/s or %f kn (filtered %f m/s or %f kn), "
 					"heading w.r.t. North is %f deg.\n", 
@@ -382,7 +380,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					printf("State is %d (invalid state).\n", (int)state);
 					break;
 				}
-				printf("Rudder angle is %f deg.\n", -uw*0.7*180.0/M_PI); // Approx...
+				printf("Rudder angle is %f deg.\n", -uw*ruddermaxangle*180.0/M_PI);
 				printf("Sail maximum angle is %f deg.\n", u*q1*180.0/M_PI);
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
@@ -394,7 +392,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				fmod_2PI(-psiwind+M_PI+M_PI)+M_PI, vwind, fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vwindhat), 0.0, Center(thetahat), Center(psiwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
-				-uw*0.7, u*q1, wtheta); // Approx...
+				-uw*ruddermaxangle, u*q1, wtheta);
 			fflush(lognavfile);
 		}
 #pragma endregion

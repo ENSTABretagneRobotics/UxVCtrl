@@ -131,6 +131,10 @@ extern double u1, u2, u3;
 
 extern double light, tilt;
 
+extern double rudderminangle, ruddermaxangle;
+
+extern double xte;
+
 // Parameters.
 extern int robid, nbvideo, 
 videoimgwidth, videoimgheight, captureperiod; 

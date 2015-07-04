@@ -107,6 +107,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			case BUGGY_ROBID:
 			case SAILBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
@@ -119,6 +120,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderSSC32(&ssc32, rudder) != EXIT_SUCCESS)
@@ -130,6 +132,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				break;
 			case MOTORBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
 				thrust = fabs(u);
 				if (bEnableBackwardsMotorboat)
