@@ -61,6 +61,7 @@ struct MINISSC
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	int LastPWs[NB_CHANNELS_PWM_MINISSC];
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
@@ -413,86 +414,92 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 	char line[256];
 	int channel = 0;
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pMiniSSC->szDevPath, 0, sizeof(pMiniSSC->szDevPath));
-	sprintf(pMiniSSC->szDevPath, "COM1");
-	pMiniSSC->BaudRate = 115200;
-	pMiniSSC->timeout = 1000;
-	pMiniSSC->bSaveRawData = 1;
-	pMiniSSC->DeviceNumber = DEFAULT_DEVICE_NUMBER_MINISSC;
-	for (channel = 0; channel < NB_CHANNELS_PWM_MINISSC; channel++)
-	{
-		pMiniSSC->MinPWs[channel] = 1000;
-		pMiniSSC->MidPWs[channel] = 1500;
-		pMiniSSC->MaxPWs[channel] = 2000;
-		pMiniSSC->ThresholdPWs[channel] = 0;
-		pMiniSSC->CoefPWs[channel] = 1;
-		pMiniSSC->bProportionalPWs[channel] = 1;
-	}
-	pMiniSSC->rudderchan = 2;
-	pMiniSSC->rightthrusterchan = 1;
-	pMiniSSC->leftthrusterchan = 0;
-	pMiniSSC->rightfluxchan = 4;
-	pMiniSSC->leftfluxchan = 3;
-	pMiniSSC->MinAngle = -0.5;
-	pMiniSSC->MaxAngle = 0.5;
-
+	memset(pMiniSSC->szCfgFilePath, 0, sizeof(pMiniSSC->szCfgFilePath));
 	sprintf(pMiniSSC->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pMiniSSC->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->BaudRate) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->bSaveRawData) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->DeviceNumber) != 1) printf("Invalid configuration file.\n");
+		memset(line, 0, sizeof(line));
 
+		// Default values.
+		memset(pMiniSSC->szDevPath, 0, sizeof(pMiniSSC->szDevPath));
+		sprintf(pMiniSSC->szDevPath, "COM1");
+		pMiniSSC->BaudRate = 115200;
+		pMiniSSC->timeout = 1000;
+		pMiniSSC->bSaveRawData = 1;
+		pMiniSSC->DeviceNumber = DEFAULT_DEVICE_NUMBER_MINISSC;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MINISSC; channel++)
 		{
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMiniSSC->MinPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMiniSSC->MidPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMiniSSC->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMiniSSC->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMiniSSC->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMiniSSC->bProportionalPWs[channel]) != 1) printf("Invalid configuration file.\n");
+			pMiniSSC->MinPWs[channel] = 1000;
+			pMiniSSC->MidPWs[channel] = 1500;
+			pMiniSSC->MaxPWs[channel] = 2000;
+			pMiniSSC->ThresholdPWs[channel] = 0;
+			pMiniSSC->CoefPWs[channel] = 1;
+			pMiniSSC->bProportionalPWs[channel] = 1;
 		}
+		pMiniSSC->rudderchan = 2;
+		pMiniSSC->rightthrusterchan = 1;
+		pMiniSSC->leftthrusterchan = 0;
+		pMiniSSC->rightfluxchan = 4;
+		pMiniSSC->leftfluxchan = 3;
+		pMiniSSC->MinAngle = -0.5;
+		pMiniSSC->MaxAngle = 0.5;
 
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->rudderchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->rightthrusterchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->leftthrusterchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->rightfluxchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMiniSSC->leftfluxchan) != 1) printf("Invalid configuration file.\n");
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pMiniSSC->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->DeviceNumber) != 1) printf("Invalid configuration file.\n");
 
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pMiniSSC->MinAngle) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pMiniSSC->MaxAngle) != 1) printf("Invalid configuration file.\n");
+			for (channel = 0; channel < NB_CHANNELS_PWM_MINISSC; channel++)
+			{
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMiniSSC->MinPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMiniSSC->MidPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMiniSSC->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMiniSSC->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pMiniSSC->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMiniSSC->bProportionalPWs[channel]) != 1) printf("Invalid configuration file.\n");
+			}
 
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->rudderchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->rightthrusterchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->leftthrusterchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->rightfluxchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->leftfluxchan) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMiniSSC->MinAngle) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMiniSSC->MaxAngle) != 1) printf("Invalid configuration file.\n");
+
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	if ((pMiniSSC->DeviceNumber < 0)||(pMiniSSC->DeviceNumber > 255))

@@ -39,6 +39,7 @@ struct SAIL
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	int LastRval;
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
@@ -211,55 +212,61 @@ inline int ConnectSail(SAIL* pSail, char* szCfgFilePath)
 	char sendbuf[MAX_NB_BYTES_SAIL];
 	int sendbuflen = 0;
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pSail->szDevPath, 0, sizeof(pSail->szDevPath));
-	sprintf(pSail->szDevPath, "COM1");
-	pSail->BaudRate = 4800;
-	pSail->timeout = 1000;
-	pSail->bSaveRawData = 1;
-	pSail->CalibrationSpeed = CALIBRATION_SPEED_SAIL;
-	pSail->CalibrationTime = CALIBRATION_TIME_SAIL;
-	pSail->CalibrationTorque = CALIBRATION_TORQUE_SAIL;
-	pSail->NormalTorque = NORMAL_TORQUE_SAIL;
-	pSail->ThresholdRval = 0;
-	pSail->MinAngle = MIN_ANGLE_SAIL;
-	pSail->MaxAngle = MAX_ANGLE_SAIL;
-
+	memset(pSail->szCfgFilePath, 0, sizeof(pSail->szCfgFilePath));
 	sprintf(pSail->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pSail->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->BaudRate) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->bSaveRawData) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->CalibrationSpeed) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->CalibrationTime) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->CalibrationTorque) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->NormalTorque) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pSail->ThresholdRval) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pSail->MinAngle) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pSail->MaxAngle) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pSail->szDevPath, 0, sizeof(pSail->szDevPath));
+		sprintf(pSail->szDevPath, "COM1");
+		pSail->BaudRate = 4800;
+		pSail->timeout = 1000;
+		pSail->bSaveRawData = 1;
+		pSail->CalibrationSpeed = CALIBRATION_SPEED_SAIL;
+		pSail->CalibrationTime = CALIBRATION_TIME_SAIL;
+		pSail->CalibrationTorque = CALIBRATION_TORQUE_SAIL;
+		pSail->NormalTorque = NORMAL_TORQUE_SAIL;
+		pSail->ThresholdRval = 0;
+		pSail->MinAngle = MIN_ANGLE_SAIL;
+		pSail->MaxAngle = MAX_ANGLE_SAIL;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pSail->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->CalibrationSpeed) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->CalibrationTime) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->CalibrationTorque) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->NormalTorque) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSail->ThresholdRval) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pSail->MinAngle) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pSail->MaxAngle) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	if ((pSail->CalibrationSpeed < MIN_MOTOR_SPEED_SAIL)||(pSail->CalibrationSpeed > MAX_MOTOR_SPEED_SAIL))

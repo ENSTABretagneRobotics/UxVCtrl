@@ -1,3 +1,7 @@
+58
+Added temporary battery alarm for SAILBOAT.
+Added possibility to use hardcoded parameters in hardware.
+
 57
 Small improvements in GUI.
 

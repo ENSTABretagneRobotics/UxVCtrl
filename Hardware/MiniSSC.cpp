@@ -114,6 +114,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 					printf("Connection to a MiniSSC lost.\n");
 					bConnected = FALSE;
 					DisconnectMiniSSC(&minissc);
+					break;
 				}
 				break;
 			case MOTORBOAT_ROBID:
@@ -136,6 +137,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 					printf("Connection to a MiniSSC lost.\n");
 					bConnected = FALSE;
 					DisconnectMiniSSC(&minissc);
+					break;
 				}		
 				break;
 			case HOVERCRAFT_ROBID:
@@ -149,6 +151,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 					printf("Connection to a MiniSSC lost.\n");
 					bConnected = FALSE;
 					DisconnectMiniSSC(&minissc);
+					break;
 				}
 				break;
 			}

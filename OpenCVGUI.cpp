@@ -420,27 +420,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
 				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
-				"r(record),p(mission),x(abort),h(help),"
-				"bn(light),uj(tilt),46825(CISCREA OSD),!?(battery or extra info),"
+				"r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
+				"bn(light),uj(tilt),46825(CISCREA OSD),"
 				"B(motorboat backwards)\n");
 			break;
+		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
+		case '!':
+			bDisableBatteryAlarm = !bDisableBatteryAlarm;
+			if (bDisableBatteryAlarm) printf("Battery alarm disabled.\n");
+			else printf("Battery alarm enabled.\n");
+			break;
+		case '?': bShowBatteryInfo = !bShowBatteryInfo; break;
 		case '4': OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '6': OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '2': OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '5': OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; break;
-		case '!':
-			bDisableLiIonAlarmCISCREA = !bDisableLiIonAlarmCISCREA;
-			if (bDisableLiIonAlarmCISCREA) printf("CISCREA Li-ion battery alarm disabled.\n");
-			else printf("CISCREA Li-ion battery alarm enabled.\n");
-			break;
-		case '?':
-			bShowVoltageCISCREA = !bShowVoltageCISCREA;
-			bStdOutDetailedInfo = !bStdOutDetailedInfo;
-			break;
-		case 'B':
-			bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat;
-			break;
+		case 'B': bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat; break;
 		case 27: // ESC
 			bExit = TRUE;
 			break;

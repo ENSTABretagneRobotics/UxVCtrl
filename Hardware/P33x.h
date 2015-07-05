@@ -27,6 +27,7 @@ struct P33X
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	double LastPressure;
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
@@ -230,34 +231,40 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 	FILE* file = NULL;
 	char line[256];
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pP33x->szDevPath, 0, sizeof(pP33x->szDevPath));
-	sprintf(pP33x->szDevPath, "COM1");
-	pP33x->BaudRate = 9600;
-	pP33x->timeout = 1000;
-	pP33x->bSaveRawData = 1;
-
+	memset(pP33x->szCfgFilePath, 0, sizeof(pP33x->szCfgFilePath));
 	sprintf(pP33x->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pP33x->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pP33x->BaudRate) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pP33x->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pP33x->bSaveRawData) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pP33x->szDevPath, 0, sizeof(pP33x->szDevPath));
+		sprintf(pP33x->szDevPath, "COM1");
+		pP33x->BaudRate = 9600;
+		pP33x->timeout = 1000;
+		pP33x->bSaveRawData = 1;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pP33x->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pP33x->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pP33x->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pP33x->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	// Used to save raw data, should be handled specifically...

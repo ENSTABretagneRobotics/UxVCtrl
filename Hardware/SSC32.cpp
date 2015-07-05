@@ -116,6 +116,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					printf("Connection to a SSC32 lost.\n");
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
+					break;
 				}		
 				break;
 			case VAIMOS_ROBID:
@@ -128,6 +129,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					printf("Connection to a SSC32 lost.\n");
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
+					break;
 				}
 				break;
 			case MOTORBOAT_ROBID:
@@ -150,6 +152,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					printf("Connection to a SSC32 lost.\n");
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
+					break;
 				}		
 				break;
 			case HOVERCRAFT_ROBID:
@@ -163,6 +166,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					printf("Connection to a SSC32 lost.\n");
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
+					break;
 				}
 				break;
 			}

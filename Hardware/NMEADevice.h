@@ -68,6 +68,7 @@ struct NMEADEVICE
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	NMEADATA LastNMEAData;
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
@@ -455,49 +456,55 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 	FILE* file = NULL;
 	char line[256];
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pNMEADevice->szDevPath, 0, sizeof(pNMEADevice->szDevPath));
-	sprintf(pNMEADevice->szDevPath, "COM1");
-	pNMEADevice->BaudRate = 4800;
-	pNMEADevice->timeout = 1000;
-	pNMEADevice->bSaveRawData = 1;
-	pNMEADevice->bEnableGPGGA = 1;
-	pNMEADevice->bEnableGPRMC = 0;
-	pNMEADevice->bEnableGPVTG = 0;
-	pNMEADevice->bEnableHCHDG = 0;
-	pNMEADevice->bEnableWIMDA = 0;
-
+	memset(pNMEADevice->szCfgFilePath, 0, sizeof(pNMEADevice->szCfgFilePath));
 	sprintf(pNMEADevice->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pNMEADevice->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->BaudRate) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->bEnableGPGGA) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->bEnableGPRMC) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->bEnableGPVTG) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->bEnableHCHDG) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pNMEADevice->bEnableWIMDA) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pNMEADevice->szDevPath, 0, sizeof(pNMEADevice->szDevPath));
+		sprintf(pNMEADevice->szDevPath, "COM1");
+		pNMEADevice->BaudRate = 4800;
+		pNMEADevice->timeout = 1000;
+		pNMEADevice->bSaveRawData = 1;
+		pNMEADevice->bEnableGPGGA = 1;
+		pNMEADevice->bEnableGPRMC = 0;
+		pNMEADevice->bEnableGPVTG = 0;
+		pNMEADevice->bEnableHCHDG = 0;
+		pNMEADevice->bEnableWIMDA = 0;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pNMEADevice->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableGPGGA) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableGPRMC) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableGPVTG) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableHCHDG) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableWIMDA) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	// Used to save raw data, should be handled specifically...

@@ -33,6 +33,7 @@ struct VIDEO
 	char* databuf;
 	//IplImage* Lastimg;
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int videoimgwidth;
 	int videoimgheight;
@@ -393,53 +394,59 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	char* ptr = NULL;
 	int i = 0;
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pVideo->szDevPath, 0, sizeof(pVideo->szDevPath));
-	sprintf(pVideo->szDevPath, "0");
-	pVideo->videoimgwidth = 320; 
-	pVideo->videoimgheight = 240; 
-	pVideo->captureperiod = 100;
-	pVideo->timeout = 0;
-	pVideo->angle = 0*M_PI/180.0;
-	pVideo->scale = 1;
-	pVideo->bFlip = 0;
-	pVideo->HorizontalBeam = 70;
-	pVideo->VerticalBeam = 50;
-
+	memset(pVideo->szCfgFilePath, 0, sizeof(pVideo->szCfgFilePath));
 	sprintf(pVideo->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pVideo->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->videoimgwidth) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->videoimgheight) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->captureperiod) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
-		pVideo->angle = d0*M_PI/180.0;
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pVideo->scale) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->bFlip) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->HorizontalBeam) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pVideo->VerticalBeam) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pVideo->szDevPath, 0, sizeof(pVideo->szDevPath));
+		sprintf(pVideo->szDevPath, "0");
+		pVideo->videoimgwidth = 320; 
+		pVideo->videoimgheight = 240; 
+		pVideo->captureperiod = 100;
+		pVideo->timeout = 0;
+		pVideo->angle = 0*M_PI/180.0;
+		pVideo->scale = 1;
+		pVideo->bFlip = 0;
+		pVideo->HorizontalBeam = 70;
+		pVideo->VerticalBeam = 50;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pVideo->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->videoimgwidth) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->videoimgheight) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->captureperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+			pVideo->angle = d0*M_PI/180.0;
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->scale) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->bFlip) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->HorizontalBeam) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->VerticalBeam) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	if (pVideo->videoimgwidth <= 0)

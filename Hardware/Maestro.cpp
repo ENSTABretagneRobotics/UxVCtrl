@@ -16,7 +16,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double rudder = 0, thrust = 0, flux = 0;
 	double thrust1 = 0, thrust2 = 0;
 	int ivalue = 0;
-	double winddir = 0;
+	double winddir = 0, vbattery1 = 0, vbattery2 = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -120,9 +120,9 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					DisconnectMaestro(&maestro);
 					break;
 				}
+				mSleep(50);
 				if (maestro.analoginputchan != 24) // Special value to indicate to disable the wind sensor...
 				{
-					mSleep(50);
 					if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
@@ -136,6 +136,26 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					psiwind = fmod_2PI(-winddir*M_PI/180.0+M_PI); // Apparent wind (in robot coordinate system).
 					LeaveCriticalSection(&StateVariablesCS);
 				}
+				// Add param battery analog input channels...?
+				if (GetValueMaestro(&maestro, 7, &ivalue) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					break;
+				}
+				vbattery1 = 2*ivalue*5.0/1024.0; // 2* because battery voltage is /2 by resistors...?
+				if (GetValueMaestro(&maestro, 9, &ivalue) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					break;
+				}
+				vbattery2 = 2*ivalue*5.0/1024.0; // 2* because battery voltage is /2 by resistors...?
+				// Add param battery alarm voltage...?
+				if ((!bDisableBatteryAlarm)&&((vbattery1 < 6.8)||(vbattery2 < 6.8))) printf("Battery alarm.\n");
+				if (bShowBatteryInfo) printf("Battery 1 : %f V, battery 2 : %f V.\n", vbattery1, vbattery2);
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
@@ -147,6 +167,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					break;
 				}
 				break;
 			case MOTORBOAT_ROBID:
@@ -169,6 +190,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					break;
 				}		
 				break;
 			case HOVERCRAFT_ROBID:
@@ -182,6 +204,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					break;
 				}
 				break;
 			}

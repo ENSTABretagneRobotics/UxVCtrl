@@ -33,6 +33,7 @@ struct HOKUYO
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	//HokuyoDATA LastHokuyoData;
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
@@ -365,67 +366,73 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 	int ivalue = 0, Status = 0;
 	char Sum = 0;
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pHokuyo->szDevPath, 0, sizeof(pHokuyo->szDevPath));
-	sprintf(pHokuyo->szDevPath, "COM1");
-	pHokuyo->BaudRate = 115200;
-	pHokuyo->timeout = 1000;
-	pHokuyo->bSaveRawData = 1;
-	pHokuyo->bForceSCIP20 = 0;
-	pHokuyo->bHS = 0;
-	pHokuyo->SlitDivision = 1024;
-	pHokuyo->StartingStep = 44;
-	pHokuyo->FrontStep = 384;
-	pHokuyo->EndStep = 725;
-	pHokuyo->ClusterCount = 0;
-	pHokuyo->ScanInterval = 0;
-	pHokuyo->bContinuousNumberOfScans = 0;
-	pHokuyo->alpha_max_err = 0.01;
-	pHokuyo->d_max_err = 0.1;
-
+	memset(pHokuyo->szCfgFilePath, 0, sizeof(pHokuyo->szCfgFilePath));
 	sprintf(pHokuyo->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pHokuyo->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->BaudRate) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->bSaveRawData) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->bForceSCIP20) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->bHS) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->SlitDivision) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->StartingStep) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->FrontStep) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->EndStep) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->ClusterCount) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->ScanInterval) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pHokuyo->bContinuousNumberOfScans) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pHokuyo->alpha_max_err) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pHokuyo->d_max_err) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pHokuyo->szDevPath, 0, sizeof(pHokuyo->szDevPath));
+		sprintf(pHokuyo->szDevPath, "COM1");
+		pHokuyo->BaudRate = 115200;
+		pHokuyo->timeout = 1000;
+		pHokuyo->bSaveRawData = 1;
+		pHokuyo->bForceSCIP20 = 0;
+		pHokuyo->bHS = 0;
+		pHokuyo->SlitDivision = 1024;
+		pHokuyo->StartingStep = 44;
+		pHokuyo->FrontStep = 384;
+		pHokuyo->EndStep = 725;
+		pHokuyo->ClusterCount = 0;
+		pHokuyo->ScanInterval = 0;
+		pHokuyo->bContinuousNumberOfScans = 0;
+		pHokuyo->alpha_max_err = 0.01;
+		pHokuyo->d_max_err = 0.1;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pHokuyo->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->bForceSCIP20) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->bHS) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->SlitDivision) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->StartingStep) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->FrontStep) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->EndStep) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->ClusterCount) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->ScanInterval) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->bContinuousNumberOfScans) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pHokuyo->alpha_max_err) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pHokuyo->d_max_err) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	if (pHokuyo->SlitDivision <= 0)

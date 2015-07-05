@@ -96,9 +96,11 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 			if (!bError)
 			{
-				if ((!bDisableLiIonAlarmCISCREA)&&(voltage/1000.0 < 9.6)) printf("Li-ion battery alarm.\n");
+				// Add param battery alarm voltage...?
 
-				if (bShowVoltageCISCREA) printf("CISCREA voltage : %f V.\n", voltage/1000.0);
+				if ((!bDisableBatteryAlarm)&&(voltage/1000.0 < 9.6)) printf("Li-ion battery alarm.\n");
+
+				if (bShowBatteryInfo) printf("Battery : %f V.\n", voltage/1000.0);
 
 				// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 				//error = 15.4*sin((heading+1439.4)*3.14/1800.0)+1.04;

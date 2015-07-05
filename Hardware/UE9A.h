@@ -36,6 +36,7 @@ struct UE9A
 	HUE9 hUE9;
 	//int LastPWs[MAX_NB_TIMERS_UE9];
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	//int MinPWs[MAX_NB_TIMERS_UE9];
 	//int MidPWs[MAX_NB_TIMERS_UE9];
@@ -73,43 +74,49 @@ inline int ConnectUE9A(UE9A* pUE9A, char* szCfgFilePath)
 	FILE* file = NULL;
 	char line[256];
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pUE9A->szDevPath, 0, sizeof(pUE9A->szDevPath));
-	sprintf(pUE9A->szDevPath, "1");
-	pUE9A->rightthrusterpwm = 0;
-	pUE9A->leftthrusterpwm = 1;
-	pUE9A->bottomthrusterpwm = 2;
-	pUE9A->rightthrustercoef = 1;
-	pUE9A->leftthrustercoef = 1;
-	pUE9A->bottomthrustercoef = 1;
-
+	memset(pUE9A->szCfgFilePath, 0, sizeof(pUE9A->szCfgFilePath));
 	sprintf(pUE9A->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pUE9A->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pUE9A->rightthrusterpwm) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pUE9A->leftthrusterpwm) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pUE9A->bottomthrusterpwm) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pUE9A->rightthrustercoef) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pUE9A->leftthrustercoef) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pUE9A->bottomthrustercoef) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pUE9A->szDevPath, 0, sizeof(pUE9A->szDevPath));
+		sprintf(pUE9A->szDevPath, "1");
+		pUE9A->rightthrusterpwm = 0;
+		pUE9A->leftthrusterpwm = 1;
+		pUE9A->bottomthrusterpwm = 2;
+		pUE9A->rightthrustercoef = 1;
+		pUE9A->leftthrustercoef = 1;
+		pUE9A->bottomthrustercoef = 1;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pUE9A->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->rightthrusterpwm) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->leftthrusterpwm) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->bottomthrusterpwm) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->rightthrustercoef) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->leftthrustercoef) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->bottomthrustercoef) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	if (OpenUE9(&pUE9A->hUE9, pUE9A->szDevPath) != EXIT_SUCCESS)

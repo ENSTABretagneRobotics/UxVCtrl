@@ -43,6 +43,7 @@ struct SWARMONDEVICE
 	int DevType;
 	SWARMONDATA LastSwarmonData;
 	char szCfgFilePath[256];
+	// Parameters.
 	char szRequest[256];
 };
 typedef struct SWARMONDEVICE SWARMONDEVICE;
@@ -199,25 +200,31 @@ inline int ConnectSwarmonDevice(SWARMONDEVICE* pSwarmonDevice, char* szCfgFilePa
 	char* ptr1 = NULL;
 	char* ptr2 = NULL;
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pSwarmonDevice->szRequest, 0, sizeof(pSwarmonDevice->szRequest));
-	sprintf(pSwarmonDevice->szRequest, "http://193.52.45.70:3000/rt/lastposition/robotTest");
-
+	memset(pSwarmonDevice->szCfgFilePath, 0, sizeof(pSwarmonDevice->szCfgFilePath));
 	sprintf(pSwarmonDevice->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pSwarmonDevice->szRequest) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pSwarmonDevice->szRequest, 0, sizeof(pSwarmonDevice->szRequest));
+		sprintf(pSwarmonDevice->szRequest, "http://193.52.45.70:3000/rt/lastposition/robotTest");
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pSwarmonDevice->szRequest) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	memset(&pSwarmonDevice->LastSwarmonData, 0, sizeof(SWARMONDATA));

@@ -61,6 +61,7 @@ struct MAESTRO
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	int LastPWs[NB_CHANNELS_PWM_MAESTRO];
 	char szCfgFilePath[256];
+	// Parameters.
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
@@ -433,96 +434,102 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 	char line[256];
 	int channel = 0;
 
-	memset(line, 0, sizeof(line));
-
-	// Default values.
-	memset(pMaestro->szDevPath, 0, sizeof(pMaestro->szDevPath));
-	sprintf(pMaestro->szDevPath, "COM1");
-	pMaestro->BaudRate = 115200;
-	pMaestro->timeout = 1000;
-	pMaestro->bSaveRawData = 1;
-	pMaestro->DeviceNumber = DEFAULT_DEVICE_NUMBER_MAESTRO;
-	for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
-	{
-		pMaestro->MinPWs[channel] = 1000;
-		pMaestro->MidPWs[channel] = 1500;
-		pMaestro->MaxPWs[channel] = 2000;
-		pMaestro->ThresholdPWs[channel] = 0;
-		pMaestro->CoefPWs[channel] = 1;
-		pMaestro->bProportionalPWs[channel] = 1;
-	}
-	pMaestro->rudderchan = 2;
-	pMaestro->rightthrusterchan = 1;
-	pMaestro->leftthrusterchan = 0;
-	pMaestro->rightfluxchan = 4;
-	pMaestro->leftfluxchan = 3;
-	pMaestro->analoginputchan = 11;
-	pMaestro->MinAngle = -0.5;
-	pMaestro->MaxAngle = 0.5;
-	pMaestro->analoginputvalueoffset = 0;
-	pMaestro->analoginputvaluecoef = 1;
-
+	memset(pMaestro->szCfgFilePath, 0, sizeof(pMaestro->szCfgFilePath));
 	sprintf(pMaestro->szCfgFilePath, "%.255s", szCfgFilePath);
 
-	// Load data from a file.
-	file = fopen(szCfgFilePath, "r");
-	if (file != NULL)
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%255s", pMaestro->szDevPath) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->BaudRate) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->timeout) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->bSaveRawData) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->DeviceNumber) != 1) printf("Invalid configuration file.\n");
+		memset(line, 0, sizeof(line));
 
+		// Default values.
+		memset(pMaestro->szDevPath, 0, sizeof(pMaestro->szDevPath));
+		sprintf(pMaestro->szDevPath, "COM1");
+		pMaestro->BaudRate = 115200;
+		pMaestro->timeout = 1000;
+		pMaestro->bSaveRawData = 1;
+		pMaestro->DeviceNumber = DEFAULT_DEVICE_NUMBER_MAESTRO;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
 		{
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->MinPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->MidPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->bProportionalPWs[channel]) != 1) printf("Invalid configuration file.\n");
+			pMaestro->MinPWs[channel] = 1000;
+			pMaestro->MidPWs[channel] = 1500;
+			pMaestro->MaxPWs[channel] = 2000;
+			pMaestro->ThresholdPWs[channel] = 0;
+			pMaestro->CoefPWs[channel] = 1;
+			pMaestro->bProportionalPWs[channel] = 1;
 		}
+		pMaestro->rudderchan = 2;
+		pMaestro->rightthrusterchan = 1;
+		pMaestro->leftthrusterchan = 0;
+		pMaestro->rightfluxchan = 4;
+		pMaestro->leftfluxchan = 3;
+		pMaestro->analoginputchan = 11;
+		pMaestro->MinAngle = -0.5;
+		pMaestro->MaxAngle = 0.5;
+		pMaestro->analoginputvalueoffset = 0;
+		pMaestro->analoginputvaluecoef = 1;
 
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->rudderchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->rightthrusterchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->leftthrusterchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->rightfluxchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->leftfluxchan) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &pMaestro->analoginputchan) != 1) printf("Invalid configuration file.\n");
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pMaestro->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->DeviceNumber) != 1) printf("Invalid configuration file.\n");
 
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pMaestro->MinAngle) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pMaestro->MaxAngle) != 1) printf("Invalid configuration file.\n");
+			for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
+			{
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMaestro->MinPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMaestro->MidPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMaestro->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMaestro->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pMaestro->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMaestro->bProportionalPWs[channel]) != 1) printf("Invalid configuration file.\n");
+			}
 
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pMaestro->analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &pMaestro->analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->rudderchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->rightthrusterchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->leftthrusterchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->rightfluxchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->leftfluxchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->analoginputchan) != 1) printf("Invalid configuration file.\n");
 
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->MinAngle) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->MaxAngle) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
 	}
 
 	if ((pMaestro->DeviceNumber < 0)||(pMaestro->DeviceNumber > 255))
