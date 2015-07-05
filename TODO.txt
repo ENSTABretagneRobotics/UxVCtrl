@@ -1,9 +1,12 @@
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
 juste plus de positions car rafraichissement plus élevé donne l'impression, timing...?
-écart à la ligne,gouvernail plus violent?
+écart à la ligne, gouvernail plus violent?
 
-setwindestimation : command to set winddir and windspeed, also add for water current and waves? (mais comment ne pas interférer avec valeur Maestro?->analoginput=24 to disable... mais pour sailboat c'est le vent apparent->réfléchir à option indiquant si on mesure vent apparent ou réel, e.g. bTrueWindMeasured...)
+faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
+dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
+
+setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
 roulis voilier et vent apparent...->étudiants

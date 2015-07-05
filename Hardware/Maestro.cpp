@@ -133,7 +133,11 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					EnterCriticalSection(&StateVariablesCS);
 					winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset+180.0)+180.0;
 					//printf("%f\n", winddir);
-					psiwind = fmod_2PI(-winddir*M_PI/180.0+M_PI); // Apparent wind (in robot coordinate system).
+					// Apparent wind (in robot coordinate system).
+					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
+					// True wind must be computed from apparent wind.
+					// Robot speed and roll not taken into account...
+					psitwind = fmod_2PI(psiawind+theta_mes);
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				// Add param battery analog input channels...?

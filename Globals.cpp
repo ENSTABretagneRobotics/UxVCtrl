@@ -13,7 +13,7 @@
 interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
 thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vxyhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-interval vwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psiwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 
 // Controller variables.
@@ -32,7 +32,7 @@ double latitude = 0, longitude = 0;
 double altitude = 0;
 double sog = 0, cog = 0;
 // Weather station.
-double vwind = 0, psiwind = 0;
+double vtwind = 0, psitwind = 0, vawind = 0, psiawind = 0;
 // Sonar.
 double alpha_mes = 0, d_mes = 0;
 vector<interval> d_all_mes;

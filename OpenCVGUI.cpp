@@ -489,8 +489,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
 				sprintf(szText, "%.1f/%.1f", 
-					(fmod_2PI(-psiwind+M_PI+M_PI)+M_PI)*180.0/M_PI, // Apparent wind for SAILBOAT, true wind for VAIMOS (should have -angle_env for true wind but it should be 0 most of the time...).
-					(fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+					// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,128));
 			}
@@ -589,7 +590,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
 				if (robid & SAILBOAT_ROBID_MASK) 
 				{
-					angle = M_PI/2.0+Center(psiwindhat)+M_PI-Center(thetahat);
+					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(thetahat);
 					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
 						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 255), 2, 8, 0);

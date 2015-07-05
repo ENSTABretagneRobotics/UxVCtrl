@@ -132,8 +132,8 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				if (nmeadevice.bEnableWIMDA)
 				{
 					// True wind.
-					psiwind = fmod_2PI(M_PI/2.0-nmeadata.WindDir+M_PI-angle_env);
-					vwind = nmeadata.WindSpeed;
+					psitwind = fmod_2PI(M_PI/2.0-nmeadata.WindDir+M_PI-angle_env);
+					vtwind = nmeadata.WindSpeed;
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);

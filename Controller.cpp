@@ -118,7 +118,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
-				double psi = Center(psiwindhat);				
+				double psi = Center(psitwindhat);				
 
 				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
 				if (((state == STARBOARD_TACK_TRAJECTORY)&&(e > radius/2.0))||
@@ -348,23 +348,25 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
 
 				printf("-------------------------------------------------------------------\n");
-				printf("Time is %f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
-				printf("GPS position of the reference coordinate system is (%f,%f).\n", lat_env, long_env);
-				printf("Heading (theta) is %f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
-				printf("Wind angle (psi) is %f deg in the reference coordinate system.\n", Center(psiwindhat)*180.0/M_PI);
+				printf("Time is %.4f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
+				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
+				printf("Heading (theta) is %.1f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
+				printf("Wind angle (psi) is %.1f deg in the reference coordinate system.\n", Center(psitwindhat)*180.0/M_PI);
 				printf("Yaw is %d deg in the NWU coordinate system, pitch is %d deg, roll is %d deg.\n", 
 					(int)(yaw*180.0/M_PI), (int)(pitch*180.0/M_PI), (int)(roll*180.0/M_PI));
-				printf("Wind direction w.r.t. North is %f deg (filtered %f deg), "
-					"wind speed is %f m/s or %f kn (filtered %f m/s or %f kn), "
-					"heading w.r.t. North is %f deg.\n", 
-					(fmod_2PI(-psiwind+M_PI+M_PI)+M_PI)*180.0/M_PI, // Apparent wind for SAILBOAT, true wind for VAIMOS (should have -angle_env for true wind but it should be 0 most of the time...).
-					(fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-					vwind, vwind*1.94, // Apparent wind for SAILBOAT, true wind for VAIMOS.
-					Center(vwindhat), Center(vwindhat)*1.94, 
+				printf("Wind direction w.r.t. North is %.1f deg (filtered %.1f deg), "
+					"wind speed is %.1f m/s or %.1f kn (filtered %.1f m/s or %.1f kn), "
+					"heading w.r.t. North is %.1f deg.\n", 
+					// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+					// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+					(robid == SAILBOAT_ROBID)? vawind: vtwind, (robid == SAILBOAT_ROBID)? vawind*1.94: vtwind*1.94, 
+					Center(vtwindhat), Center(vtwindhat)*1.94, 
 					(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
-				printf("Position (x,y) is (%f,%f), GPS position (%f,%f).\n", Center(xhat), Center(yhat), latitude, longitude);
-				printf("Waypoint position (x,y) is (%f,%f), GPS position (%f,%f).\n", wxb, wyb, wlatb, wlongb);
-				printf("Distance to the waypoint is %f m, distance to the line is %f m.\n", norm_bm, e);
+				printf("Position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", Center(xhat), Center(yhat), latitude, longitude);
+				printf("Waypoint position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", wxb, wyb, wlatb, wlongb);
+				printf("Distance to the waypoint is %.2f m, distance to the line is %.2f m.\n", norm_bm, e);
 				switch (state)
 				{
 				case DIRECT_TRAJECTORY:
@@ -380,16 +382,21 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					printf("State is %d (invalid state).\n", (int)state);
 					break;
 				}
-				printf("Rudder angle is %f deg.\n", -uw*ruddermaxangle*180.0/M_PI);
-				printf("Sail maximum angle is %f deg.\n", u*q1*180.0/M_PI);
+				printf("Rudder angle is %.1f deg.\n", -uw*ruddermaxangle*180.0/M_PI);
+				printf("Sail maximum angle is %.1f deg.\n", u*q1*180.0/M_PI);
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
 			}
 
 			// Temporary...
-			fprintf(lognavfile, "%d;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%f;%f;%f;%f;%f;%d;%f;%f;%f;\n", 
+			fprintf(lognavfile, "%d;%f;%f;%f;%.3f;%.3f;%.3f;"
+				"%.3f;%.1f;%.3f;%.1f;%.3f;%.3f;%.3f;"
+				"%f;%f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d;"
+				"%f;%f;%.2f;%.2f;%.2f;%d;"
+				"%.3f;%.3f;%.3f;\n", 
 				counter, t, lat_env, long_env, roll, pitch, yaw, 
-				fmod_2PI(-psiwind+M_PI+M_PI)+M_PI, vwind, fmod_2PI(-angle_env-Center(psiwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vwindhat), 0.0, Center(thetahat), Center(psiwindhat), 
+				// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(thetahat), Center(psitwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
 				-uw*ruddermaxangle, u*q1, wtheta);

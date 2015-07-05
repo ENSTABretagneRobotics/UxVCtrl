@@ -94,7 +94,7 @@ typedef enum STATE STATE;
 // Observer variables.
 extern interval xhat, yhat, zhat, thetahat, vxyhat, omegahat;
 extern interval vchat, psichat, hwhat;
-extern interval vwindhat, psiwindhat;
+extern interval vtwindhat, psitwindhat;
 extern interval alphahat, dhat;
 
 // Controller variables.
@@ -113,7 +113,7 @@ extern double latitude, longitude;
 extern double altitude;
 extern double sog, cog;
 // Weather station.
-extern double vwind, psiwind;
+extern double vtwind, psitwind, vawind, psiawind;
 // Sonar.
 extern double alpha_mes, d_mes;
 extern vector<interval> d_all_mes;
