@@ -1,8 +1,11 @@
+60
+Corrected Sailboat settings.
+
 59
 Modifications related to wind.
 
 58
-Added temporary battery alarm for SAILBOAT.
+Added temporary battery alarm for Sailboat.
 Added possibility to use hardcoded parameters in hardware.
 
 57

@@ -489,7 +489,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
 				sprintf(szText, "%.1f/%.1f", 
-					// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
 				offset += 16;

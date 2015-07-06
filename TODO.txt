@@ -44,6 +44,7 @@ prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine
 
 GUI, video
 mieux gérer les infos affichées selon le robot et selon le mode
+info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...?
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position

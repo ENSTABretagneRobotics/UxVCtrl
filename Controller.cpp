@@ -357,10 +357,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("Wind direction w.r.t. North is %.1f deg (filtered %.1f deg), "
 					"wind speed is %.1f m/s or %.1f kn (filtered %.1f m/s or %.1f kn), "
 					"heading w.r.t. North is %.1f deg.\n", 
-					// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-					// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? vawind: vtwind, (robid == SAILBOAT_ROBID)? vawind*1.94: vtwind*1.94, 
 					Center(vtwindhat), Center(vtwindhat)*1.94, 
 					(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
@@ -395,7 +395,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				"%f;%f;%.2f;%.2f;%.2f;%d;"
 				"%.3f;%.3f;%.3f;\n", 
 				counter, t, lat_env, long_env, roll, pitch, yaw, 
-				// Apparent wind for SAILBOAT, true wind for VAIMOS for unfiltered value.
+				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(thetahat), Center(psitwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 

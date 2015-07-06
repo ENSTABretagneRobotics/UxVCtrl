@@ -148,7 +148,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					DisconnectMaestro(&maestro);
 					break;
 				}
-				vbattery1 = 2*ivalue*5.0/1024.0; // 2* because battery voltage is /2 by resistors...?
+				vbattery1 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...				
 				if (GetValueMaestro(&maestro, 9, &ivalue) != EXIT_SUCCESS)
 				{
 					printf("Connection to a Maestro lost.\n");
@@ -156,9 +156,9 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					DisconnectMaestro(&maestro);
 					break;
 				}
-				vbattery2 = 2*ivalue*5.0/1024.0; // 2* because battery voltage is /2 by resistors...?
+				vbattery2 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...
 				// Add param battery alarm voltage...?
-				if ((!bDisableBatteryAlarm)&&((vbattery1 < 6.8)||(vbattery2 < 6.8))) printf("Battery alarm.\n");
+				if ((!bDisableBatteryAlarm)&&((vbattery1 < 6.4)||(vbattery2 < 6.4))) printf("Battery alarm.\n");
 				if (bShowBatteryInfo) printf("Battery 1 : %f V, battery 2 : %f V.\n", vbattery1, vbattery2);
 				break;
 			case VAIMOS_ROBID:

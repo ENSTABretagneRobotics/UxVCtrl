@@ -5,11 +5,11 @@ setmissionaction init
 %wait 3
 linefollowingconfig 20 0.78
 setmissionaction l0
-linefollowingtwgs 48.431272 -4.615697 48.431107 -4.615443 31557600.000000
+linefollowingtwgs 48.431272 -4.615697 48.430950 -4.615108 31557600.000000
 setmissionaction l1
-linefollowingtwgs 48.431107 -4.615443 48.431343 -4.615368 31557600.000000
+linefollowingtwgs 48.430950 -4.615108 48.431437 -4.615037 31557600.000000
 setmissionaction l2
-linefollowingtwgs 48.431343 -4.615368 48.431272 -4.615697 31557600.000000
+linefollowingtwgs 48.431437 -4.615037 48.431272 -4.615697 31557600.000000
 setmissionaction station
 linefollowingwgsstation 48.431272 -4.615697 5 31557600.000000
 setmissionaction end

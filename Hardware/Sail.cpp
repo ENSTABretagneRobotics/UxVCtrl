@@ -104,6 +104,9 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 			switch (robid)
 			{
 			case VAIMOS_ROBID:
+
+				// Add also periodic sail calibration here...
+
 				EnterCriticalSection(&StateVariablesCS);
 				//angle = deltasmax;
 				if (u > 0) angle = u*(sail.MaxAngle-sail.MinAngle)+sail.MinAngle; else u = 0;
