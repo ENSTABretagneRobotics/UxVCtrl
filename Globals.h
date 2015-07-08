@@ -375,6 +375,7 @@ extern BOOL bStdOutDetailedInfo;
 extern BOOL bDisableBatteryAlarm;
 extern BOOL bShowBatteryInfo;
 extern BOOL bEnableBackwardsMotorboat;
+extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bExit;
 extern BOOL bWaiting;
 extern BOOL bMissionRunning;

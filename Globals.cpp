@@ -294,6 +294,7 @@ BOOL bStdOutDetailedInfo = FALSE;
 BOOL bDisableBatteryAlarm = FALSE;
 BOOL bShowBatteryInfo = FALSE;
 BOOL bEnableBackwardsMotorboat = FALSE;
+BOOL bDisableRollWindCorrectionSailboat = FALSE;
 BOOL bExit = FALSE;
 BOOL bWaiting = FALSE;
 BOOL bMissionRunning = FALSE;

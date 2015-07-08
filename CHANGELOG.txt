@@ -1,3 +1,7 @@
+61
+Added roll correction for true wind estimation.
+Minor modifications in MDM.
+
 60
 Corrected Sailboat settings.
 

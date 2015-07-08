@@ -240,20 +240,6 @@ inline int SendDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pSentBytes)
 		return EXIT_FAILURE;
 	}
 
-#ifdef _DEBUG_MESSAGES_MDM
-	for (i = 0; i < buflen; i++)
-	{
-		printf("%.2x ", (int)buf[i]);
-	}
-	printf("\n");
-#endif // _DEBUG_MESSAGES_MDM
-
-	//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-	//{
-	//	fwrite((unsigned char*)buf, buflen, 1, pMDM->pfSaveFile);
-	//	fflush(pMDM->pfSaveFile);
-	//}
-
 	if (WriteRS232Port(&pMDM->RS232Port, buf, buflen, pSentBytes) != EXIT_SUCCESS)
 	{
 		printf("SendDataMDM error (%s) : %s"
@@ -263,6 +249,22 @@ inline int SendDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pSentBytes)
 			(unsigned int)pMDM);
 		return EXIT_FAILURE;
 	}
+
+#ifdef _DEBUG_MESSAGES_MDM
+	for (i = 0; i < *pSentBytes; i++)
+	{
+		printf("%.2x ", (int)buf[i]);
+	}
+	printf("\n");
+#endif // _DEBUG_MESSAGES_MDM
+
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+	if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+	{
+		fwrite(buf, *pSentBytes, 1, pMDM->pfSaveFile);
+		fflush(pMDM->pfSaveFile);
+	}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
 	return EXIT_SUCCESS;
 }
@@ -303,18 +305,20 @@ inline int RecvDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pReceivedBytes)
 	}
 
 #ifdef _DEBUG_MESSAGES_MDM
-	for (i = 0; i < buflen; i++)
+	for (i = 0; i < *pReceivedBytes; i++)
 	{
 		printf("%.2x ", (int)buf[i]);
 	}
 	printf("\n");
 #endif // _DEBUG_MESSAGES_MDM
 
-	//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-	//{
-	//	fwrite((unsigned char*)buf, buflen, 1, pMDM->pfSaveFile);
-	//	fflush(pMDM->pfSaveFile);
-	//}
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+	if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+	{
+		fwrite(buf, *pReceivedBytes, 1, pMDM->pfSaveFile);
+		fflush(pMDM->pfSaveFile);
+	}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
 	return EXIT_SUCCESS;
 }
@@ -365,20 +369,6 @@ inline int SendAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 		return EXIT_FAILURE;
 	}
 
-#ifdef _DEBUG_MESSAGES_MDM
-	for (i = 0; i < buflen; i++)
-	{
-		printf("%.2x ", (int)buf[i]);
-	}
-	printf("\n");
-#endif // _DEBUG_MESSAGES_MDM
-
-	//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-	//{
-	//	fwrite((unsigned char*)buf, buflen, 1, pMDM->pfSaveFile);
-	//	fflush(pMDM->pfSaveFile);
-	//}
-
 	if (WriteAllRS232Port(&pMDM->RS232Port, buf, buflen) != EXIT_SUCCESS)
 	{
 		printf("SendAllDataMDM error (%s) : %s"
@@ -389,12 +379,28 @@ inline int SendAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 		return EXIT_FAILURE;
 	}
 
+#ifdef _DEBUG_MESSAGES_MDM
+	for (i = 0; i < buflen; i++)
+	{
+		printf("%.2x ", (int)buf[i]);
+	}
+	printf("\n");
+#endif // _DEBUG_MESSAGES_MDM
+
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+	if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+	{
+		fwrite(buf, buflen, 1, pMDM->pfSaveFile);
+		fflush(pMDM->pfSaveFile);
+	}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+
 	return EXIT_SUCCESS;
 }
 
 /*
 Receive data with a Tritech Micron data modem. 
-Retry automatically if all the bytes were not written.
+Retry automatically if all the bytes were not read.
 Should be used in combination with SendDataMDM() or SendAllDataMDM().
 
 uint8* buf : (INOUT) Valid pointer that will receive the data received.
@@ -436,11 +442,13 @@ inline int RecvAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 	printf("\n");
 #endif // _DEBUG_MESSAGES_MDM
 
-	//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-	//{
-	//	fwrite((unsigned char*)buf, buflen, 1, pMDM->pfSaveFile);
-	//	fflush(pMDM->pfSaveFile);
-	//}
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+	if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+	{
+		fwrite(buf, buflen, 1, pMDM->pfSaveFile);
+		fflush(pMDM->pfSaveFile);
+	}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
 	return EXIT_SUCCESS;
 }
@@ -477,20 +485,6 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 	// Append CRC-16.
 	CalcCRC16(buf, buflen, &(writebuf[buflen]), &(writebuf[buflen+1]));
 
-#ifdef _DEBUG_MESSAGES_MDM
-	for (i = 0; i < buflen+2; i++)
-	{
-		printf("%.2x ", (int)writebuf[i]);
-	}
-	printf("\n");
-#endif // _DEBUG_MESSAGES_MDM
-
-	//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-	//{
-	//	fwrite((unsigned char*)writebuf, buflen+2, 1, pMDM->pfSaveFile);
-	//	fflush(pMDM->pfSaveFile);
-	//}
-
 	if (WriteAllRS232Port(&pMDM->RS232Port, writebuf, buflen+2) != EXIT_SUCCESS)
 	{
 		printf("SendDataCRC16MDM error (%s) : %s"
@@ -500,6 +494,22 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			(unsigned int)pMDM);
 		return EXIT_FAILURE;
 	}
+
+#ifdef _DEBUG_MESSAGES_MDM
+	for (i = 0; i < buflen+2; i++)
+	{
+		printf("%.2x ", (int)writebuf[i]);
+	}
+	printf("\n");
+#endif // _DEBUG_MESSAGES_MDM
+
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+	if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+	{
+		fwrite(writebuf, buflen+2, 1, pMDM->pfSaveFile);
+		fflush(pMDM->pfSaveFile);
+	}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
 	return EXIT_SUCCESS;
 }
@@ -551,11 +561,13 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 	printf("\n");
 #endif // _DEBUG_MESSAGES_MDM
 
-	//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-	//{
-	//	fwrite((unsigned char*)readbuf, buflen+2, 1, pMDM->pfSaveFile);
-	//	fflush(pMDM->pfSaveFile);
-	//}
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+	if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+	{
+		fwrite(readbuf, buflen+2, 1, pMDM->pfSaveFile);
+		fflush(pMDM->pfSaveFile);
+	}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
 	// Copy desired data.
 	memcpy(buf, readbuf, buflen);
@@ -583,16 +595,19 @@ inline int EchoByteMDM(MDM* pMDM, uint8* pb)
 	if (ReadRS232Port(&pMDM->RS232Port, pb, 1, &n) == EXIT_SUCCESS)
 	{
 #ifdef _DEBUG_MESSAGES_MDM
-		printf("%.2x \n", (int)*pb);
+		if (n == 1) printf("%.2x \n", (int)*pb);
 #endif // _DEBUG_MESSAGES_MDM
 
-		//if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
-		//{
-		//	fwrite((unsigned char*)pb, 1, 1, pMDM->pfSaveFile);
-		//	fflush(pMDM->pfSaveFile);
-		//}
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+		if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+		{
+			fwrite(pb, n, 1, pMDM->pfSaveFile);
+			fflush(pMDM->pfSaveFile);
+		}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
 		mSleep(pMDM->DelayReadWriteEchoByte);
+
 		if (WriteRS232Port(&pMDM->RS232Port, pb, 1, &n) != EXIT_SUCCESS)
 		{
 			printf("EchoMDM error (%s) : %s"
@@ -602,6 +617,18 @@ inline int EchoByteMDM(MDM* pMDM, uint8* pb)
 				(unsigned int)pMDM);
 			return EXIT_FAILURE;
 		}
+
+#ifdef _DEBUG_MESSAGES_MDM
+		if (n == 1) printf("%.2x \n", (int)*pb);
+#endif // _DEBUG_MESSAGES_MDM
+
+#ifdef ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
+		if ((pMDM->bSaveRawData)&&(pMDM->pfSaveFile)) 
+		{
+			fwrite(pb, n, 1, pMDM->pfSaveFile);
+			fflush(pMDM->pfSaveFile);
+		}
+#endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 	}
 
 	return EXIT_SUCCESS;

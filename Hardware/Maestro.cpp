@@ -136,8 +136,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
 					// True wind must be computed from apparent wind.
-					// Robot speed and roll not taken into account...
-					psitwind = fmod_2PI(psiawind+theta_mes);
+					if (bDisableRollWindCorrectionSailboat)
+						psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
+					else
+						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				// Add param battery analog input channels...?

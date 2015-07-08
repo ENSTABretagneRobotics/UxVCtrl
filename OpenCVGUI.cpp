@@ -422,7 +422,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
-				"B(motorboat backwards)\n");
+				"W(roll wind correction),B(Motorboat backwards)\n");
 			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
@@ -436,7 +436,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '2': OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '5': OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; break;
-		case 'B': bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat; break;
+		case 'W': 
+			bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat; 
+			if (bDisableRollWindCorrectionSailboat) printf("Sailboat roll wind correction disabled.\n");
+			else printf("Sailboat roll wind correction enabled.\n");
+			break;
+		case 'B': 
+			bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat; 
+			if (bEnableBackwardsMotorboat) printf("Motorboat backwards enabled.\n");
+			else printf("Motorboat backwards disabled.\n");
+			break;
 		case 27: // ESC
 			bExit = TRUE;
 			break;
