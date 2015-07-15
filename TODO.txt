@@ -1,4 +1,5 @@
 maestro : add param to tell which version (micro maestro does not support set multiple targets...)
+mettre un filtre sur les mesures de tension batterie et rajouter params correspondants
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
 juste plus de positions car rafraichissement plus élevé donne l'impression, timing...?

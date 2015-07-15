@@ -34,7 +34,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(50);
+		//mSleep(50);
 
 		if (bPauseMaestro) 
 		{
@@ -64,6 +64,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 		{
 			if (ConnectMaestro(&maestro, "Maestro0.txt") == EXIT_SUCCESS) 
 			{
+				mSleep(50);
 				bConnected = TRUE; 
 
 				if (maestro.pfSaveFile != NULL)
@@ -118,9 +119,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					mSleep(50);
 					break;
 				}
-				mSleep(50);
+				mSleep(20);
 				if (maestro.analoginputchan != 24) // Special value to indicate to disable the wind sensor...
 				{
 					if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
@@ -128,8 +130,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
 						DisconnectMaestro(&maestro);
+						mSleep(50);
 						break;
 					}
+					mSleep(20);
 					EnterCriticalSection(&StateVariablesCS);
 					winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset+180.0)+180.0;
 					//printf("%f\n", winddir);
@@ -148,16 +152,20 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					mSleep(50);
 					break;
 				}
+				mSleep(20);
 				vbattery1 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...				
 				if (GetValueMaestro(&maestro, 9, &ivalue) != EXIT_SUCCESS)
 				{
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					mSleep(50);
 					break;
 				}
+				mSleep(20);
 				vbattery2 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...
 				// Add param battery alarm voltage...?
 				if ((!bDisableBatteryAlarm)&&((vbattery1 < 6.4)||(vbattery2 < 6.4))) printf("Battery alarm.\n");
@@ -173,8 +181,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					mSleep(50);
 					break;
 				}
+				mSleep(50);
 				break;
 			case MOTORBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
@@ -196,8 +206,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					mSleep(50);
 					break;
-				}		
+				}
+				mSleep(50);
 				break;
 			case HOVERCRAFT_ROBID:
 			default:
@@ -210,8 +222,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
 					DisconnectMaestro(&maestro);
+					mSleep(50);
 					break;
 				}
+				mSleep(50);
 				break;
 			}
 		}

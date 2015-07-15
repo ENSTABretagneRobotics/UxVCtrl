@@ -1,6 +1,7 @@
 61
 Added roll correction for true wind estimation.
 Minor modifications in MDM.
+Minor modifications in Maestro timings to avoid temporary disconnections due to overload.
 
 60
 Corrected Sailboat settings.

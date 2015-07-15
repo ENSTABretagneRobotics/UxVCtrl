@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.2\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;OPENCV242;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV242;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -319,10 +319,6 @@
 			Name="Input Files"
 			>
 			<File
-				RelativePath=".\UxVCtrl.txt"
-				>
-			</File>
-			<File
 				RelativePath=".\CISCREA.txt"
 				>
 			</File>
@@ -388,6 +384,10 @@
 			</File>
 			<File
 				RelativePath=".\UE9A0.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\UxVCtrl.txt"
 				>
 			</File>
 			<File
