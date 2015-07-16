@@ -112,6 +112,9 @@ inline int GetValueMaestro(MAESTRO* pMaestro, int channel, int* pValue)
 		fflush(pMaestro->pfSaveFile);
 	}
 
+	mSleep(10); // Added because sometimes there was a timeout on the read() 
+	// (even though the data were available if read just after the timeout...)...
+
 	// Prepare the buffer that should receive data from device.
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 2;

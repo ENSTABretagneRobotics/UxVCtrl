@@ -17,6 +17,9 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double thrust1 = 0, thrust2 = 0;
 	int ivalue = 0;
 	double winddir = 0, vbattery1 = 0, vbattery2 = 0;
+	double vbattery1_alarm = 6.4, vbattery2_alarm = 6.4, vbattery1_filter_coef = 0.9, vbattery2_filter_coef = 0.9; // Temporary...
+	double vbattery1_filtered = vbattery1_alarm, vbattery2_filtered = vbattery2_alarm; // Temporary...
+	int counter = 0, counter_modulo = 11;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -122,7 +125,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					mSleep(50);
 					break;
 				}
-				mSleep(20);
+				mSleep(10);
 				if (maestro.analoginputchan != 24) // Special value to indicate to disable the wind sensor...
 				{
 					if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
@@ -133,7 +136,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 						mSleep(50);
 						break;
 					}
-					mSleep(20);
+					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
 					winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset+180.0)+180.0;
 					//printf("%f\n", winddir);
@@ -147,29 +150,41 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				// Add param battery analog input channels...?
-				if (GetValueMaestro(&maestro, 7, &ivalue) != EXIT_SUCCESS)
+				if (counter%counter_modulo == 0)
 				{
-					printf("Connection to a Maestro lost.\n");
-					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
-					mSleep(50);
-					break;
+					if (GetValueMaestro(&maestro, 7, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					vbattery1 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
+					// Add param battery 1 alarm voltage...?
+					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < vbattery1_alarm)) printf("BAT1 ALARM\n");
 				}
-				mSleep(20);
-				vbattery1 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...				
-				if (GetValueMaestro(&maestro, 9, &ivalue) != EXIT_SUCCESS)
+				if (counter%counter_modulo == 5)
 				{
-					printf("Connection to a Maestro lost.\n");
-					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
-					mSleep(50);
-					break;
+					if (GetValueMaestro(&maestro, 9, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					vbattery2 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...
+					vbattery2_filtered = vbattery2_filter_coef*vbattery2_filtered+(1.0-vbattery2_filter_coef)*vbattery2;
+					// Add param battery 2 alarm voltage...?
+					if ((!bDisableBatteryAlarm)&&(vbattery2_filtered < vbattery2_alarm)) printf("BAT2 ALARM\n");
 				}
-				mSleep(20);
-				vbattery2 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...
-				// Add param battery alarm voltage...?
-				if ((!bDisableBatteryAlarm)&&((vbattery1 < 6.4)||(vbattery2 < 6.4))) printf("Battery alarm.\n");
-				if (bShowBatteryInfo) printf("Battery 1 : %f V, battery 2 : %f V.\n", vbattery1, vbattery2);
+				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV,BAT2:%.1f/%.1fV\n", vbattery1, vbattery1_filtered, vbattery2, vbattery2_filtered);
+				counter++;
+				if (counter >= counter_modulo) counter = 0;
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);

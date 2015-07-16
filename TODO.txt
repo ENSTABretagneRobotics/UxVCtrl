@@ -1,3 +1,4 @@
+
 maestro : add param to tell which version (micro maestro does not support set multiple targets...)
 mettre un filtre sur les mesures de tension batterie et rajouter params correspondants
 
@@ -7,11 +8,11 @@ juste plus de positions car rafraichissement plus élevé donne l'impression, timi
 
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
+si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstragey et forcesailupdate...
 
 setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
 kalman pour retrouver vent vrai?
-lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtreren regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
-roulis voilier et vent apparent...->étudiants
+lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtrer en regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
@@ -50,7 +51,7 @@ info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
-afficher position des waypoints dans l'interface->en fait je peux un peu les tracer via le fichier env.txt...
+afficher position des waypoints dans l'interface->en fait je peux un peu les tracer via le fichier env.txt, mais ce serait mieux si c'était automatique (en option avec touche...)...
 mettre aussi BRG de ball par rapport au nord?
 trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
 prévoir zoom sur la map, on a du mal à savoir son cap
@@ -177,6 +178,8 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+maestro : 115200, délai 15 ms entre write et read, mauvaise gestion des timeouts du 1er byte reçu (en debug j'ai vu que les 2 bytes finissaient bien par arriver...), mauvaise interprétation de Bytes==0...?->le timeout semble bien avoir lieu (mesuré avec chrono), délai 15 ms entre write et read semble résoudre le problème...
 
 wpfollowingfileconfig radius file bWGS
 linefollowingfileconfig radius gamma_infinite file bWGS
