@@ -1,3 +1,7 @@
+62
+Corrected bug in the display of environment circles (bad radius).
+Added display of current waypoint.
+
 61
 Added roll correction for true wind estimation.
 Minor modifications in MDM.

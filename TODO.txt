@@ -51,7 +51,6 @@ info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
-afficher position des waypoints dans l'interface->en fait je peux un peu les tracer via le fichier env.txt, mais ce serait mieux si c'était automatique (en option avec touche...)...
 mettre aussi BRG de ball par rapport au nord?
 trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
 prévoir zoom sur la map, on a du mal à savoir son cap
@@ -179,7 +178,9 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 OLD
 
-maestro : 115200, délai 15 ms entre write et read, mauvaise gestion des timeouts du 1er byte reçu (en debug j'ai vu que les 2 bytes finissaient bien par arriver...), mauvaise interprétation de Bytes==0...?->le timeout semble bien avoir lieu (mesuré avec chrono), délai 15 ms entre write et read semble résoudre le problème...
+afficher position des waypoints dans l'interface->en fait je peux un peu les tracer via le fichier env.txt, mais ce serait mieux si c'était automatique (en option avec touche...), le plus simple est d'afficher le waypoint courant ou la ligne courante...
+
+maestro : 115200, délai 15 ms entre write et read, mauvaise gestion des timeouts du 1er byte reçu (en debug j'ai vu que les 2 bytes finissaient bien par arriver...), mauvaise interprétation de Bytes==0...?->le timeout semble bien avoir lieu (mesuré avec chrono), tentative aussi avec flags FILE_FLAG_WRITE_THROUGH|FILE_FLAG_NO_BUFFERING mais c'est pas mieux, voire pire..., et avec un baudrate plus élevé il y a peut-être moins de problèmes, mais c'est pas clair...->délai 15 ms entre write et read semble résoudre le problème...
 
 wpfollowingfileconfig radius file bWGS
 linefollowingfileconfig radius gamma_infinite file bWGS

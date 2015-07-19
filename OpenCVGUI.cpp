@@ -629,6 +629,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					CV_RGB(0, 0, 0), 1, 8, 0);
 				if (bRotatingMap)
 				{
+					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
 						cvCircle(dispimgs[videoid], 
@@ -636,8 +637,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsj+XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
 							), 
-							XCS2JImg(&csMap2FullImg, circles_r[i]), CV_RGB(0, 255, 0), 1, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 1, 8, 0);
 					}
+					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
 						cvLine(dispimgs[videoid], 
@@ -651,6 +653,58 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							), 
 							CV_RGB(0, 255, 0), 1, 8, 0);
 					}
+					// Waypoint.
+					if (bWaypointControl)
+					{
+						cvCircle(dispimgs[videoid], 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					if (bLineFollowingControl)
+					{
+						cvLine(dispimgs[videoid], 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							CV_RGB(255, 255, 255), 2, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							CV_RGB(0, 0, 255), 1, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					// Robot.
 					cvLine(dispimgs[videoid], 
 						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, -0.4)), 
 						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
@@ -662,12 +716,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
+					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, circles_x[i]), detailsi+YCS2IImg(&csMap2FullImg, circles_y[i])), 
-							XCS2JImg(&csMap2FullImg, circles_r[i]), CV_RGB(0, 255, 0), 1, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 1, 8, 0);
 					}
+					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
 						cvLine(dispimgs[videoid], 
@@ -675,6 +731,34 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, walls_xb[i]), detailsi+YCS2IImg(&csMap2FullImg, walls_yb[i])), 
 							CV_RGB(0, 255, 0), 1, 8, 0);
 					}
+					// Waypoint.
+					if (bWaypointControl)
+					{
+						cvCircle(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					if (bLineFollowingControl)
+					{
+						cvLine(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxa), detailsi+YCS2IImg(&csMap2FullImg, wya)), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
+							CV_RGB(255, 255, 255), 2, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxa), detailsi+YCS2IImg(&csMap2FullImg, wya)), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
+							CV_RGB(0, 0, 255), 1, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					// Robot.
 					cvLine(dispimgs[videoid], 
 						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
 						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
@@ -690,12 +774,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				InitCS2ImgEx(&csMap2FullImg, &csMap, videoimgwidth, videoimgheight, BEST_RATIO_COORDSYSTEM2IMG);
 				if (bRotatingMap)
 				{
+					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
-							XCS2JImg(&csMap2FullImg, circles_r[i]), CV_RGB(0, 255, 0), 2, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 2, 8, 0);
 					}
+					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
 						cvLine(dispimgs[videoid], 
@@ -703,6 +789,34 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							cvPoint(XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
 							CV_RGB(0, 255, 0), 2, 8, 0);
 					}
+					// Waypoint.
+					if (bWaypointControl)
+					{
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					if (bLineFollowingControl)
+					{
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wyb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							CV_RGB(255, 255, 255), 2, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wyb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							CV_RGB(0, 0, 255), 1, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					// Robot.
 					cvLine(dispimgs[videoid], 
 						cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.4)), 
 						cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.0)), 
@@ -714,12 +828,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
+					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, circles_x[i]), YCS2IImg(&csMap2FullImg, circles_y[i])), 
-							XCS2JImg(&csMap2FullImg, circles_r[i]), CV_RGB(0, 255, 0), 2, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 2, 8, 0);
 					}
+					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
 						cvLine(dispimgs[videoid], 
@@ -727,6 +843,34 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							cvPoint(XCS2JImg(&csMap2FullImg, walls_xb[i]), YCS2IImg(&csMap2FullImg, walls_yb[i])), 
 							CV_RGB(0, 255, 0), 2, 8, 0);
 					}
+					// Waypoint.
+					if (bWaypointControl)
+					{
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					if (bLineFollowingControl)
+					{
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, wxa), YCS2IImg(&csMap2FullImg, wya)), 
+							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
+							CV_RGB(255, 255, 255), 2, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, wxa), YCS2IImg(&csMap2FullImg, wya)), 
+							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
+							CV_RGB(0, 0, 255), 1, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+						cvCircle(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+					}
+					// Robot.
 					cvLine(dispimgs[videoid], 
 						cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
 						cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
