@@ -13,10 +13,13 @@ si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstra
 setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtrer en regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
+prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
+
+mission par sms : option /s check missions from sms.txt or sms folder...
 
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...

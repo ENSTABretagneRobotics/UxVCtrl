@@ -1637,7 +1637,7 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "call %255s", str) == 1)
+	else if (sscanf(line, "call %[^\n]255s", str) == 1)
 	{
 		CallMission(str);
 	}
@@ -1649,7 +1649,7 @@ inline int Commands(char* line)
 	{
 		bExit = TRUE;
 	}
-	else if (sscanf(line, "setmissionaction %255s", str) == 1)
+	else if (sscanf(line, "setmissionaction %[^\n]255s", str) == 1)
 	{
 		strcpy(szAction, str);
 	}
@@ -1669,20 +1669,20 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "system %255s", str) == 1)
+	else if (sscanf(line, "system %[^\n]255s", str) == 1)
 	{
 		system(str);
 	}
 #ifdef _WIN32
-	else if (sscanf(line, "playsoundasync %255s", str) == 1)
+	else if (sscanf(line, "playsoundasync %[^\n]255s", str) == 1)
 	{
 		PlaySound(str, NULL, SND_ASYNC);
 	}
-	else if (sscanf(line, "playsound %255s", str) == 1)
+	else if (sscanf(line, "playsound %[^\n]255s", str) == 1)
 	{
 		PlaySound(str, NULL, 0);
 	}
-	else if (sscanf(line, "loopsound %255s", str) == 1)
+	else if (sscanf(line, "loopsound %[^\n]255s", str) == 1)
 	{
 		PlaySound(str, NULL, SND_ASYNC|SND_LOOP);
 	}

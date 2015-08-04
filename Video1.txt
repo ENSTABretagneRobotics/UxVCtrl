@@ -1,4 +1,4 @@
-% 0..9 or a video filename or IP address and TCP port
+% camid (0..9) or a video filename or IP address and TCP port
 %1
 test2.wmv
 %dummy_25min.wmv

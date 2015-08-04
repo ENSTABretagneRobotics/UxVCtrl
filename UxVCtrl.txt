@@ -94,8 +94,8 @@
 % uw_integral_max
 0.1
 % cosdelta_angle_threshold (0 : simu, 0 : SAUC'ISSE, 0 : SARDINE, 0 : CISCREA)
-0
-%0.78
+%0
+0.78
 % wzradiushigh (accuracy of the depth control in m)
 0.1
 % wzradiuslow (accuracy of the depth control in m)
@@ -106,16 +106,16 @@
 2
 % omegamax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
 1
-% gamma_infinite (in rad, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
-0.78
-% r (accuracy of line/waypoint following in m, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
+% gamma_infinite (in rad, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
+0.87
+% r (accuracy of line/waypoint following in m, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
 % betatrav (angle de la voile en vent de travers (in rad))
 0.5
 % betaarr (angle de la voile en vent arrière (in rad))
 1.5
 % ksi (angle de près (in rad))
-0.87
+0.78
 % check_strategy_period (in s)
 60
 % sail_update_period (in s)

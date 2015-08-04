@@ -1,3 +1,6 @@
+63
+Better handling of files path with spaces.
+
 62
 Corrected bug in the display of environment circles (bad radius).
 Added display of current waypoint.
