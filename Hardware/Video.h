@@ -30,6 +30,7 @@ struct VIDEO
 	char port[256];
 	int DevType;
 	IplImage* frame;
+	IplImage* resizedframe;
 	char* databuf;
 	//IplImage* Lastimg;
 	char szCfgFilePath[256];
@@ -39,8 +40,10 @@ struct VIDEO
 	int videoimgheight;
 	int captureperiod;
 	int timeout;
+	BOOL bForceSoftwareResize;
+	double hscale;
+	double vscale;
 	double angle;
-	double scale;
 	int bFlip;
 	int HorizontalBeam;
 	int VerticalBeam;
@@ -57,7 +60,8 @@ inline int recvdecode(VIDEO* pVideo)
 	int i = 0;
 	CvMat* mat = NULL;
 	IplImage* imagenew = pVideo->frame;
-	//char* databufnew = pVideo->databuf;
+	char* databufnew = pVideo->databuf;
+	int curframewidth = pVideo->frame->width, curframeheight = pVideo->frame->height;
 
 	if (recvall(pVideo->s, (char*)header, 3*sizeof(unsigned int)) != EXIT_SUCCESS)
 	{
@@ -104,24 +108,28 @@ inline int recvdecode(VIDEO* pVideo)
 		cvReleaseMat(&mat);
 
 		// Resolution changed by server.
-		if ((pVideo->frame->width != pVideo->videoimgwidth)||(pVideo->frame->height != pVideo->videoimgheight))
+		if ((pVideo->frame->width != curframewidth)||(pVideo->frame->height != curframeheight))
 		{
-			printf("Unable to set desired video resolution.\n");
-			return EXIT_FAILURE;
+			if (!pVideo->bForceSoftwareResize)
+			{
+				printf("Unable to set desired video resolution.\n");
+				return EXIT_FAILURE;
+			}
 
-			//videoimgwidth = image->width;
-			//videoimgheight = image->height;
+			curframewidth = pVideo->frame->width;
+			curframeheight = pVideo->frame->height;
 
-			//if (bWindowResizedFromServer) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+			//if (bWindowResizedFromServer) cvResizeWindow("Client", curframewidth, curframeheight);
+			// Should update WindowImg...
 
-			//databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
-			//if (!databufnew)	
-			//{
-			//	printf("realloc() failed.\n");
-			//	return EXIT_FAILURE;
-			//}
-			//free(databuf);
-			//databuf = databufnew;
+			databufnew = (char*)calloc(pVideo->frame->imageSize+3*sizeof(unsigned int), sizeof(char));
+			if (!databufnew)	
+			{
+				printf("realloc() failed.\n");
+				return EXIT_FAILURE;
+			}
+			free(pVideo->databuf);
+			pVideo->databuf = databufnew;
 		}
 	}
 	else if (strncmp((char*)header, "--boundary\r\n", 3*sizeof(unsigned int)) == 0)
@@ -189,62 +197,75 @@ inline int recvdecode(VIDEO* pVideo)
 		cvReleaseMat(&mat);
 
 		// Resolution changed by server.
-		if ((pVideo->frame->width != pVideo->videoimgwidth)||(pVideo->frame->height != pVideo->videoimgheight))
+		if ((pVideo->frame->width != curframewidth)||(pVideo->frame->height != curframeheight))
 		{
-			printf("Unable to set desired video resolution.\n");
-			return EXIT_FAILURE;
+			if (!pVideo->bForceSoftwareResize)
+			{
+				printf("Unable to set desired video resolution.\n");
+				return EXIT_FAILURE;
+			}
 
-			//videoimgwidth = image->width;
-			//videoimgheight = image->height;
+			curframewidth = pVideo->frame->width;
+			curframeheight = pVideo->frame->height;
 
-			//if (bWindowResizedFromServer) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+			//if (bWindowResizedFromServer) cvResizeWindow("Client", curframewidth, curframeheight);
+			// Should update WindowImg...
 
-			//databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
-			//if (!databufnew)	
-			//{
-			//	printf("realloc() failed.\n");
-			//	return EXIT_FAILURE;
-			//}
-			//free(databuf);
-			//databuf = databufnew;
+			databufnew = (char*)calloc(pVideo->frame->imageSize+3*sizeof(unsigned int), sizeof(char));
+			if (!databufnew)	
+			{
+				printf("realloc() failed.\n");
+				return EXIT_FAILURE;
+			}
+			free(pVideo->databuf);
+			pVideo->databuf = databufnew;
 		}
 	}
 	else
 	{
 		// Partial image data (dynamic time compression) or full image data without compression.
 
-		if (((int)header[1] != pVideo->videoimgwidth)||((int)header[2] != pVideo->videoimgheight))
+		// Quick checks...
+		if (((int)header[1] < 0)||((int)header[1] > 4096)||((int)header[2] < 0)||((int)header[2] > 4096)||(val > 3*4096*4096+3*sizeof(unsigned int)))
 		{
 			printf("Unable to set desired video resolution or transmission error.\n");
 			return EXIT_FAILURE;
 		}
 
-		//videoimgwidth = header[1];
-		//videoimgheight = header[2];
+		if ((!pVideo->bForceSoftwareResize)&&
+			(((int)header[1] != curframewidth)||((int)header[2] != curframeheight)))
+		{
+			printf("Unable to set desired video resolution.\n");
+			return EXIT_FAILURE;
+		}
+
+		curframewidth = header[1];
+		curframeheight = header[2];
 
 		// Resolution changed by server.
-		//if ((image->width != videoimgwidth)||(image->height != videoimgheight))
-		//{
-		//	imagenew = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-		//	if (imagenew == NULL)
-		//	{
-		//		printf("cvCreateImage() failed.\n");
-		//		return EXIT_FAILURE;
-		//	}
-		//	cvReleaseImage(&image);
-		//	image = imagenew;
+		if ((pVideo->frame->width != curframewidth)||(pVideo->frame->height != curframeheight))
+		{
+			imagenew = cvCreateImage(cvSize(curframewidth, curframeheight), IPL_DEPTH_8U, 3);
+			if (imagenew == NULL)
+			{
+				printf("cvCreateImage() failed.\n");
+				return EXIT_FAILURE;
+			}
+			cvReleaseImage(&pVideo->frame);
+			pVideo->frame = imagenew;
 
-		//if (bWindowResizedFromServer) cvResizeWindow("Client", videoimgwidth, videoimgheight);
+			//if (bWindowResizedFromServer) cvResizeWindow("Client", curframewidth, curframeheight);
+			// Should update WindowImg...
 
-		//	databufnew = (char*)calloc(image->imageSize+3*sizeof(unsigned int), sizeof(char));
-		//	if (!databufnew)	
-		//	{
-		//		printf("realloc() failed.\n");
-		//		return EXIT_FAILURE;
-		//	}
-		//	free(databuf);
-		//	databuf = databufnew;
-		//}
+			databufnew = (char*)calloc(pVideo->frame->imageSize+3*sizeof(unsigned int), sizeof(char));
+			if (!databufnew)	
+			{
+				printf("realloc() failed.\n");
+				return EXIT_FAILURE;
+			}
+			free(pVideo->databuf);
+			pVideo->databuf = databufnew;
+		}
 
 		nbBytes = val-3*sizeof(unsigned int);
 		if (nbBytes > pVideo->frame->imageSize)
@@ -358,24 +379,35 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 		return EXIT_FAILURE;
 	}
 
-	if ((pVideo->angle == 0)&&(pVideo->scale == 1))
+	if (pVideo->bForceSoftwareResize) cvResize(pVideo->frame, pVideo->resizedframe, CV_INTER_LINEAR);
+	else pVideo->resizedframe = pVideo->frame;
+
+	if ((pVideo->hscale == 1)&&(pVideo->vscale == 1)&&(pVideo->angle == 0))
 	{
-		if (pVideo->bFlip) cvFlip(pVideo->frame, img, 1); else cvCopy(pVideo->frame, img, 0);
+		if (pVideo->bFlip) cvFlip(pVideo->resizedframe, img, 1); else cvCopy(pVideo->resizedframe, img, 0);
 	}
 	else
 	{
-		//// Create a map_matrix, where the left 2x2 matrix is the transform and the right 2x1 is the dimensions.
-		//m[0] = cos(pVideo->angle);
-		//m[1] = sin(pVideo->angle);
-		//m[3] = -m[1];
-		//m[4] = m[0];
-		//m[2] = pVideo->frame->width*0.5;  
-		//m[5] = pVideo->frame->height*0.5;  
-		//cvGetQuadrangleSubPix(pVideo->frame, img, &M);
+		// Create a map_matrix, where the left 2x2 matrix is the transform and the right 2x1 is the dimensions.
+		//double hscale = 0.5, vscale = 1.33*0.5;
+		m[0] = cos(pVideo->angle)/pVideo->hscale;
+		m[1] = sin(pVideo->angle)/pVideo->hscale;
+		m[3] = -sin(pVideo->angle)/pVideo->vscale;
+		m[4] = cos(pVideo->angle)/pVideo->vscale;
+		m[2] = (1-cos(pVideo->angle)/pVideo->hscale)*pVideo->resizedframe->width*0.5-(sin(pVideo->angle)/pVideo->hscale)*pVideo->resizedframe->height*0.5;  
+		m[5] = (sin(pVideo->angle)/pVideo->vscale)*pVideo->resizedframe->width*0.5+(1-cos(pVideo->angle)/pVideo->vscale)*pVideo->resizedframe->height*0.5;
+		cvWarpAffine(pVideo->resizedframe, img, &M, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS+CV_WARP_INVERSE_MAP, cvScalarAll(0));
 
-		cvWarpAffine(pVideo->frame, img, 
-			cv2DRotationMatrix(cvPoint2D32f(pVideo->frame->width*0.5,pVideo->frame->height*0.5), -pVideo->angle*180.0/M_PI, pVideo->scale, &M), 
-			CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
+		//double hscale = 1.33*0.5, vscale = 0.5;
+		//m[0] = hscale*cos(-angle);
+		//m[1] = hscale*sin(-angle);
+		//m[3] = vscale*-sin(-angle);
+		//m[4] = vscale*cos(-angle);
+		//m[2] = (1-hscale*cos(-angle))*resizedframe->width*0.5-hscale*sin(-angle)*resizedframe->height*0.5;  
+		//m[5] = vscale*sin(-angle)*resizedframe->width*0.5+(1-vscale*cos(-angle))*resizedframe->height*0.5;
+		////cvGetQuadrangleSubPix(resizedframe, image, &M);
+		////cv2DRotationMatrix(cvPoint2D32f(resizedframe->width*0.5,resizedframe->height*0.5), -angle*180.0/M_PI, scale, &M);
+		//cvWarpAffine(resizedframe, image, &M, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
 
 		if (pVideo->bFlip) cvFlip(img, NULL, 1);
 	}
@@ -385,6 +417,12 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 
 	return EXIT_SUCCESS;
 }
+
+//inline IplImage* QueryImgVideo(VIDEO* pVideo)
+//{	
+//	if (GetImgVideo(pVideo, &pVideo->WindowImg) != EXIT_SUCCESS) return NULL;
+//	else return pVideo->WindowImg;
+//}
 
 inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 {
@@ -410,8 +448,10 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		pVideo->videoimgheight = 240; 
 		pVideo->captureperiod = 100;
 		pVideo->timeout = 0;
+		pVideo->bForceSoftwareResize = 1;
+		pVideo->hscale = 1;
+		pVideo->vscale = 1;
 		pVideo->angle = 0*M_PI/180.0;
-		pVideo->scale = 1;
 		pVideo->bFlip = 0;
 		pVideo->HorizontalBeam = 70;
 		pVideo->VerticalBeam = 50;
@@ -431,10 +471,14 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->bForceSoftwareResize) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->hscale) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->vscale) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
 			pVideo->angle = d0*M_PI/180.0;
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pVideo->scale) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->bFlip) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -464,10 +508,15 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		printf("Invalid parameter : captureperiod.\n");
 		pVideo->captureperiod = 100;
 	}
-	if (pVideo->scale <= 0)
+	if (pVideo->hscale == 0)
 	{
-		printf("Invalid parameter : scale.\n");
-		pVideo->scale = 1;
+		printf("Invalid parameter : hscale.\n");
+		pVideo->hscale = 1;
+	}
+	if (pVideo->vscale == 0)
+	{
+		printf("Invalid parameter : vscale.\n");
+		pVideo->vscale = 1;
 	}
 	if ((pVideo->HorizontalBeam <= 0)||(pVideo->HorizontalBeam > 360))
 	{
@@ -535,13 +584,14 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 		cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 
-		if ((cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
-			(cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight))
-		{
-			printf("Unable to set desired video resolution.\n");
-			cvReleaseCapture(&pVideo->pCapture);
-			return EXIT_FAILURE;
-		}
+		// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
+		//if ((!pVideo->bForceSoftwareResize)&&
+		//	((cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+		//	(cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+		//{
+		//	printf("Unable to set desired video resolution.\n");
+		//	return EXIT_FAILURE;
+		//}
 
 		// Sometimes the first images are bad, so wait a little bit and take
 		// several images in the beginning.
@@ -562,10 +612,38 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		}
 	}
 
+	if (pVideo->bForceSoftwareResize) 
+	{
+		pVideo->resizedframe = cvCreateImage(cvSize(pVideo->videoimgwidth,pVideo->videoimgheight), pVideo->frame->depth, pVideo->frame->nChannels);
+		if (!pVideo->resizedframe)	
+		{
+			printf("Video connection : Error creating an image buffer.\n");
+			switch (pVideo->DevType)
+			{
+			case REMOTE_TYPE_VIDEO:
+				releasetcpcli(pVideo->s);
+				free(pVideo->databuf);
+				cvReleaseImage(&pVideo->frame);
+				return EXIT_FAILURE;
+			case LOCAL_TYPE_VIDEO:
+			case FILE_TYPE_VIDEO:
+				cvReleaseCapture(&pVideo->pCapture);
+				return EXIT_FAILURE;
+			default:
+				printf("Video connection : Invalid device type.\n");
+				return EXIT_FAILURE;
+			}
+		}
+	}
+	else pVideo->resizedframe = pVideo->frame;
+
+	// Should allocate WindowImg from resizedframe...
+
 	//pVideo->LastImg = cvCreateImage(cvSize(pVideo->videoimgwidth, pVideo->videoimgheight), IPL_DEPTH_8U, 3);
 	//if (!pVideo->LastImg)
 	//{
 	//	printf("Video connection : Error creating an image buffer.\n");
+	//	if (pVideo->bForceSoftwareResize) cvReleaseImage(&pVideo->resizedframe);
 	//	switch (pVideo->DevType)
 	//	{
 	//	case REMOTE_TYPE_VIDEO:
@@ -591,6 +669,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 inline int DisconnectVideo(VIDEO* pVideo)
 {
 	//cvReleaseImage(&pVideo->LastImg);
+	if (pVideo->bForceSoftwareResize) cvReleaseImage(&pVideo->resizedframe);
 	switch (pVideo->DevType)
 	{
 	case REMOTE_TYPE_VIDEO:

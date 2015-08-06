@@ -161,6 +161,14 @@ $RECYCLE.BIN/
 
 aud/*.wav
 aud/*.WAV
+aud/*.wma
+aud/*.WMA
+aud/*.mp3
+aud/*.MP3
+aud/*.flac
+aud/*.FLAC
+aud/*.ogg
+aud/*.OGG
 log/*.txt
 log/*.TXT
 log/*.csv
@@ -185,4 +193,16 @@ vid/*.mp4
 vid/*.MP4
 vid/*.avi
 vid/*.AVI
+vid/*.mpg
+vid/*.MPG
+vid/*.mpeg
+vid/*.MPEG
+vid/*.mkv
+vid/*.MKV
+vid/*.webm
+vid/*.WEBM
+vid/*.flv
+vid/*.FLV
+vid/*.ogv
+vid/*.OGV
 !*ReadMe.txt

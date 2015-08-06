@@ -13,10 +13,14 @@ dummy_25min.wmv
 100
 % timeout for remote mode (in ms)
 5
+% bForceSoftwareResize
+1
+% hscale
+1
+% vscale
+1
 % rotation angle (in deg)
 0
-% scale
-1
 % bFlip
 0
 % HorizontalBeam (in ]0..360] deg)
