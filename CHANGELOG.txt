@@ -1,3 +1,6 @@
+66
+Updated battery alarms to reflect current hardware modifications (PC batteries now in serial).
+
 65
 Sailboat channels modified to improve compatibility with motorboats.
 Maestro analoginputchan disable value is now -1.
