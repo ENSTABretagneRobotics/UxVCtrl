@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UxVCtrl", "UxVCtrl.vcxproj", "{30A6807A-5214-4E51-9ECA-AAFA08F9F6D8}"
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UxVCtrl", "UxVCtrl.vcproj", "{30A6807A-5214-4E51-9ECA-AAFA08F9F6D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

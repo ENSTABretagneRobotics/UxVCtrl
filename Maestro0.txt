@@ -24,11 +24,11 @@ COM6
 1
 % channel 1
 % MinPW (in us)
-1150
+1300
 % MidPW (in us)
-1500
+1740
 % MaxPW (in us)
-1850
+1740
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -37,11 +37,11 @@ COM6
 1
 % channel 2
 % MinPW (in us)
-1300
+1150
 % MidPW (in us)
-1740
+1500
 % MaxPW (in us)
-1740
+1850
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -76,16 +76,16 @@ COM6
 1
 % For motorboat or sailboat...
 % rudderchan
-1
-% rightthrusterchan
 2
+% rightthrusterchan
+1
 % leftthrusterchan
 0
 % rightfluxchan
 4
 % leftfluxchan
 3
-% analoginputchan
+% analoginputchan (disabled if -1)
 11
 % MinAngle (in rad)
 -0.7

@@ -1,4 +1,6 @@
+vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 
+changer channel special maestro à -1 ou 99 et indiquer dans commentaires paramètres vent ce qu'il se passe si c'est ce numéro, voir aussi pour prendre en compte sog (vt_med!=0?)
 maestro : add param to tell which version (micro maestro does not support set multiple targets...)
 mettre un filtre sur les mesures de tension batterie et rajouter params correspondants
 
@@ -180,6 +182,8 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+maintenant il n'y a plus besoin de lire ch9 et 10, ch gouvernail et voile échangés pour meilleure compatibilité avec autres robots
 
 afficher position des waypoints dans l'interface->en fait je peux un peu les tracer via le fichier env.txt, mais ce serait mieux si c'était automatique (en option avec touche...), le plus simple est d'afficher le waypoint courant ou la ligne courante...
 

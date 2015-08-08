@@ -16,10 +16,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double rudder = 0, thrust = 0, flux = 0;
 	double thrust1 = 0, thrust2 = 0;
 	int ivalue = 0;
-	double winddir = 0, vbattery1 = 0, vbattery2 = 0;
-	double vbattery1_alarm = 6.4, vbattery2_alarm = 6.4, vbattery1_filter_coef = 0.9, vbattery2_filter_coef = 0.9; // Temporary...
-	double vbattery1_filtered = vbattery1_alarm, vbattery2_filtered = vbattery2_alarm; // Temporary...
-	int counter = 0, counter_modulo = 11;
+	double winddir = 0, vbattery1 = 0;
+	double vbattery1_alarm = 4.4, vbattery1_filter_coef = 0.9; // Temporary...
+	double vbattery1_filtered = vbattery1_alarm; // Temporary...
+	int counter = 0, counter_modulo = 10;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -126,7 +126,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					break;
 				}
 				mSleep(10);
-				if (maestro.analoginputchan != 24) // Special value to indicate to disable the wind sensor...
+				if (maestro.analoginputchan != -1) // Special value to indicate to disable the wind sensor...
 				{
 					if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
 					{
@@ -166,23 +166,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					// Add param battery 1 alarm voltage...?
 					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < vbattery1_alarm)) printf("BAT1 ALARM\n");
 				}
-				if (counter%counter_modulo == 5)
-				{
-					if (GetValueMaestro(&maestro, 9, &ivalue) != EXIT_SUCCESS)
-					{
-						printf("Connection to a Maestro lost.\n");
-						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
-						mSleep(50);
-						break;
-					}
-					mSleep(10);
-					vbattery2 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...
-					vbattery2_filtered = vbattery2_filter_coef*vbattery2_filtered+(1.0-vbattery2_filter_coef)*vbattery2;
-					// Add param battery 2 alarm voltage...?
-					if ((!bDisableBatteryAlarm)&&(vbattery2_filtered < vbattery2_alarm)) printf("BAT2 ALARM\n");
-				}
-				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV,BAT2:%.1f/%.1fV\n", vbattery1, vbattery1_filtered, vbattery2, vbattery2_filtered);
+				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
