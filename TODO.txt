@@ -2,14 +2,11 @@ données aberrantes vxyhat dans logstate?
 
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 
-changer channel special maestro à -1 ou 99 et indiquer dans commentaires paramètres vent ce qu'il se passe si c'est ce numéro, voir aussi pour prendre en compte sog (vt_med!=0?)
 maestro : add param to tell which version (micro maestro does not support set multiple targets...)
 servo voile tout le temps remis à jour? ajouter option pour choisir si on utilise la commande multiple targets?
-mettre un filtre sur les mesures de tension batterie et rajouter params correspondants
 
-comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?
-juste plus de positions car rafraichissement plus élevé donne l'impression, timing...?
-écart à la ligne, gouvernail plus violent?
+comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard
+juste plus de positions car rafraichissement plus élevé donne l'impression, timing...? écart à la ligne, gouvernail plus violent?
 
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?

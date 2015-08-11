@@ -422,7 +422,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
-				"W(roll wind correction),B(Motorboat backwards)\n");
+				"~(Cytron),W(roll wind correction),B(Motorboat backwards)\n");
 			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
@@ -431,6 +431,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("Battery alarm enabled.\n");
 			break;
 		case '?': bShowBatteryInfo = !bShowBatteryInfo; break;
+		case '~': bShowCytron = !bShowCytron; break;
 		case '4': OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '6': OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;

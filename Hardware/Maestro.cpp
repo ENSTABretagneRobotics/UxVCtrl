@@ -17,9 +17,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double thrust1 = 0, thrust2 = 0;
 	int ivalue = 0;
 	double winddir = 0, vbattery1 = 0;
-	double vbattery1_alarm = 8.8, vbattery1_filter_coef = 0.9; // Temporary...
-	double vbattery1_filtered = vbattery1_alarm; // Temporary...
-	int counter = 0, counter_modulo = 10;
+	int battery1chan = 7, cytronchan = 9;
+	double vbattery1_alarm = 12.8, vbattery1_filter_coef = 0.9;
+	double vbattery1_filtered = vbattery1_alarm;
+	int counter = 0, counter_modulo = 11;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -149,10 +150,9 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
 					LeaveCriticalSection(&StateVariablesCS);
 				}
-				// Add param battery analog input channels...?
 				if (counter%counter_modulo == 0)
 				{
-					if (GetValueMaestro(&maestro, 7, &ivalue) != EXIT_SUCCESS)
+					if (GetValueMaestro(&maestro, battery1chan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
@@ -163,10 +163,23 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					mSleep(10);
 					vbattery1 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
 					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
-					// Add param battery 1 alarm voltage...?
 					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < vbattery1_alarm)) printf("BAT1 ALARM\n");
 				}
+				if (counter%counter_modulo == 5)
+				{
+					if (GetValueMaestro(&maestro, cytronchan, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					vcytron = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
+				}
 				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
+				if (bShowCytron) printf("vcytron:%.1fV\n", vcytron);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;

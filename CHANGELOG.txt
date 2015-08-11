@@ -1,3 +1,6 @@
+67
+Added Cytron value to check autonomous/manual mode changes.
+
 66
 Updated battery alarms to reflect current hardware modifications (PC batteries now in serial).
 

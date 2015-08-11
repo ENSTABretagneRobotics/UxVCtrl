@@ -206,11 +206,11 @@
 % nb_outliers
 25
 % Wind, current and waves
-% vtwind_med (true wind speed in m/s)
+% vtwind_med (true wind speed in m/s, see also Observer and any wind sensor)
 4
 % vtwind_var (true wind speed max variation in m/s)
 2
-% psitwind_med (true wind direction in rad)
+% psitwind_med (true wind direction in rad, see also Observer and any wind sensor)
 0
 % psitwind_var (true wind direction max variation in rad)
 0.1
