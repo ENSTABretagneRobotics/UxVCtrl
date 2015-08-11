@@ -1,8 +1,10 @@
+données aberrantes vxyhat dans logstate?
+
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 
 changer channel special maestro à -1 ou 99 et indiquer dans commentaires paramètres vent ce qu'il se passe si c'est ce numéro, voir aussi pour prendre en compte sog (vt_med!=0?)
 maestro : add param to tell which version (micro maestro does not support set multiple targets...)
-servo voile tout le temps remis à jour? ajouter option pour choisir si on utilise la commande multiservos?
+servo voile tout le temps remis à jour? ajouter option pour choisir si on utilise la commande multiple targets?
 mettre un filtre sur les mesures de tension batterie et rajouter params correspondants
 
 comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard, remodifier directement vnav?

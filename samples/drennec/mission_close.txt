@@ -1,0 +1,58 @@
+generalstop
+setmissionaction init
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+%wait 3
+linefollowingconfig 20 0.87
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction l0
+linefollowingtwgs 48.394024 -4.002237 48.392850 -4.002414 31557600.000000
+setmissionaction l1
+linefollowingtwgs 48.392850 -4.002414 48.393578 -4.003829 31557600.000000
+setmissionaction l2
+linefollowingtwgs 48.393578 -4.003829 48.394024 -4.002237 31557600.000000
+setmissionaction station
+linefollowingwgsstation 48.394024 -4.002237 5 31557600.000000
+setmissionaction end
+generalstop
