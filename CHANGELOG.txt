@@ -1,3 +1,8 @@
+68
+Added logging of vbattery1.
+Corrected parameters checking in Maestro to enable -1 for analoginputchan to disable it.
+Added bEnableSetMultipleTargets parameter for Maestro (better compatibility with Micro Maestro).
+
 67
 Added Cytron value to check autonomous/manual mode changes.
 

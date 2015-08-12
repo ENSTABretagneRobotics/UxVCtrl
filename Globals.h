@@ -369,6 +369,7 @@ extern CRITICAL_SECTION MissionFilesCS;
 extern CRITICAL_SECTION OpenCVCS;
 extern CRITICAL_SECTION strtimeCS;
 extern STATE state;
+extern double vbattery1;
 extern double vcytron;
 extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;

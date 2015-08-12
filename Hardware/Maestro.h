@@ -83,6 +83,7 @@ struct MAESTRO
 	double MaxAngle;
 	double analoginputvalueoffset;
 	double analoginputvaluecoef;
+	BOOL bEnableSetMultipleTargets;
 };
 typedef struct MAESTRO MAESTRO;
 
@@ -204,65 +205,119 @@ inline int SetAllPWMsMaestro(MAESTRO* pMaestro, int* selectedchannels, int* pws)
 
 	// Prepare data to send to device.
 	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuf[0] = (unsigned char)BAUD_RATE_INDICATION_BYTE_MAESTRO;
-	sendbuf[1] = (unsigned char)pMaestro->DeviceNumber;
-	sendbuf[2] = (unsigned char)(SET_MULTIPLE_TARGETS_COMMAND_MAESTRO & 0x7F);
 
-	firstselectedchannel = NB_CHANNELS_PWM_MAESTRO;
-	nbselectedchannels = 0;
-	index = 5;
-
-	memcpy(pws_tmp, pws, sizeof(pws_tmp));
-
-	for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
+	if (pMaestro->bEnableSetMultipleTargets)
 	{
-		if (!selectedchannels[channel]) continue;
+		sendbuf[0] = (unsigned char)BAUD_RATE_INDICATION_BYTE_MAESTRO;
+		sendbuf[1] = (unsigned char)pMaestro->DeviceNumber;
+		sendbuf[2] = (unsigned char)(SET_MULTIPLE_TARGETS_COMMAND_MAESTRO & 0x7F);
 
-		// To check...
-		if (channel > firstselectedchannel+nbselectedchannels)
-		{
-			printf("Maestro multiple channels must be continuous.\n");
-			return EXIT_FAILURE;
-		}
+		firstselectedchannel = NB_CHANNELS_PWM_MAESTRO;
+		nbselectedchannels = 0;
+		index = 5;
 
-		if (pMaestro->bProportionalPWs[channel])
+		memcpy(pws_tmp, pws, sizeof(pws_tmp));
+
+		for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
 		{
-			pws_tmp[channel] = (int)(pMaestro->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAESTRO));
-			if (pws_tmp[channel] >= 0)
-				pws_tmp[channel] = pMaestro->MidPWs[channel]+pws_tmp[channel]*(pMaestro->MaxPWs[channel]-pMaestro->MidPWs[channel])
-				/(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+			if (!selectedchannels[channel]) continue;
+
+			// To check...
+			if (channel > firstselectedchannel+nbselectedchannels)
+			{
+				printf("Maestro multiple channels must be continuous.\n");
+				return EXIT_FAILURE;
+			}
+
+			if (pMaestro->bProportionalPWs[channel])
+			{
+				pws_tmp[channel] = (int)(pMaestro->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAESTRO));
+				if (pws_tmp[channel] >= 0)
+					pws_tmp[channel] = pMaestro->MidPWs[channel]+pws_tmp[channel]*(pMaestro->MaxPWs[channel]-pMaestro->MidPWs[channel])
+					/(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+				else
+					pws_tmp[channel] = pMaestro->MidPWs[channel]+pws_tmp[channel]*(pMaestro->MinPWs[channel]-pMaestro->MidPWs[channel])
+					/(DEFAULT_MIN_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+			}
 			else
-				pws_tmp[channel] = pMaestro->MidPWs[channel]+pws_tmp[channel]*(pMaestro->MinPWs[channel]-pMaestro->MidPWs[channel])
-				/(DEFAULT_MIN_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+			{
+				pws_tmp[channel] = DEFAULT_MID_PW_MAESTRO+(int)(pMaestro->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAESTRO));
+			}
+
+			pws_tmp[channel] = max(min(pws_tmp[channel], pMaestro->MaxPWs[channel]), pMaestro->MinPWs[channel]);
+			//pws_tmp[channel] = max(min(pws_tmp[channel], DEFAULT_ABSOLUTE_MAX_PW_MAESTRO), DEFAULT_ABSOLUTE_MIN_PW_MAESTRO);
+
+			// The requested PWM is only applied if it is slightly different from the current value.
+			if (abs(pws_tmp[channel]-pMaestro->LastPWs[channel]) < pMaestro->ThresholdPWs[channel]) pws_tmp[channel] = pMaestro->LastPWs[channel];
+
+			//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pMaestro->LastPWs[channel], abs(pws_tmp[channel]-pMaestro->LastPWs[channel]), pMaestro->ThresholdPWs[channel]);
+
+			target = pws_tmp[channel]*4;
+			sendbuf[index] = (unsigned char)(target & 0x7F);
+			sendbuf[index+1] = (unsigned char)((target >> 7) & 0x7F);
+
+			firstselectedchannel = min(channel, firstselectedchannel);
+			nbselectedchannels++;
+			index += 2;
 		}
-		else
-		{
-			pws_tmp[channel] = DEFAULT_MID_PW_MAESTRO+(int)(pMaestro->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAESTRO));
-		}
 
-		pws_tmp[channel] = max(min(pws_tmp[channel], pMaestro->MaxPWs[channel]), pMaestro->MinPWs[channel]);
-		//pws_tmp[channel] = max(min(pws_tmp[channel], DEFAULT_ABSOLUTE_MAX_PW_MAESTRO), DEFAULT_ABSOLUTE_MIN_PW_MAESTRO);
+		if (nbselectedchannels == 0) return EXIT_SUCCESS;
 
-		// The requested PWM is only applied if it is slightly different from the current value.
-		if (abs(pws_tmp[channel]-pMaestro->LastPWs[channel]) < pMaestro->ThresholdPWs[channel]) pws_tmp[channel] = pMaestro->LastPWs[channel];
+		sendbuf[3] = (unsigned char)nbselectedchannels;
+		sendbuf[4] = (unsigned char)firstselectedchannel;
 
-		//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pMaestro->LastPWs[channel], abs(pws_tmp[channel]-pMaestro->LastPWs[channel]), pMaestro->ThresholdPWs[channel]);
-
-		target = pws_tmp[channel]*4;
-		sendbuf[index] = (unsigned char)(target & 0x7F);
-		sendbuf[index+1] = (unsigned char)((target >> 7) & 0x7F);
-
-		firstselectedchannel = min(channel, firstselectedchannel);
-		nbselectedchannels++;
-		index += 2;
+		sendbuflen = 5+2*nbselectedchannels;
 	}
+	else
+	{
+		nbselectedchannels = 0;
+		index = 0;
 
-	if (nbselectedchannels == 0) return EXIT_SUCCESS;
+		memcpy(pws_tmp, pws, sizeof(pws_tmp));
 
-	sendbuf[3] = (unsigned char)nbselectedchannels;
-	sendbuf[4] = (unsigned char)firstselectedchannel;
+		for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
+		{
+			if (!selectedchannels[channel]) continue;
 
-	sendbuflen = 5+2*nbselectedchannels;
+			if (pMaestro->bProportionalPWs[channel])
+			{
+				pws_tmp[channel] = (int)(pMaestro->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAESTRO));
+				if (pws_tmp[channel] >= 0)
+					pws_tmp[channel] = pMaestro->MidPWs[channel]+pws_tmp[channel]*(pMaestro->MaxPWs[channel]-pMaestro->MidPWs[channel])
+					/(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+				else
+					pws_tmp[channel] = pMaestro->MidPWs[channel]+pws_tmp[channel]*(pMaestro->MinPWs[channel]-pMaestro->MidPWs[channel])
+					/(DEFAULT_MIN_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+			}
+			else
+			{
+				pws_tmp[channel] = DEFAULT_MID_PW_MAESTRO+(int)(pMaestro->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAESTRO));
+			}
+
+			pws_tmp[channel] = max(min(pws_tmp[channel], pMaestro->MaxPWs[channel]), pMaestro->MinPWs[channel]);
+			//pws_tmp[channel] = max(min(pws_tmp[channel], DEFAULT_ABSOLUTE_MAX_PW_MAESTRO), DEFAULT_ABSOLUTE_MIN_PW_MAESTRO);
+
+			// The requested PWM is only applied if it is slightly different from the current value.
+			if (abs(pws_tmp[channel]-pMaestro->LastPWs[channel]) < pMaestro->ThresholdPWs[channel]) continue;
+
+			//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pMaestro->LastPWs[channel], abs(pws_tmp[channel]-pMaestro->LastPWs[channel]), pMaestro->ThresholdPWs[channel]);
+
+			sendbuf[index] = (unsigned char)BAUD_RATE_INDICATION_BYTE_MAESTRO;
+			sendbuf[index+1] = (unsigned char)pMaestro->DeviceNumber;
+			sendbuf[index+2] = (unsigned char)(SET_TARGET_COMMAND_MAESTRO & 0x7F);
+			sendbuf[index+3] = (unsigned char)channel;
+			target = pws_tmp[channel]*4;
+			sendbuf[index+4] = (unsigned char)(target & 0x7F);
+			sendbuf[index+5] = (unsigned char)((target >> 7) & 0x7F);
+
+			nbselectedchannels++;
+			index += 6;
+		}
+
+		if (nbselectedchannels == 0) return EXIT_SUCCESS;
+
+		sendbuflen = 6*nbselectedchannels;
+	}
 
 	//printf("%s\n", sendbuf);
 
@@ -472,6 +527,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		pMaestro->MaxAngle = 0.5;
 		pMaestro->analoginputvalueoffset = 0;
 		pMaestro->analoginputvaluecoef = 1;
+		pMaestro->bEnableSetMultipleTargets = 1;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -526,6 +582,9 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &pMaestro->analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMaestro->analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->bEnableSetMultipleTargets) != 1) printf("Invalid configuration file.\n");
 
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
@@ -586,7 +645,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		printf("Invalid parameter : leftfluxchan.\n");
 		pMaestro->leftfluxchan = 3;
 	}
-	if ((pMaestro->analoginputchan < 0)||(pMaestro->analoginputchan >= 32))
+	if ((pMaestro->analoginputchan < -1)||(pMaestro->analoginputchan >= 32))
 	{
 		printf("Invalid parameter : analoginputchan.\n");
 		pMaestro->analoginputchan = 11;

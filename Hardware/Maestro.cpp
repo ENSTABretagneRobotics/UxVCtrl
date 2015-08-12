@@ -16,10 +16,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double rudder = 0, thrust = 0, flux = 0;
 	double thrust1 = 0, thrust2 = 0;
 	int ivalue = 0;
-	double winddir = 0, vbattery1 = 0;
+	double winddir = 0;
 	int battery1chan = 7, cytronchan = 9;
-	double vbattery1_alarm = 12.8, vbattery1_filter_coef = 0.9;
-	double vbattery1_filtered = vbattery1_alarm;
+	double vbattery1_alarm = 12.8, vbattery1_coef = 10.10101, vbattery1_filter_coef = 0.9;
+	double vbattery1_filtered = vbattery1_alarm; // analoginputvaluethreshold...
 	int counter = 0, counter_modulo = 11;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -70,6 +70,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			{
 				mSleep(50);
 				bConnected = TRUE; 
+
+				vbattery1_filtered = vbattery1_alarm;
 
 				if (maestro.pfSaveFile != NULL)
 				{
@@ -161,9 +163,11 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 						break;
 					}
 					mSleep(10);
-					vbattery1 = 10.10101*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					EnterCriticalSection(&StateVariablesCS);
+					vbattery1 = vbattery1_coef*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
 					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
 					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < vbattery1_alarm)) printf("BAT1 ALARM\n");
+					LeaveCriticalSection(&StateVariablesCS);
 				}
 				if (counter%counter_modulo == 5)
 				{
@@ -176,10 +180,14 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 						break;
 					}
 					mSleep(10);
+					EnterCriticalSection(&StateVariablesCS);
 					vcytron = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
+					LeaveCriticalSection(&StateVariablesCS);
 				}
+				EnterCriticalSection(&StateVariablesCS);
 				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
 				if (bShowCytron) printf("vcytron:%.1fV\n", vcytron);
+				LeaveCriticalSection(&StateVariablesCS);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;

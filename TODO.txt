@@ -2,12 +2,6 @@ données aberrantes vxyhat dans logstate?
 
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 
-maestro : add param to tell which version (micro maestro does not support set multiple targets...)
-servo voile tout le temps remis à jour? ajouter option pour choisir si on utilise la commande multiple targets?
-
-comparer triangle de vnav et uxvctrl, vitesse un peu faible surtout à la fin? regarder aussi avec vaimos_dashboard
-juste plus de positions car rafraichissement plus élevé donne l'impression, timing...? écart à la ligne, gouvernail plus violent?
-
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
 si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstragey et forcesailupdate...
@@ -182,6 +176,9 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+maestro : add param to tell which version (micro maestro does not support set multiple targets...)
+servo voile tout le temps remis à jour? ajouter option pour choisir si on utilise la commande multiple targets?
 
 maintenant il n'y a plus besoin de lire ch9 et 10, ch gouvernail et voile échangés pour meilleure compatibilité avec autres robots
 

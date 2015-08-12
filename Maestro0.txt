@@ -95,3 +95,5 @@ COM6
 20
 % analoginputvaluecoef
 0.333
+% bEnableSetMultipleTargets
+1

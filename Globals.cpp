@@ -288,6 +288,7 @@ CRITICAL_SECTION MissionFilesCS;
 CRITICAL_SECTION OpenCVCS;
 CRITICAL_SECTION strtimeCS;
 STATE state = INVALID_STATE;
+double vbattery1 = 0; 
 double vcytron = 0; 
 char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;
