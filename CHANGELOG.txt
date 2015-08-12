@@ -1,3 +1,6 @@
+69
+Changed key for Cytron.
+
 68
 Added logging of vbattery1.
 Corrected parameters checking in Maestro to enable -1 for analoginputchan to disable it.
