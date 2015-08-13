@@ -1,3 +1,6 @@
+70
+Added RCMode and BAT1 display on Sailboat GUI.
+
 69
 Changed key for Cytron.
 

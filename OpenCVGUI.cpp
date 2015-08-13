@@ -469,7 +469,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case PORT_TACK_TRAJECTORY: s = 'P'; break;
 				default: s = 'I'; break;
 				}
-				sprintf(szText, "%c %d%% %d%%", s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
+				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vcytron > 1.4? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1); 
 			}
 			else sprintf(szText, "%d%% %d%% %d%%", (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
 			offset += 16;
