@@ -5,10 +5,10 @@
 % leftthrusterpwm
 1
 % bottomthrusterpwm
-2
+3
 % rightthrustercoef
-1
+-1
 % leftthrustercoef
-1
+-1
 % bottomthrustercoef
 1
