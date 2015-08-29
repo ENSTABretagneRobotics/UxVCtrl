@@ -1,8 +1,9 @@
 % camid (0..9) or a video filename or IP address and TCP port
 %127.0.0.1:4014
+Kinect2Color
 %0
 %test1.wmv
-dummy_25min.wmv
+%dummy_25min.wmv
 %127.0.0.1:4014
 %192.168.1.150:4014
 % videoimgwidth
@@ -16,7 +17,7 @@ dummy_25min.wmv
 % bForceSoftwareResize
 1
 % hscale
-1
+1.333
 % vscale
 1
 % rotation angle (in deg)
@@ -24,6 +25,6 @@ dummy_25min.wmv
 % bFlip
 0
 % HorizontalBeam (in ]0..360] deg)
-70
+70.6
 % VerticalBeam (in ]0..360] deg)
-50
+53.8

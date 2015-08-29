@@ -66,6 +66,14 @@ copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\SIMULATOR_WORKSPACE\ResetWor
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\SIMULATOR_WORKSPACE\samples"\
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\SIMULATOR_WORKSPACE\restore"\
 
+copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\TREX_WORKSPACE\UxVCtrl.exe"
+copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\TREX_WORKSPACE\CHANGELOG.txt"
+copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\TREX_WORKSPACE\ReadMe.txt"
+copy /B /Y /Z .\mission_spec.txt "%UDK_USER_PATH%\TREX_WORKSPACE\mission_spec.txt"
+copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\TREX_WORKSPACE\ResetWorkspace.bat"
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\TREX_WORKSPACE\samples"\
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\TREX_WORKSPACE\restore"\
+
 copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\VAIMOS_WORKSPACE\UxVCtrl.exe"
 copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\VAIMOS_WORKSPACE\CHANGELOG.txt"
 copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\VAIMOS_WORKSPACE\ReadMe.txt"

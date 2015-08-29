@@ -18,8 +18,10 @@
 0x00040000
 % Buggy
 %0x02000000
+% TREX
+%0x04000000
 % nbvideo (max 3)
-1
+2
 % videoimgwidth
 320
 % videoimgheight
@@ -29,13 +31,13 @@
 % bEnableOpenCVGUIs[0]
 1
 % bEnableOpenCVGUIs[1]
-0
+1
 % bEnableOpenCVGUIs[2]
 0
 % bShowVideoOpenCVGUIs[0]
-0
+1
 % bShowVideoOpenCVGUIs[1]
-0
+1
 % bShowVideoOpenCVGUIs[2]
 0
 % bCommandPrompt

@@ -33,6 +33,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispPlayingTriangle = FALSE;
 	CvPoint PlayingTrianglePoints[3];
 	int nbPlayingTrianglePoints = 3;
+	char strtime_snap[MAX_BUF_LEN];
+	char snapfilename[MAX_BUF_LEN];
 	char s = 0;
 	char szText[MAX_BUF_LEN];
 	char windowname[MAX_BUF_LEN];
@@ -230,6 +232,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case HOVERCRAFT_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
+			case TREX_ROBID:
 				u_max += 0.1;
 				u_max = (u_max > 1)? 1: u_max;
 				break;
@@ -256,6 +259,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case HOVERCRAFT_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
+			case TREX_ROBID:
 				u_max -= 0.1;
 				u_max = (u_max < 0)? 0: u_max;
 				break;
@@ -381,6 +385,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 			}
 			break;
+		case 'P':
+			memset(strtime_snap, 0, sizeof(strtime_snap));
+			EnterCriticalSection(&strtimeCS);
+			strcpy(strtime_snap, strtime_fns());
+			LeaveCriticalSection(&strtimeCS);
+			for (i = 0; i < nbvideo; i++)
+			{
+				sprintf(snapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);							
+				EnterCriticalSection(&imgsCS[i]);
+				if (!cvSaveImage(snapfilename, imgs[i], 0))
+				{
+					printf("Error saving a snapshot file.\n");
+				}
+				LeaveCriticalSection(&imgsCS[i]);
+			}
+			printf("Snapshot.\n");
+			break;
 		case 'r':
 			if (bVideoRecording)
 			{
@@ -420,7 +441,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
 				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
-				"r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
+				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
 				"C(Cytron),W(roll wind correction),B(Motorboat backwards)\n");
 			break;

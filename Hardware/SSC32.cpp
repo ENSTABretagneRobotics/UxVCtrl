@@ -156,6 +156,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}		
 				break;
 			case HOVERCRAFT_ROBID:
+			case TREX_ROBID:
 			default:
 				EnterCriticalSection(&StateVariablesCS);
 				thrust1 = u1;

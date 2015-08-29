@@ -104,6 +104,21 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 		{
 			switch (robid)
 			{
+			case BUGGY_ROBID:
+			case SAILBOAT_ROBID:
+				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = minissc.MinAngle; ruddermaxangle = minissc.MaxAngle;
+				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
+				thrust = u;
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrustersFluxMiniSSC(&minissc, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				{
+					printf("Connection to a MiniSSC lost.\n");
+					bConnected = FALSE;
+					DisconnectMiniSSC(&minissc);
+					break;
+				}		
+				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = minissc.MinAngle; ruddermaxangle = minissc.MaxAngle;
@@ -141,6 +156,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 				}		
 				break;
 			case HOVERCRAFT_ROBID:
+			case TREX_ROBID:
 			default:
 				EnterCriticalSection(&StateVariablesCS);
 				thrust1 = u1;

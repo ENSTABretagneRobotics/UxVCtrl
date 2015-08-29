@@ -232,6 +232,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				mSleep(50);
 				break;
 			case HOVERCRAFT_ROBID:
+			case TREX_ROBID:
 			default:
 				EnterCriticalSection(&StateVariablesCS);
 				thrust1 = u1;

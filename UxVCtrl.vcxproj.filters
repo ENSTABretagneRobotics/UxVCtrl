@@ -488,6 +488,9 @@
     <ClInclude Include="Hardware\Hokuyo.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">

@@ -246,7 +246,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				double abserror = fabs(error);
 				double speed = Center(omegahat)/omegamax;
 
-				if ((robid & SAUCISSE_LIKE_ROBID_MASK)||(robid == SUBMARINE_SIMULATOR_ROBID))
+				if ((robid & SAUCISSE_CLASS_ROBID_MASK)||(robid == SUBMARINE_SIMULATOR_ROBID))
 				{
 					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*speed/(Kd2+abserror)-Ki*integral;
 					else uw = Kp*sqrt(abserror)-Kd1*speed/(Kd2+abserror)-Ki*integral;

@@ -1,3 +1,8 @@
+71
+Added support of Kinect v2 in the Visual Studio 2012 project.
+Replaced SAUCISSE_LIKE by SAUCISSE_CLASS.
+Added TREX_ROBID.
+
 70
 Added RCMode and BAT1 display on Sailboat GUI.
 

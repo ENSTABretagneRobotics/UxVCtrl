@@ -19,11 +19,13 @@ _ LabJack UD driver v3.15/v3.2X
 [_ OpenAL SDK 1.1]
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
+[_ Kinect v2 SDK]
 [_ Microsoft Office Excel 2003 (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3, see UDK\Software prerequisites\CISSAU_prereq)
 *** DEVEL ***
 _ Visual Studio 2008 SP1/Visual Studio 2012
 _ OpenCV 2.4.2/2.4.9
+[_ Kinect v2 SDK]
 [_ Qt SDK 2010.05 (Qt_mini)]
 
 It is also supposed to be compatible with Linux 2.6 with equivalent prerequisites, although not fully tested.

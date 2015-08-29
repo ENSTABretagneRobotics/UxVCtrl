@@ -1,6 +1,7 @@
 % camid (0..9) or a video filename or IP address and TCP port
+Kinect2Depth
 %1
-test2.wmv
+%test2.wmv
 %dummy_25min.wmv
 %127.0.0.1:4014
 %192.168.1.150:4014
@@ -17,12 +18,12 @@ test2.wmv
 % hscale
 1
 % vscale
-1
+1.111
 % rotation angle (in deg)
 0
 % bFlip
 0
 % HorizontalBeam (in ]0..360] deg)
-70
+70.6
 % VerticalBeam (in ]0..360] deg)
-50
+53.8

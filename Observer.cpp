@@ -103,7 +103,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			//zhat = zhat & (interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat);
 
 			// SAUC'ISSE and SARDINE can measure omega.
-			if (robid & SAUCISSE_LIKE_ROBID_MASK)
+			if (robid & SAUCISSE_CLASS_ROBID_MASK)
 			{
 				omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
 			}
