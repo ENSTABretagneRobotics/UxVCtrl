@@ -15,6 +15,8 @@ mission par sms : option /s check missions from sms.txt or sms folder...
 commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
 ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
 
+nmeadevice : add hour minute second day month year from nmea2xml_wrsc2015
+
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)

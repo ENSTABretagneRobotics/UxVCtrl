@@ -24,11 +24,11 @@ COM6
 1
 % channel 1
 % MinPW (in us)
-1140
+1095
 % MidPW (in us)
-1571
+1546
 % MaxPW (in us)
-1571
+1546
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -37,11 +37,11 @@ COM6
 1
 % channel 2
 % MinPW (in us)
-969
+988
 % MidPW (in us)
-1362
+1497
 % MaxPW (in us)
-1986
+2012
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)

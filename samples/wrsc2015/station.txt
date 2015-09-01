@@ -5,7 +5,7 @@ setmissionaction init
 %wait 3
 linefollowingconfig 15 1.0
 setmissionaction station_in
-linefollowingwgsstation 60.1048 19.9496 2 280
+linefollowingwgsstation 60.1048 19.9496 1 320
 setmissionaction station_out
 linefollowingwgsstation 60.1052 19.9496 5 31557600.000000
 setmissionaction end
