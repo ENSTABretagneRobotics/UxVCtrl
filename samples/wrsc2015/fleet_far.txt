@@ -3,7 +3,7 @@ setmissionaction init
 %gpssetenvcoordposition 3
 %setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
 %wait 3
-linefollowingconfig 15 1.0
+linefollowingconfig 10 1.0
 setmissionaction l0
 linefollowingtwgs 60.104900 19.956200 60.108100 19.956200 31557600.000000
 setmissionaction l1
