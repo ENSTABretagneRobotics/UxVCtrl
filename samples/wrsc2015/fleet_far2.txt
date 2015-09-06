@@ -1,0 +1,28 @@
+generalstop
+setmissionaction init
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+%wait 3
+linefollowingconfig 15 1.0
+setmissionaction l0
+linefollowingtwgs 60.104800 19.956400 60.108200 19.956400 31557600.000000
+setmissionaction l1
+linefollowingtwgs 60.108200 19.956400 60.108200 19.949600 31557600.000000
+setmissionaction l2
+linefollowingtwgs 60.108200 19.949600 60.104800 19.949600 31557600.000000
+setmissionaction l3
+linefollowingtwgs 60.104800 19.949600 60.104800 19.956400 31557600.000000
+setmissionaction l4
+linefollowingtwgs 60.104800 19.956400 60.108200 19.956400 31557600.000000
+setmissionaction l5
+linefollowingtwgs 60.108200 19.956400 60.108200 19.949600 31557600.000000
+setmissionaction l6
+linefollowingtwgs 60.108200 19.949600 60.104800 19.949600 31557600.000000
+setmissionaction l7
+linefollowingtwgs 60.104800 19.949600 60.104800 19.956400 31557600.000000
+setmissionaction l8
+linefollowingtwgs 60.104800 19.956400 60.108200 19.956400 31557600.000000
+setmissionaction station
+linefollowingwgsstation 60.108200 19.956400 5 31557600.000000
+setmissionaction end
+generalstop

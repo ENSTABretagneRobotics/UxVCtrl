@@ -96,8 +96,8 @@
 % uw_integral_max
 0.1
 % cosdelta_angle_threshold (0 : simu, 0 : SAUC'ISSE, 0 : SARDINE, 0 : CISCREA)
-%0
-0.78
+0.5
+%0.78
 % wzradiushigh (accuracy of the depth control in m)
 0.1
 % wzradiuslow (accuracy of the depth control in m)
@@ -117,7 +117,7 @@
 % betaarr (angle de la voile en vent arrière (in rad))
 1.5
 % ksi (angle de près (in rad))
-0.78
+0.87
 % check_strategy_period (in s)
 60
 % sail_update_period (in s)

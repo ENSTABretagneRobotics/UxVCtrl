@@ -103,6 +103,7 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 		{
 			switch (robid)
 			{
+			case SAILBOAT_ROBID: // For VSim compatibility...
 			case VAIMOS_ROBID:
 
 				// Add also periodic sail calibration here...

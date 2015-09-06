@@ -1,3 +1,6 @@
+72
+Improved compatibility with VSim for Sailboat (configuration : MT, GPS, SSC-32, Sail).
+
 71
 Added support of Kinect v2 in the Visual Studio 2012 project.
 Replaced SAUCISSE_LIKE by SAUCISSE_CLASS.

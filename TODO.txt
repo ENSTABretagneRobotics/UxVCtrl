@@ -1,3 +1,5 @@
+replaceinfile enable disable kinect or new config vs2012, also for ciscrea, labjack, because of their dependencies 
+
 données aberrantes vxyhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 enregistrer cog sog dans un des logs
