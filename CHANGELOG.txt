@@ -1,3 +1,6 @@
+73
+Added Compat.bat to improve compatibility of Visual Studio projects when necessary.
+
 72
 Improved compatibility with VSim for Sailboat (configuration : MT, GPS, SSC-32, Sail).
 

@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.2\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV242;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV242;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="labjackud.lib libmodbus-3.0.3-msvcd.lib WinMM.lib WS2_32.lib opencv_core242d.lib opencv_imgproc242d.lib opencv_highgui242d.lib"
+				AdditionalDependencies="WinMM.lib WS2_32.lib labjackud.lib libmodbus-3.0.3-msvcd.lib opencv_core242d.lib opencv_imgproc242d.lib opencv_highgui242d.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SystemDrive)\OpenCV2.4.2\x86\vc9\lib;$(ProgramFiles)\libmodbus-3.0.3-msvc\x86\vc9\lib;$(ProgramFiles)\LabJack\Drivers;"
 				GenerateDebugInformation="true"
@@ -119,7 +119,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.2\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;OPENCV242;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;OPENCV242;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="labjackud.lib libmodbus-3.0.3-msvc.lib WinMM.lib WS2_32.lib opencv_core242.lib opencv_imgproc242.lib opencv_highgui242.lib zlib.lib libjasper.lib libjpeg.lib libpng.lib libtiff.lib Vfw32.lib comctl32.lib"
+				AdditionalDependencies="WinMM.lib WS2_32.lib labjackud.lib libmodbus-3.0.3-msvc.lib opencv_core242.lib opencv_imgproc242.lib opencv_highgui242.lib zlib.lib libjasper.lib libjpeg.lib libpng.lib libtiff.lib Vfw32.lib comctl32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SystemDrive)\OpenCV2.4.2\x86\vc9\staticlib;$(ProgramFiles)\libmodbus-3.0.3-msvc\x86\vc9\staticlib;$(ProgramFiles)\LabJack\Drivers;"
 				GenerateDebugInformation="true"

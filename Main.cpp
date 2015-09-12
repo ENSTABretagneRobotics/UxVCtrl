@@ -25,12 +25,16 @@
 #include "MT.h"
 #include "NMEADevice.h"
 #include "SwarmonDevice.h"
+#ifdef ENABLE_LABJACK_SUPPORT
 #include "UE9A.h"
+#endif // ENABLE_LABJACK_SUPPORT
 #include "SSC32.h"
 #include "Maestro.h"
 #include "MiniSSC.h"
 #include "Sail.h"
+#ifdef ENABLE_LIBMODBUS_SUPPORT
 #include "CISCREA.h"
+#endif // ENABLE_LIBMODBUS_SUPPORT
 #include "Observer.h"
 #include "Controller.h"
 #include "OpenCVGUI.h"
@@ -58,12 +62,16 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MTThreadId;
 	THREAD_IDENTIFIER NMEADeviceThreadId;
 	THREAD_IDENTIFIER SwarmonDeviceThreadId;
+#ifdef ENABLE_LABJACK_SUPPORT
 	THREAD_IDENTIFIER UE9AThreadId;
+#endif // ENABLE_LABJACK_SUPPORT
 	THREAD_IDENTIFIER SSC32ThreadId;
 	THREAD_IDENTIFIER MaestroThreadId;
 	THREAD_IDENTIFIER MiniSSCThreadId;
 	THREAD_IDENTIFIER SailThreadId;
+#ifdef ENABLE_LIBMODBUS_SUPPORT
 	THREAD_IDENTIFIER CISCREAThreadId;
+#endif // ENABLE_LIBMODBUS_SUPPORT
 	THREAD_IDENTIFIER ObserverThreadId;
 	THREAD_IDENTIFIER ControllerThreadId;
 	THREAD_IDENTIFIER MissionThreadId;
@@ -102,12 +110,16 @@ int main(int argc, char* argv[])
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
 	if (!bDisableGPS) CreateDefaultThread(NMEADeviceThread, NULL, &NMEADeviceThreadId);
 	if (!bDisableSwarmonDevice) CreateDefaultThread(SwarmonDeviceThread, NULL, &SwarmonDeviceThreadId);
+#ifdef ENABLE_LABJACK_SUPPORT
 	if (!bDisableUE9A) CreateDefaultThread(UE9AThread, NULL, &UE9AThreadId);
+#endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSSC32) CreateDefaultThread(SSC32Thread, NULL, &SSC32ThreadId);
 	if (!bDisableMaestro) CreateDefaultThread(MaestroThread, NULL, &MaestroThreadId);
 	if (!bDisableMiniSSC) CreateDefaultThread(MiniSSCThread, NULL, &MiniSSCThreadId);
 	if (!bDisableSail) CreateDefaultThread(SailThread, NULL, &SailThreadId);
+#ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
+#endif // ENABLE_LIBMODBUS_SUPPORT
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
 
@@ -179,12 +191,16 @@ int main(int argc, char* argv[])
 	// Stop sensors, actuators, algorithms thread loops...
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
+#ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) WaitForThread(CISCREAThreadId);
+#endif // ENABLE_LIBMODBUS_SUPPORT
 	if (!bDisableSail) WaitForThread(SailThreadId);
 	if (!bDisableMiniSSC) WaitForThread(MiniSSCThreadId);
 	if (!bDisableMaestro) WaitForThread(MaestroThreadId);
 	if (!bDisableSSC32) WaitForThread(SSC32ThreadId);
+#ifdef ENABLE_LABJACK_SUPPORT
 	if (!bDisableUE9A) WaitForThread(UE9AThreadId);
+#endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSwarmonDevice) WaitForThread(SwarmonDeviceThreadId);
 	if (!bDisableGPS) WaitForThread(NMEADeviceThreadId);
 	if (!bDisableMT) WaitForThread(MTThreadId);

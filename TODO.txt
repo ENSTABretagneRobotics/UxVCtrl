@@ -1,4 +1,4 @@
-replaceinfile enable disable kinect or new config vs2012, also for ciscrea, labjack, because of their dependencies 
+buggy : afficher aussi u_max, problème reconnection GPS Galaxy S
 
 données aberrantes vxyhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
@@ -182,6 +182,8 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+replaceinfile enable disable kinect or new config (e.g. Release_compat), also for ciscrea, labjack, because of their dependencies (add new defines, check .gitignore...)
 
 maestro : add param to tell which version (micro maestro does not support set multiple targets...)
 servo voile tout le temps remis à jour? ajouter option pour choisir si on utilise la commande multiple targets?
