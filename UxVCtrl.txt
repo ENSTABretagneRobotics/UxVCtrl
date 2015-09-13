@@ -19,9 +19,9 @@
 % Buggy
 %0x02000000
 % TREX
-0x04000000
+%0x04000000
 % QUADRO
-%0x20000000
+0x20000000
 % nbvideo (max 3)
 1
 % videoimgwidth
@@ -61,9 +61,9 @@
 % bDisableMT
 1
 % bDisableNMEADevice
-0
-% bDisableMAVLinkDevice
 1
+% bDisableMAVLinkDevice
+0
 % bDisableSwarmonDevice
 1
 % bDisableUE9A

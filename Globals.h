@@ -134,6 +134,8 @@ extern deque< vector<interval> > d_all_mes_vector;
 extern double altitude_sea_floor;
 // Modem.
 extern double acousticmodem_x, acousticmodem_y, acousticmodem_r;
+// Optical flow.
+extern double vrx, vry;
 
 // Equivalent thusters.
 // u1 : right, u2 : left, u3 : bottom.

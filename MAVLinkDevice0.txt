@@ -7,3 +7,7 @@ COM12
 1500
 % bSaveRawData
 1
+% quality_threshold
+127
+% flow_comp_m_threshold
+0.001

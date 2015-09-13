@@ -175,6 +175,9 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 OLD
 
+sauvegarder toutes les données presque brutes px4flow pour postprocessing (flow, flow_rad...), angles ardupilot aussi (attitude mid 30, gps, altitude...)?
+mais on dirait que je reçois pas optical_flow_rad... changer de firmware?
+
 0 bizarres dans depth des logmission du harbor alors que pas de problèmes dans les données brutes pression...
 il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le nuc?
 zhat à 0 aussi dans logstate, mais rien vu dans pressure... attention, il y avait du z_mes pris par GPS?

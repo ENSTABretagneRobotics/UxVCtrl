@@ -1,3 +1,7 @@
+75
+Continuation of MAVLinkDevice integration.
+Corrected QUADRO_ROBID considered as invalid parameter.
+
 74
 Added RC mode option ('7' key) for a better manual control of TREX.
 Improved GUI depending on the robid.

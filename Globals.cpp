@@ -43,6 +43,8 @@ deque< vector<interval> > d_all_mes_vector;
 double altitude_sea_floor = 0;
 // Modem.
 double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_r = 0;
+// Optical flow.
+double vrx = 0, vry = 0;
 
 // Equivalent thusters.
 // u1 : right, u2 : left, u3 : bottom.

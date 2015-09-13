@@ -482,6 +482,7 @@ inline int LoadConfig()
 	case SAILBOAT_ROBID:
 	case BUGGY_ROBID:
 	case TREX_ROBID:
+	case QUADRO_ROBID:
 		break;
 	default:
 		printf("Invalid parameter : robid.\n");

@@ -154,6 +154,15 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
 			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
 		}
+		else if (robid == QUADRO_ROBID)
+		{
+			xhat = xhat+dt*(vrx*Cos(thetahat)-vry*Sin(thetahat)+xdotnoise);
+			yhat = yhat+dt*(vrx*Sin(thetahat)+vry*Cos(thetahat)+ydotnoise);
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
+			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
+			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+		}
 		else
 		{
 			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
