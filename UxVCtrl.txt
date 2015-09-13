@@ -15,11 +15,13 @@
 % VAIMOS
 %0x00020000
 % Sailboat
-0x00040000
+%0x00040000
 % Buggy
 %0x02000000
 % TREX
-%0x04000000
+0x04000000
+% QUADRO
+%0x20000000
 % nbvideo (max 3)
 1
 % videoimgwidth
@@ -55,11 +57,13 @@
 % bDisableP33x
 1
 % bDisableRazorAHRS
-0
+1
 % bDisableMT
 1
-% bDisableGPS
+% bDisableNMEADevice
 0
+% bDisableMAVLinkDevice
+1
 % bDisableSwarmonDevice
 1
 % bDisableUE9A
@@ -67,7 +71,7 @@
 % bDisableSSC32
 1
 % bDisableMaestro
-0
+1
 % bDisableMiniSSC
 1
 % bDisableSail
@@ -76,15 +80,15 @@
 % u_max (in [0;1])
 1
 % uw_max (in [0;1], (0.5 : boost, 1 : normal) for SAUC'ISSE, (0.35 (difficult to control...) : boost, 0.25 : normal) for CISCREA)
-1
+0.5
 % uv_max (in [0;1])
 1
 % u_coef (1 : boost, 0.5 : normal)
-0.5
+1
 % uw_coef (1 : boost, 0.5 : normal)
-0.5
+1
 % Kp (1.0 : simu, 1.0 : SAUC'ISSE, 1.0 : SARDINE, 0.5 : CISCREA)
-2.5
+1
 % Kd1 (0.5 : simu, 0.25 : SAUC'ISSE, 0.5 : SARDINE, 1.0 : CISCREA)
 0
 % Kd2 (0.1 : simu, 0.05 : SAUC'ISSE, 0.1 : SARDINE, 0.1 : CISCREA)
@@ -96,7 +100,7 @@
 % uw_integral_max
 0.1
 % cosdelta_angle_threshold (0 : simu, 0 : SAUC'ISSE, 0 : SARDINE, 0 : CISCREA)
-0.5
+0
 %0.78
 % wzradiushigh (accuracy of the depth control in m)
 0.1
@@ -109,7 +113,7 @@
 % omegamax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
 1
 % gamma_infinite (in rad, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
-0.87
+0.78
 % r (accuracy of line/waypoint following in m, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
 % betatrav (angle de la voile en vent de travers (in rad))
@@ -140,9 +144,9 @@
 % d_max_err (in m, modified by Seanet)
 0.1
 % alphavxyhat.inf
-0.09
+2.4
 % alphavxyhat.sup
-0.10
+2.6
 % alphaomegahat.inf
 0.7
 % alphaomegahat.sup 
@@ -215,9 +219,9 @@
 % psitwind_med (true wind direction in rad, see also Observer and any wind sensor)
 0
 % psitwind_var (true wind direction max variation in rad)
-0.1
+0
 % wind_filter_coef (wind filter coefficient, between 0 and 1)
-0.995
+0.99
 % vc_med (vitesse du courant en m/s)
 0
 % vc_var (variation de vitesse max du courant en m/s)

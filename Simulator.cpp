@@ -37,7 +37,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		); 
 	fflush(logsimufile);
 
-	//bGPSOKSimulator = FALSE;
+	bGPSOKSimulator = FALSE;
 
 	t = 0;
 
@@ -91,12 +91,12 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			x_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			y_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			vxy_mes = vxy+vxy_bias_err+vxy_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, z_mes, &latitude, &longitude, &dval);
-			//bGPSOKSimulator = TRUE;
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, 0, &latitude, &longitude, &dval);
+			bGPSOKSimulator = TRUE;
 		}
 		else
 		{
-			//bGPSOKSimulator = FALSE;
+			bGPSOKSimulator = FALSE;
 		}
 		// Sonar.
 		alpha_mes = alpha_mes+0.1*omegas;
@@ -152,7 +152,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	StopChrono(&chrono, &t);
 
-	//bGPSOKSimulator = FALSE;
+	bGPSOKSimulator = FALSE;
 
 	fclose(logsimufile);
 

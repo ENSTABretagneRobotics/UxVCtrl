@@ -24,11 +24,11 @@ COM6
 1
 % channel 1
 % MinPW (in us)
-1095
+1000
 % MidPW (in us)
-1546
+1500
 % MaxPW (in us)
-1546
+2000
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -37,37 +37,37 @@ COM6
 1
 % channel 2
 % MinPW (in us)
-1144
+1340
+% MidPW (in us)
+1600
+% MaxPW (in us)
+1860
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 3
+% MinPW (in us)
+960
 % MidPW (in us)
 1500
 % MaxPW (in us)
-1858
+1890
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
 -1
 % bProportionalPW (0 or 1)
 1
-% channel 3
-% MinPW (in us)
-1000
-% MidPW (in us)
-1500
-% MaxPW (in us)
-2000
-% ThresholdPW (in us)
-10
-% CoefPW (-1 or 1)
-1
-% bProportionalPW (0 or 1)
-1
 % channel 4
 % MinPW (in us)
-1000
+830
 % MidPW (in us)
 1500
 % MaxPW (in us)
-2000
+2030
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -88,12 +88,12 @@ COM6
 % analoginputchan (disabled if -1)
 11
 % MinAngle (in rad)
--0.7
+-0.6
 % MaxAngle (in rad)
-0.7
+0.6
 % analoginputvalueoffset
-20
+0.0
 % analoginputvaluecoef
-0.333
+1.0
 % bEnableSetMultipleTargets
-1
+0

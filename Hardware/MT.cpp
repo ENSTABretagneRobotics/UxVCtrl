@@ -15,6 +15,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	MT mt;
 	struct timeval tv;
 	MTDATA mtdata;
+	double dval = 0;
 	BOOL bConnected = FALSE;
 	int i = 0;
 	char szSaveFilePath[256];
@@ -24,7 +25,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 	memset(&mt, 0, sizeof(MT));
 
-	//bGPSOKMT = FALSE;
+	bGPSOKMT = FALSE;
 
 	for (;;)
 	{
@@ -35,7 +36,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			if (bConnected)
 			{
 				printf("MT paused.\n");
-				//bGPSOKMT = FALSE;
+				bGPSOKMT = FALSE;
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
@@ -49,7 +50,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a MT.\n");
-				//bGPSOKMT = FALSE;
+				bGPSOKMT = FALSE;
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
@@ -106,7 +107,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			}
 			else 
 			{
-				//bGPSOKMT = FALSE;
+				bGPSOKMT = FALSE;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -136,12 +137,12 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 					//printf("%f;%f\n", mtdata.Lat, mtdata.Long);
 					latitude = mtdata.Lat;
 					longitude = mtdata.Long;
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &z_mes);
-					//bGPSOKMT = TRUE;
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+					bGPSOKMT = TRUE;
 				}
 				else
 				{
-					//bGPSOKMT = FALSE;
+					bGPSOKMT = FALSE;
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);
@@ -174,7 +175,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			else
 			{
 				printf("Connection to a MT lost.\n");
-				//bGPSOKMT = FALSE;
+				bGPSOKMT = FALSE;
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
@@ -183,7 +184,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 		if (bExit) break;
 	}
 
-	//bGPSOKMT = FALSE;
+	bGPSOKMT = FALSE;
 
 	if (mt.pfSaveFile != NULL)
 	{

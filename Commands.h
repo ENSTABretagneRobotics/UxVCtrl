@@ -510,14 +510,15 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
-			//if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKSimulator)
-			//{
-			EnterCriticalSection(&StateVariablesCS);
-			// We do not use GPS altitude for that as it is not reliable...
-			lat_env = latitude; long_env = longitude;
-			LeaveCriticalSection(&StateVariablesCS);
-			//	break;
-			//}
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			{
+				EnterCriticalSection(&StateVariablesCS);
+				// We do not use GPS altitude for that as it is not reliable...
+				// Assume that latitude,longitude is only updated by GPS...
+				lat_env = latitude; long_env = longitude;
+				LeaveCriticalSection(&StateVariablesCS);
+				//break;
+			}
 			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
 			if (!bWaiting) break;
 			if (bExit) break;
@@ -534,20 +535,21 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
-			//if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKSimulator)
-			//{
-			EnterCriticalSection(&StateVariablesCS);
-			// Should add speed...?
-			xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
-			yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
-			if (xhat.isEmpty || yhat.isEmpty)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
 			{
-				xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-				yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+				EnterCriticalSection(&StateVariablesCS);
+				// Should add speed...?
+				// Assume that x_mes,y_mes is only updated by GPS...
+				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
+				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+				//break;
 			}
-			LeaveCriticalSection(&StateVariablesCS);
-			//	break;
-			//}
 			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
 			if (!bWaiting) break;
 			if (bExit) break;
@@ -556,6 +558,14 @@ inline int Commands(char* line)
 		}
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
+	}
+	else if (strncmp(line, "startgpslocalization", strlen("startgpslocalization")) == 0)
+	{
+		bGPSLocalization = TRUE;
+	}
+	else if (strncmp(line, "stopgpslocalization", strlen("stopgpslocalization")) == 0)
+	{
+		bGPSLocalization = FALSE;
 	}
 	else if (sscanf(line, "setstateestimationwgs %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)

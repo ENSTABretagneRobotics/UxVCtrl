@@ -68,7 +68,8 @@ BOOL bDisableHokuyo = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
-BOOL bDisableGPS = FALSE;
+BOOL bDisableNMEADevice = FALSE;
+BOOL bDisableMAVLinkDevice = FALSE;
 BOOL bDisableSwarmonDevice = FALSE;
 BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
@@ -219,6 +220,9 @@ BOOL bPingerDetection = FALSE;
 BOOL bPingerTrackingControl = FALSE;
 int pingertrackingvideoid = 0; 
 
+// Simulator variables.
+BOOL bGPSOKSimulator = FALSE;
+
 // CISCREA variables.
 BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;
 
@@ -251,6 +255,10 @@ BOOL bPauseMT = FALSE, bRestartMT = FALSE;
 // NMEADevice variables.
 BOOL bGPSOKNMEADevice = FALSE;
 BOOL bPauseNMEADevice = FALSE, bRestartNMEADevice = FALSE;
+
+// MAVLinkDevice variables.
+BOOL bGPSOKMAVLinkDevice = FALSE;
+BOOL bPauseMAVLinkDevice = FALSE, bRestartMAVLinkDevice = FALSE;
 
 // SwarmonDevice variables.
 BOOL bPauseSwarmonDevice = FALSE, bRestartSwarmonDevice = FALSE;
@@ -308,6 +316,7 @@ BOOL bBrakeControl = FALSE;
 BOOL bHeadingControl = FALSE;
 BOOL bDepthControl = FALSE;
 BOOL bAltitudeSeaFloorControl = FALSE;
+BOOL bGPSLocalization = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
 
@@ -333,6 +342,3 @@ char logpipelinetaskfilename[MAX_BUF_LEN];
 
 FILE* logballtaskfile = NULL;
 char logballtaskfilename[MAX_BUF_LEN];
-
-FILE* logblackboxtaskfile = NULL;
-char logblackboxtaskfilename[MAX_BUF_LEN];

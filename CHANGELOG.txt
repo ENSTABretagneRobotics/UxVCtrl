@@ -1,3 +1,14 @@
+74
+Added RC mode option ('7' key) for a better manual control of TREX.
+Improved GUI depending on the robid.
+Added state observer for TREX.
+Replaced bDisableGPS by bDisableNMEADevice.
+Begginning of MAVLinkDevice integration.
+Added QUADRO_ROBID.
+Added bGPSOKNMEADevice, bGPSOKMT, bGPSOKMAVLinkDevice, bGPSOKSimulator to indicate if there is a GPS fix.
+Added start/stopgpslocalization commands, bGPSLocalization enabled by default (however GPS position is only used if GPS fix).
+Corrected potential bug where GPS was setting z_mes.
+
 73
 Added Compat.bat to improve compatibility of Visual Studio projects when necessary.
 

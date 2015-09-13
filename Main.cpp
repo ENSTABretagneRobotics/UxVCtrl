@@ -24,6 +24,9 @@
 #include "RazorAHRS.h"
 #include "MT.h"
 #include "NMEADevice.h"
+#ifdef ENABLE_MAVLINK_SUPPORT
+#include "MAVLinkDevice.h"
+#endif // ENABLE_MAVLINK_SUPPORT
 #include "SwarmonDevice.h"
 #ifdef ENABLE_LABJACK_SUPPORT
 #include "UE9A.h"
@@ -61,6 +64,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER RazorAHRSThreadId;
 	THREAD_IDENTIFIER MTThreadId;
 	THREAD_IDENTIFIER NMEADeviceThreadId;
+#ifdef ENABLE_MAVLINK_SUPPORT
+	THREAD_IDENTIFIER MAVLinkDeviceThreadId;
+#endif // ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER SwarmonDeviceThreadId;
 #ifdef ENABLE_LABJACK_SUPPORT
 	THREAD_IDENTIFIER UE9AThreadId;
@@ -108,7 +114,10 @@ int main(int argc, char* argv[])
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
-	if (!bDisableGPS) CreateDefaultThread(NMEADeviceThread, NULL, &NMEADeviceThreadId);
+	if (!bDisableNMEADevice) CreateDefaultThread(NMEADeviceThread, NULL, &NMEADeviceThreadId);
+#ifdef ENABLE_MAVLINK_SUPPORT
+	if (!bDisableMAVLinkDevice) CreateDefaultThread(MAVLinkDeviceThread, NULL, &MAVLinkDeviceThreadId);
+#endif // ENABLE_MAVLINK_SUPPORT
 	if (!bDisableSwarmonDevice) CreateDefaultThread(SwarmonDeviceThread, NULL, &SwarmonDeviceThreadId);
 #ifdef ENABLE_LABJACK_SUPPORT
 	if (!bDisableUE9A) CreateDefaultThread(UE9AThread, NULL, &UE9AThreadId);
@@ -202,7 +211,10 @@ int main(int argc, char* argv[])
 	if (!bDisableUE9A) WaitForThread(UE9AThreadId);
 #endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSwarmonDevice) WaitForThread(SwarmonDeviceThreadId);
-	if (!bDisableGPS) WaitForThread(NMEADeviceThreadId);
+#ifdef ENABLE_MAVLINK_SUPPORT
+	if (!bDisableMAVLinkDevice) WaitForThread(MAVLinkDeviceThreadId);
+#endif // ENABLE_MAVLINK_SUPPORT
+	if (!bDisableNMEADevice) WaitForThread(NMEADeviceThreadId);
 	if (!bDisableMT) WaitForThread(MTThreadId);
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 	if (!bDisableP33x) WaitForThread(P33xThreadId);

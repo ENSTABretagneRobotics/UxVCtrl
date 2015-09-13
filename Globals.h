@@ -47,6 +47,7 @@
 #define SIMULATOR_ROBID_MASK 0x11111111
 #define SAUCISSE_CLASS_ROBID_MASK 0x0000000E
 #define CISCREA_ROBID_MASK 0x000000E0
+#define AERIAL_ROBID_MASK 0xE0000000
 
 // Simulators id.
 #define SUBMARINE_SIMULATOR_ROBID 0x00000001
@@ -64,6 +65,7 @@
 #define SAILBOAT_ROBID 0x00040000
 #define BUGGY_ROBID 0x02000000
 #define TREX_ROBID 0x04000000
+#define QUADRO_ROBID 0x20000000
 
 #define LOG_FOLDER "log/"
 #define PIC_FOLDER "pic/"
@@ -157,7 +159,8 @@ extern BOOL bDisableHokuyo;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
-extern BOOL bDisableGPS;
+extern BOOL bDisableNMEADevice;
+extern BOOL bDisableMAVLinkDevice;
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
@@ -308,6 +311,9 @@ extern BOOL bPingerDetection;
 extern BOOL bPingerTrackingControl;
 extern int pingertrackingvideoid;
 
+// Simulator variables.
+extern BOOL bGPSOKSimulator;
+
 // CISCREA variables.
 extern BOOL bPauseCISCREA, bRestartCISCREA;
 
@@ -340,6 +346,10 @@ extern BOOL bPauseMT, bRestartMT;
 // NMEADevice variables.
 extern BOOL bGPSOKNMEADevice;
 extern BOOL bPauseNMEADevice, bRestartNMEADevice;
+
+// MAVLinkDevice variables.
+extern BOOL bGPSOKMAVLinkDevice;
+extern BOOL bPauseMAVLinkDevice, bRestartMAVLinkDevice;
 
 // SwarmonDevice variables.
 extern BOOL bPauseSwarmonDevice, bRestartSwarmonDevice;
@@ -397,6 +407,7 @@ extern BOOL bBrakeControl;
 extern BOOL bHeadingControl;
 extern BOOL bDepthControl;
 extern BOOL bAltitudeSeaFloorControl;
+extern BOOL bGPSLocalization;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 
@@ -422,9 +433,6 @@ extern char logpipelinetaskfilename[MAX_BUF_LEN];
 
 extern FILE* logballtaskfile;
 extern char logballtaskfilename[MAX_BUF_LEN];
-
-extern FILE* logblackboxtaskfile;
-extern char logblackboxtaskfilename[MAX_BUF_LEN];
 
 inline int InitGlobals(void)
 {

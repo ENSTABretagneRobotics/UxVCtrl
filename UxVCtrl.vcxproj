@@ -103,6 +103,7 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
     <ClCompile Include="Hardware\Maestro.cpp" />
+    <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\Sail.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
     <ClInclude Include="Hardware\Maestro.h" />
+    <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\Sail.h" />
     <ClInclude Include="Observer.h" />
@@ -249,12 +251,13 @@
     <ClInclude Include="Hardware\RazorAHRS.h" />
     <ClInclude Include="Hardware\RS232Port.h" />
     <ClInclude Include="Hardware\Seanet.h" />
-    <CustomBuild Include="Hardware\SSC32.h" />
+    <ClInclude Include="Hardware\SSC32.h" />
     <ClInclude Include="Hardware\SwarmonDevice.h" />
     <ClInclude Include="Hardware\UE9A.h" />
     <ClInclude Include="Hardware\Video.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="MAVLinkDevice0.txt" />
     <Text Include="UxVCtrl.txt" />
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />

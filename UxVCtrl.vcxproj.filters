@@ -219,6 +219,9 @@
     <ClCompile Include="Hardware\MiniSSC.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\MAVLinkDevice.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -485,11 +488,17 @@
     <ClInclude Include="Hardware\Sail.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\SSC32.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
     <ClInclude Include="Hardware\Hokuyo.h">
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h">
       <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MAVLinkDevice.h">
+      <Filter>Hardware</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -560,13 +569,11 @@
     <Text Include="Hokuyo0.txt">
       <Filter>Input Files</Filter>
     </Text>
+    <Text Include="MAVLinkDevice0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="Hardware\SSC32.h">
-      <Filter>Hardware</Filter>
-    </CustomBuild>
   </ItemGroup>
 </Project>

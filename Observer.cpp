@@ -48,6 +48,9 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	vtwindhat = vtwind;
 	LeaveCriticalSection(&StateVariablesCS);
 
+	// GPS localization activated by default, use start/stopgpslocalization commands to enable/disable...
+	bGPSLocalization = TRUE;
+
 	t = 0;
 
 	StartChrono(&chrono);
@@ -84,23 +87,21 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		if (robid & SUBMARINE_ROBID_MASK)
 		{
-			// Estimation du nouvel état du sous-marin simulé.
-			// Observateur d'état (juste un simulateur=dead reckoning).
+			// State observer (just dead reckoning simulator...).
 			xhat = xhat+dt*(vxyhat*Cos(thetahat)+vchat*Cos(psichat)+xdotnoise);
 			yhat = yhat+dt*(vxyhat*Sin(thetahat)+vchat*Sin(psichat)+ydotnoise);
 			//zhat = Min(zhat+dt*(u3*alphazhat+vzuphat+zdotnoise),interval(0.0)); // z always negative.
+			//zhat = zhat & (interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat);
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
 			//thetahat = thetahat+dt*((u1-u2)*alphaomegahat+thetadotnoise);
+			//thetahat = thetahat & interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
+			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
 			vxyhat = (
 				(1.0-dt*alphafvxyhat)*vxyhat
 				+dt*(u1+u2)*alphavxyhat
 				+dt*vxydotnoise
 				); // Factorization.
 			// Should add vc,psic estimation influence in vxy?
-
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
-			//thetahat = thetahat & interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			//zhat = zhat & (interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat);
 
 			// SAUC'ISSE and SARDINE can measure omega.
 			if (robid & SAUCISSE_CLASS_ROBID_MASK)
@@ -135,13 +136,31 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				//printf("omegahat = %f\n", Center(omegahat));
 			}
 		}
+		else if (robid == TREX_ROBID)
+		{
+			xhat = xhat+dt*(alphavxyhat*(u1+u2)*Cos(thetahat)+xdotnoise);
+			yhat = yhat+dt*(alphavxyhat*(u1+u2)*Sin(thetahat)+ydotnoise);
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
+			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
+			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+		}
+		else if (robid == BUGGY_ROBID)
+		{
+			xhat = xhat+dt*(alphavxyhat*u*Cos(thetahat)*Cos(alphafomegahat*uw)+xdotnoise);
+			yhat = yhat+dt*(alphavxyhat*u*Sin(thetahat)*Cos(alphafomegahat*uw)+ydotnoise);
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
+			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
+			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+		}
 		else
 		{
 			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
 			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
+			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
+			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
 			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
 
 			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
@@ -155,6 +174,23 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			//}
 			//vxyhat = 0.9*vxyhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err));
 			//printf("vxyhat = %f\n", Center(vxyhat));
+		}
+
+		if (bGPSLocalization)
+		{
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			{
+				// Should add speed...?
+				// Should add altitude with a big error...?
+				// Assume that x_mes,y_mes is only updated by GPS...
+				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
+				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+				}
+			}
 		}
 
 		// Log.

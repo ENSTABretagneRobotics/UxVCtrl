@@ -1,32 +1,28 @@
-buggy : afficher aussi u_max, problème reconnection GPS Galaxy S
 
 données aberrantes vxyhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 enregistrer cog sog dans un des logs
 
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
-dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
-si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstragey et forcesailupdate...
-
-setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
-kalman pour retrouver vent vrai?
-lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtrer en regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
-prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 mission par sms : option /s check missions from sms.txt or sms folder...
 commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
 ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
-
-nmeadevice : add hour minute second day month year from nmea2xml_wrsc2015
 
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 
 utiliser bCleanup dans tous les threads pour le cvSet()?
+
+manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
+pas de setmissionaction init et end : peut-être que j'ai fait un copier coller sans eux? szAction non protégé...
+sauvegarder e,phi,delta_theta dans wall?
+
+reg cap pas assez rapide à cause dérivée, tester avec vieux code...
+régulation à grande vitesse saucisse à faire un peu comme sardine
 
 sonar, localisation, wf
 commencer à prévoir dl en utilisant staticloc avec la position des pings dessinée avec le dr, pour l'instant il faudrait juste appeler dl toutes les 10s par exemple et le seul avantage par rapport à static serait de ne pas devoir arrêter le robot...
@@ -42,7 +38,8 @@ repère dans lequel dessiner image sonar vs detection d'obstacles
 temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
-observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...
+hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
+synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
 dans logstate rajouter tv_sec;tv_usec; pour pouvoir synchroniser temps mission
 
 Altitude sonar
@@ -64,21 +61,9 @@ MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDis
 (walltracking overlay fait aussi walldetect, wallavoidance)
 bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
 pouvoir lancer un opencvgui independamment du nombre de cameras, dynamic resolution changes?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
-synchro gui etas_wheel à faire (touches et affichage pour u_max, uw_max...), synchro périph faite
 no opencvgui, hang after exit on linux? cvStartWindowThread()... now the keys are always received by the 2 windows, not independently...
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
-
-0 bizarres dans depth des logmission du harbor alors que pas de problèmes dans les données brutes pression...->manque statevariables cs dans MissionLogThread
-idem logwall? theta_wall... voir Ball...
-pas de setmissionaction init et end : peut-être que j'ai fait un copier coller sans eux? szAction non protégé...
-il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le nuc?
-zhat à 0 aussi dans logstate, mais rien vu dans pressure...
-
-reg cap pas assez rapide à cause dérivée, tester avec vieux code...
-régulation à grande vitesse saucisse à faire un peu comme sardine
-
-sauvegarder e,phi,delta_theta dans wall?
-synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
+opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
 
 acousticmodemlocalization
 commande comme setstateestimation/gpslocalization qui contracte la position par acoustique
@@ -105,13 +90,18 @@ ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
 quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
 remplacer Sail par IM483I
-mavlink device (ardupilot, pixhawk...)
+mavlink device (ardupilot, pixhawk, px4flow...)
+voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)
 
-GPS, waypoints
+GPS, NMEA, waypoints
+mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status? UTCValid semble le plus strict donc le plus sûr?
+hdop?
+altitude GPS?
+utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
+problème reconnection GPS Galaxy S? c'est peut-être juste qu'il capte pas bien...
+nmeadevice : add hour minute second day month year from nmea2xml_wrsc2015
+MT, WeatherStation specific NMEA messages...
 pour la station, générer une croix autour du waypoint...
-mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status?
-régler bGPSOK en fonction de gpsstatus et status mti-g?->il faut 2 variables globales différentes, bGPSOKNMEADevice pour nmea et bGPSOKMT pour mt... et pour simu?
-commandes startgpslocalization/stopgpslocalization (dans observer?)
 
 Obstacle avoidance
 surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
@@ -124,18 +114,19 @@ configdistancecomputation
 distancecomputation
 commande waitdistanceless/more/wgs x y d
 
-attention aux valeurs au départ d'initialisation, attention au setstateestimation...
-surveiller divisions par 0..., vérifier cohérence paramètres par défaut
-surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
+voilier
+dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
+si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstragey et forcesailupdate...
+setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
+kalman pour retrouver vent vrai?
+lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtrer en regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
+prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 CISCREA
 après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
 pouvoir afficher period pour tous les threads
 reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte paramètres du fichier de config, voir noms/numérotation des moteurs, clockwise
 regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
-
-NMEA
-MT, WeatherStation specific messages...
 
 changer observer (et éventuellement simulator) pour que omegadot=alphaomega*(u1-u2)-alphafomega*omega (au lieu de thetadot=alphaomega*(u1-u2)...)
 si on a une IMU, on l'utilise pour omegahat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid, il faudrait rajouter le support des trames NMEA donnant la vitesse)
@@ -163,16 +154,17 @@ should add variable datacounter for each device?
 rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire les données de chaque ligne (temps absolu ou relatif en option)
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
+attention aux valeurs au départ d'initialisation, attention au setstateestimation...
+surveiller divisions par 0..., vérifier cohérence paramètres par défaut
+surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
+
 deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme WaitForUserInput() au lieu de fgets...
-
-opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
-
-image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 
 robid, robid mask : regrouper sailboat et motorboat ensemble pour laisser de la place pour UGV et UAV?
 robid log file?
 dans UxVCtrl.txt, ce serait peut-être plus logique de mettre des bEnableDevice au lieu de bDisableDevice...
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
+image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 gestion vagues et z, courants et vxy, wind...
 arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, remoteopencv gui
 rmtcommand (client serait juste telnet)
@@ -182,6 +174,18 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+0 bizarres dans depth des logmission du harbor alors que pas de problèmes dans les données brutes pression...
+il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le nuc?
+zhat à 0 aussi dans logstate, mais rien vu dans pressure... attention, il y avait du z_mes pris par GPS?
+
+bGPSOKNMEADevice pour nmea, bGPSOKMT pour mt, bGPSOKMAVLinkDevice pour mavlink et bGPSOKSimulator pour simu...
+commandes startgpslocalization/stopgpslocalization (dans observer?)
+
+observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...
+
+synchro gui etas_wheel à faire (touches et affichage pour u_max, uw_max...), synchro périph faite
+buggy, trex... : afficher aussi u_max
 
 replaceinfile enable disable kinect or new config (e.g. Release_compat), also for ciscrea, labjack, because of their dependencies (add new defines, check .gitignore...)
 

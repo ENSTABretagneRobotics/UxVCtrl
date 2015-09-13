@@ -60,7 +60,11 @@
 %
 %gpssetenvcoordposition t (double [0,oo[ timeout in s, the function blocks until the GPS is available or the timeout is reached. Set the position of the environment coordinate system from the current position using GPS. If the GPS is not available or reports that the data might be unreliable, the environment coordinate system is not modified.)
 %
-%gpslocalization t (double [0,oo[ timeout in s, the function blocks until the GPS is available or the timeout is reached. Estimation of the current position using GPS. If the GPS is not available or reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
+%gpslocalization t (double [0,oo[ timeout in s, the function blocks until [the GPS is available or] the timeout is reached. Estimation of the current position using GPS. If the GPS is not available or reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
+%
+%startgpslocalization
+%
+%stopgpslocalization
 %
 %setstateestimationwgs lat lat_err_m long long_err_m alt alt_err_m orientation orientation_err speed speed_err rotation_speed rotation_speed_err (lat, long, alt : double ]-oo,oo[ current GPS position estimation in decimal deg and m to indicate to the default dead reckoning localization algorithm the current submarine state, lat_err_m, long_err_m, alt_err_m : double [0,oo[ error in m, orientation : double [0,360[ mod(360) current angle to the North in deg, orientation_err : double [0,360[ error in deg, speed : double ]-oo,oo[ current speed in m/s, speed_err : double [0,oo[ error in m/s, rotation_speed : double ]-oo,oo[ current rotation speed to the North in deg/s, rotation_speed_err : double [0,oo[ error in deg/s. Usually used in the beginning of a mission to indicate the starting point. This replaces any previously estimated position)
 %

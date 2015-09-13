@@ -14,6 +14,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 {
 	NMEADEVICE nmeadevice;
 	NMEADATA nmeadata;
+	double dval = 0;
 	BOOL bConnected = FALSE;
 	int i = 0;
 	char szSaveFilePath[256];
@@ -23,7 +24,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 
 	memset(&nmeadevice, 0, sizeof(NMEADEVICE));
 
-	//bGPSOKNMEADevice = FALSE;
+	bGPSOKNMEADevice = FALSE;
 
 	for (;;)
 	{
@@ -34,7 +35,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (bConnected)
 			{
 				printf("NMEADevice paused.\n");
-				//bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice = FALSE;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}
@@ -48,7 +49,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a NMEADevice.\n");
-				//bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice = FALSE;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}
@@ -93,7 +94,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			}
 			else 
 			{
-				//bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice = FALSE;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -103,18 +104,20 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (GetLatestDataNMEADevice(&nmeadevice, &nmeadata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
+				
+				//printf("GPS_quality_indicator : %d, status : %c\n", nmeadata.GPS_quality_indicator, nmeadata.status);
 
 				if ((nmeadata.GPS_quality_indicator > 0)||(nmeadata.status == 'A'))
 				{
 					//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
 					latitude = nmeadata.Latitude;
 					longitude = nmeadata.Longitude;
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &z_mes);
-					//bGPSOKNMEADevice = TRUE;
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+					bGPSOKNMEADevice = TRUE;
 				}
 				else
 				{
-					//bGPSOKNMEADevice = FALSE;
+					bGPSOKNMEADevice = FALSE;
 				}
 
 				// Should check better if valid...
@@ -141,7 +144,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			else
 			{
 				printf("Connection to a NMEADevice lost.\n");
-				//bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice = FALSE;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}		
@@ -150,7 +153,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 		if (bExit) break;
 	}
 
-	//bGPSOKNMEADevice = FALSE;
+	bGPSOKNMEADevice = FALSE;
 
 	if (nmeadevice.pfSaveFile != NULL)
 	{
