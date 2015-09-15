@@ -1246,6 +1246,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartNMEADevice = TRUE;
 		bPauseNMEADevice = ival1;
 	}
+	else if (sscanf(line, "mavlinkdeviceconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "MAVLinkDevice0.txt", strlen("MAVLinkDevice0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "MAVLinkDevice0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartMAVLinkDevice = TRUE;
+		bPauseMAVLinkDevice = ival1;
+	}
 	else if (sscanf(line, "swarmondeviceconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "SwarmonDevice0.txt", strlen("SwarmonDevice0.txt")) != 0)

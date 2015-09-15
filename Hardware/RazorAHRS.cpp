@@ -26,7 +26,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(50);
 
 		if (bPauseRazorAHRS) 
 		{ 

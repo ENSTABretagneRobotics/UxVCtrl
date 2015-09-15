@@ -15,6 +15,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	CHRONO chrono_v;
 	CHRONO chrono_omega;
 	double dt = 0, t = 0, t0 = 0;
+	struct timeval tv;
 	//double dt_chrono = 0;
 	//interval xhat_prev_old, yhat_prev_old, thetahat_prev_old;
 	double cosfilteredwinddir = 0, sinfilteredwinddir = 0;
@@ -33,7 +34,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	}
 
 	fprintf(logstatefile, 
-		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;\n"
+		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;tv_sec;tv_usec;\n"
 		); 
 	fflush(logstatefile);
 
@@ -65,6 +66,13 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		dt = t-t0;
 
 		//printf("ObserverThread period : %f s.\n", dt);
+
+		// Time...
+		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
+		{
+			tv.tv_sec = 0;
+			tv.tv_usec = 0;
+		}
 
 		EnterCriticalSection(&StateVariablesCS);
 
@@ -204,14 +212,15 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		// Log.
 		fprintf(logstatefile, 			
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
 			t, 
 			Center(xhat), Center(yhat), Center(zhat), Center(thetahat), 
 			Center(vxyhat), Center(omegahat), 
 			u1, u2, u3, 
 			u, uw,
 			xhat.inf, xhat.sup, yhat.inf, yhat.sup, zhat.inf, zhat.sup, thetahat.inf, thetahat.sup, 
-			vxyhat.inf, vxyhat.sup, omegahat.inf, omegahat.sup 
+			vxyhat.inf, vxyhat.sup, omegahat.inf, omegahat.sup,
+			(int)tv.tv_sec, (int)tv.tv_usec
 			);
 		fflush(logstatefile);
 

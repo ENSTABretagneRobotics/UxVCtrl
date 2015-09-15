@@ -8,6 +8,8 @@ COM12
 % bSaveRawData
 1
 % quality_threshold
-127
+1
 % flow_comp_m_threshold
-0.001
+0.0
+% bDefaultVrToZero
+0

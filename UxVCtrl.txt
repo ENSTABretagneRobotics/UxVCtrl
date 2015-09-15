@@ -19,9 +19,9 @@
 % Buggy
 %0x02000000
 % TREX
-%0x04000000
+0x04000000
 % QUADRO
-0x20000000
+%0x20000000
 % nbvideo (max 3)
 1
 % videoimgwidth
@@ -63,7 +63,7 @@
 % bDisableNMEADevice
 1
 % bDisableMAVLinkDevice
-0
+1
 % bDisableSwarmonDevice
 1
 % bDisableUE9A
@@ -144,9 +144,9 @@
 % d_max_err (in m, modified by Seanet)
 0.1
 % alphavxyhat.inf
-2.4
+0.9
 % alphavxyhat.sup
-2.6
+1.1
 % alphaomegahat.inf
 0.7
 % alphaomegahat.sup 

@@ -13,6 +13,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 {
 	CHRONO chrono;
 	double dt = 0, t = 0, t0 = 0;
+	struct timeval tv;
+
 	double dval = 0, d1 = 0, d2 = 0;
 
 	double vc = 0, psic = 0, hw = 0;
@@ -33,7 +35,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	}
 
 	fprintf(logsimufile, 
-		"t (in s);x (in m);y (in m);z (in m);theta (in rad);vxy (in m/s);omega (in rad/s);alpha (in rad);d (in m);u1;u2;u3;\n"
+		"t (in s);x (in m);y (in m);z (in m);theta (in rad);vxy (in m/s);omega (in rad/s);alpha (in rad);d (in m);u1;u2;u3;tv_sec;tv_usec;\n"
 		); 
 	fflush(logsimufile);
 
@@ -52,6 +54,15 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		t0 = t;
 		GetTimeElapsedChrono(&chrono, &t);
 		dt = t-t0;
+
+		//printf("SimulatorThread period : %f s.\n", dt);
+
+		// Time...
+		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
+		{
+			tv.tv_sec = 0;
+			tv.tv_usec = 0;
+		}
 
 		EnterCriticalSection(&StateVariablesCS);
 
@@ -140,8 +151,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 
 		// Log.
-		fprintf(logsimufile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
-			t, x, y, z, theta, vxy, omega, alpha, d, u1, u2, u3
+		fprintf(logsimufile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
+			t, x, y, z, theta, vxy, omega, alpha, d, u1, u2, u3,
+			(int)tv.tv_sec, (int)tv.tv_usec
 			);
 		fflush(logsimufile);
 

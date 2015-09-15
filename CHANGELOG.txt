@@ -1,3 +1,13 @@
+76
+Updated MAVLinkDevice.
+Decreased Razor, MT, MAVLink period because of fast ground and aerial robots.
+Hokuyo0.txt configuration file corrected.
+GPS fix info now displayed on GUI.
+Added tv_sec;tv_usec; in logstate and logsimu.
+Changed Hokuyo log format to reduce size.
+Corrected O and G keys so that they correspond better to the commands.
+Added bEnableZQSDFullMode.
+
 75
 Continuation of MAVLinkDevice integration.
 Corrected QUADRO_ROBID considered as invalid parameter.

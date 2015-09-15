@@ -94,7 +94,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 						break;
 					}
 					fprintf(hokuyo.pfSaveFile, 
-						"tv_sec;tv_usec;angle (in rad, 0 is front);distance (in m);\n"
+						"tv_sec;tv_usec;angle (in rad, 0 is front);distance (in m);...\n"
 						); 
 					fflush(hokuyo.pfSaveFile);
 				}
@@ -115,18 +115,23 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 					tv.tv_sec = 0;
 					tv.tv_usec = 0;
 				}
-				EnterCriticalSection(&StateVariablesCS);
 
-				// 
-
-				LeaveCriticalSection(&StateVariablesCS);
+				//EnterCriticalSection(&StateVariablesCS);
+				//
+				//LeaveCriticalSection(&StateVariablesCS);
 
 				if (hokuyo.bSaveRawData)
 				{
+					//for (i = 0; i < hokuyo.StepCount; i++)
+					//{
+					//	fprintf(hokuyo.pfSaveFile, "%d;%d;%.3f;%.3f;\n", tv.tv_sec, tv.tv_usec, angles[i], distances[i]);
+					//}
+					fprintf(hokuyo.pfSaveFile, "%d;%d;", tv.tv_sec, tv.tv_usec);
 					for (i = 0; i < hokuyo.StepCount; i++)
 					{
-						fprintf(hokuyo.pfSaveFile, "%d;%d;%f;%f;\n", tv.tv_sec, tv.tv_usec, angles[i], distances[i]);
+						fprintf(hokuyo.pfSaveFile, "%.3f;%.3f;", angles[i], distances[i]);
 					}
+					fprintf(hokuyo.pfSaveFile, "\n");
 					fflush(hokuyo.pfSaveFile);
 				}
 			}

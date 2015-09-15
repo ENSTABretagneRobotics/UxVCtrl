@@ -15,7 +15,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	MAVLINKDEVICE mavlinkdevice;
 	struct timeval tv;
 	MAVLINKDATA mavlinkdata;
-	//double dval = 0;
+	double dval = 0;
 	BOOL bConnected = FALSE;
 	int i = 0;
 	char szSaveFilePath[256];
@@ -29,7 +29,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(50);
 
 		if (bPauseMAVLinkDevice)
 		{
@@ -122,10 +122,35 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 				
+				//if (mavlinkdata.gps_raw_int.fix_type > 0) printf("fix_type : %d\n", (int)mavlinkdata.gps_raw_int.fix_type);
+				
+				if (mavlinkdata.gps_raw_int.fix_type >= 2)
+				{
+					//printf("%f;%f\n", mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.long/10000000.0);
+					latitude = mavlinkdata.gps_raw_int.lat/10000000.0;
+					longitude = mavlinkdata.gps_raw_int.lon/10000000.0;
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+					bGPSOKMAVLinkDevice = TRUE;
+				}
+				else
+				{
+					bGPSOKMAVLinkDevice = FALSE;
+				}
+
+				if (fabs(mavlinkdata.attitude.yaw) > 0) yaw = mavlinkdata.attitude.yaw;
+				if (fabs(mavlinkdata.attitude.pitch) > 0) pitch = mavlinkdata.attitude.pitch;
+				if (fabs(mavlinkdata.attitude.roll) > 0) roll = mavlinkdata.attitude.roll;
+
+				if (fabs(mavlinkdata.attitude.yaw) > 0) theta_mes = fmod_2PI(M_PI/2.0-mavlinkdata.attitude.yaw-angle_env);
+				if (fabs(mavlinkdata.attitude.yawspeed) > 0) omega_mes = -mavlinkdata.attitude.yawspeed;
+
 				// Better to invert x and y like on Pixhawk...
 
-				vrx = 0;
-				vry = 0;
+				if (mavlinkdevice.bDefaultVrToZero)
+				{
+					vrx = 0;
+					vry = 0;
+				}
 
 				if (mavlinkdata.optical_flow.quality >= mavlinkdevice.quality_threshold)
 				{
@@ -142,8 +167,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					fprintf(mavlinkdevice.pfSaveFile, 
 						"%d;%d;%d;%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;%d;"
-						"%f;%f;%f;%f;%f;%f;"
-						"%d;%d;%f;%f;%d;%f;"
+						"%.4f;%.4f;%.4f;%.4f;%.4f;%.4f;"
+						"%d;%d;%.4f;%.4f;%d;%.3f;"
 						"%d;%f;%f;%f;%f;%f;%d;%d;%d;%f;"
 						"\n", 
 						(int)tv.tv_sec, (int)tv.tv_usec, (int)mavlinkdata.optical_flow.sensor_id, (int)mavlinkdata.heartbeat.type, (int)mavlinkdata.heartbeat.autopilot,

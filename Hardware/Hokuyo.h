@@ -389,7 +389,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		pHokuyo->EndStep = 725;
 		pHokuyo->ClusterCount = 0;
 		pHokuyo->ScanInterval = 0;
-		pHokuyo->bContinuousNumberOfScans = 0;
+		pHokuyo->bContinuousNumberOfScans = 1;
 		pHokuyo->alpha_max_err = 0.01;
 		pHokuyo->d_max_err = 0.1;
 

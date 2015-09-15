@@ -56,6 +56,7 @@ struct MAVLINKDEVICE
 	BOOL bSaveRawData;
 	int quality_threshold;
 	double flow_comp_m_threshold;
+	BOOL bDefaultVrToZero;
 };
 typedef struct MAVLINKDEVICE MAVLINKDEVICE;
 
@@ -234,8 +235,9 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		pMAVLinkDevice->BaudRate = 115200;
 		pMAVLinkDevice->timeout = 1000;
 		pMAVLinkDevice->bSaveRawData = 1;
-		pMAVLinkDevice->quality_threshold = 127;
-		pMAVLinkDevice->flow_comp_m_threshold = 0.001;
+		pMAVLinkDevice->quality_threshold = 1;
+		pMAVLinkDevice->flow_comp_m_threshold = 0.0;
+		pMAVLinkDevice->bDefaultVrToZero = 0;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -253,6 +255,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (sscanf(line, "%d", &pMAVLinkDevice->quality_threshold) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMAVLinkDevice->flow_comp_m_threshold) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->bDefaultVrToZero) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else
@@ -264,7 +268,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	if ((pMAVLinkDevice->quality_threshold < 0)||(pMAVLinkDevice->quality_threshold >= 256))
 	{
 		printf("Invalid parameter : quality_threshold.\n");
-		pMAVLinkDevice->quality_threshold = 127;
+		pMAVLinkDevice->quality_threshold = 1;
 	}
 
 	// Used to save raw data, should be handled specifically...

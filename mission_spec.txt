@@ -126,6 +126,8 @@
 %
 %nmeadeviceconfig NMEADevice.txt bPause
 %
+%mavlinkdeviceconfig MAVLinkDevice.txt bPause
+%
 %swarmondeviceconfig SwarmonDevice.txt bPause
 %
 %ue9aconfig UE9A.txt bPause

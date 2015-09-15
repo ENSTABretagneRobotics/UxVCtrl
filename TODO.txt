@@ -1,4 +1,13 @@
 
+mti g does not have gps?
+rajouter 2ème mavlink pour ardupilot
+should change nuc-3 option wrt windows...
+controle à distance des touches par wifi pas top (interruptions...)
+decrease opencvgui period for better effect on keys trex? RDP UDP causes key pressed loss? repeat key windows param?
+des fois il tourne quand on appuie sur avant, recabler les variateurs/moteurs pour que leur marche av corresponde (fonction frein dynamique), détermnier marche av en fonction couleurs fils et réglages actuels?
+
+add QUADRO_WORKSPACE in USERUpdtQuick.bat if needed...
+
 données aberrantes vxyhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 enregistrer cog sog dans un des logs
@@ -39,8 +48,6 @@ temps de convergence au départ pour localisation gps et peut-être sonar quand on
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
-synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
-dans logstate rajouter tv_sec;tv_usec; pour pouvoir synchroniser temps mission
 
 Altitude sonar
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
@@ -174,6 +181,9 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
+dans logstate rajouter tv_sec;tv_usec; pour pouvoir synchroniser temps tasks et raw data
 
 sauvegarder toutes les données presque brutes px4flow pour postprocessing (flow, flow_rad...), angles ardupilot aussi (attitude mid 30, gps, altitude...)?
 mais on dirait que je reçois pas optical_flow_rad... changer de firmware?

@@ -32,6 +32,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispRecordingCircle = FALSE;
 	BOOL bDispPlayingTriangle = FALSE;
 	BOOL bEnableRCMode = FALSE;
+	BOOL bEnableZQSDFullMode = FALSE;
 	BOOL bZQSDPressed = FALSE;
 	CvPoint PlayingTrianglePoints[3];
 	int nbPlayingTrianglePoints = 3;
@@ -48,11 +49,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	{
 	case TREX_ROBID:
 		bEnableRCMode = TRUE;
-		//printf("RC mode enabled.\n");
+		bEnableZQSDFullMode = TRUE;
 		break;
 	default:
 		bEnableRCMode = FALSE;
-		//printf("RC mode disabled.\n");
+		bEnableZQSDFullMode = FALSE;
 		break;
 	}
 
@@ -197,6 +198,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case SAILBOAT_ROBID:
 			case BUGGY_ROBID:
 				break;
+			case HOVERCRAFT_ROBID:
+			case TREX_ROBID:
+				if (bEnableZQSDFullMode) u = u_max;
+				if (!bHeadingControl) uw = 0;
+				break;
 			default:
 				if (!bHeadingControl) uw = 0;
 				break;
@@ -212,6 +218,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case BUGGY_ROBID:
+				break;
+			case HOVERCRAFT_ROBID:
+			case TREX_ROBID:
+				if (bEnableZQSDFullMode) u = -u_max;
+				if (!bHeadingControl) uw = 0;
 				break;
 			default:
 				if (!bHeadingControl) uw = 0;
@@ -229,6 +240,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				uw += 0.1*uw_max;
 				uw = (uw > uw_max)? uw_max: uw;
+				switch (robid)
+				{
+				case HOVERCRAFT_ROBID:
+				case TREX_ROBID:
+					if (bEnableZQSDFullMode) uw = uw_max;
+					break;
+				default:
+					break;
+				}
 			}
 			bZQSDPressed = TRUE;
 			break;
@@ -242,6 +262,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				uw -= 0.1*uw_max;
 				uw = (uw < -uw_max)? -uw_max: uw;
+				switch (robid)
+				{
+				case HOVERCRAFT_ROBID:
+				case TREX_ROBID:
+					if (bEnableZQSDFullMode) uw = -uw_max;
+					break;
+				default:
+					break;
+				}
 			}
 			bZQSDPressed = TRUE;
 			break;
@@ -379,25 +408,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
 		case 'O':
 			// gpssetenvcoordposition
-			//if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKSimulator)
-			//{
-			// We do not use GPS altitude for that as it is not reliable...
-			lat_env = latitude; long_env = longitude;
-			//}
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			{
+				// We do not use GPS altitude for that as it is not reliable...
+				// Assume that latitude,longitude is only updated by GPS...
+				lat_env = latitude; long_env = longitude;
+			}
 			break;
 		case 'G':
 			// gpslocalization
-			//if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKSimulator)
-			//{
-			// Should add speed...?
-			xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
-			yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
-			if (xhat.isEmpty || yhat.isEmpty)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
 			{
-				xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-				yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+				// Should add speed...?
+				// Assume that x_mes,y_mes is only updated by GPS...
+				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
+				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+				}
 			}
-			//}
 			break;
 		case 'Z':
 			// (re)setstateestimation
@@ -423,6 +454,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
+					// P is likely to be with a small width so we expand...
 					xhat = P[1]+interval(-x_max_err,x_max_err);
 					yhat = P[2]+interval(-y_max_err,y_max_err);
 				}
@@ -486,7 +518,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
-				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode)\n");
+				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode)\n");
 			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
@@ -515,6 +547,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bEnableRCMode = !bEnableRCMode; 
 			if (bEnableRCMode) printf("RC mode enabled.\n");
 			else printf("RC mode disabled.\n");
+			break;
+		case '1': 
+			bEnableZQSDFullMode = !bEnableZQSDFullMode; 
+			if (bEnableZQSDFullMode) printf("ZQSD full speed mode enabled.\n");
+			else printf("ZQSD full speed mode disabled.\n");
 			break;
 		case 27: // ESC
 			bExit = TRUE;
@@ -625,6 +662,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(0,255,128));
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator) strcpy(szText, "GPS FIX"); else strcpy(szText, "NO FIX");
+			offset += 16;
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(0,255,128));
+			else cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,0));
 			if (bDispSOG)
 			{
 				sprintf(szText, "SOG:%.1f", sog); 
