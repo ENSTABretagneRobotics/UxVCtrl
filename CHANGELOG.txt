@@ -1,3 +1,7 @@
+77
+Added +/- keys for coordspace zoom.
+Added support of a 2nd MAVLinkDevice for the ArduPilot.
+
 76
 Updated MAVLinkDevice.
 Decreased Razor, MT, MAVLink period because of fast ground and aerial robots.

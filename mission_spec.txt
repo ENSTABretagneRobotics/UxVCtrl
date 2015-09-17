@@ -126,7 +126,7 @@
 %
 %nmeadeviceconfig NMEADevice.txt bPause
 %
-%mavlinkdeviceconfig MAVLinkDevice.txt bPause
+%mavlinkdeviceconfig deviceid MAVLinkDevice.txt bPause
 %
 %swarmondeviceconfig SwarmonDevice.txt bPause
 %

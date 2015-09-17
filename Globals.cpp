@@ -71,7 +71,7 @@ BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
 BOOL bDisableNMEADevice = FALSE;
-BOOL bDisableMAVLinkDevice = FALSE;
+BOOL bDisableMAVLinkDevice[2];
 BOOL bDisableSwarmonDevice = FALSE;
 BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
@@ -259,8 +259,9 @@ BOOL bGPSOKNMEADevice = FALSE;
 BOOL bPauseNMEADevice = FALSE, bRestartNMEADevice = FALSE;
 
 // MAVLinkDevice variables.
-BOOL bGPSOKMAVLinkDevice = FALSE;
-BOOL bPauseMAVLinkDevice = FALSE, bRestartMAVLinkDevice = FALSE;
+BOOL bGPSOKMAVLinkDevice[2];
+BOOL bPauseMAVLinkDevice[2];
+BOOL bRestartMAVLinkDevice[2];
 
 // SwarmonDevice variables.
 BOOL bPauseSwarmonDevice = FALSE, bRestartSwarmonDevice = FALSE;

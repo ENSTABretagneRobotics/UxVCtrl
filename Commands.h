@@ -510,7 +510,7 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 				// We do not use GPS altitude for that as it is not reliable...
@@ -535,7 +535,7 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 				// Should add speed...?
@@ -1246,27 +1246,36 @@ inline int Commands(char* line)
 		if (!ival1) bRestartNMEADevice = TRUE;
 		bPauseNMEADevice = ival1;
 	}
-	else if (sscanf(line, "mavlinkdeviceconfig %255s %d", str, &ival1) == 2)
+	else if (sscanf(line, "malinkdeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
-		if (strncmp(str, "MAVLinkDevice0.txt", strlen("MAVLinkDevice0.txt")) != 0)
+		if ((ival >= 0)&&(ival < 2))
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
-			if (buf)
+			memset(str2, 0, sizeof(str2));
+			sprintf(str2, "MAVLinkDevice%d.txt", ival);
+			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				if (fcopyload(str, "MAVLinkDevice0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				if (buf)
 				{
-					printf("Unable to copy file.\n");
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					{
+						printf("Unable to copy file.\n");
+					}
+					free(buf);
 				}
-				free(buf);
+				else
+				{
+					printf("Unable to allocate data.\n");
+				}
 			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
+			mSleep(500);
+			if (!ival1) bRestartMAVLinkDevice[ival] = TRUE;
+			bPauseMAVLinkDevice[ival] = ival1;
 		}
-		mSleep(500);
-		if (!ival1) bRestartMAVLinkDevice = TRUE;
-		bPauseMAVLinkDevice = ival1;
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
 	}
 	else if (sscanf(line, "swarmondeviceconfig %255s %d", str, &ival1) == 2)
 	{

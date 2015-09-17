@@ -1,0 +1,15 @@
+% IP address and TCP port or local RS232 port
+%127.0.0.1:55555
+COM13
+% BaudRate
+115200
+% Timeout (in ms)
+1500
+% bSaveRawData
+1
+% quality_threshold
+1
+% flow_comp_m_threshold
+0.0
+% bDefaultVrToZero
+0

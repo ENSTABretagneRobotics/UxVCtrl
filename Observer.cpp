@@ -195,7 +195,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		if (bGPSLocalization)
 		{
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// Should add speed...?
 				// Should add altitude with a big error...?

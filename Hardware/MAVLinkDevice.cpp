@@ -17,26 +17,30 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	MAVLINKDATA mavlinkdata;
 	double dval = 0;
 	BOOL bConnected = FALSE;
+	int deviceid = (int)pParam;
+	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	UNREFERENCED_PARAMETER(pParam);
+	//UNREFERENCED_PARAMETER(pParam);
+
+	sprintf(szCfgFilePath, "MAVLinkDevice%d.txt", deviceid);
 
 	memset(&mavlinkdevice, 0, sizeof(MAVLINKDEVICE));
 
-	bGPSOKMAVLinkDevice = FALSE;
+	bGPSOKMAVLinkDevice[deviceid] = FALSE;
 
 	for (;;)
 	{
 		mSleep(50);
 
-		if (bPauseMAVLinkDevice)
+		if (bPauseMAVLinkDevice[deviceid])
 		{
 			if (bConnected)
 			{
 				printf("MAVLinkDevice paused.\n");
-				bGPSOKMAVLinkDevice = FALSE;
+				bGPSOKMAVLinkDevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
 			}
@@ -45,21 +49,21 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			continue;
 		}
 
-		if (bRestartMAVLinkDevice)
+		if (bRestartMAVLinkDevice[deviceid])
 		{
 			if (bConnected)
 			{
 				printf("Restarting a MAVLinkDevice.\n");
-				bGPSOKMAVLinkDevice = FALSE;
+				bGPSOKMAVLinkDevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
 			}
-			bRestartMAVLinkDevice = FALSE;
+			bRestartMAVLinkDevice[deviceid] = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectMAVLinkDevice(&mavlinkdevice, "MAVLinkDevice0.txt") == EXIT_SUCCESS) 
+			if (ConnectMAVLinkDevice(&mavlinkdevice, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
 
@@ -104,7 +108,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKMAVLinkDevice = FALSE;
+				bGPSOKMAVLinkDevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -130,11 +134,11 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					latitude = mavlinkdata.gps_raw_int.lat/10000000.0;
 					longitude = mavlinkdata.gps_raw_int.lon/10000000.0;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKMAVLinkDevice = TRUE;
+					bGPSOKMAVLinkDevice[deviceid] = TRUE;
 				}
 				else
 				{
-					bGPSOKMAVLinkDevice = FALSE;
+					bGPSOKMAVLinkDevice[deviceid] = FALSE;
 				}
 
 				if (fabs(mavlinkdata.attitude.yaw) > 0) yaw = mavlinkdata.attitude.yaw;
@@ -183,7 +187,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			else
 			{
 				printf("Connection to a MAVLinkDevice lost.\n");
-				bGPSOKMAVLinkDevice = FALSE;
+				bGPSOKMAVLinkDevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
 			}		
@@ -192,7 +196,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 		if (bExit) break;
 	}
 
-	bGPSOKMAVLinkDevice = FALSE;
+	bGPSOKMAVLinkDevice[deviceid] = FALSE;
 
 	if (mavlinkdevice.pfSaveFile != NULL)
 	{

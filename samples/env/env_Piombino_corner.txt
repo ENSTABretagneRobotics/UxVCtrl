@@ -8,21 +8,21 @@
 0
 % x  y  r (in m)
 % Number of walls
-4
+2
 % xa  ya  xb  yb (in m)
 0  0  185  0
-185  0  185  104
-185  104  0  104
-0  104  0  0
+%185  0  185  -104
+%185  -104  0  -104
+0  -104  0  0
 % Bounding box for a structured environment
 % box_env[1].inf (in m)
 0
 % box_env[1].sup (in m)
-300
+200
 % box_env[2].inf (in m)
-0
+-200
 % box_env[2].sup (in m)
-300
+0
 % Coordinate system used to display the map
 % xMin (in m)
 -55

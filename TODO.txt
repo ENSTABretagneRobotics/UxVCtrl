@@ -1,34 +1,7 @@
 
-mti g does not have gps?
-rajouter 2ème mavlink pour ardupilot
-should change nuc-3 option wrt windows...
-controle à distance des touches par wifi pas top (interruptions...)
-decrease opencvgui period for better effect on keys trex? RDP UDP causes key pressed loss? repeat key windows param?
-des fois il tourne quand on appuie sur avant, recabler les variateurs/moteurs pour que leur marche av corresponde (fonction frein dynamique), détermnier marche av en fonction couleurs fils et réglages actuels?
-
 add QUADRO_WORKSPACE in USERUpdtQuick.bat if needed...
 
-données aberrantes vxyhat dans logstate?
-vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
-enregistrer cog sog dans un des logs
-
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
-
-mission par sms : option /s check missions from sms.txt or sms folder...
-commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
-ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
-
-command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
-resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
-setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
-
-add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-
-utiliser bCleanup dans tous les threads pour le cvSet()?
-
-manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
-pas de setmissionaction init et end : peut-être que j'ai fait un copier coller sans eux? szAction non protégé...
-sauvegarder e,phi,delta_theta dans wall?
 
 reg cap pas assez rapide à cause dérivée, tester avec vieux code...
 régulation à grande vitesse saucisse à faire un peu comme sardine
@@ -47,12 +20,10 @@ repère dans lequel dessiner image sonar vs detection d'obstacles
 temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
+données aberrantes vxyhat dans logstate?
+vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
+enregistrer cog sog dans un des logs
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
-
-Altitude sonar
-faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
-l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
-prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 
 GUI, video
 mieux gérer les infos affichées selon le robot et selon le mode
@@ -68,6 +39,7 @@ MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDis
 (walltracking overlay fait aussi walldetect, wallavoidance)
 bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
 pouvoir lancer un opencvgui independamment du nombre de cameras, dynamic resolution changes?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
+utiliser bCleanup dans tous les threads pour le cvSet()?
 no opencvgui, hang after exit on linux? cvStartWindowThread()... now the keys are always received by the 2 windows, not independently...
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
@@ -87,7 +59,17 @@ bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides aprè
 add velocityofsound as env global param as necessary for echo message...
 time-division method
 
+Missions
+manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
+pas de setmissionaction init et end : peut-être que j'ai fait un copier coller sans eux? szAction non protégé...
 comment attendre la détection de ball OU un message acoustique dans les scripts?
+mission par sms : option /s check missions from sms.txt or sms folder...
+commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
+ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
+command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
+resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
+setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
+sauvegarder e,phi,delta_theta dans wall?
 
 Actuators
 ssc32 : rajouter un param midangle, et changer les formules de conversion entre uw et rudder pour que ça puisse ne pas être symétrique...
@@ -100,13 +82,14 @@ remplacer Sail par IM483I
 mavlink device (ardupilot, pixhawk, px4flow...)
 voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)
 
-GPS, NMEA, waypoints
+GPS, NMEA, waypoints, AHRS
 mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status? UTCValid semble le plus strict donc le plus sûr?
 hdop?
 altitude GPS?
 utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
 problème reconnection GPS Galaxy S? c'est peut-être juste qu'il capte pas bien...
 nmeadevice : add hour minute second day month year from nmea2xml_wrsc2015
+add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 MT, WeatherStation specific NMEA messages...
 pour la station, générer une croix autour du waypoint...
 
@@ -120,6 +103,11 @@ the control part of obstacle avoidance could be centralized to handle all the ty
 configdistancecomputation
 distancecomputation
 commande waitdistanceless/more/wgs x y d
+
+Altitude sonar
+faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
+l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
+prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 
 voilier
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
@@ -182,6 +170,9 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 OLD
 
+controle à distance des touches par wifi pas top (interruptions...)
+decrease opencvgui period for better effect on keys trex? RDP UDP causes key pressed loss? repeat key windows param?
+
 synchro temps des chronos et gettimeofday, utc...->mettre données brutes en gettimeofday, missions en chrono...
 dans logstate rajouter tv_sec;tv_usec; pour pouvoir synchroniser temps tasks et raw data
 
@@ -192,7 +183,7 @@ mais on dirait que je reçois pas optical_flow_rad... changer de firmware?
 il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le nuc?
 zhat à 0 aussi dans logstate, mais rien vu dans pressure... attention, il y avait du z_mes pris par GPS?
 
-bGPSOKNMEADevice pour nmea, bGPSOKMT pour mt, bGPSOKMAVLinkDevice pour mavlink et bGPSOKSimulator pour simu...
+bGPSOKNMEADevice pour nmea, bGPSOKMT pour mt, bGPSOKMAVLinkDevice[0], bGPSOKMAVLinkDevice[1] pour mavlink et bGPSOKSimulator pour simu...
 commandes startgpslocalization/stopgpslocalization (dans observer?)
 
 observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...

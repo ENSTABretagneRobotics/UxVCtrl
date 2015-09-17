@@ -406,9 +406,21 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'i': bShowVideoOpenCVGUIs[videoid] = !bShowVideoOpenCVGUIs[videoid]; break;
 		case '$': bShowSonar = !bShowSonar; break;
 		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
+		case '+': 
+			if ((fabs(csMap.xMin) > 1)&&(fabs(csMap.xMax) > 1)&&(fabs(csMap.yMin) > 1)&&(fabs(csMap.yMax) > 1))
+			{
+				csMap.xMin *= 0.9; csMap.xMax *= 0.9; csMap.yMin *= 0.9; csMap.yMax *= 0.9; 
+			}
+			break;
+		case '-': 
+			if ((fabs(csMap.xMin) < 100000)&&(fabs(csMap.xMax) < 100000)&&(fabs(csMap.yMin) < 100000)&&(fabs(csMap.yMax) < 100000))
+			{
+				csMap.xMin /= 0.9; csMap.xMax /= 0.9; csMap.yMin /= 0.9; csMap.yMax /= 0.9; 
+			}
+			break;
 		case 'O':
 			// gpssetenvcoordposition
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
@@ -417,7 +429,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'G':
 			// gpslocalization
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator)
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// Should add speed...?
 				// Assume that x_mes,y_mes is only updated by GPS...
@@ -515,6 +527,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'h':
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
 				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
+				"+-(coordspace zoom),"
 				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
@@ -662,9 +675,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(0,255,128));
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator) strcpy(szText, "GPS FIX"); else strcpy(szText, "NO FIX");
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator) strcpy(szText, "GPS FIX"); else strcpy(szText, "NO FIX");
 			offset += 16;
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice||bGPSOKSimulator) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(0,255,128));
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(0,255,128));
 			else cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,0));
 			if (bDispSOG)
 			{

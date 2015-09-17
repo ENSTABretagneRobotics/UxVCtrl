@@ -162,7 +162,7 @@ extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
 extern BOOL bDisableNMEADevice;
-extern BOOL bDisableMAVLinkDevice;
+extern BOOL bDisableMAVLinkDevice[2];
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
@@ -350,8 +350,9 @@ extern BOOL bGPSOKNMEADevice;
 extern BOOL bPauseNMEADevice, bRestartNMEADevice;
 
 // MAVLinkDevice variables.
-extern BOOL bGPSOKMAVLinkDevice;
-extern BOOL bPauseMAVLinkDevice, bRestartMAVLinkDevice;
+extern BOOL bGPSOKMAVLinkDevice[2];
+extern BOOL bPauseMAVLinkDevice[2];
+extern BOOL bRestartMAVLinkDevice[2];
 
 // SwarmonDevice variables.
 extern BOOL bPauseSwarmonDevice, bRestartSwarmonDevice;
@@ -441,6 +442,13 @@ inline int InitGlobals(void)
 	int i = 0;
 
 	// Missing error checking...
+
+	for (i = 0; i < 2; i++)
+	{
+		bGPSOKMAVLinkDevice[i] = FALSE;
+		bPauseMAVLinkDevice[i] = FALSE;
+		bRestartMAVLinkDevice[i] = FALSE;
+	}
 
 	for (i = 0; i < nbvideo; i++)
 	{
@@ -549,6 +557,13 @@ inline int ReleaseGlobals(void)
 		DeleteCriticalSection(&VideoRecordRequestsCS[i]);
 		DeleteCriticalSection(&dispimgsCS[i]);
 		DeleteCriticalSection(&imgsCS[i]);
+	}
+
+	for (i = 2-1; i >= 0; i--)
+	{
+		bRestartMAVLinkDevice[i] = FALSE;
+		bPauseMAVLinkDevice[i] = FALSE;
+		bGPSOKMAVLinkDevice[i] = FALSE;
 	}
 
 	return EXIT_SUCCESS;

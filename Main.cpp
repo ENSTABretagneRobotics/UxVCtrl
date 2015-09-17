@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MTThreadId;
 	THREAD_IDENTIFIER NMEADeviceThreadId;
 #ifdef ENABLE_MAVLINK_SUPPORT
-	THREAD_IDENTIFIER MAVLinkDeviceThreadId;
+	THREAD_IDENTIFIER MAVLinkDeviceThreadId[2];
 #endif // ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER SwarmonDeviceThreadId;
 #ifdef ENABLE_LABJACK_SUPPORT
@@ -116,7 +116,10 @@ int main(int argc, char* argv[])
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
 	if (!bDisableNMEADevice) CreateDefaultThread(NMEADeviceThread, NULL, &NMEADeviceThreadId);
 #ifdef ENABLE_MAVLINK_SUPPORT
-	if (!bDisableMAVLinkDevice) CreateDefaultThread(MAVLinkDeviceThread, NULL, &MAVLinkDeviceThreadId);
+	for (i = 0; i < 2; i++)
+	{
+		if (!bDisableMAVLinkDevice[i]) CreateDefaultThread(MAVLinkDeviceThread, (void*)i, &MAVLinkDeviceThreadId[i]);
+	}
 #endif // ENABLE_MAVLINK_SUPPORT
 	if (!bDisableSwarmonDevice) CreateDefaultThread(SwarmonDeviceThread, NULL, &SwarmonDeviceThreadId);
 #ifdef ENABLE_LABJACK_SUPPORT
@@ -212,7 +215,10 @@ int main(int argc, char* argv[])
 #endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSwarmonDevice) WaitForThread(SwarmonDeviceThreadId);
 #ifdef ENABLE_MAVLINK_SUPPORT
-	if (!bDisableMAVLinkDevice) WaitForThread(MAVLinkDeviceThreadId);
+	for (i = 2-1; i >= 0; i--)
+	{
+		if (!bDisableMAVLinkDevice[i]) WaitForThread(MAVLinkDeviceThreadId[i]);
+	}
 #endif // ENABLE_MAVLINK_SUPPORT
 	if (!bDisableNMEADevice) WaitForThread(NMEADeviceThreadId);
 	if (!bDisableMT) WaitForThread(MTThreadId);
