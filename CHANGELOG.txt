@@ -1,3 +1,7 @@
+78
+Added T to change text colors.
+Added QUADRO_WORKSPACE in USERUpdtQuick.bat.
+
 77
 Added +/- keys for coordspace zoom.
 Added support of a 2nd MAVLinkDevice for the ArduPilot.

@@ -1,6 +1,4 @@
 
-add QUADRO_WORKSPACE in USERUpdtQuick.bat if needed...
-
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
 
 reg cap pas assez rapide à cause dérivée, tester avec vieux code...
