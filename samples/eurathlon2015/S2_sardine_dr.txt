@@ -34,7 +34,7 @@ headingreg 180
 wait 10
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 80
+wait 65
 % stop
 thrust -1
 wait 3
@@ -64,7 +64,7 @@ setmissionaction WPCORNEROPI
 headingreg 270
 wait 10
 thrust 1
-wait 30
+wait 25
 % stop
 thrust -1
 wait 3
@@ -73,16 +73,16 @@ setmissionaction LINE1
 headingreg 112.5
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 247.5
+headingreg 270
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
@@ -91,16 +91,16 @@ setmissionaction LINE1
 headingreg 112.5
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 247.5
+headingreg 270
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
@@ -109,16 +109,16 @@ setmissionaction LINE1
 headingreg 112.5
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 247.5
+headingreg 270
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
@@ -127,16 +127,16 @@ setmissionaction LINE1
 headingreg 112.5
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 247.5
+headingreg 270
 wait 10
 thrust 1
-wait 60
+wait 50
 % stop
 thrust -1
 wait 3
