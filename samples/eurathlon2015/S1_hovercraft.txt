@@ -11,529 +11,529 @@ stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90
 thrust 1
 setmissionaction WP2
-gotoxytwgs 42.954 10.602 5400
+gotoxytwgs 42.954 10.6018 5400
 setmissionaction WPREACHED
 stop
 wait 90

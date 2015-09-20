@@ -34,15 +34,16 @@ headingreg 180
 wait 10
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 70
+wait 80
 % stop
 thrust -1
 wait 3
 stop
-setmissionaction RESET_HEADING
+setmissionaction CHANGE_DEPTH_AND_HEADING
 stop
 headingreg 180
-wait 15
+depthreg -2.0
+wait 20
 stop
 setmissionaction SONAR_MAPPING
 stop
@@ -78,7 +79,7 @@ thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 270
+headingreg 247.5
 wait 10
 thrust 1
 wait 60
@@ -96,7 +97,7 @@ thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 270
+headingreg 247.5
 wait 10
 thrust 1
 wait 60
@@ -114,7 +115,7 @@ thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 270
+headingreg 247.5
 wait 10
 thrust 1
 wait 60
@@ -132,7 +133,7 @@ thrust -1
 wait 3
 stop
 setmissionaction LINE2
-headingreg 270
+headingreg 247.5
 wait 10
 thrust 1
 wait 60
@@ -159,12 +160,6 @@ setmissionaction SONAR_CONFIG_LOCALIZATION
 stop
 seanetconfig Seanet0_loc.txt 0
 wait 60
-setmissionaction START1
-thrust 0.7
-gotoxytwgs 42.954120 10.601900 180
-thrust -1
-wait 2
-stop
 % stop and surface
 stop
 setmissionaction SURFACE

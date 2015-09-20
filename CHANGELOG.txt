@@ -1,3 +1,7 @@
+79
+Added display of uw and u in GUI for submarines.
+Added J key for start/stopgpslocalization and corresponding GUI indication. 
+
 78
 Added T to change text colors.
 Added QUADRO_WORKSPACE in USERUpdtQuick.bat.

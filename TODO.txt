@@ -1,3 +1,4 @@
+crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement...?
 
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
 

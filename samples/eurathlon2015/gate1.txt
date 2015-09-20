@@ -9,8 +9,8 @@ wait 1
 setmissionaction SUBMERGE
 stop
 headingreg 0
-depthreg -0.75
-%depthreg -1.25
+%depthreg -0.75
+depthreg -1.25
 wait 20
 setmissionaction GOSHORE
 thrust 1
@@ -24,7 +24,7 @@ headingreg 90
 wait 10
 setmissionaction GOGATE
 thrust 1
-wait 170
+wait 85
 % stop
 thrust -1
 wait 3
@@ -34,7 +34,7 @@ headingreg 180
 wait 10
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 60
+wait 80
 % stop
 thrust -1
 wait 3

@@ -8,7 +8,7 @@ COM9
 % bSaveRawData
 1
 % RangeScale (in m)
-5
+75
 % Gain (in %)
 50
 % Sensitivity (in [0..80] dB)
@@ -32,13 +32,12 @@ COM9
 % stareLLim (0 or 1)
 0
 % VelocityOfSound (in m/s)
-1475
-%1530
+%1475
+1530
 % alpha_max_err (in rad)
 0.01
 % d_max_err (in m)
-0.1
-%2.5
+2.5
 %0.1
 %0.5
 % HorizontalBeam (in ]0..360] deg)

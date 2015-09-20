@@ -501,6 +501,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 			}
 			break;
+		case 'J': 
+			// startgpslocalization/stopgpslocalization
+			bGPSLocalization = !bGPSLocalization; 
+			break;
 		case 'Z':
 			// (re)setstateestimation
 			xhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
@@ -587,7 +591,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
 				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
 				"+-(coordspace zoom),T(text color)"
-				"O(gpssetenvcoordposition),G(gpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
+				"O(gpssetenvcoordposition),G(gpslocalization),J(start/stopgpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
 				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode)\n");
@@ -682,7 +686,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vcytron > 1.4? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1); 
 				break;
 			default:
-				sprintf(szText, "%d%% %d%% %d%%", (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
+				sprintf(szText, "%d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
 				break;
 			}
 			offset += 16;
@@ -734,7 +738,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator) strcpy(szText, "GPS FIX"); else strcpy(szText, "NO FIX");
+			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			{
+				if (bGPSLocalization) strcpy(szText, "GPS FIX (IN USE)"); else strcpy(szText, "GPS FIX"); 
+			}
+			else strcpy(szText, "NO FIX");
 			offset += 16;
 			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			else cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,0));

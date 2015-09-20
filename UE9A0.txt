@@ -1,14 +1,14 @@
 % address
 1
 % rightthrusterpwm
-0
-% leftthrusterpwm
 1
+% leftthrusterpwm
+0
 % bottomthrusterpwm
-3
+2
 % rightthrustercoef
 -1
 % leftthrustercoef
 -1
 % bottomthrustercoef
-1
+-1

@@ -1,8 +1,6 @@
 % IP address and TCP port or local RS232 port
 %127.0.0.1:4001
-192.168.1.107:4001
-%192.168.1.102:4001
-%COM3
+COM3
 % BaudRate
 4800
 % Timeout (in ms)
