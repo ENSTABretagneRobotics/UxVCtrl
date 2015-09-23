@@ -1,0 +1,131 @@
+setmissionaction INIT
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+gpslocalization 3
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+startrecvxyrngmsgacousticmodem
+setmissionaction SUBMERGE
+stop
+headingreg 180
+depthreg -2.0
+wait 20
+setmissionaction VALIDATIONGATE
+thrust 1
+wait 65
+% stop
+thrust -1
+wait 3
+stop
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 1.0 0 0 220 0.05 0 2 1 0
+startballtracking
+setmissionaction WPCORNEROPI
+headingreg 270
+wait 10
+thrust 1
+wait 25
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE1
+headingreg 112.5
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE2
+headingreg 270
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE1
+headingreg 112.5
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE2
+headingreg 270
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE1
+headingreg 112.5
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE2
+headingreg 270
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE1
+headingreg 112.5
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction LINE2
+headingreg 270
+wait 10
+thrust 1
+wait 50
+% stop
+thrust -1
+wait 3
+stop
+stopballtracking
+setmissionaction RESET_HEADING
+stop
+headingreg 180
+wait 15
+stop
+setmissionaction SONAR_MAPPING
+stop
+seanetconfig Seanet0_map.txt 0
+wait 120
+setmissionaction RESET_HEADING
+stop
+headingreg 180
+wait 15
+stop
+setmissionaction SONAR_CONFIG_LOCALIZATION
+stop
+seanetconfig Seanet0_loc.txt 0
+wait 60
+% stop and surface
+stop
+setmissionaction SURFACE
+depthreg 5
+wait 60
+gpslocalization 3
+stoprecvxyrngmsgacousticmodem
+wait 60

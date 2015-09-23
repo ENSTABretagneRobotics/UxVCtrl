@@ -258,6 +258,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="MAVLinkDevice0.txt" />
+    <Text Include="MAVLinkDevice1.txt" />
     <Text Include="UxVCtrl.txt" />
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />

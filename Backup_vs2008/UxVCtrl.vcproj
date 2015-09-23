@@ -339,6 +339,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MAVLinkDevice1.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\MDM0.txt"
 				>
 			</File>

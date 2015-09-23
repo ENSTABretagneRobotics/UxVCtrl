@@ -16,6 +16,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	struct timeval tv;
 	MAVLINKDATA mavlinkdata;
 	double dval = 0;
+	CHRONO chrono_GPSOK;
 	BOOL bConnected = FALSE;
 	int deviceid = (int)pParam;
 	char szCfgFilePath[256];
@@ -66,6 +67,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			if (ConnectMAVLinkDevice(&mavlinkdevice, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				StartChrono(&chrono_GPSOK);
 
 				if (mavlinkdevice.pfSaveFile != NULL)
 				{
@@ -135,10 +138,15 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					longitude = mavlinkdata.gps_raw_int.lon/10000000.0;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
 					bGPSOKMAVLinkDevice[deviceid] = TRUE;
+					StopChronoQuick(&chrono_GPSOK);
+					StartChrono(&chrono_GPSOK);
 				}
 				else
 				{
-					bGPSOKMAVLinkDevice[deviceid] = FALSE;
+					if (GetTimeElapsedChronoQuick(&chrono_GPSOK) > 2)
+					{
+						bGPSOKMAVLinkDevice[deviceid] = FALSE;
+					}
 				}
 
 				if (fabs(mavlinkdata.attitude.yaw) > 0) yaw = mavlinkdata.attitude.yaw;
@@ -203,6 +211,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 		fclose(mavlinkdevice.pfSaveFile); 
 		mavlinkdevice.pfSaveFile = NULL;
 	}
+
+	StopChronoQuick(&chrono_GPSOK);
 
 	if (bConnected) DisconnectMAVLinkDevice(&mavlinkdevice);
 

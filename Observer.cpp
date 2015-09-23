@@ -19,6 +19,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	//double dt_chrono = 0;
 	//interval xhat_prev_old, yhat_prev_old, thetahat_prev_old;
 	double cosfilteredwinddir = 0, sinfilteredwinddir = 0;
+	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
 
@@ -34,7 +35,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	}
 
 	fprintf(logstatefile, 
-		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;tv_sec;tv_usec;\n"
+		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;tv_sec;tv_usec;lathat;longhat;althat;headinghat;\n"
 		); 
 	fflush(logstatefile);
 
@@ -210,9 +211,12 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			}
 		}
 
+		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
+		headinghat = (fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+
 		// Log.
 		fprintf(logstatefile, 			
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%f;%f;%f;%f;\n", 
 			t, 
 			Center(xhat), Center(yhat), Center(zhat), Center(thetahat), 
 			Center(vxyhat), Center(omegahat), 
@@ -220,7 +224,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			u, uw,
 			xhat.inf, xhat.sup, yhat.inf, yhat.sup, zhat.inf, zhat.sup, thetahat.inf, thetahat.sup, 
 			vxyhat.inf, vxyhat.sup, omegahat.inf, omegahat.sup,
-			(int)tv.tv_sec, (int)tv.tv_usec
+			(int)tv.tv_sec, (int)tv.tv_usec, lathat, longhat, althat, headinghat
 			);
 		fflush(logstatefile);
 

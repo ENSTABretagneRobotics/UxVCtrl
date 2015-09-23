@@ -572,6 +572,9 @@
     <Text Include="MAVLinkDevice0.txt">
       <Filter>Input Files</Filter>
     </Text>
+    <Text Include="MAVLinkDevice1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

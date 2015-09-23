@@ -1,4 +1,5 @@
-crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement...?
+crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...
+bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
 
 faire fonction fmod_2PI_pos()=[0,2PI[, fmod_360_pos()=[0,360[, fmod_2PI_rad2deg_pos()
 
@@ -168,6 +169,10 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+j'ai oublié de mettre les stopvideorecording? mais en fait ils risquent de ne pas vraiment être appelés...
+
+ardupilot mavlink : gps fix clignote car il y a des trames qui sont pas du GPS par moment (le GPS n'envoie des trames que toutes les 0.5 s)...->utiliser un chrono
 
 controle à distance des touches par wifi pas top (interruptions...)
 decrease opencvgui period for better effect on keys trex? RDP UDP causes key pressed loss? repeat key windows param?
