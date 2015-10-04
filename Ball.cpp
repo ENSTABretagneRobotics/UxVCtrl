@@ -337,6 +337,21 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				lightStatus_ball = 0;
 			}
 
+			// Send acoustic message when ball detected...
+			if (bAcoustic_ball)
+			{
+				EnterCriticalSection(&MDMCS);
+				AcousticCommandMDM = SENDOPI_MSG;
+				LeaveCriticalSection(&MDMCS);
+			}
+			else
+			{
+				// Temp...
+				EnterCriticalSection(&MDMCS);
+				AcousticCommandMDM = 0;
+				LeaveCriticalSection(&MDMCS);
+			}
+
 #define THIRD_METHOD
 #ifdef FIRST_METHOD
 			objAngle = (3.14/4.0)*floor(0.5+atan(objBoundHeight/objBoundWidth)/(3.14/4.0));

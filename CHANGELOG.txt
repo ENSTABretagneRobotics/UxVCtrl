@@ -1,3 +1,9 @@
+81
+To check (modified before euRathlon GC, not tested)!
+Send acoustic message when ball detected (check when it begins/stops...).
+Modifications in position contraction with the different methods (check error size, differences between commands and GUI keys...).
+Updates in MDM (to check and improve recvany, to follow better the defined protocol and get a real communication depending on the commands...).
+
 80
 Added lathat;longhat;althat;headinghat in logstate.
 Corrected GPS FIX blinking with ArduPilot because of low GPS msg frequency (to improve...).

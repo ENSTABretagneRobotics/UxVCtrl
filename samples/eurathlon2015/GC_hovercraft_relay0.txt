@@ -1,0 +1,546 @@
+setmissionaction INIT
+wpfollowingconfig 5
+linefollowingconfig 5 0.78
+startsendxymsgacousticmodem
+stop
+thrust 1
+setmissionaction WP1
+gotoxytwgs 42.954 10.6016 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+stopsendxymsgacousticmodem
+setmissionaction WAITING_OPI_MSG
+wait 15
+startrecvopimsgacousticmodem
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+thrust 1
+setmissionaction WP2
+gotoxytwgs 42.954 10.6018 5400
+setmissionaction WPREACHED
+stop
+wait 90
+setmissionaction END
+stoprecvopimsgacousticmodem
+generalstop

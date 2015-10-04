@@ -147,6 +147,63 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 			EnterCriticalSection(&MDMCS);
 			switch (AcousticCommandMDM)
 			{
+			case RECVANYSENDXY_MSG :
+				LeaveCriticalSection(&MDMCS);
+				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
+				memset(buf, 0, sizeof(buf));
+				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS)
+				{
+					//bError = TRUE;
+					break;
+				}
+				//printf("RECV : %.4s", buf);
+				// Time...
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
+				{
+					tv.tv_sec = 0;
+					tv.tv_usec = 0;
+				}
+				if (mdm.bSaveRawData)
+				{
+					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVANYSENDXY_MSG, 'r', buf);
+					fflush(mdm.pfSaveFile);
+				}
+				if (bExit||!AcousticCommandMDM) break;
+
+				mSleep(1000);
+				if (bExit||!AcousticCommandMDM) break;
+
+				memset(&sendxy, 0, sizeof(sendxy));
+				EnterCriticalSection(&StateVariablesCS);
+				sendxy.s[0] = (short)Center(xhat);
+				sendxy.s[1] = (short)Center(yhat);
+				LeaveCriticalSection(&StateVariablesCS);
+				for (i = 0; i < 2; i++)
+				{
+					if (SendAllDataMDM(&mdm, (uint8*)&sendxy, sizeof(sendxy)) != EXIT_SUCCESS)
+					{
+						bError = TRUE;
+						break;
+					}
+					//printf("SEND : 0x%.2x%.2x%.2x%.2x (%d,%d)\n", 
+					//	(unsigned int)sendxy.uc[3], (unsigned int)sendxy.uc[2], (unsigned int)sendxy.uc[1], (unsigned int)sendxy.uc[0], 
+					//	(int)sendxy.s[0], (int)sendxy.s[1]);
+					// Time...
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
+					{
+						tv.tv_sec = 0;
+						tv.tv_usec = 0;
+					}
+					if (mdm.bSaveRawData)
+					{
+						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVANYSENDXY_MSG, 's', 
+							(unsigned int)sendxy.uc[3], (unsigned int)sendxy.uc[2], (unsigned int)sendxy.uc[1], (unsigned int)sendxy.uc[0], 
+							(int)sendxy.s[0], (int)sendxy.s[1]);
+						fflush(mdm.pfSaveFile);
+					}
+					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
+				}
+				break;
 			case RNG_MSG :
 				LeaveCriticalSection(&MDMCS);
 				memset(buf, 0, sizeof(buf));
@@ -205,8 +262,10 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 			case SENDXY_MSG :
 				LeaveCriticalSection(&MDMCS);
 				memset(&sendxy, 0, sizeof(sendxy));
+				EnterCriticalSection(&StateVariablesCS);
 				sendxy.s[0] = (short)Center(xhat);
 				sendxy.s[1] = (short)Center(yhat);
+				LeaveCriticalSection(&StateVariablesCS);
 				for (i = 0; i < 2; i++)
 				{
 					if (SendAllDataMDM(&mdm, (uint8*)&sendxy, sizeof(sendxy)) != EXIT_SUCCESS)
@@ -273,7 +332,6 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					acousticmodem_y = 0;
 				}
 				LeaveCriticalSection(&StateVariablesCS);
-				if (bExit||!AcousticCommandMDM) break;
 				break;
 			case SENDASK_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -329,7 +387,6 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					AcousticCommandMDM = SENDXY_MSG;
 					LeaveCriticalSection(&MDMCS);
 				}
-				if (bExit||!AcousticCommandMDM) break;
 				break;
 			case SENDSPWT_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -385,7 +442,61 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					AcousticCommandMDM = 0;
 					LeaveCriticalSection(&MDMCS);
 				}
-				if (bExit||!AcousticCommandMDM) break;
+				break;
+			case SENDOPI_MSG :
+				LeaveCriticalSection(&MDMCS);
+				memset(buf, 0, sizeof(buf));
+				strcpy((char*)buf, "OPI\n");
+				for (i = 0; i < 1; i++)
+				{
+					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
+					{
+						bError = TRUE;
+						break;
+					}
+					//printf("SEND : %.4s\n", buf);
+					// Time...
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
+					{
+						tv.tv_sec = 0;
+						tv.tv_usec = 0;
+					}
+					if (mdm.bSaveRawData)
+					{
+						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDOPI_MSG, 's', buf);
+						fflush(mdm.pfSaveFile);
+					}
+					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
+				}
+				break;
+			case RECVOPI_MSG :
+				LeaveCriticalSection(&MDMCS);
+				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
+				memset(buf, 0, sizeof(buf));
+				if (RecvAllDataMDM(&mdm, buf, strlen("OPI\n")) != EXIT_SUCCESS)
+				{
+					//bError = TRUE;
+					break;
+				}
+				//printf("RECV : %.4s", buf);
+				// Time...
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
+				{
+					tv.tv_sec = 0;
+					tv.tv_usec = 0;
+				}
+				if (mdm.bSaveRawData)
+				{
+					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVOPI_MSG, 'r', buf);
+					fflush(mdm.pfSaveFile);
+				}
+				if (strncmp((char*)buf, "OPI\n", strlen("OPI\n")) == 0)
+				{
+					// Release blocking command.
+					EnterCriticalSection(&MDMCS);
+					AcousticCommandMDM = 0;
+					LeaveCriticalSection(&MDMCS);
+				}
 				break;
 			case SENDSHH_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -441,7 +552,6 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					AcousticCommandMDM = 0;
 					LeaveCriticalSection(&MDMCS);
 				}
-				if (bExit||!AcousticCommandMDM) break;
 				break;
 			case RECVXY_RNG_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -555,9 +665,9 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						{
 							// Expand initial box to be able to contract next time and because we are probably lost...
 							P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
-							// Bug?
-							//xhat = P[1];
-							//yhat = P[2];
+							// Was missing before?
+							xhat = P[1];
+							yhat = P[2];
 						}
 						else
 						{

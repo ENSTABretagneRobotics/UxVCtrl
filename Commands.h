@@ -122,7 +122,7 @@ inline int Commands(char* line)
 		dval6 = 0, dval7 = 0, dval8 = 0, dval9 = 0, dval10 = 0, dval11 = 0, dval12 = 0; 
 	int ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0, ival6 = 0, 
 		ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
-		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0;
+		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0;
 	char cval = 0;
 	char str[MAX_BUF_LEN];
 	char str2[MAX_BUF_LEN];
@@ -290,28 +290,28 @@ inline int Commands(char* line)
 		"%d %d %d %d %d %d "
 		"%lf %lf %lf "
 		"%lf %lf "
-		"%d %lf "
+		"%d %lf %d "
 		"%d %d %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, 
 		&dval4, &dval5, 
-		&ival13, &dval6, 
-		&ival14, &ival15, &ival16, 
-		&ival17
-		) == 23)
+		&ival13, &dval6, &ival14, 
+		&ival15, &ival16, &ival17, 
+		&ival18
+		) == 24)
 	{
 		EnterCriticalSection(&BallCS);
 		rmin_ball = ival1; rmax_ball = ival2; gmin_ball = ival3; gmax_ball = ival4; bmin_ball = ival5; bmax_ball = ival6; 
 		hmin_ball = ival7; hmax_ball = ival8; smin_ball = ival9; smax_ball = ival10; lmin_ball = ival11; lmax_ball = ival12; 
 		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; d0_ball = dval3; 
 		kh_ball = dval4; kv_ball = dval5; 
-		lightMin_ball = ival13; lightPixRatio_ball = dval6;
-		bDepth_ball = ival14; camdir_ball = ival15; bBrake_ball = ival16; 
-		if ((ival17 >= 0)&&(ival17 < nbvideo))
+		lightMin_ball = ival13; lightPixRatio_ball = dval6; bAcoustic_ball = ival14;
+		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; 
+		if ((ival18 >= 0)&&(ival18 < nbvideo))
 		{
-			videoid_ball = ival17;
+			videoid_ball = ival18;
 		}
 		else
 		{
@@ -610,6 +610,9 @@ inline int Commands(char* line)
 			{
 				// Expand initial box to be able to contract next time and because we are probably lost...
 				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+				// Was missing before?
+				xhat = P[1];
+				yhat = P[2];
 			}
 			else
 			{
@@ -652,11 +655,14 @@ inline int Commands(char* line)
 				{
 					// Expand initial box to be able to contract next time and because we are probably lost...
 					P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+					// Was missing before?
+					xhat = P[1];
+					yhat = P[2];
 				}
 				else
 				{
-					xhat = P[1]+interval(-x_max_err,x_max_err);
-					yhat = P[2]+interval(-y_max_err,y_max_err);
+					xhat = P[1];
+					yhat = P[2];
 				}
 				LeaveCriticalSection(&StateVariablesCS);
 			}
@@ -1556,6 +1562,62 @@ inline int Commands(char* line)
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
+	else if (strncmp(line, "startsendopimsgacousticmodem", strlen("startsendopimsgacousticmodem")) == 0)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = SENDOPI_MSG;
+		LeaveCriticalSection(&MDMCS);
+	}
+	else if (strncmp(line, "stopsendopimsgacousticmodem", strlen("stopsendopimsgacousticmodem")) == 0)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = 0;
+		LeaveCriticalSection(&MDMCS);
+	}
+	else if (strncmp(line, "startrecvopimsgacousticmodem", strlen("startrecvopimsgacousticmodem")) == 0)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = RECVOPI_MSG;
+		LeaveCriticalSection(&MDMCS);
+	}
+	else if (strncmp(line, "stoprecvopimsgacousticmodem", strlen("stoprecvopimsgacousticmodem")) == 0)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = 0;
+		LeaveCriticalSection(&MDMCS);
+	}
+	else if (sscanf(line, "waitrecvopimsgacousticmodem %lf", &delay) == 1)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = RECVOPI_MSG;
+		LeaveCriticalSection(&MDMCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&MDMCS);
+			if (AcousticCommandMDM != RECVOPI_MSG) 
+			{
+				LeaveCriticalSection(&MDMCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&MDMCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = 0;
+		LeaveCriticalSection(&MDMCS);
+	}
 	else if (strncmp(line, "startsendshhmsgacousticmodem", strlen("startsendshhmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
@@ -1619,6 +1681,18 @@ inline int Commands(char* line)
 		LeaveCriticalSection(&MDMCS);
 	}
 	else if (strncmp(line, "stoprecvxyrngmsgacousticmodem", strlen("stoprecvxyrngmsgacousticmodem")) == 0)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = 0;
+		LeaveCriticalSection(&MDMCS);
+	}
+	else if (strncmp(line, "startrecvanysendxymsgacousticmodem", strlen("startrecvanysendxymsgacousticmodem")) == 0)
+	{
+		EnterCriticalSection(&MDMCS);
+		AcousticCommandMDM = RECVANYSENDXY_MSG;
+		LeaveCriticalSection(&MDMCS);
+	}
+	else if (strncmp(line, "stoprecvanysendxymsgacousticmodem", strlen("stoprecvanysendxymsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);
 		AcousticCommandMDM = 0;

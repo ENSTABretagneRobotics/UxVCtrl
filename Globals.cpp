@@ -185,6 +185,7 @@ int camdir_ball = 0;
 int bDepth_ball = 0;
 int lightMin_ball = 0;
 double lightPixRatio_ball = 0; 
+int bAcoustic_ball = 0;
 int videoid_ball = 0; 
 double u_ball = 0;
 double theta_ball = 0;

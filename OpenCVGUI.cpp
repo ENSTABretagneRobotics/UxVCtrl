@@ -526,6 +526,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					// Expand initial box to be able to contract next time and because we are probably lost...
 					P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+					// Was missing before?
+					xhat = P[1];
+					yhat = P[2];
 				}
 				else
 				{

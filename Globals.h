@@ -86,6 +86,11 @@
 #define SENDSPWT_MSG 36
 #define RECVSPWT_MSG 37
 
+#define RECVANYSENDXY_MSG 1019
+
+#define SENDOPI_MSG 1020
+#define RECVOPI_MSG 1021
+
 #define SENDSHH_MSG 1022
 #define RECVSHH_MSG 1023
 
@@ -276,6 +281,7 @@ extern int camdir_ball;
 extern int bDepth_ball;
 extern int lightMin_ball;
 extern double lightPixRatio_ball; 
+extern int bAcoustic_ball;
 extern int videoid_ball;
 extern double u_ball;
 extern double theta_ball; // Not used...

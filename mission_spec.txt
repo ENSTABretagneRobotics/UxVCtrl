@@ -21,7 +21,7 @@
 %
 %stoppipelinetracking
 %
-%ballconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius d0 kh kv lightMin lightPixRatio bDepth camdir bBrake videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius (in pixels) greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object (in m), d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, lightMin : int [0,255] min RGB value if there is a white light, lightPixRatio : double [0,1] we consider there is a white light if it covers that ratio of the picture, bDepth : int [0,1] 1 to activate depth control, camdir : int [-1,2] 0 if used with a front camera, 1 left, -1 right, 2 bottom, bBrake : int [0,1] brake if the object is detected if 1 (do not track for tracking), videoid : int [0,oo] video id)
+%ballconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius d0 kh kv lightMin lightPixRatio bAcoustic bDepth camdir bBrake videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius (in pixels) greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object (in m), d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, lightMin : int [0,255] min RGB value if there is a white light, lightPixRatio : double [0,1] we consider there is a white light if it covers that ratio of the picture, bAcoustic : int [0,1] 1 to activate acoustic message if detected, bDepth : int [0,1] 1 to activate depth control, camdir : int [-1,2] 0 if used with a front camera, 1 left, -1 right, 2 bottom, bBrake : int [0,1] brake if the object is detected if 1 (do not track for tracking), videoid : int [0,oo] video id)
 %
 %balldetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
 %
@@ -191,6 +191,17 @@
 % Partial implementation (without OK!\n acknowledgement)...
 %waitrecvspwtmsgacousticmodem t (double [0,oo[ timeout in s, the function blocks until the desired message is received or the timeout is reached)
 %
+%euRathlon 2015, also used in ballconfig...
+%startsendopimsgacousticmodem
+%
+%stopsendopimsgacousticmodem
+%
+%startrecvopimsgacousticmodem
+%
+%stoprecvopimsgacousticmodem
+%
+%waitrecvopimsgacousticmodem t (double [0,oo[ timeout in s, the function blocks until the desired message is received or the timeout is reached)
+%
 % Maybe the shh\n message is not useful in practice...
 %startsendshhmsgacousticmodem
 %
@@ -205,6 +216,11 @@
 %startrecvxyrngmsgacousticmodem
 %
 %stoprecvxyrngmsgacousticmodem
+%
+%euRathlon 2015...
+%startrecvanysendxymsgacousticmodem
+%
+%stoprecvanysendxymsgacousticmodem
 %
 % GENERAL COMMANDS
 %

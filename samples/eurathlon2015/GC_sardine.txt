@@ -215,9 +215,20 @@ thrust -1
 wait 3
 stop
 stopballtracking
+setmissionaction WAITRANGINGS
+wait 60
 setmissionaction WPAREA2
 thrust 1
 gotoxytwgs 42.954092 10.602902 500
+% stop
+thrust -1
+wait 3
+stop
+setmissionaction WAITRANGINGS
+wait 60
+setmissionaction WPAREA2_AFTER_RANGINGS
+thrust 1
+gotoxytwgs 42.954092 10.602902 60
 % stop
 thrust -1
 wait 3
