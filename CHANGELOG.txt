@@ -1,3 +1,6 @@
+82
+Visual Studio 2008 project now uses OpenCV 2.4.9 (download http://www.ensta-bretagne.fr/lebars/Share/OpenCV2.4.9.zip and extract in C:).
+
 81
 To check (modified before euRathlon GC, not tested)!
 Send acoustic message when ball detected (check when it begins/stops...).

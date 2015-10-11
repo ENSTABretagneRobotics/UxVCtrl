@@ -1,19 +1,20 @@
 This folder contains a program used to control and configure UGVs, USVs, UUVs used in WRSC, SAUC-E and euRathlon competitions.
 
-It is recommended to be connected with an administrator account, deactivate any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189. Under Windows 7-8, choose Work for the network type if asked when connecting to the different networks (avoid Public type, to check and change go to Network and Sharing Center and click on Public to be able to change to Work).
+It is recommended to be connected with an administrator account, deactivate any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189. On Windows 7-8-10, choose Work for the network type if asked when connecting to the different networks (avoid Public type, to check and change go to Network and Sharing Center and click on Public to be able to change to Work).
 In Windows Explorer Folder Options, View tab, activate hidden files display, known files extensions display, protected system files and folders display.
 Check and change if needed Control Panel\Regional and Language Options\Customize\Numbers so that '.' is in Decimal symbol and ';' in List separator.
 Check also proxy settings of Internet Explorer, and any other installed browser, as well as FileZilla if necessary.
 
-It should work with the following software (to install preferably in order (x86 versions should be installed only on 32 bit Windows operating system versions, x64 only on 64 bit Windows operating system versions), launch Install.bat file when provided, do not launch installation from a network share, copy first on your computer) :
+It should work with the following software (see UDK\Software prerequisites, to install preferably in order (x86 versions should be installed only on 32 bit Windows operating system versions, x64 only on 64 bit Windows operating system versions), launch Install.bat file when provided, do not launch installation from a network share, copy first on your computer) :
 *** USER and DEVEL ***
 _ Windows XP Professional SP3 32 bit/Windows 8 Professional 64 bit
 _ 7-Zip (7zip_x86, 7zip_x64)
-_ Microsoft Visual C++ 2008 SP1 Redistributable Package (vcredist)
+_ Microsoft Visual C++ 2008 SP1 Redistributable Package and Microsoft Visual C++ 2012 Redistributable Package (vcredist)
 [_ Microsoft .NET Framework 3.5 Service Pack 1 (dotnetfx35)]
 [_ Google Earth 6 (Google_Earth)]
 [_ MinGW et MSYS (MinGW, MinGW_x64)]
 [_ GPS data converter (GPSDataConverter)]
+[_ Look@LAN (lalsetup250)]
 _ LabJack UD driver v3.15/v3.2X
 [_ MT SDK 2.7/3.3/4.1.5]
 [_ Maestro Control Center]
@@ -25,7 +26,7 @@ _ Kinect v2 SDK (not available for Visual Studio 2008)
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/libmodbus-3.0.6, see UDK\Software prerequisites\CISSAU_prereq)
 *** DEVEL ***
 _ Visual Studio 2008 SP1/Visual Studio 2012
-_ OpenCV 2.4.2/2.4.9
+_ OpenCV 2.4.9 (OpenCV2.4.9 or download http://www.ensta-bretagne.fr/lebars/Share/OpenCV2.4.9.zip and extract in C:)
 _ MAVLink (not available for Visual Studio 2008)
 
 It is also supposed to be compatible with Linux 2.6 with equivalent prerequisites, although not fully tested.

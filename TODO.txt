@@ -1,9 +1,7 @@
+compatibilité vs2015 à vérifier...
+
 image sonar simu pas bonne?->portée sonar, autres params?
 mapping sonar/hokuyo mean comme tour ile construction de map 2d à partir de log et injection dans google earth...
-
-conversion kinect meshlab puis dans google->générer kml automatiquement...
-kinect 2 x86?
-kinect 1 : field of view, resolution of each sensor (RGB, Depth, IR)?
 
 rajouter le stopgpslocalization dans la mission de sardine du GC...
 
@@ -11,21 +9,13 @@ rename stopgpslocalization disableautogpslocalization, startopencvgui->enableope
 
 update additionnal parameter in ballconfig in samples...
 
-envoyer (périodiquement?) un message sp avec la valeur opi trouvé lat long... en option dans ball et pipe
-
 dans ball.cpp ça peut annuler tout message acoustique, à corriger!
-
-acoustic localization : stop specifically submarine to be able to communicate correctly (perturbations by thrusters?)?
-faire un recv et analyser un peu le message comme les autres périphériques, regarder aussi ce qu'a fait Clément
+si bBalldetection ou bBalltracking arrêté alors qu'il y a une ball détectée, il continue à envoyer des msg acoustiques jusqu'à ce qu'une autre commande acoustique remplace
 
 tester mission crash vidéo...
 bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris e compte et régulation profondeur désactivée?->problème un peu comme avec le voilier, deadlock...?
-
-passer tout en cv249
-
-si bBalldetection ou bBalltracking arrêté alors qu'il y a une ball détectée, il continue à envoyer des msg acoustiques jusqu'à ce qu'une autre commande acoustique remplace
 
 crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
@@ -87,6 +77,9 @@ pour pouvoir analyser toutes les données qui viennent du modem facilement et ret
 bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?
 add velocityofsound as env global param as necessary for echo message...
 time-division method
+envoyer (périodiquement?) un message sp avec la valeur opi trouvé lat long... en option dans ball et pipe
+acoustic localization : stop specifically submarine to be able to communicate correctly (perturbations by thrusters?)?
+faire un recv et analyser un peu le message comme les autres périphériques, regarder aussi ce qu'a fait Clément
 
 Missions
 manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
@@ -119,8 +112,9 @@ comment savoir si GPS précis, utiliser ublox, vérifier son protocole...?
 altitude GPS?
 utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
 nmeadevice : add hour minute second day month year from nmea2xml_wrsc2015
+dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-MT, WeatherStation specific NMEA messages...
+MT, WeatherStation, SBG specific NMEA messages...
 pour la station, générer une croix autour du waypoint...
 
 Obstacle avoidance
