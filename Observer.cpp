@@ -50,7 +50,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	vtwindhat = vtwind;
 	LeaveCriticalSection(&StateVariablesCS);
 
-	// GPS localization activated by default, use start/stopgpslocalization commands to enable/disable...
+	// GPS localization activated by default, use enable/disableautogpslocalization commands to enable/disable...
 	bGPSLocalization = TRUE;
 
 	t = 0;

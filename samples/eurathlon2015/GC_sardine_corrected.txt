@@ -1,5 +1,5 @@
 setmissionaction INIT
-stopgpslocalization
+disableautogpslocalization
 wpfollowingconfig 1
 linefollowingconfig 2 0.78
 gpslocalization 3

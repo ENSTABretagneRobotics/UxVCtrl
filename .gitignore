@@ -205,4 +205,5 @@ vid/*.flv
 vid/*.FLV
 vid/*.ogv
 vid/*.OGV
+TODO/
 !*ReadMe.txt

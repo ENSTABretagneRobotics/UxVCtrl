@@ -50,7 +50,7 @@ inline void DisableAllControls(void)
 	u = 0; uw = 0; uv = 0;
 	LeaveCriticalSection(&StateVariablesCS);
 	EnterCriticalSection(&MDMCS);
-	AcousticCommandMDM = 0;
+	AcousticCommandMDM = 0; // Should change?
 	LeaveCriticalSection(&MDMCS);
 }
 
@@ -539,6 +539,7 @@ inline int Commands(char* line)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 				// Should add speed...?
+				// Should add altitude with a big error...?
 				// Assume that x_mes,y_mes is only updated by GPS...
 				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
 				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
@@ -559,11 +560,11 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (strncmp(line, "startgpslocalization", strlen("startgpslocalization")) == 0)
+	else if (strncmp(line, "enableautogpslocalization", strlen("enableautogpslocalization")) == 0)
 	{
 		bGPSLocalization = TRUE;
 	}
-	else if (strncmp(line, "stopgpslocalization", strlen("stopgpslocalization")) == 0)
+	else if (strncmp(line, "disableautogpslocalization", strlen("disableautogpslocalization")) == 0)
 	{
 		bGPSLocalization = FALSE;
 	}
@@ -1446,6 +1447,8 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+#pragma endregion
+#pragma region ACOUSTIC COMMANDS
 	else if (strncmp(line, "startrngmsgacousticmodem", strlen("startrngmsgacousticmodem")) == 0)
 	{
 		EnterCriticalSection(&MDMCS);

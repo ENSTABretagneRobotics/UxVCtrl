@@ -56,6 +56,8 @@ struct NMEADATA
 	double Altitude; // In m.
 	double SOG; // In m/s.
 	double COG; // In rad.
+	int year, month, day, hour, minute; 
+	double second;
 	double Heading; // In rad.
 	double WindDir; // In rad.
 	double WindSpeed; // In m/s.
@@ -325,6 +327,13 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		//	return EXIT_FAILURE;
 		//}
 
+		if (pNMEAData->utc > 0)
+		{
+			pNMEAData->hour = (int)pNMEAData->utc/10000;
+			pNMEAData->minute = (int)pNMEAData->utc/100-pNMEAData->hour*100;
+			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000)-pNMEAData->minute*100;
+		}
+
 		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
 		{
 			pNMEAData->latdeg = atoi(pNMEAData->szlatdeg);
@@ -366,6 +375,13 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 			return EXIT_FAILURE;
 		}
 
+		if (pNMEAData->utc > 0)
+		{
+			pNMEAData->hour = (int)pNMEAData->utc/10000;
+			pNMEAData->minute = (int)pNMEAData->utc/100-pNMEAData->hour*100;
+			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000)-pNMEAData->minute*100;
+		}
+
 		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
 		{
 			pNMEAData->latdeg = atoi(pNMEAData->szlatdeg);
@@ -379,6 +395,13 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		// Convert SOG to speed in m/s and COG to angle in rad.
 		pNMEAData->SOG = pNMEAData->sog/1.94;
 		pNMEAData->COG = pNMEAData->cog*M_PI/180.0;
+
+		if (pNMEAData->date > 0)
+		{
+			pNMEAData->day = (int)pNMEAData->date/10000;
+			pNMEAData->month = (int)pNMEAData->date/100-pNMEAData->day*100;
+			pNMEAData->year = 2000+((int)pNMEAData->date-pNMEAData->day*10000)-pNMEAData->month*100;
+		}
 	}
 
 	// GPS COG and SOG data.

@@ -1,16 +1,6 @@
 compatibilité vs2015 à vérifier...
 
-image sonar simu pas bonne?->portée sonar, autres params?
-mapping sonar/hokuyo mean comme tour ile construction de map 2d à partir de log et injection dans google earth...
-
-rajouter le stopgpslocalization dans la mission de sardine du GC...
-
-rename stopgpslocalization disableautogpslocalization, startopencvgui->enableopencvgui...?
-
-update additionnal parameter in ballconfig in samples...
-
-dans ball.cpp ça peut annuler tout message acoustique, à corriger!
-si bBalldetection ou bBalltracking arrêté alors qu'il y a une ball détectée, il continue à envoyer des msg acoustiques jusqu'à ce qu'une autre commande acoustique remplace
+rename startopencvgui->enableopencvgui/show/hide...?
 
 tester mission crash vidéo...
 bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
@@ -43,8 +33,11 @@ données aberrantes vxyhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 enregistrer cog sog dans un des logs
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
+image sonar simu pas bonne?->portée sonar, autres params?
+mapping sonar/hokuyo mean comme tour ile construction de map 2d à partir de log et injection dans google earth...
 
 GUI, video
+faudrait pouvoir enregistrer en high res en local en option
 mieux gérer les infos affichées selon le robot et selon le mode
 info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...?
 alterner les valeurs affichées toutes les s?
@@ -80,6 +73,10 @@ time-division method
 envoyer (périodiquement?) un message sp avec la valeur opi trouvé lat long... en option dans ball et pipe
 acoustic localization : stop specifically submarine to be able to communicate correctly (perturbations by thrusters?)?
 faire un recv et analyser un peu le message comme les autres périphériques, regarder aussi ce qu'a fait Clément
+vu le temps de transmission de 2 positions valides et d'1 rng, il vaut mieux que l'émetteur soit fixe...
+compte tenu du fait que hovercraft est presque fixe et de la vitesse du sous-marin, ça revient à une précision de 10 m
+peut-être qu'il vaudrait mieux regrouper les 2 positions dans le même message pour gagner du temps...
+disableallcontrols désactive aussi toute commande acoustique... (sans doute parce qu'il peut y avoir des régulations dues à une commande acoustique...)
 
 Missions
 manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
@@ -109,12 +106,12 @@ gérer les nouveaux messages mtdata2 pour avoir GPS avec mti-g-700...
 mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status? UTCValid semble le plus strict donc le plus sûr?
 hdop?
 comment savoir si GPS précis, utiliser ublox, vérifier son protocole...?
+pdod,hdop,vdop=5.0,2.8,4.4 quand GPS pas précis, peut-on en faire quelque chose pour déterminer précision?
 altitude GPS?
 utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
-nmeadevice : add hour minute second day month year from nmea2xml_wrsc2015
 dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-MT, WeatherStation, SBG specific NMEA messages...
+MT, WeatherStation, SBG specific NMEA messages, add also GPGLL (see NMEA2CSV)...
 pour la station, générer une croix autour du waypoint...
 
 Obstacle avoidance
@@ -128,10 +125,14 @@ configdistancecomputation
 distancecomputation
 commande waitdistanceless/more/wgs x y d
 
-Altitude sonar
+Altitude sonar, objects detection sonar
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
 l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
+essayer de déterminer un dmin et dmax entre lesquels on peut espérer voir des objets (zone < un certain seuil, avec la médiane)
+détecter les objets <= une certaine taille dans cette zone
+cas particulier du gate où c'est 2 objets éloignés d'une distance connue, pourrait aider à la localisation
+faire un tracking et voir s'ils se confirment
 
 voilier
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
@@ -174,6 +175,9 @@ should add variable datacounter for each device?
 rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire les données de chaque ligne (temps absolu ou relatif en option)
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
+simu
+reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations pour d'autres robots, et/ou intégrer les devices simulés et équations de robots dans UxVCtrl?->au moins les équations, il y a déjà des robid prévus pour différents simulateurs...
+
 attention aux valeurs au départ d'initialisation, attention au setstateestimation...
 surveiller divisions par 0..., vérifier cohérence paramètres par défaut
 surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
@@ -195,6 +199,9 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 OLD
 
+update additional parameter in ballconfig in samples...
+si bBalldetection ou bBalltracking arrêté alors qu'il y a eu une ball détectée, il continue à envoyer des msg acoustiques jusqu'à ce qu'une autre commande acoustique remplace
+
 problème reconnection GPS Galaxy S? c'est peut-être juste qu'il capte pas bien...->à cause de l'Ubiquiti!
 
 j'ai oublié de mettre les stopvideorecording? mais en fait ils risquent de ne pas vraiment être appelés...
@@ -215,7 +222,7 @@ il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le
 zhat à 0 aussi dans logstate, mais rien vu dans pressure... attention, il y avait du z_mes pris par GPS?
 
 bGPSOKNMEADevice pour nmea, bGPSOKMT pour mt, bGPSOKMAVLinkDevice[0], bGPSOKMAVLinkDevice[1] pour mavlink et bGPSOKSimulator pour simu...
-commandes startgpslocalization/stopgpslocalization (dans observer?)
+commandes enableautogpslocalization/disableautogpslocalization (dans observer?)
 
 observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...
 

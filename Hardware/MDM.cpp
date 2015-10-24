@@ -143,7 +143,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 		else
 		{
 			bError = FALSE;
-
+#pragma region ACOUSTIC COMMANDS
 			EnterCriticalSection(&MDMCS);
 			switch (AcousticCommandMDM)
 			{
@@ -682,7 +682,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				break;
 			}
-
+#pragma endregion
 			if (bError)
 			{
 				printf("Connection to a MDM lost.\n");

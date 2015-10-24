@@ -1,3 +1,8 @@
+83
+Renamed start/stopgpslocalization commands to enable/disableautogpslocalization.
+Removed the temporary code that disabled all the modem communications when the ball was not detected while trying to detect it.
+Added parsing of time and date in NMEADevice when available.
+
 82
 Visual Studio 2008 project now uses OpenCV 2.4.9 (download http://www.ensta-bretagne.fr/lebars/Share/OpenCV2.4.9.zip and extract in C:).
 

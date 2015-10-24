@@ -346,10 +346,10 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			}
 			else
 			{
-				// Temp...
-				EnterCriticalSection(&MDMCS);
-				AcousticCommandMDM = 0;
-				LeaveCriticalSection(&MDMCS);
+				//// Temp...
+				//EnterCriticalSection(&MDMCS);
+				//AcousticCommandMDM = 0;
+				//LeaveCriticalSection(&MDMCS);
 			}
 
 #define THIRD_METHOD

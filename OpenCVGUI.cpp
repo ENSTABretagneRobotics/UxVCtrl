@@ -502,7 +502,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 		case 'J': 
-			// startgpslocalization/stopgpslocalization
+			// enableautogpslocalization/disableautogpslocalization
 			bGPSLocalization = !bGPSLocalization; 
 			break;
 		case 'Z':
@@ -594,7 +594,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
 				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
 				"+-(coordspace zoom),T(text color)"
-				"O(gpssetenvcoordposition),G(gpslocalization),J(start/stopgpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
+				"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
 				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode)\n");
