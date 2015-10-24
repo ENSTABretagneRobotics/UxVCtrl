@@ -1,3 +1,7 @@
+84
+Corrections in the different position contractions.
+Compacted some MDM code parts.
+
 83
 Renamed start/stopgpslocalization commands to enable/disableautogpslocalization.
 Removed the temporary code that disabled all the modem communications when the ball was not detected while trying to detect it.

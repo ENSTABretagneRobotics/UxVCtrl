@@ -109,12 +109,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 		{
 			if (GetLatestDataHokuyo(&hokuyo, distances, angles) == EXIT_SUCCESS)
 			{
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				//EnterCriticalSection(&StateVariablesCS);
 				//

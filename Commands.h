@@ -510,15 +510,14 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
+			EnterCriticalSection(&StateVariablesCS);
 			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
-				EnterCriticalSection(&StateVariablesCS);
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
 				lat_env = latitude; long_env = longitude;
-				LeaveCriticalSection(&StateVariablesCS);
-				//break;
 			}
+			LeaveCriticalSection(&StateVariablesCS);
 			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
 			if (!bWaiting) break;
 			if (bExit) break;
@@ -535,9 +534,9 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
+			EnterCriticalSection(&StateVariablesCS);
 			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
-				EnterCriticalSection(&StateVariablesCS);
 				// Should add speed...?
 				// Should add altitude with a big error...?
 				// Assume that x_mes,y_mes is only updated by GPS...
@@ -548,9 +547,8 @@ inline int Commands(char* line)
 					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
 					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
 				}
-				LeaveCriticalSection(&StateVariablesCS);
-				//break;
 			}
+			LeaveCriticalSection(&StateVariablesCS);
 			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
 			if (!bWaiting) break;
 			if (bExit) break;
@@ -600,9 +598,8 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
-
-			// Initial box to be able to contract...?
 			EnterCriticalSection(&StateVariablesCS);
+			// Initial box to be able to contract...?
 			box P = box(xhat,yhat);
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 			//Contract(P);
@@ -611,18 +608,16 @@ inline int Commands(char* line)
 			{
 				// Expand initial box to be able to contract next time and because we are probably lost...
 				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
-				// Was missing before?
-				xhat = P[1];
-				yhat = P[2];
 			}
 			else
 			{
 				// P is likely to be with a small width so we expand...
-				xhat = P[1]+interval(-x_max_err,x_max_err);
-				yhat = P[2]+interval(-y_max_err,y_max_err);
+				P = P+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
 			}
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			xhat = P[1];
+			yhat = P[2];
 			LeaveCriticalSection(&StateVariablesCS);
-
 			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
 			if (!bWaiting) break;
 			if (bExit) break;
@@ -639,11 +634,10 @@ inline int Commands(char* line)
 		StartChrono(&chrono);
 		for (;;)
 		{
-
+			EnterCriticalSection(&StateVariablesCS);
 			if ((acousticmodem_x != 0)&&(acousticmodem_y != 0)&&(acousticmodem_r != 0))
 			{
 				// Initial box to be able to contract...?
-				EnterCriticalSection(&StateVariablesCS);
 				box P = box(xhat,yhat);
 				if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 				box M = box(
@@ -656,18 +650,12 @@ inline int Commands(char* line)
 				{
 					// Expand initial box to be able to contract next time and because we are probably lost...
 					P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
-					// Was missing before?
-					xhat = P[1];
-					yhat = P[2];
 				}
-				else
-				{
-					xhat = P[1];
-					yhat = P[2];
-				}
-				LeaveCriticalSection(&StateVariablesCS);
+				if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+				xhat = P[1];
+				yhat = P[2];
 			}
-
+			LeaveCriticalSection(&StateVariablesCS);
 			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
 			if (!bWaiting) break;
 			if (bExit) break;

@@ -491,6 +491,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// Should add speed...?
+				// Should add altitude with a big error...?
 				// Assume that x_mes,y_mes is only updated by GPS...
 				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
 				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
@@ -526,16 +527,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					// Expand initial box to be able to contract next time and because we are probably lost...
 					P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
-					// Was missing before?
-					xhat = P[1];
-					yhat = P[2];
 				}
 				else
 				{
 					// P is likely to be with a small width so we expand...
-					xhat = P[1]+interval(-x_max_err,x_max_err);
-					yhat = P[2]+interval(-y_max_err,y_max_err);
+					P = P+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
 				}
+				if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+				xhat = P[1];
+				yhat = P[2];
 			}
 			break;
 		case 'P':

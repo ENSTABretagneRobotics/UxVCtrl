@@ -153,12 +153,7 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 				int Hour = 0, Min = 0;
 				double Seconds = 0;
 
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				tt = tv.tv_sec;
 				timeptr = localtime(&tt);

@@ -100,12 +100,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 		{
 			if (GetPressureP33x(&p33x, &pressure) == EXIT_SUCCESS)
 			{
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				EnterCriticalSection(&StateVariablesCS);
 				z_mes = Pressure2Height(pressure);

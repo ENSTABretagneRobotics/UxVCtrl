@@ -151,18 +151,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(buf, 0, sizeof(buf));
-				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : %.4s", buf);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVANYSENDXY_MSG, 'r', buf);
@@ -185,15 +175,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : 0x%.2x%.2x%.2x%.2x (%d,%d)\n", 
-					//	(unsigned int)sendxy.uc[3], (unsigned int)sendxy.uc[2], (unsigned int)sendxy.uc[1], (unsigned int)sendxy.uc[0], 
-					//	(int)sendxy.s[0], (int)sendxy.s[1]);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVANYSENDXY_MSG, 's', 
@@ -215,13 +197,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : %.4s\n", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RNG_MSG, 's', buf);
@@ -237,13 +213,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("RECV : %.255s", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.255s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RNG_MSG, 'r', buf);
@@ -273,15 +243,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : 0x%.2x%.2x%.2x%.2x (%d,%d)\n", 
-					//	(unsigned int)sendxy.uc[3], (unsigned int)sendxy.uc[2], (unsigned int)sendxy.uc[1], (unsigned int)sendxy.uc[0], 
-					//	(int)sendxy.s[0], (int)sendxy.s[1]);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDXY_MSG, 's', 
@@ -296,20 +258,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(&recvxy, 0, sizeof(recvxy));
-				if (RecvAllDataMDM(&mdm, (uint8*)&recvxy, sizeof(recvxy)) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : 0x%.2x%.2x%.2x%.2x (%d,%d)\n", 
-				//	(unsigned int)recvxy.uc[3], (unsigned int)recvxy.uc[2], (unsigned int)recvxy.uc[1], (unsigned int)recvxy.uc[0], 
-				//	(int)recvxy.s[0], (int)recvxy.s[1]);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, (uint8*)&recvxy, sizeof(recvxy)) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVXY_MSG, 'r', 
@@ -344,13 +294,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : %.4s\n", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDASK_MSG, 's', buf);
@@ -363,18 +307,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(buf, 0, sizeof(buf));
-				if (RecvAllDataMDM(&mdm, buf, strlen("ask\n")) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : %.4s", buf);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVASK_MSG, 'r', buf);
@@ -399,13 +333,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : %.4s\n", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDSPWT_MSG, 's', buf);
@@ -418,18 +346,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(buf, 0, sizeof(buf));
-				if (RecvAllDataMDM(&mdm, buf, strlen("SPWT")) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : %.4s", buf);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVSPWT_MSG, 'r', buf);
@@ -454,13 +372,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : %.4s\n", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDOPI_MSG, 's', buf);
@@ -473,18 +385,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(buf, 0, sizeof(buf));
-				if (RecvAllDataMDM(&mdm, buf, strlen("OPI\n")) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : %.4s", buf);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVOPI_MSG, 'r', buf);
@@ -509,13 +411,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : %.4s\n", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDSHH_MSG, 's', buf);
@@ -528,18 +424,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(buf, 0, sizeof(buf));
-				if (RecvAllDataMDM(&mdm, buf, strlen("shh\n")) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : %.4s", buf);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVSHH_MSG, 'r', buf);
@@ -557,20 +443,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(&recvxy, 0, sizeof(recvxy));
-				if (RecvAllDataMDM(&mdm, (uint8*)&recvxy, sizeof(recvxy)) != EXIT_SUCCESS)
-				{
-					//bError = TRUE;
-					break;
-				}
-				//printf("RECV : 0x%.2x%.2x%.2x%.2x (%d,%d)\n", 
-				//	(unsigned int)recvxy.uc[3], (unsigned int)recvxy.uc[2], (unsigned int)recvxy.uc[1], (unsigned int)recvxy.uc[0], 
-				//	(int)recvxy.s[0], (int)recvxy.s[1]);
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (RecvAllDataMDM(&mdm, (uint8*)&recvxy, sizeof(recvxy)) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
 					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVXY_MSG, 'r', 
@@ -607,13 +481,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("SEND : %.4s\n", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RNG_MSG, 's', buf);
@@ -629,13 +497,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						bError = TRUE;
 						break;
 					}
-					//printf("RECV : %.255s", buf);
-					// Time...
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-					{
-						tv.tv_sec = 0;
-						tv.tv_usec = 0;
-					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 					if (mdm.bSaveRawData)
 					{
 						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.255s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RNG_MSG, 'r', buf);
@@ -649,10 +511,10 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					}
 					LeaveCriticalSection(&StateVariablesCS);
 
+					EnterCriticalSection(&StateVariablesCS);
 					if ((acousticmodem_x != 0)&&(acousticmodem_y != 0)&&(acousticmodem_r != 0))
 					{
 						// Initial box to be able to contract...?
-						EnterCriticalSection(&StateVariablesCS);
 						box P = box(xhat,yhat);
 						if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 						box M = box(
@@ -665,17 +527,12 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						{
 							// Expand initial box to be able to contract next time and because we are probably lost...
 							P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
-							// Was missing before?
-							xhat = P[1];
-							yhat = P[2];
 						}
-						else
-						{
-							xhat = P[1];
-							yhat = P[2];
-						}
-						LeaveCriticalSection(&StateVariablesCS);
+						if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+						xhat = P[1];
+						yhat = P[2];
 					}
+					LeaveCriticalSection(&StateVariablesCS);
 				}
 				break;
 			default : 

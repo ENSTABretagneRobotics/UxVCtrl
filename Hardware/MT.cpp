@@ -116,12 +116,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 		{
 			if (GetLatestDataMT(&mt, &mtdata) == EXIT_SUCCESS)
 			{
-				// Time...
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-				{
-					tv.tv_sec = 0;
-					tv.tv_usec = 0;
-				}
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				EnterCriticalSection(&StateVariablesCS);
 
