@@ -98,7 +98,7 @@ ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
 quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
 remplacer Sail par IM483I
-mavlink device (ardupilot, pixhawk, px4flow...)
+mavlink device (ardupilot, pixhawk...) : rajouter lecture et envoi de PWM
 voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)
 
 GPS, NMEA, waypoints, AHRS

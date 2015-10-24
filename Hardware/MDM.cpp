@@ -37,6 +37,33 @@ inline int PurgeDataAndWaitNsMDM(MDM* pMDM, BOOL* pbError, int n)
 	return EXIT_SUCCESS;
 }
 
+inline int SendNbSimpleMessageAndWaitNsMDM(MDM* pMDM, BOOL* pbError, int n, int nb, int msgid, char msg[4])
+{
+	uint8 buf[4];
+	int i = 0;
+	struct timeval tv;
+
+	memset(buf, 0, sizeof(buf));
+	strcpy((char*)buf, msg);
+	for (i = 0; i < nb; i++)
+	{
+		if (SendAllDataMDM(pMDM, buf, strlen((char*)buf)) != EXIT_SUCCESS)
+		{
+			*pbError = TRUE;
+			return EXIT_FAILURE;
+		}
+		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+		if (pMDM->bSaveRawData)
+		{
+			fprintf(pMDM->pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, msgid, 's', buf);
+			fflush(pMDM->pfSaveFile);
+		}
+		if (WaitNsMDM(n) != EXIT_SUCCESS) return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 {
 	MDM mdm;
@@ -285,23 +312,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				break;
 			case SENDASK_MSG :
 				LeaveCriticalSection(&MDMCS);
-				memset(buf, 0, sizeof(buf));
-				strcpy((char*)buf, "ask\n");
-				for (i = 0; i < 1; i++)
-				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
-					{
-						bError = TRUE;
-						break;
-					}
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
-					if (mdm.bSaveRawData)
-					{
-						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDASK_MSG, 's', buf);
-						fflush(mdm.pfSaveFile);
-					}
-					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
-				}
+				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDASK_MSG, "ask\n") != EXIT_SUCCESS) break;
 				break;
 			case RECVASK_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -324,23 +335,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				break;
 			case SENDSPWT_MSG :
 				LeaveCriticalSection(&MDMCS);
-				memset(buf, 0, sizeof(buf));
-				strcpy((char*)buf, "SPWT");
-				for (i = 0; i < 1; i++)
-				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
-					{
-						bError = TRUE;
-						break;
-					}
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
-					if (mdm.bSaveRawData)
-					{
-						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDSPWT_MSG, 's', buf);
-						fflush(mdm.pfSaveFile);
-					}
-					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
-				}
+				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDSPWT_MSG, "SPWT") != EXIT_SUCCESS) break;
 				break;
 			case RECVSPWT_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -363,23 +358,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				break;
 			case SENDOPI_MSG :
 				LeaveCriticalSection(&MDMCS);
-				memset(buf, 0, sizeof(buf));
-				strcpy((char*)buf, "OPI\n");
-				for (i = 0; i < 1; i++)
-				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
-					{
-						bError = TRUE;
-						break;
-					}
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
-					if (mdm.bSaveRawData)
-					{
-						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDOPI_MSG, 's', buf);
-						fflush(mdm.pfSaveFile);
-					}
-					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
-				}
+				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDOPI_MSG, "OPI\n") != EXIT_SUCCESS) break;
 				break;
 			case RECVOPI_MSG :
 				LeaveCriticalSection(&MDMCS);
@@ -402,23 +381,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				break;
 			case SENDSHH_MSG :
 				LeaveCriticalSection(&MDMCS);
-				memset(buf, 0, sizeof(buf));
-				strcpy((char*)buf, "shh\n");
-				for (i = 0; i < 1; i++)
-				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
-					{
-						bError = TRUE;
-						break;
-					}
-					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
-					if (mdm.bSaveRawData)
-					{
-						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDSHH_MSG, 's', buf);
-						fflush(mdm.pfSaveFile);
-					}
-					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
-				}
+				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDSHH_MSG, "shh\n") != EXIT_SUCCESS) break;
 				break;
 			case RECVSHH_MSG :
 				LeaveCriticalSection(&MDMCS);
