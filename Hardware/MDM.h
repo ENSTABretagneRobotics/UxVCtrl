@@ -22,7 +22,7 @@
 #define MAX_NB_BYTES_MDM 1024
 
 #define MESSAGE_LEN_MDM 4
-
+#pragma region MDM-SPECIFIC DEFINITIONS
 // Device internal buffer (in bytes).
 #define INTERNAL_BUFFER_MDM 256
 
@@ -196,7 +196,7 @@ union u4sShortMSG_MDM
 	struct uint64bits_MDM bits;  
 };
 typedef union u4sShortMSG_MDM u4sShortMSG_MDM;
-
+#pragma endregion
 struct MDM
 {
 	RS232PORT RS232Port;

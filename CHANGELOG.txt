@@ -1,3 +1,6 @@
+86
+Corrected sscanf()-related bugs in NMEADevice.
+
 85
 Added support of a 2nd NMEADevice.
 Corrected $WIMDA to take true wind direction instead of magnetic.

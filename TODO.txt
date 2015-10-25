@@ -1,7 +1,5 @@
 mtdata2!
 
-compatibilité vs2015 à vérifier...
-
 rename startopencvgui->enableopencvgui/show/hide...?
 
 tester mission crash vidéo...

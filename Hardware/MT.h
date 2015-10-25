@@ -22,7 +22,7 @@
 #define MAX_NB_BYTES_MT 2048
 
 #define MIN_STANDARD_BUF_LEN_MT 5
-
+#pragma region MT-SPECIFIC DEFINITIONS
 #define PREAMBLE_MT 0xFA
 #define ADDR_MT 0xFF
 #define EXT_LEN_MT 0xFF
@@ -145,7 +145,7 @@ struct UTC_Time_MT
 	unsigned char Valid;
 };
 typedef struct UTC_Time_MT UTC_Time_MT;
-
+#pragma endregion
 struct MTDATA
 {
 	double temp;

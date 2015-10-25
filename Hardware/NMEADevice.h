@@ -370,12 +370,12 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		memset(pNMEAData->szlongdeg, 0, sizeof(pNMEAData->szlongdeg));
 
 		if (
-			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf", &pNMEAData->utc, &pNMEAData->status, 
+			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,%lf,%c", &pNMEAData->utc, &pNMEAData->status, 
 			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
 			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
 			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date, &pNMEAData->variation, &pNMEAData->var_east) != 16)
 			&&
-			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,%lf,%c", &pNMEAData->utc, &pNMEAData->status, 
+			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf", &pNMEAData->utc, &pNMEAData->status, 
 			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
 			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
 			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date) != 14)
@@ -435,8 +435,8 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 			(sscanf(ptr_GPGLL, "$GPGLL,,,,,%lf,%c", &pNMEAData->utc, &pNMEAData->status) != 2)&&
 			(sscanf(ptr_GPGLL, "$GPGLL,,,,,,%c", &pNMEAData->status) != 1))
 		{
-			//printf("Error reading data from a NMEADevice : Invalid data. \n");
-			//return EXIT_FAILURE;
+			printf("Error reading data from a NMEADevice : Invalid data. \n");
+			return EXIT_FAILURE;
 		}
 
 		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
@@ -488,21 +488,44 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 			//printf("Error reading data from a NMEADevice : Invalid data. \n");
 			//return EXIT_FAILURE;
 		}
+		// Do other else if (sscanf() != x) if more/less complete sentence...
 
 		// Convert heading to angle in rad.
 		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
 	}
 
 	// Wind speed and angle, in relation to the vessel's bow/centerline.
-	if (pNMEADevice->bEnableIIMWV||pNMEADevice->bEnableWIMWV)
+	if (pNMEADevice->bEnableIIMWV)
 	{
-		if ((sscanf(ptr_WIMWV, "$WIMWV,%lf,R,%lf,%c,A", 
-			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3)&&
-			(sscanf(ptr_IIMWV, "$IIMWV,%lf,R,%lf,%c,A", 
-			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3))
+		if (sscanf(ptr_IIMWV, "$IIMWV,%lf,R,%lf,%c,A", 
+			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3)
 		{
-			//printf("Error reading data from a NMEADevice : Invalid data. \n");
-			//return EXIT_FAILURE;
+			printf("Error reading data from a NMEADevice : Invalid data. \n");
+			return EXIT_FAILURE;
+		}
+
+		// Convert apparent wind direction to angle in rad.
+		pNMEAData->ApparentWindDir = pNMEAData->awinddir*M_PI/180.0;
+
+		// Convert apparent wind speed to m/s.
+		switch (pNMEAData->cawindspeed)
+		{
+		case 'K': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed*0.28; break;
+		case 'M': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed; break;
+		case 'N': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed*0.51; break;
+		case 'S': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed*0.45; break;
+		default: break;
+		}
+	}
+
+	// Wind speed and angle, in relation to the vessel's bow/centerline.
+	if (pNMEADevice->bEnableWIMWV)
+	{
+		if (sscanf(ptr_WIMWV, "$WIMWV,%lf,R,%lf,%c,A", 
+			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3)
+		{
+			printf("Error reading data from a NMEADevice : Invalid data. \n");
+			return EXIT_FAILURE;
 		}
 
 		// Convert apparent wind direction to angle in rad.
