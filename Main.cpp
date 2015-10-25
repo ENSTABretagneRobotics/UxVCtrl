@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
 {
 	int i = 0;
 	BOOL bGUIAvailable = FALSE;
-	THREAD_IDENTIFIER VideoThreadId[MAX_NB_CAM];
-	THREAD_IDENTIFIER VideoRecordThreadId[MAX_NB_CAM];
+	THREAD_IDENTIFIER VideoThreadId[MAX_NB_VIDEO];
+	THREAD_IDENTIFIER VideoRecordThreadId[MAX_NB_VIDEO];
 	THREAD_IDENTIFIER SeanetProcessingThreadId;
 	THREAD_IDENTIFIER WallThreadId;
 	THREAD_IDENTIFIER PipelineThreadId;
@@ -63,9 +63,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER P33xThreadId;
 	THREAD_IDENTIFIER RazorAHRSThreadId;
 	THREAD_IDENTIFIER MTThreadId;
-	THREAD_IDENTIFIER NMEADeviceThreadId;
+	THREAD_IDENTIFIER NMEADeviceThreadId[MAX_NB_NMEADEVICE];
 #ifdef ENABLE_MAVLINK_SUPPORT
-	THREAD_IDENTIFIER MAVLinkDeviceThreadId[2];
+	THREAD_IDENTIFIER MAVLinkDeviceThreadId[MAX_NB_MAVLINKDEVICE];
 #endif // ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER SwarmonDeviceThreadId;
 #ifdef ENABLE_LABJACK_SUPPORT
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MissionThreadId;
 	THREAD_IDENTIFIER MissionLogThreadId;
 	THREAD_IDENTIFIER CommandsThreadId;
-	THREAD_IDENTIFIER OpenCVGUIThreadId[MAX_NB_CAM];
+	THREAD_IDENTIFIER OpenCVGUIThreadId[MAX_NB_VIDEO];
 
 	INIT_DEBUG;
 
@@ -114,9 +114,12 @@ int main(int argc, char* argv[])
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
-	if (!bDisableNMEADevice) CreateDefaultThread(NMEADeviceThread, NULL, &NMEADeviceThreadId);
+	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
+	{
+		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)i, &NMEADeviceThreadId[i]);
+	}
 #ifdef ENABLE_MAVLINK_SUPPORT
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
 		if (!bDisableMAVLinkDevice[i]) CreateDefaultThread(MAVLinkDeviceThread, (void*)i, &MAVLinkDeviceThreadId[i]);
 	}
@@ -215,12 +218,15 @@ int main(int argc, char* argv[])
 #endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSwarmonDevice) WaitForThread(SwarmonDeviceThreadId);
 #ifdef ENABLE_MAVLINK_SUPPORT
-	for (i = 2-1; i >= 0; i--)
+	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)
 	{
 		if (!bDisableMAVLinkDevice[i]) WaitForThread(MAVLinkDeviceThreadId[i]);
 	}
 #endif // ENABLE_MAVLINK_SUPPORT
-	if (!bDisableNMEADevice) WaitForThread(NMEADeviceThreadId);
+	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)
+	{
+		if (!bDisableNMEADevice[i]) WaitForThread(NMEADeviceThreadId[i]);
+	}
 	if (!bDisableMT) WaitForThread(MTThreadId);
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 	if (!bDisableP33x) WaitForThread(P33xThreadId);

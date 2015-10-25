@@ -42,7 +42,8 @@ inline int LoadConfig()
 	bDisableP33x = TRUE;
 	bDisableRazorAHRS = TRUE;
 	bDisableMT = TRUE;
-	bDisableNMEADevice = TRUE;
+	bDisableNMEADevice[0] = TRUE;
+	bDisableNMEADevice[1] = TRUE;
 	bDisableMAVLinkDevice[0] = TRUE;
 	bDisableMAVLinkDevice[1] = TRUE;
 	bDisableSwarmonDevice = TRUE;
@@ -181,7 +182,9 @@ inline int LoadConfig()
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMT) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bDisableNMEADevice) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableNMEADevice[0]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableNMEADevice[1]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMAVLinkDevice[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -492,7 +495,7 @@ inline int LoadConfig()
 		robid = SUBMARINE_SIMULATOR_ROBID;
 		break;
 	}
-	if ((nbvideo < 0)||(nbvideo > MAX_NB_CAM))
+	if ((nbvideo < 0)||(nbvideo > MAX_NB_VIDEO))
 	{
 		printf("Invalid parameter : nbvideo.\n");
 		nbvideo = 2;

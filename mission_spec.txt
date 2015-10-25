@@ -124,7 +124,7 @@
 %
 %mtconfig MT.txt bPause
 %
-%nmeadeviceconfig NMEADevice.txt bPause
+%nmeadeviceconfig deviceid NMEADevice.txt bPause
 %
 %mavlinkdeviceconfig deviceid MAVLinkDevice.txt bPause
 %

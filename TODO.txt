@@ -1,3 +1,5 @@
+mtdata2!
+
 compatibilité vs2015 à vérifier...
 
 rename startopencvgui->enableopencvgui/show/hide...?
@@ -5,7 +7,7 @@ rename startopencvgui->enableopencvgui/show/hide...?
 tester mission crash vidéo...
 bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
-surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris e compte et régulation profondeur désactivée?->problème un peu comme avec le voilier, deadlock...?
+surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
 
 crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
@@ -105,13 +107,12 @@ GPS, NMEA, waypoints, AHRS
 gérer les nouveaux messages mtdata2 pour avoir GPS avec mti-g-700...
 mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status? UTCValid semble le plus strict donc le plus sûr?
 hdop?
-comment savoir si GPS précis, utiliser ublox, vérifier son protocole...?
-pdod,hdop,vdop=5.0,2.8,4.4 quand GPS pas précis, peut-on en faire quelque chose pour déterminer précision?
+comment savoir si GPS précis? pdod,hdop,vdop=5.0,2.8,4.4 quand GPS pas précis, peut-on en faire quelque chose pour déterminer précision?
 altitude GPS?
 utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
 dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
-MT, WeatherStation, SBG specific NMEA messages, add also GPGLL (see NMEA2CSV)...
+MT, SBG specific NMEA messages...
 pour la station, générer une croix autour du waypoint...
 
 Obstacle avoidance
@@ -186,7 +187,6 @@ deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme
 
 robid, robid mask : regrouper sailboat et motorboat ensemble pour laisser de la place pour UGV et UAV?
 robid log file?
-dans UxVCtrl.txt, ce serait peut-être plus logique de mettre des bEnableDevice au lieu de bDisableDevice...
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
 image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 gestion vagues et z, courants et vxy, wind...

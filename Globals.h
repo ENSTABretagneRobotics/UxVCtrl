@@ -72,9 +72,11 @@
 #define VID_FOLDER "vid/"
 #define AUD_FOLDER "aud/"
 
-#define MAX_NB_CAM 3
-
 #define MAX_UNCERTAINTY 10000
+
+#define MAX_NB_VIDEO 3
+#define MAX_NB_NMEADEVICE 2
+#define MAX_NB_MAVLINKDEVICE 2
 
 // Acoustic modem messages.
 #define RNG_MSG 1
@@ -155,8 +157,8 @@ extern double xte;
 // Parameters.
 extern int robid, nbvideo, 
 videoimgwidth, videoimgheight, captureperiod; 
-extern BOOL bEnableOpenCVGUIs[MAX_NB_CAM];
-extern BOOL bShowVideoOpenCVGUIs[MAX_NB_CAM];
+extern BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
+extern BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 extern BOOL bDisableMES;
@@ -166,8 +168,8 @@ extern BOOL bDisableHokuyo;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
-extern BOOL bDisableNMEADevice;
-extern BOOL bDisableMAVLinkDevice[2];
+extern BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
+extern BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
@@ -352,13 +354,14 @@ extern BOOL bGPSOKMT;
 extern BOOL bPauseMT, bRestartMT;
 
 // NMEADevice variables.
-extern BOOL bGPSOKNMEADevice;
-extern BOOL bPauseNMEADevice, bRestartNMEADevice;
+extern BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
+extern BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
+extern BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
 // MAVLinkDevice variables.
-extern BOOL bGPSOKMAVLinkDevice[2];
-extern BOOL bPauseMAVLinkDevice[2];
-extern BOOL bRestartMAVLinkDevice[2];
+extern BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 
 // SwarmonDevice variables.
 extern BOOL bPauseSwarmonDevice, bRestartSwarmonDevice;
@@ -379,16 +382,16 @@ extern BOOL bPauseMiniSSC, bRestartMiniSSC;
 extern BOOL bPauseSail, bRestartSail;
 
 // Video variables.
-extern CRITICAL_SECTION imgsCS[MAX_NB_CAM];
-extern IplImage* imgs[MAX_NB_CAM];
-extern BOOL bPauseVideo[MAX_NB_CAM];
-extern BOOL bRestartVideo[MAX_NB_CAM];
+extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
+extern IplImage* imgs[MAX_NB_VIDEO];
+extern BOOL bPauseVideo[MAX_NB_VIDEO];
+extern BOOL bRestartVideo[MAX_NB_VIDEO];
 
 // Other.
-extern IplImage* dispimgs[MAX_NB_CAM];
-extern int VideoRecordRequests[MAX_NB_CAM];
-extern CRITICAL_SECTION dispimgsCS[MAX_NB_CAM];
-extern CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_CAM];
+extern IplImage* dispimgs[MAX_NB_VIDEO];
+extern int VideoRecordRequests[MAX_NB_VIDEO];
+extern CRITICAL_SECTION dispimgsCS[MAX_NB_VIDEO];
+extern CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
 extern CRITICAL_SECTION SeanetConnectingCS;
 extern CRITICAL_SECTION SeanetDataCS;
 extern CRITICAL_SECTION StateVariablesCS;
@@ -420,8 +423,8 @@ extern BOOL bGPSLocalization;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 
-extern CvVideoWriter* videorecordfiles[MAX_NB_CAM];
-extern char videorecordfilenames[MAX_NB_CAM][MAX_BUF_LEN];
+extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
+extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 extern FILE* missionfile;
 
@@ -449,7 +452,14 @@ inline int InitGlobals(void)
 
 	// Missing error checking...
 
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
+	{
+		bGPSOKNMEADevice[i] = FALSE;
+		bPauseNMEADevice[i] = FALSE;
+		bRestartNMEADevice[i] = FALSE;
+	}
+
+	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
 		bGPSOKMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
@@ -565,11 +575,18 @@ inline int ReleaseGlobals(void)
 		DeleteCriticalSection(&imgsCS[i]);
 	}
 
-	for (i = 2-1; i >= 0; i--)
+	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)
 	{
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bGPSOKMAVLinkDevice[i] = FALSE;
+	}
+
+	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)
+	{
+		bRestartNMEADevice[i] = FALSE;
+		bPauseNMEADevice[i] = FALSE;
+		bGPSOKNMEADevice[i] = FALSE;
 	}
 
 	return EXIT_SUCCESS;

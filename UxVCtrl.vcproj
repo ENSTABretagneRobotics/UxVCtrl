@@ -367,6 +367,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NMEADevice1.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\P33x0.txt"
 				>
 			</File>

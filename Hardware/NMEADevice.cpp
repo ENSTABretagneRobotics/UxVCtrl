@@ -16,26 +16,30 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	NMEADATA nmeadata;
 	double dval = 0;
 	BOOL bConnected = FALSE;
+	int deviceid = (int)pParam;
+	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	UNREFERENCED_PARAMETER(pParam);
+	//UNREFERENCED_PARAMETER(pParam);
+
+	sprintf(szCfgFilePath, "NMEADevice%d.txt", deviceid);
 
 	memset(&nmeadevice, 0, sizeof(NMEADEVICE));
 
-	bGPSOKNMEADevice = FALSE;
+	bGPSOKNMEADevice[deviceid] = FALSE;
 
 	for (;;)
 	{
 		mSleep(100);
 
-		if (bPauseNMEADevice)
+		if (bPauseNMEADevice[deviceid])
 		{
 			if (bConnected)
 			{
 				printf("NMEADevice paused.\n");
-				bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}
@@ -44,21 +48,21 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			continue;
 		}
 
-		if (bRestartNMEADevice)
+		if (bRestartNMEADevice[deviceid])
 		{
 			if (bConnected)
 			{
 				printf("Restarting a NMEADevice.\n");
-				bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}
-			bRestartNMEADevice = FALSE;
+			bRestartNMEADevice[deviceid] = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectNMEADevice(&nmeadevice, "NMEADevice0.txt") == EXIT_SUCCESS) 
+			if (ConnectNMEADevice(&nmeadevice, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
 
@@ -94,7 +98,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -104,7 +108,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (GetLatestDataNMEADevice(&nmeadevice, &nmeadata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
-				
+
 				//printf("GPS_quality_indicator : %d, status : %c\n", nmeadata.GPS_quality_indicator, nmeadata.status);
 
 				if ((nmeadata.GPS_quality_indicator > 0)||(nmeadata.status == 'A'))
@@ -113,11 +117,11 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					latitude = nmeadata.Latitude;
 					longitude = nmeadata.Longitude;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKNMEADevice = TRUE;
+					bGPSOKNMEADevice[deviceid] = TRUE;
 				}
 				else
 				{
-					bGPSOKNMEADevice = FALSE;
+					bGPSOKNMEADevice[deviceid] = FALSE;
 				}
 
 				// Should check better if valid...
@@ -132,7 +136,19 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
 				}
 
-				if (nmeadevice.bEnableWIMDA)
+				if (nmeadevice.bEnableIIMWV||nmeadevice.bEnableWIMWV)
+				{
+					// Apparent wind (in robot coordinate system).
+					psiawind = fmod_2PI(-nmeadata.ApparentWindDir+M_PI); 
+					vawind = nmeadata.ApparentWindSpeed;
+					// True wind must be computed from apparent wind.
+					if (bDisableRollWindCorrectionSailboat)
+						psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
+					else
+						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
+				}
+
+				if (nmeadevice.bEnableWIMWD||nmeadevice.bEnableWIMDA)
 				{
 					// True wind.
 					psitwind = fmod_2PI(M_PI/2.0-nmeadata.WindDir+M_PI-angle_env);
@@ -144,7 +160,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			else
 			{
 				printf("Connection to a NMEADevice lost.\n");
-				bGPSOKNMEADevice = FALSE;
+				bGPSOKNMEADevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}		
@@ -153,7 +169,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 		if (bExit) break;
 	}
 
-	bGPSOKNMEADevice = FALSE;
+	bGPSOKNMEADevice[deviceid] = FALSE;
 
 	if (nmeadevice.pfSaveFile != NULL)
 	{

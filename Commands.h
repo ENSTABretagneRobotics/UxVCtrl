@@ -511,7 +511,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
@@ -535,7 +535,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// Should add speed...?
 				// Should add altitude with a big error...?
@@ -1219,31 +1219,40 @@ inline int Commands(char* line)
 		if (!ival1) bRestartMT = TRUE;
 		bPauseMT = ival1;
 	}
-	else if (sscanf(line, "nmeadeviceconfig %255s %d", str, &ival1) == 2)
+	else if (sscanf(line, "nmeadeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
-		if (strncmp(str, "NMEADevice0.txt", strlen("NMEADevice0.txt")) != 0)
+		if ((ival >= 0)&&(ival < MAX_NB_NMEADEVICE))
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
-			if (buf)
+			memset(str2, 0, sizeof(str2));
+			sprintf(str2, "NMEADevice%d.txt", ival);
+			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				if (fcopyload(str, "NMEADevice0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				if (buf)
 				{
-					printf("Unable to copy file.\n");
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					{
+						printf("Unable to copy file.\n");
+					}
+					free(buf);
 				}
-				free(buf);
+				else
+				{
+					printf("Unable to allocate data.\n");
+				}
 			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
+			mSleep(500);
+			if (!ival1) bRestartNMEADevice[ival] = TRUE;
+			bPauseNMEADevice[ival] = ival1;
 		}
-		mSleep(500);
-		if (!ival1) bRestartNMEADevice = TRUE;
-		bPauseNMEADevice = ival1;
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
 	}
 	else if (sscanf(line, "malinkdeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
-		if ((ival >= 0)&&(ival < 2))
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "MAVLinkDevice%d.txt", ival);

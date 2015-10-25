@@ -479,7 +479,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'O':
 			// gpssetenvcoordposition
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
@@ -488,7 +488,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'G':
 			// gpslocalization
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				// Should add speed...?
 				// Should add altitude with a big error...?
@@ -741,13 +741,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
 			{
 				if (bGPSLocalization) strcpy(szText, "GPS FIX (IN USE)"); else strcpy(szText, "GPS FIX"); 
 			}
 			else strcpy(szText, "NO FIX");
 			offset += 16;
-			if (bGPSOKNMEADevice||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			else cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,0));
 			if (bDispSOG)
 			{

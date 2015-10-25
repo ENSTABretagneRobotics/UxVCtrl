@@ -1,3 +1,8 @@
+85
+Added support of a 2nd NMEADevice.
+Corrected $WIMDA to take true wind direction instead of magnetic.
+Added $GPGLL, $IIMWV, $WIMWV, $WIMWD support.
+
 84
 Corrections in the different position contractions.
 Compacted some MDM code parts.

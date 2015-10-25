@@ -59,8 +59,8 @@ double xte = 0;
 // Parameters.
 int robid = 0, nbvideo = 0, 
 videoimgwidth = 0, videoimgheight = 0, captureperiod = 0; 
-BOOL bEnableOpenCVGUIs[MAX_NB_CAM];
-BOOL bShowVideoOpenCVGUIs[MAX_NB_CAM];
+BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
+BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 BOOL bDisableMES = FALSE;
@@ -70,8 +70,8 @@ BOOL bDisableHokuyo = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
-BOOL bDisableNMEADevice = FALSE;
-BOOL bDisableMAVLinkDevice[2];
+BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
+BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bDisableSwarmonDevice = FALSE;
 BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
@@ -256,13 +256,14 @@ BOOL bGPSOKMT = FALSE;
 BOOL bPauseMT = FALSE, bRestartMT = FALSE;
 
 // NMEADevice variables.
-BOOL bGPSOKNMEADevice = FALSE;
-BOOL bPauseNMEADevice = FALSE, bRestartNMEADevice = FALSE;
+BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
+BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
+BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
 // MAVLinkDevice variables.
-BOOL bGPSOKMAVLinkDevice[2];
-BOOL bPauseMAVLinkDevice[2];
-BOOL bRestartMAVLinkDevice[2];
+BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 
 // SwarmonDevice variables.
 BOOL bPauseSwarmonDevice = FALSE, bRestartSwarmonDevice = FALSE;
@@ -283,16 +284,16 @@ BOOL bPauseMiniSSC = FALSE, bRestartMiniSSC = FALSE;
 BOOL bPauseSail = FALSE, bRestartSail = FALSE;
 
 // Video variables.
-CRITICAL_SECTION imgsCS[MAX_NB_CAM];
-IplImage* imgs[MAX_NB_CAM];
-BOOL bPauseVideo[MAX_NB_CAM];
-BOOL bRestartVideo[MAX_NB_CAM];
+CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
+IplImage* imgs[MAX_NB_VIDEO];
+BOOL bPauseVideo[MAX_NB_VIDEO];
+BOOL bRestartVideo[MAX_NB_VIDEO];
 
 // Other.
-IplImage* dispimgs[MAX_NB_CAM];
-int VideoRecordRequests[MAX_NB_CAM];
-CRITICAL_SECTION dispimgsCS[MAX_NB_CAM];
-CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_CAM];
+IplImage* dispimgs[MAX_NB_VIDEO];
+int VideoRecordRequests[MAX_NB_VIDEO];
+CRITICAL_SECTION dispimgsCS[MAX_NB_VIDEO];
+CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
 CRITICAL_SECTION SeanetConnectingCS;
 CRITICAL_SECTION SeanetDataCS;
 CRITICAL_SECTION StateVariablesCS;
@@ -324,8 +325,8 @@ BOOL bGPSLocalization = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
 
-CvVideoWriter* videorecordfiles[MAX_NB_CAM];
-char videorecordfilenames[MAX_NB_CAM][MAX_BUF_LEN];
+CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
+char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 FILE* missionfile = NULL;
 

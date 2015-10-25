@@ -38,6 +38,8 @@ struct NMEADATA
 	char cpressure, ctemperature;
 	double winddir, windspeed;
 	char cwinddir, cwindspeed;
+	double awinddir, awindspeed;
+	char cawinddir, cawindspeed;
 	int latdeg, longdeg;
 	double latmin, longmin;
 	char szlatdeg[3];
@@ -61,6 +63,8 @@ struct NMEADATA
 	double Heading; // In rad.
 	double WindDir; // In rad.
 	double WindSpeed; // In m/s.
+	double ApparentWindDir; // In rad.
+	double ApparentWindSpeed; // In m/s.
 };
 typedef struct NMEADATA NMEADATA;
 
@@ -77,8 +81,12 @@ struct NMEADEVICE
 	BOOL bSaveRawData;
 	BOOL bEnableGPGGA;
 	BOOL bEnableGPRMC;
+	BOOL bEnableGPGLL;
 	BOOL bEnableGPVTG;
 	BOOL bEnableHCHDG;
+	BOOL bEnableIIMWV;
+	BOOL bEnableWIMWV;
+	BOOL bEnableWIMWD;
 	BOOL bEnableWIMDA;
 };
 typedef struct NMEADEVICE NMEADEVICE;
@@ -174,8 +182,12 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 	int BytesReceived = 0, Bytes = 0, recvbuflen = 0;
 	char* ptr_GPGGA = NULL;
 	char* ptr_GPRMC = NULL;
+	char* ptr_GPGLL = NULL;
 	char* ptr_GPVTG = NULL;
 	char* ptr_HCHDG = NULL;
+	char* ptr_IIMWV = NULL;
+	char* ptr_WIMWV = NULL;
+	char* ptr_WIMWD = NULL;
 	char* ptr_WIMDA = NULL;
 	// Temporary buffers for sscanf().
 	char c0 = 0, c1 = 0, c2 = 0;
@@ -245,15 +257,23 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 
 	if (pNMEADevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
 	if (pNMEADevice->bEnableGPRMC) ptr_GPRMC = FindLatestNMEASentence("$GPRMC", recvbuf);
+	if (pNMEADevice->bEnableGPGLL) ptr_GPGLL = FindLatestNMEASentence("$GPGLL", recvbuf);
 	if (pNMEADevice->bEnableGPVTG) ptr_GPVTG = FindLatestNMEASentence("$GPVTG", recvbuf);
 	if (pNMEADevice->bEnableHCHDG) ptr_HCHDG = FindLatestNMEASentence("$HCHDG", recvbuf);
+	if (pNMEADevice->bEnableIIMWV) ptr_IIMWV = FindLatestNMEASentence("$IIMWV", recvbuf);
+	if (pNMEADevice->bEnableWIMWV) ptr_WIMWV = FindLatestNMEASentence("$WIMWV", recvbuf);
+	if (pNMEADevice->bEnableWIMWD) ptr_WIMWD = FindLatestNMEASentence("$WIMWD", recvbuf);
 	if (pNMEADevice->bEnableWIMDA) ptr_WIMDA = FindLatestNMEASentence("$WIMDA", recvbuf);
 
 	while (
 		(pNMEADevice->bEnableGPGGA&&!ptr_GPGGA)||
 		(pNMEADevice->bEnableGPRMC&&!ptr_GPRMC)||
+		(pNMEADevice->bEnableGPGLL&&!ptr_GPGLL)||
 		(pNMEADevice->bEnableGPVTG&&!ptr_GPVTG)||
 		(pNMEADevice->bEnableHCHDG&&!ptr_HCHDG)||
+		(pNMEADevice->bEnableIIMWV&&!ptr_IIMWV)||
+		(pNMEADevice->bEnableWIMWV&&!ptr_WIMWV)||
+		(pNMEADevice->bEnableWIMWD&&!ptr_WIMWD)||
 		(pNMEADevice->bEnableWIMDA&&!ptr_WIMDA)
 		)
 	{
@@ -281,8 +301,12 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		BytesReceived += Bytes;
 		if (pNMEADevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
 		if (pNMEADevice->bEnableGPRMC) ptr_GPRMC = FindLatestNMEASentence("$GPRMC", recvbuf);
+		if (pNMEADevice->bEnableGPGLL) ptr_GPGLL = FindLatestNMEASentence("$GPGLL", recvbuf);
 		if (pNMEADevice->bEnableGPVTG) ptr_GPVTG = FindLatestNMEASentence("$GPVTG", recvbuf);
 		if (pNMEADevice->bEnableHCHDG) ptr_HCHDG = FindLatestNMEASentence("$HCHDG", recvbuf);
+		if (pNMEADevice->bEnableIIMWV) ptr_IIMWV = FindLatestNMEASentence("$IIMWV", recvbuf);
+		if (pNMEADevice->bEnableWIMWV) ptr_WIMWV = FindLatestNMEASentence("$WIMWV", recvbuf);
+		if (pNMEADevice->bEnableWIMWD) ptr_WIMWD = FindLatestNMEASentence("$WIMWD", recvbuf);
 		if (pNMEADevice->bEnableWIMDA) ptr_WIMDA = FindLatestNMEASentence("$WIMDA", recvbuf);
 	}
 
@@ -320,12 +344,6 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 			printf("Error reading data from a NMEADevice : Invalid data. \n");
 			return EXIT_FAILURE;
 		}
-
-		//if (pNMEAData->GPS_quality_indicator == 0) 
-		//{
-		//	printf("Error reading data from a NMEADevice : GPS fix not available or invalid. \n");
-		//	return EXIT_FAILURE;
-		//}
 
 		if (pNMEAData->utc > 0)
 		{
@@ -404,28 +422,53 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		}
 	}
 
-	// GPS COG and SOG data.
+	// GPS position, latitude / longitude and time.
+	if (pNMEADevice->bEnableGPGLL)
+	{
+		memset(pNMEAData->szlatdeg, 0, sizeof(pNMEAData->szlatdeg));
+		memset(pNMEAData->szlongdeg, 0, sizeof(pNMEAData->szlongdeg));
+
+		if ((sscanf(ptr_GPGLL, "$GPGLL,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%c", 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east, 
+			&pNMEAData->utc, &pNMEAData->status) != 11)&&
+			(sscanf(ptr_GPGLL, "$GPGLL,,,,,%lf,%c", &pNMEAData->utc, &pNMEAData->status) != 2)&&
+			(sscanf(ptr_GPGLL, "$GPGLL,,,,,,%c", &pNMEAData->status) != 1))
+		{
+			//printf("Error reading data from a NMEADevice : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+
+		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
+		{
+			pNMEAData->latdeg = atoi(pNMEAData->szlatdeg);
+			pNMEAData->longdeg = atoi(pNMEAData->szlongdeg);
+
+			// Convert GPS latitude and longitude in decimal.
+			pNMEAData->Latitude = (pNMEAData->north == 'N')?(pNMEAData->latdeg+pNMEAData->latmin/60.0):-(pNMEAData->latdeg+pNMEAData->latmin/60.0);
+			pNMEAData->Longitude = (pNMEAData->east == 'E')?(pNMEAData->longdeg+pNMEAData->longmin/60.0):-(pNMEAData->longdeg+pNMEAData->longmin/60.0);
+		}
+
+		if (pNMEAData->utc > 0)
+		{
+			pNMEAData->hour = (int)pNMEAData->utc/10000;
+			pNMEAData->minute = (int)pNMEAData->utc/100-pNMEAData->hour*100;
+			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000)-pNMEAData->minute*100;
+		}
+	}
+
+	// GPS COG and SOG.
 	if (pNMEADevice->bEnableGPVTG)
 	{
-		if (
-			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,%lf,M,%lf,N", &pNMEAData->cog, &pNMEAData->mag_cog, &pNMEAData->sog) != 3)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,M,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,nan,T,nan,M,%lf,N", &pNMEAData->sog) != 1)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NAN,T,NAN,M,%lf,N", &pNMEAData->sog) != 1)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NaN,T,NaN,M,%lf,N", &pNMEAData->sog) != 1)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,nan,T,,,%lf,N", &pNMEAData->sog) != 1)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NAN,T,,,%lf,N", &pNMEAData->sog) != 1)
-			&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NaN,T,,,%lf,N", &pNMEAData->sog) != 1)
-			)
+		if ((sscanf(ptr_GPVTG, "$GPVTG,%lf,T,%lf,M,%lf,N", &pNMEAData->cog, &pNMEAData->mag_cog, &pNMEAData->sog) != 3)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,M,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,nan,T,nan,M,%lf,N", &pNMEAData->sog) != 1)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,NAN,T,NAN,M,%lf,N", &pNMEAData->sog) != 1)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,NaN,T,NaN,M,%lf,N", &pNMEAData->sog) != 1)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,nan,T,,,%lf,N", &pNMEAData->sog) != 1)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,NAN,T,,,%lf,N", &pNMEAData->sog) != 1)&&
+			(sscanf(ptr_GPVTG, "$GPVTG,NaN,T,,,%lf,N", &pNMEAData->sog) != 1))
 		{
 			//printf("Error reading data from a NMEADevice : Invalid data. \n");
 			//return EXIT_FAILURE;
@@ -450,17 +493,60 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
 	}
 
-	// Wind data.
-	if (pNMEADevice->bEnableWIMDA)
+	// Wind speed and angle, in relation to the vessel's bow/centerline.
+	if (pNMEADevice->bEnableIIMWV||pNMEADevice->bEnableWIMWV)
 	{
-		if (sscanf(ptr_WIMDA, "$WIMDA,%lf,%c,%lf,%c,%lf,%c,,,,,,,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
-			&f0, &c0, &pNMEAData->pressure, &pNMEAData->cpressure, &pNMEAData->temperature, &pNMEAData->ctemperature, &f1, &c1,  
-			&pNMEAData->winddir, &pNMEAData->cwinddir, &f2, &c2, &pNMEAData->windspeed, &pNMEAData->cwindspeed) != 14)
+		if ((sscanf(ptr_WIMWV, "$WIMWV,%lf,R,%lf,%c,A", 
+			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3)&&
+			(sscanf(ptr_IIMWV, "$IIMWV,%lf,R,%lf,%c,A", 
+			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3))
 		{
 			//printf("Error reading data from a NMEADevice : Invalid data. \n");
 			//return EXIT_FAILURE;
 		}
-		// Do other else if (sscanf() != x) if more/less complete WIMDA sentence...
+
+		// Convert apparent wind direction to angle in rad.
+		pNMEAData->ApparentWindDir = pNMEAData->awinddir*M_PI/180.0;
+
+		// Convert apparent wind speed to m/s.
+		switch (pNMEAData->cawindspeed)
+		{
+		case 'K': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed*0.28; break;
+		case 'M': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed; break;
+		case 'N': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed*0.51; break;
+		case 'S': pNMEAData->ApparentWindSpeed = pNMEAData->awindspeed*0.45; break;
+		default: break;
+		}
+	}
+
+	// Wind direction and speed, with respect to north.
+	if (pNMEADevice->bEnableWIMWD)
+	{
+		if (sscanf(ptr_WIMWD, "$WIMWD,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
+			&pNMEAData->winddir, &pNMEAData->cwinddir, &f1, &c1, &f2, &c2, &pNMEAData->windspeed, &pNMEAData->cwindspeed) != 8)
+		{
+			//printf("Error reading data from a NMEADevice : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+		// Do other else if (sscanf() != x) if more/less complete sentence...
+
+		// Convert wind direction to angle in rad.
+		pNMEAData->WindDir = pNMEAData->winddir*M_PI/180.0;
+
+		pNMEAData->WindSpeed = pNMEAData->windspeed; 
+	}
+
+	// Meteorological composite data.
+	if (pNMEADevice->bEnableWIMDA)
+	{
+		if (sscanf(ptr_WIMDA, "$WIMDA,%lf,%c,%lf,%c,%lf,%c,,,,,,,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
+			&f0, &c0, &pNMEAData->pressure, &pNMEAData->cpressure, &pNMEAData->temperature, &pNMEAData->ctemperature,  
+			&pNMEAData->winddir, &pNMEAData->cwinddir, &f1, &c1, &f2, &c2, &pNMEAData->windspeed, &pNMEAData->cwindspeed) != 14)
+		{
+			//printf("Error reading data from a NMEADevice : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+		// Do other else if (sscanf() != x) if more/less complete sentence...
 
 		// Convert wind direction to angle in rad.
 		pNMEAData->WindDir = pNMEAData->winddir*M_PI/180.0;
@@ -496,8 +582,12 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 		pNMEADevice->bSaveRawData = 1;
 		pNMEADevice->bEnableGPGGA = 1;
 		pNMEADevice->bEnableGPRMC = 0;
+		pNMEADevice->bEnableGPGLL = 0;
 		pNMEADevice->bEnableGPVTG = 0;
 		pNMEADevice->bEnableHCHDG = 0;
+		pNMEADevice->bEnableIIMWV = 0;
+		pNMEADevice->bEnableWIMWV = 0;
+		pNMEADevice->bEnableWIMWD = 0;
 		pNMEADevice->bEnableWIMDA = 0;
 
 		// Load data from a file.
@@ -517,9 +607,17 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->bEnableGPRMC) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableGPGLL) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->bEnableGPVTG) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->bEnableHCHDG) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableIIMWV) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableWIMWV) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableWIMWD) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->bEnableWIMDA) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
