@@ -21,6 +21,7 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_SEANET 2048
 
+#pragma region SEANET-SPECIFIC DEFINITIONS
 #define MAX_NUMBER_OF_STEPS_SEANET 6400
 
 #define MIN_MESSAGE_LEN_SEANET 11
@@ -137,7 +138,7 @@ typedef union HDCTRL HDCTRL;
 //	unsigned char HeadInf;
 //};
 //typedef struct SEANETDATA SEANETDATA;
-
+#pragma endregion
 struct SEANET
 {
 	RS232PORT RS232Port;

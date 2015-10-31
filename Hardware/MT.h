@@ -21,8 +21,10 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_MT 2048
 
-#define MIN_STANDARD_BUF_LEN_MT 5
 #pragma region MT-SPECIFIC DEFINITIONS
+#define MIN_STANDARD_BUF_LEN_MT 5
+#define MIN_EXTENDED_BUF_LEN_MT 7
+
 #define PREAMBLE_MT 0xFA
 #define ADDR_MT 0xFF
 #define EXT_LEN_MT 0xFF
@@ -270,10 +272,50 @@ inline int CheckMTChecksum(unsigned char* msg, int msglen)
 	return EXIT_SUCCESS;
 }
 
+// buf must contain the beginning of a valid message of at least MIN_STANDARD_BUF_LEN_MT bytes or 
+// at least MIN_EXTENDED_BUF_LEN_MT bytes if it is an extended length message.
+inline unsigned char* GetDataBytesMTMessage(unsigned char* buf, int* pNbDataBytes)
+{
+	uShort_MT extlen;
+
+	if (buf[3] == EXT_LEN_MT)
+	{
+		extlen.c[0] = buf[5];
+		extlen.c[1] = buf[4];
+		*pNbDataBytes = extlen.v;
+		return buf+6;
+	}
+	else
+	{
+		*pNbDataBytes = buf[3];
+		return buf+4;
+	}
+}
+
+// buf must contain the beginning of a valid message of at least MIN_STANDARD_BUF_LEN_MT bytes or 
+// at least MIN_EXTENDED_BUF_LEN_MT bytes if it is an extended length message.
+inline int GetLengthMTMessage(unsigned char* buf)
+{
+	uShort_MT extlen;
+
+	if (buf[3] == EXT_LEN_MT)
+	{
+		extlen.c[0] = buf[5];
+		extlen.c[1] = buf[4];
+		return extlen.v+MIN_EXTENDED_BUF_LEN_MT;
+	}
+	else
+	{
+		return buf[3]+MIN_STANDARD_BUF_LEN_MT;
+	}
+}
+
 // If this function succeeds, the beginning of buf contains a valid message
 // but there might be other data at the end.
 inline int AnalyzeMTMessage(unsigned char* buf, int buflen, int addr, int mid)
 {
+	int msglen = 0;
+
 	// Check number of bytes.
 	if (buflen < MIN_STANDARD_BUF_LEN_MT)
 	{
@@ -301,16 +343,20 @@ inline int AnalyzeMTMessage(unsigned char* buf, int buflen, int addr, int mid)
 	// Check number of data bytes.
 	if (buf[3] == EXT_LEN_MT)
 	{
-		//printf("Unhandled number of data bytes.\n");
-		return EXIT_FAILURE;
+		if (buflen < MIN_EXTENDED_BUF_LEN_MT)
+		{
+			//printf("Invalid number of bytes.\n");
+			return EXIT_FAILURE;
+		}
 	}
-	if (buflen < buf[3]+MIN_STANDARD_BUF_LEN_MT)
+	msglen = GetLengthMTMessage(buf);	
+	if (buflen < msglen)
 	{
 		//printf("Incomplete message.\n");
 		return EXIT_FAILURE;
 	}
 	// Checksum.
-	if (CheckMTChecksum(buf, buf[3]+MIN_STANDARD_BUF_LEN_MT) != EXIT_SUCCESS)
+	if (CheckMTChecksum(buf, msglen) != EXIT_SUCCESS)
 	{ 
 		//printf("Invalid checksum.\n");
 		return EXIT_FAILURE;	
@@ -363,7 +409,7 @@ inline int FindLatestMTMessage(unsigned char* buf, int buflen, int addr, int mid
 		*pFoundMsgTmpLen = len;
 
 		// Expected total message length.
-		msglen = (*pFoundMsg)[3]+MIN_STANDARD_BUF_LEN_MT;
+		msglen = GetLengthMTMessage(*pFoundMsg);
 
 		// Search just after the message.
 		if (FindMTMessage(*pFoundMsg+msglen, *pFoundMsgTmpLen-msglen, 
@@ -471,19 +517,17 @@ inline int GetLatestMTMessageMT(MT* pMT, int addr, int mid, unsigned char* datab
 	// Get data bytes.
 
 	memset(databuf, 0, databuflen);
-	*pNbdatabytes = ptr[3];
-
+	ptr = GetDataBytesMTMessage(ptr, pNbdatabytes);
 	// Check the number of data bytes before copy.
 	if (databuflen < *pNbdatabytes)
 	{
 		printf("Too small data buffer.\n");
 		return EXIT_FAILURE;
 	}
-
 	// Copy the data bytes of the message.
 	if (*pNbdatabytes > 0)
 	{
-		memcpy(databuf, ptr+4, *pNbdatabytes);
+		memcpy(databuf, ptr, *pNbdatabytes);
 	}
 
 	return EXIT_SUCCESS;

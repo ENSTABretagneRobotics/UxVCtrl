@@ -1,4 +1,6 @@
-mtdata2!
+mtdata2! faire findlatestmsgwithoutmid...?
+
+LIDAR/sonar : mesure vitesse si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
 
 rename startopencvgui->enableopencvgui/show/hide...?
 
