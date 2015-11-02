@@ -57,6 +57,110 @@
 // Data-related messages.
 #define REQ_DATA_MID 0x34
 #define MTDATA_MID 0x32
+#define MTDATA2_MID 0x36
+
+// Data Identifiers.
+enum XsDataIdentifier
+{
+	XDI_None					= 0x0000,
+	XDI_TypeMask				= 0xFE00,
+	XDI_FullTypeMask			= 0xFFF0,
+	XDI_FullMask				= 0xFFFF,
+	XDI_FormatMask				= 0x01FF,
+	XDI_DataFormatMask			= 0x000F,
+
+	XDI_SubFormatMask			= 0x0003,	//determines, float, fp12.20, fp16.32, double output... (where applicable)
+	XDI_SubFormatFloat			= 0x0000,
+	XDI_SubFormatFp1220			= 0x0001,
+	XDI_SubFormatFp1632			= 0x0002,
+	XDI_SubFormatDouble			= 0x0003,
+
+	XDI_TemperatureGroup		= 0x0800,
+	XDI_Temperature				= 0x0810,
+
+	XDI_TimestampGroup			= 0x1000,
+	XDI_UtcTime					= 0x1010,
+	XDI_PacketCounter			= 0x1020,
+	XDI_Itow					= 0x1030,
+	XDI_GpsAge					= 0x1040,	//!< \deprecated
+	XDI_GnssAge					= 0x1040,
+	XDI_PressureAge				= 0x1050,
+	XDI_SampleTimeFine			= 0x1060,
+	XDI_SampleTimeCoarse		= 0x1070,
+	XDI_FrameRange				= 0x1080,	// add for MTw (if needed)
+	XDI_PacketCounter8			= 0x1090,
+	XDI_SampleTime64			= 0x10A0,
+
+	XDI_OrientationGroup		= 0x2000,
+	XDI_CoordSysMask			= 0x000C,
+	XDI_CoordSysEnu				= 0x0000,
+	XDI_CoordSysNed				= 0x0004,
+	XDI_CoordSysNwu				= 0x0008,
+	XDI_Quaternion				= 0x2010,
+	XDI_RotationMatrix			= 0x2020,
+	XDI_EulerAngles				= 0x2030,
+
+	XDI_PressureGroup			= 0x3000,
+	XDI_BaroPressure			= 0x3010,
+
+	XDI_AccelerationGroup		= 0x4000,
+	XDI_DeltaV					= 0x4010,
+	XDI_Acceleration			= 0x4020,
+	XDI_FreeAcceleration		= 0x4030,
+
+	XDI_PositionGroup			= 0x5000,
+	XDI_AltitudeMsl				= 0x5010,
+	XDI_AltitudeEllipsoid		= 0x5020,
+	XDI_PositionEcef			= 0x5030,
+	XDI_LatLon					= 0x5040,
+
+	XDI_SnapshotGroup			= 0xC800,
+	XDI_RetransmissionMask		= 0x0001,
+	XDI_RetransmissionFlag		= 0x0001,
+	XDI_AwindaSnapshot 			= 0xC810,
+
+	XDI_GnssGroup				= 0x7000,
+	XDI_GnssPvtData				= 0x7010,
+	XDI_GnssSatInfo				= 0x7020,
+
+	XDI_AngularVelocityGroup	= 0x8000,
+	XDI_RateOfTurn				= 0x8020,
+	XDI_DeltaQ					= 0x8030,
+
+	XDI_GpsGroup				= 0x8800,		//!< \deprecated
+	XDI_GpsDop					= 0x8830,		//!< \deprecated
+	XDI_GpsSol					= 0x8840,		//!< \deprecated
+	XDI_GpsTimeUtc				= 0x8880,		//!< \deprecated
+	XDI_GpsSvInfo				= 0x88A0,		//!< \deprecated
+
+	XDI_RawSensorGroup			= 0xA000,
+	XDI_RawAccGyrMagTemp		= 0xA010,
+	XDI_RawGyroTemp				= 0xA020,
+	XDI_RawAcc					= 0xA030,
+	XDI_RawGyr					= 0xA040,
+	XDI_RawMag					= 0xA050,
+
+	XDI_AnalogInGroup			= 0xB000,
+	XDI_AnalogIn1				= 0xB010,
+	XDI_AnalogIn2				= 0xB020,
+
+	XDI_MagneticGroup			= 0xC000,
+	XDI_MagneticField			= 0xC020,
+
+	XDI_VelocityGroup			= 0xD000,
+	XDI_VelocityXYZ				= 0xD010,
+
+	XDI_StatusGroup				= 0xE000,
+	XDI_StatusByte				= 0xE010,
+	XDI_StatusWord				= 0xE020,
+	XDI_Rssi					= 0xE040,
+	XDI_DeviceId				= 0xE080,
+
+	XDI_IndicationGroup	        = 0x4800, // 0100.1000 -> bit reverse = 0001.0010 -> type 18
+	XDI_TriggerIn1				= 0x4810,
+	XDI_TriggerIn2				= 0x4820,
+};
+typedef enum XsDataIdentifier XsDataIdentifier;
 
 // Output mode.
 #define TEMPERATURE_BIT 0x0001
@@ -90,6 +194,7 @@
 #define OUTPUT_FORMAT_FLOAT 0x00000000
 #define OUTPUT_FORMAT_FIXED_POINT_SIGNED_1220 0x00000100
 #define OUTPUT_FORMAT_FIXED_POINT_SIGNED_1632 0x00000200
+#define OUTPUT_FORMAT_DOUBLE 0x00000300
 
 #define AUXILIARY_MODE_MASK 0x00000C00
 #define ANALOG_1 0x00000400
@@ -102,38 +207,45 @@
 
 union usShort_MT
 {
-	short v;  
+	short v;
 	unsigned char c[2];
 };
 typedef union usShort_MT usShort_MT;
 
 union uShort_MT
 {
-	unsigned short v;  
+	unsigned short v;
 	unsigned char c[2];
 };
 typedef union uShort_MT uShort_MT;
 
 union usLong_MT
 {
-	long v;  
+	long v;
 	unsigned char c[4];
 };
 typedef union usLong_MT usLong_MT;
 
 union uLong_MT
 {
-	unsigned long v;  
+	unsigned long v;
 	unsigned char c[4];
 };
 typedef union uLong_MT uLong_MT;
 
 union uFloat_MT
 {
-	float v;  
+	float v;
 	unsigned char c[4];
 };
 typedef union uFloat_MT uFloat_MT;
+
+union uDouble_MT
+{
+	double v;
+	unsigned char c[8];
+};
+typedef union uDouble_MT uDouble_MT;
 
 struct UTC_Time_MT
 {
@@ -182,6 +294,7 @@ struct MT
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	BOOL bLegacyMode;
 	double rollorientation;
 	double rollp1;
 	double rollp2;
@@ -200,17 +313,22 @@ inline int ConvertToDoubleMT(int OutputSettings, unsigned char* buf, int offset,
 	usShort_MT uss;
 	uLong_MT ul;
 	LARGE_INTEGER li;
+	uDouble_MT ud;
 	uFloat_MT uf;
 
 	switch (OutputSettings & OUTPUT_FORMAT_MASK)
 	{
-	case OUTPUT_FORMAT_FIXED_POINT_SIGNED_1220:
-		usl.c[0] = buf[3+offset];
-		usl.c[1] = buf[2+offset];
-		usl.c[2] = buf[1+offset];
-		usl.c[3] = buf[0+offset];
-		*pValue = (double)usl.v/1048576.0;
-		return offset+4;
+	case OUTPUT_FORMAT_DOUBLE:
+		ud.c[0] = buf[7+offset];
+		ud.c[1] = buf[6+offset];
+		ud.c[2] = buf[5+offset];
+		ud.c[3] = buf[4+offset];
+		ud.c[4] = buf[3+offset];
+		ud.c[5] = buf[2+offset];
+		ud.c[6] = buf[1+offset];
+		ud.c[7] = buf[0+offset];
+		*pValue = ud.v;
+		return offset+8;
 	case OUTPUT_FORMAT_FIXED_POINT_SIGNED_1632:
 		uss.c[0] = buf[5+offset];
 		uss.c[1] = buf[4+offset];
@@ -222,6 +340,14 @@ inline int ConvertToDoubleMT(int OutputSettings, unsigned char* buf, int offset,
 		li.LowPart = ul.v;
 		*pValue = (double)li.QuadPart/4294967296.0;
 		return offset+6;
+	case OUTPUT_FORMAT_FIXED_POINT_SIGNED_1220:
+		usl.c[0] = buf[3+offset];
+		usl.c[1] = buf[2+offset];
+		usl.c[2] = buf[1+offset];
+		usl.c[3] = buf[0+offset];
+		*pValue = (double)usl.v/1048576.0;
+		return offset+4;
+	case OUTPUT_FORMAT_FLOAT:
 	default:
 		uf.c[0] = buf[3+offset];
 		uf.c[1] = buf[2+offset];
@@ -533,6 +659,189 @@ inline int GetLatestMTMessageMT(MT* pMT, int addr, int mid, unsigned char* datab
 	return EXIT_SUCCESS;
 }
 
+inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
+{
+	unsigned char databuf[MAX_NB_BYTES_MT];
+	int nbdatabytes = 0;
+	int offset = 0;
+	int dataidentifier = 0;
+	int size = 0;
+	int precisionoutputsettings = 0;
+	uShort_MT us;
+	uLong_MT ul;
+	double roll = 0, pitch = 0, yaw = 0;
+
+	memset(databuf, 0, sizeof(databuf));
+	nbdatabytes = 0;
+	if (GetLatestMTMessageMT(pMT, ADDR_MT, MTDATA2_MID, databuf, sizeof(databuf), &nbdatabytes)
+		!= EXIT_SUCCESS)
+	{ 
+		return EXIT_FAILURE;	
+	}
+
+	// Analyze data.
+
+	memset(pMTData, 0, sizeof(MTDATA));
+
+	if (nbdatabytes < 3) 
+	{
+		printf("Error reading data from a MT : Empty MTDATA2 message. \n");
+		return EXIT_FAILURE;
+	}
+
+	// Might not be good if all data are not at the same output frequency...?
+
+	while (nbdatabytes >= offset+3) 
+	{
+		// Get Data Identifier and Size of the packet.
+		us.c[0] = databuf[1+offset];
+		us.c[1] = databuf[0+offset];
+		dataidentifier = us.v;
+		size = databuf[2+offset];
+		offset += 3;
+		if (nbdatabytes < offset+size) 
+		{
+			printf("Error reading data from a MT : Bad packet. \n");
+			return EXIT_FAILURE;
+		}
+		precisionoutputsettings = (dataidentifier<<2);
+		switch (dataidentifier & XDI_FullTypeMask)
+		{
+		case XDI_Temperature:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->temp);
+			break;
+		case XDI_UtcTime:
+			ul.c[0] = databuf[3+offset];
+			ul.c[1] = databuf[2+offset];
+			ul.c[2] = databuf[1+offset];
+			ul.c[3] = databuf[0+offset];
+			pMTData->UTCTime.Nanoseconds = ul.v;
+			offset += 4;
+			us.c[0] = databuf[1+offset];
+			us.c[1] = databuf[0+offset];
+			pMTData->UTCTime.Year = us.v;
+			offset += 2;
+			pMTData->UTCTime.Month = databuf[offset];
+			offset += 1;
+			pMTData->UTCTime.Day = databuf[offset];
+			offset += 1;
+			pMTData->UTCTime.Hour = databuf[offset];
+			offset += 1;
+			pMTData->UTCTime.Minute = databuf[offset];
+			offset += 1;
+			pMTData->UTCTime.Seconds = databuf[offset];
+			offset += 1;
+			pMTData->UTCTime.Valid = databuf[offset];
+			offset += 1;
+			break;
+		case XDI_PacketCounter:
+			us.c[0] = databuf[1+offset];
+			us.c[1] = databuf[0+offset];
+			pMTData->TS = us.v;
+			offset += 2;
+			break;
+		case XDI_Quaternion:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q0);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q1);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q2);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q3);
+			roll = atan2(2*pMTData->q2*pMTData->q3+2*pMTData->q0*pMTData->q1,2*sqr(pMTData->q0)+2*sqr(pMTData->q3)-1);
+			pitch = -asin(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2);
+			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
+			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
+			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+			pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
+			pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
+			pMTData->Yaw = fmod_2PI(yaw+pMT->yaworientation+pMT->yawp1*cos(yaw+pMT->yawp2));
+			break;
+		case XDI_EulerAngles:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->roll);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->pitch);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->yaw);
+			roll = pMTData->roll*M_PI/180.0;
+			pitch = pMTData->pitch*M_PI/180.0;
+			yaw = pMTData->yaw*M_PI/180.0;
+			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
+			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+			pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
+			pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
+			pMTData->Yaw = fmod_2PI(yaw+pMT->yaworientation+pMT->yawp1*cos(yaw+pMT->yawp2));
+			break;
+		case XDI_RotationMatrix:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->a);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->b);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->c);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->d);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->e);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->f);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->g);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->h);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->i);
+			roll = atan2(pMTData->f,pMTData->i);
+			pitch = -asin(pMTData->c);
+			yaw = atan2(pMTData->b,pMTData->a);
+			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
+			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+			pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
+			pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
+			pMTData->Yaw = fmod_2PI(yaw+pMT->yaworientation+pMT->yawp1*cos(yaw+pMT->yawp2));
+			break;
+		case XDI_Acceleration:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->accX);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->accY);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->accZ);
+			break;
+		case XDI_RateOfTurn:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->gyrX);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->gyrY);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->gyrZ);
+			break;
+		case XDI_MagneticField:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->magX);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->magY);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->magZ);
+			break;
+		case XDI_StatusByte:
+			pMTData->Status = databuf[offset];
+			offset += 1;
+			break;
+		case XDI_AnalogIn1:
+			us.c[0] = databuf[1+offset];
+			us.c[1] = databuf[0+offset];
+			pMTData->Ain_1 = us.v;
+			offset += 2;
+			break;
+		case XDI_AnalogIn2:
+			us.c[0] = databuf[1+offset];
+			us.c[1] = databuf[0+offset];
+			pMTData->Ain_2 = us.v;
+			offset += 2;
+			break;
+		case XDI_LatLon:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->Lat);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->Long);
+			break;
+		case XDI_AltitudeEllipsoid:
+			// Altitude Mean Sea Level or WGS84 in MTDATA message?
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->Alt);
+			break;
+		case XDI_VelocityXYZ:
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->Vel_X);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->Vel_Y);
+			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->Vel_Z);
+			break;
+		default:
+			// Skipping an unknown packet...
+			offset += size;
+			break;
+		}
+	}
+
+	pMT->LastMTData = *pMTData;
+
+	return EXIT_SUCCESS;
+}
+
 inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 {
 	unsigned char databuf[MAX_NB_BYTES_MT];
@@ -541,6 +850,10 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 	uShort_MT us;
 	uLong_MT ul;
 	double roll = 0, pitch = 0, yaw = 0;
+
+	// Warning : coordinate system might not be the same between legacy and normal modes!
+
+	if (!pMT->bLegacyMode) return GetLatestData2MT(pMT, pMTData);
 
 	memset(databuf, 0, sizeof(databuf));
 	nbdatabytes = 0;
@@ -769,6 +1082,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 		pMT->BaudRate = 115200;
 		pMT->timeout = 1000;
 		pMT->bSaveRawData = 1;
+		pMT->bLegacyMode = 1;
 		pMT->rollorientation = 0;
 		pMT->rollp1 = 0;
 		pMT->rollp2 = 0;
@@ -791,6 +1105,8 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pMT->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMT->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMT->bLegacyMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMT->rollorientation) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

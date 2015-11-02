@@ -7,6 +7,8 @@ COM5
 1000
 % bSaveRawData
 1
+% bLegacyMode
+1
 % rollorientation
 0.0
 % rollp1
