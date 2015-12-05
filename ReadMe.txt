@@ -11,9 +11,10 @@ _ Windows XP Professional SP3 32 bit/Windows 8 Professional 64 bit
 _ 7-Zip (7zip_x86, 7zip_x64)
 _ Microsoft Visual C++ 2008 SP1 Redistributable Package and Microsoft Visual C++ 2012 Redistributable Package (vcredist)
 [_ Microsoft .NET Framework 3.5 Service Pack 1 (dotnetfx35)]
+[_ Microsoft .NET Framework 4]
 [_ Google Earth 6 (Google_Earth)]
 [_ MinGW et MSYS (MinGW, MinGW_x64)]
-[_ GPS data converter (GPSDataConverter)]
+[_ GPS data conversions (GPSDataConverter)]
 [_ Look@LAN (lalsetup250)]
 _ LabJack UD driver v3.15/v3.2X
 [_ MT SDK 2.7/3.3/4.1.5]

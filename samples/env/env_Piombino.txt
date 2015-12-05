@@ -1,0 +1,45 @@
+% Angle of the x axis of the environment coordinate system to the North, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference (in deg in marine units)
+90
+% Latitude, longitude, altitude of the environment coordinate system (in decimal deg and m)
+42.954269
+10.601473
+0
+% Number of circles
+0
+% x  y  r (in m)
+% Number of walls
+12
+% xa  ya  xb  yb (in m)
+% Main pool
+0  0  185  0
+185  0  185  -104
+185  -104  0  -104
+0  -104  0  0
+% Building
+-136.805298 3.447043 -119.633466 1.111949
+-119.633466 1.111949 -123.540242 -19.792697
+-123.540242 -19.792697 -139.491374 -17.568798
+-139.491374 -17.568798 -136.805298 3.447043
+% Fence
+-143.560278 -4.558992 -158.778926 -2.668678
+-158.778926 -2.668678 -152.674313 35.915961
+-152.674313 35.915961 -94.160138 26.686782
+-94.160138 26.686782 -97.822766 -0.778364
+% Bounding box for a structured environment
+% box_env[1].inf (in m)
+0
+% box_env[1].sup (in m)
+200
+% box_env[2].inf (in m)
+-200
+% box_env[2].sup (in m)
+0
+% Coordinate system used to display the map
+% xMin (in m)
+-100
+% xMax (in m)
+100
+% yMin (in m)
+-100
+% yMax (in m)
+100

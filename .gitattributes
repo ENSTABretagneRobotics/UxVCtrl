@@ -38,6 +38,9 @@ Makefile eol=lf
 *.vcproj eol=crlf
 *.vcxproj eol=crlf
 *.vcxproj.filters eol=crlf
+*.rc eol=crlf
+*.res eol=crlf
+*.resx eol=crlf
 
 # Seanet
 *.v4log binary
