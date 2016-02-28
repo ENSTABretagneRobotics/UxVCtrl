@@ -133,13 +133,8 @@ double outliers_ratio = 0;
 // Environment parameters.
 double angle_env = 0, lat_env = 0, long_env = 0, alt_env = 0;
 int nb_circles = 0, nb_walls = 0;
-vector<double> circles_x;
-vector<double> circles_y;
-vector<double> circles_r;
-vector<double> walls_xa;
-vector<double> walls_ya;
-vector<double> walls_xb;
-vector<double> walls_yb;
+vector<double> circles_x, circles_y, circles_r;
+vector<double> walls_xa, walls_ya, walls_xb, walls_yb;
 box box_env;
 
 // Environment variables.

@@ -1,11 +1,16 @@
-affichage sonar déjà assez optimisé contrairement à ce que je pensais?
+SBG
+
+voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
+
+logs
+vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplacer avant...), omega->psidot
+dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
+logstate était compatible avec le début de logsimu à l'origine...->rajouter dans logsimu les t;lat;lon;alt;hdg;... aussi
+avec nouveau format, lognav2KML va être simplifié
 
 rajouter param acousticmodem_r_max_err dans UxVCtrl.txt et MDM0.txt comme pour sonar...
-dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
 
 LIDAR/sonar : mesurer vitesse si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
-
-vxy, en fait je devrais l'appeler vrx et je devrais rajouter vry (et vrz, psi, theta, phi, avec psi qui remplace l'ancien theta...) dans les variables d'état...
 
 rename startopencvgui->enableopencvgui/show/hide...?
 
@@ -25,7 +30,7 @@ régulation à grande vitesse saucisse à faire un peu comme sardine
 sonar, localisation, wf
 commencer à prévoir dl en utilisant staticloc avec la position des pings dessinée avec le dr, pour l'instant il faudrait juste appeler dl toutes les 10s par exemple et le seul avantage par rapport à static serait de ne pas devoir arrêter le robot...
 Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé, faire un peu pareil pour la partie affichage...
-simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores),wf complète puis passe par SeanetProcessing?
+simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?
 c'est juste au niveau de l'affichage qu'on dessinera pareil...?
 Où mettre la partie dessin des images sonar en overlay, c'est commun en partie avec seanet et simulator... dans SeanetProcessing?
 statevars va être très ralenti à cause de dmes..., faire une cs spécifique?
@@ -35,15 +40,11 @@ options pour enlever les outliers avant, après...
 repère dans lequel dessiner image sonar vs detection d'obstacles
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
-temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?
 données aberrantes vxyhat dans logstate?
-->initialization de vxyhat à revoir...?
 simu : au début convergence vers un intervalle tout petit correspondant au biais quand y a GPS, convergence vers un intervalle de vitesse tout petit...
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
-enregistrer cog sog dans un des logs
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 image sonar simu pas bonne?->portée sonar, autres params?
-mapping sonar/hokuyo mean comme tour ile construction de map 2d à partir de log et injection dans google earth...
 flux acoustique sur un mur pas tout à fait droit...
 
 GUI, video
@@ -54,7 +55,6 @@ alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
 mettre aussi BRG de ball par rapport au nord?
-trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)
 prévoir zoom sur la map, on a du mal à savoir son cap
 FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
 MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
@@ -112,6 +112,8 @@ mavlink device (ardupilot, pixhawk...) : rajouter lecture et envoi de PWM
 voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)
 
 GPS, NMEA, waypoints, AHRS
+rajouter utc du GPS (variable globale mis à jour uniquement par NMEA car pour MT et MAVLink on a l'heure PC dans leurs logs) pour trouver erreur d'horloge?
+enregistrer cog sog dans un des logs (logstate)?
 mtdata2 : faire findlatestmsgwithoutmid...? Coordinate system not the same between legacy and normal modes!
 mti-g : gps pris en compte si utctime valid, il faudrait peut-être plutôt regarder status? UTCValid semble le plus strict donc le plus sûr?
 hdop?
@@ -158,7 +160,7 @@ reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte para
 regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
 
 changer observer (et éventuellement simulator) pour que omegadot=alphaomega*(u1-u2)-alphafomega*omega (au lieu de thetadot=alphaomega*(u1-u2)...)
-si on a une IMU, on l'utilise pour omegahat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid, il faudrait rajouter le support des trames NMEA donnant la vitesse)
+si on a une IMU, on l'utilise pour omegahat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid)
 vitesse GPS a priori bonne si dispo, par contre vaut mieux pas trop utiliser l'altitude du GPS (uniquement en dernier recours)
 utiliser les accéléros quand on a rien d'autre? refaire des tests...
 prendre en compte dans la localisation la position GPS de la bouée avec longueur du câble et profondeur du sous-marin?
@@ -166,6 +168,7 @@ prendre en compte dans la localisation la position GPS de la bouée avec longueur
 openal, pingertracking
 
 replay
+voir UxVDataViewer
 replay with mission planner?
 faire option lecture de fichier sonar qui lit les temps et attend de dt=t1-t0 avec t0 et t1 lus dans le fichier, voir comment c'est fait pour vidéo
 rajouter fonction replay uxvctrl, comment gérer mieux les histoires de conversions de temps?
@@ -206,6 +209,10 @@ rajouter un device qui communiquerait avec une MOOSDB
 
 
 OLD
+
+temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?->c'est sans doute normal, lié au fait qu'on sait qu'on bouge pas (si vxyhat n'est pas de largeur infinie)...
+affichage sonar déjà assez optimisé contrairement à ce que je pensais?
+trouver comment dessiner plus efficacement l'image sonar (sans superposition de dessin, quel que soit zoom...)->déjà pas mal?
 
 update additional parameter in ballconfig in samples...
 si bBalldetection ou bBalltracking arrêté alors qu'il y a eu une ball détectée, il continue à envoyer des msg acoustiques jusqu'à ce qu'une autre commande acoustique remplace

@@ -231,13 +231,8 @@ extern double outliers_ratio;
 // Environment parameters.
 extern double angle_env, lat_env, long_env, alt_env;
 extern int nb_circles, nb_walls;
-extern vector<double> circles_x;
-extern vector<double> circles_y;
-extern vector<double> circles_r;
-extern vector<double> walls_xa;
-extern vector<double> walls_ya;
-extern vector<double> walls_xb;
-extern vector<double> walls_yb;
+extern vector<double> circles_x, circles_y, circles_r;
+extern vector<double> walls_xa, walls_ya, walls_xb, walls_yb;
 extern box box_env;
 
 // Environment variables.
