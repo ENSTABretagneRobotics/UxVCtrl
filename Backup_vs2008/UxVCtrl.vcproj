@@ -815,6 +815,10 @@
 			Name="Hardware"
 			>
 			<File
+				RelativePath=".\Hardware\AIS.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hardware\CISCREA.cpp"
 				>
 			</File>

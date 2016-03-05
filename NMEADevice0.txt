@@ -1,6 +1,6 @@
 % IP address and TCP port or local RS232 port
-%127.0.0.1:4001
-COM3
+127.0.0.1:4001
+%COM3
 % BaudRate
 4800
 % Timeout (in ms)
@@ -8,7 +8,7 @@ COM3
 % bSaveRawData
 1
 % bEnableGPGGA
-1
+0
 % bEnableGPRMC
 0
 % bEnableGPGLL
@@ -25,3 +25,5 @@ COM3
 0
 % bEnableWIMDA
 0
+% bEnableAIVDM
+1

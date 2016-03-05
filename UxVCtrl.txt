@@ -63,7 +63,7 @@
 % bDisableMT
 1
 % bDisableNMEADevice[0]
-1
+0
 % bDisableNMEADevice[1]
 1
 % bDisableMAVLinkDevice[0]

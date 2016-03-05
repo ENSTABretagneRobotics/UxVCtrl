@@ -168,7 +168,7 @@ MiniSSC.o: ./Hardware/MiniSSC.cpp ./Hardware/MiniSSC.h
 MT.o: ./Hardware/MT.cpp ./Hardware/MT.h
 	$(CC) $(CFLAGS) -c $<
 
-NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h
+NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h ./Hardware/AIS.h
 	$(CC) $(CFLAGS) -c $<
 
 P33x.o: ./Hardware/P33x.cpp ./Hardware/P33x.h

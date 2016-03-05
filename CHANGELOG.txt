@@ -1,3 +1,5 @@
+Beginning of minimal AIS support.
+
 87
 Added support of extended length messages in MT.
 Preliminary support of MTDATA2 messages.

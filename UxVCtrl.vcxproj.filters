@@ -500,6 +500,9 @@
     <ClInclude Include="Hardware\MAVLinkDevice.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\AIS.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">

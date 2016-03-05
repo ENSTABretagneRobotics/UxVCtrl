@@ -17,6 +17,11 @@
 #include "OSThread.h"
 #endif // DISABLE_NMEADEVICETHREAD
 
+// Temporary...
+#if defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
+#include "AIS.h"
+#endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
+
 #define TIMEOUT_MESSAGE_NMEADEVICE 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_NMEADEVICE 2048
@@ -53,6 +58,11 @@ struct NMEADATA
 	double sog, cog, mag_cog;
 	double heading, deviation, variation;
 	char dev_east, var_east;
+	int nbsentences;
+	int sentence_number;
+	int seqmsgid;
+	char AIS_channel;
+	int nbfillbits;
 	double Latitude; // In decimal degrees.
 	double Longitude; // In decimal degrees.
 	double Altitude; // In m.
@@ -65,6 +75,10 @@ struct NMEADATA
 	double WindSpeed; // In m/s.
 	double ApparentWindDir; // In rad.
 	double ApparentWindSpeed; // In m/s.
+	double AIS_Latitude; // In decimal degrees.
+	double AIS_Longitude; // In decimal degrees.
+	double AIS_SOG; // In m/s.
+	double AIS_COG; // In rad.
 };
 typedef struct NMEADATA NMEADATA;
 
@@ -88,6 +102,7 @@ struct NMEADEVICE
 	BOOL bEnableWIMWV;
 	BOOL bEnableWIMWD;
 	BOOL bEnableWIMDA;
+	BOOL bEnableAIVDM;
 };
 typedef struct NMEADEVICE NMEADEVICE;
 
@@ -154,12 +169,15 @@ inline void ComputeNMEAchecksum(char* sentence, char checksum[4])
 {
 	int i = 0;
 	char res = 0;
+	BOOL bFoundBeginning = FALSE;
 
 	memset(checksum, 0, sizeof(checksum));
 	while (sentence[i])
 	{
-		if (sentence[i] == '$')
+		// '$' for classic NMEA, '!' for AIS.
+		if ((!bFoundBeginning)&&((sentence[i] == '$')||(sentence[i] == '!')))
 		{
+			bFoundBeginning = TRUE;
 			i++;
 			continue;
 		}
@@ -189,9 +207,13 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 	char* ptr_WIMWV = NULL;
 	char* ptr_WIMWD = NULL;
 	char* ptr_WIMDA = NULL;
+	char* ptr_AIVDM = NULL;
 	// Temporary buffers for sscanf().
 	char c0 = 0, c1 = 0, c2 = 0;
 	double f0 = 0, f1 = 0, f2 = 0;
+	char aisbuf[128];
+	int aisbuflen = 0;
+	int i = 0;
 	CHRONO chrono;
 
 	StartChrono(&chrono);
@@ -264,6 +286,7 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 	if (pNMEADevice->bEnableWIMWV) ptr_WIMWV = FindLatestNMEASentence("$WIMWV", recvbuf);
 	if (pNMEADevice->bEnableWIMWD) ptr_WIMWD = FindLatestNMEASentence("$WIMWD", recvbuf);
 	if (pNMEADevice->bEnableWIMDA) ptr_WIMDA = FindLatestNMEASentence("$WIMDA", recvbuf);
+	if (pNMEADevice->bEnableAIVDM) ptr_AIVDM = FindLatestNMEASentence("!AIVDM", recvbuf);
 
 	while (
 		(pNMEADevice->bEnableGPGGA&&!ptr_GPGGA)||
@@ -274,7 +297,8 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		(pNMEADevice->bEnableIIMWV&&!ptr_IIMWV)||
 		(pNMEADevice->bEnableWIMWV&&!ptr_WIMWV)||
 		(pNMEADevice->bEnableWIMWD&&!ptr_WIMWD)||
-		(pNMEADevice->bEnableWIMDA&&!ptr_WIMDA)
+		(pNMEADevice->bEnableWIMDA&&!ptr_WIMDA)||
+		(pNMEADevice->bEnableAIVDM&&!ptr_AIVDM)
 		)
 	{
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_NMEADEVICE)
@@ -308,6 +332,7 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		if (pNMEADevice->bEnableWIMWV) ptr_WIMWV = FindLatestNMEASentence("$WIMWV", recvbuf);
 		if (pNMEADevice->bEnableWIMWD) ptr_WIMWD = FindLatestNMEASentence("$WIMWD", recvbuf);
 		if (pNMEADevice->bEnableWIMDA) ptr_WIMDA = FindLatestNMEASentence("$WIMDA", recvbuf);
+		if (pNMEADevice->bEnableAIVDM) ptr_AIVDM = FindLatestNMEASentence("!AIVDM", recvbuf);
 	}
 
 	// Analyze data.
@@ -577,6 +602,53 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		pNMEAData->WindSpeed = pNMEAData->windspeed; 
 	}
 
+	// AIS data.
+	if (pNMEADevice->bEnableAIVDM)
+	{
+		memset(aisbuf, 0, sizeof(aisbuf));
+		if (sscanf(ptr_AIVDM, "!AIVDM,%d,%d,,%c,%128s", 
+			&pNMEAData->nbsentences, &pNMEAData->sentence_number, &pNMEAData->AIS_channel, aisbuf) != 4)
+		{
+			//printf("Error reading data from a NMEADevice : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+		// Do other else if (sscanf() != x) if more/less complete sentence...
+
+		// Only the most simples AIS messages are handled...
+		if ((pNMEAData->nbsentences == 1)&&(pNMEAData->sentence_number == 1))
+		{
+			i = 0;
+			// Search for the end of the AIS data payload.
+			while ((i < sizeof(aisbuf)-1)&&(aisbuf+i))
+			{
+				if (sscanf(aisbuf+i, ",%d", &pNMEAData->nbfillbits) == 1) 
+				{
+					aisbuflen = i;
+					// Fill with 0 the rest of the buffer to keep only the AIS data payload in aisbuf.
+					memset(aisbuf+i, 0, sizeof(aisbuf)-i);
+					break;
+				}
+				i++;
+			}
+			if (aisbuflen != 0)
+			{
+				// Temporary...
+#if defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
+				decode_AIS(aisbuf, aisbuflen, &pNMEAData->AIS_Latitude, &pNMEAData->AIS_Longitude, &pNMEAData->AIS_SOG, &pNMEAData->AIS_COG);
+#endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
+			}
+			else
+			{
+				//printf("Error reading data from a NMEADevice : Invalid data. \n");
+				//return EXIT_FAILURE;
+			}
+		}
+		else
+		{
+			// Unhandled...
+		}
+	}
+
 	pNMEADevice->LastNMEAData = *pNMEAData;
 
 	return EXIT_SUCCESS;
@@ -612,6 +684,7 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 		pNMEADevice->bEnableWIMWV = 0;
 		pNMEADevice->bEnableWIMWD = 0;
 		pNMEADevice->bEnableWIMDA = 0;
+		pNMEADevice->bEnableAIVDM = 0;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -643,6 +716,8 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pNMEADevice->bEnableWIMWD) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->bEnableWIMDA) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->bEnableAIVDM) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else

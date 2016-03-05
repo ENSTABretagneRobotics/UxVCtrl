@@ -25,3 +25,5 @@ COM14
 0
 % bEnableWIMDA
 0
+% bEnableAIVDM
+0

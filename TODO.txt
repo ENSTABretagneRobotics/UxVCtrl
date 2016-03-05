@@ -123,6 +123,7 @@ utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas p
 dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 MT, SBG specific NMEA messages...
+convert AIS to C code...
 pour la station, générer une croix autour du waypoint...
 
 Obstacle avoidance
@@ -131,6 +132,7 @@ positionobstacleavoidance : faire tuto ajout step-by-step
 wallavoidance, visualobstacleavoidance : it is reactive behavior
 wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
 the control part of obstacle avoidance could be centralized to handle all the types of obstacles (punctual, line...), maybe using vector fields
+add vector field obstacle avoidance mission like visual obstacle, e.g using AIS and simulatedinternetswarmondevice
 
 configdistancecomputation
 distancecomputation
