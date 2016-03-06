@@ -1,7 +1,7 @@
 % Hexadecimal identifier of the robot (see Globals.h)
 % robid
 % Simulator
-0x00000001
+%0x00000001
 % SAUCISSE
 %0x00000002
 % SARDINE
@@ -23,7 +23,7 @@
 % TREX
 %0x04000000
 % QUADRO
-%0x20000000
+0x20000000
 % nbvideo (max 3)
 2
 % videoimgwidth
@@ -63,11 +63,11 @@
 % bDisableMT
 1
 % bDisableNMEADevice[0]
-0
+1
 % bDisableNMEADevice[1]
 1
 % bDisableMAVLinkDevice[0]
-1
+0
 % bDisableMAVLinkDevice[1]
 1
 % bDisableSwarmonDevice
