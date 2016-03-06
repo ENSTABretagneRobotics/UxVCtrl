@@ -102,8 +102,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"tv_sec;tv_usec;sensor_id;type;autopilot;"
 						"fix_type;lat;lon;alt;eph;epv;vel;cog;satellites_visible;"
 						"roll (in rad);pitch (in rad);yaw (rad);rollspeed (in rad/s);pitchspeed (in rad/s);yawspeed (in rad/s);"
+						"press_abs (in bar);press_diff (in bar);temperature (in celsius degrees);"
 						"flow_x;flow_y;flow_comp_m_x;flow_comp_m_y;quality;ground_distance (in m);"
 						"integration_time_us;integrated_x;integrated_y;integrated_xgyro;integrated_ygyro;integrated_zgyro;temperature;quality;time_delta_distance_us;distance;"
+						"chan1_raw;chan2_raw;chan3_raw;chan4_raw;chan5_raw;chan6_raw;chan7_raw;chan8_raw;"
+						"servo1_raw;servo2_raw;servo3_raw;servo4_raw;servo5_raw;servo6_raw;servo7_raw;servo8_raw;"
+						"airspeed (in m/s);alt (in m);climb (in m/s);"
 						"\n"
 						); 
 					fflush(mavlinkdevice.pfSaveFile);
@@ -168,6 +172,42 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);
+				
+				
+				// Temp...
+				int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
+				int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
+				switch (robid)
+				{
+				case QUADRO_ROBID:
+
+					memset(selectedchannels, 0, sizeof(selectedchannels));
+					memset(pws, 0, sizeof(pws));
+
+					// Convert u (in [-1;1]) into pulse width (in us).
+					pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u1*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u2*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u3*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+
+					pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+					pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+					pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+
+					selectedchannels[0] = 1;
+					selectedchannels[1] = 1;
+					selectedchannels[2] = 1;
+
+					if (!mavlinkdevice.InitPWs[0]) pws[0] = 0;
+					if (!mavlinkdevice.InitPWs[1]) pws[1] = 0;
+					if (!mavlinkdevice.InitPWs[2]) pws[2] = 0;
+
+					SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws);
+					//mSleep(50);
+					break;
+				default:
+					break;
+				}
+			
 
 				if (mavlinkdevice.bSaveRawData)
 				{
@@ -175,14 +215,22 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"%d;%d;%d;%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%.4f;%.4f;%.4f;%.4f;%.4f;%.4f;"
+						"%.4f;%.4f;%.1f;"
 						"%d;%d;%.4f;%.4f;%d;%.3f;"
 						"%d;%f;%f;%f;%f;%f;%d;%d;%d;%f;"
+						"%d;%d;%d;%d;%d;%d;%d;%d;"
+						"%d;%d;%d;%d;%d;%d;%d;%d;"
+						"%.4f;%.4f;%.4f;"
 						"\n", 
 						(int)tv.tv_sec, (int)tv.tv_usec, (int)mavlinkdata.optical_flow.sensor_id, (int)mavlinkdata.heartbeat.type, (int)mavlinkdata.heartbeat.autopilot,
 						(int)mavlinkdata.gps_raw_int.fix_type, (int)mavlinkdata.gps_raw_int.lat, (int)mavlinkdata.gps_raw_int.lon, (int)mavlinkdata.gps_raw_int.alt,(int)mavlinkdata.gps_raw_int.eph, (int)mavlinkdata.gps_raw_int.epv, (int)mavlinkdata.gps_raw_int.vel, (int)mavlinkdata.gps_raw_int.cog, (int)mavlinkdata.gps_raw_int.satellites_visible,
 						(double)mavlinkdata.attitude.roll, (double)mavlinkdata.attitude.pitch, (double)mavlinkdata.attitude.yaw, (double)mavlinkdata.attitude.rollspeed, (double)mavlinkdata.attitude.pitchspeed, (double)mavlinkdata.attitude.yawspeed,
+						(double)(mavlinkdata.scaled_pressure.press_abs*0.001), (double)(mavlinkdata.scaled_pressure.press_diff*0.001), (double)(mavlinkdata.scaled_pressure.temperature*0.01), 
 						(int)mavlinkdata.optical_flow.flow_x, (int)mavlinkdata.optical_flow.flow_y, (double)mavlinkdata.optical_flow.flow_comp_m_x, (double)mavlinkdata.optical_flow.flow_comp_m_y, (int)mavlinkdata.optical_flow.quality, (double)mavlinkdata.optical_flow.ground_distance,
-						(int)mavlinkdata.optical_flow_rad.integration_time_us, (double)mavlinkdata.optical_flow_rad.integrated_x, (double)mavlinkdata.optical_flow_rad.integrated_y, (double)mavlinkdata.optical_flow_rad.integrated_xgyro, (double)mavlinkdata.optical_flow_rad.integrated_ygyro, (double)mavlinkdata.optical_flow_rad.integrated_zgyro, (int)mavlinkdata.optical_flow_rad.temperature, (int)mavlinkdata.optical_flow_rad.quality, (int)mavlinkdata.optical_flow_rad.time_delta_distance_us, (double)mavlinkdata.optical_flow_rad.distance
+						(int)mavlinkdata.optical_flow_rad.integration_time_us, (double)mavlinkdata.optical_flow_rad.integrated_x, (double)mavlinkdata.optical_flow_rad.integrated_y, (double)mavlinkdata.optical_flow_rad.integrated_xgyro, (double)mavlinkdata.optical_flow_rad.integrated_ygyro, (double)mavlinkdata.optical_flow_rad.integrated_zgyro, (int)mavlinkdata.optical_flow_rad.temperature, (int)mavlinkdata.optical_flow_rad.quality, (int)mavlinkdata.optical_flow_rad.time_delta_distance_us, (double)mavlinkdata.optical_flow_rad.distance,
+						(int)mavlinkdata.rc_channels_raw.chan1_raw, (int)mavlinkdata.rc_channels_raw.chan2_raw, (int)mavlinkdata.rc_channels_raw.chan3_raw, (int)mavlinkdata.rc_channels_raw.chan4_raw, (int)mavlinkdata.rc_channels_raw.chan5_raw, (int)mavlinkdata.rc_channels_raw.chan6_raw, (int)mavlinkdata.rc_channels_raw.chan7_raw, (int)mavlinkdata.rc_channels_raw.chan8_raw, 
+						(int)mavlinkdata.servo_output_raw.servo1_raw, (int)mavlinkdata.servo_output_raw.servo2_raw, (int)mavlinkdata.servo_output_raw.servo3_raw, (int)mavlinkdata.servo_output_raw.servo4_raw, (int)mavlinkdata.servo_output_raw.servo5_raw, (int)mavlinkdata.servo_output_raw.servo6_raw, (int)mavlinkdata.servo_output_raw.servo7_raw, (int)mavlinkdata.servo_output_raw.servo8_raw, 
+						(double)mavlinkdata.vfr_hud.airspeed, (double)mavlinkdata.vfr_hud.alt, (double)mavlinkdata.vfr_hud.climb
 						);
 					fflush(mavlinkdevice.pfSaveFile);
 				}

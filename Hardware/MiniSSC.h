@@ -70,6 +70,7 @@ struct MINISSC
 	int MinPWs[NB_CHANNELS_PWM_MINISSC];
 	int MidPWs[NB_CHANNELS_PWM_MINISSC];
 	int MaxPWs[NB_CHANNELS_PWM_MINISSC];
+	int InitPWs[NB_CHANNELS_PWM_MINISSC];
 	int ThresholdPWs[NB_CHANNELS_PWM_MINISSC];
 	double CoefPWs[NB_CHANNELS_PWM_MINISSC];
 	int bProportionalPWs[NB_CHANNELS_PWM_MINISSC];
@@ -79,6 +80,7 @@ struct MINISSC
 	int rightfluxchan;
 	int leftfluxchan;
 	double MinAngle;
+	double MidAngle;
 	double MaxAngle;
 };
 typedef struct MINISSC MINISSC;
@@ -435,6 +437,7 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 			pMiniSSC->MinPWs[channel] = 1000;
 			pMiniSSC->MidPWs[channel] = 1500;
 			pMiniSSC->MaxPWs[channel] = 2000;
+			pMiniSSC->InitPWs[channel] = 1500;
 			pMiniSSC->ThresholdPWs[channel] = 0;
 			pMiniSSC->CoefPWs[channel] = 1;
 			pMiniSSC->bProportionalPWs[channel] = 1;
@@ -445,6 +448,7 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 		pMiniSSC->rightfluxchan = 4;
 		pMiniSSC->leftfluxchan = 3;
 		pMiniSSC->MinAngle = -0.5;
+		pMiniSSC->MidAngle = 0;
 		pMiniSSC->MaxAngle = 0.5;
 
 		// Load data from a file.
@@ -471,6 +475,8 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pMiniSSC->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMiniSSC->InitPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pMiniSSC->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%lf", &pMiniSSC->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
@@ -491,6 +497,8 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMiniSSC->MinAngle) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMiniSSC->MidAngle) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMiniSSC->MaxAngle) != 1) printf("Invalid configuration file.\n");
 
@@ -513,7 +521,12 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 		if (
 			(pMiniSSC->MinPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MINISSC)||(pMiniSSC->MinPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MINISSC)||
 			(pMiniSSC->MidPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MINISSC)||(pMiniSSC->MidPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MINISSC)||
-			(pMiniSSC->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MINISSC)||(pMiniSSC->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MINISSC)||
+			(pMiniSSC->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MINISSC)||(pMiniSSC->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MINISSC)
+			||(
+			(pMiniSSC->InitPWs[channel] != 0)&&
+			((pMiniSSC->InitPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MINISSC)||(pMiniSSC->InitPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MINISSC)||
+			(pMiniSSC->MinPWs[channel] > pMiniSSC->InitPWs[channel])||(pMiniSSC->InitPWs[channel] > pMiniSSC->MaxPWs[channel]))			
+			)||
 			(pMiniSSC->MinPWs[channel] > pMiniSSC->MidPWs[channel])||(pMiniSSC->MidPWs[channel] > pMiniSSC->MaxPWs[channel])||
 			(pMiniSSC->ThresholdPWs[channel] < 0)
 			)
@@ -522,6 +535,7 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 			pMiniSSC->MinPWs[channel] = 1000;
 			pMiniSSC->MidPWs[channel] = 1500;
 			pMiniSSC->MaxPWs[channel] = 2000;
+			pMiniSSC->InitPWs[channel] = 1500;
 			pMiniSSC->ThresholdPWs[channel] = 0;
 			pMiniSSC->CoefPWs[channel] = 1;
 			pMiniSSC->bProportionalPWs[channel] = 1;
@@ -554,10 +568,11 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 		pMiniSSC->leftfluxchan = 3;
 	}
 
-	if (pMiniSSC->MaxAngle-pMiniSSC->MinAngle <= 0.001)
+	if ((pMiniSSC->MaxAngle-pMiniSSC->MidAngle <= 0.001)||(pMiniSSC->MidAngle-pMiniSSC->MinAngle <= 0.001))
 	{
-		printf("Invalid parameters : MaxAngle or MinAngle.\n");
+		printf("Invalid parameters : MinAngle, MidAngle or MaxAngle.\n");
 		pMiniSSC->MinAngle = -0.5;
+		pMiniSSC->MidAngle = 0;
 		pMiniSSC->MaxAngle = 0.5;
 	}
 

@@ -16,6 +16,8 @@ COM6
 1500
 % MaxPW (in us)
 2000
+% InitPW (in us, 0 to disable channel)
+1500
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -29,6 +31,8 @@ COM6
 1500
 % MaxPW (in us)
 2000
+% InitPW (in us, 0 to disable channel)
+1500
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -42,6 +46,8 @@ COM6
 1500
 % MaxPW (in us)
 2000
+% InitPW (in us, 0 to disable channel)
+1500
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -55,6 +61,8 @@ COM6
 1500
 % MaxPW (in us)
 2000
+% InitPW (in us, 0 to disable channel)
+1500
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -68,6 +76,8 @@ COM6
 1500
 % MaxPW (in us)
 2000
+% InitPW (in us, 0 to disable channel)
+1500
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -87,5 +97,7 @@ COM6
 3
 % MinAngle (in rad)
 -0.6
+% MidAngle (in rad)
+0
 % MaxAngle (in rad)
 0.6

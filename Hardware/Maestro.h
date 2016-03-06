@@ -70,6 +70,7 @@ struct MAESTRO
 	int MinPWs[NB_CHANNELS_PWM_MAESTRO];
 	int MidPWs[NB_CHANNELS_PWM_MAESTRO];
 	int MaxPWs[NB_CHANNELS_PWM_MAESTRO];
+	int InitPWs[NB_CHANNELS_PWM_MAESTRO];
 	int ThresholdPWs[NB_CHANNELS_PWM_MAESTRO];
 	double CoefPWs[NB_CHANNELS_PWM_MAESTRO];
 	int bProportionalPWs[NB_CHANNELS_PWM_MAESTRO];
@@ -80,6 +81,7 @@ struct MAESTRO
 	int leftfluxchan;
 	int analoginputchan;
 	double MinAngle;
+	double MidAngle;
 	double MaxAngle;
 	double analoginputvalueoffset;
 	double analoginputvaluecoef;
@@ -513,6 +515,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 			pMaestro->MinPWs[channel] = 1000;
 			pMaestro->MidPWs[channel] = 1500;
 			pMaestro->MaxPWs[channel] = 2000;
+			pMaestro->InitPWs[channel] = 1500;
 			pMaestro->ThresholdPWs[channel] = 0;
 			pMaestro->CoefPWs[channel] = 1;
 			pMaestro->bProportionalPWs[channel] = 1;
@@ -524,6 +527,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		pMaestro->leftfluxchan = 3;
 		pMaestro->analoginputchan = 11;
 		pMaestro->MinAngle = -0.5;
+		pMaestro->MidAngle = 0;
 		pMaestro->MaxAngle = 0.5;
 		pMaestro->analoginputvalueoffset = 0;
 		pMaestro->analoginputvaluecoef = 1;
@@ -553,6 +557,8 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pMaestro->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pMaestro->InitPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pMaestro->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%lf", &pMaestro->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
@@ -575,6 +581,8 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMaestro->MinAngle) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->MidAngle) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMaestro->MaxAngle) != 1) printf("Invalid configuration file.\n");
 
@@ -605,7 +613,12 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		if (
 			(pMaestro->MinPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAESTRO)||(pMaestro->MinPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAESTRO)||
 			(pMaestro->MidPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAESTRO)||(pMaestro->MidPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAESTRO)||
-			(pMaestro->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAESTRO)||(pMaestro->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAESTRO)||
+			(pMaestro->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAESTRO)||(pMaestro->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAESTRO)
+			||(
+			(pMaestro->InitPWs[channel] != 0)&&
+			((pMaestro->InitPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAESTRO)||(pMaestro->InitPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAESTRO)||
+			(pMaestro->MinPWs[channel] > pMaestro->InitPWs[channel])||(pMaestro->InitPWs[channel] > pMaestro->MaxPWs[channel]))			
+			)||
 			(pMaestro->MinPWs[channel] > pMaestro->MidPWs[channel])||(pMaestro->MidPWs[channel] > pMaestro->MaxPWs[channel])||
 			(pMaestro->ThresholdPWs[channel] < 0)
 			)
@@ -614,6 +627,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 			pMaestro->MinPWs[channel] = 1000;
 			pMaestro->MidPWs[channel] = 1500;
 			pMaestro->MaxPWs[channel] = 2000;
+			pMaestro->InitPWs[channel] = 1500;
 			pMaestro->ThresholdPWs[channel] = 0;
 			pMaestro->CoefPWs[channel] = 1;
 			pMaestro->bProportionalPWs[channel] = 1;
@@ -651,10 +665,11 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		pMaestro->analoginputchan = 11;
 	}
 
-	if (pMaestro->MaxAngle-pMaestro->MinAngle <= 0.001)
+	if ((pMaestro->MaxAngle-pMaestro->MidAngle <= 0.001)||(pMaestro->MidAngle-pMaestro->MinAngle <= 0.001))
 	{
-		printf("Invalid parameters : MaxAngle or MinAngle.\n");
+		printf("Invalid parameters : MinAngle, MidAngle or MaxAngle.\n");
 		pMaestro->MinAngle = -0.5;
+		pMaestro->MidAngle = 0;
 		pMaestro->MaxAngle = 0.5;
 	}
 

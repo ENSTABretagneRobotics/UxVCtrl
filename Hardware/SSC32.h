@@ -53,6 +53,7 @@ struct SSC32
 	int MinPWs[NB_CHANNELS_PWM_SSC32];
 	int MidPWs[NB_CHANNELS_PWM_SSC32];
 	int MaxPWs[NB_CHANNELS_PWM_SSC32];
+	int InitPWs[NB_CHANNELS_PWM_SSC32];
 	int ThresholdPWs[NB_CHANNELS_PWM_SSC32];
 	double CoefPWs[NB_CHANNELS_PWM_SSC32];
 	int bProportionalPWs[NB_CHANNELS_PWM_SSC32];
@@ -62,6 +63,7 @@ struct SSC32
 	int rightfluxchan;
 	int leftfluxchan;
 	double MinAngle;
+	double MidAngle;
 	double MaxAngle;
 };
 typedef struct SSC32 SSC32;
@@ -542,6 +544,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 			pSSC32->MinPWs[channel] = 1000;
 			pSSC32->MidPWs[channel] = 1500;
 			pSSC32->MaxPWs[channel] = 2000;
+			pSSC32->InitPWs[channel] = 1500;
 			pSSC32->ThresholdPWs[channel] = 0;
 			pSSC32->CoefPWs[channel] = 1;
 			pSSC32->bProportionalPWs[channel] = 1;
@@ -552,6 +555,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		pSSC32->rightfluxchan = 4;
 		pSSC32->leftfluxchan = 3;
 		pSSC32->MinAngle = -0.5;
+		pSSC32->MidAngle = 0;
 		pSSC32->MaxAngle = 0.5;
 
 		// Load data from a file.
@@ -576,6 +580,8 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pSSC32->MaxPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%d", &pSSC32->InitPWs[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pSSC32->ThresholdPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%lf", &pSSC32->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
@@ -597,6 +603,8 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pSSC32->MinAngle) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pSSC32->MidAngle) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pSSC32->MaxAngle) != 1) printf("Invalid configuration file.\n");
 
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
@@ -612,7 +620,12 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		if (
 			(pSSC32->MinPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_SSC32)||(pSSC32->MinPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_SSC32)||
 			(pSSC32->MidPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_SSC32)||(pSSC32->MidPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_SSC32)||
-			(pSSC32->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_SSC32)||(pSSC32->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_SSC32)||
+			(pSSC32->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_SSC32)||(pSSC32->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_SSC32)
+			||(
+			(pSSC32->InitPWs[channel] != 0)&&
+			((pSSC32->InitPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_SSC32)||(pSSC32->InitPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_SSC32)||
+			(pSSC32->MinPWs[channel] > pSSC32->InitPWs[channel])||(pSSC32->InitPWs[channel] > pSSC32->MaxPWs[channel]))			
+			)||
 			(pSSC32->MinPWs[channel] > pSSC32->MidPWs[channel])||(pSSC32->MidPWs[channel] > pSSC32->MaxPWs[channel])||
 			(pSSC32->ThresholdPWs[channel] < 0)
 			)
@@ -621,6 +634,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 			pSSC32->MinPWs[channel] = 1000;
 			pSSC32->MidPWs[channel] = 1500;
 			pSSC32->MaxPWs[channel] = 2000;
+			pSSC32->InitPWs[channel] = 1500;
 			pSSC32->ThresholdPWs[channel] = 0;
 			pSSC32->CoefPWs[channel] = 1;
 			pSSC32->bProportionalPWs[channel] = 1;
@@ -653,10 +667,11 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		pSSC32->leftfluxchan = 3;
 	}
 
-	if (pSSC32->MaxAngle-pSSC32->MinAngle <= 0.001)
+	if ((pSSC32->MaxAngle-pSSC32->MidAngle <= 0.001)||(pSSC32->MidAngle-pSSC32->MinAngle <= 0.001))
 	{
-		printf("Invalid parameters : MaxAngle or MinAngle.\n");
+		printf("Invalid parameters : MinAngle, MidAngle or MaxAngle.\n");
 		pSSC32->MinAngle = -0.5;
+		pSSC32->MidAngle = 0;
 		pSSC32->MaxAngle = 0.5;
 	}
 
