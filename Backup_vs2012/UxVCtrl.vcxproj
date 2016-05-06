@@ -170,6 +170,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="Hardware\AIS.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
     <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
