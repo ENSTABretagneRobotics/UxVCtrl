@@ -1,3 +1,7 @@
+89
+Prevented display/system sleep on Windows (to try to avoid automatic maintenance...).
+
+88
 Added InitPW, MidAngle parameters in actuators configuration files.
 Added preliminary MAVLink PWM input and output support.
 Beginning of minimal AIS support.

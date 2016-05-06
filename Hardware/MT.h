@@ -1140,14 +1140,14 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 
 	if (OpenRS232Port(&pMT->RS232Port, pMT->szDevPath) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MT.\n");
+		printf("Unable to connect to a MT.\n");
 		return EXIT_FAILURE;
 	}
 
 	if (SetOptionsRS232Port(&pMT->RS232Port, pMT->BaudRate, NOPARITY, FALSE, 8, 
 		TWOSTOPBITS, (UINT)pMT->timeout) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MT.\n");
+		printf("Unable to connect to a MT.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;
 	}

@@ -269,14 +269,14 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 
 	if (OpenRS232Port(&pMES->RS232Port, pMES->szDevPath) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MES.\n");
+		printf("Unable to connect to a MES.\n");
 		return EXIT_FAILURE;
 	}
 
 	if (SetOptionsRS232Port(&pMES->RS232Port, pMES->BaudRate, NOPARITY, FALSE, 8, 
 		ONESTOPBIT, (UINT)pMES->timeout) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MES.\n");
+		printf("Unable to connect to a MES.\n");
 		CloseRS232Port(&pMES->RS232Port);
 		return EXIT_FAILURE;
 	}

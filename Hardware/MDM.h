@@ -684,14 +684,14 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 
 	if (OpenRS232Port(&pMDM->RS232Port, pMDM->szDevPath) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MDM.\n");
+		printf("Unable to connect to a MDM.\n");
 		return EXIT_FAILURE;
 	}
 
 	if (SetOptionsRS232Port(&pMDM->RS232Port, pMDM->BaudRate, NOPARITY, FALSE, 8, 
 		ONESTOPBIT, (UINT)pMDM->timeout) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MDM.\n");
+		printf("Unable to connect to a MDM.\n");
 		CloseRS232Port(&pMDM->RS232Port);
 		return EXIT_FAILURE;
 	}

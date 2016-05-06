@@ -2086,14 +2086,14 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 
 	if (OpenRS232Port(&pSeanet->RS232Port, pSeanet->szDevPath) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to Seanet.\n");
+		printf("Unable to connect to a Seanet.\n");
 		return EXIT_FAILURE;
 	}
 
 	if (SetOptionsRS232Port(&pSeanet->RS232Port, pSeanet->BaudRate, NOPARITY, FALSE, 8, 
 		ONESTOPBIT, (UINT)pSeanet->timeout) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to Seanet.\n");
+		printf("Unable to connect to a Seanet.\n");
 		CloseRS232Port(&pSeanet->RS232Port);
 		return EXIT_FAILURE;
 	}

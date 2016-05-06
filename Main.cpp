@@ -93,6 +93,12 @@ int main(int argc, char* argv[])
 	LoadEnv();
 	InitGlobals();
 
+#ifdef _WIN32
+	// Prevent display/system sleep...
+	SetThreadExecutionState(ES_CONTINUOUS|ES_DISPLAY_REQUIRED);
+	//SetThreadExecutionState(ES_CONTINUOUS|ES_SYSTEM_REQUIRED);
+#endif // _WIN32
+
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...
 	for (i = 0; i < nbvideo; i++)
 	{
@@ -247,6 +253,11 @@ int main(int argc, char* argv[])
 		WaitForThread(VideoRecordThreadId[i]);
 		WaitForThread(VideoThreadId[i]);
 	}
+
+#ifdef _WIN32
+	// Allow the system to idle to sleep normally.
+	SetThreadExecutionState(ES_CONTINUOUS);
+#endif // _WIN32
 
 	ReleaseGlobals();
 	UnloadEnv();
