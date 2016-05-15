@@ -213,13 +213,13 @@
     <ClCompile Include="Hardware\Hokuyo.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="Hardware\Sail.cpp">
-      <Filter>Hardware</Filter>
-    </ClCompile>
     <ClCompile Include="Hardware\MiniSSC.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
     <ClCompile Include="Hardware\MAVLinkDevice.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\IM483I.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
   </ItemGroup>
@@ -485,9 +485,6 @@
     <ClInclude Include="Hardware\MiniSSC.h">
       <Filter>Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="Hardware\Sail.h">
-      <Filter>Hardware</Filter>
-    </ClInclude>
     <ClInclude Include="Hardware\SSC32.h">
       <Filter>Hardware</Filter>
     </ClInclude>
@@ -501,6 +498,9 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="Hardware\AIS.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\IM483I.h">
       <Filter>Hardware</Filter>
     </ClInclude>
   </ItemGroup>
@@ -533,9 +533,6 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="RazorAHRS0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Sail0.txt">
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="Seanet0.txt">
@@ -579,6 +576,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="NMEADevice1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="IM483I0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

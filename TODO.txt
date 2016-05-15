@@ -101,16 +101,15 @@ setresumepoint : command to indicate a resumepoint (updates the resume file with
 sauvegarder e,phi,delta_theta dans wall?
 
 Actuators
-MAVLinkDevice : improve PWM input/output
+MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware, du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM, rajouter touches spéciales pour changer mode de input 8 (manual, stabilize, etc.)...
 param midangle : changer les formules de conversion entre uw et rudder pour que ça puisse ne pas être symétrique...
 reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer des données...
-revoir l'organisation des actionneurs (sail, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
+revoir l'organisation des actionneurs (IM483I, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
 ue9 : rajouter eth, DO, DI, pulseinput, i2c, voir comment faire similaire à SSC-32/IOIOSrv...
 trim/offset, min max facilement réglables dans interface, certains paramètres reconfigurables immédiatement, d'autres prennent du temps (offset, gain, portée sonar...?), faire fonctions spécifiques pour qu'on sache lesquels sont facilement modifiables...->maintenant on a les commandes deviceconfig device.txt...
 quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
-remplacer Sail par IM483I
-voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)
-utilisation d'InitPW?
+voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)->utiliser InitPW?
+vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
 rajouter utc du GPS (variable globale mis à jour uniquement par NMEA car pour MT et MAVLink on a l'heure PC dans leurs logs) pour trouver erreur d'horloge?

@@ -8,11 +8,11 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "Config.h"
-#include "Sail.h"
+#include "IM483I.h"
 
-THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
+THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 {
-	SAIL sail;
+	IM483I im483i;
 	double angle = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -22,7 +22,7 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
-	memset(&sail, 0, sizeof(SAIL));
+	memset(&im483i, 0, sizeof(IM483I));
 
 	StartChrono(&chrono_period);
 
@@ -33,50 +33,50 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 
 		mSleep(50);
 
-		if (bPauseSail) 
+		if (bPauseIM483I) 
 		{
 			if (bConnected)
 			{
-				printf("Sail paused.\n");
+				printf("IM483I paused.\n");
 				bConnected = FALSE;
-				DisconnectSail(&sail);
+				DisconnectIM483I(&im483i);
 			}
 			if (bExit) break;
 			mSleep(100);
 			continue;
 		}
 
-		if (bRestartSail) 
+		if (bRestartIM483I) 
 		{
 			if (bConnected)
 			{
-				printf("Restarting a Sail.\n");
+				printf("Restarting a IM483I.\n");
 				bConnected = FALSE;
-				DisconnectSail(&sail);
+				DisconnectIM483I(&im483i);
 			}
-			bRestartSail = FALSE;
+			bRestartIM483I = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectSail(&sail, "Sail0.txt") == EXIT_SUCCESS) 
+			if (ConnectIM483I(&im483i, "IM483I0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
 
-				if (sail.pfSaveFile != NULL)
+				if (im483i.pfSaveFile != NULL)
 				{
-					fclose(sail.pfSaveFile); 
-					sail.pfSaveFile = NULL;
+					fclose(im483i.pfSaveFile); 
+					im483i.pfSaveFile = NULL;
 				}
-				if ((sail.bSaveRawData)&&(sail.pfSaveFile == NULL)) 
+				if ((im483i.bSaveRawData)&&(im483i.pfSaveFile == NULL)) 
 				{
-					if (strlen(sail.szCfgFilePath) > 0)
+					if (strlen(im483i.szCfgFilePath) > 0)
 					{
-						sprintf(szTemp, "%.127s", sail.szCfgFilePath);
+						sprintf(szTemp, "%.127s", im483i.szCfgFilePath);
 					}
 					else
 					{
-						sprintf(szTemp, "sail");
+						sprintf(szTemp, "im483i");
 					}
 					// Remove the extension.
 					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
@@ -85,10 +85,10 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 					EnterCriticalSection(&strtimeCS);
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtime_fns());
 					LeaveCriticalSection(&strtimeCS);
-					sail.pfSaveFile = fopen(szSaveFilePath, "wb");
-					if (sail.pfSaveFile == NULL) 
+					im483i.pfSaveFile = fopen(szSaveFilePath, "wb");
+					if (im483i.pfSaveFile == NULL) 
 					{
-						printf("Unable to create Sail data file.\n");
+						printf("Unable to create IM483I data file.\n");
 						break;
 					}
 				}
@@ -106,17 +106,17 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 			case SAILBOAT_ROBID: // For VSim compatibility...
 			case VAIMOS_ROBID:
 
-				// Add also periodic sail calibration here...
+				// Add also periodic im483i calibration here...
 
 				EnterCriticalSection(&StateVariablesCS);
 				//angle = deltasmax;
-				if (u > 0) angle = u*(sail.MaxAngle-sail.MinAngle)+sail.MinAngle; else u = 0;
+				if (u > 0) angle = u*(im483i.MaxAngle-im483i.MinAngle)+im483i.MinAngle; else u = 0;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetMaxAngleSail(&sail, angle) != EXIT_SUCCESS)
+				if (SetMaxAngleIM483I(&im483i, angle) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Sail lost.\n");
+					printf("Connection to a IM483I lost.\n");
 					bConnected = FALSE;
-					DisconnectSail(&sail);
+					DisconnectIM483I(&im483i);
 				}
 				break;
 			default:
@@ -124,20 +124,20 @@ THREAD_PROC_RETURN_VALUE SailThread(void* pParam)
 			}
 		}
 
-		//printf("SailThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		//printf("IM483IThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
 
 		if (bExit) break;
 	}
 
 	StopChronoQuick(&chrono_period);
 
-	if (sail.pfSaveFile != NULL)
+	if (im483i.pfSaveFile != NULL)
 	{
-		fclose(sail.pfSaveFile); 
-		sail.pfSaveFile = NULL;
+		fclose(im483i.pfSaveFile); 
+		im483i.pfSaveFile = NULL;
 	}
 
-	if (bConnected) DisconnectSail(&sail);
+	if (bConnected) DisconnectIM483I(&im483i);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

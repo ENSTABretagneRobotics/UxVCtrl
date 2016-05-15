@@ -1391,14 +1391,14 @@ inline int Commands(char* line)
 		if (!ival1) bRestartMiniSSC = TRUE;
 		bPauseMiniSSC = ival1;
 	}
-	else if (sscanf(line, "sailconfig %255s %d", str, &ival1) == 2)
+	else if (sscanf(line, "im483iconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "Sail0.txt", strlen("Sail0.txt")) != 0)
+		if (strncmp(str, "IM483I0.txt", strlen("IM483I0.txt")) != 0)
 		{
 			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "Sail0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "IM483I0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -1410,8 +1410,8 @@ inline int Commands(char* line)
 			}
 		}
 		mSleep(500);
-		if (!ival1) bRestartSail = TRUE;
-		bPauseSail = ival1;
+		if (!ival1) bRestartIM483I = TRUE;
+		bPauseIM483I = ival1;
 	}
 	else if (sscanf(line, "videoconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{

@@ -105,7 +105,7 @@
     <ClCompile Include="Hardware\Maestro.cpp" />
     <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
-    <ClCompile Include="Hardware\Sail.cpp" />
+    <ClCompile Include="Hardware\IM483I.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
@@ -175,7 +175,7 @@
     <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
-    <ClInclude Include="Hardware\Sail.h" />
+    <ClInclude Include="Hardware\IM483I.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pipeline.h" />
@@ -274,7 +274,7 @@
     <Text Include="NMEADevice0.txt" />
     <Text Include="P33x0.txt" />
     <Text Include="RazorAHRS0.txt" />
-    <Text Include="Sail0.txt" />
+    <Text Include="IM483I0.txt" />
     <Text Include="Seanet0.txt" />
     <Text Include="SSC320.txt" />
     <Text Include="SwarmonDevice0.txt" />

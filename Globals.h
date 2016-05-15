@@ -175,7 +175,7 @@ extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
 extern BOOL bDisableMaestro;
 extern BOOL bDisableMiniSSC;
-extern BOOL bDisableSail;
+extern BOOL bDisableIM483I;
 
 // Controller parameters.
 extern double u_max, uw_max, uv_max, u_coef, uw_coef;
@@ -373,8 +373,8 @@ extern BOOL bPauseMaestro, bRestartMaestro;
 // MiniSSC variables.
 extern BOOL bPauseMiniSSC, bRestartMiniSSC;
 
-// Sail variables.
-extern BOOL bPauseSail, bRestartSail;
+// IM483I variables.
+extern BOOL bPauseIM483I, bRestartIM483I;
 
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];

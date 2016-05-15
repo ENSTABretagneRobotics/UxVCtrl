@@ -272,6 +272,8 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	int sendbuflen = 0;
 	mavlink_message_t msg;
 	mavlink_rc_channels_override_t rc_override;
+	//mavlink_servo_output_raw_t servo_output_raw;
+	//mavlink_command_long_t servo_command_msg;
 	//int channel = 0;
 	//int pws_tmp[NB_CHANNELS_PWM_MAVLINKDEVICE];
 
@@ -290,7 +292,28 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	rc_override.target_system = 1;
 	rc_override.target_component = 1;
 	mavlink_msg_rc_channels_override_encode(255, 1, &msg, &rc_override);
+
+	//memset(&servo_output_raw, 0, sizeof(servo_output_raw));
+	//servo_output_raw.servo1_raw = (uint16_t)pws[0];
+	//servo_output_raw.servo2_raw = (uint16_t)pws[1];
+	//servo_output_raw.servo3_raw = (uint16_t)pws[2];
+	//servo_output_raw.servo4_raw = (uint16_t)pws[3];
+	//servo_output_raw.servo5_raw = (uint16_t)pws[4];
+	//servo_output_raw.servo6_raw = (uint16_t)pws[5];
+	//servo_output_raw.servo7_raw = (uint16_t)pws[6];
+	//servo_output_raw.servo8_raw = (uint16_t)pws[7];
+	//servo_output_raw.port = 1;
+	//mavlink_msg_servo_output_raw_encode(255, 1, &msg, &servo_output_raw);
 	
+	//memset(&servo_command_msg, 0, sizeof(servo_command_msg));
+	//servo_command_msg.command = MAV_CMD_DO_SET_SERVO;
+	//servo_command_msg.confirmation = 0;
+	//servo_command_msg.param1 = 1;
+	//servo_command_msg.param2 = (uint16_t)pws[0];
+	//servo_command_msg.target_system = 1;
+	//servo_command_msg.target_component = 1;
+	//mavlink_msg_command_long_encode(255, 1, &msg, &servo_command_msg);
+
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
@@ -310,6 +333,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	unsigned char sendbuf[256];
 	int sendbuflen = 0;
 	mavlink_message_t msg;
+    mavlink_param_set_t param_set_msg;
     mavlink_command_long_t arm_command_msg;
 	mavlink_command_long_t msg_interval_command_msg;
 	mavlink_request_data_stream_t req_data_stream_msg;
@@ -448,6 +472,26 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	
 	mSleep(50);
 
+	// Disable all arm checks...
+	memset(&param_set_msg, 0, sizeof(param_set_msg));
+    sprintf(param_set_msg.param_id, "ARMING_CHECK"); // http://ardupilot.org/plane/docs/parameters.html#arming-check-arm-checks-to-peform-bitmask
+    param_set_msg.param_value = 0;
+    param_set_msg.param_type = MAV_PARAM_TYPE_UINT32;
+    param_set_msg.target_system = 1;
+    param_set_msg.target_component = 1;
+	mavlink_msg_param_set_encode(255, 1, &msg, &param_set_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	// Arm...
 	memset(&arm_command_msg, 0, sizeof(arm_command_msg));
     arm_command_msg.command = MAV_CMD_COMPONENT_ARM_DISARM;
     arm_command_msg.confirmation = 0;

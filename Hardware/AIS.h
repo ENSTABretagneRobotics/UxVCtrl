@@ -3,13 +3,27 @@
 
 // From http://jamsignal.blogspot.fr/2009/05/free-ais-message-decoder.html
 
-#include <iostream>
+//#include <stdlib.h>
+//
+//// Enable additional features in math.h.
+//#	ifndef _USE_MATH_DEFINES
+//#		define _USE_MATH_DEFINES
+//#	endif // _USE_MATH_DEFINES
+//
+//#ifndef UNREFERENCED_PARAMETER
+//#define UNREFERENCED_PARAMETER(P) (void)(P)
+//#endif // UNREFERENCED_PARAMETER
+//
+//#include <math.h>
+//
+//#include <iostream>
+//#include <iomanip>
+
 #include <bitset>
-#include <iomanip>
 
-using namespace std;
+//using namespace std;
 
-inline int bin_to_int_AIS(string temp_s)
+inline int bin_to_int_AIS(std::string temp_s)
 {
 	int i=0;
 	for (int x=0; x<(int)temp_s.length(); x++) {
@@ -24,7 +38,7 @@ inline int decode_AIS(char* aisbuf, int aisbuflen, double* pAIS_Latitude, double
 	UNREFERENCED_PARAMETER(aisbuflen);
 
 	// six bit ascii table. (gpsd.berlios.de/AIVDM)
-	string six_bit_table[120];
+	std::string six_bit_table[120];
 	six_bit_table[48]="000000";
 	six_bit_table[49]="000001";
 	six_bit_table[50]="000010";
@@ -93,21 +107,21 @@ inline int decode_AIS(char* aisbuf, int aisbuflen, double* pAIS_Latitude, double
 
 
 
-	string six_bit=aisbuf;
+	std::string six_bit=aisbuf;
 
 	// convert 6 bit string to binary
-	string ais_binary="";
+	std::string ais_binary="";
 	unsigned int x = 0;
 	for (x=0; x<six_bit.length(); x++) {
 		int z,y;
 		z=six_bit[x];
 		y=(x+1)*6-5;
 		ais_binary.append(six_bit_table[z]);
-		//cout<<z<<" "<<six_bit_table[z]<<" "<<y<<endl;
+		//std::cout<<z<<" "<<six_bit_table[z]<<" "<<y<<std::endl;
 	}
-	
-	string temp_s=ais_binary.substr(0,6);
-	//bitset<6> bb (temp_s);
+
+	std::string temp_s=ais_binary.substr(0,6);
+	//std::bitset<6> bb (temp_s);
 	//int ais_message_type=bb.to_ulong();
 	int ais_message_type=bin_to_int_AIS(temp_s);
 
@@ -116,75 +130,75 @@ inline int decode_AIS(char* aisbuf, int aisbuflen, double* pAIS_Latitude, double
 		// Unhandled...
 		return EXIT_FAILURE;
 	}
-	
+
 	temp_s=ais_binary.substr(6,2);
-	//bitset<2> cc (temp_s);
+	//std::bitset<2> cc (temp_s);
 	//int ais_repeat_indicator=cc.to_ulong();
 	int ais_repeat_indicator=bin_to_int_AIS(temp_s);
-	
+
 	temp_s=ais_binary.substr(8,30);
-	//bitset<30> dd (temp_s);
+	//std::bitset<30> dd (temp_s);
 	//int ais_mmsi=dd.to_ulong();
 	int ais_mmsi=bin_to_int_AIS(temp_s);
-	
+
 	temp_s=ais_binary.substr(38,4);
-	//bitset<4> ee(temp_s);
+	//std::bitset<4> ee(temp_s);
 	//int ais_navigation_status=ee.to_ulong();
 	int ais_navigation_status=bin_to_int_AIS(temp_s);
-	
+
 	temp_s=ais_binary.substr(42,8);
-	//bitset<8> ff(temp_s);
+	//std::bitset<8> ff(temp_s);
 	//int ais_rate_of_turn=ff.to_ulong();
 	int ais_rate_of_turn=bin_to_int_AIS(temp_s);
-	
+
 	temp_s=ais_binary.substr(50,10);
-	//bitset<10> gg(temp_s);
+	//std::bitset<10> gg(temp_s);
 	//int ais_speed_over_ground=gg.to_ulong()/10;
 	int ais_speed_over_ground=bin_to_int_AIS(temp_s)/10;
-	
-	string ais_position_accuracy=ais_binary.substr(60,1);
-	
+
+	std::string ais_position_accuracy=ais_binary.substr(60,1);
+
 	char west=ais_binary[61];
 	temp_s=ais_binary.substr(61,28);
-	bitset<28> hh(temp_s);
+	std::bitset<28> hh(temp_s);
 	if (west=='1') {hh.flip();}
 	double ais_longitude=hh.to_ulong();;
 	ais_longitude=ais_longitude/10000/60;
 	if (west=='1') {ais_longitude *= -1;}
-	
+
 
 	char south=ais_binary[89];
 	temp_s=ais_binary.substr(89,27);
-	bitset<27> ii(temp_s);
+	std::bitset<27> ii(temp_s);
 	if (south=='1') {ii.flip();}
 	double ais_latitude=ii.to_ulong();
 	ais_latitude=ais_latitude/10000/60;
 	if (south=='1') {ais_latitude *= -1;}
-	
+
 
 	temp_s=ais_binary.substr(116,12);
-	//bitset<12> jj(temp_s);
+	//std::bitset<12> jj(temp_s);
 	//int ais_course_over_ground=jj.to_ulong()/10;
 	int ais_course_over_ground=bin_to_int_AIS(temp_s)/10;
-	
+
 
 	temp_s=ais_binary.substr(128,9);
-	//bitset<9> kk(temp_s);
+	//std::bitset<9> kk(temp_s);
 	//int ais_true_heading=kk.to_ulong();
 	int ais_true_heading=bin_to_int_AIS(temp_s);
-	
-	cout<<"\nmessage type = \t\t"<<ais_message_type;
-	cout<<"\nrepeat indicator = \t"<<ais_repeat_indicator;
-	cout<< setfill('0')<< "\nMMSI = \t\t\t" << setw(9) <<ais_mmsi;
-	cout<<"\nnavagation status = \t"<<ais_navigation_status;
-	cout<<"\nrate of turn = \t\t"<<ais_rate_of_turn;
-	cout<<"\nspeed over ground = \t"<<ais_speed_over_ground;
-	cout<<"\nposition accuracy = \t"<<ais_position_accuracy;
-	cout<< fixed << "\nlongitude = \t\t"<<ais_longitude;
-	cout<< fixed << "\nlatitude = \t\t"<<ais_latitude;
-	cout<<"\ncourse over ground = \t"<<ais_course_over_ground;
-	cout<<"\ntrue heading = \t\t"<<ais_true_heading;
-	cout<<endl;
+
+	std::cout<<"\nmessage type = \t\t"<<ais_message_type;
+	std::cout<<"\nrepeat indicator = \t"<<ais_repeat_indicator;
+	std::cout<< std::setfill('0')<< "\nMMSI = \t\t\t" << std::setw(9) <<ais_mmsi;
+	std::cout<<"\nnavagation status = \t"<<ais_navigation_status;
+	std::cout<<"\nrate of turn = \t\t"<<ais_rate_of_turn;
+	std::cout<<"\nspeed over ground = \t"<<ais_speed_over_ground;
+	std::cout<<"\nposition accuracy = \t"<<ais_position_accuracy;
+	std::cout<< std::fixed << "\nlongitude = \t\t"<<ais_longitude;
+	std::cout<< std::fixed << "\nlatitude = \t\t"<<ais_latitude;
+	std::cout<<"\ncourse over ground = \t"<<ais_course_over_ground;
+	std::cout<<"\ntrue heading = \t\t"<<ais_true_heading;
+	std::cout<<std::endl;
 
 	*pAIS_Latitude = ais_latitude;
 	*pAIS_Longitude = ais_longitude;

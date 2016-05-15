@@ -80,7 +80,7 @@
 1
 % bDisableMiniSSC
 1
-% bDisableSail
+% bDisableIM483I
 1
 % Controller parameters
 % u_max (in [0;1])

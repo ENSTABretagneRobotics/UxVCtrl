@@ -2,7 +2,7 @@
 
 @md "%TMP%\UxVCtrl"
 
-@set /P DISABLE_KINECT2="Disable Kinect2 (0, 1) : "
+@set /P DISABLE_KINECT2="Disable Kinect2 (0, 1 (recommended)) : "
 @set /P DISABLE_MAVLINK="Disable MAVLink (0, 1) : "
 @set /P DISABLE_LABJACK="Disable LabJack (0, 1) : "
 @set /P DISABLE_LIBMODBUS="Disable libmodbus (0, 1) : "

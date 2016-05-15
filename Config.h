@@ -51,7 +51,7 @@ inline int LoadConfig()
 	bDisableSSC32 = TRUE;
 	bDisableMaestro = TRUE;
 	bDisableMiniSSC = TRUE;
-	bDisableSail = TRUE;
+	bDisableIM483I = TRUE;
 	// Controller parameters.
 	u_max = 1;
 	uw_max = 1;
@@ -200,7 +200,7 @@ inline int LoadConfig()
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMiniSSC) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bDisableSail) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableIM483I) != 1) printf("Invalid configuration file.\n");
 
 		// Controller parameters.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

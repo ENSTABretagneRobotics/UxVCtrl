@@ -379,7 +379,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Sail0.txt"
+				RelativePath=".\IM483I0.txt"
 				>
 			</File>
 			<File
@@ -947,11 +947,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Hardware\Sail.cpp"
+				RelativePath=".\Hardware\IM483I.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Hardware\Sail.h"
+				RelativePath=".\Hardware\IM483I.h"
 				>
 			</File>
 			<File

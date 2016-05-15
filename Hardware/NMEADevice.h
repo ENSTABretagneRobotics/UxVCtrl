@@ -36,6 +36,10 @@
 // Maximum number of characters of a NMEA sentence (excluding the line terminators CR and LF).
 #define MAX_NB_BYTES_NMEA_SENTENCE 80
 
+#define MAX_NB_BYTES_NMEA_SENTENCE_BEGIN 7
+
+#define MAX_NB_BYTES_NMEA_CHECKSUM 4
+
 struct NMEADATA
 {
 	double utc, date;
@@ -106,7 +110,7 @@ struct NMEADEVICE
 };
 typedef struct NMEADEVICE NMEADEVICE;
 
-inline char* FindBeginningNMEASentence(char sentencebegin[7], char* str)
+inline char* FindBeginningNMEASentence(char* sentencebegin, char* str)
 {
 	char* ptr = NULL;
 
@@ -121,7 +125,7 @@ inline char* FindBeginningNMEASentence(char sentencebegin[7], char* str)
 	return ptr;
 }
 
-inline char* FindNMEASentence(char sentencebegin[7], char* str)
+inline char* FindNMEASentence(char* sentencebegin, char* str)
 {
 	char* ptr = NULL;
 	char* foundstr = NULL;
@@ -147,7 +151,7 @@ inline char* FindNMEASentence(char sentencebegin[7], char* str)
 	return foundstr;
 }
 
-inline char* FindLatestNMEASentence(char sentencebegin[7], char* str)
+inline char* FindLatestNMEASentence(char* sentencebegin, char* str)
 {
 	char* ptr = NULL;
 	char* foundstr = NULL;
@@ -165,13 +169,13 @@ inline char* FindLatestNMEASentence(char sentencebegin[7], char* str)
 	return foundstr;
 }
 
-inline void ComputeNMEAchecksum(char* sentence, char checksum[4])
+inline void ComputeNMEAchecksum(char* sentence, char* checksum)
 {
 	int i = 0;
 	char res = 0;
 	BOOL bFoundBeginning = FALSE;
 
-	memset(checksum, 0, sizeof(checksum));
+	memset(checksum, 0, MAX_NB_BYTES_NMEA_CHECKSUM);
 	while (sentence[i])
 	{
 		// '$' for classic NMEA, '!' for AIS.

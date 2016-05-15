@@ -70,6 +70,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 				}
 
 				LeaveCriticalSection(&OpenCVCS);
+				//mSleep(captureperiod);
 			}
 			else 
 			{

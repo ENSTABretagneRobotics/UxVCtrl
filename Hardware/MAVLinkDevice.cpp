@@ -34,7 +34,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(50);
+		//mSleep(50);
 
 		if (bPauseMAVLinkDevice[deviceid])
 		{
@@ -66,6 +66,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 		{
 			if (ConnectMAVLinkDevice(&mavlinkdevice, szCfgFilePath) == EXIT_SUCCESS) 
 			{
+				mSleep(50);
 				bConnected = TRUE; 
 
 				StartChrono(&chrono_GPSOK);
@@ -173,6 +174,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 				LeaveCriticalSection(&StateVariablesCS);
 				
+				mSleep(25);
+
 				
 				// Temp...
 				int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
@@ -184,10 +187,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					memset(selectedchannels, 0, sizeof(selectedchannels));
 					memset(pws, 0, sizeof(pws));
 
+					EnterCriticalSection(&StateVariablesCS);
 					// Convert u (in [-1;1]) into pulse width (in us).
 					pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u1*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 					pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u2*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 					pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u3*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					LeaveCriticalSection(&StateVariablesCS);
 
 					pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 					pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
@@ -201,10 +206,19 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					if (!mavlinkdevice.InitPWs[1]) pws[1] = 0;
 					if (!mavlinkdevice.InitPWs[2]) pws[2] = 0;
 
-					SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws);
-					//mSleep(50);
+					if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+					{
+						printf("Connection to a MAVLinkDevice lost.\n");
+						bGPSOKMAVLinkDevice[deviceid] = FALSE;
+						bConnected = FALSE;
+						DisconnectMAVLinkDevice(&mavlinkdevice);
+						mSleep(50);
+						break;
+					}
+					mSleep(25);
 					break;
 				default:
+					mSleep(25);
 					break;
 				}
 			
@@ -241,6 +255,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				bGPSOKMAVLinkDevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
+				mSleep(50);
 			}		
 		}
 

@@ -138,7 +138,7 @@
 %
 %minisscconfig MiniSSC.txt bPause
 %
-%sailconfig Sail.txt bPause
+%im483iconfig IM483I.txt bPause
 %
 %videoconfig videoid Video.txt bPause
 %

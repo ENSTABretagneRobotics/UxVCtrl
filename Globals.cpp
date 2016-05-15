@@ -77,7 +77,7 @@ BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
 BOOL bDisableMaestro = FALSE;
 BOOL bDisableMiniSSC = FALSE;
-BOOL bDisableSail = FALSE;
+BOOL bDisableIM483I = FALSE;
 
 // Controller parameters.
 double u_max = 0, uw_max = 0, uv_max = 0, u_coef = 0, uw_coef = 0;
@@ -275,8 +275,8 @@ BOOL bPauseMaestro = FALSE, bRestartMaestro = FALSE;
 // MiniSSC variables.
 BOOL bPauseMiniSSC = FALSE, bRestartMiniSSC = FALSE;
 
-// Sail variables.
-BOOL bPauseSail = FALSE, bRestartSail = FALSE;
+// IM483I variables.
+BOOL bPauseIM483I = FALSE, bRestartIM483I = FALSE;
 
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];

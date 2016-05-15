@@ -34,7 +34,7 @@
 #include "SSC32.h"
 #include "Maestro.h"
 #include "MiniSSC.h"
-#include "Sail.h"
+#include "IM483I.h"
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 #include "CISCREA.h"
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER SSC32ThreadId;
 	THREAD_IDENTIFIER MaestroThreadId;
 	THREAD_IDENTIFIER MiniSSCThreadId;
-	THREAD_IDENTIFIER SailThreadId;
+	THREAD_IDENTIFIER IM483IThreadId;
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	THREAD_IDENTIFIER CISCREAThreadId;
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 	if (!bDisableSSC32) CreateDefaultThread(SSC32Thread, NULL, &SSC32ThreadId);
 	if (!bDisableMaestro) CreateDefaultThread(MaestroThread, NULL, &MaestroThreadId);
 	if (!bDisableMiniSSC) CreateDefaultThread(MiniSSCThread, NULL, &MiniSSCThreadId);
-	if (!bDisableSail) CreateDefaultThread(SailThread, NULL, &SailThreadId);
+	if (!bDisableIM483I) CreateDefaultThread(IM483IThread, NULL, &IM483IThreadId);
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -215,7 +215,7 @@ int main(int argc, char* argv[])
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) WaitForThread(CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
-	if (!bDisableSail) WaitForThread(SailThreadId);
+	if (!bDisableIM483I) WaitForThread(IM483IThreadId);
 	if (!bDisableMiniSSC) WaitForThread(MiniSSCThreadId);
 	if (!bDisableMaestro) WaitForThread(MaestroThreadId);
 	if (!bDisableSSC32) WaitForThread(SSC32ThreadId);
