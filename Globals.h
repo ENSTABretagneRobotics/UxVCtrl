@@ -116,7 +116,7 @@ extern interval alphahat, dhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-extern double u, uw, uv, wx, wy, wz, wtheta, wd, wu;
+extern double u, uw, uv, ul, wx, wy, wz, wtheta, wd, wu;
 extern double wxa, wya, wxb, wyb;
 extern double wasf; // altitude_sea_floor.
 
@@ -404,6 +404,7 @@ extern BOOL bShowBatteryInfo;
 extern BOOL bShowCytron;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
+extern BOOL bRearmAutopilot;
 extern BOOL bExit;
 extern BOOL bWaiting;
 extern BOOL bMissionRunning;

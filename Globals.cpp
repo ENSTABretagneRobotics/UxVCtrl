@@ -18,7 +18,7 @@ interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_U
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-double u = 0, uw = 0, uv = 0, wx = 0, wy = 0, wz = 0, wtheta = 0, wd = 0, wu = 0;
+double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wtheta = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wxb = 0, wyb = 0;
 double wasf = 0;
 
@@ -306,6 +306,7 @@ BOOL bShowBatteryInfo = FALSE;
 BOOL bShowCytron = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;
 BOOL bEnableBackwardsMotorboat = FALSE;
+BOOL bRearmAutopilot = FALSE;
 BOOL bExit = FALSE;
 BOOL bWaiting = FALSE;
 BOOL bMissionRunning = FALSE;

@@ -117,7 +117,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
 					break;
-				}		
+				}
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);

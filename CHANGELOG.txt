@@ -1,3 +1,8 @@
+92
+Added temporary lateral command ul for QUADRO_ROBID.
+Added Rearm key.
+Improvements in MAVLinkDevice.
+
 91
 Replaced Sail by IM483I.
 Corrected bug "for function parameters, array types are adjusted to pointer types" in NMEADevice.

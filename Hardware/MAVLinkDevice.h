@@ -265,6 +265,71 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 	return EXIT_SUCCESS;
 }
 
+inline int ArmMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, BOOL bArm)
+{
+	unsigned char sendbuf[256];
+	int sendbuflen = 0;
+	mavlink_message_t msg;
+	mavlink_command_long_t mode_command_msg;
+	mavlink_param_set_t param_set_msg;
+	mavlink_command_long_t arm_command_msg;
+
+	// Try to force mode...
+	memset(&mode_command_msg, 0, sizeof(mode_command_msg));
+	mode_command_msg.command = MAV_CMD_DO_SET_MODE;
+	mode_command_msg.confirmation = 0;
+	mode_command_msg.param1 = MAV_MODE_MANUAL_ARMED;
+	mode_command_msg.target_system = 1;
+	mode_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &mode_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	// Disable all arm checks...
+	memset(&param_set_msg, 0, sizeof(param_set_msg));
+	sprintf(param_set_msg.param_id, "ARMING_CHECK"); // http://ardupilot.org/plane/docs/parameters.html#arming-check-arm-checks-to-peform-bitmask
+	param_set_msg.param_value = 0;
+	param_set_msg.param_type = MAV_PARAM_TYPE_UINT32;
+	param_set_msg.target_system = 1;
+	param_set_msg.target_component = 1;
+	mavlink_msg_param_set_encode(255, 1, &msg, &param_set_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	// Arm/disarm...
+	memset(&arm_command_msg, 0, sizeof(arm_command_msg));
+	arm_command_msg.command = MAV_CMD_COMPONENT_ARM_DISARM;
+	arm_command_msg.confirmation = 0;
+	arm_command_msg.param1 = (bArm? 1.0f: 0.0f);
+	arm_command_msg.target_system = 1;
+	arm_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &arm_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	return EXIT_SUCCESS;
+}
+
 // pw in us.
 inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedchannels, int* pws)
 {
@@ -272,39 +337,92 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	int sendbuflen = 0;
 	mavlink_message_t msg;
 	mavlink_rc_channels_override_t rc_override;
-	//mavlink_servo_output_raw_t servo_output_raw;
 	//mavlink_command_long_t servo_command_msg;
-	//int channel = 0;
-	//int pws_tmp[NB_CHANNELS_PWM_MAVLINKDEVICE];
+	int channel = 0;
+	int pws_tmp[NB_CHANNELS_PWM_MAVLINKDEVICE];
+	int nbselectedchannels = 0;
 
-	// Temp...
-	UNREFERENCED_PARAMETER(selectedchannels);
+	nbselectedchannels = 0;
 
+	memcpy(pws_tmp, pws, sizeof(pws_tmp));
+
+	for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
+	{
+		if (!selectedchannels[channel]) 
+		{
+			pws_tmp[channel] = pMAVLinkDevice->LastPWs[channel];
+			continue;
+		}
+
+		if (pMAVLinkDevice->bProportionalPWs[channel])
+		{
+			pws_tmp[channel] = (int)(pMAVLinkDevice->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAVLINKDEVICE));
+			if (pws_tmp[channel] >= 0)
+				pws_tmp[channel] = pMAVLinkDevice->MidPWs[channel]+pws_tmp[channel]*(pMAVLinkDevice->MaxPWs[channel]-pMAVLinkDevice->MidPWs[channel])
+				/(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MID_PW_MAVLINKDEVICE);
+			else
+				pws_tmp[channel] = pMAVLinkDevice->MidPWs[channel]+pws_tmp[channel]*(pMAVLinkDevice->MinPWs[channel]-pMAVLinkDevice->MidPWs[channel])
+				/(DEFAULT_MIN_PW_MAVLINKDEVICE-DEFAULT_MID_PW_MAVLINKDEVICE);
+		}
+		else
+		{
+			pws_tmp[channel] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(pMAVLinkDevice->CoefPWs[channel]*(pws_tmp[channel]-DEFAULT_MID_PW_MAVLINKDEVICE));
+		}
+
+		pws_tmp[channel] = max(min(pws_tmp[channel], pMAVLinkDevice->MaxPWs[channel]), pMAVLinkDevice->MinPWs[channel]);
+		//pws_tmp[channel] = max(min(pws_tmp[channel], DEFAULT_ABSOLUTE_MAX_PW_MAVLINKDEVICE), DEFAULT_ABSOLUTE_MIN_PW_MAVLINKDEVICE);
+
+		// If InitPW is set to 0, disable override...
+		if (!pMAVLinkDevice->InitPWs[channel]) pws_tmp[channel] = 0;
+
+		// The requested PWM is only applied if it is slightly different from the current value.
+		if (abs(pws_tmp[channel]-pMAVLinkDevice->LastPWs[channel]) < pMAVLinkDevice->ThresholdPWs[channel]) 
+		{
+			pws_tmp[channel] = pMAVLinkDevice->LastPWs[channel];
+			continue;
+		}
+
+		//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pMAVLinkDevice->LastPWs[channel], abs(pws_tmp[channel]-pMAVLinkDevice->LastPWs[channel]), pMAVLinkDevice->ThresholdPWs[channel]);
+
+		nbselectedchannels++;
+	}
+
+	if (nbselectedchannels == 0) return EXIT_SUCCESS;
+
+	// ArduRover : 
+	// Input 1 : Steering.
+	// Input 3 : Throttle.
+	// Input 7 : Record waypoint.
+	// Input 8 : AUX 1 (mode switch).
+
+	// ArduCopter : 
+	// Input 1 : Roll/aileron.
+	// Input 2 : Pitch/elevator.
+	// Input 3 : Throttle.
+	// Input 4 : Yaw/rudder.
+	// Input 5 : AUX 1 (mode switch).
+
+	// ArduPlane : 
+	// Input 1 : Roll/aileron.
+	// Input 2 : Pitch/elevator.
+	// Input 3 : Throttle.
+	// Input 4 : Yaw/rudder.
+	// Input 8 : AUX 4 (mode switch).
+
+	// Override PWM inputs. If PWM is 0, no override...
 	memset(&rc_override, 0, sizeof(rc_override));
-	rc_override.chan1_raw = (uint16_t)pws[0];
-	rc_override.chan2_raw = (uint16_t)pws[1];
-	rc_override.chan3_raw = (uint16_t)pws[2];
-	rc_override.chan4_raw = (uint16_t)pws[3];
-	rc_override.chan5_raw = (uint16_t)pws[4];
-	rc_override.chan6_raw = (uint16_t)pws[5];
-	rc_override.chan7_raw = (uint16_t)pws[6];
-	rc_override.chan8_raw = (uint16_t)pws[7];
+	rc_override.chan1_raw = (uint16_t)pws_tmp[0];
+	rc_override.chan2_raw = (uint16_t)pws_tmp[1];
+	rc_override.chan3_raw = (uint16_t)pws_tmp[2];
+	rc_override.chan4_raw = (uint16_t)pws_tmp[3];
+	rc_override.chan5_raw = (uint16_t)pws_tmp[4];
+	rc_override.chan6_raw = (uint16_t)pws_tmp[5];
+	rc_override.chan7_raw = (uint16_t)pws_tmp[6];
+	rc_override.chan8_raw = (uint16_t)pws_tmp[7];
 	rc_override.target_system = 1;
 	rc_override.target_component = 1;
 	mavlink_msg_rc_channels_override_encode(255, 1, &msg, &rc_override);
 
-	//memset(&servo_output_raw, 0, sizeof(servo_output_raw));
-	//servo_output_raw.servo1_raw = (uint16_t)pws[0];
-	//servo_output_raw.servo2_raw = (uint16_t)pws[1];
-	//servo_output_raw.servo3_raw = (uint16_t)pws[2];
-	//servo_output_raw.servo4_raw = (uint16_t)pws[3];
-	//servo_output_raw.servo5_raw = (uint16_t)pws[4];
-	//servo_output_raw.servo6_raw = (uint16_t)pws[5];
-	//servo_output_raw.servo7_raw = (uint16_t)pws[6];
-	//servo_output_raw.servo8_raw = (uint16_t)pws[7];
-	//servo_output_raw.port = 1;
-	//mavlink_msg_servo_output_raw_encode(255, 1, &msg, &servo_output_raw);
-	
 	//memset(&servo_command_msg, 0, sizeof(servo_command_msg));
 	//servo_command_msg.command = MAV_CMD_DO_SET_SERVO;
 	//servo_command_msg.confirmation = 0;
@@ -321,6 +439,17 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 		return EXIT_FAILURE;
 	}
 
+	for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
+	{
+		if (!selectedchannels[channel]) continue;
+
+		// The requested PWM should have been only applied if it was slightly different from the current value.
+		if (abs(pws_tmp[channel]-pMAVLinkDevice->LastPWs[channel]) < pMAVLinkDevice->ThresholdPWs[channel]) continue;
+
+		// Update last known value.
+		pMAVLinkDevice->LastPWs[channel] = pws_tmp[channel];
+	}
+
 	return EXIT_SUCCESS;
 }
 
@@ -333,12 +462,12 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	unsigned char sendbuf[256];
 	int sendbuflen = 0;
 	mavlink_message_t msg;
-    mavlink_param_set_t param_set_msg;
-    mavlink_command_long_t arm_command_msg;
 	mavlink_command_long_t msg_interval_command_msg;
 	mavlink_request_data_stream_t req_data_stream_msg;
 	mavlink_rc_channels_override_t rc_override;
-    mavlink_command_long_t mode_command_msg;
+	mavlink_command_long_t mode_command_msg;
+	mavlink_param_set_t param_set_msg;
+	mavlink_command_long_t arm_command_msg;
 
 	memset(pMAVLinkDevice->szCfgFilePath, 0, sizeof(pMAVLinkDevice->szCfgFilePath));
 	sprintf(pMAVLinkDevice->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -453,7 +582,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 
 	for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
 	{
-		pMAVLinkDevice->LastPWs[channel] = 0;
+		pMAVLinkDevice->LastPWs[channel] = pMAVLinkDevice->InitPWs[channel]; // Will try to initialize with that below...
 	}
 
 	if (OpenRS232Port(&pMAVLinkDevice->RS232Port, pMAVLinkDevice->szDevPath) != EXIT_SUCCESS)
@@ -469,16 +598,190 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
-	
+
+	mSleep(50);
+
+	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
+	msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
+	msg_interval_command_msg.confirmation = 0;
+	msg_interval_command_msg.param1 = MAVLINK_MSG_ID_GPS_RAW_INT;
+	msg_interval_command_msg.param2 = 200000;
+	msg_interval_command_msg.target_system = 1;
+	msg_interval_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
+	msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
+	msg_interval_command_msg.confirmation = 0;
+	msg_interval_command_msg.param1 = MAVLINK_MSG_ID_SCALED_PRESSURE;
+	msg_interval_command_msg.param2 = 200000;
+	msg_interval_command_msg.target_system = 1;
+	msg_interval_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
+	msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
+	msg_interval_command_msg.confirmation = 0;
+	msg_interval_command_msg.param1 = MAVLINK_MSG_ID_ATTITUDE;
+	msg_interval_command_msg.param2 = 20000;
+	msg_interval_command_msg.target_system = 1;
+	msg_interval_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
+	msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
+	msg_interval_command_msg.confirmation = 0;
+	msg_interval_command_msg.param1 = MAVLINK_MSG_ID_RC_CHANNELS_RAW;
+	msg_interval_command_msg.param2 = 20000;
+	msg_interval_command_msg.target_system = 1;
+	msg_interval_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	memset(&req_data_stream_msg, 0, sizeof(req_data_stream_msg));
+	req_data_stream_msg.req_stream_id = MAV_DATA_STREAM_RAW_SENSORS; // https://groups.google.com/forum/#!topic/drones-discuss/gIkqFECW_B8
+	req_data_stream_msg.req_message_rate = 5;
+	req_data_stream_msg.start_stop = 1;
+	req_data_stream_msg.target_system = 1;
+	req_data_stream_msg.target_component = 1;
+	mavlink_msg_request_data_stream_encode(255, 1, &msg, &req_data_stream_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	memset(&req_data_stream_msg, 0, sizeof(req_data_stream_msg));
+	req_data_stream_msg.req_stream_id = MAV_DATA_STREAM_EXTRA1; // https://groups.google.com/forum/#!topic/drones-discuss/gIkqFECW_B8
+	req_data_stream_msg.req_message_rate = 50;
+	req_data_stream_msg.start_stop = 1;
+	req_data_stream_msg.target_system = 1;
+	req_data_stream_msg.target_component = 1;
+	mavlink_msg_request_data_stream_encode(255, 1, &msg, &req_data_stream_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	memset(&req_data_stream_msg, 0, sizeof(req_data_stream_msg));
+	req_data_stream_msg.req_stream_id = MAV_DATA_STREAM_RC_CHANNELS; // https://groups.google.com/forum/#!topic/drones-discuss/gIkqFECW_B8
+	req_data_stream_msg.req_message_rate = 50;
+	req_data_stream_msg.start_stop = 1;
+	req_data_stream_msg.target_system = 1;
+	req_data_stream_msg.target_component = 1;
+	mavlink_msg_request_data_stream_encode(255, 1, &msg, &req_data_stream_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	// Override PWM inputs. If PWM is 0, no override...
+	// The initial values must be the ones expected by the autopilot to arm safely...
+	memset(&rc_override, 0, sizeof(rc_override));
+	rc_override.chan1_raw = (uint16_t)pMAVLinkDevice->InitPWs[0];
+	rc_override.chan2_raw = (uint16_t)pMAVLinkDevice->InitPWs[1];
+	rc_override.chan3_raw = (uint16_t)pMAVLinkDevice->InitPWs[2];
+	rc_override.chan4_raw = (uint16_t)pMAVLinkDevice->InitPWs[3];
+	rc_override.chan5_raw = (uint16_t)pMAVLinkDevice->InitPWs[4];
+	rc_override.chan6_raw = (uint16_t)pMAVLinkDevice->InitPWs[5];
+	rc_override.chan7_raw = (uint16_t)pMAVLinkDevice->InitPWs[6];
+	rc_override.chan8_raw = (uint16_t)pMAVLinkDevice->InitPWs[7];
+	rc_override.target_system = 1;
+	rc_override.target_component = 1;
+	mavlink_msg_rc_channels_override_encode(255, 1, &msg, &rc_override);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	// Try to force mode...
+	memset(&mode_command_msg, 0, sizeof(mode_command_msg));
+	mode_command_msg.command = MAV_CMD_DO_SET_MODE;
+	mode_command_msg.confirmation = 0;
+	mode_command_msg.param1 = MAV_MODE_MANUAL_ARMED;
+	mode_command_msg.target_system = 1;
+	mode_command_msg.target_component = 1;
+	mavlink_msg_command_long_encode(255, 1, &msg, &mode_command_msg);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a MAVLinkDevice.\n");
+		CloseRS232Port(&pMAVLinkDevice->RS232Port);
+		return EXIT_FAILURE;
+	}
 	mSleep(50);
 
 	// Disable all arm checks...
 	memset(&param_set_msg, 0, sizeof(param_set_msg));
-    sprintf(param_set_msg.param_id, "ARMING_CHECK"); // http://ardupilot.org/plane/docs/parameters.html#arming-check-arm-checks-to-peform-bitmask
-    param_set_msg.param_value = 0;
-    param_set_msg.param_type = MAV_PARAM_TYPE_UINT32;
-    param_set_msg.target_system = 1;
-    param_set_msg.target_component = 1;
+	sprintf(param_set_msg.param_id, "ARMING_CHECK"); // http://ardupilot.org/plane/docs/parameters.html#arming-check-arm-checks-to-peform-bitmask
+	param_set_msg.param_value = 0;
+	param_set_msg.param_type = MAV_PARAM_TYPE_UINT32;
+	param_set_msg.target_system = 1;
+	param_set_msg.target_component = 1;
 	mavlink_msg_param_set_encode(255, 1, &msg, &param_set_msg);
 
 	memset(sendbuf, 0, sizeof(sendbuf));
@@ -493,183 +796,12 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 
 	// Arm...
 	memset(&arm_command_msg, 0, sizeof(arm_command_msg));
-    arm_command_msg.command = MAV_CMD_COMPONENT_ARM_DISARM;
-    arm_command_msg.confirmation = 0;
-    arm_command_msg.param1 = 1;
-    arm_command_msg.target_system = 1;
-    arm_command_msg.target_component = 1;
+	arm_command_msg.command = MAV_CMD_COMPONENT_ARM_DISARM;
+	arm_command_msg.confirmation = 0;
+	arm_command_msg.param1 = 1;
+	arm_command_msg.target_system = 1;
+	arm_command_msg.target_component = 1;
 	mavlink_msg_command_long_encode(255, 1, &msg, &arm_command_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
-    msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
-    msg_interval_command_msg.confirmation = 0;
-    msg_interval_command_msg.param1 = MAVLINK_MSG_ID_GPS_RAW_INT;
-    msg_interval_command_msg.param2 = 200000;
-    msg_interval_command_msg.target_system = 1;
-    msg_interval_command_msg.target_component = 1;
-	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
-    msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
-    msg_interval_command_msg.confirmation = 0;
-    msg_interval_command_msg.param1 = MAVLINK_MSG_ID_SCALED_PRESSURE;
-    msg_interval_command_msg.param2 = 200000;
-    msg_interval_command_msg.target_system = 1;
-    msg_interval_command_msg.target_component = 1;
-	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
-    msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
-    msg_interval_command_msg.confirmation = 0;
-    msg_interval_command_msg.param1 = MAVLINK_MSG_ID_ATTITUDE;
-    msg_interval_command_msg.param2 = 20000;
-    msg_interval_command_msg.target_system = 1;
-    msg_interval_command_msg.target_component = 1;
-	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&msg_interval_command_msg, 0, sizeof(msg_interval_command_msg));
-    msg_interval_command_msg.command = MAV_CMD_SET_MESSAGE_INTERVAL;
-    msg_interval_command_msg.confirmation = 0;
-    msg_interval_command_msg.param1 = MAVLINK_MSG_ID_RC_CHANNELS_RAW;
-    msg_interval_command_msg.param2 = 20000;
-    msg_interval_command_msg.target_system = 1;
-    msg_interval_command_msg.target_component = 1;
-	mavlink_msg_command_long_encode(255, 1, &msg, &msg_interval_command_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&req_data_stream_msg, 0, sizeof(req_data_stream_msg));
-    req_data_stream_msg.req_stream_id = MAV_DATA_STREAM_RAW_SENSORS; // https://groups.google.com/forum/#!topic/drones-discuss/gIkqFECW_B8
-    req_data_stream_msg.req_message_rate = 5;
-    req_data_stream_msg.start_stop = 1;
-    req_data_stream_msg.target_system = 1;
-    req_data_stream_msg.target_component = 1;
-	mavlink_msg_request_data_stream_encode(255, 1, &msg, &req_data_stream_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&req_data_stream_msg, 0, sizeof(req_data_stream_msg));
-    req_data_stream_msg.req_stream_id = MAV_DATA_STREAM_EXTRA1; // https://groups.google.com/forum/#!topic/drones-discuss/gIkqFECW_B8
-    req_data_stream_msg.req_message_rate = 50;
-    req_data_stream_msg.start_stop = 1;
-    req_data_stream_msg.target_system = 1;
-    req_data_stream_msg.target_component = 1;
-	mavlink_msg_request_data_stream_encode(255, 1, &msg, &req_data_stream_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&req_data_stream_msg, 0, sizeof(req_data_stream_msg));
-    req_data_stream_msg.req_stream_id = MAV_DATA_STREAM_RC_CHANNELS; // https://groups.google.com/forum/#!topic/drones-discuss/gIkqFECW_B8
-    req_data_stream_msg.req_message_rate = 50;
-    req_data_stream_msg.start_stop = 1;
-    req_data_stream_msg.target_system = 1;
-    req_data_stream_msg.target_component = 1;
-	mavlink_msg_request_data_stream_encode(255, 1, &msg, &req_data_stream_msg);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-	
-	memset(&rc_override, 0, sizeof(rc_override));
-	rc_override.chan1_raw = (uint16_t)pMAVLinkDevice->InitPWs[0];
-	rc_override.chan2_raw = (uint16_t)pMAVLinkDevice->InitPWs[1];
-	rc_override.chan3_raw = (uint16_t)pMAVLinkDevice->InitPWs[2];
-	rc_override.chan4_raw = (uint16_t)pMAVLinkDevice->InitPWs[3];
-	rc_override.chan5_raw = (uint16_t)pMAVLinkDevice->InitPWs[4];
-	rc_override.chan6_raw = (uint16_t)pMAVLinkDevice->InitPWs[5];
-	rc_override.chan7_raw = (uint16_t)pMAVLinkDevice->InitPWs[6];
-	rc_override.chan8_raw = (uint16_t)pMAVLinkDevice->InitPWs[7];
-	rc_override.target_system = 1;
-	rc_override.target_component = 1;
-	mavlink_msg_rc_channels_override_encode(255, 1, &msg, &rc_override);
-	
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
-		CloseRS232Port(&pMAVLinkDevice->RS232Port);
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-
-	memset(&mode_command_msg, 0, sizeof(mode_command_msg));
-    mode_command_msg.command = MAV_CMD_DO_SET_MODE;
-    mode_command_msg.confirmation = 0;
-    mode_command_msg.param1 = MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
-    mode_command_msg.target_system = 1;
-    mode_command_msg.target_component = 1;
-	mavlink_msg_command_long_encode(255, 1, &msg, &mode_command_msg);
 
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	

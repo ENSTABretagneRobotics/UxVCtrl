@@ -307,6 +307,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		uw = (uw < -uw_max)? -uw_max: uw;
 		uv = (uv > uv_max)? uv_max: uv;
 		uv = (uv < -uv_max)? -uv_max: uv;
+		ul = (ul > 1)? 1: ul;
+		ul = (ul < -1)? -1: ul;
 
 		//u1 = (u+uw)/2;
 		//u2 = (u-uw)/2;

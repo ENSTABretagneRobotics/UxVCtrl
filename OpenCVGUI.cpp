@@ -335,6 +335,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'a':		
 			switch (robid)
 			{
+			case QUADRO_ROBID:
+				ul += 0.1;
+				ul = (ul > 1)? 1: ul;
+				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
 				uw_max += 0.1;
@@ -347,6 +351,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'e':	
 			switch (robid)
 			{
+			case QUADRO_ROBID:
+				ul -= 0.1;
+				ul = (ul < -1)? -1: ul;
+				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
 				uw_max -= 0.1;
@@ -597,7 +605,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
-				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode)\n");
+				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n");
 			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
@@ -631,6 +639,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bEnableZQSDFullMode = !bEnableZQSDFullMode; 
 			if (bEnableZQSDFullMode) printf("ZQSD full speed mode enabled.\n");
 			else printf("ZQSD full speed mode disabled.\n");
+			break;
+		case '9': 
+			bRearmAutopilot = TRUE; 
+			printf("Rearm.\n");
 			break;
 		case 27: // ESC
 			bExit = TRUE;

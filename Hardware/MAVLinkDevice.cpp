@@ -175,36 +175,50 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				LeaveCriticalSection(&StateVariablesCS);
 				
 				mSleep(25);
-
-				
+								
 				// Temp...
 				int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
 				int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
 				switch (robid)
 				{
+				//case BUGGY_ROBID:
 				case QUADRO_ROBID:
+
+					if (bRearmAutopilot)
+					{
+						if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							bGPSOKMAVLinkDevice[deviceid] = FALSE;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
+						mSleep(25);
+						bRearmAutopilot = FALSE;
+					}
 
 					memset(selectedchannels, 0, sizeof(selectedchannels));
 					memset(pws, 0, sizeof(pws));
 
 					EnterCriticalSection(&StateVariablesCS);
 					// Convert u (in [-1;1]) into pulse width (in us).
-					pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u1*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-					pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u2*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-					pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u3*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+					pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 					LeaveCriticalSection(&StateVariablesCS);
 
 					pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 					pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 					pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+					pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 
 					selectedchannels[0] = 1;
 					selectedchannels[1] = 1;
 					selectedchannels[2] = 1;
-
-					if (!mavlinkdevice.InitPWs[0]) pws[0] = 0;
-					if (!mavlinkdevice.InitPWs[1]) pws[1] = 0;
-					if (!mavlinkdevice.InitPWs[2]) pws[2] = 0;
+					selectedchannels[3] = 1;
 
 					if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
 					{
@@ -222,7 +236,6 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					break;
 				}
 			
-
 				if (mavlinkdevice.bSaveRawData)
 				{
 					fprintf(mavlinkdevice.pfSaveFile, 
