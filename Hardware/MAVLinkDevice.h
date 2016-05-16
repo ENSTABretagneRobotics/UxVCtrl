@@ -311,6 +311,8 @@ inline int ArmMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, BOOL bArm)
 	mSleep(50);
 
 	// Arm/disarm...
+	// Firmware ArduCopter 3.1.5 does not seem to support arm/disarm command, use the transmitter method 
+	// instead : holding the throttle down and rudder right for 5 seconds...
 	memset(&arm_command_msg, 0, sizeof(arm_command_msg));
 	arm_command_msg.command = MAV_CMD_COMPONENT_ARM_DISARM;
 	arm_command_msg.confirmation = 0;
@@ -795,6 +797,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	mSleep(50);
 
 	// Arm...
+	// Firmware ArduCopter 3.1.5 does not seem to support arm/disarm command, use the transmitter method 
+	// instead : holding the throttle down and rudder right for 5 seconds...
 	memset(&arm_command_msg, 0, sizeof(arm_command_msg));
 	arm_command_msg.command = MAV_CMD_COMPONENT_ARM_DISARM;
 	arm_command_msg.confirmation = 0;

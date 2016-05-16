@@ -86,9 +86,9 @@
 % u_max (in [0;1])
 1
 % uw_max (in [0;1], (0.5 : boost, 1 : normal) for SAUC'ISSE, (0.35 (difficult to control...) : boost, 0.25 : normal) for CISCREA)
-0.5
+1
 % uv_max (in [0;1])
-0.75
+1
 % u_coef (1 : boost, 0.5 : normal)
 1
 % uw_coef (1 : boost, 0.5 : normal)
