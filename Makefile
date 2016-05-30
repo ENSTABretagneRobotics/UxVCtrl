@@ -3,25 +3,25 @@
 #    sudo apt-get install build-essential
 # in a terminal.
 # Additionally, you need to install OpenCV 2.3.1/2.4.2/2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
-# (on some versions of Linux or OpenCV, set nbvideo to 1 in UxVCtrl.txt if the program stops immediately after opening OpenCV windows)
+# (on some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows)
 
 PROGS = UxVCtrl
 
-CC = g++
-#CFLAGS += -g -fpermissive
-CFLAGS += -O3 -fpermissive
-CFLAGS += -Wall -Wno-unknown-pragmas 
-#CFLAGS += -Wextra -Winline
+CC = gcc
+CXX = g++
+
+#CFLAGS += -g -Wall -Wextra -Winline
+CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-but-set-variable -Wno-unused-parameter
 
 #CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY -D _DEBUG_MESSAGES 
-#CFLAGS += -D OPENCV231
-CFLAGS += -D OPENCV242
-#CFLAGS += -D OPENCV249
 CFLAGS += -D ENABLE_LABJACK_SUPPORT
 CFLAGS += -D ENABLE_LIBMODBUS_SUPPORT
 CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
 CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD 
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
+#Temp...
+CFLAGS += -D DISABLE_AIS_SUPPORT
+CFLAGS += -D OPENCV249
 
 CFLAGS += -I../OSUtils 
 CFLAGS += -I../Extensions/Devices/LabjackUtils/liblabjackusb
@@ -32,6 +32,8 @@ CFLAGS += -I../Extensions/Misc/SurfaceVisualObstacle
 CFLAGS += -I../interval -I../matrix_lib 
 CFLAGS += -I./Hardware 
 CFLAGS += -I. -I..
+
+CXXFLAGS += $(CFLAGS) -fpermissive
 
 LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_video -lopencv_features2d -lopencv_ml -lopencv_highgui -lopencv_objdetect -lopencv_contrib -lopencv_legacy
 LDFLAGS += -lmodbus
@@ -75,181 +77,181 @@ OSTimer.o: ../OSUtils/OSTimer.c ../OSUtils/OSTimer.h OSEv.o
 ############################# Extensions #############################
 
 labjackusb.o: ../Extensions/Devices/LabjackUtils/liblabjackusb/labjackusb.c ../Extensions/Devices/LabjackUtils/liblabjackusb/labjackusb.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 u3.o: ../Extensions/Devices/LabjackUtils/U3Utils/u3.c ../Extensions/Devices/LabjackUtils/U3Utils/u3.h labjackusb.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 U3Core.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Core.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Core.h u3.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 U3Cfg.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Cfg.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Cfg.h U3Core.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 U3Mgr.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Mgr.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Mgr.h U3Cfg.o OSCriticalSection.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 ue9.o: ../Extensions/Devices/LabjackUtils/UE9Utils/ue9.c ../Extensions/Devices/LabjackUtils/UE9Utils/ue9.h labjackusb.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 UE9Core.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Core.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Core.h ue9.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 UE9Cfg.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.h UE9Core.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 UE9Mgr.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Mgr.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Mgr.h UE9Cfg.o OSCriticalSection.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 CvCore.o: ../Extensions/Img/CvCore.c ../Extensions/Img/CvCore.h OSTime.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 CvFiles.o: ../Extensions/Img/CvFiles.c ../Extensions/Img/CvFiles.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 CvProc.o: ../Extensions/Img/CvProc.c ../Extensions/Img/CvProc.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 CvDraw.o: ../Extensions/Img/CvDraw.c ../Extensions/Img/CvDraw.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 CvDisp.o: ../Extensions/Img/CvDisp.c ../Extensions/Img/CvDisp.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 ToolsObs.o: ../Extensions/Misc/SurfaceVisualObstacle/ToolsObs.cpp ../Extensions/Misc/SurfaceVisualObstacle/ToolsObs.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Horizon.o: ../Extensions/Misc/SurfaceVisualObstacle/Horizon.cpp ../Extensions/Misc/SurfaceVisualObstacle/Horizon.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Obstacle.o: ../Extensions/Misc/SurfaceVisualObstacle/Obstacle.cpp ../Extensions/Misc/SurfaceVisualObstacle/Obstacle.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 mainDetectionObstacle.o: ../Extensions/Misc/SurfaceVisualObstacle/mainDetectionObstacle.cpp ../Extensions/Misc/SurfaceVisualObstacle/mainDetectionObstacle.h Obstacle.o Horizon.o ToolsObs.o
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 ############################# interval #############################
 
 iboolean.o: ../interval/iboolean.cpp ../interval/iboolean.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 interval.o: ../interval/interval.cpp ../interval/interval.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 box.o: ../interval/box.cpp ../interval/box.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 rmatrix.o: ../interval/rmatrix.cpp ../interval/rmatrix.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 imatrix.o: ../interval/imatrix.cpp ../interval/imatrix.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 ############################# Hardware #############################
 
 CISCREA.o: ./Hardware/CISCREA.cpp ./Hardware/CISCREA.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Hokuyo.o: ./Hardware/Hokuyo.cpp ./Hardware/Hokuyo.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Maestro.o: ./Hardware/Maestro.cpp ./Hardware/Maestro.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 MDM.o: ./Hardware/MDM.cpp ./Hardware/MDM.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 MES.o: ./Hardware/MES.cpp ./Hardware/MES.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 MiniSSC.o: ./Hardware/MiniSSC.cpp ./Hardware/MiniSSC.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 MT.o: ./Hardware/MT.cpp ./Hardware/MT.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h ./Hardware/AIS.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 P33x.o: ./Hardware/P33x.cpp ./Hardware/P33x.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 RazorAHRS.o: ./Hardware/RazorAHRS.cpp ./Hardware/RazorAHRS.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 RS232Port.o: ./Hardware/RS232Port.cpp ./Hardware/RS232Port.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 IM483I.o: ./Hardware/IM483I.cpp ./Hardware/IM483I.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 SSC32.o: ./Hardware/SSC32.cpp ./Hardware/SSC32.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 SwarmonDevice.o: ./Hardware/SwarmonDevice.cpp ./Hardware/SwarmonDevice.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 UE9A.o: ./Hardware/UE9A.cpp ./Hardware/UE9A.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Video.o: ./Hardware/Video.cpp ./Hardware/Video.h
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 ############################# PROGS #############################
 
 Ball.o: Ball.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Commands.o: Commands.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Computations.o: Computations.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Config.o: Config.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Controller.o: Controller.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Globals.o: Globals.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Main.o: Main.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Observer.o: Observer.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 OpenCVGUI.o: OpenCVGUI.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Pipeline.o: Pipeline.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 SeanetProcessing.o: SeanetProcessing.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Simulator.o: Simulator.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 SurfaceVisualObstacle.o: SurfaceVisualObstacle.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 VideoRecord.o: VideoRecord.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 VisualObstacle.o: VisualObstacle.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 Wall.o: Wall.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c $<
 
 UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pipeline.o OpenCVGUI.o Observer.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o IM483I.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o Maestro.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm -f $(PROGS) $(PROGS:%=%.elf) $(PROGS:%=%.exe) *.o *.obj core *.gch

@@ -119,9 +119,9 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 				{
 					//for (i = 0; i < hokuyo.StepCount; i++)
 					//{
-					//	fprintf(hokuyo.pfSaveFile, "%d;%d;%.3f;%.3f;\n", tv.tv_sec, tv.tv_usec, angles[i], distances[i]);
+					//	fprintf(hokuyo.pfSaveFile, "%d;%d;%.3f;%.3f;\n", (int)tv.tv_sec, (int)tv.tv_usec, angles[i], distances[i]);
 					//}
-					fprintf(hokuyo.pfSaveFile, "%d;%d;", tv.tv_sec, tv.tv_usec);
+					fprintf(hokuyo.pfSaveFile, "%d;%d;", (int)tv.tv_sec, (int)tv.tv_usec);
 					for (i = 0; i < hokuyo.StepCount; i++)
 					{
 						fprintf(hokuyo.pfSaveFile, "%.3f;%.3f;", angles[i], distances[i]);

@@ -162,7 +162,7 @@ inline int decode_AIS(char* aisbuf, int aisbuflen, double* pAIS_Latitude, double
 	temp_s=ais_binary.substr(61,28);
 	std::bitset<28> hh(temp_s);
 	if (west=='1') {hh.flip();}
-	double ais_longitude=hh.to_ulong();;
+	double ais_longitude=hh.to_ulong();
 	ais_longitude=ais_longitude/10000/60;
 	if (west=='1') {ais_longitude *= -1;}
 

@@ -1,3 +1,7 @@
+93
+Corrected MAVLinkDevice rudder direction.
+Improved Linux compatibility.
+
 92
 Added temporary lateral command ul for QUADRO_ROBID.
 Added Rearm key.

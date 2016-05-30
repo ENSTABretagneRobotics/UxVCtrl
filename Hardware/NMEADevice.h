@@ -623,7 +623,7 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		{
 			i = 0;
 			// Search for the end of the AIS data payload.
-			while ((i < sizeof(aisbuf)-1)&&(aisbuf+i))
+			while ((i < (int)sizeof(aisbuf)-1)&&(aisbuf+i))
 			{
 				if (sscanf(aisbuf+i, ",%d", &pNMEAData->nbfillbits) == 1) 
 				{
