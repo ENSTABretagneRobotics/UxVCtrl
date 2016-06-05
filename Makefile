@@ -1,8 +1,8 @@
-# Makefile for Linux tested with Ubuntu 10.10 using OpenCV 2.4.2. 
+# Makefile for Linux, tested with Ubuntu 15.10. 
 # You might need to install C/C++ development tools by typing :
 #    sudo apt-get install build-essential
 # in a terminal.
-# Additionally, you need to install OpenCV 2.3.1/2.4.2/2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
+# Additionally, you need to install OpenCV 2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
 # (on some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows)
 
 PROGS = UxVCtrl

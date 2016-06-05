@@ -68,7 +68,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	// Needed on Linux to get windows-related functions working properly in multiple threads?
 	EnterCriticalSection(&OpenCVCS);
 
-	cvStartWindowThread();
+	// Sometimes needed on Linux, sometimes not...
+	//cvStartWindowThread();
 
 	//cvNamedWindow("Initializing...", CV_WINDOW_AUTOSIZE);
 	//cvMoveWindow("Initializing...", 0, 0);

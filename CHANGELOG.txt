@@ -1,3 +1,6 @@
+94
+Improved Linux compatibility.
+
 93
 Corrected MAVLinkDevice rudder direction.
 Improved Linux compatibility.

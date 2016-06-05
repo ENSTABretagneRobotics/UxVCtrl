@@ -87,6 +87,9 @@ int main(int argc, char* argv[])
 
 	INIT_DEBUG;
 
+	// Disable buffering for printf()...
+	setbuf(stdout, NULL);
+
 	srand(GetTickCount());
 
 	LoadConfig();

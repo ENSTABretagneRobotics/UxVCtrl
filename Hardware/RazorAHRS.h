@@ -55,7 +55,7 @@ struct RAZORAHRS
 };
 typedef struct RAZORAHRS RAZORAHRS;
 
-inline char* FindBeginningRazorAHRSSentence(char sentencebegin[7], char* str)
+inline char* FindBeginningRazorAHRSSentence(char* sentencebegin, char* str)
 {
 	char* ptr = NULL;
 
@@ -70,7 +70,7 @@ inline char* FindBeginningRazorAHRSSentence(char sentencebegin[7], char* str)
 	return ptr;
 }
 
-inline char* FindRazorAHRSSentence(char sentencebegin[7], char* str)
+inline char* FindRazorAHRSSentence(char* sentencebegin, char* str)
 {
 	char* ptr = NULL;
 	char* foundstr = NULL;
@@ -86,7 +86,7 @@ inline char* FindRazorAHRSSentence(char sentencebegin[7], char* str)
 	foundstr = ptr;
 
 	// Check if the sentence is complete.
-	ptr = strstr(foundstr+strlen(sentencebegin), "\r");
+	ptr = strstr(foundstr+strlen(sentencebegin), "\r\n");
 	if (!ptr)
 	{
 		// The sentence is incomplete.
@@ -96,7 +96,7 @@ inline char* FindRazorAHRSSentence(char sentencebegin[7], char* str)
 	return foundstr;
 }
 
-inline char* FindLatestRazorAHRSSentence(char sentencebegin[7], char* str)
+inline char* FindLatestRazorAHRSSentence(char* sentencebegin, char* str)
 {
 	char* ptr = NULL;
 	char* foundstr = NULL;

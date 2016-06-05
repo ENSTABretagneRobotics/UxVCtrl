@@ -236,7 +236,7 @@ inline int SendDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pSentBytes)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to send at once. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -246,7 +246,7 @@ inline int SendDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pSentBytes)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error sending data with the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -290,7 +290,7 @@ inline int RecvDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pReceivedBytes)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to receive at once. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -300,7 +300,7 @@ inline int RecvDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pReceivedBytes)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error receiving data with the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -336,7 +336,7 @@ inline int PurgeDataMDM(MDM* pMDM)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error purging data from the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -365,7 +365,7 @@ inline int SendAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to send at once. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -375,7 +375,7 @@ inline int SendAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error sending data with the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -420,7 +420,7 @@ inline int RecvAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to receive at once. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -430,7 +430,7 @@ inline int RecvAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error receiving data with the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -476,7 +476,7 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to send at once. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -491,7 +491,7 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error sending data with the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -539,7 +539,7 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to receive at once. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -549,7 +549,7 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Error receiving data with the device. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
 
@@ -581,7 +581,7 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Bad CRC-16. ", 
-			(unsigned int)pMDM);
+			(unsigned int)(intptr_t)pMDM);
 		return EXIT_INVALID_DATA;	
 	}
 
@@ -614,7 +614,7 @@ inline int EchoByteMDM(MDM* pMDM, uint8* pb)
 				"(pMDM=%#x)\n", 
 				strtime_m(), 
 				"Error sending data with the device. ", 
-				(unsigned int)pMDM);
+				(unsigned int)(intptr_t)pMDM);
 			return EXIT_FAILURE;
 		}
 

@@ -42,7 +42,7 @@ _ ..\matrix_lib : matrix library compatible with interval.
 
 Most of the time, it should not be necessary to modify them.
 
-Please do not try to build the program in a directory that contains commas!
+Please do not try to build the program in a directory that contains commas! Mind the line endings in the configuration files depending on the OS!
 
 The principle of execution of the program is the following : main() launches all the devices, controller, observer, missions, GUI and the command interpreter threads depending on the UxVCtrl.txt configuration file. After all initializations, the program should be waiting for user input through the GUI and/or the command interpreter, or run the mission specified as argument if any. The program should exit depending on GUI interaction, commands typed or mission scripts. Type 'h' on an OpenCVGUI window to get the list of available keyboard controls. Available commands are described in mission_spec.txt. A lot of parameters can be modified in the UxVCtrl.txt configuration file, as well as in the other device-specific configuration files to modify the behavior of the program. 
 
