@@ -185,6 +185,18 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 			}
+			if ((bPingerDetection||bPingerTrackingControl)&&(videoid == videoid_pinger)) 		
+			{
+				EnterCriticalSection(&PingerOverlayImgCS);
+				CopyOverlay(PingerOverlayImg, dispimgs[videoid]);
+				LeaveCriticalSection(&PingerOverlayImgCS);
+			}
+			if ((bMissingWorkerDetection||bMissingWorkerTrackingControl)&&(videoid == videoid_missingworker)) 		
+			{
+				EnterCriticalSection(&MissingWorkerOverlayImgCS);
+				CopyOverlay(MissingWorkerOverlayImg, dispimgs[videoid]);
+				LeaveCriticalSection(&MissingWorkerOverlayImgCS);
+			}
 		}
 		LeaveCriticalSection(&dispimgsCS[videoid]);
 

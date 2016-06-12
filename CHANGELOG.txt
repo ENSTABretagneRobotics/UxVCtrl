@@ -1,3 +1,7 @@
+95
+Added missing worker and pinger missions.
+Corrected build problem in Commands.h due to numerous else-if.
+
 94
 Improved Linux compatibility.
 

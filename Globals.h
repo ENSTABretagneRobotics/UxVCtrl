@@ -247,8 +247,8 @@ extern CRITICAL_SECTION WallOverlayImgCS;
 extern IplImage* WallOverlayImg;
 extern double d0_wall, beta_wall, delta_wall, dmin_wall, dmax_wall, gamma_infinite_wall, r_wall;
 extern int bLat_wall;
-extern double u_wall;
 extern int bBrake_wall;
+extern double u_wall;
 
 // Pipeline variables.
 extern BOOL bPipelineDetection;
@@ -260,9 +260,9 @@ extern int rmin_pipeline, rmax_pipeline, gmin_pipeline, gmax_pipeline, bmin_pipe
 extern int hmin_pipeline, hmax_pipeline, smin_pipeline, smax_pipeline, lmin_pipeline, lmax_pipeline;
 extern double objMinRadiusRatio_pipeline, objRealRadius_pipeline, d0_pipeline; 
 extern double kh_pipeline, kv_pipeline;
+extern int bBrake_pipeline;
 extern int videoid_pipeline; 
 extern double u_pipeline;
-extern int bBrake_pipeline;
 
 // Ball variables.
 extern BOOL bBallDetection;
@@ -274,15 +274,15 @@ extern int rmin_ball, rmax_ball, gmin_ball, gmax_ball, bmin_ball, bmax_ball; // 
 extern int hmin_ball, hmax_ball, smin_ball, smax_ball, lmin_ball, lmax_ball; // Warning : ]hmin,hmax[ is exclusive...
 extern double objMinRadiusRatio_ball, objRealRadius_ball, d0_ball; 
 extern double kh_ball, kv_ball; // Not used...
-extern int camdir_ball;
-extern int bDepth_ball;
 extern int lightMin_ball;
 extern double lightPixRatio_ball; 
 extern int bAcoustic_ball;
+extern int bDepth_ball;
+extern int camdir_ball;
+extern int bBrake_ball;
 extern int videoid_ball;
 extern double u_ball;
 extern double theta_ball; // Not used...
-extern int bBrake_ball;
 extern double x_ball, y_ball, z_ball;
 extern double lat_ball, long_ball, alt_ball;
 extern int lightStatus_ball;
@@ -295,9 +295,9 @@ extern CRITICAL_SECTION VisualObstacleOverlayImgCS;
 extern IplImage* VisualObstacleOverlayImg;
 extern int rmin_visualobstacle, rmax_visualobstacle, gmin_visualobstacle, gmax_visualobstacle, bmin_visualobstacle, bmax_visualobstacle;
 extern double obsPixRatio_visualobstacle; 
+extern int bBrake_visualobstacle;
 extern int videoid_visualobstacle;
 extern double u_visualobstacle;
-extern int bBrake_visualobstacle;
 
 // Surface visual obstacle variables.
 extern BOOL bSurfaceVisualObstacleDetection;
@@ -307,14 +307,37 @@ extern CRITICAL_SECTION SurfaceVisualObstacleOverlayImgCS;
 extern IplImage* SurfaceVisualObstacleOverlayImg;
 extern char weather_surfacevisualobstacle; 
 extern int boatsize_surfacevisualobstacle;
+extern int bBrake_surfacevisualobstacle;
 extern int videoid_surfacevisualobstacle;
 extern double u_surfacevisualobstacle;
-extern int bBrake_surfacevisualobstacle;
 
 // Pinger variables.
 extern BOOL bPingerDetection;
 extern BOOL bPingerTrackingControl;
-extern int pingertrackingvideoid;
+extern CRITICAL_SECTION PingerCS;
+extern CRITICAL_SECTION PingerOverlayImgCS;
+extern IplImage* PingerOverlayImg;
+extern int rmin_pinger, rmax_pinger, gmin_pinger, gmax_pinger, bmin_pinger, bmax_pinger; 
+extern int hmin_pinger, hmax_pinger, smin_pinger, smax_pinger, lmin_pinger, lmax_pinger;
+extern double objMinRadiusRatio_pinger, objRealRadius_pinger; 
+extern double pulsefreq_pinger, pulselen_pinger, pulsepersec_pinger, hyddist_pinger, hydorient_pinger, preferreddir_pinger; 
+extern int bBrakeSurfaceEnd_pinger;
+extern int videoid_pinger; 
+extern double u_pinger;
+
+// Missing worker variables.
+extern BOOL bMissingWorkerDetection;
+extern BOOL bMissingWorkerTrackingControl;
+extern CRITICAL_SECTION MissingWorkerCS;
+extern CRITICAL_SECTION MissingWorkerOverlayImgCS;
+extern IplImage* MissingWorkerOverlayImg;
+extern int rmin_missingworker, rmax_missingworker, gmin_missingworker, gmax_missingworker, bmin_missingworker, bmax_missingworker; 
+extern int hmin_missingworker, hmax_missingworker, smin_missingworker, smax_missingworker, lmin_missingworker, lmax_missingworker;
+extern double objMinRadiusRatio_missingworker, objRealRadius_missingworker, d0_missingworker; 
+extern double kh_missingworker, kv_missingworker;
+extern int bBrake_missingworker;
+extern int videoid_missingworker; 
+extern double u_missingworker;
 
 // Simulator variables.
 extern BOOL bGPSOKSimulator;
@@ -442,6 +465,12 @@ extern char logpipelinetaskfilename[MAX_BUF_LEN];
 extern FILE* logballtaskfile;
 extern char logballtaskfilename[MAX_BUF_LEN];
 
+extern FILE* logpingertaskfile;
+extern char logpingertaskfilename[MAX_BUF_LEN];
+
+extern FILE* logmissingworkertaskfile;
+extern char logmissingworkertaskfilename[MAX_BUF_LEN];
+
 inline int InitGlobals(void)
 {
 	int i = 0;
@@ -493,6 +522,12 @@ inline int InitGlobals(void)
 	SurfaceVisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	PingerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+	cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
+
+	MissingWorkerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+	cvSet(MissingWorkerOverlayImg, CV_RGB(0, 0, 0), NULL);
+
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
 
@@ -506,6 +541,10 @@ inline int InitGlobals(void)
 	InitCriticalSection(&VisualObstacleOverlayImgCS);
 	InitCriticalSection(&SurfaceVisualObstacleCS);
 	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
+	InitCriticalSection(&PingerCS);
+	InitCriticalSection(&PingerOverlayImgCS);
+	InitCriticalSection(&MissingWorkerCS);
+	InitCriticalSection(&MissingWorkerOverlayImgCS);
 	InitCriticalSection(&MDMCS);
 	InitCriticalSection(&SeanetOverlayImgCS);
 	InitCriticalSection(&SeanetConnectingCS);
@@ -534,6 +573,10 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&SeanetConnectingCS);
 	DeleteCriticalSection(&SeanetOverlayImgCS);
 	DeleteCriticalSection(&MDMCS);
+	DeleteCriticalSection(&MissingWorkerOverlayImgCS);
+	DeleteCriticalSection(&MissingWorkerCS);
+	DeleteCriticalSection(&PingerOverlayImgCS);
+	DeleteCriticalSection(&PingerCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleCS);
 	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
@@ -546,6 +589,10 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&WallCS);
 
 	cvReleaseImage(&SeanetOverlayImg);
+
+	cvReleaseImage(&MissingWorkerOverlayImg);
+
+	cvReleaseImage(&PingerOverlayImg);
 
 	cvReleaseImage(&SurfaceVisualObstacleOverlayImg);
 

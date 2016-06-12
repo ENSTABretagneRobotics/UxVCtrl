@@ -40,6 +40,7 @@ inline void DisableAllControls(void)
 	bVisualObstacleAvoidanceControl = FALSE;
 	bSurfaceVisualObstacleAvoidanceControl = FALSE;
 	bPingerTrackingControl = FALSE;
+	bMissingWorkerTrackingControl = FALSE;
 	bLineFollowingControl = FALSE;
 	bWaypointControl = FALSE;
 	bDistanceControl = FALSE;
@@ -118,6 +119,7 @@ inline void AbortMission(void)
 // See mission_spec.txt.
 inline int Commands(char* line)
 {
+	BOOL bContinueElseIf = FALSE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 	double dval = 0, dval1 = 0, dval2 = 0, dval3 = 0, dval4 = 0, dval5 = 0, 
 		dval6 = 0, dval7 = 0, dval8 = 0, dval9 = 0, dval10 = 0, dval11 = 0, dval12 = 0; 
 	int ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0, ival6 = 0, 
@@ -217,7 +219,8 @@ inline int Commands(char* line)
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, &dval5, 
+		&dval1, &dval2, &dval3, 
+		&dval4, &dval5, 
 		&ival13, 
 		&ival14
 		) == 19)
@@ -494,6 +497,162 @@ inline int Commands(char* line)
 		if (bBrake_surfacevisualobstacle) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
+	}
+	else if (sscanf(line, "pingerconfig "
+		"%d %d %d %d %d %d "
+		"%d %d %d %d %d %d "
+		"%lf %lf "
+		"%lf %lf %lf %lf %lf %lf "
+		"%d "
+		"%d", 
+		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
+		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
+		&dval1, &dval2, 
+		&dval3, &dval4, &dval5, &dval6, &dval7, &dval8, 
+		&ival13, 
+		&ival14
+		) == 19)
+	{
+		EnterCriticalSection(&PingerCS);
+		rmin_pinger = ival1; rmax_pinger = ival2; gmin_pinger = ival3; gmax_pinger = ival4; bmin_pinger = ival5; bmax_pinger = ival6; 
+		hmin_pinger = ival7; hmax_pinger = ival8; smin_pinger = ival9; smax_pinger = ival10; lmin_pinger = ival11; lmax_pinger = ival12; 
+		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; 
+		pulsefreq_pinger = dval3; pulselen_pinger = dval4; pulsepersec_pinger = dval5; hyddist_pinger = dval6; hydorient_pinger = dval7; preferreddir_pinger = dval8; 
+		bBrakeSurfaceEnd_pinger = ival13; 
+		if ((ival14 >= 0)&&(ival14 < nbvideo))
+		{
+			videoid_pinger = ival14;
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+		LeaveCriticalSection(&PingerCS);
+	}
+	else if (sscanf(line, "pingerdetection %lf", &delay) == 1)
+	{
+		EnterCriticalSection(&PingerCS);
+		EnterCriticalSection(&StateVariablesCS);
+		u_pinger = u;
+		bPingerDetection = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&PingerCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			if (!bPingerDetection) break;
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+		EnterCriticalSection(&PingerCS);
+		bPingerDetection = FALSE;
+		if (bBrakeSurfaceEnd_pinger) bBrakeControl = FALSE;
+		LeaveCriticalSection(&PingerCS);
+	}
+	else if (strncmp(line, "startpingertracking", strlen("startpingertracking")) == 0)
+	{
+		EnterCriticalSection(&PingerCS);
+		EnterCriticalSection(&StateVariablesCS);
+		u_pinger = u;
+		bPingerTrackingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&PingerCS);
+	}
+	else if (strncmp(line, "stoppingertracking", strlen("stoppingertracking")) == 0)
+	{
+		EnterCriticalSection(&PingerCS);
+		bPingerTrackingControl = FALSE;
+		//bDistanceControl = FALSE;
+		//if (bBrake_pinger) bBrakeControl = FALSE;
+		bHeadingControl = FALSE;
+		//bDepthControl = FALSE;
+		//bAltitudeSeaFloorControl = FALSE;
+		LeaveCriticalSection(&PingerCS);
+	}
+	else if (sscanf(line, "missingworkerconfig "
+		"%d %d %d %d %d %d "
+		"%d %d %d %d %d %d "
+		"%lf %lf %lf "
+		"%lf %lf "
+		"%d "
+		"%d", 
+		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
+		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
+		&dval1, &dval2, &dval3, 
+		&dval4, &dval5, 
+		&ival13, 
+		&ival14
+		) == 19)
+	{
+		EnterCriticalSection(&MissingWorkerCS);
+		rmin_missingworker = ival1; rmax_missingworker = ival2; gmin_missingworker = ival3; gmax_missingworker = ival4; bmin_missingworker = ival5; bmax_missingworker = ival6; 
+		hmin_missingworker = ival7; hmax_missingworker = ival8; smin_missingworker = ival9; smax_missingworker = ival10; lmin_missingworker = ival11; lmax_missingworker = ival12; 
+		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; d0_missingworker = dval3; 
+		kh_missingworker = dval4; kv_missingworker = dval5; 
+		bBrake_missingworker = ival13; 
+		if ((ival14 >= 0)&&(ival14 < nbvideo))
+		{
+			videoid_missingworker = ival14;
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+		LeaveCriticalSection(&MissingWorkerCS);
+	}
+	else if (sscanf(line, "missingworkerdetection %lf", &delay) == 1)
+	{
+		EnterCriticalSection(&MissingWorkerCS);
+		EnterCriticalSection(&StateVariablesCS);
+		u_missingworker = u;
+		bMissingWorkerDetection = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&MissingWorkerCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			if (!bMissingWorkerDetection) break;
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+		EnterCriticalSection(&MissingWorkerCS);
+		bMissingWorkerDetection = FALSE;
+		if (bBrake_missingworker) bBrakeControl = FALSE;
+		LeaveCriticalSection(&MissingWorkerCS);
+	}
+	else if (strncmp(line, "startmissingworkertracking", strlen("startmissingworkertracking")) == 0)
+	{
+		EnterCriticalSection(&MissingWorkerCS);
+		EnterCriticalSection(&StateVariablesCS);
+		u_missingworker = u;
+		bMissingWorkerTrackingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&MissingWorkerCS);
+	}
+	else if (strncmp(line, "stopmissingworkertracking", strlen("stopmissingworkertracking")) == 0)
+	{
+		EnterCriticalSection(&MissingWorkerCS);
+		bMissingWorkerTrackingControl = FALSE;
+		//bDistanceControl = FALSE;
+		//if (bBrake_missingworker) bBrakeControl = FALSE;
+		bHeadingControl = FALSE;
+		//bDepthControl = FALSE;
+		//bAltitudeSeaFloorControl = FALSE;
+		LeaveCriticalSection(&MissingWorkerCS);
 	}
 #pragma endregion
 #pragma region LOCALIZATION AND ADVANCED MOVING COMMANDS
@@ -1043,7 +1202,8 @@ inline int Commands(char* line)
 	}
 #pragma endregion
 #pragma region DEVICE COMMANDS
-	else if (sscanf(line, "cicreaconfig %255s %d", str, &ival1) == 2)
+	else bContinueElseIf = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+	if (bContinueElseIf) if (sscanf(line, "cicreaconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")) != 0)
 		{

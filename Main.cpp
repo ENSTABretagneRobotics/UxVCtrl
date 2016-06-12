@@ -15,6 +15,8 @@
 #include "Ball.h"
 #include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
+#include "Pinger.h"
+#include "MissingWorker.h"
 #include "Simulator.h"
 #include "MES.h"
 #include "MDM.h"
@@ -55,6 +57,8 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER BallThreadId;
 	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
+	THREAD_IDENTIFIER PingerThreadId;
+	THREAD_IDENTIFIER MissingWorkerThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
 	THREAD_IDENTIFIER MESThreadId;
 	THREAD_IDENTIFIER MDMThreadId;
@@ -115,6 +119,8 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(BallThread, NULL, &BallThreadId);
 	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
+	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
+	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
 	if (robid == SUBMARINE_SIMULATOR_ROBID) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
 	if (!bDisableMES) CreateDefaultThread(MESThread, NULL, &MESThreadId);
 	if (!bDisableMDM) CreateDefaultThread(MDMThread, NULL, &MDMThreadId);
@@ -244,6 +250,8 @@ int main(int argc, char* argv[])
 	if (!bDisableMDM) WaitForThread(MDMThreadId);
 	if (!bDisableMES) WaitForThread(MESThreadId);
 	if (robid == SUBMARINE_SIMULATOR_ROBID) WaitForThread(SimulatorThreadId);
+	WaitForThread(MissingWorkerThreadId);
+	WaitForThread(PingerThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 	WaitForThread(VisualObstacleThreadId);
 	WaitForThread(BallThreadId);

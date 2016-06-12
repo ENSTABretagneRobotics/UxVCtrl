@@ -149,8 +149,8 @@ CRITICAL_SECTION WallOverlayImgCS;
 IplImage* WallOverlayImg = NULL;
 double d0_wall = 0, beta_wall = 0, delta_wall = 0, dmin_wall = 0, dmax_wall = 0, gamma_infinite_wall = 0, r_wall = 0;
 int bLat_wall = 0;
-double u_wall = 0;
 int bBrake_wall = 0;
+double u_wall = 0;
 
 // Pipeline variables.
 BOOL bPipelineDetection = FALSE;
@@ -162,9 +162,9 @@ int rmin_pipeline = 0, rmax_pipeline = 0, gmin_pipeline = 0, gmax_pipeline = 0, 
 int hmin_pipeline = 0, hmax_pipeline = 0, smin_pipeline = 0, smax_pipeline = 0, lmin_pipeline = 0, lmax_pipeline = 0;
 double objMinRadiusRatio_pipeline = 0, objRealRadius_pipeline = 0, d0_pipeline = 0; 
 double kh_pipeline = 0, kv_pipeline = 0;
+int bBrake_pipeline = 0;
 int videoid_pipeline = 0; 
 double u_pipeline = 0;
-int bBrake_pipeline = 0;
 
 // Ball variables.
 BOOL bBallDetection = FALSE;
@@ -176,15 +176,15 @@ int rmin_ball = 0, rmax_ball = 0, gmin_ball = 0, gmax_ball = 0, bmin_ball = 0, b
 int hmin_ball = 0, hmax_ball = 0, smin_ball = 0, smax_ball = 0, lmin_ball = 0, lmax_ball = 0;
 double objMinRadiusRatio_ball = 0, objRealRadius_ball = 0, d0_ball = 0; 
 double kh_ball = 0, kv_ball = 0;
-int camdir_ball = 0;
-int bDepth_ball = 0;
 int lightMin_ball = 0;
 double lightPixRatio_ball = 0; 
 int bAcoustic_ball = 0;
+int bDepth_ball = 0;
+int camdir_ball = 0;
+int bBrake_ball = 0;
 int videoid_ball = 0; 
 double u_ball = 0;
 double theta_ball = 0;
-int bBrake_ball = 0;
 double x_ball = 0, y_ball = 0, z_ball = 0;
 double lat_ball = 0, long_ball = 0, alt_ball = 0;
 int lightStatus_ball = 0;
@@ -197,9 +197,9 @@ CRITICAL_SECTION VisualObstacleOverlayImgCS;
 IplImage* VisualObstacleOverlayImg = NULL;
 int rmin_visualobstacle = 0, rmax_visualobstacle = 0, gmin_visualobstacle = 0, gmax_visualobstacle = 0, bmin_visualobstacle = 0, bmax_visualobstacle = 0; 
 double obsPixRatio_visualobstacle = 0; 
+int bBrake_visualobstacle = 0;
 int videoid_visualobstacle = 0; 
 double u_visualobstacle = 0;
-int bBrake_visualobstacle = 0;
 
 // Surface visual obstacle variables.
 BOOL bSurfaceVisualObstacleDetection = FALSE;
@@ -209,14 +209,37 @@ CRITICAL_SECTION SurfaceVisualObstacleOverlayImgCS;
 IplImage* SurfaceVisualObstacleOverlayImg = NULL;
 char weather_surfacevisualobstacle = 0; 
 int boatsize_surfacevisualobstacle = 0; 
+int bBrake_surfacevisualobstacle = 0;
 int videoid_surfacevisualobstacle = 0; 
 double u_surfacevisualobstacle = 0;
-int bBrake_surfacevisualobstacle = 0;
 
 // Pinger variables.
 BOOL bPingerDetection = FALSE;
 BOOL bPingerTrackingControl = FALSE;
-int pingertrackingvideoid = 0; 
+CRITICAL_SECTION PingerCS;
+CRITICAL_SECTION PingerOverlayImgCS;
+IplImage* PingerOverlayImg = NULL;
+int rmin_pinger = 0, rmax_pinger = 0, gmin_pinger = 0, gmax_pinger = 0, bmin_pinger = 0, bmax_pinger = 0; 
+int hmin_pinger = 0, hmax_pinger = 0, smin_pinger = 0, smax_pinger = 0, lmin_pinger = 0, lmax_pinger = 0;
+double objMinRadiusRatio_pinger = 0, objRealRadius_pinger = 0; 
+double pulsefreq_pinger = 0, pulselen_pinger = 0, pulsepersec_pinger = 0, hyddist_pinger = 0, hydorient_pinger = 0, preferreddir_pinger = 0; 
+int bBrakeSurfaceEnd_pinger = 0;
+int videoid_pinger = 0; 
+double u_pinger = 0;
+
+// Missing worker variables.
+BOOL bMissingWorkerDetection = FALSE;
+BOOL bMissingWorkerTrackingControl = FALSE;
+CRITICAL_SECTION MissingWorkerCS;
+CRITICAL_SECTION MissingWorkerOverlayImgCS;
+IplImage* MissingWorkerOverlayImg = NULL;
+int rmin_missingworker = 0, rmax_missingworker = 0, gmin_missingworker = 0, gmax_missingworker = 0, bmin_missingworker = 0, bmax_missingworker = 0; 
+int hmin_missingworker = 0, hmax_missingworker = 0, smin_missingworker = 0, smax_missingworker = 0, lmin_missingworker = 0, lmax_missingworker = 0;
+double objMinRadiusRatio_missingworker = 0, objRealRadius_missingworker = 0, d0_missingworker = 0; 
+double kh_missingworker = 0, kv_missingworker = 0;
+int bBrake_missingworker = 0;
+int videoid_missingworker = 0; 
+double u_missingworker = 0;
 
 // Simulator variables.
 BOOL bGPSOKSimulator = FALSE;
@@ -343,3 +366,9 @@ char logpipelinetaskfilename[MAX_BUF_LEN];
 
 FILE* logballtaskfile = NULL;
 char logballtaskfilename[MAX_BUF_LEN];
+
+FILE* logpingertaskfile = NULL;
+char logpingertaskfilename[MAX_BUF_LEN];
+
+FILE* logmissingworkertaskfile = NULL;
+char logmissingworkertaskfilename[MAX_BUF_LEN];

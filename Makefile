@@ -223,10 +223,16 @@ Globals.o: Globals.cpp
 Main.o: Main.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
+MissingWorker.o: MissingWorker.cpp
+	$(CXX) $(CXXFLAGS) -c $<
+
 Observer.o: Observer.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 OpenCVGUI.o: OpenCVGUI.cpp
+	$(CXX) $(CXXFLAGS) -c $<
+
+Pinger.o: Pinger.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
 Pipeline.o: Pipeline.cpp
@@ -250,7 +256,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pipeline.o OpenCVGUI.o Observer.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o IM483I.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o Maestro.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o IM483I.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o Maestro.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

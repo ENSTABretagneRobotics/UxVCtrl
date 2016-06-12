@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MissingWorker.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Observer.cpp"
 				>
 			</File>
@@ -216,6 +220,10 @@
 			</File>
 			<File
 				RelativePath=".\Pipeline.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Pinger.cpp"
 				>
 			</File>
 			<File
@@ -273,6 +281,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MissingWorker.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Observer.h"
 				>
 			</File>
@@ -282,6 +294,10 @@
 			</File>
 			<File
 				RelativePath=".\Pipeline.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Pinger.h"
 				>
 			</File>
 			<File

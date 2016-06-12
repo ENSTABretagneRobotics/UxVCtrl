@@ -1,6 +1,9 @@
-SBG
+revoir code com modem, detection ball et light
+rajouter param acousticmodem_r_max_err dans UxVCtrl.txt et MDM0.txt comme pour sonar...
 
-missions pinger, missing worker...
+pour les détections, être plus robuste en regardant plusieurs images de suite
+essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...
+optimisation : ne pas effacer tout le temps les overlayimg dans les threads de missions
 
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 
@@ -9,8 +12,6 @@ vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplac
 dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
 logstate était compatible avec le début de logsimu à l'origine...->rajouter dans logsimu les t;lat;lon;alt;hdg;... aussi
 avec nouveau format, lognav2KML va être simplifié
-
-rajouter param acousticmodem_r_max_err dans UxVCtrl.txt et MDM0.txt comme pour sonar...
 
 LIDAR/sonar : mesurer vitesse si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
 
@@ -49,6 +50,7 @@ image sonar simu pas bonne?->portée sonar, autres params?
 flux acoustique sur un mur pas tout à fait droit...
 
 GUI, video
+pour mieux gérer les problèmes de EOL, au moment où on fait isdigit() ignorer les CR, LF...
 faudrait pouvoir enregistrer en high res en local en option
 mieux gérer les infos affichées selon le robot et selon le mode
 info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...?
@@ -113,6 +115,8 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
+SBG
+Update also DCB settings Windows, check current settings to know what to set manually, check if equivalent to cfmakeraw()
 rajouter utc du GPS (variable globale mis à jour uniquement par NMEA car pour MT et MAVLink on a l'heure PC dans leurs logs) pour trouver erreur d'horloge?
 enregistrer cog sog dans un des logs (logstate)?
 mtdata2 : faire findlatestmsgwithoutmid...? Coordinate system not the same between legacy and normal modes!
@@ -157,19 +161,13 @@ kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtrer en regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
 prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
-CISCREA
-après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
-pouvoir afficher period pour tous les threads
-reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte paramètres du fichier de config, voir noms/numérotation des moteurs, clockwise
-regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
-
 changer observer (et éventuellement simulator) pour que omegadot=alphaomega*(u1-u2)-alphafomega*omega (au lieu de thetadot=alphaomega*(u1-u2)...)
 si on a une IMU, on l'utilise pour omegahat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid)
 vitesse GPS a priori bonne si dispo, par contre vaut mieux pas trop utiliser l'altitude du GPS (uniquement en dernier recours)
 utiliser les accéléros quand on a rien d'autre? refaire des tests...
 prendre en compte dans la localisation la position GPS de la bouée avec longueur du câble et profondeur du sous-marin?
 
-openal, pingertracking
+openal, pingertracking->script python séparé
 
 replay
 voir UxVDataViewer
@@ -194,6 +192,12 @@ ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonc
 simu
 reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations pour d'autres robots, et/ou intégrer les devices simulés et équations de robots dans UxVCtrl?->au moins les équations, il y a déjà des robid prévus pour différents simulateurs...
 
+CISCREA
+après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
+pouvoir afficher period pour tous les threads
+reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte paramètres du fichier de config, voir noms/numérotation des moteurs, clockwise
+regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
+
 attention aux valeurs au départ d'initialisation, attention au setstateestimation...
 surveiller divisions par 0..., vérifier cohérence paramètres par défaut
 surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
@@ -205,7 +209,7 @@ robid log file?
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
 image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 gestion vagues et z, courants et vxy, wind...
-arovguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, remoteopencv gui
+uxvguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, remoteopencv gui
 rmtcommand (client serait juste telnet)
 compiler UxVCtrl pour android (ne doit pas appeler opencgui, pas de timers...)
 rajouter un device qui communiquerait avec une MOOSDB

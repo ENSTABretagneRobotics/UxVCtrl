@@ -107,8 +107,10 @@
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MissingWorker.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
+    <ClCompile Include="Pinger.cpp" />
     <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
@@ -176,8 +178,10 @@
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
+    <ClInclude Include="MissingWorker.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OpenCVGUI.h" />
+    <ClInclude Include="Pinger.h" />
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />
