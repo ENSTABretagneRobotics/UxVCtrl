@@ -1,3 +1,9 @@
+96
+Optimization : do not always erase overlayimg in missions threads.
+Changed the period of most of the mission threads to captureperiod.
+Corrections in pinger tracking.
+Added objMinDetectionDuration parameter for the missions with detections (not used yet).
+
 95
 Added missing worker and pinger missions.
 Corrected build problem in Commands.h due to numerous else-if.

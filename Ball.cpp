@@ -71,6 +71,10 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	//unsigned char hmin_invalid = 70, hmax_invalid = 140, smin = 120, smax = 240, lmin = 80, lmax = 160;
 	//unsigned char hmin_invalid = 40, hmax_invalid = 140, smin = 100, smax = 240, lmin = 50, lmax = 190;
 
+	//BOOL bTemporaryObjectDetected = FALSE;
+	//BOOL bTemporaryObjectDetected_prev = bTemporaryObjectDetected;
+	CHRONO chrono_mindetectionduration;
+
 	char strtime_pic[MAX_BUF_LEN];
 	char picfilename[MAX_BUF_LEN];
 	int pic_counter = 0;
@@ -105,24 +109,19 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	fflush(logballtaskfile);
 
 	StartChrono(&chrono);
+	StartChrono(&chrono_mindetectionduration);
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(captureperiod);
 
 		if (bExit) break;
-		if ((!bBallDetection)&&(!bBallTrackingControl)) 
-		{
-			EnterCriticalSection(&BallOverlayImgCS);
-			cvSet(BallOverlayImg, CV_RGB(0, 0, 0), NULL);
-			LeaveCriticalSection(&BallOverlayImgCS);
-			continue;
-		}
+		if ((!bBallDetection)&&(!bBallTrackingControl)) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
 		EnterCriticalSection(&BallCS);
-
+#pragma region Object detection
 		// Initializations...
 		memset(nbSelectedPixelsj, 0, videoimgwidth*sizeof(int));
 		memset(nbSelectedPixelsi, 0, videoimgheight*sizeof(int));
@@ -249,9 +248,16 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				}
 			}
 		}
-
+#pragma endregion
 		if (nbSelectedPixels == 0) 
 		{
+			//bTemporaryObjectDetected = FALSE;
+			//if (bTemporaryObjectDetected != bTemporaryObjectDetected_prev)
+			//{
+			//	bTemporaryObjectDetected_prev = bTemporaryObjectDetected;
+			//	StopChronoQuick(&chrono_mindetectionduration);
+			//	StartChrono(&chrono_mindetectionduration);
+			//}
 			LeaveCriticalSection(&BallCS);
 			EnterCriticalSection(&BallOverlayImgCS);
 			cvCopy(overlayimage, BallOverlayImg, 0);
@@ -264,7 +270,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		// sqrt() is used to virtually increase the radius because there are always missed selected pixels...
 		objRadius = (int)(videoimgwidth*sqrt((double)nbSelectedPixels/(double)nbTotalPixels)/2.0);
 
-		// Bounding rectangle computation.
+#pragma region Bounding rectangle computation
 		int i0 = -1, i1 = -1, j0 = -1, j1 = -1;
 		// Get the first line that contains the detected object.
 		for (i = 0; i < image->height; i++)
@@ -307,9 +313,10 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		objBoundHeight = i1-i0;
 
 		cvRectangle(overlayimage, cvPoint(j0,i0), cvPoint(j1,i1), CV_RGB(128,0,255));
-
+#pragma endregion
 		if (objRadius > objMinRadius)
 		{
+#pragma region Object characteristics computations
 			// Compute the mean of selected pixels.
 			obji = obji/(double)nbSelectedPixels;
 			objj = objj/(double)nbSelectedPixels;
@@ -323,34 +330,6 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			objDistance = objRealRadius_ball/tan(objRadius*pixelAngleSize);
 			objBearing = -(objj-image->width/2.0)*pixelAngleSize;
 			objElevation = -(obji-image->height/2.0)*pixelAngleSize;
-			char szText[256];
-			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
-			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
-
-			if (nbSelectedPixelsLight_ball > nbTotalPixels*lightPixRatio_ball) 
-			{
-				lightStatus_ball = 1; 
-				cvPutText(overlayimage, "Light", cvPoint(10,videoimgheight-40), &font, CV_RGB(0,255,0));
-			}
-			else 
-			{
-				lightStatus_ball = 0;
-			}
-
-			// Send acoustic message when ball detected...
-			if (bAcoustic_ball)
-			{
-				EnterCriticalSection(&MDMCS);
-				AcousticCommandMDM = SENDOPI_MSG;
-				LeaveCriticalSection(&MDMCS);
-			}
-			else
-			{
-				//// Temp...
-				//EnterCriticalSection(&MDMCS);
-				//AcousticCommandMDM = 0;
-				//LeaveCriticalSection(&MDMCS);
-			}
 
 #define THIRD_METHOD
 #ifdef FIRST_METHOD
@@ -461,6 +440,52 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					CV_RGB(255,0,255));
 			}					
 #endif // THIRD_METHOD
+#pragma endregion
+		//	bTemporaryObjectDetected = TRUE;
+		//}
+		//else
+		//{
+		//	bTemporaryObjectDetected = FALSE;
+		//}
+
+		//if (bTemporaryObjectDetected != bTemporaryObjectDetected_prev)
+		//{
+		//	bTemporaryObjectDetected_prev = bTemporaryObjectDetected;
+		//	StopChronoQuick(&chrono_mindetectionduration);
+		//	StartChrono(&chrono_mindetectionduration);
+		//}
+
+		//if (bTemporaryObjectDetected&&(GetTimeElapsedChronoQuick(&chrono_mindetectionduration) > objMinDetectionDuration_ball))
+		//{
+#pragma region Actions
+			char szText[256];
+			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
+			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
+
+			if (nbSelectedPixelsLight_ball > nbTotalPixels*lightPixRatio_ball) 
+			{
+				lightStatus_ball = 1; 
+				cvPutText(overlayimage, "Light", cvPoint(10,videoimgheight-40), &font, CV_RGB(0,255,0));
+			}
+			else 
+			{
+				lightStatus_ball = 0;
+			}
+
+			// Send acoustic message when ball detected...
+			if (bAcoustic_ball)
+			{
+				EnterCriticalSection(&MDMCS);
+				AcousticCommandMDM = SENDOPI_MSG;
+				LeaveCriticalSection(&MDMCS);
+			}
+			else
+			{
+				//// Temp...
+				//EnterCriticalSection(&MDMCS);
+				//AcousticCommandMDM = 0;
+				//LeaveCriticalSection(&MDMCS);
+			}
 
 			EnterCriticalSection(&StateVariablesCS);
 			switch (camdir_ball)
@@ -626,6 +651,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					}
 				}
 			}
+#pragma endregion
 		}
 
 		LeaveCriticalSection(&BallCS);
@@ -637,6 +663,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		if (bExit) break;
 	}
 
+	StopChronoQuick(&chrono_mindetectionduration);
 	StopChronoQuick(&chrono);
 
 	fclose(logballtaskfile);

@@ -103,21 +103,15 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(captureperiod);
 
 		if (bExit) break;
-		if ((!bMissingWorkerDetection)&&(!bMissingWorkerTrackingControl)) 
-		{
-			EnterCriticalSection(&MissingWorkerOverlayImgCS);
-			cvSet(MissingWorkerOverlayImg, CV_RGB(0, 0, 0), NULL);
-			LeaveCriticalSection(&MissingWorkerOverlayImgCS);
-			continue;
-		}
+		if ((!bMissingWorkerDetection)&&(!bMissingWorkerTrackingControl)) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
 		EnterCriticalSection(&MissingWorkerCS);
-
+#pragma region Object detection
 		// Initializations...
 		memset(nbSelectedPixelsj, 0, videoimgwidth*sizeof(int));
 		memset(nbSelectedPixelsi, 0, videoimgheight*sizeof(int));
@@ -230,7 +224,7 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 				}
 			}
 		}
-
+#pragma endregion
 		if (nbSelectedPixels == 0) 
 		{
 			LeaveCriticalSection(&MissingWorkerCS);
@@ -245,7 +239,7 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 		// sqrt() is used to virtually increase the radius because there are always missed selected pixels...
 		objRadius = (int)(videoimgwidth*sqrt((double)nbSelectedPixels/(double)nbTotalPixels)/2.0);
 
-		// Bounding rectangle computation.
+#pragma region Bounding rectangle computation
 		int i0 = -1, i1 = -1, j0 = -1, j1 = -1;
 		// Get the first line that contains the detected object.
 		for (i = 0; i < image->height; i++)
@@ -288,9 +282,10 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 		objBoundHeight = i1-i0;
 
 		cvRectangle(overlayimage, cvPoint(j0,i0), cvPoint(j1,i1), CV_RGB(128,0,255));
-
+#pragma endregion
 		if (objRadius > objMinRadius)
 		{
+#pragma region Object characteristics computations
 			// Compute the mean of selected pixels.
 			obji = obji/(double)nbSelectedPixels;
 			objj = objj/(double)nbSelectedPixels;
@@ -304,9 +299,6 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 			objDistance = objRealRadius_missingworker/tan(objRadius*pixelAngleSize);
 			objBearing = -(objj-image->width/2.0)*pixelAngleSize;
 			objElevation = -(obji-image->height/2.0)*pixelAngleSize;
-			char szText[256];
-			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
-			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
 #define THIRD_METHOD
 #ifdef FIRST_METHOD
@@ -417,6 +409,11 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 					CV_RGB(255,0,255));
 			}					
 #endif // THIRD_METHOD
+#pragma endregion
+#pragma region Actions
+			char szText[256];
+			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
+			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
 			fprintf(logmissingworkertaskfile, "%f;%f;\n", 
 				GetTimeElapsedChronoQuick(&chrono), objDistance
@@ -490,6 +487,7 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 				bHeadingControl = TRUE;
 				LeaveCriticalSection(&StateVariablesCS);
 			}
+#pragma endregion
 		}
 
 		LeaveCriticalSection(&MissingWorkerCS);

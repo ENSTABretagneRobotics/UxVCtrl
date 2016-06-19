@@ -37,15 +37,11 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(captureperiod);
 
 		if (bExit) break;
 		if ((!bSurfaceVisualObstacleDetection)&&(!bSurfaceVisualObstacleAvoidanceControl)) 
 		{
-			EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-			cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
-			LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-
 			if (bCleanUp)
 			{
 				cvDestroyWindow("debug");
@@ -60,7 +56,6 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				cvDestroyWindow("test");
 				bCleanUp = FALSE;
 			}
-
 			continue;
 		}
 
@@ -102,6 +97,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 		if (result.x > 0)
 		{
+#pragma region Actions
 			if (result.x == 2)
 				cvPutText(overlayimage, "Obstacle detected on the left", cvPoint(10,videoimgheight-20), &font, CV_RGB(0,255,0));
 			else
@@ -170,9 +166,9 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				EnterCriticalSection(&StateVariablesCS);
 				// Temporary...
 
-BOOL bDistanceControl0 = bDistanceControl;
-BOOL bBrakeControl0 = bBrakeControl;
-BOOL bHeadingControl0 = bHeadingControl;
+				BOOL bDistanceControl0 = bDistanceControl;
+				BOOL bBrakeControl0 = bBrakeControl;
+				BOOL bHeadingControl0 = bHeadingControl;
 
 				if (bBrake_surfacevisualobstacle) u = 0;
 				if (result.x == 2)
@@ -191,12 +187,13 @@ BOOL bHeadingControl0 = bHeadingControl;
 				if (bBrake_surfacevisualobstacle) bBrakeControl = FALSE;
 				//bHeadingControl = TRUE;
 
-bDistanceControl = bDistanceControl0;
-bBrakeControl = bBrakeControl0;
-bHeadingControl = bHeadingControl0;
+				bDistanceControl = bDistanceControl0;
+				bBrakeControl = bBrakeControl0;
+				bHeadingControl = bHeadingControl0;
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}
+#pragma endregion
 		}
 
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);

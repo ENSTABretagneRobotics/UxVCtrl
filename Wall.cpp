@@ -62,13 +62,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 		mSleep(100);
 
 		if (bExit) break;
-		if ((!bWallDetection)&&(!bWallTrackingControl)&&(!bWallAvoidanceControl)) 
-		{
-			EnterCriticalSection(&WallOverlayImgCS);
-			cvSet(WallOverlayImg, CV_RGB(0, 0, 0), NULL);
-			LeaveCriticalSection(&WallOverlayImgCS);
-			continue;
-		}
+		if ((!bWallDetection)&&(!bWallTrackingControl)&&(!bWallAvoidanceControl)) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
@@ -245,9 +239,9 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			EnterCriticalSection(&StateVariablesCS);
 			// Temporary...
 
-BOOL bDistanceControl0 = bDistanceControl;
-BOOL bBrakeControl0 = bBrakeControl;
-BOOL bHeadingControl0 = bHeadingControl;
+			BOOL bDistanceControl0 = bDistanceControl;
+			BOOL bBrakeControl0 = bBrakeControl;
+			BOOL bHeadingControl0 = bHeadingControl;
 
 			if (bBrake_wall) u = 0;
 			if (sin(phi)*cos(phi) < 0) uw = -1; else uw = 1;
@@ -263,9 +257,9 @@ BOOL bHeadingControl0 = bHeadingControl;
 			if (bBrake_wall) bBrakeControl = FALSE;
 			//bHeadingControl = TRUE;
 
-bDistanceControl = bDistanceControl0;
-bBrakeControl = bBrakeControl0;
-bHeadingControl = bHeadingControl0;
+			bDistanceControl = bDistanceControl0;
+			bBrakeControl = bBrakeControl0;
+			bHeadingControl = bHeadingControl0;
 
 			LeaveCriticalSection(&StateVariablesCS);
 		}

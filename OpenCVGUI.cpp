@@ -100,7 +100,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	for (;;)
 	{
-		c = cvWaitKey(100);
+		c = cvWaitKey(captureperiod);
 
 		if (bExit) break;
 		if (bEnableOpenCVGUIs[videoid]) 

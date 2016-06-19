@@ -107,21 +107,49 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(captureperiod);
 
 		if (bExit) break;
-		if ((!bPingerDetection)&&(!bPingerTrackingControl)) 
-		{
-			EnterCriticalSection(&PingerOverlayImgCS);
-			cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
-			LeaveCriticalSection(&PingerOverlayImgCS);
-			continue;
-		}
+		if ((!bPingerDetection)&&(!bPingerTrackingControl)) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
 		EnterCriticalSection(&PingerCS);
 
+
+		if (bPingerTrackingControl)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			u = u_pinger;
+
+
+			// Get the results from pingerdetection.py (needs to be launched/killed from the mission file using system command...)...
+
+			FILE* filedetect = fopen(LOG_FOLDER"pingerdetection.txt", "r");
+			if (filedetect != NULL)
+			{
+				if (fscanf(filedetect, "%lf;%lf;%lf;%lf", &pingerdir, &pingerdirerr, &pingerdist, &pingerdisterr) != 1) printf("Invalid detection file.\n");
+				if (fclose(filedetect) != EXIT_SUCCESS) printf("fclose() failed.\n");
+			}
+
+			fprintf(logpingertaskfile, "%f;%f;%f;%f;%f;\n", 
+				GetTimeElapsedChronoQuick(&chrono), pingerdir, pingerdirerr, pingerdist, pingerdisterr
+				);
+			fflush(logpingertaskfile);
+
+
+			objBearing = fmod_2PI_deg2rad(-pingerdir);
+
+
+			wtheta = Center(thetahat)+objBearing-fmod_2PI_deg2rad(-preferreddir_pinger); // Try to always keep it to its side, e.g. preferreddir_pinger=345...
+			//bDistanceControl = FALSE;
+			//bBrakeControl = FALSE;
+			bHeadingControl = TRUE;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+
+
+#pragma region Object detection
 		// Initializations...
 		memset(nbSelectedPixelsj, 0, videoimgwidth*sizeof(int));
 		memset(nbSelectedPixelsi, 0, videoimgheight*sizeof(int));
@@ -234,7 +262,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 				}
 			}
 		}
-
+#pragma endregion
 		if (nbSelectedPixels == 0) 
 		{
 			LeaveCriticalSection(&PingerCS);
@@ -249,7 +277,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 		// sqrt() is used to virtually increase the radius because there are always missed selected pixels...
 		objRadius = (int)(videoimgwidth*sqrt((double)nbSelectedPixels/(double)nbTotalPixels)/2.0);
 
-		// Bounding rectangle computation.
+#pragma region Bounding rectangle computation
 		int i0 = -1, i1 = -1, j0 = -1, j1 = -1;
 		// Get the first line that contains the detected object.
 		for (i = 0; i < image->height; i++)
@@ -292,9 +320,10 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 		objBoundHeight = i1-i0;
 
 		cvRectangle(overlayimage, cvPoint(j0,i0), cvPoint(j1,i1), CV_RGB(128,0,255));
-
+#pragma endregion
 		if (objRadius > objMinRadius)
 		{
+#pragma region Object characteristics computations
 			// Compute the mean of selected pixels.
 			obji = obji/(double)nbSelectedPixels;
 			objj = objj/(double)nbSelectedPixels;
@@ -308,9 +337,6 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 			objDistance = objRealRadius_pinger/tan(objRadius*pixelAngleSize);
 			objBearing = -(objj-image->width/2.0)*pixelAngleSize;
 			objElevation = -(obji-image->height/2.0)*pixelAngleSize;
-			char szText[256];
-			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
-			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
 #define THIRD_METHOD
 #ifdef FIRST_METHOD
@@ -421,6 +447,11 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 					CV_RGB(255,0,255));
 			}					
 #endif // THIRD_METHOD
+#pragma endregion
+#pragma region Actions
+			char szText[256];
+			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
+			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
 			if (bPingerDetection)
 			{
@@ -481,35 +512,8 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 						printf("Error saving a picture file.\n");
 					}
 				}
-
-				EnterCriticalSection(&StateVariablesCS);
-				u = u_pinger;
-
-
-				// Get the results from pingerdetection.py (needs to be launched from the mission file using system command...)...
-
-				FILE* filedetect = fopen(LOG_FOLDER"pingerdetection.txt", "r");
-				if (filedetect != NULL)
-				{
-					if (fscanf(filedetect, "%lf;%lf;%lf;%lf", &pingerdir, &pingerdirerr, &pingerdist, &pingerdisterr) != 1) printf("Invalid detection file.\n");
-					if (fclose(filedetect) != EXIT_SUCCESS) printf("fclose() failed.\n");
-				}
-
-
-				objBearing = fmod_2PI_deg2rad(-pingerdir);
-
-
-				wtheta = Center(thetahat)+objBearing-fmod_2PI_deg2rad(-preferreddir_pinger); // Tries to always keep it to its side, e.g. preferreddir_pinger=345...
-				//bDistanceControl = FALSE;
-				//bBrakeControl = FALSE;
-				bHeadingControl = TRUE;
-				LeaveCriticalSection(&StateVariablesCS);
 			}
-
-			fprintf(logpingertaskfile, "%f;%f;%f;%f;%f;\n", 
-				GetTimeElapsedChronoQuick(&chrono), pingerdir, pingerdirerr, pingerdist, pingerdisterr
-				);
-			fflush(logpingertaskfile);
+#pragma endregion
 		}
 
 		LeaveCriticalSection(&PingerCS);

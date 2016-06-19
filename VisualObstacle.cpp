@@ -45,16 +45,10 @@ THREAD_PROC_RETURN_VALUE VisualObstacleThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		mSleep(captureperiod);
 
 		if (bExit) break;
-		if ((!bVisualObstacleDetection)&&(!bVisualObstacleAvoidanceControl)) 
-		{
-			EnterCriticalSection(&VisualObstacleOverlayImgCS);
-			cvSet(VisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
-			LeaveCriticalSection(&VisualObstacleOverlayImgCS);
-			continue;
-		}
+		if ((!bVisualObstacleDetection)&&(!bVisualObstacleAvoidanceControl)) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
@@ -110,6 +104,7 @@ THREAD_PROC_RETURN_VALUE VisualObstacleThread(void* pParam)
 
 		if (nbSelectedPixels > nbTotalPixels*obsPixRatio_visualobstacle)
 		{
+#pragma region Actions
 			// Compute the mean of selected pixels.
 			//obsi = obsi/(double)nbSelectedPixels;
 			//obsj = obsj/(double)nbSelectedPixels;
@@ -183,9 +178,9 @@ THREAD_PROC_RETURN_VALUE VisualObstacleThread(void* pParam)
 				EnterCriticalSection(&StateVariablesCS);
 				// Temporary...
 
-BOOL bDistanceControl0 = bDistanceControl;
-BOOL bBrakeControl0 = bBrakeControl;
-BOOL bHeadingControl0 = bHeadingControl;
+				BOOL bDistanceControl0 = bDistanceControl;
+				BOOL bBrakeControl0 = bBrakeControl;
+				BOOL bHeadingControl0 = bHeadingControl;
 
 				if (bBrake_visualobstacle) u = 0;
 				if ((nbSelectedPixelsMiddle > nbSelectedPixelsRight)&&(nbSelectedPixelsMiddle > nbSelectedPixelsLeft))
@@ -206,12 +201,13 @@ BOOL bHeadingControl0 = bHeadingControl;
 				if (bBrake_visualobstacle) bBrakeControl = FALSE;
 				//bHeadingControl = TRUE;
 
-bDistanceControl = bDistanceControl0;
-bBrakeControl = bBrakeControl0;
-bHeadingControl = bHeadingControl0;
+				bDistanceControl = bDistanceControl0;
+				bBrakeControl = bBrakeControl0;
+				bHeadingControl = bHeadingControl0;
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}
+#pragma endregion
 		}
 
 		LeaveCriticalSection(&VisualObstacleCS);

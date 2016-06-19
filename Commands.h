@@ -213,23 +213,23 @@ inline int Commands(char* line)
 	else if (sscanf(line, "pipelineconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
-		"%lf %lf %lf "
+		"%lf %lf %lf %lf "
 		"%lf %lf "
 		"%d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, 
-		&dval4, &dval5, 
+		&dval1, &dval2, &dval3, &dval4, 
+		&dval5, &dval6, 
 		&ival13, 
 		&ival14
-		) == 19)
+		) == 20)
 	{
 		EnterCriticalSection(&PipelineCS);
 		rmin_pipeline = ival1; rmax_pipeline = ival2; gmin_pipeline = ival3; gmax_pipeline = ival4; bmin_pipeline = ival5; bmax_pipeline = ival6; 
 		hmin_pipeline = ival7; hmax_pipeline = ival8; smin_pipeline = ival9; smax_pipeline = ival10; lmin_pipeline = ival11; lmax_pipeline = ival12; 
-		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; d0_pipeline = dval3; 
-		kh_pipeline = dval4; kv_pipeline = dval5; 
+		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; objMinDetectionDuration_pipeline = dval3; d0_pipeline = dval4; 
+		kh_pipeline = dval5; kv_pipeline = dval6; 
 		bBrake_pipeline = ival13; 
 		if ((ival14 >= 0)&&(ival14 < nbvideo))
 		{
@@ -291,26 +291,26 @@ inline int Commands(char* line)
 	else if (sscanf(line, "ballconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
-		"%lf %lf %lf "
+		"%lf %lf %lf %lf "
 		"%lf %lf "
 		"%d %lf %d "
 		"%d %d %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, 
-		&dval4, &dval5, 
-		&ival13, &dval6, &ival14, 
+		&dval1, &dval2, &dval3, &dval4, 
+		&dval5, &dval6, 
+		&ival13, &dval7, &ival14, 
 		&ival15, &ival16, &ival17, 
 		&ival18
-		) == 24)
+		) == 25)
 	{
 		EnterCriticalSection(&BallCS);
 		rmin_ball = ival1; rmax_ball = ival2; gmin_ball = ival3; gmax_ball = ival4; bmin_ball = ival5; bmax_ball = ival6; 
 		hmin_ball = ival7; hmax_ball = ival8; smin_ball = ival9; smax_ball = ival10; lmin_ball = ival11; lmax_ball = ival12; 
-		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; d0_ball = dval3; 
-		kh_ball = dval4; kv_ball = dval5; 
-		lightMin_ball = ival13; lightPixRatio_ball = dval6; bAcoustic_ball = ival14;
+		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionDuration_ball = dval3; d0_ball = dval4; 
+		kh_ball = dval5; kv_ball = dval6; 
+		lightMin_ball = ival13; lightPixRatio_ball = dval7; bAcoustic_ball = ival14;
 		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; 
 		if ((ival18 >= 0)&&(ival18 < nbvideo))
 		{
@@ -374,12 +374,12 @@ inline int Commands(char* line)
 		}
 		LeaveCriticalSection(&BallCS);
 	}
-	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %d %d", 
-		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6, &dval, &ival7, &ival8) == 9)
+	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %lf %d %d", 
+		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6, &dval1, &dval2, &ival7, &ival8) == 10)
 	{
 		EnterCriticalSection(&VisualObstacleCS);
 		rmin_visualobstacle = ival1; rmax_visualobstacle = ival2; gmin_visualobstacle = ival3; gmax_visualobstacle = ival4; bmin_visualobstacle = ival5; bmax_visualobstacle = ival6; 
-		obsPixRatio_visualobstacle = dval; 
+		obsPixRatio_visualobstacle = dval1; obsMinDetectionDuration_visualobstacle = dval2; 
 		bBrake_visualobstacle = ival7;
 		if ((ival8 >= 0)&&(ival8 < nbvideo))
 		{
@@ -436,12 +436,13 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&VisualObstacleCS);
 	}
-	else if (sscanf(line, "surfacevisualobstacleconfig %c %d %d %d", 
-		&cval, &ival1, &ival2, &ival3) == 4)
+	else if (sscanf(line, "surfacevisualobstacleconfig %c %d %lf %d %d", 
+		&cval, &ival1, &dval, &ival2, &ival3) == 5)
 	{
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		weather_surfacevisualobstacle = cval;
 		boatsize_surfacevisualobstacle = ival1; 
+		obsMinDetectionDuration_surfacevisualobstacle = dval; 
 		bBrake_surfacevisualobstacle = ival2;
 		if ((ival3 >= 0)&&(ival3 < nbvideo))
 		{
@@ -501,23 +502,23 @@ inline int Commands(char* line)
 	else if (sscanf(line, "pingerconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
-		"%lf %lf "
+		"%lf %lf %lf "
 		"%lf %lf %lf %lf %lf %lf "
 		"%d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, 
-		&dval3, &dval4, &dval5, &dval6, &dval7, &dval8, 
+		&dval1, &dval2, &dval3, 
+		&dval4, &dval5, &dval6, &dval7, &dval8, &dval9, 
 		&ival13, 
 		&ival14
-		) == 19)
+		) == 20)
 	{
 		EnterCriticalSection(&PingerCS);
 		rmin_pinger = ival1; rmax_pinger = ival2; gmin_pinger = ival3; gmax_pinger = ival4; bmin_pinger = ival5; bmax_pinger = ival6; 
 		hmin_pinger = ival7; hmax_pinger = ival8; smin_pinger = ival9; smax_pinger = ival10; lmin_pinger = ival11; lmax_pinger = ival12; 
-		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; 
-		pulsefreq_pinger = dval3; pulselen_pinger = dval4; pulsepersec_pinger = dval5; hyddist_pinger = dval6; hydorient_pinger = dval7; preferreddir_pinger = dval8; 
+		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionDuration_pinger = dval3; 
+		pulsefreq_pinger = dval4; pulselen_pinger = dval5; pulsepersec_pinger = dval6; hyddist_pinger = dval7; hydorient_pinger = dval8; preferreddir_pinger = dval9; 
 		bBrakeSurfaceEnd_pinger = ival13; 
 		if ((ival14 >= 0)&&(ival14 < nbvideo))
 		{
@@ -579,23 +580,23 @@ inline int Commands(char* line)
 	else if (sscanf(line, "missingworkerconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
-		"%lf %lf %lf "
+		"%lf %lf %lf %lf "
 		"%lf %lf "
 		"%d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, 
-		&dval4, &dval5, 
+		&dval1, &dval2, &dval3, &dval4, 
+		&dval5, &dval6, 
 		&ival13, 
 		&ival14
-		) == 19)
+		) == 20)
 	{
 		EnterCriticalSection(&MissingWorkerCS);
 		rmin_missingworker = ival1; rmax_missingworker = ival2; gmin_missingworker = ival3; gmax_missingworker = ival4; bmin_missingworker = ival5; bmax_missingworker = ival6; 
 		hmin_missingworker = ival7; hmax_missingworker = ival8; smin_missingworker = ival9; smax_missingworker = ival10; lmin_missingworker = ival11; lmax_missingworker = ival12; 
-		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; d0_missingworker = dval3; 
-		kh_missingworker = dval4; kv_missingworker = dval5; 
+		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; objMinDetectionDuration_missingworker = dval3; d0_missingworker = dval4; 
+		kh_missingworker = dval5; kv_missingworker = dval6; 
 		bBrake_missingworker = ival13; 
 		if ((ival14 >= 0)&&(ival14 < nbvideo))
 		{

@@ -245,7 +245,7 @@ depthreg -3.0
 wait 1
 setmissionaction STRUCT
 thrust 0.2
-pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 1 0.4 0 0
+pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0
 startpipelinetracking
 wait 210
 stoppipelinetracking
