@@ -79,24 +79,29 @@
 #define MAX_NB_MAVLINKDEVICE 2
 
 // Acoustic modem messages.
-#define RNG_MSG 1
-#define SENDXY_MSG 6
-#define RECVXY_MSG 7
-#define SENDASK_MSG 12
-#define RECVASK_MSG 13
+enum ACOUSTIC_MODEM_MESSAGES
+{
+	RNG_MSG = 1,
+	SENDXY_MSG = 6,
+	RECVXY_MSG = 7,
+	SENDASK_MSG = 12,
+	RECVASK_MSG = 13,
 
-#define SENDSPWT_MSG 36
-#define RECVSPWT_MSG 37
+	SENDSPWT_MSG = 36,
+	RECVSPWT_MSG = 37,
 
-#define RECVANYSENDXY_MSG 1019
+	RECVANYSENDXY_MSG = 1019,
 
-#define SENDOPI_MSG 1020
-#define RECVOPI_MSG 1021
+	SENDOPI_MSG,
+	RECVOPI_MSG,
+	WAITRECVOPI_MSG,
 
-#define SENDSHH_MSG 1022
-#define RECVSHH_MSG 1023
+	SENDSHH_MSG,
+	RECVSHH_MSG,
 
-#define RECVXY_RNG_MSG 1024
+	RECVXY_RNG_MSG
+};
+typedef enum ACOUSTIC_MODEM_MESSAGES ACOUSTIC_MODEM_MESSAGES;
 
 // Sailboat supervisor states.
 enum STATE
@@ -141,6 +146,8 @@ extern deque< vector<interval> > d_all_mes_vector;
 extern double altitude_sea_floor;
 // Modem.
 extern double acousticmodem_x, acousticmodem_y, acousticmodem_r;
+extern int opi_id;
+extern double opi_x, opi_y;
 // Optical flow.
 extern double vrx, vry;
 
@@ -263,6 +270,7 @@ extern double kh_pipeline, kv_pipeline;
 extern int bBrake_pipeline;
 extern int videoid_pipeline; 
 extern double u_pipeline;
+extern BOOL bPipelineFound;
 
 // Ball variables.
 extern BOOL bBallDetection;
@@ -285,6 +293,7 @@ extern double u_ball;
 extern double theta_ball; // Not used...
 extern double x_ball, y_ball, z_ball;
 extern double lat_ball, long_ball, alt_ball;
+extern BOOL bBallFound;
 extern int lightStatus_ball;
 
 // Visual obstacle variables.
@@ -325,6 +334,7 @@ extern double pulsefreq_pinger, pulselen_pinger, pulsepersec_pinger, hyddist_pin
 extern int bBrakeSurfaceEnd_pinger;
 extern int videoid_pinger; 
 extern double u_pinger;
+extern BOOL bPingerFound;
 
 // Missing worker variables.
 extern BOOL bMissingWorkerDetection;
@@ -339,6 +349,7 @@ extern double kh_missingworker, kv_missingworker;
 extern int bBrake_missingworker;
 extern int videoid_missingworker; 
 extern double u_missingworker;
+extern BOOL bMissingWorkerFound;
 
 // Simulator variables.
 extern BOOL bGPSOKSimulator;

@@ -457,6 +457,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 		//if (bTemporaryObjectDetected&&(GetTimeElapsedChronoQuick(&chrono_mindetectionduration) > objMinDetectionDuration_ball))
 		//{
+			bBallFound = TRUE;
 #pragma region Actions
 			char szText[256];
 			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));

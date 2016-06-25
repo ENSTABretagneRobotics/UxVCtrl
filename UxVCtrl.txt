@@ -1,14 +1,12 @@
 % Hexadecimal identifier of the robot (see Globals.h)
 % robid
 % Simulator
-%0x00000001
+0x00000001
 % SAUCISSE
 %0x00000002
 % SARDINE
 %0x00000004
-% CISCREA 2014
-%0x00000060
-% Orange = VICI
+% CISCREA
 %0x00000060
 % Hovercraft
 %0x00000200
@@ -23,7 +21,7 @@
 % TREX
 %0x04000000
 % QUADRO
-0x20000000
+%0x20000000
 % nbvideo (max 3)
 2
 % videoimgwidth
@@ -67,7 +65,7 @@
 % bDisableNMEADevice[1]
 1
 % bDisableMAVLinkDevice[0]
-0
+1
 % bDisableMAVLinkDevice[1]
 1
 % bDisableSwarmonDevice
@@ -86,9 +84,9 @@
 % u_max (in [0;1])
 1
 % uw_max (in [0;1], (0.5 : boost, 1 : normal) for SAUC'ISSE, (0.35 (difficult to control...) : boost, 0.25 : normal) for CISCREA)
-1
+0.5
 % uv_max (in [0;1])
-1
+0.75
 % u_coef (1 : boost, 0.5 : normal)
 1
 % uw_coef (1 : boost, 0.5 : normal)
@@ -210,7 +208,7 @@
 % omegadotnoise.sup
 0.001
 % rangescale (in m, modified by Seanet)
-75
+10
 % sdir
 1
 %1 for Simulator and CISCREA

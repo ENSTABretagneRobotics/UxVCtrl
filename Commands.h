@@ -239,6 +239,7 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+		bPipelineFound = FALSE;
 		LeaveCriticalSection(&PipelineCS);
 	}
 	else if (sscanf(line, "pipelinedetection %lf", &delay) == 1)
@@ -320,6 +321,7 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+		bBallFound = FALSE;
 		LeaveCriticalSection(&BallCS);
 	}
 	else if (sscanf(line, "balldetection %lf", &delay) == 1)
@@ -528,6 +530,7 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+		bPingerFound = FALSE;
 		LeaveCriticalSection(&PingerCS);
 	}
 	else if (sscanf(line, "pingerdetection %lf", &delay) == 1)
@@ -606,6 +609,7 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+		bMissingWorkerFound = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
 	else if (sscanf(line, "missingworkerdetection %lf", &delay) == 1)
@@ -891,6 +895,47 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		wx = Center(xhat)+dval1; wy = Center(yhat)+dval2;
+		bLineFollowingControl = FALSE;
+		bWaypointControl = TRUE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			if (sqrt(pow(wx-Center(xhat),2)+pow(wy-Center(yhat),2)) < radius)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (strncmp(line, "gotoopi", strlen("gotoopi")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wx = opi_x; wy = opi_y;
+		bLineFollowingControl = FALSE;
+		bWaypointControl = TRUE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "gotoopit %lf", &delay) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wx = opi_x; wy = opi_y;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
 		bHeadingControl = TRUE;
@@ -1750,7 +1795,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "waitrecvopimsgacousticmodem %lf", &delay) == 1)
 	{
 		EnterCriticalSection(&MDMCS);
-		AcousticCommandMDM = RECVOPI_MSG;
+		AcousticCommandMDM = WAITRECVOPI_MSG;
 		LeaveCriticalSection(&MDMCS);
 		delay = fabs(delay);
 		bWaiting = TRUE;
@@ -1758,7 +1803,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&MDMCS);
-			if (AcousticCommandMDM != RECVOPI_MSG) 
+			if (AcousticCommandMDM != WAITRECVOPI_MSG) 
 			{
 				LeaveCriticalSection(&MDMCS);
 				break;

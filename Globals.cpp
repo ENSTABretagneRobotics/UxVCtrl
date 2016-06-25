@@ -43,6 +43,8 @@ deque< vector<interval> > d_all_mes_vector;
 double altitude_sea_floor = 0;
 // Modem.
 double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_r = 0;
+int opi_id = 0;
+double opi_x = 0, opi_y = 0;
 // Optical flow.
 double vrx = 0, vry = 0;
 
@@ -165,6 +167,7 @@ double kh_pipeline = 0, kv_pipeline = 0;
 int bBrake_pipeline = 0;
 int videoid_pipeline = 0; 
 double u_pipeline = 0;
+BOOL bPipelineFound = FALSE;
 
 // Ball variables.
 BOOL bBallDetection = FALSE;
@@ -187,6 +190,7 @@ double u_ball = 0;
 double theta_ball = 0;
 double x_ball = 0, y_ball = 0, z_ball = 0;
 double lat_ball = 0, long_ball = 0, alt_ball = 0;
+BOOL bBallFound = FALSE;
 int lightStatus_ball = 0;
 
 // Visual obstacle variables.
@@ -227,6 +231,7 @@ double pulsefreq_pinger = 0, pulselen_pinger = 0, pulsepersec_pinger = 0, hyddis
 int bBrakeSurfaceEnd_pinger = 0;
 int videoid_pinger = 0; 
 double u_pinger = 0;
+BOOL bPingerFound = FALSE;
 
 // Missing worker variables.
 BOOL bMissingWorkerDetection = FALSE;
@@ -241,6 +246,7 @@ double kh_missingworker = 0, kv_missingworker = 0;
 int bBrake_missingworker = 0;
 int videoid_missingworker = 0; 
 double u_missingworker = 0;
+BOOL bMissingWorkerFound = FALSE;
 
 // Simulator variables.
 BOOL bGPSOKSimulator = FALSE;

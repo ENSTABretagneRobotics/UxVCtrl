@@ -71,11 +71,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 	//int buflen = 0;
 	int receivedbytes = 0;
 	uint8 buf[256];
-	u2sShortMSG_MDM sendxy;
-	u2sShortMSG_MDM recvxy;
-	u2sShortMSG_MDM recvxy1;
-	u2sShortMSG_MDM recvxy2;
-	//u2sShortMSG_MDM recvxy3;
+	u2sShortMSG_MDM sendxy, recvxy, recvxy1, recvxy2;//, recvxy3;
 	//uInt8_MDM bits;
 	//int msgcounter = 0;
 	BOOL bError = FALSE;
@@ -174,6 +170,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 			EnterCriticalSection(&MDMCS);
 			switch (AcousticCommandMDM)
 			{
+#pragma region RECVANYSENDXY_MSG
 			case RECVANYSENDXY_MSG :
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
@@ -213,6 +210,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
 				}
 				break;
+#pragma endregion 
+#pragma region RNG_MSG
 			case RNG_MSG :
 				LeaveCriticalSection(&MDMCS);
 				memset(buf, 0, sizeof(buf));
@@ -256,6 +255,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
 				}
 				break;
+#pragma endregion 
+#pragma region XY
 			case SENDXY_MSG :
 				LeaveCriticalSection(&MDMCS);
 				memset(&sendxy, 0, sizeof(sendxy));
@@ -310,6 +311,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				}
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
+#pragma endregion 
+#pragma region ASK
 			case SENDASK_MSG :
 				LeaveCriticalSection(&MDMCS);
 				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDASK_MSG, "ask\n") != EXIT_SUCCESS) break;
@@ -333,6 +336,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					LeaveCriticalSection(&MDMCS);
 				}
 				break;
+#pragma endregion 
+#pragma region SPWT
 			case SENDSPWT_MSG :
 				LeaveCriticalSection(&MDMCS);
 				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDSPWT_MSG, "SPWT") != EXIT_SUCCESS) break;
@@ -356,29 +361,114 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					LeaveCriticalSection(&MDMCS);
 				}
 				break;
+#pragma endregion 
+#pragma region OPI
 			case SENDOPI_MSG :
 				LeaveCriticalSection(&MDMCS);
-				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDOPI_MSG, "OPI\n") != EXIT_SUCCESS) break;
+				memset(buf, 0, sizeof(buf));
+				memset(&sendxy, 0, sizeof(sendxy));
+				EnterCriticalSection(&BallCS);
+				sprintf((char*)buf, "OPI%d", lightStatus_ball?1:0);
+				sendxy.s[0] = (short)x_ball;
+				sendxy.s[1] = (short)y_ball;
+				LeaveCriticalSection(&BallCS);
+				memcpy(buf+strlen((char*)buf), (uint8*)&sendxy, sizeof(sendxy));
+				for (i = 0; i < 2; i++)
+				{
+					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)+sizeof(sendxy)) != EXIT_SUCCESS)
+					{
+						bError = TRUE;
+						break;
+					}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+					if (mdm.bSaveRawData)
+					{
+						fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;OPI %c 0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, SENDOPI_MSG, 's', (char)buf[3], 
+							(unsigned int)sendxy.uc[3], (unsigned int)sendxy.uc[2], (unsigned int)sendxy.uc[1], (unsigned int)sendxy.uc[0], 
+							(int)sendxy.s[0], (int)sendxy.s[1]);
+						fflush(mdm.pfSaveFile);
+					}
+					if (WaitNsMDM(8) != EXIT_SUCCESS) break;
+				}
 				break;
 			case RECVOPI_MSG :
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
 				memset(buf, 0, sizeof(buf));
-				if (RecvAllDataMDM(&mdm, buf, 4) != EXIT_SUCCESS) break;
+				memset(&recvxy, 0, sizeof(recvxy));
+				if (RecvAllDataMDM(&mdm, buf, 8) != EXIT_SUCCESS) break;
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
-					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;%.4s;\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVOPI_MSG, 'r', buf);
+					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;OPI %c 0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, RECVOPI_MSG, 'r', (char)buf[3], 
+						(unsigned int)recvxy.uc[3], (unsigned int)recvxy.uc[2], (unsigned int)recvxy.uc[1], (unsigned int)recvxy.uc[0], 
+						(int)recvxy.s[0], (int)recvxy.s[1]);
 					fflush(mdm.pfSaveFile);
 				}
-				if (strncmp((char*)buf, "OPI\n", strlen("OPI\n")) == 0)
+				if ((strncmp((char*)buf, "OPI", strlen("OPI")) == 0)&&(sscanf((char*)buf+4, "%u", &recvxy.u) == 1))
 				{
-					// Release blocking command.
-					EnterCriticalSection(&MDMCS);
-					AcousticCommandMDM = 0;
-					LeaveCriticalSection(&MDMCS);
+					//recvxy3 = recvxy2;
+					recvxy2 = recvxy1;
+					recvxy1 = recvxy;
+					if (recvxy1.u == recvxy2.u)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						buf[4] = 0; // For atoi() to work as expected...
+						opi_id = atoi((char*)buf+3);
+						opi_x = recvxy.s[0]; 
+						opi_y = recvxy.s[1];
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						opi_id = 0; opi_x = 0; opi_y = 0;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
 				}
 				break;
+			case WAITRECVOPI_MSG :
+				LeaveCriticalSection(&MDMCS);
+				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
+				memset(buf, 0, sizeof(buf));
+				memset(&recvxy, 0, sizeof(recvxy));
+				if (RecvAllDataMDM(&mdm, buf, 8) != EXIT_SUCCESS) break;
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+				if (mdm.bSaveRawData)
+				{
+					fprintf(mdm.pfSaveFile, "%d;%d;%d;%c;OPI %c 0x%.2x%.2x%.2x%.2x (%d,%d);\n", (int)tv.tv_sec, (int)tv.tv_usec, WAITRECVOPI_MSG, 'r', (char)buf[3], 
+						(unsigned int)recvxy.uc[3], (unsigned int)recvxy.uc[2], (unsigned int)recvxy.uc[1], (unsigned int)recvxy.uc[0], 
+						(int)recvxy.s[0], (int)recvxy.s[1]);
+					fflush(mdm.pfSaveFile);
+				}
+				if ((strncmp((char*)buf, "OPI", strlen("OPI")) == 0)&&(sscanf((char*)buf+4, "%u", &recvxy.u) == 1))
+				{
+					//recvxy3 = recvxy2;
+					recvxy2 = recvxy1;
+					recvxy1 = recvxy;
+					if (recvxy1.u == recvxy2.u)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						buf[4] = 0; // For atoi() to work as expected...
+						opi_id = atoi((char*)buf+3);
+						opi_x = recvxy.s[0]; 
+						opi_y = recvxy.s[1];
+						LeaveCriticalSection(&StateVariablesCS);
+						// Release blocking command.
+						EnterCriticalSection(&MDMCS);
+						AcousticCommandMDM = 0;
+						LeaveCriticalSection(&MDMCS);
+					}
+					else
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						opi_id = 0; opi_x = 0; opi_y = 0;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+				}
+				break;
+#pragma endregion 
+#pragma region SHH
 			case SENDSHH_MSG :
 				LeaveCriticalSection(&MDMCS);
 				if (SendNbSimpleMessageAndWaitNsMDM(&mdm, &bError, 8, 1, SENDSHH_MSG, "shh\n") != EXIT_SUCCESS) break;
@@ -402,6 +492,8 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					LeaveCriticalSection(&MDMCS);
 				}
 				break;
+#pragma endregion 
+#pragma region RECVXY_RNG
 			case RECVXY_RNG_MSG :
 				LeaveCriticalSection(&MDMCS);
 				if (PurgeDataAndWaitNsMDM(&mdm, &bError, 2) != EXIT_SUCCESS) break;
@@ -498,6 +590,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				break;
+#pragma endregion 
 			default : 
 				LeaveCriticalSection(&MDMCS);
 				break;

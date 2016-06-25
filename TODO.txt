@@ -1,7 +1,21 @@
-revoir code com modem, detection ball et light, AcousticCommandMDM = SENDOPI_MSG message..
-rajouter param acousticmodem_r_max_err dans UxVCtrl.txt et MDM0.txt comme pour sonar...
+race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
+
+Mosaiquing video avec les logs de 2014
+
+Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
+Utilisation de headingreg et depthreg pendant staticloc?
 
 pour les détections, être plus robuste en regardant plusieurs images de suite : objMinDetectionDuration...
+commande checkXXX bTrue bNbCommandsToSkip pour faire un peu comme un if et goto
+checkball 0 2
+sendmsg
+track
+checkball 1 4
+balldetection
+checkball 0 2
+sendmsg
+track
+continuewall
 
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 
@@ -10,8 +24,6 @@ vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplac
 dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
 logstate était compatible avec le début de logsimu à l'origine...->rajouter dans logsimu les t;lat;lon;alt;hdg;... aussi
 avec nouveau format, lognav2KML va être simplifié
-
-rename startopencvgui->enableopencvgui/show/hide...?
 
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
@@ -47,7 +59,8 @@ LIDAR/sonar : mesurer vitesse si le cap change peu et les obstacles changent peu
 
 GUI, video
 pour mieux gérer les problèmes de EOL, au moment où on fait isdigit() ignorer les CR, LF...
-faudrait pouvoir enregistrer en high res en local en option
+rename startopencvgui->enableopencvgui/show/hide...?
+faudrait pouvoir enregistrer en high res en local en option->utiliser remotewebcammultisrv et se connecter dessus...
 mieux gérer les infos affichées selon le robot et selon le mode
 info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...?
 alterner les valeurs affichées toutes les s?
@@ -76,13 +89,15 @@ dans la spec, il faudrait rajouter un message shh\n pour interrompre les sendxy 
 cohérence des messages : il faut regarder bit par bit (il faut qu'au moins 2 bits sur 3 soient cohérents à chaque fois)
 (modems envoient probablement par paquet de 4 octets (sans doute complété par des octets nuls))
 flush du modem quand il reçoit des données invalides?
-pour pouvoir analyser toutes les données qui viennent du modem facilement et retirer les vieilles, il vaut mieux utiliser des messages qui ont une en-tête et fin prédéfinie...
 bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?
 add velocityofsound as env global param as necessary for echo message...
+rajouter param acousticmodem_r_max_err dans UxVCtrl.txt et MDM0.txt comme pour sonar...
 time-division method
 envoyer (périodiquement?) un message sp avec la valeur opi trouvé lat long... en option dans ball et pipe
 acoustic localization : stop specifically submarine to be able to communicate correctly (perturbations by thrusters?)?
+pour pouvoir analyser toutes les données qui viennent du modem facilement et retirer les vieilles, il vaut mieux utiliser des messages qui ont une en-tête et fin prédéfinie...
 faire un recv et analyser un peu le message comme les autres périphériques, regarder aussi ce qu'a fait Clément
+To be able to make a real communication protocol, should receinve 4 bytes, check the beginning of the data to determine if it is a known message, receive remaining data  if the specific message needs it, and act accordingly...
 vu le temps de transmission de 2 positions valides et d'1 rng, il vaut mieux que l'émetteur soit fixe...
 compte tenu du fait que hovercraft est presque fixe et de la vitesse du sous-marin, ça revient à une précision de 10 m
 peut-être qu'il vaudrait mieux regrouper les 2 positions dans le même message pour gagner du temps...

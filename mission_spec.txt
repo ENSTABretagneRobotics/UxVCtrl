@@ -94,6 +94,10 @@
 %
 %gotoxytrelative x y t (x, y : double ]-oo,oo[ position in m from the current position in the environment coordinate system, t : double [0,oo[ timeout in s, the function blocks until the position or the timeout is reached)
 %
+%gotoopi (go to the current OPI position)
+%
+%gotoopit t (t : double [0,oo[ timeout in s, the function blocks until the position or the timeout is reached. Go to the current OPI position)
+%
 %gotoxywgs lat long (lat, long : double ]-oo,oo[ position in decimal deg in WGS)
 %
 %gotoxytwgs lat long t (lat, long : double ]-oo,oo[ position in decimal deg in WGS, t : double [0,oo[ timeout in s, the function blocks until the position or the timeout is reached)
