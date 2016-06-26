@@ -1,3 +1,6 @@
+98
+Attempt to limit race conditions.
+
 97
 Updated OPI acoustic message.
 Added gotoopi and gotoopit commands.

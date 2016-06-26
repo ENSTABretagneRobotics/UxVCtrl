@@ -201,7 +201,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		LeaveCriticalSection(&dispimgsCS[videoid]);
 
 		EnterCriticalSection(&StateVariablesCS);
-
 #pragma region KEYS
 		switch ((char)c)
 		{
@@ -684,9 +683,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		}
 #pragma endregion
-
 		EnterCriticalSection(&dispimgsCS[videoid]);
-
 #pragma region OSD
 		if (bOSD)
 		{
@@ -1170,11 +1167,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 		}
 #pragma endregion
-
+		LeaveCriticalSection(&dispimgsCS[videoid]);
 		LeaveCriticalSection(&StateVariablesCS);
 
+		EnterCriticalSection(&dispimgsCS[videoid]);
 		cvShowImage(windowname, dispimgs[videoid]);
-
 		LeaveCriticalSection(&dispimgsCS[videoid]);
 
 		if (bExit) break;
