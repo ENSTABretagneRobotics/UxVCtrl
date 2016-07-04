@@ -1,28 +1,34 @@
 setmissionaction INIT
-setstateestimation 0 2 20 2 0 10000 0 10000 0 0.1 0 0.1
-wait 2
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+disableautogpslocalization
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
 setmissionaction SUBMERGE
 stop
-headingreg 345
-depthreg -1.75
-wait 10
+headingreg 315
+depthreg -1.25
+wait 20
 % go forward to reach middle
 setmissionaction GOMIDDLE
 thrust 1
-pipelineconfig 0 0 0 0 0 0 25 65 45 240 65 210 0.03 0.15 0 1 0.4 0 1
-pipelinedetection 75 0
+wait 100
 % stop
 thrust -1
 wait 3
 stop
 % 90 deg turn
 setmissionaction NINETYTURN
-headingreg 255
+headingreg 75
 wait 10
 % go forward to pass through the validation gate
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 57
+wait 50
 % stop
 thrust -1
 wait 3
@@ -31,3 +37,4 @@ stop
 setmissionaction SURFACE
 depthreg 5
 wait 60
+enableautogpslocalization

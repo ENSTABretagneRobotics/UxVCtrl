@@ -238,9 +238,11 @@
 0
 % Simulated submarine initial state
 % x_0 (in m)
-0
+48.5
+%0
 % y_0 (in m)
-0
+22
+%0
 % z_0 (in m)
 0
 % theta_0 (in rad)

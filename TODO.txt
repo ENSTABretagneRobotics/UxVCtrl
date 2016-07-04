@@ -31,6 +31,7 @@ tester mission crash vidéo sur sardine pendant longtemps, sur des missions, en a
 race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
 Pb compil linux ais et exe opencvgui (cvStartWindowThread()?, try with cv2413(->pas de gros changement) or cv310(->trop d'erreurs)...), préparer qt .pro pour débugguer, bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
 crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...
+why I need to press twice r to stop videorecording when it was started by a script?
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
 
 reg cap pas assez rapide à cause dérivée, tester avec vieux code...
@@ -79,6 +80,9 @@ no opencvgui, hang after exit on linux? cvStartWindowThread()... now the keys ar
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
 essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...->pas forcément souhaitable
+Mettre en var globale les périphériques?
+Pour la taille des images partagées, prendre la résolution min des webcams
+Les paramètres globaux videoimgwidth/height n'ont peut-être plus d'utilité
 
 acousticmodemlocalization
 commande comme setstateestimation/gpslocalization qui contracte la position par acoustique
