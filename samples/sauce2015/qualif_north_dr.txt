@@ -16,7 +16,7 @@ wait 20
 % go forward to reach middle
 setmissionaction GOMIDDLE
 thrust 1
-wait 100
+wait 105
 % stop
 thrust -1
 wait 3
@@ -28,9 +28,17 @@ wait 10
 % go forward to pass through the validation gate
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 50
+wait 40
 % stop
+stop
+wait 1
+% go backward to pass through the validation gate
+setmissionaction VALIDATIONGATEBACK
+headingreg 75
 thrust -1
+wait 40
+% stop
+thrust 1
 wait 3
 stop
 % stop and surface

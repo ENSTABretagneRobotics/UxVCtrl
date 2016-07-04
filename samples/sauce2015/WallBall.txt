@@ -1,3 +1,6 @@
+%
+%NEED SONAR_CONFIG_WALL!!!!!!!!!!!!!!!!!!!!!!!!!
+%
 setmissionaction INIT
 %gpssetenvcoordposition 3
 %setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
@@ -10,56 +13,9 @@ startvideorecording 1
 wait 1
 setmissionaction SUBMERGE
 stop
-headingreg 165
-depthreg -1.25
-wait 20
-% go forward to reach middle
-setmissionaction GOMIDDLE
-thrust 1
-wait 105
-% stop
-thrust -1
-wait 3
-stop
-% 90 deg turn
-setmissionaction NINETYTURN
-headingreg 255
-wait 10
-% go forward to pass through the validation gate
-setmissionaction VALIDATIONGATE
-thrust 1
-wait 30
-% stop
-thrust -1
-wait 3
-stop
-setmissionaction SONAR_CONFIG_WALL
-stop
-seanetconfig Seanet0_wf.txt 0
-% need to wait 60 s before using the sonar...
-%wait 60
-setmissionaction CHANGE_HEADING
-stop
 headingreg 345
 depthreg -1.25
-wait 10
-% go forward move away from gate
-setmissionaction GOAWAY
-thrust 1
-wait 15
-stop
-% 90 deg turn
-setmissionaction NINETYTURN
-headingreg 75
-wait 10
-% go forward to pass on the side of the validation gate
-setmissionaction VALIDATIONGATESIDE
-thrust 1
-wait 50
-% stop
-thrust -1
-wait 3
-stop
+wait 20
 setmissionaction WALL_TRACKING_BALL_DETECTION
 thrust 0.5
 ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 1

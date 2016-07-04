@@ -372,7 +372,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				sendxy.s[0] = (short)x_ball;
 				sendxy.s[1] = (short)y_ball;
 				LeaveCriticalSection(&BallCS);
-				memcpy(buf+strlen((char*)buf), (uint8*)&sendxy, sizeof(sendxy));
+				memcpy(buf+strlen((char*)buf), &sendxy, sizeof(sendxy));
 				for (i = 0; i < 2; i++)
 				{
 					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)+sizeof(sendxy)) != EXIT_SUCCESS)
@@ -397,6 +397,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				memset(buf, 0, sizeof(buf));
 				memset(&recvxy, 0, sizeof(recvxy));
 				if (RecvAllDataMDM(&mdm, buf, 8) != EXIT_SUCCESS) break;
+				memcpy(&recvxy.u, (char*)buf+4, sizeof(recvxy));
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
@@ -405,7 +406,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						(int)recvxy.s[0], (int)recvxy.s[1]);
 					fflush(mdm.pfSaveFile);
 				}
-				if ((strncmp((char*)buf, "OPI", strlen("OPI")) == 0)&&(sscanf((char*)buf+4, "%u", &recvxy.u) == 1))
+				if (strncmp((char*)buf, "OPI", strlen("OPI")) == 0)
 				{
 					//recvxy3 = recvxy2;
 					recvxy2 = recvxy1;
@@ -433,6 +434,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				memset(buf, 0, sizeof(buf));
 				memset(&recvxy, 0, sizeof(recvxy));
 				if (RecvAllDataMDM(&mdm, buf, 8) != EXIT_SUCCESS) break;
+				memcpy(&recvxy.u, (char*)buf+4, sizeof(recvxy));
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 				if (mdm.bSaveRawData)
 				{
@@ -441,7 +443,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						(int)recvxy.s[0], (int)recvxy.s[1]);
 					fflush(mdm.pfSaveFile);
 				}
-				if ((strncmp((char*)buf, "OPI", strlen("OPI")) == 0)&&(sscanf((char*)buf+4, "%u", &recvxy.u) == 1))
+				if (strncmp((char*)buf, "OPI", strlen("OPI")) == 0)
 				{
 					//recvxy3 = recvxy2;
 					recvxy2 = recvxy1;
@@ -451,7 +453,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						EnterCriticalSection(&StateVariablesCS);
 						buf[4] = 0; // For atoi() to work as expected...
 						opi_id = atoi((char*)buf+3);
-						opi_x = recvxy.s[0]; 
+						opi_x = recvxy.s[0];
 						opi_y = recvxy.s[1];
 						LeaveCriticalSection(&StateVariablesCS);
 						// Release blocking command.

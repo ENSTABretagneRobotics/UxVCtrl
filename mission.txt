@@ -16,67 +16,22 @@ wait 20
 % go forward to reach middle
 setmissionaction GOMIDDLE
 thrust 1
-wait 100
+wait 105
 % stop
 thrust -1
 wait 3
 stop
 % 90 deg turn
 setmissionaction NINETYTURN
-headingreg 75
+headingreg 255
 wait 10
 % go forward to pass through the validation gate
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 50
+wait 30
 % stop
 thrust -1
 wait 3
-stop
-setmissionaction SONAR_CONFIG_WALL
-stop
-seanetconfig Seanet0_wf.txt 0
-wait 60
-setmissionaction CHANGE_HEADING
-stop
-headingreg 345
-depthreg -1.25
-wait 20
-setmissionaction WALL_TRACKING_BALL_DETECTION
-thrust 0.3
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 1
-wallconfig 6 2 -1 0 15 0.78 2 1 0
-startwalltracking
-balldetection 120
-setmissionaction BALL_DETECTED_OR_TIMEOUT
-stopwalltracking
-% stop
-thrust -0.3
-wait 1
-stop
-setmissionaction BALL_TRACKING
-startballtracking
-wait 20
-stopballtracking
-startrecvopimsgacousticmodem
-setmissionaction AVOID_OBSTACLE
-stop
-thrust -1
-wait 4
-stop
-headingreg 0
-depthreg -1.25
-wait 10
-setmissionaction WALL_TRACKING
-thrust 0.3
-wallconfig 3 2 -1 0 10 0.78 2 1 0
-startwalltracking
-wait 220
-stopwalltracking
-stoprecvopimsgacousticmodem
-% stop
-thrust -0.3
-wait 1
 stop
 % stop and surface
 setmissionaction SURFACE

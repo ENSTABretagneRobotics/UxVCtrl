@@ -1,3 +1,6 @@
+99
+Corrected position parsing in OPI acoustic message.
+
 98
 Attempt to limit race conditions.
 

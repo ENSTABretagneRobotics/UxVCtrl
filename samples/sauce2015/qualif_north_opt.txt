@@ -10,26 +10,25 @@ startvideorecording 1
 wait 1
 setmissionaction SUBMERGE
 stop
-headingreg 345
-depthreg -1.75
-wait 10
+headingreg 165
+depthreg -1.25
+wait 20
 % go forward to reach middle
 setmissionaction GOMIDDLE
 thrust 1
-pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0 0
-pipelinedetection 115
+wait 105
 % stop
 thrust -1
 wait 3
 stop
 % 90 deg turn
 setmissionaction NINETYTURN
-headingreg 75
+headingreg 255
 wait 10
 % go forward to pass through the validation gate
 setmissionaction VALIDATIONGATE
 thrust 1
-wait 50
+wait 30
 % stop
 thrust -1
 wait 3
