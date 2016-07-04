@@ -1,14 +1,8 @@
 setmissionaction INIT
 wpfollowingconfig 0.25
 stop
-setmissionaction WAIT_INVITATION
-waitrecvopimsgacousticmodem 3600
 startvideorecording 0
 wait 1
-setmissionaction GO_OPI
-thrust 0.7
-gotoopit 120
-stop
 setmissionaction SEARCH_OPI
 ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 2 0 1
 startballtracking

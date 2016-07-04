@@ -923,15 +923,6 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (strncmp(line, "gotoopi", strlen("gotoopi")) == 0)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		wx = opi_x; wy = opi_y;
-		bLineFollowingControl = FALSE;
-		bWaypointControl = TRUE;
-		bHeadingControl = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
 	else if (sscanf(line, "gotoopit %lf", &delay) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -963,6 +954,15 @@ inline int Commands(char* line)
 		}
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
+	}
+	else if (strncmp(line, "gotoopi", strlen("gotoopi")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wx = opi_x; wy = opi_y;
+		bLineFollowingControl = FALSE;
+		bWaypointControl = TRUE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "gotoxywgs %lf %lf", &dval1, &dval2) == 2)
 	{
