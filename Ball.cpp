@@ -560,7 +560,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			if (bBallTrackingControl)
 			{
 				pic_counter++;
-				if ((pic_counter > 15)||bBrake_ball)
+				if ((pic_counter > (int)(1000/captureperiod))||bBrake_ball)
 				{
 					pic_counter = 0;
 					// Save a picture showing the detection.

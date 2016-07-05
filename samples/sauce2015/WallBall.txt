@@ -19,14 +19,14 @@ depthreg -1.25
 wait 20
 setmissionaction WALL_TRACKING
 thrust 0.5
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 1
 wallconfig 3 2 1 0 10 0.78 2 1 0
 startwalltracking
 wait 70
 stopwalltracking
 setmissionaction WALL_TRACKING_BALL_DETECTION
-wallconfig 6 2 1 0 15 0.78 2 1 0
 thrust 0.5
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 -1 0 1
+wallconfig 3 2 1 0 10 0.78 2 1 0
 startwalltracking
 wait 5
 balldetection 120
@@ -46,8 +46,16 @@ stop
 thrust -1
 wait 1
 stop
-headingreg 180
+setmissionaction MOVE_AWAY
+headingreg 253
 depthreg -1.25
+wait 10
+thrust 0.5
+wait 40
+% stop
+thrust -1
+wait 3
+stop
 wait 120
 stoprecvopimsgacousticmodem
 % stop

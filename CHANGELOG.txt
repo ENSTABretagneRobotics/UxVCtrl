@@ -1,3 +1,6 @@
+101
+Updated snapshots frequency for objects tracking.
+
 100
 Corrected parsing order of gotoopit and gotoopi commands.
 

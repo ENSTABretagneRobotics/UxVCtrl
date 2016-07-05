@@ -459,7 +459,7 @@ THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam)
 			if (bPipelineTrackingControl)
 			{
 				pic_counter++;
-				if (pic_counter > 15)
+				if (pic_counter > (int)(1000/captureperiod))
 				{
 					pic_counter = 0;
 					// Save a picture showing the detection.

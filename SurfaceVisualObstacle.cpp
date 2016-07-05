@@ -143,7 +143,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 			{
 				pic_counter++;
 				// Temporary...
-				//if (pic_counter > 15)
+				//if (pic_counter > (int)(1000/captureperiod))
 				{
 					//pic_counter = 0;
 					// Save a picture showing the detection.
