@@ -2,6 +2,7 @@ setmissionaction INIT
 %gpssetenvcoordposition 3
 %setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
 disableautogpslocalization
+gpslocalization 1
 wpfollowingconfig 1
 linefollowingconfig 2 0.78
 startvideorecording 0
