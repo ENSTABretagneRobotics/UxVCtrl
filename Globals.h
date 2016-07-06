@@ -331,6 +331,7 @@ extern int rmin_pinger, rmax_pinger, gmin_pinger, gmax_pinger, bmin_pinger, bmax
 extern int hmin_pinger, hmax_pinger, smin_pinger, smax_pinger, lmin_pinger, lmax_pinger;
 extern double objMinRadiusRatio_pinger, objRealRadius_pinger, objMinDetectionDuration_pinger; 
 extern double pulsefreq_pinger, pulselen_pinger, pulsepersec_pinger, hyddist_pinger, hydorient_pinger, preferreddir_pinger; 
+extern int bUseFile_pinger;
 extern int bBrakeSurfaceEnd_pinger;
 extern int videoid_pinger; 
 extern double u_pinger;

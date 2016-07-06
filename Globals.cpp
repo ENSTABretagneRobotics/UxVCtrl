@@ -228,6 +228,7 @@ int rmin_pinger = 0, rmax_pinger = 0, gmin_pinger = 0, gmax_pinger = 0, bmin_pin
 int hmin_pinger = 0, hmax_pinger = 0, smin_pinger = 0, smax_pinger = 0, lmin_pinger = 0, lmax_pinger = 0;
 double objMinRadiusRatio_pinger = 0, objRealRadius_pinger = 0, objMinDetectionDuration_pinger = 0; 
 double pulsefreq_pinger = 0, pulselen_pinger = 0, pulsepersec_pinger = 0, hyddist_pinger = 0, hydorient_pinger = 0, preferreddir_pinger = 0; 
+int bUseFile_pinger = 0;
 int bBrakeSurfaceEnd_pinger = 0;
 int videoid_pinger = 0; 
 double u_pinger = 0;

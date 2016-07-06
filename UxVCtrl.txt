@@ -310,4 +310,4 @@
 % simulatorperiod (in ms)
 70
 % outliers_ratio
-0.25
+0.15

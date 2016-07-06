@@ -507,24 +507,27 @@ inline int Commands(char* line)
 		"%lf %lf %lf "
 		"%lf %lf %lf %lf %lf %lf "
 		"%d "
+		"%d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, 
 		&dval4, &dval5, &dval6, &dval7, &dval8, &dval9, 
 		&ival13, 
-		&ival14
-		) == 20)
+		&ival14, 
+		&ival15
+		) == 24)
 	{
 		EnterCriticalSection(&PingerCS);
 		rmin_pinger = ival1; rmax_pinger = ival2; gmin_pinger = ival3; gmax_pinger = ival4; bmin_pinger = ival5; bmax_pinger = ival6; 
 		hmin_pinger = ival7; hmax_pinger = ival8; smin_pinger = ival9; smax_pinger = ival10; lmin_pinger = ival11; lmax_pinger = ival12; 
 		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionDuration_pinger = dval3; 
 		pulsefreq_pinger = dval4; pulselen_pinger = dval5; pulsepersec_pinger = dval6; hyddist_pinger = dval7; hydorient_pinger = dval8; preferreddir_pinger = dval9; 
-		bBrakeSurfaceEnd_pinger = ival13; 
-		if ((ival14 >= 0)&&(ival14 < nbvideo))
+		bUseFile_pinger = ival13; 
+		bBrakeSurfaceEnd_pinger = ival14; 
+		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
-			videoid_pinger = ival14;
+			videoid_pinger = ival15;
 		}
 		else
 		{

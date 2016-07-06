@@ -1,3 +1,9 @@
+103
+Updated pinger commands.
+
+102
+Updated pinger commands.
+
 101
 Updated snapshots frequency for objects tracking.
 

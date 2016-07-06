@@ -36,6 +36,7 @@ wait 3
 stop
 % stop and surface
 setmissionaction SURFACE
+stop
 depthreg 5
 wait 60
 enableautogpslocalization

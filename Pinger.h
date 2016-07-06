@@ -10,7 +10,7 @@
 #ifndef PINGER_H
 #define PINGER_H
 
-#include "Config.h"
+#include "Commands.h"
 
 THREAD_PROC_RETURN_VALUE PingerThread(void* pParam);
 

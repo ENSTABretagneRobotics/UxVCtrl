@@ -119,33 +119,38 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 		if (bPingerTrackingControl)
 		{
-			EnterCriticalSection(&StateVariablesCS);
-			u = u_pinger;
-
-
-			// Get the results from pingerdetection.py (needs to be launched/killed from the mission file using system command...)...
-
-			FILE* filedetect = fopen(LOG_FOLDER"pingerdetection.txt", "r");
-			if (filedetect != NULL)
+#pragma region bUseFile_pinger
+			if (bUseFile_pinger)
 			{
-				if (fscanf(filedetect, "%lf;%lf;%lf;%lf", &pingerdir, &pingerdirerr, &pingerdist, &pingerdisterr) != 1) printf("Invalid detection file.\n");
-				if (fclose(filedetect) != EXIT_SUCCESS) printf("fclose() failed.\n");
+				EnterCriticalSection(&StateVariablesCS);
+				u = u_pinger;
+
+
+				// Get the results from pingerdetection.py (needs to be launched/killed from the mission file using system command...)...
+
+				FILE* filedetect = fopen(LOG_FOLDER"pingerdetection.txt", "r");
+				if (filedetect != NULL)
+				{
+					if (fscanf(filedetect, "%lf;%lf;%lf;%lf", &pingerdir, &pingerdirerr, &pingerdist, &pingerdisterr) != 1) printf("Invalid detection file.\n");
+					if (fclose(filedetect) != EXIT_SUCCESS) printf("fclose() failed.\n");
+				}
+
+				fprintf(logpingertaskfile, "%f;%f;%f;%f;%f;\n", 
+					GetTimeElapsedChronoQuick(&chrono), pingerdir, pingerdirerr, pingerdist, pingerdisterr
+					);
+				fflush(logpingertaskfile);
+
+
+				objBearing = fmod_2PI_deg2rad(-pingerdir);
+
+
+				wtheta = Center(thetahat)+objBearing-fmod_2PI_deg2rad(-preferreddir_pinger); // Try to always keep it to its side, e.g. preferreddir_pinger=345...
+				//bDistanceControl = FALSE;
+				//bBrakeControl = FALSE;
+				bHeadingControl = TRUE;
+				LeaveCriticalSection(&StateVariablesCS);
 			}
-
-			fprintf(logpingertaskfile, "%f;%f;%f;%f;%f;\n", 
-				GetTimeElapsedChronoQuick(&chrono), pingerdir, pingerdirerr, pingerdist, pingerdisterr
-				);
-			fflush(logpingertaskfile);
-
-
-			objBearing = fmod_2PI_deg2rad(-pingerdir);
-
-
-			wtheta = Center(thetahat)+objBearing-fmod_2PI_deg2rad(-preferreddir_pinger); // Try to always keep it to its side, e.g. preferreddir_pinger=345...
-			//bDistanceControl = FALSE;
-			//bBrakeControl = FALSE;
-			bHeadingControl = TRUE;
-			LeaveCriticalSection(&StateVariablesCS);
+#pragma endregion
 		}
 
 
@@ -474,8 +479,6 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 				if (bBrakeSurfaceEnd_pinger)
 				{
-					// To modify...
-
 					// Temporary...
 					EnterCriticalSection(&StateVariablesCS);
 					u = 0;
@@ -487,6 +490,23 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 					u = 0;
 					bBrakeControl = FALSE;
 					LeaveCriticalSection(&StateVariablesCS);
+					
+					EnterCriticalSection(&StateVariablesCS);
+					AbortMission();
+					LeaveCriticalSection(&StateVariablesCS);
+					mSleep(3000);
+
+					EnterCriticalSection(&StateVariablesCS);
+					wz = 0; // Surface...
+					bDepthControl = TRUE;
+					bAltitudeSeaFloorControl = FALSE;
+					LeaveCriticalSection(&StateVariablesCS);
+					mSleep(30000);
+					EnterCriticalSection(&StateVariablesCS);
+					wz = 0;
+					bDepthControl = FALSE;
+					bAltitudeSeaFloorControl = FALSE;
+					LeaveCriticalSection(&StateVariablesCS);					
 				}
 				bPingerDetection = FALSE;
 			}
@@ -494,7 +514,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 			if (bPingerTrackingControl)
 			{
 				pic_counter++;
-				if (pic_counter > (int)(1000/captureperiod))
+				if ((pic_counter > (int)(1000/captureperiod))||bBrakeSurfaceEnd_pinger)
 				{
 					pic_counter = 0;
 					// Save a picture showing the detection.
@@ -512,6 +532,38 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 					{
 						printf("Error saving a picture file.\n");
 					}
+				}
+
+				if (bBrakeSurfaceEnd_pinger)
+				{
+					// Temporary...
+					EnterCriticalSection(&StateVariablesCS);
+					u = 0;
+					bDistanceControl = FALSE;
+					bBrakeControl = TRUE;
+					LeaveCriticalSection(&StateVariablesCS);
+					mSleep(3000);
+					EnterCriticalSection(&StateVariablesCS);
+					u = 0;
+					bBrakeControl = FALSE;
+					LeaveCriticalSection(&StateVariablesCS);
+					
+					EnterCriticalSection(&StateVariablesCS);
+					AbortMission();
+					LeaveCriticalSection(&StateVariablesCS);
+					mSleep(3000);
+
+					EnterCriticalSection(&StateVariablesCS);
+					wz = 0; // Surface...
+					bDepthControl = TRUE;
+					bAltitudeSeaFloorControl = FALSE;
+					LeaveCriticalSection(&StateVariablesCS);
+					mSleep(30000);
+					EnterCriticalSection(&StateVariablesCS);
+					wz = 0;
+					bDepthControl = FALSE;
+					bAltitudeSeaFloorControl = FALSE;
+					LeaveCriticalSection(&StateVariablesCS);					
 				}
 			}
 #pragma endregion
