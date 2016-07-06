@@ -1,7 +1,8 @@
 % camid (0..9) or a video filename or IP address and TCP port
 %127.0.0.1:4014
 %0
-test1.wmv
+%test1.wmv
+vid0_2016-07-05_12h42min53s.wmv
 %dummy_25min.wmv
 %127.0.0.1:4014
 %192.168.1.150:4014

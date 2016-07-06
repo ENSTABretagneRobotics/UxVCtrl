@@ -50,7 +50,7 @@
 %
 %pingerdetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
 %
-%startpingertracking (modify headingreg with pinger information from hydrophones, keep any previous depthreg (might surface), thrust (might stop))
+%startpingertracking (modify headingreg with pinger information from hydrophones or aborting mission and surfacing in option, keep any previous depthreg (might surface), thrust (might stop))
 %
 %stoppingertracking
 %

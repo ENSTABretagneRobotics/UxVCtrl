@@ -1,0 +1,31 @@
+setmissionaction INIT
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+disableautogpslocalization
+gpslocalization 1
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+setmissionaction SUBMERGE
+stop
+headingreg 253
+depthreg -1.25
+wait 20
+%setmissionaction GO_STRUCT
+%thrust 1
+%wait 10
+setmissionaction STRUCT_TRACKING
+thrust 0.4
+pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0 0
+startpipelinetracking
+wait 200
+stoppipelinetracking
+% stop and surface
+setmissionaction SURFACE
+stop
+depthreg 5
+wait 60
+enableautogpslocalization

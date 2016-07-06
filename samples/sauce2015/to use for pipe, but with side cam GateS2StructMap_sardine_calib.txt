@@ -1,3 +1,24 @@
+
+setmissionaction staticsonarlocalization
+stop
+wait 3
+staticsonarlocalization 15
+wait 3
+setmissionaction GO_CLOSE_TO_GATE
+thrust 0.7
+gotoxyt 25 12.5 120
+thrust -1
+wait 2
+stop
+wait 3
+
+
+
+
+
+
+
+
 setmissionaction INIT
 wpfollowingconfig 0.25
 gpslocalization 3
