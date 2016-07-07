@@ -27,22 +27,24 @@ wait 3
 stop
 % 90 deg turn
 setmissionaction NINETYTURN
-headingreg 253
+headingreg 252
 wait 10
 % go forward to pass through the validation gate
 setmissionaction VALIDATIONGATE
 thrust 1
 wait 40
-% stop
-thrust -1
-wait 3
-stop
 setmissionaction STRUCT_TRACKING
-thrust 0.4
+% disable boost mode
+%controlconfig 1 1.0 0.75 0.5 0.5
+%wait 1
+thrust 0.2
 pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0 0
 startpipelinetracking
-wait 200
+wait 120
 stoppipelinetracking
+% restore boost mode
+%controlconfig 1 0.5 0.75 1.0 1.0
+%wait 1
 setmissionaction staticsonarlocalization
 stop
 wait 3
@@ -50,7 +52,7 @@ staticsonarlocalization 15
 wait 3
 setmissionaction GO_WALL
 thrust 0.7
-gotoxyt 45 15 120
+gotoxyt 45 15 150
 thrust -1
 wait 2
 stop
@@ -59,22 +61,13 @@ stop
 seanetconfig Seanet0_wf.txt 0
 % need to wait 60 s before using the sonar...
 wait 60
-
-
-
-
-
-
-
-
-
-setmissionaction SUBMERGE
+setmissionaction CHANGE_DEPTH_HEADING
 stop
 headingreg 75
-depthreg -1.25
+depthreg -1.75
 wait 20
 setmissionaction WALL_TRACKING
-thrust 0.5
+thrust 0.3
 wallconfig 3 2 1 0 10 0.78 2 1 0
 startwalltracking
 wait 70
@@ -82,11 +75,11 @@ stopwalltracking
 setmissionaction WALL_TRACKING_BALL_DETECTION
 stop
 ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 -1 0 1
-thrust 0.5
+thrust 0.3
 wallconfig 3 2 1 0 10 0.78 2 1 0
 startwalltracking
 wait 5
-balldetection 120
+balldetection 240
 setmissionaction BALL_DETECTED_OR_TIMEOUT
 stopwalltracking
 % stop
@@ -98,122 +91,121 @@ startballtracking
 wait 30
 stopballtracking
 startrecvopimsgacousticmodem
-setmissionaction AVOID_OBSTACLE
-stop
-thrust -1
-wait 1
-stop
-setmissionaction MOVE_AWAY
-headingreg 253
-depthreg -1.25
-wait 10
-thrust 0.5
-wait 40
-% stop
-thrust -1
-wait 3
-stop
-wait 120
-stoprecvopimsgacousticmodem
-% stop
-thrust -0.3
-wait 1
-stop
-% stop and surface
-setmissionaction SURFACE
-stop
-depthreg 5
-wait 60
-enableautogpslocalization
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-setmissionaction CHANGE_HEADING
-stop
-headingreg 345
-depthreg -1.25
-wait 10
-% go forward move away from gate
-setmissionaction GOAWAY
-thrust 1
-wait 15
-stop
-% 90 deg turn
-setmissionaction NINETYTURN
-headingreg 75
-wait 10
-% go forward to pass on the side of the validation gate
-setmissionaction VALIDATIONGATESIDE
-thrust 1
-wait 50
-% stop
-thrust -1
-wait 3
-stop
-setmissionaction WALL_TRACKING_BALL_DETECTION
-thrust 0.5
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 -1 0 1
-wallconfig 6 2 -1 0 15 0.78 2 1 0
-startwalltracking
-balldetection 120
-setmissionaction BALL_DETECTED_OR_TIMEOUT
-stopwalltracking
-% stop
-thrust -0.3
-wait 1
-stop
-setmissionaction BALL_TRACKING
-startballtracking
-wait 45
-stopballtracking
-startrecvopimsgacousticmodem
-setmissionaction AVOID_OBSTACLE
-stop
-thrust -1
-wait 1
-stop
-headingreg 0
-depthreg -1.25
-wait 10
 setmissionaction WALL_TRACKING
+stop
+headingreg 165
+wait 10
 thrust 0.3
-wallconfig 3 2 -1 0 10 0.78 2 1 0
+wallconfig 3 2 1 0 10 0.78 2 1 0
 startwalltracking
-wait 220
+wait 120
 stopwalltracking
 stoprecvopimsgacousticmodem
 % stop
 thrust -0.3
 wait 1
+stop
+setmissionaction SONAR_CONFIG_LOCALIZATION
+stop
+seanetconfig Seanet0_loc.txt 0
+% need to wait 60 s before using the sonar...
+wait 60
+setmissionaction staticsonarlocalization
+stop
+wait 3
+staticsonarlocalization 15
+wait 3
+setmissionaction GO_PINGER_AREA
+thrust 0.7
+gotoxyt 32.5 15 150
+thrust -1
+wait 2
+stop
+setmissionaction staticsonarlocalization
+stop
+wait 3
+staticsonarlocalization 15
+wait 3
+setmissionaction CHANGE_DEPTH_HEADING
+stop
+headingreg 252
+depthreg -1.75
+wait 25
+setmissionaction BOX_SURVEY
+%thrust 0.7
+pingerconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 15000 0.01 1 0.15 0 90 0 1 0
+startpingertracking
+setmissionaction WP1
+thrust 0.7
+gotoxyt 32.5 15 90
+thrust -1
+wait 2
+stop
+setmissionaction WP2
+thrust 0.7
+gotoxyt 45 15 90
+thrust -1
+wait 2
+stop
+setmissionaction WP3
+thrust 0.7
+gotoxyt 32.5 13 90
+thrust -1
+wait 2
+stop
+setmissionaction WP4
+thrust 0.7
+gotoxyt 45 13 90
+thrust -1
+wait 2
+stop
+setmissionaction WP5
+thrust 0.7
+gotoxyt 32.5 11 90
+thrust -1
+wait 2
+stop
+setmissionaction WP6
+thrust 0.7
+gotoxyt 45 11 90
+thrust -1
+wait 2
+stop
+setmissionaction WP7
+thrust 0.7
+gotoxyt 32.5 9 90
+thrust -1
+wait 2
+stop
+setmissionaction WP8
+thrust 0.7
+gotoxyt 45 9 90
+thrust -1
+wait 2
+stop
+setmissionaction WP9
+thrust 0.7
+gotoxyt 32.5 7 90
+thrust -1
+wait 2
+stop
+setmissionaction WP10
+thrust 0.7
+gotoxyt 45 7 90
+thrust -1
+wait 2
+stop
+setmissionaction WP11
+thrust 0.7
+gotoxyt 32.5 5 90
+thrust -1
+wait 2
+stop
+setmissionaction END_BOX_SURVEY
+stoppingertracking
+% stop
+thrust -0.3
+wait 2
 stop
 % stop and surface
 setmissionaction SURFACE

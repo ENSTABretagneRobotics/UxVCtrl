@@ -24,7 +24,7 @@ wait 3
 stop
 % 90 deg turn
 setmissionaction NINETYTURN
-headingreg 253
+headingreg 252
 wait 10
 % go forward to pass through the validation gate
 setmissionaction VALIDATIONGATE

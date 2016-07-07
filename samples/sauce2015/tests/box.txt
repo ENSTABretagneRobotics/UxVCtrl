@@ -16,7 +16,7 @@ wait 1
 setmissionaction SUBMERGE
 stop
 headingreg 165
-depthreg -2.75
+depthreg -1.75
 wait 25
 setmissionaction BOX_SURVEY
 %thrust 0.7
