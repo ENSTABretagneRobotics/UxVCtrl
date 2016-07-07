@@ -1,3 +1,6 @@
+104
+Updated logpingertask.
+
 103
 Updated pinger commands.
 

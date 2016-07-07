@@ -459,6 +459,11 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
 			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
+			fprintf(logpingertaskfile, "%f;%f;%f;%f;%f;\n", 
+				GetTimeElapsedChronoQuick(&chrono), 0.0, 25.0, objDistance, 0.25*objDistance
+				);
+			fflush(logpingertaskfile);
+
 			if (bPingerDetection)
 			{
 				// Save a picture showing the detection.

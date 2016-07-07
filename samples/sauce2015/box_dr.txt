@@ -1,6 +1,3 @@
-%
-%NEED SONAR_CONFIG_LOCALIZATION!!!!!!!!!!!!!!!!!!!!!!!!!
-%
 setmissionaction INIT
 %gpssetenvcoordposition 3
 %setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
@@ -21,48 +18,60 @@ headingreg 165
 depthreg -2.75
 wait 25
 setmissionaction BOX_SURVEY
-thrust 0.7
+%thrust 0.7
 pingerconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 15000 0.01 1 0.15 0 90 0 1 0
 startpingertracking
 setmissionaction WP1
 thrust 0.7
-gotoxyt 32.5 12.5 90
+gotoxyt 35 15 90
 thrust -1
 wait 2
 stop
 setmissionaction WP2
 thrust 0.7
-gotoxyt 40 12.5 90
+gotoxyt 45 15 90
 thrust -1
 wait 2
 stop
 setmissionaction WP3
 thrust 0.7
-gotoxyt 32.5 10 90
+gotoxyt 35 12.5 90
 thrust -1
 wait 2
 stop
 setmissionaction WP4
 thrust 0.7
-gotoxyt 40 10 90
+gotoxyt 45 12.5 90
 thrust -1
 wait 2
 stop
 setmissionaction WP5
 thrust 0.7
-gotoxyt 32.5 7.5 90
+gotoxyt 35 10 90
 thrust -1
 wait 2
 stop
 setmissionaction WP6
 thrust 0.7
-gotoxyt 40 7.5 90
+gotoxyt 45 10 90
 thrust -1
 wait 2
 stop
 setmissionaction WP7
 thrust 0.7
-gotoxyt 32.5 5 90
+gotoxyt 35 7.5 90
+thrust -1
+wait 2
+stop
+setmissionaction WP8
+thrust 0.7
+gotoxyt 45 7.5 90
+thrust -1
+wait 2
+stop
+setmissionaction WP9
+thrust 0.7
+gotoxyt 35 5 90
 thrust -1
 wait 2
 stop
