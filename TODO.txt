@@ -1,3 +1,4 @@
+bug dessin des wp si bRotatingMap, dessiner en cyan les distances sonar
 
 Mosaiquing video avec les logs de 2014
 
