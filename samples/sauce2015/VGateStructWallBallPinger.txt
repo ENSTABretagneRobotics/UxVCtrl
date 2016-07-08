@@ -88,7 +88,7 @@ wait 1
 stop
 setmissionaction BALL_TRACKING
 startballtracking
-wait 30
+wait 60
 stopballtracking
 startrecvopimsgacousticmodem
 setmissionaction WALL_TRACKING
@@ -109,7 +109,25 @@ setmissionaction SONAR_CONFIG_LOCALIZATION
 stop
 seanetconfig Seanet0_loc.txt 0
 % need to wait 60 s before using the sonar...
-wait 60
+%wait 60
+wait 10
+setmissionaction MOVE_AWAY
+headingreg 252
+wait 10
+thrust 1
+wait 80
+% stop
+thrust -1
+wait 3
+stop
+headingreg 345
+wait 10
+thrust 1
+wait 6
+% stop
+thrust -1
+wait 3
+stop
 setmissionaction staticsonarlocalization
 stop
 wait 3
@@ -117,7 +135,7 @@ staticsonarlocalization 15
 wait 3
 setmissionaction GO_PINGER_AREA
 thrust 0.7
-gotoxyt 32.5 17 180
+gotoxyt 30 17 180
 thrust -1
 wait 2
 stop
@@ -137,7 +155,7 @@ pingerconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 15000 0.01 1 0.15 0 90
 startpingertracking
 setmissionaction WP1
 thrust 0.7
-gotoxyt 32.5 17 90
+gotoxyt 30 17 90
 thrust -1
 wait 2
 stop
@@ -149,7 +167,7 @@ wait 2
 stop
 setmissionaction WP3
 thrust 0.7
-gotoxyt 32.5 19 90
+gotoxyt 30 19 90
 thrust -1
 wait 2
 stop
@@ -161,7 +179,7 @@ wait 2
 stop
 setmissionaction WP5
 thrust 0.7
-gotoxyt 32.5 21 90
+gotoxyt 30 21 90
 thrust -1
 wait 2
 stop
@@ -173,7 +191,7 @@ wait 2
 stop
 setmissionaction WP7
 thrust 0.7
-gotoxyt 32.5 23 90
+gotoxyt 30 23 90
 thrust -1
 wait 2
 stop
@@ -185,7 +203,7 @@ wait 2
 stop
 setmissionaction WP9
 thrust 0.7
-gotoxyt 32.5 25 90
+gotoxyt 30 25 90
 thrust -1
 wait 2
 stop
@@ -197,7 +215,7 @@ wait 2
 stop
 setmissionaction WP11
 thrust 0.7
-gotoxyt 32.5 27 90
+gotoxyt 30 27 90
 thrust -1
 wait 2
 stop
