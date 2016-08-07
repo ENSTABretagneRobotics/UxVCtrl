@@ -154,6 +154,10 @@
 %
 %videoconfig videoid Video.txt bPause
 %
+%showcytroninfo bShowCytronInfo
+%
+% ACOUSTIC COMMANDS
+%
 %%rngacousticmodem nbretries retryperiod (send rng and wait for the result)
 %
 %%sendxyzerracousticmodem nbretries retryperiod (send xyzerr)
@@ -238,9 +242,15 @@
 %
 %showdetailedinfo bStdOutDetailedInfo
 %
-%startopencvgui videoid (int)
+%showbatteryinfo bShowBatteryInfo
 %
-%stopopencvgui videoid (int)
+%enablebatteryalarm
+%
+%disablebatteryalarm
+%
+%enableopencvgui videoid (int)
+%
+%disableopencvgui videoid (int)
 %
 %startvideorecording videoid (int)
 %

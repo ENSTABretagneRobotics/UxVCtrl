@@ -437,7 +437,7 @@ extern BOOL bOSDButtonPressedCISCREA;
 extern BOOL bStdOutDetailedInfo;
 extern BOOL bDisableBatteryAlarm;
 extern BOOL bShowBatteryInfo;
-extern BOOL bShowCytron;
+extern BOOL bShowCytronInfo;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
 extern BOOL bRearmAutopilot;

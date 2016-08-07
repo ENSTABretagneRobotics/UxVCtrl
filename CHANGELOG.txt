@@ -1,3 +1,10 @@
+105
+Corrected GUI problems when bEnableOpenCVGUIs[videoid] is 0 on Linux.
+Corrected display bug of waypoints and lines to follow if bRotatingMap.
+Attempt to correct problems with OpenCV windows in threads on Linux.
+Renamed start/stopopencvgui command to enable/disableopencvgui.
+Added showcytroninfo, showbatteryinfo, enable/disablebatteryalarm commands.
+
 104
 Updated logpingertask.
 

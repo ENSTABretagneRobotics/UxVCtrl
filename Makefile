@@ -3,7 +3,8 @@
 #    sudo apt-get install build-essential
 # in a terminal.
 # Additionally, you need to install OpenCV 2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
-# (on some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows)
+# Use dos2unix *.txt to ensure line endings are correct in the configuration files.
+# On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows.
 
 PROGS = UxVCtrl
 
@@ -21,6 +22,7 @@ CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
 #Temp...
 CFLAGS += -D DISABLE_AIS_SUPPORT
+CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 CFLAGS += -D OPENCV249
 
 CFLAGS += -I../OSUtils 

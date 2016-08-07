@@ -8,7 +8,7 @@
 % bSaveRawData
 1
 % bEnableGPGGA
-0
+1
 % bEnableGPRMC
 0
 % bEnableGPGLL
@@ -16,7 +16,7 @@
 % bEnableGPVTG
 0
 % bEnableHCHDG
-0
+1
 % bEnableIIMWV
 0
 % bEnableWIMWV
@@ -24,6 +24,6 @@
 % bEnableWIMWD
 0
 % bEnableWIMDA
-0
-% bEnableAIVDM
 1
+% bEnableAIVDM
+0

@@ -1,0 +1,99 @@
+setmissionaction INIT
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+%enableautogpslocalization
+disableautogpslocalization
+gpslocalization 1
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+setmissionaction SUBMERGE
+stop
+headingreg 165
+depthreg -1.75
+wait 25
+setmissionaction BOX_SURVEY
+%thrust 0.7
+pingerconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 15000 0.01 1 0.15 0 90 0 1 0
+startpingertracking
+setmissionaction WP1
+thrust 0.7
+gotoxyt 32.5 15 90
+thrust -1
+wait 2
+stop
+setmissionaction WP2
+thrust 0.7
+gotoxyt 45 15 90
+thrust -1
+wait 2
+stop
+setmissionaction WP3
+thrust 0.7
+gotoxyt 32.5 13 90
+thrust -1
+wait 2
+stop
+setmissionaction WP4
+thrust 0.7
+gotoxyt 45 13 90
+thrust -1
+wait 2
+stop
+setmissionaction WP5
+thrust 0.7
+gotoxyt 32.5 11 90
+thrust -1
+wait 2
+stop
+setmissionaction WP6
+thrust 0.7
+gotoxyt 45 11 90
+thrust -1
+wait 2
+stop
+setmissionaction WP7
+thrust 0.7
+gotoxyt 32.5 9 90
+thrust -1
+wait 2
+stop
+setmissionaction WP8
+thrust 0.7
+gotoxyt 45 9 90
+thrust -1
+wait 2
+stop
+setmissionaction WP9
+thrust 0.7
+gotoxyt 32.5 7 90
+thrust -1
+wait 2
+stop
+setmissionaction WP10
+thrust 0.7
+gotoxyt 45 7 90
+thrust -1
+wait 2
+stop
+setmissionaction WP11
+thrust 0.7
+gotoxyt 32.5 5 90
+thrust -1
+wait 2
+stop
+setmissionaction END_BOX_SURVEY
+stoppingertracking
+% stop
+thrust -0.3
+wait 2
+stop
+% stop and surface
+setmissionaction SURFACE
+stop
+depthreg 5
+wait 60
+enableautogpslocalization

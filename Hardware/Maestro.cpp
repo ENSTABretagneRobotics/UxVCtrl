@@ -186,7 +186,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				EnterCriticalSection(&StateVariablesCS);
 				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
-				if (bShowCytron) printf("vcytron:%.1fV (%s)\n", vcytron, (vcytron > 1.4? "auto": "manual"));
+				if (bShowCytronInfo) printf("vcytron:%.1fV (%s)\n", vcytron, (vcytron > 1.4? "auto": "manual"));
 				LeaveCriticalSection(&StateVariablesCS);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;

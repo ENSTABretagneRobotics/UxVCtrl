@@ -1,0 +1,42 @@
+setmissionaction INIT
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+disableautogpslocalization
+gpslocalization 1
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+setmissionaction SUBMERGE
+stop
+headingreg 165
+depthreg -1.25
+wait 20
+% go forward to reach middle
+setmissionaction GOMIDDLE
+thrust 1
+wait 107
+% stop
+thrust -1
+wait 3
+stop
+% 90 deg turn
+setmissionaction NINETYTURN
+headingreg 252
+wait 10
+% go forward to pass through the validation gate
+setmissionaction VALIDATIONGATE
+thrust 1
+wait 40
+% stop
+thrust -1
+wait 3
+stop
+% stop and surface
+setmissionaction SURFACE
+stop
+depthreg 5
+wait 60
+enableautogpslocalization

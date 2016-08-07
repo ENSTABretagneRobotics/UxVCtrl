@@ -1,11 +1,13 @@
-bug dessin des wp si bRotatingMap, dessiner en cyan les distances sonar
+
+Faire release uxvctrl, recompiler uxvctrl_compat, mettre logvid2imgoverlay sur github
+
+rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!), pouvoir avoir un nb de fenêtres indépendant du nb de caméras, up/down/left/rightlimit en px pour les parties de robots visibles à l'écran lors des traitements (ou mieux, definir une forme plus complexe un peu comme la map dans env)
+Add cropping for each cam to handle zed correctly, -1 is no cropping->hscale and vscale partially gives similar functionality (translation missing)
+hoffset,voffset to translate in the beginning? check what opencv functions provide
+maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
 
 Mosaiquing video avec les logs de 2014
 
-Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
-Utilisation de headingreg et depthreg pendant staticloc?
-
-pour les détections, être plus robuste en regardant plusieurs images de suite : objMinDetectionDuration...
 commande checkXXX bTrue bNbCommandsToSkip pour faire un peu comme un if et goto
 checkball 0 2
 sendmsg
@@ -17,7 +19,6 @@ sendmsg
 track
 continuewall
 
-voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 
 logs
 vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplacer avant...), omega->psidot
@@ -25,20 +26,27 @@ dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajo
 logstate était compatible avec le début de logsimu à l'origine...->rajouter dans logsimu les t;lat;lon;alt;hdg;... aussi
 avec nouveau format, lognav2KML va être simplifié
 
-déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
-surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
-
+bugs
+déconnexions intempestives maestro rpiz, compiler en debug pour comprendre, timings?
+toujours pas de snapshot pour ASV (periode des snapshots trop grande?)...
+Si le pipe est au centre de l'image mais tout en bas, le tracking marchera pas bien...
+Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
 tester mission crash vidéo sur sardine pendant longtemps, sur des missions, en appuyant sur tous les boutons...
 race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
-Pb compil linux ais et exe opencvgui (cvStartWindowThread()?, try with cv2413(->pas de gros changement) or cv310(->trop d'erreurs)...), préparer qt .pro pour débugguer, bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
+Pb compil linux ais
+pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
+GTK : now the keys are randomly received by the 2 windows...
+préparer qt .pro pour débugguer
+bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
 crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...
 why I need to press twice r to stop videorecording when it was started by a script?
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
-
-reg cap pas assez rapide à cause dérivée, tester avec vieux code...
-régulation à grande vitesse saucisse à faire un peu comme sardine
+déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
+surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
 
 sonar, localisation, wf
+dessiner en cyan les distances sonar?
+voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 commencer à prévoir dl en utilisant staticloc avec la position des pings dessinée avec le dr, pour l'instant il faudrait juste appeler dl toutes les 10s par exemple et le seul avantage par rapport à static serait de ne pas devoir arrêter le robot...
 Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé, faire un peu pareil pour la partie affichage...
 simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?
@@ -50,6 +58,7 @@ mindist, maxDist, threshold params... maintenant c'est peut-être plus sur adspan
 options pour enlever les outliers avant, après...
 repère dans lequel dessiner image sonar vs detection d'obstacles
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
+Utilisation de headingreg et depthreg pendant staticloc?
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
 données aberrantes vxyhat dans logstate?
 simu : au début convergence vers un intervalle tout petit correspondant au biais quand y a GPS, convergence vers un intervalle de vitesse tout petit...
@@ -62,10 +71,8 @@ LIDAR/sonar : mesurer vitesse si le cap change peu et les obstacles changent peu
 GUI, video
 pour mieux gérer les problèmes de EOL, au moment où on fait isdigit() ignorer les CR, LF...
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
-rename startopencvgui->enableopencvgui/show/hide...?
 faudrait pouvoir enregistrer en high res en local en option->utiliser remotewebcammultisrv et se connecter dessus...
 mieux gérer les infos affichées selon le robot et selon le mode
-info optimization if no gui : commands showbatteryvoltage, enablebatteryalarm...?
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)
 pouvoir afficher robot indépendamment de l'échelle, afficher en option l'image sonar corrigée avec la boussole et en option l'estimation de position
@@ -77,13 +84,12 @@ MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDis
 bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
 pouvoir lancer un opencvgui independamment du nombre de cameras, dynamic resolution changes?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
 utiliser bCleanup dans tous les threads pour le cvSet()?
-no opencvgui, hang after exit on linux? cvStartWindowThread()... now the keys are always received by the 2 windows, not independently...
-pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
 essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...->pas forcément souhaitable
 Mettre en var globale les périphériques?
 Pour la taille des images partagées, prendre la résolution min des webcams
 Les paramètres globaux videoimgwidth/height n'ont peut-être plus d'utilité
+détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
 
 acousticmodemlocalization
 commande comme setstateestimation/gpslocalization qui contracte la position par acoustique
@@ -110,10 +116,14 @@ peut-être qu'il vaudrait mieux regrouper les 2 positions dans le même message po
 disableallcontrols désactive aussi toute commande acoustique... (sans doute parce qu'il peut y avoir des régulations dues à une commande acoustique...)
 
 Missions
+pour les détections, être plus robuste en regardant plusieurs images de suite : objMinDetectionDuration...
+Chercher l'anomalie avec toutes les caméras et sonar avec portée réduite car elle a été bougée pour la finale?
+station : rajouter bStationControl comme bBrakeControl, voir paper_vstab_rc.pdf
 manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
 pas de setmissionaction init et end : peut-être que j'ai fait un copier coller sans eux? szAction non protégé...
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 mission par sms : option /s check missions from sms.txt or sms folder...
+Pouvoir programmer avec les touches de la télécommande
 commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
 ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
@@ -148,9 +158,11 @@ add rotation matrix multiplication to enable coordinate system change, conventio
 Razor invalid data au début parfois sous linux, jusqu'à 2048 octets invisibles invalides?
 MT, SBG specific NMEA messages...
 convert AIS to C code...
-pour la station, générer une croix autour du waypoint...
+gps éthernet, logguer cette heure, synchro heure pc avec GPS, prendre plutot gprmc?
+rajouter OSComputerI2CPort rpi
 
 Obstacle avoidance
+enable/disablegeofence coordinates/file command, in 3D
 surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 positionobstacleavoidance : faire tuto ajout step-by-step
 wallavoidance, visualobstacleavoidance : it is reactive behavior
@@ -231,10 +243,17 @@ uxvguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, af
 rmtcommand (client serait juste telnet)
 compiler UxVCtrl pour android (ne doit pas appeler opencgui, pas de timers...)
 rajouter un device qui communiquerait avec une MOOSDB
+connectionqualitychecker: programme server/client qui évalue la qualité de la connexion wifi et déclenche une alarme sonore en cas de problème
+procédure équilibrage auto en mesurant vitesse de montée : en fait il faudrait une bonne estimation de rho_water, V_robot et alpha...
+peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer en cas d'erreur, le faire quitter dès qu'il y a une erreur et avoir un autre programme qui surveille sa présence et le relance s'il est arrêté. Il faut que le programme soit ensuite capable de reprendre là où il en était
 
 
 
 OLD
+
+try with cv2413(->pas de gros changements) or cv310(->trop d'erreurs)...)
+
+Need to improve command line only mode to display cytron, gps fix... info in extra info->not really necessary, see log file
 
 temps de convergence au départ pour localisation gps et peut-être sonar quand on RAZ?->c'est sans doute normal, lié au fait qu'on sait qu'on bouge pas (si vxyhat n'est pas de largeur infinie)...
 affichage sonar déjà assez optimisé contrairement à ce que je pensais?
@@ -410,6 +429,8 @@ rajouter angle_env = M_PI/2.0-d0*M_PI/180.0; à setenvcoordposition
 gpslocalization t qui bloque jusqu'à ce qu'il ait le fix ou le timeout, en général il vaudra mieux entre sûr d'être en surface depuis longtemps pour améliorer la précision
 bGPSOK? pour simulator, le GPS fait des mesures quand z >= z_gps_lim
 distinction gpssurface, gpssubmarine, faire 2 commandes distinctes? plutôt gérer qu'un seul gps, la plupart du temps on n'en a qu'un, et on augmente l'erreur si sur bouée pour l'instant, si on rajoute le cas particulier bouée il faudra prendre en compte longueur du câble et profondeur pour que ça ait vraiment un intérêt de faire la distinction...
+
+régulation en profondeur peut-être un peu imprécise et use les propulseurs, peut-être faire une commande plus progressive -> mais risque de faire que le sous-marin se stabilise avec le propulseur qui tourne tout le temps
 
 organisation include config.h dans hardware (voir sonar...)
 

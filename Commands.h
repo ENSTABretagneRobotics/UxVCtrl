@@ -1653,6 +1653,10 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (sscanf(line, "showcytroninfo %d", &ival) == 1)
+	{
+		bShowCytronInfo = ival? TRUE: FALSE;
+	}
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS
 	else if (strncmp(line, "startrngmsgacousticmodem", strlen("startrngmsgacousticmodem")) == 0)
@@ -1913,7 +1917,19 @@ inline int Commands(char* line)
 	{
 		bStdOutDetailedInfo = ival? TRUE: FALSE;
 	}
-	else if (sscanf(line, "startopencvgui %d", &ival) == 1)
+	else if (sscanf(line, "showbatteryinfo %d", &ival) == 1)
+	{
+		bShowBatteryInfo = ival? TRUE: FALSE;
+	}
+	else if (strncmp(line, "enablebatteryalarm", strlen("enablebatteryalarm")) == 0)
+	{
+		bDisableBatteryAlarm = FALSE;
+	}
+	else if (strncmp(line, "disablebatteryalarm", strlen("disablebatteryalarm")) == 0)
+	{
+		bDisableBatteryAlarm = TRUE;
+	}
+	else if (sscanf(line, "enableopencvgui %d", &ival) == 1)
 	{
 		if ((ival >= 0)&&(ival < nbvideo))
 		{
@@ -1924,7 +1940,7 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "stopopencvgui %d", &ival) == 1)
+	else if (sscanf(line, "disableopencvgui %d", &ival) == 1)
 	{
 		if ((ival >= 0)&&(ival < nbvideo))
 		{

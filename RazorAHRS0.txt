@@ -20,8 +20,8 @@ COM5
 % pitchp2
 0.0
 % yaworientation
-0.0151
+0.0
 % yawp1
--0.7774
+0.0
 % yawp2
-1.5629
+0.0

@@ -65,34 +65,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	StartChrono(&chrono_recording);
 	StartChrono(&chrono_playing);
 
-	// Needed on Linux to get windows-related functions working properly in multiple threads?
-	EnterCriticalSection(&OpenCVCS);
-
-	// Sometimes needed on Linux, sometimes not...
+	// Sometimes needed on Linux to get windows-related functions working properly in multiple threads, sometimes not...
+	//EnterCriticalSection(&OpenCVCS);
 	//cvStartWindowThread();
-
-	//cvNamedWindow("Initializing...", CV_WINDOW_AUTOSIZE);
-	//cvMoveWindow("Initializing...", 0, 0);
-	////cvResizeWindow("Initializing...", 160, 120);
-	//EnterCriticalSection(&dispimgsCS[videoid]);
-	//cvSet(dispimgs[videoid], CV_RGB(0, 0, 0), NULL);
-	//cvShowImage("Initializing...", dispimgs[videoid]);
-	//LeaveCriticalSection(&dispimgsCS[videoid]);
-	//cvWaitKey(100);
-	//cvDestroyWindow("Initializing...");
-
-	sprintf(windowname, "UxVOpenCVGUI%d", videoid);
-	cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
-	cvMoveWindow(windowname, videoimgwidth*videoid, 0);
-	EnterCriticalSection(&dispimgsCS[videoid]);
-	cvSet(dispimgs[videoid], CV_RGB(0, 0, 0), NULL);
-	cvShowImage(windowname, dispimgs[videoid]);
-	LeaveCriticalSection(&dispimgsCS[videoid]);
-	cvWaitKey(100);
-	cvDestroyWindow(windowname);
-	memset(windowname, 0, sizeof(windowname));
-
-	LeaveCriticalSection(&OpenCVCS);
+	//LeaveCriticalSection(&OpenCVCS);
 
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0.0, 1, 8);
 	colortextid = 0;
@@ -100,7 +76,17 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	for (;;)
 	{
-		c = cvWaitKey(captureperiod);
+		if (windowname[0] != 0)	
+		{
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+			EnterCriticalSection(&OpenCVCS);
+			c = cvWaitKey(captureperiod); 
+			LeaveCriticalSection(&OpenCVCS);
+#else
+			c = cvWaitKey(captureperiod); 
+#endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+		}
+		else mSleep(captureperiod);
 
 		if (bExit) break;
 		if (bEnableOpenCVGUIs[videoid]) 
@@ -108,8 +94,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (windowname[0] == 0)
 			{
 				sprintf(windowname, "UxVOpenCVGUI%d", videoid);
+				EnterCriticalSection(&OpenCVCS);
 				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
 				cvMoveWindow(windowname, videoimgwidth*videoid, 0);
+				LeaveCriticalSection(&OpenCVCS);
 			}
 		}
 		else
@@ -129,7 +117,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					//AbortMission();
 					bDispPlayingTriangle = FALSE;
 				}
+				EnterCriticalSection(&OpenCVCS);
 				cvDestroyWindow(windowname);
+				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
+				cvDestroyWindow(windowname);
+				LeaveCriticalSection(&OpenCVCS);
 				memset(windowname, 0, sizeof(windowname));
 			}
 			mSleep(100);
@@ -631,7 +623,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '2': OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '5': OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; break;
-		case 'C': bShowCytron = !bShowCytron; break;
+		case 'C': bShowCytronInfo = !bShowCytronInfo; break;
 		case 'W': 
 			bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat; 
 			if (bDisableRollWindCorrectionSailboat) printf("Sailboat roll wind correction disabled.\n");
@@ -1029,42 +1021,74 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					for (i = 0; i < nb_circles; i++)
 					{
 						cvCircle(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 2, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
 						cvLine(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
-							cvPoint(XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							CV_RGB(0, 255, 0), 2, 8, 0);
 					}
 					// Waypoint.
 					if (bWaypointControl)
 					{
 						cvCircle(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
 						cvLine(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wyb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wyb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							cvPoint(
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
@@ -1170,9 +1194,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		LeaveCriticalSection(&dispimgsCS[videoid]);
 		LeaveCriticalSection(&StateVariablesCS);
 
+		EnterCriticalSection(&OpenCVCS);
 		EnterCriticalSection(&dispimgsCS[videoid]);
 		cvShowImage(windowname, dispimgs[videoid]);
 		LeaveCriticalSection(&dispimgsCS[videoid]);
+		LeaveCriticalSection(&OpenCVCS);
 
 		if (bExit) break;
 	}
@@ -1190,8 +1216,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		//AbortMission();
 		bDispPlayingTriangle = FALSE;
 	}
-	cvDestroyWindow(windowname);
-	memset(windowname, 0, sizeof(windowname));
+	if (windowname[0] != 0)
+	{
+		EnterCriticalSection(&OpenCVCS);
+		cvDestroyWindow(windowname);
+		cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
+		cvDestroyWindow(windowname);
+		LeaveCriticalSection(&OpenCVCS);
+		memset(windowname, 0, sizeof(windowname));
+	}
 
 	StopChronoQuick(&chrono_playing);
 	StopChronoQuick(&chrono_recording);
