@@ -60,6 +60,7 @@ inline void CallMission(char* str)
 	EnterCriticalSection(&MissionFilesCS);
 	if (!bMissionRunning)
 	{
+		memset(labels, 0, sizeof(labels));
 		missionfile = fopen(str, "r");
 		if (missionfile == NULL)
 		{
@@ -111,9 +112,131 @@ inline void AbortMission(void)
 		{
 			printf("Error closing mission file.\n");
 		}
+		memset(labels, 0, sizeof(labels));
 	}
 	LeaveCriticalSection(&MissionFilesCS);
 	DisableAllControls();
+}
+
+inline void JumpMission(int linenumber)
+{
+	EnterCriticalSection(&MissionFilesCS);
+	if (bMissionRunning)
+	{
+		if (linenumber > 0)
+		{
+			if (fsetline(missionfile, linenumber) != EXIT_SUCCESS)
+			{
+				printf("jump failed.\n");
+			}
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else
+	{
+		printf("Cannot use jump outside a mission file.\n");
+	}
+	LeaveCriticalSection(&MissionFilesCS);
+}
+
+inline void LabelMission(int id)
+{
+	EnterCriticalSection(&MissionFilesCS);
+	if (bMissionRunning)
+	{
+		if ((id >= 0)&&(id < MAX_NB_LABELS))
+		{
+			// Labels are reset every time a new mission file is opened.
+			if (labels[id] > 0) 
+			{
+				printf("Label already exists.\n"); 
+			}
+			else 
+			{
+				labels[id] = ftellline(missionfile);
+				if (labels[id] <= 0)
+				{
+					printf("File error.\n");
+				}
+			}
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else
+	{
+		printf("Cannot use label outside a mission file.\n");
+	}
+	LeaveCriticalSection(&MissionFilesCS);
+}
+
+inline void GotoMission(int id)
+{
+	int cur = 0, i = 0, ival = 0;
+	char* r = NULL;
+	char line[MAX_BUF_LEN];
+
+	EnterCriticalSection(&MissionFilesCS);
+	if (bMissionRunning)
+	{
+		if ((id >= 0)&&(id < MAX_NB_LABELS))
+		{
+			if (labels[id] > 0) 
+			{
+				// Go to the next line after the label.
+				if (fsetline(missionfile, labels[id]+1) != EXIT_SUCCESS)
+				{
+					printf("goto failed.\n");
+				}
+			}
+			else
+			{
+				// Need to search for the label.
+
+				cur = ftell(missionfile);
+				rewind(missionfile);
+
+				for (;;)
+				{
+					r = fgets(line, sizeof(line), missionfile);
+					if (r == NULL) 
+					{
+						printf("goto failed : label not found.\n");
+						clearerr(missionfile);
+						// Go back to initial position.
+						if (fseek(missionfile, cur, SEEK_SET) != EXIT_SUCCESS)
+						{
+							printf("File error.\n");
+						}
+						break;
+					}
+					i++;
+					if (sscanf(line, "label %d", &ival) == 1)
+					{
+						if ((ival >= 0)&&(ival < MAX_NB_LABELS))
+						{
+							labels[ival] = i;
+							if (ival == id) break;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else
+	{
+		printf("Cannot use goto outside a mission file.\n");
+	}
+	LeaveCriticalSection(&MissionFilesCS);
 }
 
 // See mission_spec.txt.
@@ -1984,6 +2107,18 @@ inline int Commands(char* line)
 	else if (strncmp(line, "abort", strlen("abort")) == 0)
 	{
 		AbortMission();
+	}
+	else if (sscanf(line, "jump %d", &ival) == 1)
+	{
+		JumpMission(ival);
+	}
+	else if (sscanf(line, "label %d", &ival) == 1)
+	{
+		LabelMission(ival);
+	}
+	else if (sscanf(line, "goto %d", &ival) == 1)
+	{
+		GotoMission(ival);
 	}
 	else if (strncmp(line, "exit", strlen("exit")) == 0)
 	{

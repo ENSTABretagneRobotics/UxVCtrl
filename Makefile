@@ -3,7 +3,8 @@
 #    sudo apt-get install build-essential
 # in a terminal.
 # Additionally, you need to install OpenCV 2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
-# Use dos2unix *.txt to ensure line endings are correct in the configuration files.
+# For more information on the configuration used, see www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt .
+# Use dos2unix *.txt to ensure line endings are correct for Linux in the configuration files.
 # On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows.
 
 PROGS = UxVCtrl
@@ -14,7 +15,8 @@ CXX = g++
 #CFLAGS += -g -Wall -Wextra -Winline
 CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-but-set-variable -Wno-unused-parameter
 
-#CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY -D _DEBUG_MESSAGES 
+#CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY 
+#CFLAGS += -D _DEBUG_MESSAGES 
 CFLAGS += -D ENABLE_LABJACK_SUPPORT
 CFLAGS += -D ENABLE_LIBMODBUS_SUPPORT
 CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
@@ -24,6 +26,7 @@ CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
 CFLAGS += -D DISABLE_AIS_SUPPORT
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 CFLAGS += -D OPENCV249
+#CFLAGS += -D OPENCV310
 
 CFLAGS += -I../OSUtils 
 CFLAGS += -I../Extensions/Devices/LabjackUtils/liblabjackusb
@@ -37,7 +40,8 @@ CFLAGS += -I. -I..
 
 CXXFLAGS += $(CFLAGS) -fpermissive
 
-LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_calib3d -lopencv_video -lopencv_features2d -lopencv_ml -lopencv_highgui -lopencv_objdetect -lopencv_contrib -lopencv_legacy
+LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
+#LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
 LDFLAGS += -lmodbus
 #LDFLAGS += -lusb-1.0
 LDFLAGS += -lpthread -lrt -lm

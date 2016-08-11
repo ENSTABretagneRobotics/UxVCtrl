@@ -718,6 +718,16 @@ inline int LoadEnv()
 		printf("Configuration file not found.\n");
 	}
 
+	if (nb_circles < 0)
+	{
+		printf("Invalid parameter : nb_circles.\n");
+		nb_circles = 0;
+	}
+	if (nb_walls < 0)
+	{
+		printf("Invalid parameter : nb_walls.\n");
+		nb_walls = 0;
+	}
 	if ((box_env.IsEmpty())||(box_env[1].inf >= box_env[1].sup)||(box_env[2].inf >= box_env[2].sup))
 	{
 		printf("Invalid parameter : box_env.\n");

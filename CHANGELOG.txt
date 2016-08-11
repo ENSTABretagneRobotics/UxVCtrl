@@ -1,3 +1,9 @@
+106
+Improved compatibility with OpenCV 3.1.0.
+Corrected potential memory leak in SurfaceVisualObstacle.
+Added hcenter, vcenter, hshift, vshift, nb_excluded_area_points, excluded_area_points parameters in Video configuration files.
+Added jump, label and goto commands.
+
 105
 Corrected GUI problems when bEnableOpenCVGUIs[videoid] is 0 on Linux.
 Corrected display bug of waypoints and lines to follow if bRotatingMap.

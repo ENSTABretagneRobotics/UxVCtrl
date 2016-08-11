@@ -30,7 +30,7 @@ _ Visual Studio 2008 SP1/Visual Studio 2012
 _ OpenCV 2.4.9 (OpenCV2.4.9 or download http://www.ensta-bretagne.fr/lebars/Share/OpenCV2.4.9.zip and extract in C:)
 _ MAVLink (not available for Visual Studio 2008)
 
-It is also supposed to be compatible with Linux 2.6 with equivalent prerequisites, although not fully tested.
+It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested, see Makefile.
 
 Restart the computer after installation.
 

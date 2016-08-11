@@ -351,6 +351,7 @@ BOOL bAltitudeSeaFloorControl = FALSE;
 BOOL bGPSLocalization = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
+int labels[MAX_NB_LABELS];
 
 CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];

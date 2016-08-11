@@ -41,12 +41,18 @@ struct VIDEO
 	int captureperiod;
 	int timeout;
 	BOOL bForceSoftwareResize;
+	double hcenter;
+	double vcenter;
 	double hscale;
 	double vscale;
 	double angle;
+	double hshift;
+	double vshift;
 	int bFlip;
 	int HorizontalBeam;
 	int VerticalBeam;
+	int nb_excluded_area_points;
+	CvPoint* excluded_area_points;
 };
 typedef struct VIDEO VIDEO;
 
@@ -312,6 +318,7 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 {	
 	double m[6]; // For rotation...
 	CvMat M = cvMat(2, 3, CV_64F, m); // For rotation...
+	double hcenter = 0, vcenter = 0, hshift = 0, vshift = 0;
 
 	switch (pVideo->DevType)
 	{
@@ -382,35 +389,33 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 	if (pVideo->bForceSoftwareResize) cvResize(pVideo->frame, pVideo->resizedframe, CV_INTER_LINEAR);
 	else pVideo->resizedframe = pVideo->frame;
 
-	if ((pVideo->hscale == 1)&&(pVideo->vscale == 1)&&(pVideo->angle == 0))
+	if ((pVideo->hcenter == 0)&&(pVideo->vcenter == 0)&&
+		(pVideo->hscale == 1)&&(pVideo->vscale == 1)&&(pVideo->angle == 0)&&
+		(pVideo->hshift == 0)&&(pVideo->vshift == 0))
 	{
 		if (pVideo->bFlip) cvFlip(pVideo->resizedframe, img, 1); else cvCopy(pVideo->resizedframe, img, 0);
 	}
 	else
 	{
 		// Create a map_matrix, where the left 2x2 matrix is the transform and the right 2x1 is the dimensions.
-		//double hscale = 0.5, vscale = 1.33*0.5;
+
+		hcenter = pVideo->resizedframe->width*0.5+pVideo->hcenter;
+		vcenter = pVideo->resizedframe->height*0.5+pVideo->vcenter;
+		hshift = pVideo->resizedframe->width*0.5+pVideo->hshift;
+		vshift = pVideo->resizedframe->height*0.5+pVideo->vshift;
+
 		m[0] = cos(pVideo->angle)/pVideo->hscale;
 		m[1] = sin(pVideo->angle)/pVideo->hscale;
 		m[3] = -sin(pVideo->angle)/pVideo->vscale;
 		m[4] = cos(pVideo->angle)/pVideo->vscale;
-		m[2] = (1-cos(pVideo->angle)/pVideo->hscale)*pVideo->resizedframe->width*0.5-(sin(pVideo->angle)/pVideo->hscale)*pVideo->resizedframe->height*0.5;  
-		m[5] = (sin(pVideo->angle)/pVideo->vscale)*pVideo->resizedframe->width*0.5+(1-cos(pVideo->angle)/pVideo->vscale)*pVideo->resizedframe->height*0.5;
+		m[2] = (1-cos(pVideo->angle)/pVideo->hscale)*hshift-(sin(pVideo->angle)/pVideo->hscale)*vshift+hcenter-hshift;  
+		m[5] = (sin(pVideo->angle)/pVideo->vscale)*hshift+(1-cos(pVideo->angle)/pVideo->vscale)*vshift+vcenter-vshift;
 		cvWarpAffine(pVideo->resizedframe, img, &M, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS+CV_WARP_INVERSE_MAP, cvScalarAll(0));
-
-		//double hscale = 1.33*0.5, vscale = 0.5;
-		//m[0] = hscale*cos(-angle);
-		//m[1] = hscale*sin(-angle);
-		//m[3] = vscale*-sin(-angle);
-		//m[4] = vscale*cos(-angle);
-		//m[2] = (1-hscale*cos(-angle))*resizedframe->width*0.5-hscale*sin(-angle)*resizedframe->height*0.5;  
-		//m[5] = vscale*sin(-angle)*resizedframe->width*0.5+(1-vscale*cos(-angle))*resizedframe->height*0.5;
-		////cvGetQuadrangleSubPix(resizedframe, image, &M);
-		////cv2DRotationMatrix(cvPoint2D32f(resizedframe->width*0.5,resizedframe->height*0.5), -angle*180.0/M_PI, scale, &M);
-		//cvWarpAffine(resizedframe, image, &M, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
 
 		if (pVideo->bFlip) cvFlip(img, NULL, 1);
 	}
+
+	if (pVideo->nb_excluded_area_points > 0) cvFillConvexPoly(img, pVideo->excluded_area_points, pVideo->nb_excluded_area_points, cvScalarAll(0), 8, 0);
 
 	////cvSet(pVideo->LastImg, CV_RGB(0, 0, 0), NULL);
 	//cvCopy(img, pVideo->LastImg, 0);
@@ -430,7 +435,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	char line[256];
 	double d0 = 0;
 	char* ptr = NULL;
-	int i = 0;
+	int i = 0, i0 = 0, i1 = 0;
 
 	memset(pVideo->szCfgFilePath, 0, sizeof(pVideo->szCfgFilePath));
 	sprintf(pVideo->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -449,12 +454,18 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		pVideo->captureperiod = 100;
 		pVideo->timeout = 0;
 		pVideo->bForceSoftwareResize = 1;
+		pVideo->hcenter = 0;//+videoimgwidth/2
+		pVideo->vcenter = 0;//+videoimgheight/2
 		pVideo->hscale = 1;
 		pVideo->vscale = 1;
 		pVideo->angle = 0*M_PI/180.0;
+		pVideo->hshift = 0;//+videoimgwidth/2
+		pVideo->vshift = 0;//+videoimgheight/2
 		pVideo->bFlip = 0;
 		pVideo->HorizontalBeam = 70;
 		pVideo->VerticalBeam = 50;
+		pVideo->nb_excluded_area_points = 0;
+		pVideo->excluded_area_points = NULL;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -473,6 +484,10 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->bForceSoftwareResize) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->hcenter) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->vcenter) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pVideo->hscale) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pVideo->vscale) != 1) printf("Invalid configuration file.\n");
@@ -480,11 +495,35 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
 			pVideo->angle = d0*M_PI/180.0;
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->hshift) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->vshift) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->bFlip) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->HorizontalBeam) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->VerticalBeam) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pVideo->nb_excluded_area_points) != 1) printf("Invalid configuration file.\n");
+			if (pVideo->nb_excluded_area_points > 0)
+			{
+				pVideo->excluded_area_points = (CvPoint*)calloc(pVideo->nb_excluded_area_points, sizeof(CvPoint));
+				if (!pVideo->excluded_area_points)	
+				{
+					printf("calloc() failed.\n");
+					fclose(file);
+					return EXIT_FAILURE;
+				}
+				for (i = 0; i < pVideo->nb_excluded_area_points; i++)
+				{
+					if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+					if (sscanf(line, "%d %d", &i0, &i1) != 2) printf("Invalid configuration file.\n");
+					pVideo->excluded_area_points[i] = cvPoint(i1, i0);
+				}
+			}
+
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else
@@ -527,6 +566,11 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	{
 		printf("Invalid parameter : VerticalBeam.\n");
 		pVideo->VerticalBeam = 50;
+	}
+	if (pVideo->nb_excluded_area_points < 0)
+	{
+		printf("Invalid parameter : nb_excluded_area_points.\n");
+		pVideo->nb_excluded_area_points = 0;
 	}
 
 	memset(pVideo->address, 0, sizeof(pVideo->address));
@@ -691,6 +735,10 @@ inline int DisconnectVideo(VIDEO* pVideo)
 		printf("Video disconnection : Invalid device type.\n");
 		return EXIT_FAILURE;
 	}
+
+	if (pVideo->nb_excluded_area_points > 0) free(pVideo->excluded_area_points);
+	pVideo->excluded_area_points = NULL;
+	pVideo->nb_excluded_area_points = 0;
 
 	printf("Camera disconnected or video file closed.\n");
 

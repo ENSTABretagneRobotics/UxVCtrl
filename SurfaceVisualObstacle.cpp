@@ -13,7 +13,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
-	Mat frame;
+	cv::Mat frame;
 	cv::Point2f result;
 
 	// Missing error checking...
@@ -77,7 +77,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		// Correction of bad lines on the borders of the video...
 		//		CorrectImageBordersRawBGR(data, videoimgwidth, videoimgheight, 2, 0, 0, 0);
 
-		frame = Mat(image, true);
+		frame = cv::cvarrToMat(image);
 
 		result = cv::Point2f(-1, 0);
 		try 

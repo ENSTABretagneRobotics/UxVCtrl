@@ -260,6 +260,12 @@
 %
 %abort (abort the mission)
 %
+%jump linenumber (int > 0, only used inside a mission file)
+%
+%label id (int, only used inside a mission file)
+%
+%goto id (int, only used inside a mission file)
+%
 %exit
 %
 %setmissionaction name (string representing the current action name to store in the mission log file)

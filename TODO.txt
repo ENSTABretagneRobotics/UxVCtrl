@@ -1,24 +1,12 @@
 
-Faire release uxvctrl, recompiler uxvctrl_compat, mettre logvid2imgoverlay sur github
-
-rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!), pouvoir avoir un nb de fenêtres indépendant du nb de caméras, up/down/left/rightlimit en px pour les parties de robots visibles à l'écran lors des traitements (ou mieux, definir une forme plus complexe un peu comme la map dans env)
-Add cropping for each cam to handle zed correctly, -1 is no cropping->hscale and vscale partially gives similar functionality (translation missing)
-hoffset,voffset to translate in the beginning? check what opencv functions provide
-maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
-
+mettre logvid2imgoverlay sur github, corriger bug de flip ou autre avec vue rochers sauc-e, update rotation etc. with what is in Video
 Mosaiquing video avec les logs de 2014
 
-commande checkXXX bTrue bNbCommandsToSkip pour faire un peu comme un if et goto
-checkball 0 2
-sendmsg
-track
-checkball 1 4
-balldetection
-checkball 0 2
-sendmsg
-track
-continuewall
+rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!), pouvoir avoir un nb de fenêtres indépendant du nb de caméras
+maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
 
+use %[^\n]255s like in Video in all devices?
+add parameter labelid to ballconfig : -1 does nothing when detected, otherwise goto labelid
 
 logs
 vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplacer avant...), omega->psidot
@@ -27,7 +15,7 @@ logstate était compatible avec le début de logsimu à l'origine...->rajouter dans
 avec nouveau format, lognav2KML va être simplifié
 
 bugs
-déconnexions intempestives maestro rpiz, compiler en debug pour comprendre, timings?
+Bug maestro rpiz et rpi2, déconnexions intempestives, compiler en debug pour comprendre, timings? Test with micro maestro?
 toujours pas de snapshot pour ASV (periode des snapshots trop grande?)...
 Si le pipe est au centre de l'image mais tout en bas, le tracking marchera pas bien...
 Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
@@ -251,7 +239,20 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
-try with cv2413(->pas de gros changements) or cv310(->trop d'erreurs)...)
+commande checkXXX bTrue bNbCommandsToSkip pour faire un peu comme un if et goto
+checkball 0 2
+sendmsg
+track
+checkball 1 4
+balldetection
+checkball 0 2
+sendmsg
+track
+continuewall
+
+up/down/left/rightlimit en px pour les parties de robots visibles à l'écran lors des traitements (ou mieux, definir une forme plus complexe un peu comme la map dans env)
+Add cropping for each cam to handle zed correctly, -1 is no cropping->hscale and vscale partially gives similar functionality (translation missing)
+hcenter,vcenter,hshift,vshift to translate before and after rotation? check logvid2imgoverlay
 
 Need to improve command line only mode to display cytron, gps fix... info in extra info->not really necessary, see log file
 

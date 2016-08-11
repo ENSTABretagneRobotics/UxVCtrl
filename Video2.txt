@@ -14,11 +14,19 @@
 5
 % bForceSoftwareResize
 1
+% hcenter
+0
+% vcenter
+0
 % hscale
 1
 % vscale
 1
 % rotation angle (in deg)
+0
+% hshift
+0
+% vshift
 0
 % bFlip
 0
@@ -26,3 +34,5 @@
 70
 % VerticalBeam (in ]0..360] deg)
 50
+% nb_excluded_area_points
+0

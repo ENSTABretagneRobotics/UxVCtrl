@@ -74,6 +74,8 @@
 
 #define MAX_UNCERTAINTY 10000
 
+#define MAX_NB_LABELS 256
+
 #define MAX_NB_VIDEO 3
 #define MAX_NB_NMEADEVICE 2
 #define MAX_NB_MAVLINKDEVICE 2
@@ -454,6 +456,7 @@ extern BOOL bAltitudeSeaFloorControl;
 extern BOOL bGPSLocalization;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
+extern int labels[MAX_NB_LABELS];
 
 extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
@@ -570,6 +573,7 @@ inline int InitGlobals(void)
 	StartChrono(&chrono_mission);
 	StopChronoQuick(&chrono_mission);
 	memset(szAction, 0, sizeof(szAction));
+	memset(labels, 0, sizeof(labels));
 
 	return EXIT_SUCCESS;
 }
