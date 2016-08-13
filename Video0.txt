@@ -1,5 +1,4 @@
 % camid (0..9) or a video filename or IP address and TCP port
-%127.0.0.1:4014
 %0
 test1.wmv
 %dummy_25min.wmv
@@ -37,3 +36,8 @@ test1.wmv
 50
 % nb_excluded_area_points
 0
+%3
+% excluded_area_points
+%0 240
+%320 240
+%160 120

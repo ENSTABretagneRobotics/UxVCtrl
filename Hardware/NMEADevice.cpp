@@ -16,7 +16,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	NMEADATA nmeadata;
 	double dval = 0;
 	BOOL bConnected = FALSE;
-	int deviceid = (int)pParam;
+	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];

@@ -1,27 +1,16 @@
 
-mettre logvid2imgoverlay sur github, corriger bug de flip ou autre avec vue rochers sauc-e, update rotation etc. with what is in Video
-Mosaiquing video avec les logs de 2014
-
-rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!), pouvoir avoir un nb de fenêtres indépendant du nb de caméras
-maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
-
-use %[^\n]255s like in Video in all devices?
 add parameter labelid to ballconfig : -1 does nothing when detected, otherwise goto labelid
-
-logs
-vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplacer avant...), omega->psidot
-dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
-logstate était compatible avec le début de logsimu à l'origine...->rajouter dans logsimu les t;lat;lon;alt;hdg;... aussi
-avec nouveau format, lognav2KML va être simplifié
+add a visual studio config for Linux, utiliser dernière version linux headers?
+maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
 
 bugs
 Bug maestro rpiz et rpi2, déconnexions intempestives, compiler en debug pour comprendre, timings? Test with micro maestro?
 toujours pas de snapshot pour ASV (periode des snapshots trop grande?)...
 Si le pipe est au centre de l'image mais tout en bas, le tracking marchera pas bien...
+Pour les commandes sans paramètres, si des caractères erronés sont après la commande mais avant le retour à la ligne, ça marche quand même, est-ce qu'il faut retourner erreur?
 Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
 tester mission crash vidéo sur sardine pendant longtemps, sur des missions, en appuyant sur tous les boutons...
 race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
-Pb compil linux ais
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 GTK : now the keys are randomly received by the 2 windows...
 préparer qt .pro pour débugguer
@@ -32,8 +21,13 @@ bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
 
+logs
+vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplacer avant...), omega->psidot
+dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
+logstate était compatible avec le début de logsimu à l'origine...->rajouter dans logsimu les t;lat;lon;alt;hdg;... aussi
+avec nouveau format, lognav2KML va être simplifié
+
 sonar, localisation, wf
-dessiner en cyan les distances sonar?
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 commencer à prévoir dl en utilisant staticloc avec la position des pings dessinée avec le dr, pour l'instant il faudrait juste appeler dl toutes les 10s par exemple et le seul avantage par rapport à static serait de ne pas devoir arrêter le robot...
 Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé, faire un peu pareil pour la partie affichage...
@@ -57,7 +51,7 @@ flux acoustique sur un mur pas tout à fait droit...
 LIDAR/sonar : mesurer vitesse si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
 
 GUI, video
-pour mieux gérer les problèmes de EOL, au moment où on fait isdigit() ignorer les CR, LF...
+rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!), pouvoir avoir un nb de fenêtres indépendant du nb de caméras
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
 faudrait pouvoir enregistrer en high res en local en option->utiliser remotewebcammultisrv et se connecter dessus...
 mieux gérer les infos affichées selon le robot et selon le mode
@@ -104,6 +98,8 @@ peut-être qu'il vaudrait mieux regrouper les 2 positions dans le même message po
 disableallcontrols désactive aussi toute commande acoustique... (sans doute parce qu'il peut y avoir des régulations dues à une commande acoustique...)
 
 Missions
+mettre logvid2imgoverlay sur github, corriger bug de flip ou autre avec vue rochers sauc-e, update rotation etc. with what is in Video
+Mosaiquing video avec les logs de 2014
 pour les détections, être plus robuste en regardant plusieurs images de suite : objMinDetectionDuration...
 Chercher l'anomalie avec toutes les caméras et sonar avec portée réduite car elle a été bougée pour la finale?
 station : rajouter bStationControl comme bBrakeControl, voir paper_vstab_rc.pdf
@@ -238,6 +234,12 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+dessiner en cyan les distances sonar?->pas très visible si caméra activée...
+
+Pb compil linux ais
+
+pour mieux gérer les problèmes de EOL, au moment où on fait isdigit() ignorer les CR, LF...->use %[^\r\n]255s like in Video in all devices?->only good when we expect to get spaces in the string...
 
 commande checkXXX bTrue bNbCommandsToSkip pour faire un peu comme un if et goto
 checkball 0 2

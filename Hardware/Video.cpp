@@ -15,7 +15,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	VIDEO video;
 	IplImage* img = NULL;
 	BOOL bConnected = FALSE;
-	int videoid = (int)pParam;
+	int videoid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 
 	sprintf(szCfgFilePath, "Video%d.txt", videoid);

@@ -37,3 +37,8 @@ test2.wmv
 50
 % nb_excluded_area_points
 0
+%3
+% excluded_area_points
+%0 240
+%320 240
+%160 120

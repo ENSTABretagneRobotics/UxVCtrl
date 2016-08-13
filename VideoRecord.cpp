@@ -11,7 +11,7 @@
 
 TIMERCALLBACK_RETURN_VALUE VideoRecordCallbackFunction(void* pParam, BOOLEAN b)
 {
-	int videoid = (int)pParam;
+	int videoid = (intptr_t)pParam;
 
 	UNREFERENCED_PARAMETER(b);
 
@@ -25,7 +25,7 @@ TIMERCALLBACK_RETURN_VALUE VideoRecordCallbackFunction(void* pParam, BOOLEAN b)
 
 THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 {
-	int videoid = (int)pParam;
+	int videoid = (intptr_t)pParam;
 	TIMER timer;
 	BOOL bVideoRecording = FALSE;
 
@@ -53,7 +53,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				}
 				else
 				{
-					if (CreateTimer(&timer, VideoRecordCallbackFunction, (void*)videoid, captureperiod, captureperiod) != EXIT_SUCCESS)
+					if (CreateTimer(&timer, VideoRecordCallbackFunction, (void*)(intptr_t)videoid, captureperiod, captureperiod) != EXIT_SUCCESS)
 					{
 						printf("Error creating a timer.\n");
 						cvReleaseVideoWriter(&videorecordfiles[videoid]);

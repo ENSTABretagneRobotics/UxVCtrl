@@ -13,14 +13,14 @@
 #include "OSMisc.h"
 
 #ifdef _MSC_VER
-// Disable some Visual Studio warnings that happen sometimes in libmodbus.
+// Disable some Visual Studio warnings.
 #pragma warning(disable : 4005) 
 #endif // _MSC_VER
 
 #include <modbus/modbus.h>
 
 #ifdef _MSC_VER
-// Restore the Visual Studio warnings previously disabled for libmodbus.
+// Restore the Visual Studio warnings previously disabled.
 #pragma warning(default : 4005) 
 #endif // _MSC_VER
 

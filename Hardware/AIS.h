@@ -1,3 +1,12 @@
+// Prevent Visual Studio Intellisense from defining _WIN32 and _MSC_VER when we use 
+// Visual Studio to edit Linux or Borland C++ code.
+#ifdef __linux__
+#	undef _WIN32
+#endif // __linux__
+#if defined(__GNUC__) || defined(__BORLANDC__)
+#	undef _MSC_VER
+#endif // defined(__GNUC__) || defined(__BORLANDC__)
+
 #ifndef AIS_H
 #define AIS_H
 
@@ -19,7 +28,26 @@
 //#include <iostream>
 //#include <iomanip>
 
+#ifndef __GNUC__
 #include <bitset>
+#else
+// min and max need to be undefined for this header to work...
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#include <bitset>
+#if !defined(NOMINMAX) || defined(FORCE_MINMAX_DEFINITION)
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // min
+#endif // !defined(NOMINMAX) || defined(FORCE_MINMAX_DEFINITION)
+#endif // __GNUC__
 
 //using namespace std;
 

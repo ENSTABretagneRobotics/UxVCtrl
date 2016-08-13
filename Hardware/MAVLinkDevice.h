@@ -21,10 +21,12 @@
 // Disable some Visual Studio warnings.
 #pragma warning(disable : 4201) 
 #pragma warning(disable : 4244) 
+#pragma warning(disable : 4459) 
 #endif // _MSC_VER
 #include "mavlink/common/mavlink.h"
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4459) 
 #pragma warning(default : 4244) 
 #pragma warning(default : 4201) 
 #endif // _MSC_VER

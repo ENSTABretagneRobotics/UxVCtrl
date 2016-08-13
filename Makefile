@@ -12,18 +12,17 @@ PROGS = UxVCtrl
 CC = gcc
 CXX = g++
 
-#CFLAGS += -g -Wall -Wextra -Winline
-CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-but-set-variable -Wno-unused-parameter
+#CFLAGS += -g -Wall -Wno-unknown-pragmas -Wextra -Winline
+CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-parameter
 
 #CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY 
 #CFLAGS += -D _DEBUG_MESSAGES 
 CFLAGS += -D ENABLE_LABJACK_SUPPORT
 CFLAGS += -D ENABLE_LIBMODBUS_SUPPORT
+CFLAGS += -D ENABLE_MAVLINK_SUPPORT
 CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
 CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD 
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
-#Temp...
-CFLAGS += -D DISABLE_AIS_SUPPORT
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 CFLAGS += -D OPENCV249
 #CFLAGS += -D OPENCV310
@@ -161,7 +160,13 @@ CISCREA.o: ./Hardware/CISCREA.cpp ./Hardware/CISCREA.h
 Hokuyo.o: ./Hardware/Hokuyo.cpp ./Hardware/Hokuyo.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+IM483I.o: ./Hardware/IM483I.cpp ./Hardware/IM483I.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 Maestro.o: ./Hardware/Maestro.cpp ./Hardware/Maestro.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+MAVLinkDevice.o: ./Hardware/MAVLinkDevice.cpp ./Hardware/MAVLinkDevice.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 MDM.o: ./Hardware/MDM.cpp ./Hardware/MDM.h
@@ -186,9 +191,6 @@ RazorAHRS.o: ./Hardware/RazorAHRS.cpp ./Hardware/RazorAHRS.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 RS232Port.o: ./Hardware/RS232Port.cpp ./Hardware/RS232Port.h
-	$(CXX) $(CXXFLAGS) -c $<
-
-IM483I.o: ./Hardware/IM483I.cpp ./Hardware/IM483I.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
@@ -262,7 +264,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o IM483I.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o Maestro.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

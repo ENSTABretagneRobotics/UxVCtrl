@@ -1,3 +1,8 @@
+107
+Inverted coordinates for excluded_area_points in Video.
+Improved different line endings support.
+Improved compatibility with Visual Studio 2015 and gcc 5.2.1.
+
 106
 Improved compatibility with OpenCV 3.1.0.
 Corrected potential memory leak in SurfaceVisualObstacle.

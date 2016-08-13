@@ -18,7 +18,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	double dval = 0;
 	CHRONO chrono_GPSOK;
 	BOOL bConnected = FALSE;
-	int deviceid = (int)pParam;
+	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];

@@ -1375,7 +1375,22 @@ inline int Commands(char* line)
 #pragma endregion
 #pragma region DEVICE COMMANDS
 	else bContinueElseIf = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+#ifdef __GNUC__
+// Disable some GCC warnings.
+#pragma GCC diagnostic ignored "-Wparentheses"
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic push
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // __GNUC__
 	if (bContinueElseIf) if (sscanf(line, "cicreaconfig %255s %d", str, &ival1) == 2)
+#ifdef __GNUC__
+// Restore the GCC warnings previously disabled.
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic pop
+#else
+#pragma GCC diagnostic warning "-Wparentheses"
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // __GNUC__
 	{
 		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")) != 0)
 		{
@@ -2100,7 +2115,7 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "call %[^\n]255s", str) == 1)
+	else if (sscanf(line, "call %[^\r\n]255s", str) == 1)
 	{
 		CallMission(str);
 	}
@@ -2124,7 +2139,7 @@ inline int Commands(char* line)
 	{
 		bExit = TRUE;
 	}
-	else if (sscanf(line, "setmissionaction %[^\n]255s", str) == 1)
+	else if (sscanf(line, "setmissionaction %[^\r\n]255s", str) == 1)
 	{
 		strcpy(szAction, str);
 	}
@@ -2144,20 +2159,20 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "system %[^\n]255s", str) == 1)
+	else if (sscanf(line, "system %[^\r\n]255s", str) == 1)
 	{
-		system(str);
+		ival = system(str);
 	}
 #ifdef _WIN32
-	else if (sscanf(line, "playsoundasync %[^\n]255s", str) == 1)
+	else if (sscanf(line, "playsoundasync %[^\r\n]255s", str) == 1)
 	{
 		PlaySound(str, NULL, SND_ASYNC);
 	}
-	else if (sscanf(line, "playsound %[^\n]255s", str) == 1)
+	else if (sscanf(line, "playsound %[^\r\n]255s", str) == 1)
 	{
 		PlaySound(str, NULL, 0);
 	}
-	else if (sscanf(line, "loopsound %[^\n]255s", str) == 1)
+	else if (sscanf(line, "loopsound %[^\r\n]255s", str) == 1)
 	{
 		PlaySound(str, NULL, SND_ASYNC|SND_LOOP);
 	}

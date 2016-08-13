@@ -109,8 +109,8 @@ int main(int argc, char* argv[])
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...
 	for (i = 0; i < nbvideo; i++)
 	{
-		CreateDefaultThread(VideoThread, (void*)i, &VideoThreadId[i]);
-		CreateDefaultThread(VideoRecordThread, (void*)i, &VideoRecordThreadId[i]);
+		CreateDefaultThread(VideoThread, (void*)(intptr_t)i, &VideoThreadId[i]);
+		CreateDefaultThread(VideoRecordThread, (void*)(intptr_t)i, &VideoRecordThreadId[i]);
 	}
 
 	CreateDefaultThread(SeanetProcessingThread, NULL, &SeanetProcessingThreadId);
@@ -131,12 +131,12 @@ int main(int argc, char* argv[])
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
 	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
 	{
-		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)i, &NMEADeviceThreadId[i]);
+		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)(intptr_t)i, &NMEADeviceThreadId[i]);
 	}
 #ifdef ENABLE_MAVLINK_SUPPORT
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
-		if (!bDisableMAVLinkDevice[i]) CreateDefaultThread(MAVLinkDeviceThread, (void*)i, &MAVLinkDeviceThreadId[i]);
+		if (!bDisableMAVLinkDevice[i]) CreateDefaultThread(MAVLinkDeviceThread, (void*)(intptr_t)i, &MAVLinkDeviceThreadId[i]);
 	}
 #endif // ENABLE_MAVLINK_SUPPORT
 	if (!bDisableSwarmonDevice) CreateDefaultThread(SwarmonDeviceThread, NULL, &SwarmonDeviceThreadId);
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 	if (bCommandPrompt) CreateDefaultThread(CommandsThread, NULL, &CommandsThreadId);
 	for (i = 0; i < nbvideo; i++)
 	{
-		CreateDefaultThread(OpenCVGUIThread, (void*)i, &OpenCVGUIThreadId[i]);
+		CreateDefaultThread(OpenCVGUIThread, (void*)(intptr_t)i, &OpenCVGUIThreadId[i]);
 	}
 
 	// Launch a mission file if specified as argument.
