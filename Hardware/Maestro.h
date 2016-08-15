@@ -195,6 +195,7 @@ inline int SetPWMMaestro(MAESTRO* pMaestro, int channel, int pw)
 	return EXIT_SUCCESS;
 }
 
+// If digital output, bit = (pw >= 1500)? 1 : 0;.
 // pw in us.
 inline int SetAllPWMsMaestro(MAESTRO* pMaestro, int* selectedchannels, int* pws)
 {
@@ -398,6 +399,29 @@ inline int SetFluxMaestro(MAESTRO* pMaestro, double urf, double ulf)
 
 	selectedchannels[pMaestro->rightfluxchan] = 1;
 	selectedchannels[pMaestro->leftfluxchan] = 1;
+
+	return SetAllPWMsMaestro(pMaestro, selectedchannels, pws);
+}
+
+inline int SetRudderThrusterMaestro(MAESTRO* pMaestro, double angle, double urt)
+{
+	int selectedchannels[NB_CHANNELS_PWM_MAESTRO];
+	int pws[NB_CHANNELS_PWM_MAESTRO];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert angle (in rad) into Maestro pulse width (in us).
+	pws[pMaestro->rudderchan] = DEFAULT_MID_PW_MAESTRO+(int)(angle*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)
+		/(pMaestro->MaxAngle-pMaestro->MinAngle));
+	// Convert u (in [-1;1]) into Maestro pulse width (in us).
+	pws[pMaestro->rightthrusterchan] = DEFAULT_MID_PW_MAESTRO+(int)(urt*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)/2.0);
+
+	pws[pMaestro->rudderchan] = max(min(pws[pMaestro->rudderchan], DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+	pws[pMaestro->rightthrusterchan] = max(min(pws[pMaestro->rightthrusterchan], DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+
+	selectedchannels[pMaestro->rudderchan] = 1;
+	selectedchannels[pMaestro->rightthrusterchan] = 1;
 
 	return SetAllPWMsMaestro(pMaestro, selectedchannels, pws);
 }

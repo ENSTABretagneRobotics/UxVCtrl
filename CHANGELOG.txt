@@ -1,3 +1,8 @@
+109
+Added SetRudderThrusterMaestro() to optimize for Sailboat.
+Added USE_MOTORBOAT_WITH_FLUX option for Motorboat.
+Improved period regularity of Maestro thread.
+
 108
 Compacted SurfaceVisualObstacle code to reduce compilation time.
 Added ENABLE_BUILD_OPTIMIZATION_SAILBOAT option to reduce compilation time for Sailboat with Raspberry Pi Zero.

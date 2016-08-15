@@ -324,6 +324,29 @@ inline int SetFluxMiniSSC(MINISSC* pMiniSSC, double urf, double ulf)
 	return SetAllPWMsMiniSSC(pMiniSSC, selectedchannels, pws);
 }
 
+inline int SetRudderThrusterMiniSSC(MINISSC* pMiniSSC, double angle, double urt)
+{
+	int selectedchannels[NB_CHANNELS_PWM_MINISSC];
+	int pws[NB_CHANNELS_PWM_MINISSC];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert angle (in rad) into MiniSSC pulse width (in us).
+	pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angle*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
+		/(pMiniSSC->MaxAngle-pMiniSSC->MinAngle));
+	// Convert u (in [-1;1]) into MiniSSC pulse width (in us).
+	pws[pMiniSSC->rightthrusterchan] = DEFAULT_MID_PW_MINISSC+(int)(urt*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)/2.0);
+
+	pws[pMiniSSC->rudderchan] = max(min(pws[pMiniSSC->rudderchan], DEFAULT_MAX_PW_MINISSC), DEFAULT_MIN_PW_MINISSC);
+	pws[pMiniSSC->rightthrusterchan] = max(min(pws[pMiniSSC->rightthrusterchan], DEFAULT_MAX_PW_MINISSC), DEFAULT_MIN_PW_MINISSC);
+
+	selectedchannels[pMiniSSC->rudderchan] = 1;
+	selectedchannels[pMiniSSC->rightthrusterchan] = 1;
+
+	return SetAllPWMsMiniSSC(pMiniSSC, selectedchannels, pws);
+}
+
 inline int SetRudderThrustersFluxMiniSSC(MINISSC* pMiniSSC, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_MINISSC];

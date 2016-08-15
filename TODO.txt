@@ -1,7 +1,9 @@
+Maestro thread maybe too fast, check timings of other threads also...
 Code maestro est-il compatible avec la micro avec analog in? Rajouter dans le fichier de config les analog in
-Renommer vcytron si c'est plus cytron?
 maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
+Renommer vcytron si c'est plus cytron?
 add parameter labelid to ballconfig : -1 does nothing when detected, otherwise goto labelid
+Env_viana
 add a visual studio config for Linux, utiliser dernière version linux headers?
 
 bugs
@@ -144,8 +146,9 @@ add rotation matrix multiplication to enable coordinate system change, conventio
 Razor invalid data au début parfois sous linux, jusqu'à 2048 octets invisibles invalides?
 MT, SBG specific NMEA messages...
 convert AIS to C code...
-gps éthernet, logguer cette heure, synchro heure pc avec GPS, prendre plutot gprmc?
 rajouter OSComputerI2CPort rpi
+auto magnetic calbration algo in plane and space, see Matlab code in ptrbrtz, add magnetic declination in AHRS config files (or use yaworientation parameter)?
+gps éthernet, logguer cette heure, synchro heure pc avec GPS, prendre plutot gprmc?
 
 Obstacle avoidance
 enable/disablegeofence coordinates/file command, in 3D

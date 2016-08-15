@@ -120,7 +120,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersFluxMaestro(&maestro, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
 				{
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
@@ -152,6 +152,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
 					LeaveCriticalSection(&StateVariablesCS);
 				}
+				else mSleep(20);
 				if (counter%counter_modulo == 0)
 				{
 					if (GetValueMaestro(&maestro, battery1chan, &ivalue) != EXIT_SUCCESS)
@@ -169,7 +170,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < vbattery1_alarm)) printf("BAT1 ALARM\n");
 					LeaveCriticalSection(&StateVariablesCS);
 				}
-				if (counter%counter_modulo == 5)
+				else if (counter%counter_modulo == 5)
 				{
 					if (GetValueMaestro(&maestro, cytronchan, &ivalue) != EXIT_SUCCESS)
 					{
@@ -184,6 +185,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					vcytron = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
 					LeaveCriticalSection(&StateVariablesCS);
 				}
+				else mSleep(20);
 				EnterCriticalSection(&StateVariablesCS);
 				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
 				if (bShowCytronInfo) printf("vcytron:%.1fV (%s)\n", vcytron, (vcytron > 1.4? "auto": "manual"));
@@ -207,6 +209,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				mSleep(50);
 				break;
 			case MOTORBOAT_ROBID:
+#ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
@@ -230,6 +233,27 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					break;
 				}
 				mSleep(50);
+#else
+				UNREFERENCED_PARAMETER(flux);
+				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
+				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				thrust = u;
+				if (!bEnableBackwardsMotorboat)
+				{
+					if (u < 0) thrust = 0;
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					mSleep(50);
+					break;
+				}
+				mSleep(50);
+#endif // USE_MOTORBOAT_WITH_FLUX
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:

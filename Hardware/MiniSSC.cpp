@@ -111,7 +111,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersFluxMiniSSC(&minissc, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				if (SetRudderThrusterMiniSSC(&minissc, rudder, thrust) != EXIT_SUCCESS)
 				{
 					printf("Connection to a MiniSSC lost.\n");
 					bConnected = FALSE;
@@ -133,6 +133,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 				}
 				break;
 			case MOTORBOAT_ROBID:
+#ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = minissc.MinAngle; ruddermaxangle = minissc.MaxAngle;
 				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
@@ -154,6 +155,25 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 					DisconnectMiniSSC(&minissc);
 					break;
 				}		
+#else
+				UNREFERENCED_PARAMETER(flux);
+				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = minissc.MinAngle; ruddermaxangle = minissc.MaxAngle;
+				rudder = ((minissc.MaxAngle+minissc.MinAngle)/2.0)-uw*((minissc.MaxAngle-minissc.MinAngle)/2.0);
+				thrust = u;
+				if (!bEnableBackwardsMotorboat)
+				{
+					if (u < 0) thrust = 0;
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrusterMiniSSC(&minissc, rudder, thrust) != EXIT_SUCCESS)
+				{
+					printf("Connection to a MiniSSC lost.\n");
+					bConnected = FALSE;
+					DisconnectMiniSSC(&minissc);
+					break;
+				}		
+#endif // USE_MOTORBOAT_WITH_FLUX
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:

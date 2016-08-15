@@ -111,7 +111,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersFluxSSC32(&ssc32, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				if (SetRudderThrusterSSC32(&ssc32, rudder, thrust) != EXIT_SUCCESS)
 				{
 					printf("Connection to a SSC32 lost.\n");
 					bConnected = FALSE;
@@ -133,6 +133,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}
 				break;
 			case MOTORBOAT_ROBID:
+#ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
@@ -154,6 +155,25 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					DisconnectSSC32(&ssc32);
 					break;
 				}		
+#else
+				UNREFERENCED_PARAMETER(flux);
+				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
+				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
+				thrust = u;
+				if (!bEnableBackwardsMotorboat)
+				{
+					if (u < 0) thrust = 0;
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrusterSSC32(&ssc32, rudder, thrust) != EXIT_SUCCESS)
+				{
+					printf("Connection to a SSC32 lost.\n");
+					bConnected = FALSE;
+					DisconnectSSC32(&ssc32);
+					break;
+				}		
+#endif // USE_MOTORBOAT_WITH_FLUX
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:

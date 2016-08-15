@@ -432,6 +432,29 @@ inline int SetFluxSSC32(SSC32* pSSC32, double urf, double ulf)
 	return SetAllPWMsSSC32(pSSC32, selectedchannels, pws);
 }
 
+inline int SetRudderThrusterSSC32(SSC32* pSSC32, double angle, double urt)
+{
+	int selectedchannels[NB_CHANNELS_PWM_SSC32];
+	int pws[NB_CHANNELS_PWM_SSC32];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert angle (in rad) into SSC32 pulse width (in us).
+	pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angle*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)
+		/(pSSC32->MaxAngle-pSSC32->MinAngle));
+	// Convert u (in [-1;1]) into SSC32 pulse width (in us).
+	pws[pSSC32->rightthrusterchan] = DEFAULT_MID_PW_SSC32+(int)(urt*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)/2.0);
+
+	pws[pSSC32->rudderchan] = max(min(pws[pSSC32->rudderchan], DEFAULT_MAX_PW_SSC32), DEFAULT_MIN_PW_SSC32);
+	pws[pSSC32->rightthrusterchan] = max(min(pws[pSSC32->rightthrusterchan], DEFAULT_MAX_PW_SSC32), DEFAULT_MIN_PW_SSC32);
+
+	selectedchannels[pSSC32->rudderchan] = 1;
+	selectedchannels[pSSC32->rightthrusterchan] = 1;
+
+	return SetAllPWMsSSC32(pSSC32, selectedchannels, pws);
+}
+
 inline int SetRudderThrustersFluxSSC32(SSC32* pSSC32, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_SSC32];
