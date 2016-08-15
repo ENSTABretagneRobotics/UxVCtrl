@@ -95,17 +95,51 @@ COM6
 4
 % leftfluxchan
 3
-% analoginputchan (disabled if -1)
+% winddiranaloginputchan (disabled if -1)
 11
+% winddiranaloginputvalueoffset
+0.0
+% winddiranaloginputvaluethreshold
+0.0
+% winddiranaloginputvaluecoef
+1.0
+% windspeedanaloginputchan (disabled if -1)
+-1
+% windspeedanaloginputvalueoffset
+0.0
+% windspeedanaloginputvaluethreshold
+0.0
+% windspeedanaloginputvaluecoef
+1.0
+% bat1analoginputchan (disabled if -1)
+7
+% bat1analoginputvalueoffset
+0.0
+% bat1analoginputvaluethreshold
+12.8
+% bat1analoginputvaluecoef
+10.10101
+% bat2analoginputchan (disabled if -1)
+-1
+% bat2analoginputvalueoffset
+0.0
+% bat2analoginputvaluethreshold
+0.0
+% bat2analoginputvaluecoef
+1.0
+% switchanaloginputchan (disabled if -1)
+9
+% switchanaloginputvalueoffset
+0.0
+% switchanaloginputvaluethreshold
+1.4
+% switchanaloginputvaluecoef
+1.0
 % MinAngle (in rad)
 -0.6
 % MidAngle (in rad)
 0
 % MaxAngle (in rad)
 0.6
-% analoginputvalueoffset
-0.0
-% analoginputvaluecoef
-1.0
 % bEnableSetMultipleTargets
 0

@@ -80,7 +80,9 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			if (bVideoRecording) 
 			{
 				DeleteTimer(&timer, FALSE);
+				mSleep(captureperiod);
 				cvReleaseVideoWriter(&videorecordfiles[videoid]);
+				mSleep(captureperiod);
 				bVideoRecording = FALSE;
 			}
 		}
@@ -91,7 +93,9 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 	if (bVideoRecording) 
 	{
 		DeleteTimer(&timer, FALSE);
+		mSleep(captureperiod);
 		cvReleaseVideoWriter(&videorecordfiles[videoid]);
+		mSleep(captureperiod);
 		bVideoRecording = FALSE;
 	}
 

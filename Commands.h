@@ -1791,9 +1791,9 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "showcytroninfo %d", &ival) == 1)
+	else if (sscanf(line, "showswitchinfo %d", &ival) == 1)
 	{
-		bShowCytronInfo = ival? TRUE: FALSE;
+		bShowSwitchInfo = ival? TRUE: FALSE;
 	}
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS

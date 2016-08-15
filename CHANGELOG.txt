@@ -1,3 +1,9 @@
+110
+Attempt to solve random corrupted video recording on Raspberry Pi Zero.
+Added X key corresponding to disableopencvgui.
+Renamed showcytroninfo to showswitchinfo.
+Updated Maestro configuration file to support several analog inputs.
+
 109
 Added SetRudderThrusterMaestro() to optimize for Sailboat.
 Added USE_MOTORBOAT_WITH_FLUX option for Motorboat.

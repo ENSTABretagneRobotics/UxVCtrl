@@ -154,7 +154,7 @@
 %
 %videoconfig videoid Video.txt bPause
 %
-%showcytroninfo bShowCytronInfo
+%showswitchinfo bShowSwitchInfo
 %
 % ACOUSTIC COMMANDS
 %

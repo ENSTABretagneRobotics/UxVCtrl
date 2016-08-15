@@ -56,7 +56,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);theta (in rad);psi (in rad);" 
 			"latitude (in decimal degrees);longitude (in decimal degrees);x (in m);y (in m);ax (in m);ay (in m);bx (in m);by (in m);CurWP;" 
 			"wpslat[CurWP] (in decimal degrees);wpslong[CurWP] (in decimal degrees);e (in m);norm_ma (in m);norm_bm (in m);state;" 
-			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbattery1 (in V);vcytron (in V);\n"
+			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbattery1 (in V);vswitch (in V);\n"
 			); 
 		fflush(lognavfile);
 	}
@@ -401,7 +401,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(thetahat), Center(psitwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
-				-uw*ruddermaxangle, u*q1, wtheta, vbattery1, vcytron);
+				-uw*ruddermaxangle, u*q1, wtheta, vbattery1, vswitch);
 			fflush(lognavfile);
 		}
 #pragma endregion

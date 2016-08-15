@@ -17,9 +17,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double thrust1 = 0, thrust2 = 0;
 	int ivalue = 0;
 	double winddir = 0;
-	int battery1chan = 7, cytronchan = 9;
-	double vbattery1_alarm = 12.8, vbattery1_coef = 10.10101, vbattery1_filter_coef = 0.9;
-	double vbattery1_filtered = vbattery1_alarm; // analoginputvaluethreshold...
+	double vbattery1_filter_coef = 0;
+	double vbattery1_filtered = 0;
 	int counter = 0, counter_modulo = 11;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -71,7 +70,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				mSleep(50);
 				bConnected = TRUE; 
 
-				vbattery1_filtered = vbattery1_alarm;
+				vbattery1_filter_coef = 0.9;
+				vbattery1_filtered = maestro.bat1analoginputvaluethreshold;
 
 				if (maestro.pfSaveFile != NULL)
 				{
@@ -129,9 +129,9 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					break;
 				}
 				mSleep(10);
-				if (maestro.analoginputchan != -1) // Special value to indicate to disable the wind sensor...
+				if (maestro.winddiranaloginputchan != -1) // Special value to indicate to disable the wind sensor...
 				{
-					if (GetValueMaestro(&maestro, maestro.analoginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValueMaestro(&maestro, maestro.winddiranaloginputchan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
@@ -141,7 +141,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					winddir = fmod_360(ivalue*maestro.analoginputvaluecoef+maestro.analoginputvalueoffset+180.0)+180.0;
+					winddir = fmod_360(ivalue*maestro.winddiranaloginputvaluecoef+maestro.winddiranaloginputvalueoffset+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
@@ -155,7 +155,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				else mSleep(20);
 				if (counter%counter_modulo == 0)
 				{
-					if (GetValueMaestro(&maestro, battery1chan, &ivalue) != EXIT_SUCCESS)
+					if (GetValueMaestro(&maestro, maestro.bat1analoginputchan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
@@ -165,14 +165,14 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vbattery1 = vbattery1_coef*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					vbattery1 = maestro.bat1analoginputvaluecoef*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
 					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
-					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < vbattery1_alarm)) printf("BAT1 ALARM\n");
+					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < maestro.bat1analoginputvaluethreshold)) printf("BAT1 ALARM\n");
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if (counter%counter_modulo == 5)
 				{
-					if (GetValueMaestro(&maestro, cytronchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValueMaestro(&maestro, maestro.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
@@ -182,13 +182,15 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vcytron = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
+					vswitchcoef = maestro.switchanaloginputvaluecoef;
+					vswitchthreshold = maestro.switchanaloginputvaluethreshold;
+					vswitch = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
 				EnterCriticalSection(&StateVariablesCS);
 				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
-				if (bShowCytronInfo) printf("vcytron:%.1fV (%s)\n", vcytron, (vcytron > 1.4? "auto": "manual"));
+				if (bShowSwitchInfo) printf("vswitch:%.1fV (%s)\n", vswitch, (vswitch*vswitchcoef > vswitchthreshold? "auto": "manual"));
 				LeaveCriticalSection(&StateVariablesCS);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;

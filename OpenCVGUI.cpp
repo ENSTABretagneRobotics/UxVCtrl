@@ -604,12 +604,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'h':
 			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
-				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),"
+				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),X(disableopencvgui),"
 				"+-(coordspace zoom),T(text color)"
 				"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
 				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 				"bn(light),uj(tilt),46825(CISCREA OSD),"
-				"C(Cytron),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n");
+				"C(Switch),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n");
 			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
@@ -623,7 +623,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '2': OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; break;
 		case '5': OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; break;
-		case 'C': bShowCytronInfo = !bShowCytronInfo; break;
+		case 'C': bShowSwitchInfo = !bShowSwitchInfo; break;
 		case 'W': 
 			bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat; 
 			if (bDisableRollWindCorrectionSailboat) printf("Sailboat roll wind correction disabled.\n");
@@ -647,6 +647,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case '9': 
 			bRearmAutopilot = TRUE; 
 			printf("Rearm.\n");
+			break;
+		case 'X': 
+			bEnableOpenCVGUIs[videoid] = FALSE;
 			break;
 		case 27: // ESC
 			bExit = TRUE;
@@ -692,7 +695,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "%d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
 				break;
 			case VAIMOS_ROBID:
-			case SAILBOAT_ROBID_MASK:
+			case SAILBOAT_ROBID:
 				switch (state)
 				{
 				case DIRECT_TRAJECTORY: s = 'D'; break;
@@ -700,7 +703,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case PORT_TACK_TRAJECTORY: s = 'P'; break;
 				default: s = 'I'; break;
 				}
-				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vcytron > 1.4? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1); 
+				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1); 
 				break;
 			default:
 				sprintf(szText, "%d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
