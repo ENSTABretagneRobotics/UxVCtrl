@@ -1,3 +1,8 @@
+108
+Compacted SurfaceVisualObstacle code to reduce compilation time.
+Added ENABLE_BUILD_OPTIMIZATION_SAILBOAT option to reduce compilation time for Sailboat with Raspberry Pi Zero.
+Added USE_ALTERNATE_RECORDING option in case of codecs problems.
+
 107
 Inverted coordinates for excluded_area_points in Video.
 Improved different line endings support.

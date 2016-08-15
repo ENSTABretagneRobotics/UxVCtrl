@@ -39,11 +39,21 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 			if (!bVideoRecording) 
 			{
+#ifdef USE_ALTERNATE_RECORDING
+				EnterCriticalSection(&strtimeCS);
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
+				LeaveCriticalSection(&strtimeCS);
+				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
+					CV_FOURCC('M','J','P','G'), 
+					//CV_FOURCC('D','I','V','X'), 
+					//CV_FOURCC('I', 'Y', 'U', 'V'), 
+#else
 				EnterCriticalSection(&strtimeCS);
 				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.wmv", videoid, strtime_fns());
 				LeaveCriticalSection(&strtimeCS);
 				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
 					CV_FOURCC('W','M','V','2'), 
+#endif // USE_ALTERNATE_RECORDING
 					1000.0/(double)captureperiod, 
 					cvSize(videoimgwidth,videoimgheight), 
 					1);

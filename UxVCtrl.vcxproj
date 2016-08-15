@@ -53,7 +53,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV249;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -75,7 +75,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV249;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -141,10 +141,6 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.cpp" />
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.cpp" />
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.cpp" />
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.cpp" />
     <ClCompile Include="..\interval\box.cpp" />
     <ClCompile Include="..\interval\iboolean.cpp" />
     <ClCompile Include="..\interval\imatrix.cpp" />
@@ -212,10 +208,6 @@
     <ClInclude Include="..\Extensions\Img\CvUtils.h" />
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.h" />
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.h" />
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.h" />
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.h" />
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.h" />
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.h" />
     <ClInclude Include="..\interval\box.h" />
     <ClInclude Include="..\interval\iboolean.h" />
     <ClInclude Include="..\interval\imatrix.h" />

@@ -28,9 +28,6 @@
     <Filter Include="Extensions\UE9Utils">
       <UniqueIdentifier>{fe1216c7-7ecc-4ccb-87d6-8af1b89f0479}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Extensions\SurfaceVisualObstacle">
-      <UniqueIdentifier>{f5709885-0671-4ba3-9b98-58ff8331bb52}</UniqueIdentifier>
-    </Filter>
     <Filter Include="interval">
       <UniqueIdentifier>{ec4b31cd-f896-4029-b398-c7bf5f7438c1}</UniqueIdentifier>
     </Filter>
@@ -140,18 +137,6 @@
     </ClCompile>
     <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.c">
       <Filter>Extensions\UE9Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.cpp">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.cpp">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.cpp">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.cpp">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
     </ClCompile>
     <ClCompile Include="..\interval\box.cpp">
       <Filter>interval</Filter>
@@ -343,18 +328,6 @@
     </ClInclude>
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.h">
       <Filter>Extensions\UE9Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.h">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.h">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.h">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.h">
-      <Filter>Extensions\SurfaceVisualObstacle</Filter>
     </ClInclude>
     <ClInclude Include="..\interval\box.h">
       <Filter>interval</Filter>

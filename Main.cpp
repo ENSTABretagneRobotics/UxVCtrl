@@ -9,10 +9,13 @@
 
 #include "Video.h"
 #include "VideoRecord.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "SeanetProcessing.h"
 #include "Wall.h"
 #include "Pipeline.h"
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "Ball.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
 #include "Pinger.h"
@@ -23,9 +26,13 @@
 #include "Seanet.h"
 #include "Hokuyo.h"
 #include "P33x.h"
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRS.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "MT.h"
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "NMEADevice.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "MAVLinkDevice.h"
 #endif // ENABLE_MAVLINK_SUPPORT
@@ -34,12 +41,15 @@
 #include "UE9A.h"
 #endif // ENABLE_LABJACK_SUPPORT
 #include "SSC32.h"
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "Maestro.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "MiniSSC.h"
 #include "IM483I.h"
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 #include "CISCREA.h"
 #endif // ENABLE_LIBMODBUS_SUPPORT
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "Observer.h"
 #include "Controller.h"
 #include "OpenCVGUI.h"
@@ -51,10 +61,13 @@ int main(int argc, char* argv[])
 	BOOL bGUIAvailable = FALSE;
 	THREAD_IDENTIFIER VideoThreadId[MAX_NB_VIDEO];
 	THREAD_IDENTIFIER VideoRecordThreadId[MAX_NB_VIDEO];
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER SeanetProcessingThreadId;
 	THREAD_IDENTIFIER WallThreadId;
 	THREAD_IDENTIFIER PipelineThreadId;
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER BallThreadId;
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
@@ -65,9 +78,13 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER SeanetThreadId;
 	THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER RazorAHRSThreadId;
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MTThreadId;
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER NMEADeviceThreadId[MAX_NB_NMEADEVICE];
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER MAVLinkDeviceThreadId[MAX_NB_MAVLINKDEVICE];
 #endif // ENABLE_MAVLINK_SUPPORT
@@ -76,12 +93,15 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER UE9AThreadId;
 #endif // ENABLE_LABJACK_SUPPORT
 	THREAD_IDENTIFIER SSC32ThreadId;
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MaestroThreadId;
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MiniSSCThreadId;
 	THREAD_IDENTIFIER IM483IThreadId;
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	THREAD_IDENTIFIER CISCREAThreadId;
 #endif // ENABLE_LIBMODBUS_SUPPORT
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER ObserverThreadId;
 	THREAD_IDENTIFIER ControllerThreadId;
 	THREAD_IDENTIFIER MissionThreadId;
@@ -113,10 +133,13 @@ int main(int argc, char* argv[])
 		CreateDefaultThread(VideoRecordThread, (void*)(intptr_t)i, &VideoRecordThreadId[i]);
 	}
 
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(SeanetProcessingThread, NULL, &SeanetProcessingThreadId);
 	CreateDefaultThread(WallThread, NULL, &WallThreadId);
 	CreateDefaultThread(PipelineThread, NULL, &PipelineThreadId);
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(BallThread, NULL, &BallThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
@@ -127,12 +150,16 @@ int main(int argc, char* argv[])
 	if (!bDisableSeanet) CreateDefaultThread(SeanetThread, NULL, &SeanetThreadId);
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
 	{
 		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)(intptr_t)i, &NMEADeviceThreadId[i]);
 	}
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
@@ -144,12 +171,15 @@ int main(int argc, char* argv[])
 	if (!bDisableUE9A) CreateDefaultThread(UE9AThread, NULL, &UE9AThreadId);
 #endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSSC32) CreateDefaultThread(SSC32Thread, NULL, &SSC32ThreadId);
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMaestro) CreateDefaultThread(MaestroThread, NULL, &MaestroThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMiniSSC) CreateDefaultThread(MiniSSCThread, NULL, &MiniSSCThreadId);
 	if (!bDisableIM483I) CreateDefaultThread(IM483IThread, NULL, &IM483IThreadId);
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
 
@@ -221,12 +251,15 @@ int main(int argc, char* argv[])
 	// Stop sensors, actuators, algorithms thread loops...
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) WaitForThread(CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
 	if (!bDisableIM483I) WaitForThread(IM483IThreadId);
 	if (!bDisableMiniSSC) WaitForThread(MiniSSCThreadId);
+#endif // ENABLE_LIBMODBUS_SUPPORT
 	if (!bDisableMaestro) WaitForThread(MaestroThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableSSC32) WaitForThread(SSC32ThreadId);
 #ifdef ENABLE_LABJACK_SUPPORT
 	if (!bDisableUE9A) WaitForThread(UE9AThreadId);
@@ -238,12 +271,16 @@ int main(int argc, char* argv[])
 		if (!bDisableMAVLinkDevice[i]) WaitForThread(MAVLinkDeviceThreadId[i]);
 	}
 #endif // ENABLE_MAVLINK_SUPPORT
+#endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)
 	{
 		if (!bDisableNMEADevice[i]) WaitForThread(NMEADeviceThreadId[i]);
 	}
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMT) WaitForThread(MTThreadId);
+#endif // ENABLE_LIBMODBUS_SUPPORT
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);
 	if (!bDisableSeanet) WaitForThread(SeanetThreadId);
@@ -254,10 +291,13 @@ int main(int argc, char* argv[])
 	WaitForThread(PingerThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 	WaitForThread(VisualObstacleThreadId);
+#endif // ENABLE_LIBMODBUS_SUPPORT
 	WaitForThread(BallThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	WaitForThread(PipelineThreadId);
 	WaitForThread(WallThreadId);
 	WaitForThread(SeanetProcessingThreadId);
+#endif // ENABLE_LIBMODBUS_SUPPORT
 
 	for (i = nbvideo-1; i >= 0; i--)
 	{

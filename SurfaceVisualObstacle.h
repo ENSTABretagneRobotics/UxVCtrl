@@ -11,7 +11,6 @@
 #define SURFACEVISUALOBSTACLE_H
 
 #include "Config.h"
-#include "mainDetectionObstacle.h"
 
 THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam);
 

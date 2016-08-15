@@ -5,6 +5,7 @@
 # Additionally, you need to install OpenCV 2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
 # For more information on the configuration used, see www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt .
 # Use dos2unix *.txt to ensure line endings are correct for Linux in the configuration files.
+# In case of codecs problems, try with USE_ALTERNATE_RECORDING...
 # On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows.
 
 PROGS = UxVCtrl
@@ -24,6 +25,8 @@ CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
 CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD 
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+#CFLAGS += -D USE_ALTERNATE_RECORDING
+#CFLAGS += -D ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 CFLAGS += -D OPENCV249
 #CFLAGS += -D OPENCV310
 
@@ -32,7 +35,6 @@ CFLAGS += -I../Extensions/Devices/LabjackUtils/liblabjackusb
 CFLAGS += -I../Extensions/Devices/LabjackUtils/U3Utils
 CFLAGS += -I../Extensions/Devices/LabjackUtils/UE9Utils
 CFLAGS += -I../Extensions/Img
-CFLAGS += -I../Extensions/Misc/SurfaceVisualObstacle
 CFLAGS += -I../interval -I../matrix_lib 
 CFLAGS += -I./Hardware 
 CFLAGS += -I. -I..
@@ -121,18 +123,6 @@ CvDraw.o: ../Extensions/Img/CvDraw.c ../Extensions/Img/CvDraw.h CvCore.o
 	$(CXX) $(CXXFLAGS) -c $<
 
 CvDisp.o: ../Extensions/Img/CvDisp.c ../Extensions/Img/CvDisp.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
-
-ToolsObs.o: ../Extensions/Misc/SurfaceVisualObstacle/ToolsObs.cpp ../Extensions/Misc/SurfaceVisualObstacle/ToolsObs.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
-
-Horizon.o: ../Extensions/Misc/SurfaceVisualObstacle/Horizon.cpp ../Extensions/Misc/SurfaceVisualObstacle/Horizon.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
-
-Obstacle.o: ../Extensions/Misc/SurfaceVisualObstacle/Obstacle.cpp ../Extensions/Misc/SurfaceVisualObstacle/Obstacle.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
-
-mainDetectionObstacle.o: ../Extensions/Misc/SurfaceVisualObstacle/mainDetectionObstacle.cpp ../Extensions/Misc/SurfaceVisualObstacle/mainDetectionObstacle.h Obstacle.o Horizon.o ToolsObs.o
 	$(CXX) $(CXXFLAGS) -c $<
 
 ############################# interval #############################
@@ -264,7 +254,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o mainDetectionObstacle.o Obstacle.o Horizon.o ToolsObs.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

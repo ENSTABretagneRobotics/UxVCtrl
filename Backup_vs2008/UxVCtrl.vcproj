@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
+				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV249;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc\SurfaceVisualObstacle;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
+				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;OPENCV249;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -219,11 +219,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Pipeline.cpp"
+				RelativePath=".\Pinger.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Pinger.cpp"
+				RelativePath=".\Pipeline.cpp"
 				>
 			</File>
 			<File
@@ -293,11 +293,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Pipeline.h"
+				RelativePath=".\Pinger.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Pinger.h"
+				RelativePath=".\Pipeline.h"
 				>
 			</File>
 			<File
@@ -347,6 +347,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IM483I0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Maestro0.txt"
 				>
 			</File>
@@ -392,10 +396,6 @@
 			</File>
 			<File
 				RelativePath=".\RazorAHRS0.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\IM483I0.txt"
 				>
 			</File>
 			<File
@@ -638,42 +638,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="SurfaceVisualObstacle"
-				>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\Horizon.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\mainDetectionObstacle.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\Obstacle.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Extensions\Misc\SurfaceVisualObstacle\ToolsObs.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="interval"
@@ -851,6 +815,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hardware\IM483I.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\IM483I.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hardware\Maestro.cpp"
 				>
 			</File>
@@ -960,14 +932,6 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\RS232Port.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Hardware\IM483I.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Hardware\IM483I.h"
 				>
 			</File>
 			<File

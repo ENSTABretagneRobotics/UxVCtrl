@@ -1,10 +1,12 @@
-
+Code maestro est-il compatible avec la micro avec analog in? Rajouter dans le fichier de config les analog in
+Renommer vcytron si c'est plus cytron?
+maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
 add parameter labelid to ballconfig : -1 does nothing when detected, otherwise goto labelid
 add a visual studio config for Linux, utiliser dernière version linux headers?
-maestro : analoginputchan0,1,2,3,4, analoginputvalueoffset, analoginputvaluethreshold, analoginputvaluecoef
 
 bugs
-Bug maestro rpiz et rpi2, déconnexions intempestives, compiler en debug pour comprendre, timings? Test with micro maestro?
+Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4…
+Invalid minangle, midangle or maxangle sometimes on rpi2?
 toujours pas de snapshot pour ASV (periode des snapshots trop grande?)...
 Si le pipe est au centre de l'image mais tout en bas, le tracking marchera pas bien...
 Pour les commandes sans paramètres, si des caractères erronés sont après la commande mais avant le retour à la ligne, ça marche quand même, est-ce qu'il faut retourner erreur?
@@ -234,6 +236,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Bug maestro rpiz et rpi2, déconnexions intempestives, compiler en debug pour comprendre, timings? Test with micro maestro?->changer hub usb, certains types semblent provoquer une incompatibilité...
 
 dessiner en cyan les distances sonar?->pas très visible si caméra activée...
 
