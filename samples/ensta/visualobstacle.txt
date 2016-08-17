@@ -2,7 +2,7 @@ setmissionaction visualobstacle
 %setstateestimation 0 2 0 2 0 10000 0 10000 0 0.1 0 0.1
 %wait 2
 thrust 0.5
-visualobstacleconfig 220 255 220 255 220 255 0.125 0 0 0
+visualobstacleconfig 220 255 220 255 220 255 0.125 0 0 -1 0
 startvisualobstacleavoidance
 wait 600
 stopvisualobstacleavoidance

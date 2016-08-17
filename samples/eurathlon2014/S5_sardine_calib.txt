@@ -82,7 +82,7 @@ setmissionaction SONAR_CONFIG_LOCALIZATION
 stop
 seanetconfig Seanet0_loc.txt
 wait 60
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 2 0 220 0.05 0
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 2 0 220 0.05 -1 0
 startballtracking
 setmissionaction staticsonarlocalization
 stop
@@ -200,8 +200,8 @@ depthreg -1.25
 wait 20
 setmissionaction WALL_TRACKING_BALL_DETECTION
 thrust 0.3
-ballconfig 0 0 0 0 0 0 20 220 95 240 75 210 0.03 0.07 0 1.0 0 0 -1 0 220 0.05 1
-wallconfig 6 2 -1 0 15 0.78 2 1
+ballconfig 0 0 0 0 0 0 20 220 95 240 75 210 0.03 0.07 0 1.0 0 0 -1 0 220 0.05 -1 1
+wallconfig 6 2 -1 0 15 0.78 2 1 -1
 startwalltracking
 balldetection 150 0
 setmissionaction BALL_DETECTED_OR_TIMEOUT
@@ -221,7 +221,7 @@ depthreg -1.25
 wait 20
 setmissionaction WALL_TRACKING
 thrust 0.3
-wallconfig 3 2 -1 0 10 0.78 2 1
+wallconfig 3 2 -1 0 10 0.78 2 1 -1
 startwalltracking
 wait 210
 stopwalltracking

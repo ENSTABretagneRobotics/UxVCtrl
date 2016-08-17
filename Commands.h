@@ -247,7 +247,7 @@ inline int Commands(char* line)
 		dval6 = 0, dval7 = 0, dval8 = 0, dval9 = 0, dval10 = 0, dval11 = 0, dval12 = 0; 
 	int ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0, ival6 = 0, 
 		ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
-		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0;
+		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0;
 	char cval = 0;
 	char str[MAX_BUF_LEN];
 	char str2[MAX_BUF_LEN];
@@ -264,12 +264,12 @@ inline int Commands(char* line)
 	// e.g. stop vs stopwalltracking (when strncmp() is used).
 
 #pragma region MISSIONS
-	if (sscanf(line, "wallconfig %lf %lf %lf %lf %lf %lf %lf %d %d", 
-		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &ival1, &ival2) == 9)
+	if (sscanf(line, "wallconfig %lf %lf %lf %lf %lf %lf %lf %d %d %d", 
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &ival1, &ival2, &ival3) == 10)
 	{
 		EnterCriticalSection(&WallCS);
 		d0_wall = dval1; beta_wall = dval2; delta_wall = dval3; dmin_wall = dval4; dmax_wall = dval5; 
-		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2;
+		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2; labelid_wall = ival3; 
 		LeaveCriticalSection(&WallCS);
 	}
 	else if (sscanf(line, "walldetection %lf", &delay) == 1)
@@ -338,25 +338,25 @@ inline int Commands(char* line)
 		"%d %d %d %d %d %d "
 		"%lf %lf %lf %lf "
 		"%lf %lf "
-		"%d "
+		"%d %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, &dval4, 
 		&dval5, &dval6, 
-		&ival13, 
-		&ival14
-		) == 20)
+		&ival13, &ival14, 
+		&ival15
+		) == 21)
 	{
 		EnterCriticalSection(&PipelineCS);
 		rmin_pipeline = ival1; rmax_pipeline = ival2; gmin_pipeline = ival3; gmax_pipeline = ival4; bmin_pipeline = ival5; bmax_pipeline = ival6; 
 		hmin_pipeline = ival7; hmax_pipeline = ival8; smin_pipeline = ival9; smax_pipeline = ival10; lmin_pipeline = ival11; lmax_pipeline = ival12; 
 		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; objMinDetectionDuration_pipeline = dval3; d0_pipeline = dval4; 
 		kh_pipeline = dval5; kv_pipeline = dval6; 
-		bBrake_pipeline = ival13; 
-		if ((ival14 >= 0)&&(ival14 < nbvideo))
+		bBrake_pipeline = ival13; labelid_pipeline = ival14; 
+		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
-			videoid_pipeline = ival14;
+			videoid_pipeline = ival15;
 		}
 		else
 		{
@@ -418,16 +418,16 @@ inline int Commands(char* line)
 		"%lf %lf %lf %lf "
 		"%lf %lf "
 		"%d %lf %d "
-		"%d %d %d "
+		"%d %d %d %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, &dval4, 
 		&dval5, &dval6, 
 		&ival13, &dval7, &ival14, 
-		&ival15, &ival16, &ival17, 
-		&ival18
-		) == 25)
+		&ival15, &ival16, &ival17, &ival18, 
+		&ival19
+		) == 26)
 	{
 		EnterCriticalSection(&BallCS);
 		rmin_ball = ival1; rmax_ball = ival2; gmin_ball = ival3; gmax_ball = ival4; bmin_ball = ival5; bmax_ball = ival6; 
@@ -435,10 +435,10 @@ inline int Commands(char* line)
 		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionDuration_ball = dval3; d0_ball = dval4; 
 		kh_ball = dval5; kv_ball = dval6; 
 		lightMin_ball = ival13; lightPixRatio_ball = dval7; bAcoustic_ball = ival14;
-		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; 
-		if ((ival18 >= 0)&&(ival18 < nbvideo))
+		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; labelid_ball = ival18; 
+		if ((ival19 >= 0)&&(ival19 < nbvideo))
 		{
-			videoid_ball = ival18;
+			videoid_ball = ival19;
 		}
 		else
 		{
@@ -499,16 +499,16 @@ inline int Commands(char* line)
 		}
 		LeaveCriticalSection(&BallCS);
 	}
-	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %lf %d %d", 
-		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6, &dval1, &dval2, &ival7, &ival8) == 10)
+	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %lf %d %d %d", 
+		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6, &dval1, &dval2, &ival7, &ival8, &ival9) == 11)
 	{
 		EnterCriticalSection(&VisualObstacleCS);
 		rmin_visualobstacle = ival1; rmax_visualobstacle = ival2; gmin_visualobstacle = ival3; gmax_visualobstacle = ival4; bmin_visualobstacle = ival5; bmax_visualobstacle = ival6; 
 		obsPixRatio_visualobstacle = dval1; obsMinDetectionDuration_visualobstacle = dval2; 
-		bBrake_visualobstacle = ival7;
-		if ((ival8 >= 0)&&(ival8 < nbvideo))
+		bBrake_visualobstacle = ival7; labelid_visualobstacle = ival8; 
+		if ((ival9 >= 0)&&(ival9 < nbvideo))
 		{
-			videoid_visualobstacle = ival8;
+			videoid_visualobstacle = ival9;
 		}
 		else
 		{
@@ -561,17 +561,17 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&VisualObstacleCS);
 	}
-	else if (sscanf(line, "surfacevisualobstacleconfig %c %d %lf %d %d", 
-		&cval, &ival1, &dval, &ival2, &ival3) == 5)
+	else if (sscanf(line, "surfacevisualobstacleconfig %c %d %lf %d %d %d", 
+		&cval, &ival1, &dval, &ival2, &ival3, &ival4) == 6)
 	{
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		weather_surfacevisualobstacle = cval;
 		boatsize_surfacevisualobstacle = ival1; 
 		obsMinDetectionDuration_surfacevisualobstacle = dval; 
-		bBrake_surfacevisualobstacle = ival2;
-		if ((ival3 >= 0)&&(ival3 < nbvideo))
+		bBrake_surfacevisualobstacle = ival2;  labelid_surfacevisualobstacle = ival3;
+		if ((ival4 >= 0)&&(ival4 < nbvideo))
 		{
-			videoid_surfacevisualobstacle = ival3;
+			videoid_surfacevisualobstacle = ival4;
 		}
 		else
 		{
@@ -630,16 +630,16 @@ inline int Commands(char* line)
 		"%lf %lf %lf "
 		"%lf %lf %lf %lf %lf %lf "
 		"%d "
-		"%d "
+		"%d %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, 
 		&dval4, &dval5, &dval6, &dval7, &dval8, &dval9, 
 		&ival13, 
-		&ival14, 
-		&ival15
-		) == 24)
+		&ival14, &ival15, 
+		&ival16
+		) == 25)
 	{
 		EnterCriticalSection(&PingerCS);
 		rmin_pinger = ival1; rmax_pinger = ival2; gmin_pinger = ival3; gmax_pinger = ival4; bmin_pinger = ival5; bmax_pinger = ival6; 
@@ -647,10 +647,10 @@ inline int Commands(char* line)
 		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionDuration_pinger = dval3; 
 		pulsefreq_pinger = dval4; pulselen_pinger = dval5; pulsepersec_pinger = dval6; hyddist_pinger = dval7; hydorient_pinger = dval8; preferreddir_pinger = dval9; 
 		bUseFile_pinger = ival13; 
-		bBrakeSurfaceEnd_pinger = ival14; 
-		if ((ival15 >= 0)&&(ival15 < nbvideo))
+		bBrakeSurfaceEnd_pinger = ival14; labelid_pinger = ival15; 
+		if ((ival16 >= 0)&&(ival16 < nbvideo))
 		{
-			videoid_pinger = ival15;
+			videoid_pinger = ival16;
 		}
 		else
 		{
@@ -711,25 +711,25 @@ inline int Commands(char* line)
 		"%d %d %d %d %d %d "
 		"%lf %lf %lf %lf "
 		"%lf %lf "
-		"%d "
+		"%d %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, &dval4, 
 		&dval5, &dval6, 
-		&ival13, 
-		&ival14
-		) == 20)
+		&ival13, &ival14, 
+		&ival15
+		) == 21)
 	{
 		EnterCriticalSection(&MissingWorkerCS);
 		rmin_missingworker = ival1; rmax_missingworker = ival2; gmin_missingworker = ival3; gmax_missingworker = ival4; bmin_missingworker = ival5; bmax_missingworker = ival6; 
 		hmin_missingworker = ival7; hmax_missingworker = ival8; smin_missingworker = ival9; smax_missingworker = ival10; lmin_missingworker = ival11; lmax_missingworker = ival12; 
 		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; objMinDetectionDuration_missingworker = dval3; d0_missingworker = dval4; 
 		kh_missingworker = dval5; kv_missingworker = dval6; 
-		bBrake_missingworker = ival13; 
-		if ((ival14 >= 0)&&(ival14 < nbvideo))
+		bBrake_missingworker = ival13; labelid_missingworker = ival14; 
+		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
-			videoid_missingworker = ival14;
+			videoid_missingworker = ival15;
 		}
 		else
 		{

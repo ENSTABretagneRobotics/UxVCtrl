@@ -3,10 +3,10 @@ setmissionaction swarm_wall_ball
 %wait 2
 thrust 0.3
 %thrust 0.6
-%wallconfig 3 2 -1 0 10 0.78 2 1 0
-wallconfig 1 2 -1 0 3 0.78 1 1 0
+%wallconfig 3 2 -1 0 10 0.78 2 1 0 -1
+wallconfig 1 2 -1 0 3 0.78 1 1 0 -1
 startwalltracking
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 1
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 -1 1
 balldetection 600
 setmissionaction BALL_DETECTED_OR_TIMEOUT
 stopwalltracking
@@ -23,7 +23,7 @@ startrecvopimsgacousticmodem
 setmissionaction WALL_TRACKING
 thrust 0.3
 %thrust 0.6
-wallconfig 1 2 -1 0 3 0.78 1 1 0
+wallconfig 1 2 -1 0 3 0.78 1 1 0 -1
 startwalltracking
 wait 180
 stopwalltracking

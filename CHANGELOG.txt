@@ -1,3 +1,6 @@
+111
+Added labelid parameter to all missionconfig (with partial implementation for ball).
+
 110
 Attempt to solve random corrupted video recording on Raspberry Pi Zero.
 Added X key corresponding to disableopencvgui.

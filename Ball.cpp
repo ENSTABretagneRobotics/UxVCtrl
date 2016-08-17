@@ -652,6 +652,24 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					}
 				}
 			}
+
+			if (labelid_ball != -1)
+			{
+				if (bBallTrackingControl)
+				{
+					// stopballtracking to avoid multiple goto...
+					bBallTrackingControl = FALSE;
+					bDistanceControl = FALSE;
+					//if (bBrake_ball) bBrakeControl = FALSE;
+					bHeadingControl = FALSE;
+					if (bDepth_ball) 
+					{
+						bDepthControl = FALSE;
+						bAltitudeSeaFloorControl = FALSE;
+					}
+				}
+				GotoMission(labelid_ball);
+			}
 #pragma endregion
 		}
 

@@ -17,7 +17,7 @@ wait 10
 % go forward to reach middle
 setmissionaction GOMIDDLE
 thrust 1
-pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0 0
+pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0 -1 0
 pipelinedetection 115
 % stop
 thrust -1

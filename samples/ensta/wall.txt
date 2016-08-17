@@ -3,9 +3,9 @@ setmissionaction wall
 %wait 2
 thrust 0.3
 %thrust 0.6
-%wallconfig 3 2 0 0 10 0.78 2 0 0
-%wallconfig 3 2 -1 0 10 0.78 2 1 0
-wallconfig 1 2 -1 0 3 0.78 1 1 0
+%wallconfig 3 2 0 0 10 0.78 2 0 0 -1
+%wallconfig 3 2 -1 0 10 0.78 2 1 0 -1
+wallconfig 1 2 -1 0 3 0.78 1 1 0 -1
 %walldetection 30
 %startwallavoidance
 startwalltracking

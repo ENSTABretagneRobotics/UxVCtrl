@@ -10,7 +10,7 @@
 #ifndef BALL_H
 #define BALL_H
 
-#include "Config.h"
+#include "Commands.h"
 
 THREAD_PROC_RETURN_VALUE BallThread(void* pParam);
 

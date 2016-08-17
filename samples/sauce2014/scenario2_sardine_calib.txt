@@ -1,6 +1,6 @@
 setmissionaction INIT
 stop
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 -1 0 220 0.05 1
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 -1 0 220 0.05 -1 1
 setmissionaction SUBMERGE
 stop
 headingreg 345
@@ -8,8 +8,8 @@ depthreg -1.25
 wait 20
 setmissionaction WALL_TRACKING_BALL_DETECTION
 thrust 0.3
-%wallconfig 3 2 -1 0 10 0.78 2 1
-wallconfig 6 2 -1 0 10 0.78 2 1
+%wallconfig 3 2 -1 0 10 0.78 2 1 -1
+wallconfig 6 2 -1 0 10 0.78 2 1 -1
 startwalltracking
 balldetection 120 0
 setmissionaction BALL_DETECTED_OR_TIMEOUT
@@ -29,8 +29,8 @@ depthreg -1.25
 wait 20
 setmissionaction WALL_TRACKING
 thrust 0.3
-%wallconfig 3 2 -1 0 10 0.78 2 1
-wallconfig 3 2 -1 0 10 0.78 2 1
+%wallconfig 3 2 -1 0 10 0.78 2 1 -1
+wallconfig 3 2 -1 0 10 0.78 2 1 -1
 startwalltracking
 wait 230
 stopwalltracking

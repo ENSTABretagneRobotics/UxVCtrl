@@ -19,15 +19,15 @@ depthreg -1.75
 wait 20
 setmissionaction WALL_TRACKING
 thrust 0.3
-wallconfig 3 2 1 0 10 0.78 2 1 0
+wallconfig 3 2 1 0 10 0.78 2 1 0 -1
 startwalltracking
 wait 70
 stopwalltracking
 setmissionaction WALL_TRACKING_BALL_DETECTION
 stop
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 -1 0 1
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 -1 0 -1 1
 thrust 0.3
-wallconfig 3 2 1 0 10 0.78 2 1 0
+wallconfig 3 2 1 0 10 0.78 2 1 0 -1
 startwalltracking
 wait 5
 balldetection 240
@@ -47,7 +47,7 @@ stop
 headingreg 165
 wait 10
 thrust 0.3
-wallconfig 3 2 1 0 10 0.78 2 1 0
+wallconfig 3 2 1 0 10 0.78 2 1 0 -1
 startwalltracking
 wait 120
 stopwalltracking

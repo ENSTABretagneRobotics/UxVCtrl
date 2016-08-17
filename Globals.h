@@ -257,6 +257,7 @@ extern IplImage* WallOverlayImg;
 extern double d0_wall, beta_wall, delta_wall, dmin_wall, dmax_wall, gamma_infinite_wall, r_wall;
 extern int bLat_wall;
 extern int bBrake_wall;
+extern int labelid_wall;
 extern double u_wall;
 
 // Pipeline variables.
@@ -270,6 +271,7 @@ extern int hmin_pipeline, hmax_pipeline, smin_pipeline, smax_pipeline, lmin_pipe
 extern double objMinRadiusRatio_pipeline, objRealRadius_pipeline, objMinDetectionDuration_pipeline, d0_pipeline; 
 extern double kh_pipeline, kv_pipeline;
 extern int bBrake_pipeline;
+extern int labelid_pipeline;
 extern int videoid_pipeline; 
 extern double u_pipeline;
 extern BOOL bPipelineFound;
@@ -290,6 +292,7 @@ extern int bAcoustic_ball;
 extern int bDepth_ball;
 extern int camdir_ball;
 extern int bBrake_ball;
+extern int labelid_ball;
 extern int videoid_ball;
 extern double u_ball;
 extern double theta_ball; // Not used...
@@ -307,6 +310,7 @@ extern IplImage* VisualObstacleOverlayImg;
 extern int rmin_visualobstacle, rmax_visualobstacle, gmin_visualobstacle, gmax_visualobstacle, bmin_visualobstacle, bmax_visualobstacle;
 extern double obsPixRatio_visualobstacle, obsMinDetectionDuration_visualobstacle; 
 extern int bBrake_visualobstacle;
+extern int labelid_visualobstacle;
 extern int videoid_visualobstacle;
 extern double u_visualobstacle;
 
@@ -320,6 +324,7 @@ extern char weather_surfacevisualobstacle;
 extern int boatsize_surfacevisualobstacle;
 extern double obsMinDetectionDuration_surfacevisualobstacle;
 extern int bBrake_surfacevisualobstacle;
+extern int labelid_surfacevisualobstacle;
 extern int videoid_surfacevisualobstacle;
 extern double u_surfacevisualobstacle;
 
@@ -335,6 +340,7 @@ extern double objMinRadiusRatio_pinger, objRealRadius_pinger, objMinDetectionDur
 extern double pulsefreq_pinger, pulselen_pinger, pulsepersec_pinger, hyddist_pinger, hydorient_pinger, preferreddir_pinger; 
 extern int bUseFile_pinger;
 extern int bBrakeSurfaceEnd_pinger;
+extern int labelid_pinger;
 extern int videoid_pinger; 
 extern double u_pinger;
 extern BOOL bPingerFound;
@@ -350,6 +356,7 @@ extern int hmin_missingworker, hmax_missingworker, smin_missingworker, smax_miss
 extern double objMinRadiusRatio_missingworker, objRealRadius_missingworker, objMinDetectionDuration_missingworker, d0_missingworker; 
 extern double kh_missingworker, kv_missingworker;
 extern int bBrake_missingworker;
+extern int labelid_missingworker;
 extern int videoid_missingworker; 
 extern double u_missingworker;
 extern BOOL bMissingWorkerFound;
