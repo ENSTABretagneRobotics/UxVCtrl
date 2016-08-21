@@ -42,6 +42,8 @@
 0
 % bShowVideoOpenCVGUIs[2]
 0
+% bMAVLinkInterface
+1
 % bCommandPrompt
 1
 % bEcho

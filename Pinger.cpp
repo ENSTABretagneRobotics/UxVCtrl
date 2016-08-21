@@ -518,8 +518,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 			if (bPingerTrackingControl)
 			{
-				pic_counter++;
-				if ((pic_counter > (int)(1000/captureperiod))||bBrakeSurfaceEnd_pinger)
+				if (pic_counter > (int)(1000/captureperiod))
 				{
 					pic_counter = 0;
 					// Save a picture showing the detection.
@@ -538,6 +537,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 						printf("Error saving a picture file.\n");
 					}
 				}
+				else pic_counter++;
 
 				if (bBrakeSurfaceEnd_pinger)
 				{
@@ -572,6 +572,10 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 				}
 			}
 #pragma endregion
+		}
+		else
+		{
+			pic_counter = 1000; // To force to save the first object image upon detection...
 		}
 
 		LeaveCriticalSection(&PingerCS);

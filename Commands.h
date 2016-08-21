@@ -11,7 +11,7 @@
 #define COMMANDS_H
 
 #include "Computations.h"
-
+#pragma region MISSION-RELATED FUNCTIONS
 THREAD_PROC_RETURN_VALUE CommandsThread(void* pParam);
 
 THREAD_PROC_RETURN_VALUE MissionThread(void* pParam);
@@ -61,6 +61,10 @@ inline void CallMission(char* str)
 	if (!bMissionRunning)
 	{
 		memset(labels, 0, sizeof(labels));
+		memset(procdefineaddrs, 0, sizeof(procdefineaddrs));
+		memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
+		memset(procstackids, 0, sizeof(procstackids));
+		procstack = 0;
 		missionfile = fopen(str, "r");
 		if (missionfile == NULL)
 		{
@@ -112,6 +116,10 @@ inline void AbortMission(void)
 		{
 			printf("Error closing mission file.\n");
 		}
+		procstack = 0;
+		memset(procstackids, 0, sizeof(procstackids));
+		memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
+		memset(procdefineaddrs, 0, sizeof(procdefineaddrs));
 		memset(labels, 0, sizeof(labels));
 	}
 	LeaveCriticalSection(&MissionFilesCS);
@@ -145,32 +153,33 @@ inline void JumpMission(int linenumber)
 inline void LabelMission(int id)
 {
 	EnterCriticalSection(&MissionFilesCS);
-	if (bMissionRunning)
-	{
-		if ((id >= 0)&&(id < MAX_NB_LABELS))
-		{
-			// Labels are reset every time a new mission file is opened.
-			if (labels[id] > 0) 
-			{
-				printf("Label already exists.\n"); 
-			}
-			else 
-			{
-				labels[id] = ftellline(missionfile);
-				if (labels[id] <= 0)
-				{
-					printf("File error.\n");
-				}
-			}
-		}
-		else
-		{
-			printf("Invalid parameter.\n");
-		}
-	}
-	else
+	if (!bMissionRunning)
 	{
 		printf("Cannot use label outside a mission file.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if ((id < 0)||(id >= MAX_NB_LABELS))
+	{
+		printf("Invalid parameter.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	// Labels are reset every time a new mission file is opened.
+	if (labels[id] > 0) 
+	{
+		if (labels[id] != ftellline(missionfile))
+		{
+			printf("Label %d already exists.\n", id);
+		}
+	}
+	else 
+	{
+		labels[id] = ftellline(missionfile);
+		if (labels[id] <= 0)
+		{
+			printf("File error.\n");
+		}
 	}
 	LeaveCriticalSection(&MissionFilesCS);
 }
@@ -182,63 +191,290 @@ inline void GotoMission(int id)
 	char line[MAX_BUF_LEN];
 
 	EnterCriticalSection(&MissionFilesCS);
-	if (bMissionRunning)
+	if (!bMissionRunning)
 	{
-		if ((id >= 0)&&(id < MAX_NB_LABELS))
+		printf("Cannot use goto outside a mission file.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if ((id < 0)||(id >= MAX_NB_LABELS))
+	{
+		printf("Invalid parameter.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if (labels[id] > 0) 
+	{
+		// Go to the next line after the label.
+		if (fsetline(missionfile, labels[id]) != EXIT_SUCCESS)
 		{
-			if (labels[id] > 0) 
-			{
-				// Go to the next line after the label.
-				if (fsetline(missionfile, labels[id]+1) != EXIT_SUCCESS)
-				{
-					printf("goto failed.\n");
-				}
-			}
-			else
-			{
-				// Need to search for the label.
-
-				cur = ftell(missionfile);
-				rewind(missionfile);
-
-				for (;;)
-				{
-					r = fgets(line, sizeof(line), missionfile);
-					if (r == NULL) 
-					{
-						printf("goto failed : label not found.\n");
-						clearerr(missionfile);
-						// Go back to initial position.
-						if (fseek(missionfile, cur, SEEK_SET) != EXIT_SUCCESS)
-						{
-							printf("File error.\n");
-						}
-						break;
-					}
-					i++;
-					if (sscanf(line, "label %d", &ival) == 1)
-					{
-						if ((ival >= 0)&&(ival < MAX_NB_LABELS))
-						{
-							labels[ival] = i;
-							if (ival == id) break;
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			printf("Invalid parameter.\n");
+			printf("goto failed.\n");
 		}
 	}
 	else
 	{
-		printf("Cannot use goto outside a mission file.\n");
+		// Need to search for the label.
+
+		cur = ftell(missionfile);
+		rewind(missionfile);
+
+		for (;;)
+		{
+			r = fgets(line, sizeof(line), missionfile);
+			if (r == NULL) 
+			{
+				printf("goto failed : label not found.\n");
+				clearerr(missionfile);
+				// Go back to initial position.
+				if (fseek(missionfile, cur, SEEK_SET) != EXIT_SUCCESS)
+				{
+					printf("File error.\n");
+				}
+				break;
+			}
+			i++;
+			if (sscanf(line, "label %d", &ival) == 1)
+			{
+				if ((ival < 0)||(ival >= MAX_NB_LABELS))
+				{
+					printf("Invalid parameter.\n");
+					continue;
+				}
+				if (labels[ival] > 0) 
+				{
+					if (labels[ival] != i+1)
+					{
+						printf("Label %d already exists.\n", ival);
+						continue;
+					}
+				}
+				else 
+				{
+					labels[ival] = i+1;
+					if (ival == id) break;
+				}
+			}
+		}
 	}
 	LeaveCriticalSection(&MissionFilesCS);
 }
 
+inline void DefineProcedure(int id)
+{
+	char* r = NULL;
+	char line[MAX_BUF_LEN];
+
+	EnterCriticalSection(&MissionFilesCS);
+	if (!bMissionRunning)
+	{
+		printf("Cannot use procedure outside a mission file.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if ((id < 0)||(id >= MAX_NB_PROCEDURES))
+	{
+		printf("Invalid parameter.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	// Procedures are reset every time a new mission file is opened.
+	if (procdefineaddrs[id] > 0) 
+	{
+		if (procdefineaddrs[id] != ftellline(missionfile))
+		{
+			printf("Procedure %d already exists.\n", id); 
+			LeaveCriticalSection(&MissionFilesCS);
+			return;
+		}
+	}
+	else
+	{
+		procdefineaddrs[id] = ftellline(missionfile);
+		if (procdefineaddrs[id] <= 0)
+		{
+			printf("File error.\n");
+			LeaveCriticalSection(&MissionFilesCS);
+			return;
+		}
+	}
+	// Procedures are only executed by the execute command, so go to the line after the next return command.
+	for (;;)
+	{
+		r = fgets(line, sizeof(line), missionfile);
+		if (r == NULL) 
+		{
+			printf("Could not find return command in a procedure.\n");
+			break;
+		}
+		if (strncmp(line, "return", strlen("return")) == 0) break;
+	}
+	LeaveCriticalSection(&MissionFilesCS);
+}
+
+inline void ExecuteProcedure(int id)
+{
+	int cur = 0, ret = 0, i = 0, ival = 0;
+	char* r = NULL;
+	char line[MAX_BUF_LEN];
+
+	EnterCriticalSection(&MissionFilesCS);
+	if (!bMissionRunning)
+	{
+		printf("Cannot use execute outside a mission file.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if ((id < 0)||(id >= MAX_NB_PROCEDURES))
+	{
+		printf("Invalid parameter.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	// Get the return line.
+	ret = ftellline(missionfile);
+	if (ret <= 0)
+	{
+		printf("File error.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}	
+	if (procdefineaddrs[id] > 0) 
+	{
+		// Go to the next line after the procedure definition.
+		if (fsetline(missionfile, procdefineaddrs[id]) != EXIT_SUCCESS)
+		{
+			printf("execute failed.\n");
+		}
+		else
+		{
+			if ((procstack < 0)||(procstack >= MAX_NB_PROCEDURES)) 
+			{
+				printf("Procedure stack error.\n");
+			}
+			else
+			{
+				// Add the procedure id to the stack.
+				procstackids[procstack] = id;
+				procstack++;
+				// Store the return line.
+				procreturnaddrs[id] = ret;
+			}
+		}
+	}
+	else
+	{
+		// Need to search for the procedure definition.
+
+		cur = ftell(missionfile);
+		rewind(missionfile);
+
+		for (;;)
+		{
+			r = fgets(line, sizeof(line), missionfile);
+			if (r == NULL) 
+			{
+				printf("execute failed : procedure definition not found.\n");
+				clearerr(missionfile);
+				// Go back to initial position.
+				if (fseek(missionfile, cur, SEEK_SET) != EXIT_SUCCESS)
+				{
+					printf("File error.\n");
+				}
+				break;
+			}
+			i++;
+			if (sscanf(line, "procedure %d", &ival) == 1)
+			{
+				if ((ival < 0)||(ival >= MAX_NB_PROCEDURES))
+				{
+					printf("Invalid parameter.\n");
+					continue;
+				}
+				if (procdefineaddrs[ival] > 0) 
+				{
+					if (procdefineaddrs[ival] != i+1)
+					{
+						printf("Procedure %d already exists.\n", ival); 
+						continue;
+					}
+				}
+				else
+				{
+					procdefineaddrs[ival] = i+1;
+					if (ival == id) 
+					{
+						if ((procstack < 0)||(procstack >= MAX_NB_PROCEDURES)) 
+						{
+							printf("Procedure stack error.\n");
+						}
+						else
+						{
+							// Add the procedure id to the stack.
+							procstackids[procstack] = id;
+							procstack++;
+							// Store the return line.
+							procreturnaddrs[id] = ret;
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+	LeaveCriticalSection(&MissionFilesCS);
+}
+
+inline void ReturnProcedure(void)
+{
+	int id = 0, linenumber = 0;
+	EnterCriticalSection(&MissionFilesCS);
+	if (!bMissionRunning)
+	{
+		printf("Cannot use return outside a mission file.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if ((procstack < 0)||(procstack >= MAX_NB_PROCEDURES)) 
+	{
+		printf("Procedure stack error.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	if (procstack == 0) 
+	{
+		printf("Unexpected return command.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	id = procstackids[procstack-1];
+	if ((id < 0)||(id >= MAX_NB_PROCEDURES))
+	{
+		printf("Invalid parameter.\n");
+		LeaveCriticalSection(&MissionFilesCS);
+		return;
+	}
+	// Go to the next line after the execute command.
+	linenumber = procreturnaddrs[id];
+	if (linenumber > 0)
+	{
+		if (fsetline(missionfile, linenumber) != EXIT_SUCCESS)
+		{
+			printf("return failed.\n");
+		}
+		else
+		{
+			procstackids[procstack-1] = 0;
+			procstack--;
+			procreturnaddrs[id] = 0;
+		}
+	}
+	else
+	{
+		printf("Invalid parameter.\n");
+	}
+	LeaveCriticalSection(&MissionFilesCS);
+}
+#pragma endregion
 // See mission_spec.txt.
 inline int Commands(char* line)
 {
@@ -269,7 +505,7 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&WallCS);
 		d0_wall = dval1; beta_wall = dval2; delta_wall = dval3; dmin_wall = dval4; dmax_wall = dval5; 
-		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2; labelid_wall = ival3; 
+		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2; procid_wall = ival3; 
 		LeaveCriticalSection(&WallCS);
 	}
 	else if (sscanf(line, "walldetection %lf", &delay) == 1)
@@ -353,7 +589,7 @@ inline int Commands(char* line)
 		hmin_pipeline = ival7; hmax_pipeline = ival8; smin_pipeline = ival9; smax_pipeline = ival10; lmin_pipeline = ival11; lmax_pipeline = ival12; 
 		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; objMinDetectionDuration_pipeline = dval3; d0_pipeline = dval4; 
 		kh_pipeline = dval5; kv_pipeline = dval6; 
-		bBrake_pipeline = ival13; labelid_pipeline = ival14; 
+		bBrake_pipeline = ival13; procid_pipeline = ival14; 
 		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
 			videoid_pipeline = ival15;
@@ -435,7 +671,7 @@ inline int Commands(char* line)
 		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionDuration_ball = dval3; d0_ball = dval4; 
 		kh_ball = dval5; kv_ball = dval6; 
 		lightMin_ball = ival13; lightPixRatio_ball = dval7; bAcoustic_ball = ival14;
-		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; labelid_ball = ival18; 
+		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; procid_ball = ival18; 
 		if ((ival19 >= 0)&&(ival19 < nbvideo))
 		{
 			videoid_ball = ival19;
@@ -505,7 +741,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&VisualObstacleCS);
 		rmin_visualobstacle = ival1; rmax_visualobstacle = ival2; gmin_visualobstacle = ival3; gmax_visualobstacle = ival4; bmin_visualobstacle = ival5; bmax_visualobstacle = ival6; 
 		obsPixRatio_visualobstacle = dval1; obsMinDetectionDuration_visualobstacle = dval2; 
-		bBrake_visualobstacle = ival7; labelid_visualobstacle = ival8; 
+		bBrake_visualobstacle = ival7; procid_visualobstacle = ival8; 
 		if ((ival9 >= 0)&&(ival9 < nbvideo))
 		{
 			videoid_visualobstacle = ival9;
@@ -568,7 +804,7 @@ inline int Commands(char* line)
 		weather_surfacevisualobstacle = cval;
 		boatsize_surfacevisualobstacle = ival1; 
 		obsMinDetectionDuration_surfacevisualobstacle = dval; 
-		bBrake_surfacevisualobstacle = ival2;  labelid_surfacevisualobstacle = ival3;
+		bBrake_surfacevisualobstacle = ival2;  procid_surfacevisualobstacle = ival3;
 		if ((ival4 >= 0)&&(ival4 < nbvideo))
 		{
 			videoid_surfacevisualobstacle = ival4;
@@ -647,7 +883,7 @@ inline int Commands(char* line)
 		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionDuration_pinger = dval3; 
 		pulsefreq_pinger = dval4; pulselen_pinger = dval5; pulsepersec_pinger = dval6; hyddist_pinger = dval7; hydorient_pinger = dval8; preferreddir_pinger = dval9; 
 		bUseFile_pinger = ival13; 
-		bBrakeSurfaceEnd_pinger = ival14; labelid_pinger = ival15; 
+		bBrakeSurfaceEnd_pinger = ival14; procid_pinger = ival15; 
 		if ((ival16 >= 0)&&(ival16 < nbvideo))
 		{
 			videoid_pinger = ival16;
@@ -726,7 +962,7 @@ inline int Commands(char* line)
 		hmin_missingworker = ival7; hmax_missingworker = ival8; smin_missingworker = ival9; smax_missingworker = ival10; lmin_missingworker = ival11; lmax_missingworker = ival12; 
 		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; objMinDetectionDuration_missingworker = dval3; d0_missingworker = dval4; 
 		kh_missingworker = dval5; kv_missingworker = dval6; 
-		bBrake_missingworker = ival13; labelid_missingworker = ival14; 
+		bBrake_missingworker = ival13; procid_missingworker = ival14; 
 		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
 			videoid_missingworker = ival15;
@@ -2134,6 +2370,18 @@ inline int Commands(char* line)
 	else if (sscanf(line, "goto %d", &ival) == 1)
 	{
 		GotoMission(ival);
+	}
+	else if (sscanf(line, "procedure %d", &ival) == 1)
+	{
+		DefineProcedure(ival);
+	}
+	else if (sscanf(line, "execute %d", &ival) == 1)
+	{
+		ExecuteProcedure(ival);
+	}
+	else if (strncmp(line, "return", strlen("return")) == 0)
+	{
+		ReturnProcedure();
 	}
 	else if (strncmp(line, "exit", strlen("exit")) == 0)
 	{

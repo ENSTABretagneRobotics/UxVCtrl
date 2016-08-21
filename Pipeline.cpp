@@ -458,7 +458,6 @@ THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam)
 
 			if (bPipelineTrackingControl)
 			{
-				pic_counter++;
 				if (pic_counter > (int)(1000/captureperiod))
 				{
 					pic_counter = 0;
@@ -478,6 +477,7 @@ THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam)
 						printf("Error saving a picture file.\n");
 					}
 				}
+				else pic_counter++;
 
 				EnterCriticalSection(&StateVariablesCS);
 				u = u_pipeline;
@@ -489,6 +489,10 @@ THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam)
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 #pragma endregion
+		}
+		else
+		{
+			pic_counter = 1000; // To force to save the first object image upon detection...
 		}
 
 		LeaveCriticalSection(&PipelineCS);

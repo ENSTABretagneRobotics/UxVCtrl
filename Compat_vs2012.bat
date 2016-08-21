@@ -46,6 +46,8 @@
 @sleep 1
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 @sleep 1
+
+@echo Please manually exclude from build MAVLinkDevice.cpp/.h, MAVLinkInterface.cpp/.h
 )
 
 @if "%DISABLE_LABJACK%"=="1" (

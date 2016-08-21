@@ -63,6 +63,7 @@ int robid = 0, nbvideo = 0,
 videoimgwidth = 0, videoimgheight = 0, captureperiod = 0; 
 BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
+BOOL bMAVLinkInterface = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 BOOL bDisableMES = FALSE;
@@ -152,7 +153,7 @@ IplImage* WallOverlayImg = NULL;
 double d0_wall = 0, beta_wall = 0, delta_wall = 0, dmin_wall = 0, dmax_wall = 0, gamma_infinite_wall = 0, r_wall = 0;
 int bLat_wall = 0;
 int bBrake_wall = 0;
-int labelid_wall = 0;
+int procid_wall = 0;
 double u_wall = 0;
 
 // Pipeline variables.
@@ -166,7 +167,7 @@ int hmin_pipeline = 0, hmax_pipeline = 0, smin_pipeline = 0, smax_pipeline = 0, 
 double objMinRadiusRatio_pipeline = 0, objRealRadius_pipeline = 0, objMinDetectionDuration_pipeline = 0, d0_pipeline = 0; 
 double kh_pipeline = 0, kv_pipeline = 0;
 int bBrake_pipeline = 0;
-int labelid_pipeline = 0;
+int procid_pipeline = 0;
 int videoid_pipeline = 0; 
 double u_pipeline = 0;
 BOOL bPipelineFound = FALSE;
@@ -187,7 +188,7 @@ int bAcoustic_ball = 0;
 int bDepth_ball = 0;
 int camdir_ball = 0;
 int bBrake_ball = 0;
-int labelid_ball = 0;
+int procid_ball = 0;
 int videoid_ball = 0; 
 double u_ball = 0;
 double theta_ball = 0;
@@ -205,7 +206,7 @@ IplImage* VisualObstacleOverlayImg = NULL;
 int rmin_visualobstacle = 0, rmax_visualobstacle = 0, gmin_visualobstacle = 0, gmax_visualobstacle = 0, bmin_visualobstacle = 0, bmax_visualobstacle = 0; 
 double obsPixRatio_visualobstacle = 0, obsMinDetectionDuration_visualobstacle = 0; 
 int bBrake_visualobstacle = 0;
-int labelid_visualobstacle = 0;
+int procid_visualobstacle = 0;
 int videoid_visualobstacle = 0; 
 double u_visualobstacle = 0;
 
@@ -219,7 +220,7 @@ char weather_surfacevisualobstacle = 0;
 int boatsize_surfacevisualobstacle = 0; 
 double obsMinDetectionDuration_surfacevisualobstacle = 0;
 int bBrake_surfacevisualobstacle = 0;
-int labelid_surfacevisualobstacle = 0;
+int procid_surfacevisualobstacle = 0;
 int videoid_surfacevisualobstacle = 0; 
 double u_surfacevisualobstacle = 0;
 
@@ -235,7 +236,7 @@ double objMinRadiusRatio_pinger = 0, objRealRadius_pinger = 0, objMinDetectionDu
 double pulsefreq_pinger = 0, pulselen_pinger = 0, pulsepersec_pinger = 0, hyddist_pinger = 0, hydorient_pinger = 0, preferreddir_pinger = 0; 
 int bUseFile_pinger = 0;
 int bBrakeSurfaceEnd_pinger = 0;
-int labelid_pinger = 0;
+int procid_pinger = 0;
 int videoid_pinger = 0; 
 double u_pinger = 0;
 BOOL bPingerFound = FALSE;
@@ -251,7 +252,7 @@ int hmin_missingworker = 0, hmax_missingworker = 0, smin_missingworker = 0, smax
 double objMinRadiusRatio_missingworker = 0, objRealRadius_missingworker = 0, objMinDetectionDuration_missingworker = 0, d0_missingworker = 0; 
 double kh_missingworker = 0, kv_missingworker = 0;
 int bBrake_missingworker = 0;
-int labelid_missingworker = 0;
+int procid_missingworker = 0;
 int videoid_missingworker = 0; 
 double u_missingworker = 0;
 BOOL bMissingWorkerFound = FALSE;
@@ -361,6 +362,10 @@ BOOL bGPSLocalization = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
 int labels[MAX_NB_LABELS];
+int procdefineaddrs[MAX_NB_PROCEDURES];
+int procreturnaddrs[MAX_NB_PROCEDURES];
+int procstackids[MAX_NB_PROCEDURES];
+int procstack = 0;
 
 CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];

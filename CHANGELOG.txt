@@ -1,3 +1,9 @@
+112
+Corrected label/goto problems.
+Added procedure, execute and return commands.
+Added preliminary MAVLinkInterface to be able to send telemetry data to Mission Planner.
+Changed labelid parameter to procid in all missionconfig.
+
 111
 Added labelid parameter to all missionconfig (with partial implementation for ball).
 

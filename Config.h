@@ -33,6 +33,7 @@ inline int LoadConfig()
 	bShowVideoOpenCVGUIs[0] = TRUE;
 	bShowVideoOpenCVGUIs[1] = TRUE;
 	bShowVideoOpenCVGUIs[2] = TRUE;
+	bMAVLinkInterface = TRUE;
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
 	bDisableMES = TRUE;
@@ -163,6 +164,8 @@ inline int LoadConfig()
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[1]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[2]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bMAVLinkInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

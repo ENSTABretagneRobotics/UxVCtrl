@@ -540,7 +540,6 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 			if (bSurfaceVisualObstacleAvoidanceControl)
 			{
-				pic_counter++;
 				// Temporary...
 				//if (pic_counter > (int)(1000/captureperiod))
 				{
@@ -561,6 +560,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 						printf("Error saving a picture file.\n");
 					}
 				}
+				//else pic_counter++;
 
 				EnterCriticalSection(&StateVariablesCS);
 				// Temporary...
@@ -593,6 +593,10 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 #pragma endregion
+		}
+		else
+		{
+			pic_counter = 1000; // To force to save the first object image upon detection...
 		}
 
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);

@@ -559,8 +559,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 			if (bBallTrackingControl)
 			{
-				pic_counter++;
-				if ((pic_counter > (int)(1000/captureperiod))||bBrake_ball)
+				if (pic_counter > (int)(1000/captureperiod))
 				{
 					pic_counter = 0;
 					// Save a picture showing the detection.
@@ -579,6 +578,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						printf("Error saving a picture file.\n");
 					}
 				}
+				else pic_counter++;
 
 				if (bBrake_ball)
 				{
@@ -653,11 +653,11 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				}
 			}
 
-			if (labelid_ball != -1)
+			if (procid_ball != -1)
 			{
 				if (bBallTrackingControl)
 				{
-					// stopballtracking to avoid multiple goto...
+					// stopballtracking to avoid multiple execute...
 					bBallTrackingControl = FALSE;
 					bDistanceControl = FALSE;
 					//if (bBrake_ball) bBrakeControl = FALSE;
@@ -668,9 +668,14 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						bAltitudeSeaFloorControl = FALSE;
 					}
 				}
-				GotoMission(labelid_ball);
+				if (bEcho) printf("execute %d\n", procid_ball);
+				ExecuteProcedure(procid_ball);
 			}
 #pragma endregion
+		}
+		else
+		{
+			pic_counter = 1000; // To force to save the first object image upon detection...
 		}
 
 		LeaveCriticalSection(&BallCS);

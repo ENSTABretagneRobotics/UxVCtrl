@@ -187,7 +187,6 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 		if (bWallTrackingControl)
 		{
-			pic_counter++;
 			if (pic_counter > 15)
 			{
 				pic_counter = 0;
@@ -202,6 +201,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 					printf("Error saving a picture file.\n");
 				}
 			}
+			else pic_counter++;
 
 			if (bLat_wall)
 			{
@@ -219,7 +219,6 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 		if ((bWallAvoidanceControl)&&(e > 0))
 		{
-			pic_counter++;
 			// Temporary...
 			//if (pic_counter > 15)
 			{
@@ -235,6 +234,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 					printf("Error saving a picture file.\n");
 				}
 			}
+			//else pic_counter++;
 
 			EnterCriticalSection(&StateVariablesCS);
 			// Temporary...

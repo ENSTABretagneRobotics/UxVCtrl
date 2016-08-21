@@ -50,6 +50,9 @@
 #include "CISCREA.h"
 #endif // ENABLE_LIBMODBUS_SUPPORT
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifdef ENABLE_MAVLINK_SUPPORT
+#include "MAVLinkInterface.h"
+#endif // ENABLE_MAVLINK_SUPPORT
 #include "Observer.h"
 #include "Controller.h"
 #include "OpenCVGUI.h"
@@ -102,6 +105,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER CISCREAThreadId;
 #endif // ENABLE_LIBMODBUS_SUPPORT
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifdef ENABLE_MAVLINK_SUPPORT
+	THREAD_IDENTIFIER MAVLinkInterfaceThreadId;
+#endif // ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER ObserverThreadId;
 	THREAD_IDENTIFIER ControllerThreadId;
 	THREAD_IDENTIFIER MissionThreadId;
@@ -180,6 +186,9 @@ int main(int argc, char* argv[])
 	if (robid & CISCREA_ROBID_MASK) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifdef ENABLE_MAVLINK_SUPPORT
+	if (bMAVLinkInterface) CreateDefaultThread(MAVLinkInterfaceThread, NULL, &MAVLinkInterfaceThreadId);
+#endif // ENABLE_MAVLINK_SUPPORT
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
 
@@ -251,6 +260,11 @@ int main(int argc, char* argv[])
 	// Stop sensors, actuators, algorithms thread loops...
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
+#ifdef ENABLE_MAVLINK_SUPPORT
+	// No way to stop it correctly...
+	//if (bMAVLinkInterface) WaitForThread(MAVLinkInterfaceThreadId);
+	if (bMAVLinkInterface) mSleep(100);
+#endif // ENABLE_MAVLINK_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid & CISCREA_ROBID_MASK) WaitForThread(CISCREAThreadId);

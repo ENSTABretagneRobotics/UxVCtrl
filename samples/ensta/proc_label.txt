@@ -1,0 +1,52 @@
+%procedure 0
+%headingreg 45
+%wait 10
+%execute 1
+%return
+procedure 0
+headingreg 55
+wait 10
+execute 1
+return
+label 0
+generalstop
+headingreg 0
+depthreg -1
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+%goto 1
+execute 1
+% rotate
+headingreg 180
+wait 10
+%procedure 1
+%headingreg 275
+%wait 10
+%return
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+generalstop
+label 1
+%label 1
+headingreg 90
+wait 10
+execute 0
+headingreg -90
+wait 10
+abort
+%goto 0
+procedure 1
+headingreg 270
+wait 10
+return

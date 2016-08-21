@@ -213,6 +213,9 @@
     <ClCompile Include="Pinger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MAVLinkInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -486,6 +489,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pinger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MAVLinkInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

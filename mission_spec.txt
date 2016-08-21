@@ -1,7 +1,7 @@
 %
 % MISSIONS
 %
-%wallconfig d0 beta delta dmin dmax gamma_infinite r bLat bBrake labelid (d0 : double ]-oo,oo[ target distance in m, beta : double [-180,180] mod(360) beam width in deg, delta : double [-180,180] mod(360) beam direction in deg, 0 being the front of the robot, dmin : double ]-oo,oo[ min detection distance in m, dmax : double ]-oo,oo[ max detection distance in m, gamma_infinite : double ]-oo,oo[ angle to come closer to the line when far away in rad (for tracking) / double ]-oo,oo[ angle limit of the line to be considered as an obstacle to avoid in rad (for avoidance), r : double [0,oo[ distance at which the angle to the line to track will be gamma_infinite/2 in m, bLat : int [0,1] 1 if the wall to track is lateral, bBrake : int [0,1] brake if the wall is detected if 1 (only for detection and avoidance), labelid : int [0,256] -1 does nothing when detected, otherwise stop tracking or avoidance and goto labelid)
+%wallconfig d0 beta delta dmin dmax gamma_infinite r bLat bBrake procid (d0 : double ]-oo,oo[ target distance in m, beta : double [-180,180] mod(360) beam width in deg, delta : double [-180,180] mod(360) beam direction in deg, 0 being the front of the robot, dmin : double ]-oo,oo[ min detection distance in m, dmax : double ]-oo,oo[ max detection distance in m, gamma_infinite : double ]-oo,oo[ angle to come closer to the line when far away in rad (for tracking) / double ]-oo,oo[ angle limit of the line to be considered as an obstacle to avoid in rad (for avoidance), r : double [0,oo[ distance at which the angle to the line to track will be gamma_infinite/2 in m, bLat : int [0,1] 1 if the wall to track is lateral, bBrake : int [0,1] brake if the wall is detected if 1 (only for detection and avoidance), procid : int [0,256] -1 does nothing when detected, otherwise stop tracking or avoidance and execute procid (not implemented))
 %
 %walldetection t (t : double [0,oo[ timeout in s, the function blocks until the wall is detected or the timeout is reached)
 %
@@ -13,7 +13,7 @@
 %
 %stopwallavoidance
 %
-%pipelineconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv bBrake labelid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, bBrake : int [0,1] brake if the object is detected if 1 (no effect for tracking), labelid : int [0,256] -1 does nothing when detected, otherwise stop tracking and goto labelid, videoid : int [0,oo] video id)
+%pipelineconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv bBrake procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, bBrake : int [0,1] brake if the object is detected if 1 (no effect for tracking), procid : int [0,256] -1 does nothing when detected, otherwise stop tracking and execute procid (not implemented), videoid : int [0,oo] video id)
 %
 %pipelinedetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
 %
@@ -21,7 +21,7 @@
 %
 %stoppipelinetracking
 %
-%ballconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv lightMin lightPixRatio bAcoustic bDepth camdir bBrake labelid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, lightMin : int [0,255] min RGB value if there is a white light, lightPixRatio : double [0,1] we consider there is a white light if it covers that ratio of the picture, bAcoustic : int [0,1] 1 to activate acoustic message if detected, bDepth : int [0,1] 1 to activate depth control, camdir : int [-1,2] 0 if used with a front camera, 1 left, -1 right, 2 bottom, bBrake : int [0,1] brake if the object is detected if 1 (do not track for tracking), labelid : int [0,256] -1 does nothing when detected, otherwise stop tracking and goto labelid, videoid : int [0,oo] video id)
+%ballconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv lightMin lightPixRatio bAcoustic bDepth camdir bBrake procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, lightMin : int [0,255] min RGB value if there is a white light, lightPixRatio : double [0,1] we consider there is a white light if it covers that ratio of the picture, bAcoustic : int [0,1] 1 to activate acoustic message if detected, bDepth : int [0,1] 1 to activate depth control, camdir : int [-1,2] 0 if used with a front camera, 1 left, -1 right, 2 bottom, bBrake : int [0,1] brake if the object is detected if 1 (do not track for tracking), procid : int [0,256] -1 does nothing when detected, otherwise stop tracking and execute procid, videoid : int [0,oo] video id)
 %
 %balldetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
 %
@@ -29,7 +29,7 @@
 %
 %stopballtracking
 %
-%visualobstacleconfig r- r+ g- g+ b- b+ obsPixRatio obsMinDetectionDuration bBrake labelid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the lights if there is an obstacle, obsPixRatio : double [0,1] we consider there is an obstacle if lights cover that ratio of the picture, obsMinDetectionDuration : double [0,oo[ min duration in s for the obstacle to be considered as detected, bBrake : int [0,1] brake if the obstacle is detected if 1, labelid : int [0,256] -1 does nothing when detected, otherwise stop avoidance and goto labelid, videoid : int [0,oo] video id)
+%visualobstacleconfig r- r+ g- g+ b- b+ obsPixRatio obsMinDetectionDuration bBrake procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the lights if there is an obstacle, obsPixRatio : double [0,1] we consider there is an obstacle if lights cover that ratio of the picture, obsMinDetectionDuration : double [0,oo[ min duration in s for the obstacle to be considered as detected, bBrake : int [0,1] brake if the obstacle is detected if 1, procid : int [0,256] -1 does nothing when detected, otherwise stop avoidance and execute procid (not implemented), videoid : int [0,oo] video id)
 %
 %visualobstacledetection t (t : double [0,oo[ timeout in s, the function blocks until the obstacle is detected or the timeout is reached)
 %
@@ -37,7 +37,7 @@
 %
 %stopvisualobstacleavoidance
 %
-%surfacevisualobstacleconfig weather boatsize obsMinDetectionDuration bBrake labelid videoid (weather : c (cloudy) or s (sunny), boatsize : int [0,oo] height in pixels of the visible part of the boat on the camera, obsMinDetectionDuration : double [0,oo[ min duration in s for the obstacle to be considered as detected, bBrake : int [0,1] brake if the obstacle is detected if 1, labelid : int [0,256] -1 does nothing when detected, otherwise stop avoidance and goto labelid, videoid : int [0,oo] video id)
+%surfacevisualobstacleconfig weather boatsize obsMinDetectionDuration bBrake procid videoid (weather : c (cloudy) or s (sunny), boatsize : int [0,oo] height in pixels of the visible part of the boat on the camera, obsMinDetectionDuration : double [0,oo[ min duration in s for the obstacle to be considered as detected, bBrake : int [0,1] brake if the obstacle is detected if 1, procid : int [0,256] -1 does nothing when detected, otherwise stop avoidance and execute procid (not implemented), videoid : int [0,oo] video id)
 %
 %surfacevisualobstacledetection t (t : double [0,oo[ timeout in s, the function blocks until the obstacle is detected or the timeout is reached)
 %
@@ -45,7 +45,7 @@
 %
 %stopsurfacevisualobstacleavoidance
 %
-%pingerconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration pulsefreq pulselen pulsepersec hyddist hydorient preferreddir bUseFile bBrakeSurfaceEnd labelid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, pulsefreq : int [0,48000] frequency of the pulse in Hz, pulselen : double [0,oo[ pulse length in s, pulsepersec : double [0,oo[ number of pulse per s, hyddist : double [0,oo[ distance between the hydrophones in m, hydorient : double [0,360[ orientation of the hydrophones w.r.t. the robot in deg (0=hyd0 on the front and hyd1 on the rear, 90=hyd0 on the right and hyd1 on the left), preferreddir : double [0,360[ preferred direction w.r.t. the robot in deg to solve symmetry ambiguity (0=front, 90=right), bUseFile : int [0,1] use pingerdetection.txt info for tracking, bBrakeSurfaceEnd : int [0,1] brake, surface and stop the mission if the object is detected if 1, labelid : int [0,256] -1 does nothing when detected, otherwise stop tracking and goto labelid, videoid : int [0,oo] video id)
+%pingerconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration pulsefreq pulselen pulsepersec hyddist hydorient preferreddir bUseFile bBrakeSurfaceEnd procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, pulsefreq : int [0,48000] frequency of the pulse in Hz, pulselen : double [0,oo[ pulse length in s, pulsepersec : double [0,oo[ number of pulse per s, hyddist : double [0,oo[ distance between the hydrophones in m, hydorient : double [0,360[ orientation of the hydrophones w.r.t. the robot in deg (0=hyd0 on the front and hyd1 on the rear, 90=hyd0 on the right and hyd1 on the left), preferreddir : double [0,360[ preferred direction w.r.t. the robot in deg to solve symmetry ambiguity (0=front, 90=right), bUseFile : int [0,1] use pingerdetection.txt info for tracking, bBrakeSurfaceEnd : int [0,1] brake, surface and stop the mission if the object is detected if 1, procid : int [0,256] -1 does nothing when detected, otherwise stop tracking and execute procid (not implemented), videoid : int [0,oo] video id)
 % Other coefficients related to hydrophones to add...?
 %
 %pingerdetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
@@ -54,7 +54,7 @@
 %
 %stoppingertracking
 %
-%missingworkerconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv bBrake labelid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, bBrake : int [0,1] brake if the object is detected if 1 (no effect for tracking), labelid : int [0,256] -1 does nothing when detected, otherwise stop tracking and goto labelid, videoid : int [0,oo] video id)
+%missingworkerconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv bBrake procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, bBrake : int [0,1] brake if the object is detected if 1 (no effect for tracking), procid : int [0,256] -1 does nothing when detected, otherwise stop tracking and execute procid (not implemented), videoid : int [0,oo] video id)
 %
 %missingworkerdetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
 %
@@ -262,9 +262,15 @@
 %
 %jump linenumber (int > 0, only used inside a mission file)
 %
-%label id (int, only used inside a mission file)
+%label id (int [0,256[, only used inside a mission file)
 %
-%goto id (int, only used inside a mission file)
+%goto id (int [0,256[, only used inside a mission file)
+%
+%procedure id (int [0,256[, only used inside a mission file)
+%
+%execute id (int [0,256[ procedure id, only used inside a mission file)
+%
+%return (only used inside a mission file)
 %
 %exit
 %
