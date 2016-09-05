@@ -14,6 +14,35 @@
 #include "OSNet.h"
 #include "CvUtils.h"
 
+#ifdef USE_FFMPEG_VIDEO
+//#ifndef __STDC_CONSTANT_MACROS
+//#define __STDC_CONSTANT_MACROS_DEFINED
+//#define __STDC_CONSTANT_MACROS
+//#endif // __STDC_CONSTANT_MACROS
+
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4244) 
+#endif // _MSC_VER
+
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswscale/swscale.h>
+}
+
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4244)
+#endif // _MSC_VER
+
+// compatibility with newer API
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
+#define av_frame_alloc avcodec_alloc_frame
+#define av_frame_free avcodec_free_frame
+#endif
+#endif // USE_FFMPEG_VIDEO
+
 #ifndef DISABLE_VIDEOTHREAD
 #include "OSThread.h"
 #endif // DISABLE_VIDEOTHREAD
@@ -32,6 +61,19 @@ struct VIDEO
 	IplImage* frame;
 	IplImage* resizedframe;
 	char* databuf;
+#ifdef USE_FFMPEG_VIDEO
+	AVFormatContext   *pFormatCtx;
+	int               videoStream;
+	AVCodecContext    *pCodecCtxOrig;
+	AVCodecContext    *pCodecCtx;
+	AVCodec           *pCodec;
+	AVFrame           *pFrame;
+	AVFrame           *pFrameRGB;
+	AVPacket          packet;
+	int               numBytes;
+	uint8_t           *buffer;
+	struct SwsContext *sws_ctx;
+#endif // USE_FFMPEG_VIDEO
 	//IplImage* Lastimg;
 	char szCfgFilePath[256];
 	// Parameters.
@@ -55,6 +97,171 @@ struct VIDEO
 	CvPoint* excluded_area_points;
 };
 typedef struct VIDEO VIDEO;
+
+#ifdef USE_FFMPEG_VIDEO
+inline int ffmpegopen(VIDEO* pVideo)
+{
+	int i = 0;
+
+	pVideo->pFormatCtx = NULL;
+	pVideo->videoStream = 0;
+	pVideo->pCodecCtxOrig = NULL;
+	pVideo->pCodecCtx = NULL;
+	pVideo->pCodec = NULL;
+	pVideo->pFrame = NULL;
+	pVideo->pFrameRGB = NULL;
+	pVideo->numBytes = 0;
+	pVideo->buffer = NULL;
+	pVideo->sws_ctx = NULL;
+
+	// Register all formats and codecs
+	av_register_all();
+
+	// Open video file
+	if (avformat_open_input(&pVideo->pFormatCtx, pVideo->szDevPath, NULL, NULL)!=0)
+		return EXIT_FAILURE; // Couldn't open file
+
+	  // Retrieve stream information
+	if (avformat_find_stream_info(pVideo->pFormatCtx, NULL)<0)
+		return EXIT_FAILURE; // Couldn't find stream information
+
+	  // Dump information about file onto standard error
+	av_dump_format(pVideo->pFormatCtx, 0, pVideo->szDevPath, 0);
+
+	// Find the first video stream
+	pVideo->videoStream = -1;
+	for (i = 0; i<(int)pVideo->pFormatCtx->nb_streams; i++)
+		if (pVideo->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) {
+			pVideo->videoStream = i;
+			break;
+		}
+	if (pVideo->videoStream==-1)
+		return EXIT_FAILURE; // Didn't find a video stream
+
+	  // Get a pointer to the codec context for the video stream
+	pVideo->pCodecCtxOrig = pVideo->pFormatCtx->streams[pVideo->videoStream]->codec;
+	// Find the decoder for the video stream
+	pVideo->pCodec = avcodec_find_decoder(pVideo->pCodecCtxOrig->codec_id);
+	if (pVideo->pCodec==NULL) {
+		fprintf(stderr, "Unsupported codec!\n");
+		return EXIT_FAILURE; // Codec not found
+	}
+	// Copy context
+	pVideo->pCodecCtx = avcodec_alloc_context3(pVideo->pCodec);
+	if (avcodec_copy_context(pVideo->pCodecCtx, pVideo->pCodecCtxOrig) != 0) {
+		fprintf(stderr, "Couldn't copy codec context");
+		return EXIT_FAILURE; // Error copying codec context
+	}
+
+	// Open codec
+	if (avcodec_open2(pVideo->pCodecCtx, pVideo->pCodec, NULL)<0)
+		return EXIT_FAILURE; // Could not open codec
+
+	  // Allocate video frame
+	pVideo->pFrame = av_frame_alloc();
+
+	// Allocate an AVFrame structure
+	pVideo->pFrameRGB = av_frame_alloc();
+	if (pVideo->pFrameRGB==NULL)
+		return EXIT_FAILURE;
+
+	// Determine required buffer size and allocate buffer
+	pVideo->numBytes = avpicture_get_size(AV_PIX_FMT_RGB24, pVideo->pCodecCtx->width,
+		pVideo->pCodecCtx->height);
+	pVideo->buffer = (uint8_t *)av_malloc(pVideo->numBytes*sizeof(uint8_t));
+
+	// Assign appropriate parts of buffer to image planes in pFrameRGB
+	// Note that pFrameRGB is an AVFrame, but AVFrame is a superset
+	// of AVPicture
+	avpicture_fill((AVPicture *)pVideo->pFrameRGB, pVideo->buffer, AV_PIX_FMT_RGB24,
+		pVideo->pCodecCtx->width, pVideo->pCodecCtx->height);
+
+	// initialize SWS context for software scaling
+	pVideo->sws_ctx = sws_getContext(pVideo->pCodecCtx->width,
+		pVideo->pCodecCtx->height,
+		pVideo->pCodecCtx->pix_fmt,
+		pVideo->pCodecCtx->width,
+		pVideo->pCodecCtx->height,
+		AV_PIX_FMT_RGB24,
+		SWS_BILINEAR,
+		NULL,
+		NULL,
+		NULL
+		);
+
+	if ((pVideo->pCodecCtx->width != pVideo->videoimgwidth)||(pVideo->pCodecCtx->height != pVideo->videoimgheight))
+	{
+		printf("Unable to set desired video resolution.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int ffmpegread(VIDEO* pVideo)
+{
+	int y = 0;
+	int frameFinished = 0;
+
+	// Read frames
+	if (av_read_frame(pVideo->pFormatCtx, &pVideo->packet)>=0) {
+		// Is this a packet from the video stream?
+		if (pVideo->packet.stream_index==pVideo->videoStream) {
+			// Decode video frame
+			avcodec_decode_video2(pVideo->pCodecCtx, pVideo->pFrame, &frameFinished, &pVideo->packet);
+
+			// Did we get a video frame?
+			if (frameFinished) {
+				// Convert the image from its native format to RGB
+				sws_scale(pVideo->sws_ctx, (uint8_t const * const *)pVideo->pFrame->data,
+					pVideo->pFrame->linesize, 0, pVideo->pCodecCtx->height,
+					pVideo->pFrameRGB->data, pVideo->pFrameRGB->linesize);
+
+				for (y = 0; y<pVideo->pCodecCtx->height; y++)
+				{
+					memcpy(pVideo->frame->imageData+y*pVideo->pCodecCtx->width*3, pVideo->pFrameRGB->data[0]+y*pVideo->pFrameRGB->linesize[0], pVideo->pCodecCtx->width*3);
+				}
+				cvCvtColor(pVideo->frame, pVideo->frame, CV_BGR2RGB);
+			}
+		}
+
+		// Free the packet that was allocated by av_read_frame
+		av_free_packet(&pVideo->packet);
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int ffmpegclose(VIDEO* pVideo)
+{
+	// Free the RGB image
+	av_free(pVideo->buffer);
+	av_frame_free(&pVideo->pFrameRGB);
+
+	// Free the YUV frame
+	av_frame_free(&pVideo->pFrame);
+
+	// Close the codecs
+	avcodec_close(pVideo->pCodecCtx);
+	avcodec_close(pVideo->pCodecCtxOrig);
+
+	// Close the video file
+	avformat_close_input(&pVideo->pFormatCtx);
+
+	pVideo->pFormatCtx = NULL;
+	pVideo->videoStream = 0;
+	pVideo->pCodecCtxOrig = NULL;
+	pVideo->pCodecCtx = NULL;
+	pVideo->pCodec = NULL;
+	pVideo->pFrame = NULL;
+	pVideo->pFrameRGB = NULL;
+	pVideo->numBytes = 0;
+	pVideo->buffer = NULL;
+	pVideo->sws_ctx = NULL;
+
+	return EXIT_SUCCESS;
+}
+#endif // USE_FFMPEG_VIDEO
 
 inline int recvdecode(VIDEO* pVideo)
 {
@@ -371,7 +578,6 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 			break;
 		}
 	case LOCAL_TYPE_VIDEO:
-	case FILE_TYPE_VIDEO:
 		mSleep(pVideo->captureperiod);
 		pVideo->frame = cvQueryFrame(pVideo->pCapture);
 		if (!pVideo->frame)
@@ -379,6 +585,24 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 			printf("Error reading an image from a video.\n");
 			return EXIT_FAILURE;
 		}
+		break;
+	case FILE_TYPE_VIDEO:
+#ifdef USE_FFMPEG_VIDEO
+		mSleep(pVideo->captureperiod);
+		if (ffmpegread(pVideo) != EXIT_SUCCESS)
+		{
+			printf("Error reading an image from a video.\n");
+			return EXIT_FAILURE;
+		}
+#else
+		mSleep(pVideo->captureperiod);
+		pVideo->frame = cvQueryFrame(pVideo->pCapture);
+		if (!pVideo->frame)
+		{
+			printf("Error reading an image from a video.\n");
+			return EXIT_FAILURE;
+		}
+#endif // USE_FFMPEG_VIDEO
 		break;
 	default:
 		mSleep(pVideo->captureperiod);
@@ -613,46 +837,98 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		{
 			pVideo->DevType = LOCAL_TYPE_VIDEO;
 			pVideo->pCapture = cvCreateCameraCapture(atoi(pVideo->szDevPath));
+			if (!pVideo->pCapture) 
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				return EXIT_FAILURE;
+			}
+
+			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
+			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+
+			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
+			//if ((!pVideo->bForceSoftwareResize)&&
+			//	((cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+			//	(cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+			//{
+			//	printf("Unable to set desired video resolution.\n");
+			//	cvReleaseCapture(&pVideo->pCapture);
+			//	return EXIT_FAILURE;
+			//}
+
+			// Sometimes the first images are bad, so wait a little bit and take
+			// several images in the beginning.
+			i = 0;
+			while (i < 4)
+			{
+				mSleep(500);
+				pVideo->frame = cvQueryFrame(pVideo->pCapture);
+				i++;
+			}
+
+			pVideo->frame = cvQueryFrame(pVideo->pCapture);
+			if (!pVideo->frame)
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				cvReleaseCapture(&pVideo->pCapture);
+				return EXIT_FAILURE;
+			}
 		}
 		else
 		{
 			pVideo->DevType = FILE_TYPE_VIDEO;
+#ifdef USE_FFMPEG_VIDEO
+			pVideo->frame = cvCreateImage(cvSize(pVideo->videoimgwidth, pVideo->videoimgheight), IPL_DEPTH_8U, 3);
+			if (pVideo->frame == NULL)
+			{
+				printf("cvCreateImage() failed.\n");
+				return EXIT_FAILURE;
+			}
+			if (ffmpegopen(pVideo) != EXIT_SUCCESS) 
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				cvReleaseImage(&pVideo->frame);
+				return EXIT_FAILURE;
+			}
+#else
 			pVideo->pCapture = cvCreateFileCapture(pVideo->szDevPath);
-		}
-		if (!pVideo->pCapture) 
-		{
-			printf("Unable to connect to a local/remote camera or open a video file.\n");
-			return EXIT_FAILURE;
-		}
+			if (!pVideo->pCapture) 
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				return EXIT_FAILURE;
+			}
 
-		cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
-		cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
+			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 
-		// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
-		//if ((!pVideo->bForceSoftwareResize)&&
-		//	((cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
-		//	(cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
-		//{
-		//	printf("Unable to set desired video resolution.\n");
-		//	return EXIT_FAILURE;
-		//}
+			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
+			//if ((!pVideo->bForceSoftwareResize)&&
+			//	((cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+			//	(cvGetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+			//{
+			//	printf("Unable to set desired video resolution.\n");
+			//	cvReleaseCapture(&pVideo->pCapture);
+			//	return EXIT_FAILURE;
+			//}
 
-		// Sometimes the first images are bad, so wait a little bit and take
-		// several images in the beginning.
-		i = 0;
-		while (i < 4)
-		{
-			mSleep(500);
+			// Sometimes the first images are bad, so wait a little bit and take
+			// several images in the beginning.
+			i = 0;
+			while (i < 4)
+			{
+				mSleep(500);
+				pVideo->frame = cvQueryFrame(pVideo->pCapture);
+				i++;
+			}
+
 			pVideo->frame = cvQueryFrame(pVideo->pCapture);
-			i++;
-		}
-
-		pVideo->frame = cvQueryFrame(pVideo->pCapture);
-		if (!pVideo->frame)
-		{
-			printf("Unable to connect to a local/remote camera or open a video file.\n");
-			cvReleaseCapture(&pVideo->pCapture);
-			return EXIT_FAILURE;
+			if (!pVideo->frame)
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				cvReleaseCapture(&pVideo->pCapture);
+				return EXIT_FAILURE;
+			}
+#endif // USE_FFMPEG_VIDEO
 		}
 	}
 
@@ -670,8 +946,15 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				cvReleaseImage(&pVideo->frame);
 				return EXIT_FAILURE;
 			case LOCAL_TYPE_VIDEO:
-			case FILE_TYPE_VIDEO:
 				cvReleaseCapture(&pVideo->pCapture);
+				return EXIT_FAILURE;
+			case FILE_TYPE_VIDEO:
+#ifdef USE_FFMPEG_VIDEO
+				ffmpegclose(pVideo);
+				cvReleaseImage(&pVideo->frame);
+#else
+				cvReleaseCapture(&pVideo->pCapture);
+#endif // USE_FFMPEG_VIDEO
 				return EXIT_FAILURE;
 			default:
 				printf("Video connection : Invalid device type.\n");
@@ -696,8 +979,15 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	//		cvReleaseImage(&pVideo->frame);
 	//		return EXIT_FAILURE;
 	//	case LOCAL_TYPE_VIDEO:
-	//	case FILE_TYPE_VIDEO:
 	//		cvReleaseCapture(&pVideo->pCapture);
+	//		return EXIT_FAILURE;
+	//	case FILE_TYPE_VIDEO:
+	//#ifdef USE_FFMPEG_VIDEO
+	//		ffmpegclose(pVideo);
+	//		cvReleaseImage(&pVideo->frame);
+	//#else
+	//		cvReleaseCapture(&pVideo->pCapture);
+	//#endif // USE_FFMPEG_VIDEO
 	//		return EXIT_FAILURE;
 	//	default:
 	//		printf("Video connection : Invalid device type.\n");
@@ -728,8 +1018,15 @@ inline int DisconnectVideo(VIDEO* pVideo)
 		cvReleaseImage(&pVideo->frame);
 		break;
 	case LOCAL_TYPE_VIDEO:
-	case FILE_TYPE_VIDEO:
 		cvReleaseCapture(&pVideo->pCapture);
+		break;
+	case FILE_TYPE_VIDEO:
+#ifdef USE_FFMPEG_VIDEO
+		ffmpegclose(pVideo);
+		cvReleaseImage(&pVideo->frame);
+#else
+		cvReleaseCapture(&pVideo->pCapture);
+#endif // USE_FFMPEG_VIDEO
 		break;
 	default:
 		printf("Video disconnection : Invalid device type.\n");
@@ -744,6 +1041,13 @@ inline int DisconnectVideo(VIDEO* pVideo)
 
 	return EXIT_SUCCESS;
 }
+
+//#ifdef USE_FFMPEG_VIDEO
+//#ifdef __STDC_CONSTANT_MACROS_DEFINED
+//#undef __STDC_CONSTANT_MACROS_DEFINED
+//#undef __STDC_CONSTANT_MACROS
+//#endif // __STDC_CONSTANT_MACROS_DEFINED
+//#endif // USE_FFMPEG_VIDEO
 
 #ifndef DISABLE_VIDEOTHREAD
 THREAD_PROC_RETURN_VALUE VideoThread(void* pParam);

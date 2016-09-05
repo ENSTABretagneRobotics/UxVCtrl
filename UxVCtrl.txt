@@ -119,7 +119,7 @@
 % omegamax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
 0.8
 % gamma_infinite (in rad, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
-0.78
+1.3
 % r (accuracy of line/waypoint following in m, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
 % betatrav (angle de la voile en vent de travers (in rad))

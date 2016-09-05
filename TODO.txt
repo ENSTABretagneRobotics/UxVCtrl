@@ -1,3 +1,13 @@
+ffmpeg...
+
+Faire programme pour aider à la mag calib
+Appli gps qui affiche sog
+Dashboard : pouvoir n'afficher qu'une certaine partie de la traj
+
+Afficher tension, force vent, affichage des waypoints courants mission planner
+modify waypoints commands so that they do a line following in the case of a sailboat
+Copier implémentation launchtcpsrv pour la modifier et stopper correctement
+
 Some threads maybe too fast, check timings...
 add a visual studio config for Linux, utiliser dernière version linux headers?
 

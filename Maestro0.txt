@@ -98,11 +98,11 @@ COM6
 % winddiranaloginputchan (disabled if -1)
 11
 % winddiranaloginputvalueoffset
-0.0
+20.0
 % winddiranaloginputvaluethreshold
 0.0
 % winddiranaloginputvaluecoef
-1.0
+0.333
 % windspeedanaloginputchan (disabled if -1)
 -1
 % windspeedanaloginputvalueoffset
