@@ -1,17 +1,20 @@
+linefollowingrelativerobot relatif au cap
+rajouter commande setwindestimation/wgs avec unités des marins
 ffmpeg...
 
 Faire programme pour aider à la mag calib
-Appli gps qui affiche sog
+Appli gps qui affiche sog à partir des logs
 Dashboard : pouvoir n'afficher qu'une certaine partie de la traj
 
-Afficher tension, force vent, affichage des waypoints courants mission planner
-modify waypoints commands so that they do a line following in the case of a sailboat
+Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
+modify waypoints/heading commands so that they do a line following in the case of a sailboat?
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement
 
-Some threads maybe too fast, check timings...
+Some threads may be too fast, check timings...
 add a visual studio config for Linux, utiliser dernière version linux headers?
 
 bugs
+should add commands critical section so that bWaiting = FALSE would never risk to be overwritten just after...
 Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4…
 Invalid minangle, midangle or maxangle sometimes on rpi2?
 Si le pipe est au centre de l'image mais tout en bas, le tracking marchera pas bien...

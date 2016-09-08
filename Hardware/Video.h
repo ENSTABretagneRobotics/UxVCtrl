@@ -99,6 +99,12 @@ struct VIDEO
 typedef struct VIDEO VIDEO;
 
 #ifdef USE_FFMPEG_VIDEO
+
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4996) 
+#endif // _MSC_VER
+
 inline int ffmpegopen(VIDEO* pVideo)
 {
 	int i = 0;
@@ -261,6 +267,12 @@ inline int ffmpegclose(VIDEO* pVideo)
 
 	return EXIT_SUCCESS;
 }
+
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4996)
+#endif // _MSC_VER
+
 #endif // USE_FFMPEG_VIDEO
 
 inline int recvdecode(VIDEO* pVideo)

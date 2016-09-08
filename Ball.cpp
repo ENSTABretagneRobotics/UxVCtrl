@@ -670,6 +670,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				}
 				if (bEcho) printf("execute %d\n", procid_ball);
 				ExecuteProcedure(procid_ball);
+				bWaiting = FALSE; // To interrupt and force execution of the next commands...
 			}
 #pragma endregion
 		}

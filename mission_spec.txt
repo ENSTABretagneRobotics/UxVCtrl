@@ -112,6 +112,10 @@
 %
 %linefollowingtrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
 %
+%linefollowingrelativerobot xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line)
+%
+%linefollowingtrelativerobot xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%
 %linefollowingwgs lata longa latb longb (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line)
 %
 %linefollowingtwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
