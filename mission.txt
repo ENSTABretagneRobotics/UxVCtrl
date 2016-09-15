@@ -1,35 +1,22 @@
-procedure 0
-linefollowingconfig 5 1.3
-linefollowingtwgs 41.691766 -8.821465 41.691961 -8.821234 31557600.000000
-linefollowingtwgs 41.691961 -8.821234 41.691200 -8.820008 31557600.000000
-linefollowingtwgs 41.691200 -8.820008 41.691025 -8.820243 31557600.000000
-setmissionaction Return_L0
-linefollowingtwgs 41.691928 -8.821704 41.690855 -8.819963 31557600.000000
-return
-procedure 1
-linefollowingconfig 5 1.3
-linefollowingtwgs 41.691025 -8.820243 41.691200 -8.820008 31557600.000000
-linefollowingtwgs 41.691200 -8.820008 41.691961 -8.821234 31557600.000000
-linefollowingtwgs 41.691961 -8.821234 41.691766 -8.821465 31557600.000000
-setmissionaction Return_L1
-linefollowingtwgs 41.690855 -8.819963 41.691928 -8.821704 31557600.000000
-return
 generalstop
-setmissionaction init
-%gpssetenvcoordposition 3
-%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
-%wait 3
-label 0
-setmissionaction L0
-ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0 3.0 0 0 220 0.05 0 0 0 0 0 0
-startballtracking
-linefollowingconfig 5 1.3
-linefollowingtwgs 41.691928 -8.821704 41.690855 -8.819963 31557600.000000
-stopballtracking
-setmissionaction L1
-ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0 3.0 0 0 220 0.05 0 0 0 0 1 0
-startballtracking
-linefollowingconfig 5 1.3
-linefollowingtwgs 41.690855 -8.819963 41.691928 -8.821704 31557600.000000
-stopballtracking
-goto 0
+headingreg 0
+depthreg -1
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+% rotate
+headingreg 180
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+generalstop

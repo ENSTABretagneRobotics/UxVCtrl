@@ -4,7 +4,6 @@ test1.wmv
 %dummy_25min.wmv
 %127.0.0.1:4014
 %192.168.1.150:4014
-%rtsp://192.168.1.254/sjcam.mp4
 % videoimgwidth
 320
 % videoimgheight
