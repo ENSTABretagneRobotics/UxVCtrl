@@ -1,3 +1,6 @@
+114
+Improved error messages during hardware initialization.
+
 113
 Preliminary ffmpeg support.
 Corrected procid for ball.

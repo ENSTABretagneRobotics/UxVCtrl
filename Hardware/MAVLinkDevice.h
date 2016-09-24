@@ -618,7 +618,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -637,7 +637,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -656,7 +656,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -675,7 +675,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -693,7 +693,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -711,7 +711,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -729,7 +729,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -754,7 +754,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -773,7 +773,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -792,7 +792,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -813,7 +813,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
 	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MAVLinkDevice.\n");
+		printf("Unable to connect to a MAVLinkDevice : Command failure.\n");
 		CloseRS232Port(&pMAVLinkDevice->RS232Port);
 		return EXIT_FAILURE;
 	}

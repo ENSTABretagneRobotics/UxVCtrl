@@ -511,7 +511,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 	if (WriteAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a Hokuyo.\n");
+		printf("Unable to connect to a Hokuyo : RS command failure.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -522,7 +522,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 	if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a Hokuyo.\n");
+		printf("Unable to connect to a Hokuyo : RS command failure.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -530,7 +530,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 	// Check response.
 	if (strcmp(recvbuf, "RS\n00P\n\n") != 0)
 	{
-		printf("Unable to connect to a Hokuyo.\n");
+		printf("Unable to connect to a Hokuyo : RS command failure.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -544,7 +544,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 	if (WriteAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a Hokuyo.\n");
+		printf("Unable to connect to a Hokuyo : BM command failure.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -555,7 +555,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 	if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a Hokuyo.\n");
+		printf("Unable to connect to a Hokuyo : BM command failure.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -564,7 +564,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 	Status = 0; Sum = 0;
 	if ((sscanf(recvbuf, "BM\n%02d%c\n\n", &Status, &Sum) != 2)||((Status != 0)&&(Status != 2)))
 	{
-		printf("Unable to connect to a Hokuyo.\n");
+		printf("Unable to connect to a Hokuyo : BM command failure.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -580,7 +580,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 		if (WriteAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a Hokuyo.\n");
+			printf("Unable to connect to a Hokuyo : HS command failure.\n");
 			CloseRS232Port(&pHokuyo->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -591,7 +591,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 		if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a Hokuyo.\n");
+			printf("Unable to connect to a Hokuyo : HS command failure.\n");
 			CloseRS232Port(&pHokuyo->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -600,7 +600,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		ivalue = 0; Status = 0; Sum = 0;
 		if ((sscanf(recvbuf, "HS%01d\n%02d%c\n\n", &ivalue, &Status, &Sum) != 3)||((Status != 0)&&(Status != 2)))
 		{
-			printf("Unable to connect to a Hokuyo.\n");
+			printf("Unable to connect to a Hokuyo : HS command failure.\n");
 			CloseRS232Port(&pHokuyo->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -619,7 +619,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 		if (WriteAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a Hokuyo.\n");
+			printf("Unable to connect to a Hokuyo : MD command failure.\n");
 			CloseRS232Port(&pHokuyo->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -630,7 +630,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 
 		if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a Hokuyo.\n");
+			printf("Unable to connect to a Hokuyo : MD command failure.\n");
 			CloseRS232Port(&pHokuyo->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -639,7 +639,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		ivalue = 0;
 		if (sscanf(recvbuf, "MD%04d%04d%02d%01d%02d\n00P\n\n", &ivalue, &ivalue, &ivalue, &ivalue, &ivalue) != 5)
 		{
-			printf("Unable to connect to a Hokuyo.\n");
+			printf("Unable to connect to a Hokuyo : MD command failure.\n");
 			CloseRS232Port(&pHokuyo->RS232Port);
 			return EXIT_FAILURE;
 		}

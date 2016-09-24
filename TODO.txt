@@ -1,10 +1,15 @@
+
+Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
+
+UxVCtrl github w700 problem
+
 linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
-ffmpeg...
 
 Faire programme pour aider à la mag calib
-Appli gps qui affiche sog à partir des logs
-Dashboard : pouvoir n'afficher qu'une certaine partie de la traj
+Appli gps qui affiche sog à partir des logs?
+Dashboard : pouvoir n'afficher qu'une certaine partie de la traj, manque fmod360 pour sailangle, évaluer aussi COG, texte devrait s'afficher au-dessus des dessins, rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
+mettre dashboard sur github?
 
 Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
 modify waypoints/heading commands so that they do a line following in the case of a sailboat?

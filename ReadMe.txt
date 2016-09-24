@@ -22,12 +22,13 @@ _ LabJack UD driver v3.15/v3.2X
 [_ OpenAL SDK 1.1]
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
+[_ ffmpeg 32 bit (ffmpeg-msvc)]
 _ Kinect v2 SDK (not available for Visual Studio 2008 and Windows XP)
 [_ Microsoft Office Excel 2003 (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/libmodbus-3.0.6, see UDK\Software prerequisites\CISSAU_prereq)
 *** DEVEL ***
 _ Visual Studio 2008 SP1/Visual Studio 2012
-_ OpenCV 2.4.9 (OpenCV2.4.9 or download http://www.ensta-bretagne.fr/lebars/Share/OpenCV2.4.9.zip and extract in C:)
+_ OpenCV 2.4.9 (OpenCV2.4.9 or see http://www.ensta-bretagne.fr/lebars/Share/setup_qt2010.05_opencv249.pdf)
 _ MAVLink (not available for Visual Studio 2008)
 
 It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested, see Makefile.
@@ -55,6 +56,8 @@ To add a new mission/advanced processing, VisualObstacle or Ball can be used as 
 To add a new device support, NMEADevice can be used as an example. Most of the time, a configuration file should be added for a device, as it is done for NMEADevice and others. A parameter to enable/disable this device should also be added in UxVCtrl.txt, see LoadConfig() in Config.h.
  
 All the shared variables should be declared in Globals.cpp/.h and protected by critical sections (most of them are protected in group, e.g. StateVariables, Ball,...). Some initializations should be done in InitGlobals()/ReleaseGlobals() (e.g. critical sections, images overlays,...).
+
+When enabled (see bMAVLinkInterface setting in UxVCtrl.txt), a MAVLink server is listening on TCP port 5760. You can use Mission Planner to connect to it and get partial position info (cancel the "Get Params" or "Home altitude" dialogs if they appear).
 
 Hardware support : 
 - Hokuyo : Hokuyo URG-04LX-UG01 laser telemeter.

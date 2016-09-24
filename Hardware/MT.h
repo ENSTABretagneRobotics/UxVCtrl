@@ -1156,7 +1156,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	SetMTChecksum(gotoconfigbuf, sizeof(gotoconfigbuf));
 	if (WriteAllRS232Port(&pMT->RS232Port, gotoconfigbuf, sizeof(gotoconfigbuf)) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MT.\n");
+		printf("Unable to connect to a MT : Initialization failure.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -1166,7 +1166,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	if (GetLatestMTMessageMT(pMT, ADDR_MT, GO_TO_CONFIG_ACK_MID, databuf, sizeof(databuf), &nbdatabytes)
 		!= EXIT_SUCCESS)
 	{ 
-		printf("Unable to connect to a MT.\n");
+		printf("Unable to connect to a MT : Initialization failure.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;	
 	}
@@ -1175,7 +1175,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	SetMTChecksum(reqconfigurationbuf, sizeof(reqconfigurationbuf));
 	if (WriteAllRS232Port(&pMT->RS232Port, reqconfigurationbuf, sizeof(reqconfigurationbuf)) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MT.\n");
+		printf("Unable to connect to a MT : Initialization failure.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -1185,7 +1185,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	if (GetLatestMTMessageMT(pMT, ADDR_MT, CONFIGURATION_MID, databuf, sizeof(databuf), &nbdatabytes)
 		!= EXIT_SUCCESS)
 	{ 
-		printf("Unable to connect to a MT.\n");
+		printf("Unable to connect to a MT : Initialization failure.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;	
 	}
@@ -1205,7 +1205,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	SetMTChecksum(gotomeasurementbuf, sizeof(gotomeasurementbuf));
 	if (WriteAllRS232Port(&pMT->RS232Port, gotomeasurementbuf, sizeof(gotomeasurementbuf)) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a MT.\n");
+		printf("Unable to connect to a MT : Initialization failure.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -1215,7 +1215,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	if (GetLatestMTMessageMT(pMT, ADDR_MT, GO_TO_MEASUREMENT_ACK_MID, databuf, sizeof(databuf), &nbdatabytes)
 		!= EXIT_SUCCESS)
 	{ 
-		printf("Unable to connect to a MT.\n");
+		printf("Unable to connect to a MT : Initialization failure.\n");
 		CloseRS232Port(&pMT->RS232Port);
 		return EXIT_FAILURE;	
 	}
