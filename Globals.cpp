@@ -73,6 +73,7 @@ BOOL bDisableHokuyo = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
+BOOL bDisableSBG = FALSE;
 BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
 BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bDisableSwarmonDevice = FALSE;
@@ -288,6 +289,10 @@ BOOL bPauseRazorAHRS = FALSE, bRestartRazorAHRS = FALSE;
 // MT variables.
 BOOL bGPSOKMT = FALSE;
 BOOL bPauseMT = FALSE, bRestartMT = FALSE;
+
+// SBG variables.
+BOOL bGPSOKSBG = FALSE;
+BOOL bPauseSBG = FALSE, bRestartSBG = FALSE;
 
 // NMEADevice variables.
 BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];

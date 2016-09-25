@@ -1037,7 +1037,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (CheckGPSOK())
 			{
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
@@ -1061,7 +1061,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (CheckGPSOK())
 			{
 				// Should add speed...?
 				// Should add altitude with a big error...?
@@ -1801,6 +1801,28 @@ inline int Commands(char* line)
 		mSleep(500);
 		if (!ival1) bRestartMT = TRUE;
 		bPauseMT = ival1;
+	}
+	else if (sscanf(line, "sbgconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "SBG0.txt", strlen("SBG0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "SBG0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartSBG = TRUE;
+		bPauseSBG = ival1;
 	}
 	else if (sscanf(line, "nmeadeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{

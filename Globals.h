@@ -179,6 +179,7 @@ extern BOOL bDisableHokuyo;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
+extern BOOL bDisableSBG;
 extern BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bDisableSwarmonDevice;
@@ -395,6 +396,10 @@ extern BOOL bPauseRazorAHRS, bRestartRazorAHRS;
 extern BOOL bGPSOKMT;
 extern BOOL bPauseMT, bRestartMT;
 
+// SBG variables.
+extern BOOL bGPSOKSBG;
+extern BOOL bPauseSBG, bRestartSBG;
+
 // NMEADevice variables.
 extern BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
@@ -501,6 +506,11 @@ extern char logpingertaskfilename[MAX_BUF_LEN];
 
 extern FILE* logmissingworkertaskfile;
 extern char logmissingworkertaskfilename[MAX_BUF_LEN];
+
+inline BOOL CheckGPSOK(void)
+{
+	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator);
+}
 
 inline int InitGlobals(void)
 {

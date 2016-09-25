@@ -140,6 +140,8 @@
 %
 %mtconfig MT.txt bPause
 %
+%sbgconfig SBG.txt bPause
+%
 %nmeadeviceconfig deviceid NMEADevice.txt bPause
 %
 %mavlinkdeviceconfig deviceid MAVLinkDevice.txt bPause

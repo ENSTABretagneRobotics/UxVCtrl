@@ -216,6 +216,9 @@
     <ClCompile Include="MAVLinkInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\SBG.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -494,6 +497,9 @@
     <ClInclude Include="MAVLinkInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\SBG.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -570,6 +576,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="IM483I0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="SBG0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

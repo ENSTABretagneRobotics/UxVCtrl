@@ -115,18 +115,23 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 			}
 
 			memset(&gps_raw_int, 0, sizeof(mavlink_gps_raw_int_t));
-			if (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator)
+			if (CheckGPSOK())
 			{
-			gps_raw_int.fix_type = 2;
+				gps_raw_int.fix_type = 2;
+				gps_raw_int.vel = (uint16_t)(sog*100);
+				gps_raw_int.cog = (uint16_t)(fmod_360_pos((-angle_env-cog+M_PI/2.0)*180.0/M_PI)*100);
 			}
-			else gps_raw_int.fix_type = 0;
+			else 
+			{
+				gps_raw_int.fix_type = 0;
+				gps_raw_int.vel = UINT16_MAX;
+				gps_raw_int.cog = UINT16_MAX;
+			}
 			gps_raw_int.lat = (int32_t)(lathat*10000000.0);
 			gps_raw_int.lon = (int32_t)(longhat*10000000.0);
 			gps_raw_int.alt = (int32_t)(althat*1000.0);
 			gps_raw_int.eph = UINT16_MAX;
 			gps_raw_int.epv = UINT16_MAX;
-			gps_raw_int.vel = (uint16_t)(sog*100); //UINT16_MAX;
-			gps_raw_int.cog = (uint16_t)(fmod_360_pos((-angle_env-cog+M_PI/2.0)*180.0/M_PI)*100); //UINT16_MAX;
 			gps_raw_int.satellites_visible = 255;
 
 			memset(&attitude, 0, sizeof(mavlink_attitude_t));

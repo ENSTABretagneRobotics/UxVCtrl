@@ -1,4 +1,6 @@
 
+SBG : why the initial position and date will be used by the 2D magnetic calibration?
+
 Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
 
 UxVCtrl github w700 problem
@@ -19,6 +21,7 @@ Some threads may be too fast, check timings...
 add a visual studio config for Linux, utiliser dernière version linux headers?
 
 bugs
+manque des StopChrono() au moins dans MT, SBG
 should add commands critical section so that bWaiting = FALSE would never risk to be overwritten just after...
 Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4…
 Invalid minangle, midangle or maxangle sometimes on rpi2?
@@ -148,7 +151,6 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
-SBG
 Update also DCB settings Windows, check current settings to know what to set manually, check if equivalent to cfmakeraw()
 rajouter utc du GPS (variable globale mis à jour uniquement par NMEA car pour MT et MAVLink on a l'heure PC dans leurs logs) pour trouver erreur d'horloge?
 enregistrer cog sog dans un des logs (logstate)?
@@ -161,6 +163,7 @@ utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas p
 dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 Razor invalid data au début parfois sous linux, jusqu'à 2048 octets invisibles invalides?
+rajouter support GPHDT pour cap dual GPS (comme HCHDG), GPZDA (date) et PRDID (angles)
 MT, SBG specific NMEA messages...
 convert AIS to C code...
 rajouter OSComputerI2CPort rpi
@@ -317,7 +320,6 @@ mais on dirait que je reçois pas optical_flow_rad... changer de firmware?
 il y a des 0 qui s'affichent parfois brièvement pour depth dans opencvgui sur le nuc?
 zhat à 0 aussi dans logstate, mais rien vu dans pressure... attention, il y avait du z_mes pris par GPS?
 
-bGPSOKNMEADevice pour nmea, bGPSOKMT pour mt, bGPSOKMAVLinkDevice[0], bGPSOKMAVLinkDevice[1] pour mavlink et bGPSOKSimulator pour simu...
 commandes enableautogpslocalization/disableautogpslocalization (dans observer?)
 
 observer : prévoir d'autres equations quand gps non dispo (voir etas_wheel eurathlon 2013 pour robot terrestre), comment déterminer si GPS OK...

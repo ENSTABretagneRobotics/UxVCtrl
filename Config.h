@@ -43,6 +43,7 @@ inline int LoadConfig()
 	bDisableP33x = TRUE;
 	bDisableRazorAHRS = TRUE;
 	bDisableMT = TRUE;
+	bDisableSBG = TRUE;
 	bDisableNMEADevice[0] = TRUE;
 	bDisableNMEADevice[1] = TRUE;
 	bDisableMAVLinkDevice[0] = TRUE;
@@ -184,6 +185,8 @@ inline int LoadConfig()
 		if (sscanf(line, "%d", &bDisableRazorAHRS) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMT) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableSBG) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableNMEADevice[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

@@ -31,6 +31,9 @@
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "MT.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifdef ENABLE_SBG_SUPPORT
+#include "SBG.h"
+#endif // ENABLE_SBG_SUPPORT
 #include "NMEADevice.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
@@ -86,6 +89,9 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MTThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifdef ENABLE_SBG_SUPPORT
+	THREAD_IDENTIFIER SBGThreadId;
+#endif // ENABLE_SBG_SUPPORT
 	THREAD_IDENTIFIER NMEADeviceThreadId[MAX_NB_NMEADEVICE];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
@@ -161,6 +167,9 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifdef ENABLE_SBG_SUPPORT
+	if (!bDisableSBG) CreateDefaultThread(SBGThread, NULL, &SBGThreadId);
+#endif // ENABLE_SBG_SUPPORT
 	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
 	{
 		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)(intptr_t)i, &NMEADeviceThreadId[i]);
@@ -290,6 +299,9 @@ int main(int argc, char* argv[])
 	{
 		if (!bDisableNMEADevice[i]) WaitForThread(NMEADeviceThreadId[i]);
 	}
+#ifdef ENABLE_SBG_SUPPORT
+	if (!bDisableSBG) WaitForThread(SBGThreadId);
+#endif // ENABLE_SBG_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMT) WaitForThread(MTThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT

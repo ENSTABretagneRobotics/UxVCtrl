@@ -23,6 +23,7 @@ _ LabJack UD driver v3.15/v3.2X
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
 [_ ffmpeg 32 bit (ffmpeg-msvc)]
+[_ SBG v3.5.0]
 _ Kinect v2 SDK (not available for Visual Studio 2008 and Windows XP)
 [_ Microsoft Office Excel 2003 (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/libmodbus-3.0.6, see UDK\Software prerequisites\CISSAU_prereq)

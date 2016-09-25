@@ -1,0 +1,29 @@
+% IP address and TCP port or local RS232 port
+%127.0.0.1:4007
+COM5
+%/dev/cu.usbserial-FTX2GE57
+% BaudRate
+115200
+%921600
+% Timeout (in ms)
+1000
+% bSaveRawData
+1
+% rollorientation
+0.0
+% rollp1
+0.0
+% rollp2
+0.0
+% pitchorientation
+0.0
+% pitchp1
+0.0
+% pitchp2
+0.0
+% yaworientation
+0
+% yawp1
+0
+% yawp2
+0
