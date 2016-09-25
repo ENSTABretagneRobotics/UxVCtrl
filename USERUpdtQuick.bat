@@ -1,6 +1,6 @@
 cd /d "%~dp0"
 
-set UDK_USER_PATH=..\..\..\..\..\..\..\..\Robotics data\Competitions or robots specific data\AUVs\2015-2016\UDK\USER
+set UDK_USER_PATH=..\..\..\..\..\..\..\..\Robotics data\Competitions or robots specific data\AUVs\2016-2017\UDK\USER
 
 copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\BUGGY_WORKSPACE\UxVCtrl.exe"
 copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\BUGGY_WORKSPACE\CHANGELOG.txt"
