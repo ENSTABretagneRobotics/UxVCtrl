@@ -1,5 +1,7 @@
-
-SBG : why the initial position and date will be used by the 2D magnetic calibration?
+Add COG, SOG, pressure in MT, SBG
+vérifier signes, unités entre MT et SBG...
+odometer data SBG, format du log...?
+rajouter param pour SBG0.txt pour définir quand on prend en compte le GPS ou trouver automatiquement...
 
 Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
 

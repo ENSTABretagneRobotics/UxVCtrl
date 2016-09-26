@@ -23,7 +23,7 @@
 
 #define TIMEOUT_MESSAGE_SBG 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
-#define MAX_NB_BYTES_SBG 9216
+#define MAX_NB_BYTES_SBG 8192
 
 #pragma region SBG-SPECIFIC DEFINITIONS
 #ifdef ENABLE_SBG_SUPPORT
@@ -180,6 +180,9 @@ struct SBGDATA
 	float eulerStdDev[3];
 	float positionStdDev[3];
 	float velocityStdDev[3];
+	double odometerVelocity;
+	unsigned char gpsRawData[4086];
+	unsigned int gpsRawDataSize;
 	unsigned char Status;
 	unsigned short TS; 
 	struct UTC_Time_SBG UTCTime;
@@ -241,23 +244,61 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 	// Handle separately each received data according to the log ID.
 	switch (msg)
 	{
+	case SBG_ECOM_LOG_UTC_TIME:
+		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->utcData.timeStamp;
+		pSBG->LastSBGData.UTCTime.Year = pLogData->utcData.year;
+		pSBG->LastSBGData.UTCTime.Month = pLogData->utcData.month;
+		pSBG->LastSBGData.UTCTime.Day = pLogData->utcData.day;
+		pSBG->LastSBGData.UTCTime.Hour = pLogData->utcData.hour;
+		pSBG->LastSBGData.UTCTime.Minute = pLogData->utcData.minute;
+		pSBG->LastSBGData.UTCTime.Seconds = pLogData->utcData.second;
+		pSBG->LastSBGData.UTCTime.Nanoseconds = pLogData->utcData.nanoSecond;
+		pSBG->LastSBGData.UTCTime.Valid = (unsigned char)sbgEComLogUtcGetClockUtcStatus(pLogData->utcData.status);
+		LeaveCriticalSection(&pSBG->CallbackCS);	
+		break;
+	case SBG_ECOM_LOG_IMU_DATA:
+		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->imuData.timeStamp;
+		pSBG->LastSBGData.gyrX = pLogData->imuData.gyroscopes[0];
+		pSBG->LastSBGData.gyrY = pLogData->imuData.gyroscopes[1];
+		pSBG->LastSBGData.gyrZ = pLogData->imuData.gyroscopes[2];
+		pSBG->LastSBGData.accX = pLogData->imuData.accelerometers[0];
+		pSBG->LastSBGData.accY = pLogData->imuData.accelerometers[1];
+		pSBG->LastSBGData.accZ = pLogData->imuData.accelerometers[2];
+		pSBG->LastSBGData.temp = pLogData->imuData.temperature;
+		LeaveCriticalSection(&pSBG->CallbackCS);	
+		break;
+	case SBG_ECOM_LOG_MAG:
+		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->magData.timeStamp;
+		pSBG->LastSBGData.magX = pLogData->magData.magnetometers[0];
+		pSBG->LastSBGData.magY = pLogData->magData.magnetometers[1];
+		pSBG->LastSBGData.magZ = pLogData->magData.magnetometers[2];
+		LeaveCriticalSection(&pSBG->CallbackCS);	
+		break;
 	case SBG_ECOM_LOG_EKF_EULER:
 		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->ekfEulerData.timeStamp;
 		pSBG->LastSBGData.roll = sbgRadToDegF(pLogData->ekfEulerData.euler[0]);
 		pSBG->LastSBGData.pitch = sbgRadToDegF(pLogData->ekfEulerData.euler[1]);
 		pSBG->LastSBGData.yaw = sbgRadToDegF(pLogData->ekfEulerData.euler[2]);
 		pSBG->LastSBGData.eulerStdDev[0] = pLogData->ekfEulerData.eulerStdDev[0];
 		pSBG->LastSBGData.eulerStdDev[1] = pLogData->ekfEulerData.eulerStdDev[1];
 		pSBG->LastSBGData.eulerStdDev[2] = pLogData->ekfEulerData.eulerStdDev[2];
-		LeaveCriticalSection(&pSBG->CallbackCS);	
+		roll = pSBG->LastSBGData.roll*M_PI/180.0;
+		pitch = pSBG->LastSBGData.pitch*M_PI/180.0;
+		yaw = pSBG->LastSBGData.yaw*M_PI/180.0;
 
 		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 		pSBG->LastSBGData.Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
 		pSBG->LastSBGData.Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
 		pSBG->LastSBGData.Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
+		LeaveCriticalSection(&pSBG->CallbackCS);	
 		break;
 	case SBG_ECOM_LOG_EKF_QUAT:
 		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->ekfQuatData.timeStamp;
 		pSBG->LastSBGData.q0 = pLogData->ekfQuatData.quaternion[0];
 		pSBG->LastSBGData.q1 = pLogData->ekfQuatData.quaternion[1];
 		pSBG->LastSBGData.q2 = pLogData->ekfQuatData.quaternion[2];
@@ -277,6 +318,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_EKF_NAV:
 		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->ekfNavData.timeStamp;
 		pSBG->LastSBGData.Lat = pLogData->ekfNavData.position[0];
 		pSBG->LastSBGData.Long = pLogData->ekfNavData.position[1];
 		pSBG->LastSBGData.Alt = pLogData->ekfNavData.position[2];
@@ -289,6 +331,18 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		pSBG->LastSBGData.velocityStdDev[0] = pLogData->ekfNavData.velocityStdDev[0];
 		pSBG->LastSBGData.velocityStdDev[1] = pLogData->ekfNavData.velocityStdDev[1];
 		pSBG->LastSBGData.velocityStdDev[2] = pLogData->ekfNavData.velocityStdDev[2];
+		LeaveCriticalSection(&pSBG->CallbackCS);	
+		break;
+	case SBG_ECOM_LOG_ODO_VEL:
+		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.TS = (unsigned short)pLogData->odometerData.timeStamp;
+		pSBG->LastSBGData.odometerVelocity = pLogData->odometerData.velocity;
+		LeaveCriticalSection(&pSBG->CallbackCS);	
+		break;
+	case SBG_ECOM_LOG_GPS1_RAW:
+		EnterCriticalSection(&pSBG->CallbackCS);
+		pSBG->LastSBGData.gpsRawDataSize = pLogData->gpsRawData.bufferSize;
+		memcpy(pSBG->LastSBGData.gpsRawData, pLogData->gpsRawData.rawBuffer, pLogData->gpsRawData.bufferSize);
 		LeaveCriticalSection(&pSBG->CallbackCS);	
 		break;
 	default:
@@ -693,30 +747,19 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 	StartChrono(&chrono);
 
 	// Loop to discard old data...
-	while (errorCode != SBG_NO_ERROR)
+	do
 	{
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_SBG)
 		{
 			printf("Error reading data from a SBG : Message timeout. \n");
+			StopChronoQuick(&chrono);
 			return EXIT_TIMEOUT;
 		}
-		// Try to read a frame.
-		errorCode = sbgEComHandle(&pSBG->comHandle);
-		// Test if we have to release some CPU (no frame received).
-		if (errorCode == SBG_NOT_READY)
-		{
-			// Release CPU.
-			sbgSleep(1);
-		}
-		else
-		{
-			printf("Error reading data from a SBG. \n");
-			return EXIT_FAILURE;
-		}
-	}
+		// Try to read and parse one frame.
+		errorCode = sbgEComHandleOneLog(&pSBG->comHandle);
+	} while (errorCode != SBG_NOT_READY);
 		
 	StopChronoQuick(&chrono);
-
 #else
 	unsigned char databuf[MAX_NB_BYTES_SBG];
 	int nbdatabytes = 0;
@@ -928,7 +971,7 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 	return EXIT_SUCCESS;
 }
 
-// SBG must be initialized to 0 before (e.g. SBG mt; memset(&mt, 0, sizeof(SBG));)!
+// SBG must be initialized to 0 before (e.g. SBG sbg; memset(&sbg, 0, sizeof(SBG));)!
 inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 {
 	FILE* file = NULL;
