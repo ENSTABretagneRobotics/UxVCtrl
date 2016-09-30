@@ -17,6 +17,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	MTDATA mtdata;
 	double dval = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -27,8 +28,13 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 	bGPSOKMT = FALSE;
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
 		mSleep(50);
 
 		if (bPauseMT)
@@ -144,9 +150,17 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 				if (mt.bSaveRawData)
 				{
+					// If raw Euler angles were not sent, ensure that they would still be in the log file.
+					if ((mtdata.roll == 0)&&(mtdata.pitch == 0)&&(mtdata.yaw == 0)&&
+						(mtdata.q0 != sqrt(3.0)/2.0)||(mtdata.q1 != 0)||(mtdata.q2 != 0)||(mtdata.q3 != 0))
+					{
+						mtdata.roll = roll*M_PI/180.0;
+						mtdata.pitch = pitch*M_PI/180.0;
+						mtdata.yaw = yaw*M_PI/180.0;
+					}
 					fprintf(mt.pfSaveFile, 
 						"%d;%d;"
-						"%d;%d;%d;%d;%d;%d;%d;%d;"
+						"%d;%d;%d;%d;%d;%d;%f;%d;"
 						"%d;"
 						"%f;%f;%f;"
 						"%f;%f;%f;"
@@ -155,7 +169,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 						"%f;%f;%f;"
 						"%d;%d;\n", 
 						(int)mtdata.TS, (int)0, 
-						(int)mtdata.UTCTime.Nanoseconds, (int)mtdata.UTCTime.Year, (int)mtdata.UTCTime.Month, (int)mtdata.UTCTime.Day, (int)mtdata.UTCTime.Hour, (int)mtdata.UTCTime.Minute, (int)mtdata.UTCTime.Seconds, (int)mtdata.UTCTime.Valid, 
+						(int)mtdata.UTCTime.Nanoseconds, (int)mtdata.UTCTime.Year, (int)mtdata.UTCTime.Month, (int)mtdata.UTCTime.Day, (int)mtdata.UTCTime.Hour, (int)mtdata.UTCTime.Minute, (double)mtdata.UTCTime.Seconds, (int)mtdata.UTCTime.Valid, 
 						(int)mtdata.Status, 
 						mtdata.accX, mtdata.accY, mtdata.accZ, 
 						mtdata.gyrX, mtdata.gyrY, mtdata.gyrZ, 
@@ -176,8 +190,12 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			}
 		}
 
+		//printf("MTThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	bGPSOKMT = FALSE;
 

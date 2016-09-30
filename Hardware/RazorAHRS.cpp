@@ -16,6 +16,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 	struct timeval tv;
 	RAZORAHRSDATA razorahrsdata;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -24,8 +25,13 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 
 	memset(&razorahrs, 0, sizeof(RAZORAHRS));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
 		mSleep(50);
 
 		if (bPauseRazorAHRS) 
@@ -118,8 +124,12 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 			}
 		}
 
+		//printf("RazorAHRSThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (razorahrs.pfSaveFile != NULL)
 	{

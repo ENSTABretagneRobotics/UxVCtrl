@@ -17,6 +17,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 	SBGDATA sbgdata;
 	double dval = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -27,8 +28,13 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 
 	bGPSOKSBG = FALSE;
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
 		mSleep(50);
 
 		if (bPauseSBG)
@@ -145,9 +151,17 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 
 				if (sbg.bSaveRawData)
 				{
+					// If raw Euler angles were not sent, ensure that they would still be in the log file.
+					if ((sbgdata.roll == 0)&&(sbgdata.pitch == 0)&&(sbgdata.yaw == 0)&&
+						(sbgdata.q0 != sqrt(3.0)/2.0)||(sbgdata.q1 != 0)||(sbgdata.q2 != 0)||(sbgdata.q3 != 0))
+					{
+						sbgdata.roll = roll*M_PI/180.0;
+						sbgdata.pitch = pitch*M_PI/180.0;
+						sbgdata.yaw = yaw*M_PI/180.0;
+					}
 					fprintf(sbg.pfSaveFile, 
 						"%d;%d;"
-						"%d;%d;%d;%d;%d;%d;%d;%d;"
+						"%d;%d;%d;%d;%d;%d;%f;%d;"
 						"%d;"
 						"%f;%f;%f;"
 						"%f;%f;%f;"
@@ -156,7 +170,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						"%f;%f;%f;"
 						"%d;%d;\n", 
 						(int)sbgdata.TS, (int)0, 
-						(int)sbgdata.UTCTime.Nanoseconds, (int)sbgdata.UTCTime.Year, (int)sbgdata.UTCTime.Month, (int)sbgdata.UTCTime.Day, (int)sbgdata.UTCTime.Hour, (int)sbgdata.UTCTime.Minute, (int)sbgdata.UTCTime.Seconds, (int)sbgdata.UTCTime.Valid, 
+						(int)sbgdata.UTCTime.Nanoseconds, (int)sbgdata.UTCTime.Year, (int)sbgdata.UTCTime.Month, (int)sbgdata.UTCTime.Day, (int)sbgdata.UTCTime.Hour, (int)sbgdata.UTCTime.Minute, (double)sbgdata.UTCTime.Seconds, (int)sbgdata.UTCTime.Valid, 
 						(int)sbgdata.Status, 
 						sbgdata.accX, sbgdata.accY, sbgdata.accZ, 
 						sbgdata.gyrX, sbgdata.gyrY, sbgdata.gyrZ, 
@@ -177,8 +191,12 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			}
 		}
 
+		//printf("SBGThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	bGPSOKSBG = FALSE;
 

@@ -1,3 +1,8 @@
+116
+Corrected bug when if Euler angles were not sent from MT/SBG, they were not stored in the log file while they were still computed from quaternions.
+Changed UTC_Seconds from int to double in the log file for sbgCenter compatibility.
+Added test code to check the thread period of SBG, MT and RazorAHRS.
+
 115
 Added preliminary SBG support.
 
