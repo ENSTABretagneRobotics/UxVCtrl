@@ -152,7 +152,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 				{
 					// If raw Euler angles were not sent, ensure that they would still be in the log file.
 					if ((mtdata.roll == 0)&&(mtdata.pitch == 0)&&(mtdata.yaw == 0)&&
-						(mtdata.q0 != sqrt(3.0)/2.0)||(mtdata.q1 != 0)||(mtdata.q2 != 0)||(mtdata.q3 != 0))
+						((mtdata.q0 != sqrt(3.0)/2.0)||(mtdata.q1 != 0)||(mtdata.q2 != 0)||(mtdata.q3 != 0)))
 					{
 						mtdata.roll = roll*M_PI/180.0;
 						mtdata.pitch = pitch*M_PI/180.0;

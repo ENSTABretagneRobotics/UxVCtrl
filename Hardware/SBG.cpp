@@ -133,8 +133,9 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				theta_mes = fmod_2PI(M_PI/2.0-sbgdata.Yaw-angle_env);
 				omega_mes = sbgdata.gyrZ;
 
-				if ((sbgdata.positionStdDev[0] > 0)&&(sbgdata.positionStdDev[0] < 10)&&
-					(sbgdata.positionStdDev[1] > 0)&&(sbgdata.positionStdDev[1] < 10))
+				// Check accuracy at 3*sigma to use GPS data.
+				if ((sbgdata.positionStdDev[0] > 0)&&(sbgdata.positionStdDev[0] < sbg.gpsaccuracythreshold/3.0)&&
+					(sbgdata.positionStdDev[1] > 0)&&(sbgdata.positionStdDev[1] < sbg.gpsaccuracythreshold/3.0))
 				{
 					//printf("%f;%f\n", sbgdata.Lat, sbgdata.Long);
 					latitude = sbgdata.Lat;
@@ -153,7 +154,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				{
 					// If raw Euler angles were not sent, ensure that they would still be in the log file.
 					if ((sbgdata.roll == 0)&&(sbgdata.pitch == 0)&&(sbgdata.yaw == 0)&&
-						(sbgdata.q0 != sqrt(3.0)/2.0)||(sbgdata.q1 != 0)||(sbgdata.q2 != 0)||(sbgdata.q3 != 0))
+						((sbgdata.q0 != sqrt(3.0)/2.0)||(sbgdata.q1 != 0)||(sbgdata.q2 != 0)||(sbgdata.q3 != 0)))
 					{
 						sbgdata.roll = roll*M_PI/180.0;
 						sbgdata.pitch = pitch*M_PI/180.0;

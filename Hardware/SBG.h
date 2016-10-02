@@ -212,6 +212,7 @@ struct SBG
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	double gpsaccuracythreshold;
 	double rollorientation;
 	double rollp1;
 	double rollp2;
@@ -1002,6 +1003,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 		pSBG->BaudRate = 115200;
 		pSBG->timeout = 1000;
 		pSBG->bSaveRawData = 1;
+		pSBG->gpsaccuracythreshold = 10;
 		pSBG->rollorientation = 0;
 		pSBG->rollp1 = 0;
 		pSBG->rollp2 = 0;
@@ -1024,6 +1026,8 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSBG->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSBG->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pSBG->gpsaccuracythreshold) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pSBG->rollorientation) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1048,6 +1052,12 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pSBG->gpsaccuracythreshold < 0)
+	{
+		printf("Invalid parameter : gpsaccuracythreshold.\n");
+		pSBG->gpsaccuracythreshold = 10;
 	}
 
 	// Used to save raw data, should be handled specifically...

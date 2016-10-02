@@ -1,5 +1,4 @@
-vérifier signes, unités entre MT et SBG...->au moins difference de - sur le yaw et le roll, le Z, le Y (difference de NWU à NED), faire programme de conversion spécifique SBG2MT et inversement...
-rajouter param gpsaccuracythreshold pour SBG0.txt pour définir quand on prend en compte le GPS, ou trouver automatiquement...
+vérifier signes, unités entre MT et SBG...->au moins difference de - sur le yaw et le roll, le Z, le Y (difference de NWU à NED), faire programme de conversion spécifique SBG2MT et inversement, faire un MT2NMEA pour pouvoir être compatible avec tous les programme pour GPS...
 Add COG, SOG, pressure in MT, SBG
 odometer data SBG, format du log...?
 
@@ -263,6 +262,7 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+rajouter param gpsaccuracythreshold pour SBG0.txt pour définir quand on prend en compte le GPS, ou trouver automatiquement...
 surveiller freq thread SBG
 
 check \n in commands for Linux...->ne marche pas

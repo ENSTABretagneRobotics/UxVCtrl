@@ -9,6 +9,8 @@ COM5
 1000
 % bSaveRawData
 1
+% gpsaccuracythreshold (in m)
+10.0
 % rollorientation
 0.0
 % rollp1

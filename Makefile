@@ -2,7 +2,7 @@
 # You might need to install C/C++ development tools by typing :
 #    sudo apt-get install build-essential
 # in a terminal.
-# Additionally, you need to install OpenCV 2.4.9, libmodbus 3.0.6[, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
+# Additionally, you need to install OpenCV 2.4.9, MAVLink, libmodbus 3.0.6, SBG Systems Inertial SDK v3.5.0[, ffmpeg 32 bit, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
 # For more information on the configuration used, see www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt .
 # Use dos2unix *.txt to ensure line endings are correct for Linux in the configuration files.
 # In case of codecs problems, try with USE_ALTERNATE_RECORDING...
@@ -18,17 +18,18 @@ CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-parameter
 
 #CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY 
 #CFLAGS += -D _DEBUG_MESSAGES 
+CFLAGS += -D OPENCV249
+#CFLAGS += -D OPENCV310
+CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+#CFLAGS += -D USE_ALTERNATE_RECORDING
+CFLAGS += -D ENABLE_MAVLINK_SUPPORT
 CFLAGS += -D ENABLE_LABJACK_SUPPORT
 CFLAGS += -D ENABLE_LIBMODBUS_SUPPORT
-CFLAGS += -D ENABLE_MAVLINK_SUPPORT
+CFLAGS += -D ENABLE_SBG_SUPPORT
 #CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
 CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD 
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
-CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
-#CFLAGS += -D USE_ALTERNATE_RECORDING
 #CFLAGS += -D ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-CFLAGS += -D OPENCV249
-#CFLAGS += -D OPENCV310
 
 CFLAGS += -I../OSUtils 
 CFLAGS += -I../Extensions/Devices/LabjackUtils/liblabjackusb
@@ -38,12 +39,14 @@ CFLAGS += -I../Extensions/Img
 CFLAGS += -I../interval -I../matrix_lib 
 CFLAGS += -I./Hardware 
 CFLAGS += -I. -I..
+CFLAGS += -I/usr/local/include/sbgECom/src -I/usr/local/include/sbgECom/common 
 
 CXXFLAGS += $(CFLAGS) -fpermissive
 
 LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
 #LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
 LDFLAGS += -lmodbus
+LDFLAGS += -lsbgECom
 #LDFLAGS += -lusb-1.0
 LDFLAGS += -lpthread -lrt -lm
 
@@ -183,6 +186,9 @@ RazorAHRS.o: ./Hardware/RazorAHRS.cpp ./Hardware/RazorAHRS.h
 RS232Port.o: ./Hardware/RS232Port.cpp ./Hardware/RS232Port.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+SBG.o: ./Hardware/SBG.cpp ./Hardware/SBG.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
 	$(CXX) $(CXXFLAGS) -c $<
 
@@ -257,7 +263,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
