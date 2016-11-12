@@ -12,7 +12,7 @@
 
 #include "Globals.h"
 
-inline int LoadConfig()
+inline int LoadConfig(void)
 {
 	FILE* file = NULL;
 	char line[MAX_BUF_LEN];
@@ -635,7 +635,7 @@ inline int LoadConfig()
 	return EXIT_SUCCESS;
 }
 
-inline int LoadEnv()
+inline int LoadEnv(void)
 {
 	FILE* file = NULL;
 	char line[MAX_BUF_LEN];
@@ -748,7 +748,7 @@ inline int LoadEnv()
 	return EXIT_SUCCESS;
 }
 
-inline int UnloadEnv()
+inline int UnloadEnv(void)
 {
 	// Default values.
 	angle_env = M_PI/2.0-90.0*M_PI/180.0;
@@ -767,6 +767,93 @@ inline int UnloadEnv()
 	box_env = box(interval(-10,10),interval(-10,10));
 	csMap.xMin = -10; csMap.xMax = 10; csMap.yMin = -10; csMap.yMax = 10; 
 
+	return EXIT_SUCCESS;
+}
+
+inline int LoadKeys(void)
+{
+	FILE* file = NULL;
+	char line[MAX_BUF_LEN];
+	int i = 0, j = 0;
+
+	memset(line, 0, sizeof(line));
+
+	// Default values.
+	memset(keys, 0, sizeof(keys));
+	keys[FWD_KEY] = 'z';
+	keys[BWD_KEY] = 's';
+	keys[LEFT_KEY] = 'q';
+	keys[RIGHT_KEY] = 'd';
+	keys[LAT_LEFT_KEY] = 'a';
+	keys[LAT_RIGHT_KEY] = 'e';
+	keys[BRAKE_KEY] = 'w';
+	keys[DEPTHCONTROL_KEY] = 'y';
+	keys[ALTITUDESEAFLOORCONTROL_KEY] = 'Y';
+
+	file = fopen("keys.txt", "r");
+	if (file != NULL)
+	{
+		for (i = 0; i < NB_CONFIGURABLE_KEYS; i++)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%c", &keys[i]) != 1) printf("Invalid configuration file.\n");
+		}
+		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+	}
+	else
+	{
+		printf("Configuration file not found.\n");
+	}
+
+	for (i = 0; i < NB_CONFIGURABLE_KEYS; i++)
+	{
+		for (j = 0; j < NB_CONFIGURABLE_KEYS; j++)
+		{
+			if (keys[i] == keys[j])
+			{
+				printf("Invalid parameter : keys[%d] == keys[%d] == '%c' (ASCII code %d).\n", (int)i, (int)j, keys[i], (int)keys[i]);
+			}
+		}
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int TranslateKeys(int c)
+{
+	if (c == keys[FWD_KEY]) c = 'z';
+	if (c == keys[BWD_KEY]) c = 's';
+	if (c == keys[LEFT_KEY]) c = 'q';
+	if (c == keys[RIGHT_KEY]) c = 'd';
+	if (c == keys[LAT_LEFT_KEY]) c = 'a';
+	if (c == keys[LAT_RIGHT_KEY]) c = 'e';
+	if (c == keys[BRAKE_KEY]) c = 'w';
+	if (c == keys[DEPTHCONTROL_KEY]) c = 'y';
+	if (c == keys[ALTITUDESEAFLOORCONTROL_KEY]) c = 'Y';
+
+	return c;
+}
+
+inline int DisplayKeys(void)
+{
+	printf("On OpenCVGUI : \n");
+	printf("%c%c%c%c,fv,%c%c,%c(brake),space(stop),g(generalstop),t%c%c(control),"
+		"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),X(disableopencvgui),"
+		"+-(coordspace zoom),T(text color)"
+		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
+		"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
+		"bn(light),uj(tilt),46825(CISCREA OSD),"
+		"C(Switch),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n", 
+		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
+		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDESEAFLOORCONTROL_KEY]);
+
+	return EXIT_SUCCESS;
+}
+
+inline int DisplayHelp(void)
+{
+	printf("On the command prompt : \nCheck mission_spec.txt for available commands.\n");
+	DisplayKeys();
 	return EXIT_SUCCESS;
 }
 

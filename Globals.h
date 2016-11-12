@@ -67,6 +67,22 @@
 #define TREX_ROBID 0x04000000
 #define QUADRO_ROBID 0x20000000
 
+enum KEYS
+{
+	FWD_KEY,
+	BWD_KEY,
+	LEFT_KEY,
+	RIGHT_KEY,
+	LAT_LEFT_KEY,
+	LAT_RIGHT_KEY,
+	BRAKE_KEY,
+	DEPTHCONTROL_KEY,
+	ALTITUDESEAFLOORCONTROL_KEY,
+
+	NB_CONFIGURABLE_KEYS
+};
+typedef enum KEYS KEYS;
+
 #define LOG_FOLDER "log/"
 #define PIC_FOLDER "pic/"
 #define VID_FOLDER "vid/"
@@ -477,6 +493,7 @@ extern int procdefineaddrs[MAX_NB_PROCEDURES];
 extern int procreturnaddrs[MAX_NB_PROCEDURES];
 extern int procstackids[MAX_NB_PROCEDURES];
 extern int procstack;
+extern char keys[NB_CONFIGURABLE_KEYS];
 
 extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];

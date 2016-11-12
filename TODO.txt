@@ -1,22 +1,28 @@
-vérifier signes, unités entre MT et SBG...->au moins difference de - sur le yaw et le roll, le Z, le Y (difference de NWU à NED), faire programme de conversion spécifique SBG2MT et inversement, faire un MT2NMEA pour pouvoir être compatible avec tous les programme pour GPS...
+set wtheta to current when enabling headingcontrol, same for other controls?
+check if improvements can be made on AUV control (e.g. to avoid sinking and lose control...)
+
+utiliser hokuyo pour estimer vitesse longi et lat...
+
 Add COG, SOG, pressure in MT, SBG
-odometer data SBG, format du log...?
+
+Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
+selon les accx_err, ça aura ou non une influence sur les équations d'état
+Gérer le -g dans acc…
+changer les theta et psi et rajouter équations voilier
 
 Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
-
-UxVCtrl github w700 problem
 
 linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
 
 Faire programme pour aider à la mag calib
 Appli gps qui affiche sog à partir des logs?
-Dashboard : pouvoir n'afficher qu'une certaine partie de la traj, manque fmod360 pour sailangle, évaluer aussi COG, texte devrait s'afficher au-dessus des dessins, rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
-mettre dashboard sur github?
+Dashboard : rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
 
 Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
 modify waypoints/heading commands so that they do a line following in the case of a sailboat?
-Copier implémentation launchtcpsrv pour la modifier et stopper correctement
+Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
+Rajouter option choix série ou TCP et port pour MAVLinkInterface
 
 Some threads may be too fast, check timings...
 add a visual studio config for Linux, utiliser dernière version linux headers?
@@ -38,6 +44,7 @@ Quand je fais un lock des statevariables pour staticlocalization, vérifier que s
 race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 GTK : now the keys are randomly received by the 2 windows...
+Attention à la touche NUM LOCK dans les vm Linux!
 préparer qt .pro pour débugguer
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
@@ -262,6 +269,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+odometer data SBG, format du log...?->non dispo
+
+vérifier signes, unités entre MT et SBG...->au moins difference de - sur le yaw et le roll, le Z, le Y (difference de NWU à NED), faire programme de conversion spécifique SBG2MT et inversement...
+faire un MT2NMEA pour pouvoir être compatible avec tous les programmes pour GPS
 rajouter param gpsaccuracythreshold pour SBG0.txt pour définir quand on prend en compte le GPS, ou trouver automatiquement...
 surveiller freq thread SBG
 

@@ -2409,6 +2409,10 @@ inline int Commands(char* line)
 	{
 		bExit = TRUE;
 	}
+	else if (strncmp(line, "help", strlen("help")) == 0)
+	{
+		DisplayHelp();
+	}
 	else if (sscanf(line, "setmissionaction %[^\r\n]255s", str) == 1)
 	{
 		strcpy(szAction, str);

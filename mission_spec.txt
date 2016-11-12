@@ -280,6 +280,8 @@
 %
 %exit
 %
+%help
+%
 %setmissionaction name (string representing the current action name to store in the mission log file)
 %
 %wait t (double [0,oo[ timeout in s, the function blocks until the timeout is reached)

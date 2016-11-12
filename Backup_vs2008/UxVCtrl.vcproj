@@ -351,6 +351,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\keys.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Maestro0.txt"
 				>
 			</File>

@@ -130,6 +130,7 @@ int main(int argc, char* argv[])
 
 	LoadConfig();
 	LoadEnv();
+	LoadKeys();
 	InitGlobals();
 
 #ifdef _WIN32

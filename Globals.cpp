@@ -371,6 +371,7 @@ int procdefineaddrs[MAX_NB_PROCEDURES];
 int procreturnaddrs[MAX_NB_PROCEDURES];
 int procstackids[MAX_NB_PROCEDURES];
 int procstack = 0;
+char keys[NB_CONFIGURABLE_KEYS];
 
 CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];

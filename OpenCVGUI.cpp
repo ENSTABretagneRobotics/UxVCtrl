@@ -32,7 +32,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispRecordingCircle = FALSE;
 	BOOL bDispPlayingTriangle = FALSE;
 	BOOL bEnableRCMode = FALSE;
-	BOOL bEnableZQSDFullMode = FALSE;
+	BOOL bEnableFullSpeedMode = FALSE;
 	BOOL bZQSDPressed = FALSE;
 	CvPoint PlayingTrianglePoints[3];
 	int nbPlayingTrianglePoints = 3;
@@ -51,11 +51,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	{
 	case TREX_ROBID:
 		bEnableRCMode = TRUE;
-		bEnableZQSDFullMode = TRUE;
+		bEnableFullSpeedMode = TRUE;
 		break;
 	default:
 		bEnableRCMode = FALSE;
-		bEnableZQSDFullMode = FALSE;
+		bEnableFullSpeedMode = FALSE;
 		break;
 	}
 
@@ -89,6 +89,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		else mSleep(captureperiod);
 
 		if (bExit) break;
+#pragma region IMAGES
 		if (bEnableOpenCVGUIs[videoid]) 
 		{
 			if (windowname[0] == 0)
@@ -191,10 +192,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 		}
 		LeaveCriticalSection(&dispimgsCS[videoid]);
+#pragma endregion
 
 		EnterCriticalSection(&StateVariablesCS);
 #pragma region KEYS
-		switch ((char)c)
+		switch (TranslateKeys(c))
 		{
 		case 'z':
 			u += 0.1*u_max;
@@ -208,7 +210,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
-				if (bEnableZQSDFullMode) u = u_max;
+				if (bEnableFullSpeedMode) u = u_max;
 				if (!bHeadingControl) uw = 0;
 				break;
 			default:
@@ -229,7 +231,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
-				if (bEnableZQSDFullMode) u = -u_max;
+				if (bEnableFullSpeedMode) u = -u_max;
 				if (!bHeadingControl) uw = 0;
 				break;
 			default:
@@ -252,7 +254,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 				case HOVERCRAFT_ROBID:
 				case TREX_ROBID:
-					if (bEnableZQSDFullMode) uw = uw_max;
+					if (bEnableFullSpeedMode) uw = uw_max;
 					break;
 				default:
 					break;
@@ -274,7 +276,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 				case HOVERCRAFT_ROBID:
 				case TREX_ROBID:
-					if (bEnableZQSDFullMode) uw = -uw_max;
+					if (bEnableFullSpeedMode) uw = -uw_max;
 					break;
 				default:
 					break;
@@ -339,6 +341,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'a':		
 			switch (robid)
 			{
+			case MOTORBOAT_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
+			case BUGGY_ROBID:
+				if (!bHeadingControl) uw = 0;
+				break;
 			case QUADRO_ROBID:
 				ul += 0.1;
 				ul = (ul > 1)? 1: ul;
@@ -355,6 +363,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'e':	
 			switch (robid)
 			{
+			case MOTORBOAT_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
+			case BUGGY_ROBID:
+				if (!bHeadingControl) uw = 0;
+				break;
 			case QUADRO_ROBID:
 				ul -= 0.1;
 				ul = (ul < -1)? -1: ul;
@@ -435,6 +449,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 		case 'T': 
+#pragma region COLORS
 			colortextid++;
 			switch (colortextid)
 			{
@@ -488,6 +503,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				colortext = CV_RGB(0,255,128);
 				break;
 			}
+#pragma endregion
 			break;
 		case 'O':
 			// gpssetenvcoordposition
@@ -602,14 +618,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'x':
 			AbortMission();
 			break;
-		case 'h':
-			printf("zqsd,fv,ae,w(brake),space(stop),g(generalstop),tyY(control),"
-				"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),X(disableopencvgui),"
-				"+-(coordspace zoom),T(text color)"
-				"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
-				"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
-				"bn(light),uj(tilt),46825(CISCREA OSD),"
-				"C(Switch),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n");
+		case 'h': DisplayHelp(); break;
+		case 'K':
+			LoadKeys();
+			printf("Keys updated.\n");
+			DisplayKeys();
 			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
@@ -640,9 +653,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("RC mode disabled.\n");
 			break;
 		case '1': 
-			bEnableZQSDFullMode = !bEnableZQSDFullMode; 
-			if (bEnableZQSDFullMode) printf("ZQSD full speed mode enabled.\n");
-			else printf("ZQSD full speed mode disabled.\n");
+			bEnableFullSpeedMode = !bEnableFullSpeedMode; 
+			if (bEnableFullSpeedMode) printf("Full speed mode enabled.\n");
+			else printf("Full speed mode disabled.\n");
 			break;
 		case '9': 
 			bRearmAutopilot = TRUE; 

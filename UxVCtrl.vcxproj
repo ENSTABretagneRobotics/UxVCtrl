@@ -258,6 +258,7 @@
     <ClInclude Include="Hardware\Video.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="keys.txt" />
     <Text Include="MAVLinkDevice0.txt" />
     <Text Include="MAVLinkDevice1.txt" />
     <Text Include="NMEADevice1.txt" />

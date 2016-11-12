@@ -70,7 +70,10 @@ Hardware support :
 - NMEADevice : GPS, Furuno WS200 weather station, AIS Receiver dAISy.
 - P33x : Keller pressure sensor PAA-33x.
 - RazorAHRS : SparkFun 9DOF Razor IMU.
+- SBG : SBG Systems Ellipse-N AHRS.
 - Seanet : Tritech Micron Sonar, Tritech Miniking Sonar.
 - SSC-32 : Lynxmotion SSC-32, SSC-32u servo controllers.
+- UE9A : LabJack UE9.
+- Video : USB webcam, SJCAM M10+ through Wi-Fi, Kinect v2.
 
 See also https://github.com/ENSTABretagneRobotics/Android, https://github.com/ENSTABretagneRobotics/Hardware-CPP, https://github.com/ENSTABretagneRobotics/Hardware-MATLAB, https://github.com/ENSTABretagneRobotics/Hardware-Java.

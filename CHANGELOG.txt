@@ -1,3 +1,7 @@
+118
+Added help command.
+Added keys.txt configuration file.
+
 117
 Added Linux support for SBG.
 Corrected bug in condition when raw Euler angles were not sent from MT/SBG.
@@ -179,7 +183,7 @@ GPS fix info now displayed on GUI.
 Added tv_sec;tv_usec; in logstate and logsimu.
 Changed Hokuyo log format to reduce size.
 Corrected O and G keys so that they correspond better to the commands.
-Added bEnableZQSDFullMode.
+Added bEnableFullSpeedMode.
 
 75
 Continuation of MAVLinkDevice integration.
