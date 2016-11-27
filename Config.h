@@ -809,7 +809,7 @@ inline int LoadKeys(void)
 	{
 		for (j = 0; j < NB_CONFIGURABLE_KEYS; j++)
 		{
-			if (keys[i] == keys[j])
+			if ((i != j)&&(keys[i] == keys[j]))
 			{
 				printf("Invalid parameter : keys[%d] == keys[%d] == '%c' (ASCII code %d).\n", (int)i, (int)j, keys[i], (int)keys[i]);
 			}

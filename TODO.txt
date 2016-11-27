@@ -1,3 +1,12 @@
+if (!bEnableHeadingControl)
+{
+	bEnableHeadingControl = TRUE;
+	wtheta = Center(thetahat);
+}
+else 
+{
+	bEnableHeadingControl = FALSE;
+}
 set wtheta to current when enabling headingcontrol, same for other controls?
 check if improvements can be made on AUV control (e.g. to avoid sinking and lose control...)
 

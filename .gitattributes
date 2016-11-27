@@ -23,6 +23,7 @@
 *.BAT eol=crlf
 *.cmd eol=crlf
 *.CMD eol=crlf
+# Might contain binary data but should try to be displayed as text...
 *.csv -text
 *.CSV -text
 # Reg files are UTF-16 and this might cause problems...
@@ -42,12 +43,21 @@ Makefile eol=lf
 *.res eol=crlf
 *.resx eol=crlf
 
+# LaTeX
+*.tex eol=crlf
+*.TEX eol=crlf
+*.bib eol=crlf
+*.BIB eol=crlf
+*.lyx eol=crlf
+*.LYX eol=crlf
+
 # Seanet
 *.v4log binary
 *.partheader binary
 *.userver binary
 
 # MOOS
+# Might contain binary data but should try to be displayed as text...
 *.alog -text
 
 #
