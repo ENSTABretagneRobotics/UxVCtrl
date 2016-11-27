@@ -196,7 +196,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 		EnterCriticalSection(&StateVariablesCS);
 #pragma region KEYS
-		switch (TranslateKeys(c))
+		switch ((char)TranslateKeys(c))
 		{
 		case 'z':
 			u += 0.1*u_max;

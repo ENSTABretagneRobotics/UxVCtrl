@@ -1,3 +1,7 @@
+Ubuntu 16.10 errors cv min, max, distinguer cas C et C++? Trouver où min et max sont définis en mode c++
+Ne réagit pas aux touches, tester avec ubuntu 15.10 ou anciennes versions du programme->version WRSC marche…->cast char nécessaire, regarder plus en détails…
+Warnings misleading indent
+
 if (!bEnableHeadingControl)
 {
 	bEnableHeadingControl = TRUE;

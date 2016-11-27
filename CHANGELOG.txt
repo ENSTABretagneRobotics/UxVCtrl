@@ -1,3 +1,6 @@
+120
+Corrected bug with keys that were not working on Linux.
+
 119
 Removed inttypes.h since it should only be added when needed.
 Corrected bug when checking duplicate keys.
