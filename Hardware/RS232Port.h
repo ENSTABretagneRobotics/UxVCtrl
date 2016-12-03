@@ -8,8 +8,6 @@ Fabrice Le Bars
 
 Created : 2013-08-16
 
-Version status : Not finished
-
 ***************************************************************************************************************:)*/
 
 // Prevent Visual Studio Intellisense from defining _WIN32 and _MSC_VER when we use 
