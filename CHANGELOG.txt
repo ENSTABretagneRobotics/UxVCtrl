@@ -1,3 +1,6 @@
+121
+Added TCP server support to RS2323Port.
+
 120
 Corrected bug with keys that were not working on Linux.
 

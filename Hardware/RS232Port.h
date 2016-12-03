@@ -61,14 +61,16 @@ Debug macros specific to RS232Port.
 #define MAX_RS232PORT_TIMEOUT 25500
 #define MAX_RS232PORT_NAME_LENGTH (128-8)
 
-#define RS232PORT_TYPE_LOCAL 0
-#define RS232PORT_TYPE_REMOTE 1
-//#define RS232PORT_TYPE_UE9 2
+#define LOCAL_TYPE_RS232PORT 0
+#define TCP_CLIENT_TYPE_RS232PORT 1
+#define TCP_SERVER_TYPE_RS232PORT 2
+//#define UE9_TYPE_RS232PORT 3
 
 struct RS232PORT
 {
 	HANDLE hDev;
 	SOCKET s;
+	SOCKET s_srv;
 	char szDevPath[256];
 	char address[256];
 	char port[256];
@@ -81,25 +83,55 @@ Open a RS232 port. Use CloseRS232Port() to close it at the end.
 
 RS232PORT* pRS232Port : (INOUT) Valid pointer that will receive a structure 
 corresponding to a RS232 port.
-char* szDevPath : (IN) IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port.
+char* szDevPath : (IN) Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port.
 
 Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */
 inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 {
 	char* ptr = NULL;
+	int iResult = EXIT_FAILURE;
 
 	memset(pRS232Port->szDevPath, 0, sizeof(pRS232Port->szDevPath));
 	memset(pRS232Port->address, 0, sizeof(pRS232Port->address));
 	memset(pRS232Port->port, 0, sizeof(pRS232Port->port));
 
-	// Try to determine whether it is an IP address and TCP port or a local RS232 port.
+	// Try to determine whether it is a server TCP port, a client IP address and TCP port or a local RS232 port.
 	ptr = strchr(szDevPath, ':');
-	if ((ptr != NULL)&&(ptr[1] != 0))
+	if ((szDevPath[0] == ':')&&(atoi(szDevPath+1) > 0))
+	{
+		strcpy(pRS232Port->port, szDevPath+1);
+		pRS232Port->DevType = TCP_SERVER_TYPE_RS232PORT;
+		if (inittcpsrv(&pRS232Port->s_srv, "0.0.0.0", pRS232Port->port, 1, DEFAULT_SOCK_TIMEOUT) != EXIT_SUCCESS)
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
+				"(szDevPath=%s)\n", 
+				strtime_m(), 
+				"inittcpsrv failed. ", 
+				szDevPath));
+			return EXIT_FAILURE;
+		}
+		iResult = waitforclifortcpsrv(pRS232Port->s_srv, &pRS232Port->s, DEFAULT_SOCK_TIMEOUT);
+		switch (iResult)
+		{
+		case EXIT_SUCCESS:
+			break;
+		case EXIT_TIMEOUT:
+		default:
+			PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
+				"(szDevPath=%s)\n", 
+				strtime_m(), 
+				"waitforclifortcpsrv failed or timed out. ", 
+				szDevPath));
+			releasetcpsrv(pRS232Port->s_srv);
+			return EXIT_FAILURE;
+		}
+	}
+	else if ((ptr != NULL)&&(ptr[1] != 0))
 	{
 		memcpy(pRS232Port->address, szDevPath, ptr-szDevPath);
 		strcpy(pRS232Port->port, ptr+1);
-		pRS232Port->DevType = RS232PORT_TYPE_REMOTE;
+		pRS232Port->DevType = TCP_CLIENT_TYPE_RS232PORT;
 		if (inittcpcli(&pRS232Port->s, pRS232Port->address, pRS232Port->port) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
@@ -112,7 +144,7 @@ inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 	}
 	else
 	{
-		pRS232Port->DevType = RS232PORT_TYPE_LOCAL;
+		pRS232Port->DevType = LOCAL_TYPE_RS232PORT;
 		if (OpenComputerRS232Port(&pRS232Port->hDev, szDevPath) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
@@ -126,9 +158,10 @@ inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		break;
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		if (PurgeComputerRS232Port(pRS232Port->hDev) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
@@ -160,9 +193,18 @@ inline int CloseRS232Port(RS232PORT* pRS232Port)
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
 		return releasetcpcli(pRS232Port->s);
-	case RS232PORT_TYPE_LOCAL:
+	case TCP_SERVER_TYPE_RS232PORT:
+		if (disconnectclifromtcpsrv(pRS232Port->s) != EXIT_SUCCESS)
+		{
+			PRINT_DEBUG_WARNING_RS232PORT(("CloseRS232Port error (%s) : %s(pRS232Port=%#x)\n", 
+				strtime_m(), 
+				"Error disconnecting a client. ", 
+				pRS232Port));
+		}
+		return releasetcpsrv(pRS232Port->s_srv);
+	case LOCAL_TYPE_RS232PORT:
 		return CloseComputerRS232Port(pRS232Port->hDev);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("CloseRS232Port error (%s) : %s(pRS232Port=%#x)\n", 
@@ -195,7 +237,8 @@ inline int SetOptionsRS232Port(RS232PORT* pRS232Port, UINT BaudRate, BYTE Parity
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		PRINT_DEBUG_WARNING_RS232PORT(("SetOptionsRS232Port warning (%s) : %s"
 			"(pRS232Port=%#x, BaudRate=%u, ParityMode=%u, bCheckParity=%u, "
 			"nbDataBits=%u, StopBitsMode=%u, timeout=%u)\n", 
@@ -203,7 +246,7 @@ inline int SetOptionsRS232Port(RS232PORT* pRS232Port, UINT BaudRate, BYTE Parity
 			"Please check the configuration of the hardware or software RS232 to TCP/IP converter. ", 
 			pRS232Port, BaudRate, (UINT)ParityMode, (UINT)bCheckParity, (UINT)nbDataBits, (UINT)StopBitsMode, timeout));
 		break;
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		if (SetOptionsComputerRS232Port(pRS232Port->hDev, BaudRate, ParityMode, bCheckParity, nbDataBits, StopBitsMode, timeout) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_ERROR_RS232PORT(("SetOptionsRS232Port error (%s) : %s"
@@ -250,9 +293,10 @@ inline int PurgeRS232Port(RS232PORT* pRS232Port)
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		return flushsocket(pRS232Port->s);
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		return PurgeComputerRS232Port(pRS232Port->hDev);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("PurgeRS232Port error (%s) : %s(pRS232Port=%#x)\n", 
@@ -278,9 +322,10 @@ inline int DrainRS232Port(RS232PORT* pRS232Port)
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		return flushsocket(pRS232Port->s);
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		return DrainComputerRS232Port(pRS232Port->hDev);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("DrainRS232Port error (%s) : %s(pRS232Port=%#x)\n", 
@@ -308,7 +353,8 @@ inline int WriteRS232Port(RS232PORT* pRS232Port, uint8* writebuf, int writebufle
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		{
 #ifdef _DEBUG_MESSAGES_RS232PORT
 			int i = 0;
@@ -350,7 +396,7 @@ inline int WriteRS232Port(RS232PORT* pRS232Port, uint8* writebuf, int writebufle
 
 			return EXIT_SUCCESS;
 		}
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		return WriteComputerRS232Port(pRS232Port->hDev, writebuf, (int)writebuflen, pWrittenBytes);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("WriteRS232Port error (%s) : %s"
@@ -378,7 +424,8 @@ inline int ReadRS232Port(RS232PORT* pRS232Port, uint8* readbuf, int readbuflen, 
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		{
 #ifdef _DEBUG_MESSAGES_RS232PORT
 			int i = 0;
@@ -420,7 +467,7 @@ inline int ReadRS232Port(RS232PORT* pRS232Port, uint8* readbuf, int readbuflen, 
 
 			return EXIT_SUCCESS;
 		}
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		return ReadComputerRS232Port(pRS232Port->hDev, readbuf, (int)readbuflen, pReadBytes);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("ReadRS232Port error (%s) : %s"
@@ -447,9 +494,10 @@ inline int WriteAllRS232Port(RS232PORT* pRS232Port, uint8* writebuf, int writebu
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		return sendall(pRS232Port->s, (char*)writebuf, writebuflen);
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		return WriteAllComputerRS232Port(pRS232Port->hDev, writebuf, (int)writebuflen);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("WriteAllRS232Port error (%s) : %s"
@@ -476,9 +524,10 @@ inline int ReadAllRS232Port(RS232PORT* pRS232Port, uint8* readbuf, int readbufle
 {
 	switch (pRS232Port->DevType)
 	{
-	case RS232PORT_TYPE_REMOTE:
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
 		return recvall(pRS232Port->s, (char*)readbuf, readbuflen);
-	case RS232PORT_TYPE_LOCAL:
+	case LOCAL_TYPE_RS232PORT:
 		return ReadAllComputerRS232Port(pRS232Port->hDev, readbuf, (int)readbuflen);
 	default:
 		PRINT_DEBUG_ERROR_RS232PORT(("ReadAllRS232Port error (%s) : %s"
