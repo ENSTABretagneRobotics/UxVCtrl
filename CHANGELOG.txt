@@ -1,5 +1,8 @@
+122
+Added szMAVLinkInterfacePath, MAVLinkInterfaceBaudRate and MAVLinkInterfaceTimeout parameters.
+
 121
-Added TCP server support to RS2323Port.
+Added TCP server support to RS232Port.
 
 120
 Corrected bug with keys that were not working on Linux.

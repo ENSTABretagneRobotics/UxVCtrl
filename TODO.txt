@@ -15,7 +15,7 @@ utiliser hokuyo pour estimer vitesse longi et lat...
 
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
 selon les accx_err, ça aura ou non une influence sur les équations d'état
-Gérer le -g dans acc…
+Gérer le -g dans acc...
 changer les theta et psi et rajouter équations voilier
 
 Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
@@ -23,15 +23,14 @@ Faire détection plus robuste en regardant plusieurs images et selon un detection
 linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
 
-
-Some threads may be too fast, check timings...
 add a visual studio config for Linux, utiliser dernière version linux headers?
 
 bugs
-Warnings misleading indent VS2015...
+Warnings misleading indent VS2017 or gcc 6.2...
 Ubuntu 16.10 errors cv min, max, distinguer cas C et C++? Trouver où min et max sont définis en mode c++
 Ne réagit pas aux touches, tester avec ubuntu 15.10 ou anciennes versions du programme->version WRSC marche…->cast char nécessaire, regarder plus en détails…
 prebuilt static libs : for VS2012 there is also the XP platform toolset, might get unexpected results if mixed with default platform toolset?
+Some threads may be too fast, check timings...
 manque des StopChrono() au moins dans MT, SBG
 should add commands critical section so that bWaiting = FALSE would never risk to be overwritten just after...
 Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4…
@@ -88,7 +87,7 @@ MAVLinkInterface : solve message Failed to update home location...
 Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
 modify waypoints/heading commands so that they do a line following in the case of a sailboat?
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
-Rajouter option choix série ou TCP et port pour MAVLinkInterface
+Move MAVLinkInterface in Hardware with its own config file?
 rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!)->voir google api, niveaux de zoom, etc.
 mousecallback to set waypoints, lines...
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
@@ -172,9 +171,10 @@ vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
 GN/GL parfois utilisé à la place de GP dans NMEA?->$GN, $GP->"$G%c" && c0=='N' ||'P'
+dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
+pour le UBX, mieux généraliser mes fonctions FindMessage() : elles se résument toutes à on cherche un début de message partout et on essaye de voir combien d'octets ils faudrait redemander pour avoir un message complet, on demande le max si on n'a pas trouvé de début de message (ou que le capteur envoie tout le temps des données), ou 1 octet si on en a trouvé un mais qu'on n'a pas d'idée de combien il faut redemander au min pour avoir un message complet...
 faire un UBXDevice (2 devront pouvoir être connectés sur UxVCtrl), notamment pour pouvoir faire un programme (qui serait sur le robot) qui configure la base Tiny RTK (connectée en TCP) avec les bons messages et lance le mode Survey-in, puis renvoit les RTCM sur le rover Tiny RTK d'une part, tout en récupérant sa position GPS d'autre part...
 voir aussi pour gérer le mode RTCM injecté dans MAVLink pour pouvoir les retransmettre au rover Tiny RTK...
-pour le UBX, mieux généraliser mes fonctions FindMessage() : elles se résument toutes à on cherche un début de message partout et on essaye de voir combien d'octets ils faudrait redemander pour avoir un message complet, on demande le max si on n'a pas trouvé de début de message (ou que le capteur envoie tout le temps des données), ou 1 octet si on en a trouvé un mais qu'on n'a pas d'idée de combien il faut redemander au min pour avoir un message complet...
 Update also DCB settings Windows, check current settings to know what to set manually, check if equivalent to cfmakeraw()
 rajouter utc du GPS (variable globale mis à jour uniquement par NMEA car pour MT et MAVLink on a l'heure PC dans leurs logs) pour trouver erreur d'horloge?
 mtdata2 : faire findlatestmsgwithoutmid...? Coordinate system not the same between legacy and normal modes!
@@ -183,7 +183,6 @@ hdop?
 comment savoir si GPS précis? pdod,hdop,vdop=5.0,2.8,4.4 quand GPS pas précis, peut-on en faire quelque chose pour déterminer précision?
 altitude GPS?
 utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
-dans nmeadevice, ne plus chercher à récupérer tous les nmea sentences en même temps, retourner une erreur seulement s'il n'y en a aucun
 add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
 Razor invalid data au début parfois sous linux, jusqu'à 2048 octets invisibles invalides?
 rajouter support GPHDT pour cap dual GPS (comme HCHDG), GPZDA (date) et PRDID (angles)
@@ -269,6 +268,8 @@ deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme
 
 robid, robid mask : regrouper sailboat et motorboat ensemble pour laisser de la place pour UGV et UAV?
 robid log file?
+pause device supersedes restart, restart is now useless?
+on pourrait supprimer la gestion du bConnected si on faisait une boucle de connexion avec dedans une boucle de polling, comme c'est le cas dans multitcpsrv? mais ça m'oblige à dupliquer la gestion des bPause, bExit...
 pour les périphériques, des fois faire une structure correspondant à chaque trame améliorerait la lisibilité...?
 image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 gestion vagues et z, courants et vxy, wind...

@@ -44,6 +44,12 @@
 0
 % bMAVLinkInterface
 1
+% szMAVLinkInterfacePath (server TCP port (e.g. :5760), client IP address and TCP port (e.g. 127.0.0.1:5760) or local RS232 port)
+:5760
+% MAVLinkInterfaceBaudRate
+115200
+% MAVLinkInterfaceTimeout (in ms)
+1500
 % bCommandPrompt
 1
 % bEcho

@@ -1,4 +1,4 @@
-% IP address and TCP port or local RS232 port
+% Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
 %127.0.0.1:55555
 COM9
 % BaudRate

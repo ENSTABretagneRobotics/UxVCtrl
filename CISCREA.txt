@@ -1,4 +1,4 @@
-% IP address and TCP port or local RS232 port
+% Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
 %192.168.1.6:502
 %192.168.1.7:502
 %192.168.1.8:502
