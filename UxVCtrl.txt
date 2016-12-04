@@ -74,6 +74,10 @@
 1
 % bDisableNMEADevice[1]
 1
+% bDisableUBXDevice[0]
+1
+% bDisableUBXDevice[1]
+1
 % bDisableMAVLinkDevice[0]
 1
 % bDisableMAVLinkDevice[1]

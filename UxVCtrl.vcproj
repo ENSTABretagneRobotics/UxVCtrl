@@ -415,6 +415,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UBXDevice0.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\UBXDevice1.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\UE9A0.txt"
 				>
 			</File>
@@ -960,6 +968,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\SwarmonDevice.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\UBXDevice.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\UBXDevice.h"
 				>
 			</File>
 			<File

@@ -36,6 +36,7 @@
 #endif // ENABLE_SBG_SUPPORT
 #include "NMEADevice.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#include "UBXDevice.h"
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "MAVLinkDevice.h"
 #endif // ENABLE_MAVLINK_SUPPORT
@@ -94,6 +95,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_SBG_SUPPORT
 	THREAD_IDENTIFIER NMEADeviceThreadId[MAX_NB_NMEADEVICE];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+	THREAD_IDENTIFIER UBXDeviceThreadId[MAX_NB_UBXDEVICE];
 #ifdef ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER MAVLinkDeviceThreadId[MAX_NB_MAVLINKDEVICE];
 #endif // ENABLE_MAVLINK_SUPPORT
@@ -176,6 +178,10 @@ int main(int argc, char* argv[])
 		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)(intptr_t)i, &NMEADeviceThreadId[i]);
 	}
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+	for (i = 0; i < MAX_NB_UBXDEVICE; i++)
+	{
+		if (!bDisableUBXDevice[i]) CreateDefaultThread(UBXDeviceThread, (void*)(intptr_t)i, &UBXDeviceThreadId[i]);
+	}
 #ifdef ENABLE_MAVLINK_SUPPORT
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
@@ -295,6 +301,10 @@ int main(int argc, char* argv[])
 		if (!bDisableMAVLinkDevice[i]) WaitForThread(MAVLinkDeviceThreadId[i]);
 	}
 #endif // ENABLE_MAVLINK_SUPPORT
+	for (i = MAX_NB_UBXDEVICE-1; i >= 0; i--)
+	{
+		if (!bDisableUBXDevice[i]) WaitForThread(UBXDeviceThreadId[i]);
+	}
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)
 	{

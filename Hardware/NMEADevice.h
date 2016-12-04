@@ -34,11 +34,17 @@
 // an 8 bit exclusive OR of all characters between, but not including, the '$' and '*'.
 
 // Maximum number of characters of a NMEA sentence (excluding the line terminators CR and LF).
+#ifndef MAX_NB_BYTES_NMEA_SENTENCE
 #define MAX_NB_BYTES_NMEA_SENTENCE 80
+#endif // MAX_NB_BYTES_NMEA_SENTENCE
 
+#ifndef MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
 #define MAX_NB_BYTES_NMEA_SENTENCE_BEGIN 7
+#endif // MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
 
+#ifndef MAX_NB_BYTES_NMEA_CHECKSUM
 #define MAX_NB_BYTES_NMEA_CHECKSUM 4
+#endif // MAX_NB_BYTES_NMEA_CHECKSUM
 
 struct NMEADATA
 {
@@ -169,7 +175,7 @@ inline char* FindLatestNMEASentence(char* sentencebegin, char* str)
 	return foundstr;
 }
 
-inline void ComputeNMEAchecksum(char* sentence, char* checksum)
+inline void ComputeNMEAChecksum(char* sentence, char* checksum)
 {
 	int i = 0;
 	char res = 0;
@@ -178,18 +184,16 @@ inline void ComputeNMEAchecksum(char* sentence, char* checksum)
 	memset(checksum, 0, MAX_NB_BYTES_NMEA_CHECKSUM);
 	while (sentence[i])
 	{
-		// '$' for classic NMEA, '!' for AIS.
-		if ((!bFoundBeginning)&&((sentence[i] == '$')||(sentence[i] == '!')))
+		if (!bFoundBeginning)
 		{
-			bFoundBeginning = TRUE;
-			i++;
-			continue;
+			// '$' for classic NMEA, '!' for AIS.
+			if ((sentence[i] == '$')||(sentence[i] == '!')) bFoundBeginning = TRUE;
 		}
-		if (sentence[i] == '*')
+		else
 		{
-			break;
+			if (sentence[i] == '*') break;
+			res ^= sentence[i];
 		}
-		res ^= sentence[i];
 		i++;
 	}
 

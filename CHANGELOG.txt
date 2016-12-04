@@ -1,3 +1,6 @@
+123
+Beginning of UBXDevice integration.
+
 122
 Added szMAVLinkInterfacePath, MAVLinkInterfaceBaudRate and MAVLinkInterfaceTimeout parameters.
 

@@ -1855,6 +1855,37 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (sscanf(line, "ubxdeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_UBXDEVICE))
+		{
+			memset(str2, 0, sizeof(str2));
+			sprintf(str2, "UBXDevice%d.txt", ival);
+			if (strncmp(str, str2, strlen(str2)) != 0)
+			{
+				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				if (buf)
+				{
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					{
+						printf("Unable to copy file.\n");
+					}
+					free(buf);
+				}
+				else
+				{
+					printf("Unable to allocate data.\n");
+				}
+			}
+			mSleep(500);
+			if (!ival1) bRestartUBXDevice[ival] = TRUE;
+			bPauseUBXDevice[ival] = ival1;
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 	else if (sscanf(line, "malinkdeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))

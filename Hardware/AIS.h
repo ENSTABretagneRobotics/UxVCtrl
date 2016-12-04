@@ -32,13 +32,16 @@
 #include <bitset>
 #else
 // min and max need to be undefined for this header to work...
+#if !defined(DISABLE_MINMAX_UNDEFINITION)
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
+#endif // !defined(DISABLE_MINMAX_UNDEFINITION)
 #include <bitset>
+#if !defined(DISABLE_MINMAX_REDEFINITION)
 #if !defined(NOMINMAX) || defined(FORCE_MINMAX_DEFINITION)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
@@ -47,6 +50,7 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // min
 #endif // !defined(NOMINMAX) || defined(FORCE_MINMAX_DEFINITION)
+#endif // !defined(DISABLE_MINMAX_REDEFINITION)
 #endif // __GNUC__
 
 //using namespace std;

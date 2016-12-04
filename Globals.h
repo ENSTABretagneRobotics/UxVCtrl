@@ -95,6 +95,7 @@ typedef enum KEYS KEYS;
 
 #define MAX_NB_VIDEO 3
 #define MAX_NB_NMEADEVICE 2
+#define MAX_NB_UBXDEVICE 2
 #define MAX_NB_MAVLINKDEVICE 2
 
 // Acoustic modem messages.
@@ -200,6 +201,7 @@ extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
 extern BOOL bDisableSBG;
 extern BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
+extern BOOL bDisableUBXDevice[MAX_NB_UBXDEVICE];
 extern BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
@@ -424,6 +426,11 @@ extern BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
+// UBXDevice variables.
+extern BOOL bGPSOKUBXDevice[MAX_NB_UBXDEVICE];
+extern BOOL bPauseUBXDevice[MAX_NB_UBXDEVICE];
+extern BOOL bRestartUBXDevice[MAX_NB_UBXDEVICE];
+
 // MAVLinkDevice variables.
 extern BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -529,7 +536,7 @@ extern char logmissingworkertaskfilename[MAX_BUF_LEN];
 
 inline BOOL CheckGPSOK(void)
 {
-	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKSimulator);
+	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKUBXDevice[0]||bGPSOKUBXDevice[1]||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKSimulator);
 }
 
 inline int InitGlobals(void)
@@ -543,6 +550,13 @@ inline int InitGlobals(void)
 		bGPSOKNMEADevice[i] = FALSE;
 		bPauseNMEADevice[i] = FALSE;
 		bRestartNMEADevice[i] = FALSE;
+	}
+
+	for (i = 0; i < MAX_NB_UBXDEVICE; i++)
+	{
+		bGPSOKUBXDevice[i] = FALSE;
+		bPauseUBXDevice[i] = FALSE;
+		bRestartUBXDevice[i] = FALSE;
 	}
 
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
@@ -688,6 +702,13 @@ inline int ReleaseGlobals(void)
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bGPSOKMAVLinkDevice[i] = FALSE;
+	}
+
+	for (i = MAX_NB_UBXDEVICE-1; i >= 0; i--)
+	{
+		bRestartUBXDevice[i] = FALSE;
+		bPauseUBXDevice[i] = FALSE;
+		bGPSOKUBXDevice[i] = FALSE;
 	}
 
 	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)

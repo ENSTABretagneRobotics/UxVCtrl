@@ -219,6 +219,9 @@
     <ClCompile Include="Hardware\SBG.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\UBXDevice.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -500,6 +503,9 @@
     <ClInclude Include="Hardware\SBG.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\UBXDevice.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -582,6 +588,12 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="keys.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="UBXDevice0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="UBXDevice1.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>
