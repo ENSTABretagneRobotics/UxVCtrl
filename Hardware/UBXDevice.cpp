@@ -24,6 +24,21 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 
 	//UNREFERENCED_PARAMETER(pParam);
 
+/*
+
+	char* buf = "$GPRMC,163634.000,A,4825.0961,N,00428.3419,W,0.00,309.63,150512,,,A*70\r\n";
+	int buflen = strlen(buf)+1;
+	int sentencelen = 0, nbBytesToRequest = 0, nbBytesToDiscard = 0;
+	char talkerid[3];
+	char mnemonic[4];
+
+	AnalyzeSentenceNMEA(buf, buflen, talkerid, mnemonic, &sentencelen, 
+								  &nbBytesToRequest, &nbBytesToDiscard);
+
+
+
+*/
+
 	sprintf(szCfgFilePath, "UBXDevice%d.txt", deviceid);
 
 	memset(&ubxdevice, 0, sizeof(UBXDEVICE));
@@ -32,7 +47,7 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		//mSleep(100);
 
 		if (bPauseUBXDevice[deviceid])
 		{
@@ -105,10 +120,25 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 		}
 		else
 		{
-			if (GetLatestDataUBXDevice(&ubxdevice, &ubxdata) == EXIT_SUCCESS)
+			if (GetDataUBXDevice(&ubxdevice, &ubxdata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 
+				// lat/lon might be temporarily bad we this... 
+				if (ubxdata.nav_status_pl.gpsFix >= 0x02)
+				{
+					//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
+					latitude = ubxdata.Latitude;
+					longitude = ubxdata.Longitude;
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+					bGPSOKUBXDevice[deviceid] = TRUE;
+				}
+				else
+				{
+					bGPSOKUBXDevice[deviceid] = FALSE;
+				}
+
+/*
 				//printf("GPS_quality_indicator : %d, status : %c\n", ubxdata.GPS_quality_indicator, ubxdata.status);
 
 				if ((ubxdata.GPS_quality_indicator > 0)||(ubxdata.status == 'A'))
@@ -154,7 +184,7 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 					psitwind = fmod_2PI(M_PI/2.0-ubxdata.WindDir+M_PI-angle_env);
 					vtwind = ubxdata.WindSpeed;
 				}
-
+*/
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
@@ -163,6 +193,7 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 				bGPSOKUBXDevice[deviceid] = FALSE;
 				bConnected = FALSE;
 				DisconnectUBXDevice(&ubxdevice);
+				mSleep(100);
 			}		
 		}
 

@@ -17,10 +17,7 @@
 #include "OSThread.h"
 #endif // DISABLE_NMEADEVICETHREAD
 
-// Temporary...
-#if defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
-#include "AIS.h"
-#endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
+#include "NMEAProtocol.h"
 
 #define TIMEOUT_MESSAGE_NMEADEVICE 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -45,52 +42,6 @@
 #ifndef MAX_NB_BYTES_NMEA_CHECKSUM
 #define MAX_NB_BYTES_NMEA_CHECKSUM 4
 #endif // MAX_NB_BYTES_NMEA_CHECKSUM
-
-struct NMEADATA
-{
-	double utc, date;
-	double pressure, temperature;
-	char cpressure, ctemperature;
-	double winddir, windspeed;
-	char cwinddir, cwindspeed;
-	double awinddir, awindspeed;
-	char cawinddir, cawindspeed;
-	int latdeg, longdeg;
-	double latmin, longmin;
-	char szlatdeg[3];
-	char szlongdeg[4];
-	char north, east;
-	int GPS_quality_indicator;
-	int nbsat;
-	double hdop;
-	double height_geoid;
-	char status;
-	double sog, cog, mag_cog;
-	double heading, deviation, variation;
-	char dev_east, var_east;
-	int nbsentences;
-	int sentence_number;
-	int seqmsgid;
-	char AIS_channel;
-	int nbfillbits;
-	double Latitude; // In decimal degrees.
-	double Longitude; // In decimal degrees.
-	double Altitude; // In m.
-	double SOG; // In m/s.
-	double COG; // In rad.
-	int year, month, day, hour, minute; 
-	double second;
-	double Heading; // In rad.
-	double WindDir; // In rad.
-	double WindSpeed; // In m/s.
-	double ApparentWindDir; // In rad.
-	double ApparentWindSpeed; // In m/s.
-	double AIS_Latitude; // In decimal degrees.
-	double AIS_Longitude; // In decimal degrees.
-	double AIS_SOG; // In m/s.
-	double AIS_COG; // In rad.
-};
-typedef struct NMEADATA NMEADATA;
 
 struct NMEADEVICE
 {

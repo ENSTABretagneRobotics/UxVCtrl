@@ -485,9 +485,6 @@
     <ClInclude Include="Hardware\MAVLinkDevice.h">
       <Filter>Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="Hardware\AIS.h">
-      <Filter>Hardware</Filter>
-    </ClInclude>
     <ClInclude Include="Hardware\IM483I.h">
       <Filter>Hardware</Filter>
     </ClInclude>
@@ -504,6 +501,21 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="Hardware\UBXDevice.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\UBXProtocol.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\NMEAProtocol.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\AIS.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\RTCM2Protocol.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\RTCM3Protocol.h">
       <Filter>Hardware</Filter>
     </ClInclude>
   </ItemGroup>

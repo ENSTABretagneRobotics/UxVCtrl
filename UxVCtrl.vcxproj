@@ -177,8 +177,12 @@
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
+    <ClInclude Include="Hardware\NMEAProtocol.h" />
+    <ClInclude Include="Hardware\RTCM2Protocol.h" />
+    <ClInclude Include="Hardware\RTCM3Protocol.h" />
     <ClInclude Include="Hardware\SBG.h" />
     <ClInclude Include="Hardware\UBXDevice.h" />
+    <ClInclude Include="Hardware\UBXProtocol.h" />
     <ClInclude Include="MAVLinkInterface.h" />
     <ClInclude Include="MissingWorker.h" />
     <ClInclude Include="Observer.h" />

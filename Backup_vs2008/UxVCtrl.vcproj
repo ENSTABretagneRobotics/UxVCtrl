@@ -923,6 +923,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hardware\NMEAProtocol.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hardware\P33x.cpp"
 				>
 			</File>
@@ -944,6 +948,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\RS232Port.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\RTCM2Protocol.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\RTCM3Protocol.h"
 				>
 			</File>
 			<File
@@ -976,6 +988,10 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\UBXDevice.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\UBXProtocol.h"
 				>
 			</File>
 			<File

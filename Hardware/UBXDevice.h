@@ -17,480 +17,20 @@
 #include "OSThread.h"
 #endif // DISABLE_UBXDEVICETHREAD
 
-// Temporary...
-#if defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
-#include "AIS.h"
-#endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
+#include "UBXProtocol.h"
+#include "NMEAProtocol.h"
+#include "RTCM3Protocol.h"
+
+//#pragma pack(show)
+
+// Check for potential paddings in bitfields and structs, check their size and the sum of the size of their fields!
+
+// To prevent unexpected padding in struct...
+#pragma pack(push,1) 
 
 #define TIMEOUT_MESSAGE_UBXDEVICE 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
-#define MAX_NB_BYTES_UBXDEVICE 2048
-
-// A NMEA sentence begins with a '$' and ends with a carriage return/line feed sequence and can 
-// be no longer than 80 characters of visible text (plus the line terminators). The data is contained 
-// within this single line with data items separated by commas. The data itself is just ascii text. 
-// There is a provision for a checksum at the end of each sentence which may or may not be checked by 
-// the unit that reads the data. The checksum field consists of a '*' and two hex digits representing 
-// an 8 bit exclusive OR of all characters between, but not including, the '$' and '*'.
-
-// Maximum number of characters of a NMEA sentence (excluding the line terminators CR and LF).
-#ifndef MAX_NB_BYTES_NMEA_SENTENCE
-#define MAX_NB_BYTES_NMEA_SENTENCE 80
-#endif // MAX_NB_BYTES_NMEA_SENTENCE
-
-#ifndef MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
-#define MAX_NB_BYTES_NMEA_SENTENCE_BEGIN 7
-#endif // MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
-
-#ifndef MAX_NB_BYTES_NMEA_CHECKSUM
-#define MAX_NB_BYTES_NMEA_CHECKSUM 4
-#endif // MAX_NB_BYTES_NMEA_CHECKSUM
-
-#pragma region UBX-SPECIFIC DEFINITIONS
-#define SYNC_CHAR_1_UBX 0xB5
-#define SYNC_CHAR_2_UBX 0x62
-
-#define MIN_PACKET_LENGTH_UBX 8
-
-#define NB_BYTES_CHECKSUM_UBX 2
-
-#define NAV_CLASS_UBX 0x01
-#define RXM_CLASS_UBX 0x02
-#define INF_CLASS_UBX 0x04
-#define ACK_CLASS_UBX 0x05
-#define CFG_CLASS_UBX 0x06
-#define UPD_CLASS_UBX 0x09
-#define MON_CLASS_UBX 0x0A
-#define AID_CLASS_UBX 0x0B
-#define TIM_CLASS_UBX 0x0D
-#define ESF_CLASS_UBX 0x10
-#define MGA_CLASS_UBX 0x13
-#define LOG_CLASS_UBX 0x21
-#define SEC_CLASS_UBX 0x27
-#define HNR_CLASS_UBX 0x28
-
-#define ACK_ACK_ID_UBX 0x01
-#define ACK_NAK_ID_UBX 0x00
-
-#define CFG_CFG_ID_UBX 0x09
-#define CFG_INF_ID_UBX 0x02
-#define CFG_MSG_ID_UBX 0x01
-#define CFG_NAV5_ID_UBX 0x24
-#define CFG_NMEA_ID_UBX 0x17
-#define CFG_PRT_ID_UBX 0x00
-#define CFG_RATE_ID_UBX 0x08
-#define CFG_RST_ID_UBX 0x04
-#define CFG_TMODE2_ID_UBX 0x3D
-#define CFG_USB_ID_UBX 0x1B
-
-#define NAV_DGPS_ID_UBX 0x31
-#define NAV_DOP_ID_UBX 0x04
-#define NAV_POSECEF_ID_UBX 0x01
-#define NAV_POSLLH_ID_UBX 0x02
-#define NAV_PVT_ID_UBX 0x07
-#define NAV_SOL_ID_UBX 0x06
-#define NAV_STATUS_ID_UBX 0x03
-#define NAV_VELECEF_ID_UBX 0x11
-#define NAV_VELNED_ID_UBX 0x12
-
-#define TIM_SVIN_ID_UBX 0x04
-
-union uShort_UBX
-{
-	unsigned short v;
-	unsigned char c[2];
-};
-typedef union uShort_UBX uShort_UBX;
-#pragma endregion
-
-
-
-
-// packet must contain a valid packet of packetlen bytes.
-inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, int mid)
-{
-	unsigned char* payload = NULL;
-	memcpy(payload, packet+MIN_PACKET_LENGTH_UBX-NB_BYTES_CHECKSUM_UBX, packetlen-MIN_PACKET_LENGTH_UBX);
-	switch (mclass)
-	{
-	case ACK_CLASS_UBX:
-		switch (mid)
-		{
-		case ACK_ACK_ID_UBX:
-			break;
-		default:
-			break;
-		}
-		break;
-	default:
-		break;
-	}
-
-	return EXIT_SUCCESS;
-}
-
-// packet must contain a valid packet of packetlen bytes.
-inline void SetChecksumUBX(unsigned char* packet, int packetlen)
-{
-	int i = 0;
-	unsigned char CK_A = 0, CK_B = 0;
-
-	for (i = 0; i < packetlen; i++)
-	{
-		CK_A = CK_A + packet[i];
-		CK_B = CK_B + CK_A;
-	}
-	packet[packetlen-2] = CK_A;
-	packet[packetlen-1] = CK_B;
-}
-
-// packet must contain a valid packet of packetlen bytes.
-inline int CheckChecksumUBX(unsigned char* packet, int packetlen)
-{
-	int i = 0;
-	unsigned char CK_A = 0, CK_B = 0;
-
-	for (i = 0; i < packetlen; i++)
-	{
-		CK_A = CK_A + packet[i];
-		CK_B = CK_B + CK_A;
-	}
-	if ((packet[packetlen-2] != CK_A)||(packet[packetlen-1] != CK_B))
-	{
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
-}
-
-// buf must contain the beginning of a valid packet of at least MIN_PACKET_LENGTH_UBX-NB_BYTES_CHECKSUM_UBX bytes.
-inline int GetPacketLengthUBX(unsigned char* buf)
-{
-	uShort_UBX len;
-
-	len.c[0] = buf[4];
-	len.c[1] = buf[5];
-	return len.v+MIN_PACKET_LENGTH_UBX;
-}
-
-/*
-Return : EXIT_SUCCESS if the beginning of buf contains a valid packet (there might be other data at the end), 
-EXIT_OUT_OF_MEMORY if the packet is incomplete (check *pnbBytesToRequest to know how many additional bytes 
-should be requested, -1 if unknown) or EXIT_FAILURE if there is an error (check *pnbBytesToDiscard to know how 
-many bytes can be safely discarded).
-*/
-inline int AnalyzePacketUBX(unsigned char* buf, int buflen, int* pmclass, int* pmid, int* ppacketlen, int* pnbBytesToRequest, int* pnbBytesToDiscard)
-{
-	*pnbBytesToRequest = -1;
-	*pnbBytesToDiscard = 0;
-	if (buflen <= 0)
-	{
-		return EXIT_FAILURE;
-	}
-	if ((buflen > 0)&&(buf[0] != SYNC_CHAR_1_UBX))
-	{
-		*pnbBytesToDiscard = 1;
-		return EXIT_FAILURE;
-	}
-	if ((buflen > 1)&&(buf[1] != SYNC_CHAR_2_UBX))
-	{
-		*pnbBytesToDiscard = 1; // We are only sure that the first sync byte was not correct...
-		return EXIT_FAILURE;
-	}
-	if (buflen > 2)
-	{
-		*pmclass = buf[2];
-	}
-	else
-	{
-		return EXIT_OUT_OF_MEMORY;
-	}
-	if (buflen > 3)
-	{
-		*pmid = buf[3];
-	}
-	else
-	{
-		return EXIT_OUT_OF_MEMORY;
-	}
-	if (buflen >= MIN_PACKET_LENGTH_UBX-NB_BYTES_CHECKSUM_UBX)
-	{
-		*ppacketlen = GetPacketLengthUBX(buf);	
-	}
-	else
-	{
-		return EXIT_OUT_OF_MEMORY;
-	}
-	if (buflen < *ppacketlen)
-	{
-		*pnbBytesToRequest = *ppacketlen-buflen;
-		return EXIT_OUT_OF_MEMORY;
-	}
-	if (CheckChecksumUBX(buf, *ppacketlen) != EXIT_SUCCESS)
-	{ 
-		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes were not correct...
-		return EXIT_FAILURE;	
-	}
-
-	return EXIT_SUCCESS;
-}
-
-/*
-Return : EXIT_SUCCESS if the beginning of *pFoundPacket contains a valid packet (there might be other data at the end, data in the beginning of buf might have been discarded), 
-EXIT_OUT_OF_MEMORY if the packet is incomplete (check *pnbBytesToRequest to know how many additional bytes 
-should be requested, -1 if unknown) or EXIT_FAILURE if no packet could be found.
-*/
-inline int FindPacketUBX(unsigned char* buf, int buflen, int* pmclass, int* pmid, int* ppacketlen, int* pnbBytesToRequest, unsigned char** pFoundPacket, int* pnbBytesDiscarded)
-{
-	int res = EXIT_FAILURE, nbBytesToRequest = -1, nbBytesToDiscard = 0;
-
-	*pnbBytesToRequest = -1;
-	*pFoundPacket = buf;
-	*pnbBytesDiscarded = 0;
-
-	for (;;)
-	{
-		res = AnalyzePacketUBX(*pFoundPacket, buflen-(*pnbBytesDiscarded), pmclass, pmid, ppacketlen, &nbBytesToRequest, &nbBytesToDiscard);
-		switch (res)
-		{
-		case EXIT_SUCCESS:
-			return EXIT_SUCCESS;
-		case EXIT_OUT_OF_MEMORY:
-			(*pnbBytesToRequest) = nbBytesToRequest;
-			return EXIT_OUT_OF_MEMORY;
-		default:
-			(*pFoundPacket) += nbBytesToDiscard;
-			(*pnbBytesDiscarded) += nbBytesToDiscard;
-			if (buflen-(*pnbBytesDiscarded) <= 0)
-			{
-				*pFoundPacket = NULL;
-				return EXIT_FAILURE;
-			}
-			break;
-		}
-	} 
-}
-
-/*
-Return : EXIT_SUCCESS if the beginning of buf contains a valid packet (there might be other data at the end), 
-EXIT_OUT_OF_MEMORY if the packet is incomplete (check *pnbBytesToRequest to know how many additional bytes 
-should be requested, -1 if unknown) or EXIT_FAILURE if there is an error (check *pnbBytesToDiscard to know how 
-many bytes can be safely discarded).
-*/
-inline int AnalyzePacketWithMIDUBX(unsigned char* buf, int buflen, int mclass, int mid, int* ppacketlen, int* pnbBytesToRequest, int* pnbBytesToDiscard)
-{
-	*pnbBytesToRequest = -1;
-	*pnbBytesToDiscard = 0;
-	if (buflen <= 0)
-	{
-		return EXIT_FAILURE;
-	}
-	if ((buflen > 0)&&(buf[0] != SYNC_CHAR_1_UBX))
-	{
-		*pnbBytesToDiscard = 1;
-		return EXIT_FAILURE;
-	}
-	if ((buflen > 1)&&(buf[1] != SYNC_CHAR_2_UBX))
-	{
-		*pnbBytesToDiscard = 1; // We are only sure that the first sync byte was not correct...
-		return EXIT_FAILURE;
-	}
-	if ((buflen > 2)&&(mclass != buf[2]))
-	{
-		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes were not correct...
-		return EXIT_FAILURE;
-	}
-	if ((buflen > 3)&&(mid != buf[3]))
-	{
-		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes were not correct...
-		return EXIT_FAILURE;
-	}
-	if (buflen >= MIN_PACKET_LENGTH_UBX-NB_BYTES_CHECKSUM_UBX)
-	{
-		*ppacketlen = GetPacketLengthUBX(buf);	
-	}
-	else
-	{
-		return EXIT_OUT_OF_MEMORY;
-	}
-	if (buflen < *ppacketlen)
-	{
-		*pnbBytesToRequest = *ppacketlen-buflen;
-		return EXIT_OUT_OF_MEMORY;
-	}
-	if (CheckChecksumUBX(buf, *ppacketlen) != EXIT_SUCCESS)
-	{ 
-		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes were not correct...
-		return EXIT_FAILURE;	
-	}
-
-	return EXIT_SUCCESS;
-}
-
-/*
-Return : EXIT_SUCCESS if the beginning of *pFoundPacket contains a valid packet (there might be other data at the end, data in the beginning of buf might have been discarded), 
-EXIT_OUT_OF_MEMORY if the packet is incomplete (check *pnbBytesToRequest to know how many additional bytes 
-should be requested, -1 if unknown) or EXIT_FAILURE if no compatible packet could be found.
-*/
-inline int FindPacketWithMIDUBX(unsigned char* buf, int buflen, int mclass, int mid, int* ppacketlen, int* pnbBytesToRequest, unsigned char** pFoundPacket, int* pnbBytesDiscarded)
-{
-	int res = EXIT_FAILURE, nbBytesToRequest = -1, nbBytesToDiscard = 0;
-
-	*pnbBytesToRequest = -1;
-	*pFoundPacket = buf;
-	*pnbBytesDiscarded = 0;
-
-	for (;;)
-	{
-		res = AnalyzePacketWithMIDUBX(*pFoundPacket, buflen-(*pnbBytesDiscarded), mclass, mid, ppacketlen, &nbBytesToRequest, &nbBytesToDiscard);
-		switch (res)
-		{
-		case EXIT_SUCCESS:
-			return EXIT_SUCCESS;
-		case EXIT_OUT_OF_MEMORY:
-			(*pnbBytesToRequest) = nbBytesToRequest;
-			return EXIT_OUT_OF_MEMORY;
-		default:
-			(*pFoundPacket) += nbBytesToDiscard;
-			(*pnbBytesDiscarded) += nbBytesToDiscard;
-			if (buflen-(*pnbBytesDiscarded) <= 0)
-			{
-				*pFoundPacket = NULL;
-				return EXIT_FAILURE;
-			}
-			break;
-		}
-	} 
-}
-
-
-// If this function succeeds, the beginning of *pFoundMsg should contain the latest valid message
-// but there might be other data at the end. Data in the beginning of buf might have been discarded, 
-// including valid messages.
-/*
-
- or EXIT_FAILURE if no compatible packet could be found.
-*/
-inline int FindLatestPacketWithMIDUBX(unsigned char* buf, int buflen, int mclass, int mid, int* ppacketlen, int* pnbBytesToRequest, unsigned char** pFoundPacket, int* pnbBytesDiscarded)
-{
-	unsigned char* ptr = NULL;
-	int res = EXIT_FAILURE, nbBytesDiscarded = 0, packetlen = 0, nbBytesToRequest = 0;
-
-	*pnbBytesToRequest = -1;
-	*pnbBytesDiscarded = 0;
-
-	res = FindPacketWithMIDUBX(buf, buflen, mclass, mid, &packetlen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
-	switch (res)
-	{
-	case EXIT_SUCCESS:
-		(*pnbBytesDiscarded) += nbBytesDiscarded;
-		break;
-	case EXIT_OUT_OF_MEMORY:
-		(*pnbBytesToRequest) = nbBytesToRequest;
-		(*pnbBytesDiscarded) += nbBytesDiscarded;
-		return EXIT_OUT_OF_MEMORY;
-	default:
-		*pFoundPacket = NULL;
-		(*pnbBytesDiscarded) += nbBytesDiscarded;
-		return EXIT_FAILURE;
-	}
-
-	for (;;) 
-	{
-		// Save the position of the beginning of the message.
-		*pFoundPacket = ptr;
-		*ppacketlen = packetlen;
-
-		// Search just after the message.
-		res = FindPacketWithMIDUBX(*pFoundPacket+packetlen, buflen-(*pnbBytesDiscarded)-packetlen, 
-			mclass, mid, &packetlen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
-		switch (res)
-		{
-		case EXIT_SUCCESS:
-			(*pnbBytesDiscarded) += (nbBytesDiscarded+packetlen);
-			break;
-		case EXIT_OUT_OF_MEMORY:
-		default:
-			return EXIT_SUCCESS;
-		}
-	}
-}
-
-inline int ProcessPacketsUBX(unsigned char* buf, int buflen, int* pnbBytesToRequest, int* pnbBytesDiscarded)
-{
-	unsigned char* ptr = buf;
-	int res = EXIT_FAILURE, nbBytesDiscarded = 0, mclass_tmp= 0, mid_tmp = 0, packetlen = 0;
-
-	packetlen = 0;
-	*pnbBytesToRequest = -1;
-	*pnbBytesDiscarded = 0;
-
-	for (;;) 
-	{
-		res = FindPacketUBX(ptr+packetlen, buflen-(*pnbBytesDiscarded)-packetlen, 
-			&mclass_tmp, &mid_tmp, &packetlen, pnbBytesToRequest, &ptr, &nbBytesDiscarded);
-		switch (res)
-		{
-		case EXIT_SUCCESS:
-			(*pnbBytesDiscarded) += nbBytesDiscarded;
-			break;
-		case EXIT_OUT_OF_MEMORY:
-			(*pnbBytesDiscarded) += nbBytesDiscarded;
-			return EXIT_OUT_OF_MEMORY;
-		default:
-			(*pnbBytesDiscarded) += nbBytesDiscarded;
-			return EXIT_FAILURE;
-		}
-
-		ProcessPacketUBX(ptr, packetlen, mclass_tmp, mid_tmp);
-	}
-}
-
-struct UBXDATA
-{
-	double utc, date;
-	double pressure, temperature;
-	char cpressure, ctemperature;
-	double winddir, windspeed;
-	char cwinddir, cwindspeed;
-	double awinddir, awindspeed;
-	char cawinddir, cawindspeed;
-	int latdeg, longdeg;
-	double latmin, longmin;
-	char szlatdeg[3];
-	char szlongdeg[4];
-	char north, east;
-	int GPS_quality_indicator;
-	int nbsat;
-	double hdop;
-	double height_geoid;
-	char status;
-	double sog, cog, mag_cog;
-	double heading, deviation, variation;
-	char dev_east, var_east;
-	int nbsentences;
-	int sentence_number;
-	int seqmsgid;
-	char AIS_channel;
-	int nbfillbits;
-	double Latitude; // In decimal degrees.
-	double Longitude; // In decimal degrees.
-	double Altitude; // In m.
-	double SOG; // In m/s.
-	double COG; // In rad.
-	int year, month, day, hour, minute; 
-	double second;
-	double Heading; // In rad.
-	double WindDir; // In rad.
-	double WindSpeed; // In m/s.
-	double ApparentWindDir; // In rad.
-	double ApparentWindSpeed; // In m/s.
-	double AIS_Latitude; // In decimal degrees.
-	double AIS_Longitude; // In decimal degrees.
-	double AIS_SOG; // In m/s.
-	double AIS_COG; // In rad.
-};
-typedef struct UBXDATA UBXDATA;
+#define MAX_NB_BYTES_UBXDEVICE 4096
 
 struct UBXDEVICE
 {
@@ -503,103 +43,200 @@ struct UBXDEVICE
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
-	BOOL bEnableGPGGA;
-	BOOL bEnableGPRMC;
-	BOOL bEnableGPGLL;
-	BOOL bEnableGPVTG;
-	BOOL bEnableHCHDG;
-	BOOL bEnableIIMWV;
-	BOOL bEnableWIMWV;
-	BOOL bEnableWIMWD;
-	BOOL bEnableWIMDA;
-	BOOL bEnableAIVDM;
+	BOOL bRevertToDefaultCfg;
+	BOOL bSetBaseCfg;
+	int SurveyMode;
+	double svinMinDur;
+	double svinAccLimit;
+	double fixedLat;
+	double fixedLon;
+	double fixedAlt;
+	double fixedPosAcc;
+	BOOL bEnableGGA;
+	BOOL bEnableRMC;
+	BOOL bEnableGLL;
+	BOOL bEnableVTG;
+	BOOL bEnableHDG;
+	BOOL bEnableMWV;
+	BOOL bEnableMWD;
+	BOOL bEnableMDA;
+	BOOL bEnableVDM;
 };
 typedef struct UBXDEVICE UBXDEVICE;
 
-inline char* FindSentenceBeginningNMEA(char* sentencebegin, char* str)
+//inline int GetUBXPacketWithMIDUBXDevice(UBXDEVICE* pUBXDevice, int mclass, int mid, int* ppacketlen, unsigned char* databuf, int databuflen)
+inline int GetUBXPacketWithMIDUBXDevice(UBXDEVICE* pUBXDevice, int mclass, int mid, UBXDATA* pUBXData)
 {
-	char* ptr = NULL;
+	unsigned char recvbuf[MAX_NB_BYTES_UBXDEVICE];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	unsigned char* ptr = NULL;
+	int packetlen = 0;
+	CHRONO chrono;
 
-	ptr = strstr(str, sentencebegin);
-	if (!ptr)
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_UBXDEVICE-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired message...
+
+	nbBytesToRequest = MIN_PACKET_LENGTH_UBX;
+	if (ReadAllRS232Port(&pUBXDevice->RS232Port, recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
 	{
-		// Could not find the beginning of the sentence.
-		return NULL;
+		printf("Error reading data from a UBXDevice. \n");
+		return EXIT_FAILURE;
 	}
-
-	// Return the position of the beginning of the sentence.
-	return ptr;
-}
-
-inline char* FindSentenceNMEA(char* sentencebegin, char* str)
-{
-	char* ptr = NULL;
-	char* foundstr = NULL;
-
-	ptr = strstr(str, sentencebegin);
-	if (!ptr)
+	BytesReceived += nbBytesToRequest;
+	
+	for (;;)
 	{
-		// Could not find the beginning of the sentence.
-		return NULL;
-	}
-
-	// Save the position of the beginning of the sentence.
-	foundstr = ptr;
-
-	// Check if the sentence is complete.
-	ptr = strstr(foundstr+strlen(sentencebegin), "\r");
-	if (!ptr)
-	{
-		// The sentence is incomplete.
-		return NULL;
-	}
-
-	return foundstr;
-}
-
-inline char* FindLatestSentenceNMEA(char* sentencebegin, char* str)
-{
-	char* ptr = NULL;
-	char* foundstr = NULL;
-
-	ptr = FindSentenceNMEA(sentencebegin, str);
-	while (ptr) 
-	{
-		// Save the position of the beginning of the sentence.
-		foundstr = ptr;
-
-		// Search just after the beginning of the sentence.
-		ptr = FindSentenceNMEA(sentencebegin, foundstr+strlen(sentencebegin));
-	}
-
-	return foundstr;
-}
-
-inline void ComputeChecksumNMEA(char* sentence, char* checksum)
-{
-	int i = 0;
-	char res = 0;
-	BOOL bFoundBeginning = FALSE;
-
-	memset(checksum, 0, MAX_NB_BYTES_NMEA_CHECKSUM);
-	while (sentence[i])
-	{
-		if (!bFoundBeginning)
+		res = FindPacketWithMIDUBX(recvbuf, BytesReceived, mclass, mid, &packetlen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
 		{
-			// '$' for classic NMEA, '!' for AIS.
-			if ((sentence[i] == '$')||(sentence[i] == '!')) bFoundBeginning = TRUE;
-		}
-		else
+			nbBytesToRequest = nbBytesDiscarded;
+		}	
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
 		{
-			if (sentence[i] == '*') break;
-			res ^= sentence[i];
+			printf("Error reading data from a UBXDevice : Invalid data. \n");
+			return EXIT_INVALID_DATA;
 		}
-		i++;
+		if (ReadAllRS232Port(&pUBXDevice->RS232Port, recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a UBXDevice. \n");
+			return EXIT_FAILURE;
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBXDEVICE)
+		{
+			printf("Error reading data from a UBXDevice : Packet timeout. \n");
+			return EXIT_TIMEOUT;
+		}
 	}
 
-	sprintf(checksum, "*%02x", (int)res);
+	if (BytesReceived-nbBytesDiscarded-packetlen > 0)
+	{
+		printf("Warning getting data from a UBXDevice : Unexpected data after a packet. \n");
+	}
+
+	//// Get data bytes.
+
+	//memset(databuf, 0, databuflen);
+
+	//// Check the number of data bytes before copy.
+	//if (databuflen < *ppacketlen)
+	//{
+	//	printf("Error getting data from a UBXDevice : Too small data buffer. \n");
+	//	return EXIT_FAILURE;
+	//}
+
+	//// Copy the data bytes of the message.
+	//if (*ppacketlen > 0)
+	//{
+	//	memcpy(databuf, ptr, *ppacketlen);
+	//}
+
+	if (ProcessPacketUBX(ptr, packetlen, mclass, mid, pUBXData) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
 }
 
+// TODO...
+// regarde si c'est du nmea, de l'ubx, et met à jour pUBXDevice->LastData
+//inline int GetDataUBXDevice(UBXDEVICE* pUBXDevice, unsigned char* databuf, int databuflen)
+inline int GetDataUBXDevice(UBXDEVICE* pUBXDevice, UBXDATA* pUBXData)
+{
+	unsigned char recvbuf[MAX_NB_BYTES_UBXDEVICE];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	unsigned char* ptr = NULL;
+	int packetlen = 0;
+	int mclass = 0, mid = 0;
+	CHRONO chrono;
+
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_UBXDEVICE-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired message...
+
+	nbBytesToRequest = min(MIN_PACKET_LENGTH_UBX, MIN_NB_BYTES_SENTENCE_NMEA);
+	if (ReadAllRS232Port(&pUBXDevice->RS232Port, recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a UBXDevice. \n");
+		return EXIT_FAILURE;
+	}
+	BytesReceived += nbBytesToRequest;
+	
+	for (;;)
+	{
+		res = FindPacketUBX(recvbuf, BytesReceived, &mclass, &mid, &packetlen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
+		{
+			nbBytesToRequest = nbBytesDiscarded;
+		}	
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
+		{
+			printf("Error reading data from a UBXDevice : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+		if (ReadAllRS232Port(&pUBXDevice->RS232Port, recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a UBXDevice. \n");
+			return EXIT_FAILURE;
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBXDEVICE)
+		{
+			printf("Error reading data from a UBXDevice : Packet timeout. \n");
+			return EXIT_TIMEOUT;
+		}
+	}
+
+	if (BytesReceived-nbBytesDiscarded-packetlen > 0)
+	{
+		printf("Warning getting data from a UBXDevice : Unexpected data after a packet. \n");
+	}
+
+	//// Get data bytes.
+
+	//memset(databuf, 0, databuflen);
+
+	//// Check the number of data bytes before copy.
+	//if (databuflen < *ppacketlen)
+	//{
+	//	printf("Error getting data from a UBXDevice : Too small data buffer. \n");
+	//	return EXIT_FAILURE;
+	//}
+
+	//// Copy the data bytes of the message.
+	//if (*ppacketlen > 0)
+	//{
+	//	memcpy(databuf, ptr, *ppacketlen);
+	//}
+
+	if (ProcessPacketUBX(ptr, packetlen, mclass, mid, pUBXData) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+/*
 // We suppose that read operations return when a message has just been completely sent, and not randomly.
 inline int GetLatestDataUBXDevice(UBXDEVICE* pUBXDevice, UBXDATA* pUBXData)
 {
@@ -616,11 +253,6 @@ inline int GetLatestDataUBXDevice(UBXDEVICE* pUBXDevice, UBXDATA* pUBXData)
 	char* ptr_WIMWD = NULL;
 	char* ptr_WIMDA = NULL;
 	char* ptr_AIVDM = NULL;
-	// Temporary buffers for sscanf().
-	char c0 = 0, c1 = 0, c2 = 0;
-	double f0 = 0, f1 = 0, f2 = 0;
-	char aisbuf[128];
-	int aisbuflen = 0;
 	int i = 0;
 	CHRONO chrono;
 
@@ -685,28 +317,28 @@ inline int GetLatestDataUBXDevice(UBXDEVICE* pUBXDevice, UBXDATA* pUBXData)
 	// But normally we should not have to get more data unless we did not wait enough
 	// for the desired message...
 
-	if (pUBXDevice->bEnableGPGGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
-	if (pUBXDevice->bEnableGPRMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
-	if (pUBXDevice->bEnableGPGLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
-	if (pUBXDevice->bEnableGPVTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
-	if (pUBXDevice->bEnableHCHDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
+	if (pUBXDevice->bEnableGGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
+	if (pUBXDevice->bEnableRMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
+	if (pUBXDevice->bEnableGLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
+	if (pUBXDevice->bEnableVTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
+	if (pUBXDevice->bEnableHDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
 	if (pUBXDevice->bEnableIIMWV) ptr_IIMWV = FindLatestSentenceNMEA("$IIMWV", recvbuf);
-	if (pUBXDevice->bEnableWIMWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
-	if (pUBXDevice->bEnableWIMWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
-	if (pUBXDevice->bEnableWIMDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
-	if (pUBXDevice->bEnableAIVDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
+	if (pUBXDevice->bEnableMWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
+	if (pUBXDevice->bEnableMWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
+	if (pUBXDevice->bEnableMDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
+	if (pUBXDevice->bEnableVDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
 
 	while (
-		(pUBXDevice->bEnableGPGGA&&!ptr_GPGGA)||
-		(pUBXDevice->bEnableGPRMC&&!ptr_GPRMC)||
-		(pUBXDevice->bEnableGPGLL&&!ptr_GPGLL)||
-		(pUBXDevice->bEnableGPVTG&&!ptr_GPVTG)||
-		(pUBXDevice->bEnableHCHDG&&!ptr_HCHDG)||
+		(pUBXDevice->bEnableGGA&&!ptr_GPGGA)||
+		(pUBXDevice->bEnableRMC&&!ptr_GPRMC)||
+		(pUBXDevice->bEnableGLL&&!ptr_GPGLL)||
+		(pUBXDevice->bEnableVTG&&!ptr_GPVTG)||
+		(pUBXDevice->bEnableHDG&&!ptr_HCHDG)||
 		(pUBXDevice->bEnableIIMWV&&!ptr_IIMWV)||
-		(pUBXDevice->bEnableWIMWV&&!ptr_WIMWV)||
-		(pUBXDevice->bEnableWIMWD&&!ptr_WIMWD)||
-		(pUBXDevice->bEnableWIMDA&&!ptr_WIMDA)||
-		(pUBXDevice->bEnableAIVDM&&!ptr_AIVDM)
+		(pUBXDevice->bEnableMWV&&!ptr_WIMWV)||
+		(pUBXDevice->bEnableMWD&&!ptr_WIMWD)||
+		(pUBXDevice->bEnableMDA&&!ptr_WIMDA)||
+		(pUBXDevice->bEnableVDM&&!ptr_AIVDM)
 		)
 	{
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBXDEVICE)
@@ -731,333 +363,224 @@ inline int GetLatestDataUBXDevice(UBXDEVICE* pUBXDevice, UBXDATA* pUBXData)
 			fflush(pUBXDevice->pfSaveFile);
 		}
 		BytesReceived += Bytes;
-		if (pUBXDevice->bEnableGPGGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
-		if (pUBXDevice->bEnableGPRMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
-		if (pUBXDevice->bEnableGPGLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
-		if (pUBXDevice->bEnableGPVTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
-		if (pUBXDevice->bEnableHCHDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
+		if (pUBXDevice->bEnableGGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
+		if (pUBXDevice->bEnableRMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
+		if (pUBXDevice->bEnableGLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
+		if (pUBXDevice->bEnableVTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
+		if (pUBXDevice->bEnableHDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
 		if (pUBXDevice->bEnableIIMWV) ptr_IIMWV = FindLatestSentenceNMEA("$IIMWV", recvbuf);
-		if (pUBXDevice->bEnableWIMWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
-		if (pUBXDevice->bEnableWIMWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
-		if (pUBXDevice->bEnableWIMDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
-		if (pUBXDevice->bEnableAIVDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
+		if (pUBXDevice->bEnableMWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
+		if (pUBXDevice->bEnableMWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
+		if (pUBXDevice->bEnableMDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
+		if (pUBXDevice->bEnableVDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
 	}
 
 	// Analyze data.
 
-	memset(pUBXData, 0, sizeof(UBXDATA));
+	ProcessSentenceNMEA();
+	pUBXDevice->LastUBXData = *pNMEAData;
 
-	// GPS essential fix data.
-	if (pUBXDevice->bEnableGPGGA)
+	return EXIT_SUCCESS;
+}*/
+/*
+inline int GetLatestPacketWithMIDUBX(UBXDEVICE* pUBXDevice, int mclass, int mid, int* ppacketlen, unsigned char* databuf, int databuflen)
+{
+
+	return EXIT_SUCCESS;
+}
+
+inline int ProcessPacketsUBX(unsigned char* buf, int buflen, int* pnbBytesToRequest, int* pnbBytesDiscarded)
+{
+	unsigned char* ptr = buf;
+	int res = EXIT_FAILURE, nbBytesDiscarded = 0, mclass_tmp= 0, mid_tmp = 0, packetlen = 0;
+
+	packetlen = 0;
+	*pnbBytesToRequest = -1;
+	*pnbBytesDiscarded = 0;
+
+	for (;;) 
 	{
-		memset(pUBXData->szlatdeg, 0, sizeof(pUBXData->szlatdeg));
-		memset(pUBXData->szlongdeg, 0, sizeof(pUBXData->szlongdeg));
-
-		if (
-			(sscanf(ptr_GPGGA, "$GPGGA,%lf,%c%c%lf,%c,%c%c%c%lf,%c,%d,%d,%lf,%lf,M,%lf,M", &pUBXData->utc, 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east,
-			&pUBXData->GPS_quality_indicator, &pUBXData->nbsat, &pUBXData->hdop, &pUBXData->Altitude, &pUBXData->height_geoid) != 15)
-			&&
-			(sscanf(ptr_GPGGA, "$GPGGA,%lf,%c%c%lf,%c,%c%c%c%lf,%c,%d,%d,%lf,%lf,M", &pUBXData->utc, 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east,
-			&pUBXData->GPS_quality_indicator, &pUBXData->nbsat, &pUBXData->hdop, &pUBXData->Altitude) != 14)
-			&&
-			(sscanf(ptr_GPGGA, "$GPGGA,%lf,%c%c%lf,%c,%c%c%c%lf,%c,%d", &pUBXData->utc, 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east,
-			&pUBXData->GPS_quality_indicator) != 11)
-			&&
-			(sscanf(ptr_GPGGA, "$GPGGA,%lf,,,,,%d", &pUBXData->utc, &pUBXData->GPS_quality_indicator) != 2)
-			&&
-			(sscanf(ptr_GPGGA, "$GPGGA,,,,,,%d", &pUBXData->GPS_quality_indicator) != 1)
-			)
+		res = FindPacketUBX(ptr+packetlen, buflen-(*pnbBytesDiscarded)-packetlen, 
+			&mclass_tmp, &mid_tmp, &packetlen, pnbBytesToRequest, &ptr, &nbBytesDiscarded);
+		switch (res)
 		{
-			printf("Error reading data from a UBXDevice : Invalid data. \n");
+		case EXIT_SUCCESS:
+			(*pnbBytesDiscarded) += nbBytesDiscarded;
+			break;
+		case EXIT_OUT_OF_MEMORY:
+			(*pnbBytesDiscarded) += nbBytesDiscarded;
+			return EXIT_OUT_OF_MEMORY;
+		default:
+			(*pnbBytesDiscarded) += nbBytesDiscarded;
 			return EXIT_FAILURE;
 		}
 
-		if (pUBXData->utc > 0)
-		{
-			pUBXData->hour = (int)pUBXData->utc/10000;
-			pUBXData->minute = (int)pUBXData->utc/100-pUBXData->hour*100;
-			pUBXData->second = (pUBXData->utc-pUBXData->hour*10000)-pUBXData->minute*100;
-		}
-
-		if ((strlen(pUBXData->szlatdeg) > 0)&&(strlen(pUBXData->szlongdeg) > 0))
-		{
-			pUBXData->latdeg = atoi(pUBXData->szlatdeg);
-			pUBXData->longdeg = atoi(pUBXData->szlongdeg);
-
-			// Convert GPS latitude and longitude in decimal.
-			pUBXData->Latitude = (pUBXData->north == 'N')?(pUBXData->latdeg+pUBXData->latmin/60.0):-(pUBXData->latdeg+pUBXData->latmin/60.0);
-			pUBXData->Longitude = (pUBXData->east == 'E')?(pUBXData->longdeg+pUBXData->longmin/60.0):-(pUBXData->longdeg+pUBXData->longmin/60.0);
-		}
+		ProcessPacketUBX(ptr, packetlen, mclass_tmp, mid_tmp);
 	}
+}
+*/
+inline int RevertToDefaultCfgUBXDevice(UBXDEVICE* pUBXDevice)
+{
+	unsigned char sendbuf[32];
+	int sendbuflen = 0;
+	struct CFG_CFG_PL_UBX cfg_cfg_pl;
 
-	// GPS recommended minimum data.
-	if (pUBXDevice->bEnableGPRMC)
+	memset(&cfg_cfg_pl, 0, sizeof(cfg_cfg_pl));	
+	cfg_cfg_pl.clearMask.ioPort = 1;
+	cfg_cfg_pl.clearMask.msgConf = 1;
+	cfg_cfg_pl.clearMask.infMsg = 1;
+	cfg_cfg_pl.clearMask.navConf = 1;
+	cfg_cfg_pl.clearMask.rxmConf = 1;
+	cfg_cfg_pl.clearMask.senConf = 1;
+	cfg_cfg_pl.clearMask.rinvConf = 1;
+	cfg_cfg_pl.clearMask.antConf = 0;
+	cfg_cfg_pl.clearMask.logConf = 1;
+	cfg_cfg_pl.clearMask.ftsConf = 1;
+	cfg_cfg_pl.loadMask.ioPort = 1;
+	cfg_cfg_pl.loadMask.msgConf = 1;
+	cfg_cfg_pl.loadMask.infMsg = 1;
+	cfg_cfg_pl.loadMask.navConf = 1;
+	cfg_cfg_pl.loadMask.rxmConf = 1;
+	cfg_cfg_pl.loadMask.senConf = 1;
+	cfg_cfg_pl.loadMask.rinvConf = 1;
+	cfg_cfg_pl.loadMask.antConf = 1;
+	cfg_cfg_pl.loadMask.logConf = 1;
+	cfg_cfg_pl.loadMask.ftsConf = 1;
+	cfg_cfg_pl.deviceMask.devBBR = 1;
+	cfg_cfg_pl.deviceMask.devFlash = 1;
+	cfg_cfg_pl.deviceMask.devEEPROM = 1;
+	cfg_cfg_pl.deviceMask.devSpiFlash = 1;
+	EncodePacketUBX(sendbuf, &sendbuflen, CFG_CLASS_UBX, CFG_CFG_ID_UBX, (unsigned char*)&cfg_cfg_pl, sizeof(cfg_cfg_pl));
+
+	if (WriteAllRS232Port(&pUBXDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		memset(pUBXData->szlatdeg, 0, sizeof(pUBXData->szlatdeg));
-		memset(pUBXData->szlongdeg, 0, sizeof(pUBXData->szlongdeg));
-
-		if (
-			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,%lf,%c", &pUBXData->utc, &pUBXData->status, 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east,
-			&pUBXData->sog, &pUBXData->cog, &pUBXData->date, &pUBXData->variation, &pUBXData->var_east) != 16)
-			&&
-			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf", &pUBXData->utc, &pUBXData->status, 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east,
-			&pUBXData->sog, &pUBXData->cog, &pUBXData->date) != 14)
-			&&
-			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c", &pUBXData->utc, &pUBXData->status, 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east) != 11)
-			&&
-			(sscanf(ptr_GPRMC, "$GPRMC,%lf,%c", &pUBXData->utc, &pUBXData->status) != 2)
-			&&
-			(sscanf(ptr_GPRMC, "$GPRMC,,%c", &pUBXData->status) != 1)
-			)
-		{
-			printf("Error reading data from a UBXDevice : Invalid data. \n");
-			return EXIT_FAILURE;
-		}
-
-		if (pUBXData->utc > 0)
-		{
-			pUBXData->hour = (int)pUBXData->utc/10000;
-			pUBXData->minute = (int)pUBXData->utc/100-pUBXData->hour*100;
-			pUBXData->second = (pUBXData->utc-pUBXData->hour*10000)-pUBXData->minute*100;
-		}
-
-		if ((strlen(pUBXData->szlatdeg) > 0)&&(strlen(pUBXData->szlongdeg) > 0))
-		{
-			pUBXData->latdeg = atoi(pUBXData->szlatdeg);
-			pUBXData->longdeg = atoi(pUBXData->szlongdeg);
-
-			// Convert GPS latitude and longitude in decimal.
-			pUBXData->Latitude = (pUBXData->north == 'N')?(pUBXData->latdeg+pUBXData->latmin/60.0):-(pUBXData->latdeg+pUBXData->latmin/60.0);
-			pUBXData->Longitude = (pUBXData->east == 'E')?(pUBXData->longdeg+pUBXData->longmin/60.0):-(pUBXData->longdeg+pUBXData->longmin/60.0);
-		}
-
-		// Convert SOG to speed in m/s and COG to angle in rad.
-		pUBXData->SOG = pUBXData->sog/1.94;
-		pUBXData->COG = pUBXData->cog*M_PI/180.0;
-
-		if (pUBXData->date > 0)
-		{
-			pUBXData->day = (int)pUBXData->date/10000;
-			pUBXData->month = (int)pUBXData->date/100-pUBXData->day*100;
-			pUBXData->year = 2000+((int)pUBXData->date-pUBXData->day*10000)-pUBXData->month*100;
-		}
+		printf("Error writing data to a UBXDevice. \n");
+		return EXIT_FAILURE;
 	}
-
-	// GPS position, latitude / longitude and time.
-	if (pUBXDevice->bEnableGPGLL)
+	if ((pUBXDevice->bSaveRawData)&&(pUBXDevice->pfSaveFile))
 	{
-		memset(pUBXData->szlatdeg, 0, sizeof(pUBXData->szlatdeg));
-		memset(pUBXData->szlongdeg, 0, sizeof(pUBXData->szlongdeg));
-
-		if ((sscanf(ptr_GPGLL, "$GPGLL,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%c", 
-			&pUBXData->szlatdeg[0], &pUBXData->szlatdeg[1], &pUBXData->latmin, &pUBXData->north, 
-			&pUBXData->szlongdeg[0], &pUBXData->szlongdeg[1], &pUBXData->szlongdeg[2], &pUBXData->longmin, &pUBXData->east, 
-			&pUBXData->utc, &pUBXData->status) != 11)&&
-			(sscanf(ptr_GPGLL, "$GPGLL,,,,,%lf,%c", &pUBXData->utc, &pUBXData->status) != 2)&&
-			(sscanf(ptr_GPGLL, "$GPGLL,,,,,,%c", &pUBXData->status) != 1))
-		{
-			printf("Error reading data from a UBXDevice : Invalid data. \n");
-			return EXIT_FAILURE;
-		}
-
-		if ((strlen(pUBXData->szlatdeg) > 0)&&(strlen(pUBXData->szlongdeg) > 0))
-		{
-			pUBXData->latdeg = atoi(pUBXData->szlatdeg);
-			pUBXData->longdeg = atoi(pUBXData->szlongdeg);
-
-			// Convert GPS latitude and longitude in decimal.
-			pUBXData->Latitude = (pUBXData->north == 'N')?(pUBXData->latdeg+pUBXData->latmin/60.0):-(pUBXData->latdeg+pUBXData->latmin/60.0);
-			pUBXData->Longitude = (pUBXData->east == 'E')?(pUBXData->longdeg+pUBXData->longmin/60.0):-(pUBXData->longdeg+pUBXData->longmin/60.0);
-		}
-
-		if (pUBXData->utc > 0)
-		{
-			pUBXData->hour = (int)pUBXData->utc/10000;
-			pUBXData->minute = (int)pUBXData->utc/100-pUBXData->hour*100;
-			pUBXData->second = (pUBXData->utc-pUBXData->hour*10000)-pUBXData->minute*100;
-		}
+		fwrite(sendbuf, sendbuflen, 1, pUBXDevice->pfSaveFile);
+		fflush(pUBXDevice->pfSaveFile);
 	}
 
-	// GPS COG and SOG.
-	if (pUBXDevice->bEnableGPVTG)
+	// Should check ACK...
+
+	return EXIT_SUCCESS;
+}
+
+inline int SetBaseCfgUBXDevice(UBXDEVICE* pUBXDevice)
+{
+	unsigned char sendbuf[512];
+	int sendbuflen = 0;
+	int offset = 0;
+	unsigned char packet[64];
+	int packetlen = 0;
+	unsigned char cfg_msg_pl[8];
+	struct CFG_TMODE3_PL_UBX cfg_tmode3_pl;
+
+	// Enable 1005, 1077, 1087, 1127 RTCM messages on UART1 and USB.
+	memset(cfg_msg_pl, 0, sizeof(cfg_msg_pl));
+	cfg_msg_pl[0] = RTCM_CLASS_UBX;
+	cfg_msg_pl[1] = RTCM_1005_ID_UBX;
+	cfg_msg_pl[3] = 1; // UART1 rate.
+	cfg_msg_pl[5] = 1; // USB rate.
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = RTCM_1077_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = RTCM_1087_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = RTCM_1127_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	// Disable GGA, GLL, GSA, GSV, RMC, VTG, TXT NMEA messages.
+	memset(cfg_msg_pl, 0, sizeof(cfg_msg_pl));
+	cfg_msg_pl[0] = NMEA_STD_CLASS_UBX;
+	cfg_msg_pl[1] = NMEA_STD_GGA_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_GLL_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_GSA_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_GSV_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_RMC_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_VTG_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_TXT_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+
+	//UBX-CFG-PORT set RTCM 3 as Output Protocol
+
+	// Activate Self-Survey-In or Fixed-Position-Mode.
+	memset(&cfg_tmode3_pl, 0, sizeof(cfg_tmode3_pl));
+	cfg_tmode3_pl.flags.lla = 1;
+	cfg_tmode3_pl.flags.mode = (unsigned short)pUBXDevice->SurveyMode;
+	cfg_tmode3_pl.ecefXOrLat = (long)(pUBXDevice->fixedLat*10000000);
+	cfg_tmode3_pl.ecefYOrLon = (long)(pUBXDevice->fixedLon*10000000);
+	cfg_tmode3_pl.ecefZOrAlt = (long)(pUBXDevice->fixedAlt*100);
+	cfg_tmode3_pl.ecefXOrLatHP = (char)((pUBXDevice->fixedLat*10000000-cfg_tmode3_pl.ecefXOrLat)*100);
+	cfg_tmode3_pl.ecefYOrLonHP = (char)((pUBXDevice->fixedLon*10000000-cfg_tmode3_pl.ecefYOrLon)*100);
+	cfg_tmode3_pl.ecefZOrAltHP = (char)((pUBXDevice->fixedAlt*100-cfg_tmode3_pl.ecefZOrAlt)*100);
+	cfg_tmode3_pl.fixedPosAcc = (unsigned long)(pUBXDevice->fixedPosAcc*10000);
+	cfg_tmode3_pl.svinMinDur = (unsigned long)pUBXDevice->svinMinDur;
+	cfg_tmode3_pl.svinAccLimit = (unsigned long)(pUBXDevice->svinAccLimit*10000);
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_TMODE3_ID_UBX, (unsigned char*)&cfg_tmode3_pl, sizeof(cfg_tmode3_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	
+	sendbuflen = offset;
+
+	if (WriteAllRS232Port(&pUBXDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		if ((sscanf(ptr_GPVTG, "$GPVTG,%lf,T,%lf,M,%lf,N", &pUBXData->cog, &pUBXData->mag_cog, &pUBXData->sog) != 3)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,M,%lf,N", &pUBXData->cog, &pUBXData->sog) != 2)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,%lf,T,,,%lf,N", &pUBXData->cog, &pUBXData->sog) != 2)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,nan,T,nan,M,%lf,N", &pUBXData->sog) != 1)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NAN,T,NAN,M,%lf,N", &pUBXData->sog) != 1)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NaN,T,NaN,M,%lf,N", &pUBXData->sog) != 1)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,nan,T,,,%lf,N", &pUBXData->sog) != 1)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NAN,T,,,%lf,N", &pUBXData->sog) != 1)&&
-			(sscanf(ptr_GPVTG, "$GPVTG,NaN,T,,,%lf,N", &pUBXData->sog) != 1))
-		{
-			//printf("Error reading data from a UBXDevice : Invalid data. \n");
-			//return EXIT_FAILURE;
-		}
-
-		// Convert SOG to speed in m/s and COG to angle in rad.
-		pUBXData->SOG = pUBXData->sog/1.94;
-		pUBXData->COG = pUBXData->cog*M_PI/180.0;
+		printf("Error writing data to a UBXDevice. \n");
+		return EXIT_FAILURE;
 	}
-
-	// Heading data.
-	if (pUBXDevice->bEnableHCHDG)
+	if ((pUBXDevice->bSaveRawData)&&(pUBXDevice->pfSaveFile))
 	{
-		if (sscanf(ptr_HCHDG, "$HCHDG,%lf,%lf,%c,%lf,%c", 
-			&pUBXData->heading, &pUBXData->deviation, &pUBXData->dev_east, &pUBXData->variation, &pUBXData->var_east) != 5)
-		{
-			//printf("Error reading data from a UBXDevice : Invalid data. \n");
-			//return EXIT_FAILURE;
-		}
-		// Do other else if (sscanf() != x) if more/less complete sentence...
-
-		// Convert heading to angle in rad.
-		pUBXData->Heading = pUBXData->heading*M_PI/180.0;
+		fwrite(sendbuf, sendbuflen, 1, pUBXDevice->pfSaveFile);
+		fflush(pUBXDevice->pfSaveFile);
 	}
 
-	// Wind speed and angle, in relation to the vessel's bow/centerline.
-	if (pUBXDevice->bEnableIIMWV)
+	// Should check ACK...
+
+	return EXIT_SUCCESS;
+}
+
+// Transfer data (e.g. RTCM extracted from MAVLink) without any interpretation...
+inline int TransferToUBXDevice(UBXDEVICE* pUBXDevice, unsigned char* sendbuf, int sendbuflen)
+{
+	if (WriteAllRS232Port(&pUBXDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		if (sscanf(ptr_IIMWV, "$IIMWV,%lf,R,%lf,%c,A", 
-			&pUBXData->awinddir, &pUBXData->awindspeed, &pUBXData->cawindspeed) != 3)
-		{
-			printf("Error reading data from a UBXDevice : Invalid data. \n");
-			return EXIT_FAILURE;
-		}
-
-		// Convert apparent wind direction to angle in rad.
-		pUBXData->ApparentWindDir = pUBXData->awinddir*M_PI/180.0;
-
-		// Convert apparent wind speed to m/s.
-		switch (pUBXData->cawindspeed)
-		{
-		case 'K': pUBXData->ApparentWindSpeed = pUBXData->awindspeed*0.28; break;
-		case 'M': pUBXData->ApparentWindSpeed = pUBXData->awindspeed; break;
-		case 'N': pUBXData->ApparentWindSpeed = pUBXData->awindspeed*0.51; break;
-		case 'S': pUBXData->ApparentWindSpeed = pUBXData->awindspeed*0.45; break;
-		default: break;
-		}
+		printf("Error writing data to a UBXDevice. \n");
+		return EXIT_FAILURE;
 	}
-
-	// Wind speed and angle, in relation to the vessel's bow/centerline.
-	if (pUBXDevice->bEnableWIMWV)
+	if ((pUBXDevice->bSaveRawData)&&(pUBXDevice->pfSaveFile))
 	{
-		if (sscanf(ptr_WIMWV, "$WIMWV,%lf,R,%lf,%c,A", 
-			&pUBXData->awinddir, &pUBXData->awindspeed, &pUBXData->cawindspeed) != 3)
-		{
-			printf("Error reading data from a UBXDevice : Invalid data. \n");
-			return EXIT_FAILURE;
-		}
-
-		// Convert apparent wind direction to angle in rad.
-		pUBXData->ApparentWindDir = pUBXData->awinddir*M_PI/180.0;
-
-		// Convert apparent wind speed to m/s.
-		switch (pUBXData->cawindspeed)
-		{
-		case 'K': pUBXData->ApparentWindSpeed = pUBXData->awindspeed*0.28; break;
-		case 'M': pUBXData->ApparentWindSpeed = pUBXData->awindspeed; break;
-		case 'N': pUBXData->ApparentWindSpeed = pUBXData->awindspeed*0.51; break;
-		case 'S': pUBXData->ApparentWindSpeed = pUBXData->awindspeed*0.45; break;
-		default: break;
-		}
+		fwrite(sendbuf, sendbuflen, 1, pUBXDevice->pfSaveFile);
+		fflush(pUBXDevice->pfSaveFile);
 	}
-
-	// Wind direction and speed, with respect to north.
-	if (pUBXDevice->bEnableWIMWD)
-	{
-		if (sscanf(ptr_WIMWD, "$WIMWD,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
-			&pUBXData->winddir, &pUBXData->cwinddir, &f1, &c1, &f2, &c2, &pUBXData->windspeed, &pUBXData->cwindspeed) != 8)
-		{
-			//printf("Error reading data from a UBXDevice : Invalid data. \n");
-			//return EXIT_FAILURE;
-		}
-		// Do other else if (sscanf() != x) if more/less complete sentence...
-
-		// Convert wind direction to angle in rad.
-		pUBXData->WindDir = pUBXData->winddir*M_PI/180.0;
-
-		pUBXData->WindSpeed = pUBXData->windspeed; 
-	}
-
-	// Meteorological composite data.
-	if (pUBXDevice->bEnableWIMDA)
-	{
-		if (sscanf(ptr_WIMDA, "$WIMDA,%lf,%c,%lf,%c,%lf,%c,,,,,,,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
-			&f0, &c0, &pUBXData->pressure, &pUBXData->cpressure, &pUBXData->temperature, &pUBXData->ctemperature,  
-			&pUBXData->winddir, &pUBXData->cwinddir, &f1, &c1, &f2, &c2, &pUBXData->windspeed, &pUBXData->cwindspeed) != 14)
-		{
-			//printf("Error reading data from a UBXDevice : Invalid data. \n");
-			//return EXIT_FAILURE;
-		}
-		// Do other else if (sscanf() != x) if more/less complete sentence...
-
-		// Convert wind direction to angle in rad.
-		pUBXData->WindDir = pUBXData->winddir*M_PI/180.0;
-
-		pUBXData->WindSpeed = pUBXData->windspeed; 
-	}
-
-	// AIS data.
-	if (pUBXDevice->bEnableAIVDM)
-	{
-		memset(aisbuf, 0, sizeof(aisbuf));
-		if (sscanf(ptr_AIVDM, "!AIVDM,%d,%d,,%c,%128s", 
-			&pUBXData->nbsentences, &pUBXData->sentence_number, &pUBXData->AIS_channel, aisbuf) != 4)
-		{
-			//printf("Error reading data from a UBXDevice : Invalid data. \n");
-			//return EXIT_FAILURE;
-		}
-		// Do other else if (sscanf() != x) if more/less complete sentence...
-
-		// Only the most simples AIS messages are handled...
-		if ((pUBXData->nbsentences == 1)&&(pUBXData->sentence_number == 1))
-		{
-			i = 0;
-			// Search for the end of the AIS data payload.
-			while ((i < (int)sizeof(aisbuf)-1)&&(aisbuf+i))
-			{
-				if (sscanf(aisbuf+i, ",%d", &pUBXData->nbfillbits) == 1) 
-				{
-					aisbuflen = i;
-					// Fill with 0 the rest of the buffer to keep only the AIS data payload in aisbuf.
-					memset(aisbuf+i, 0, sizeof(aisbuf)-i);
-					break;
-				}
-				i++;
-			}
-			if (aisbuflen != 0)
-			{
-				// Temporary...
-#if defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
-				decode_AIS(aisbuf, aisbuflen, &pUBXData->AIS_Latitude, &pUBXData->AIS_Longitude, &pUBXData->AIS_SOG, &pUBXData->AIS_COG);
-#endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
-			}
-			else
-			{
-				//printf("Error reading data from a UBXDevice : Invalid data. \n");
-				//return EXIT_FAILURE;
-			}
-		}
-		else
-		{
-			// Unhandled...
-		}
-	}
-
-	pUBXDevice->LastUBXData = *pUBXData;
 
 	return EXIT_SUCCESS;
 }
@@ -1080,19 +603,18 @@ inline int ConnectUBXDevice(UBXDEVICE* pUBXDevice, char* szCfgFilePath)
 		// Default values.
 		memset(pUBXDevice->szDevPath, 0, sizeof(pUBXDevice->szDevPath));
 		sprintf(pUBXDevice->szDevPath, "COM1");
-		pUBXDevice->BaudRate = 4800;
+		pUBXDevice->BaudRate = 9600;
 		pUBXDevice->timeout = 1000;
 		pUBXDevice->bSaveRawData = 1;
-		pUBXDevice->bEnableGPGGA = 1;
-		pUBXDevice->bEnableGPRMC = 0;
-		pUBXDevice->bEnableGPGLL = 0;
-		pUBXDevice->bEnableGPVTG = 0;
-		pUBXDevice->bEnableHCHDG = 0;
-		pUBXDevice->bEnableIIMWV = 0;
-		pUBXDevice->bEnableWIMWV = 0;
-		pUBXDevice->bEnableWIMWD = 0;
-		pUBXDevice->bEnableWIMDA = 0;
-		pUBXDevice->bEnableAIVDM = 0;
+		pUBXDevice->bRevertToDefaultCfg = 1;
+		pUBXDevice->bSetBaseCfg = 1;
+		pUBXDevice->SurveyMode = 1;
+		pUBXDevice->svinMinDur = 30;
+		pUBXDevice->svinAccLimit = 10;
+		pUBXDevice->fixedLat = 0;
+		pUBXDevice->fixedLon = 0;
+		pUBXDevice->fixedAlt = 0;
+		pUBXDevice->fixedPosAcc = 10;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -1107,25 +629,23 @@ inline int ConnectUBXDevice(UBXDEVICE* pUBXDevice, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pUBXDevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableGPGGA) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->bRevertToDefaultCfg) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableGPRMC) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->bSetBaseCfg) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableGPGLL) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->SurveyMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableGPVTG) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->svinMinDur) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableHCHDG) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->svinAccLimit) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableIIMWV) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->fixedLat) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableWIMWV) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->fixedLon) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableWIMWD) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->fixedAlt) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableWIMDA) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pUBXDevice->bEnableAIVDM) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUBXDevice->fixedPosAcc) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else
@@ -1153,6 +673,26 @@ inline int ConnectUBXDevice(UBXDEVICE* pUBXDevice, char* szCfgFilePath)
 		return EXIT_FAILURE;
 	}
 
+	if (pUBXDevice->bRevertToDefaultCfg)
+	{
+		if (RevertToDefaultCfgUBXDevice(pUBXDevice) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a UBXDevice.\n");
+			CloseRS232Port(&pUBXDevice->RS232Port);
+			return EXIT_FAILURE;
+		}
+	}
+
+	if (pUBXDevice->bSetBaseCfg)
+	{
+		if (SetBaseCfgUBXDevice(pUBXDevice) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a UBXDevice.\n");
+			CloseRS232Port(&pUBXDevice->RS232Port);
+			return EXIT_FAILURE;
+		}
+	}
+
 	printf("UBXDevice connected.\n");
 
 	return EXIT_SUCCESS;
@@ -1174,5 +714,8 @@ inline int DisconnectUBXDevice(UBXDEVICE* pUBXDevice)
 #ifndef DISABLE_UBXDEVICETHREAD
 THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam);
 #endif // DISABLE_UBXDEVICETHREAD
+
+// Restore default alignment settings.
+#pragma pack(pop) 
 
 #endif // UBXDEVICE_H

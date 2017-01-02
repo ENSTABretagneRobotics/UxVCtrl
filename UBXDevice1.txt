@@ -1,9 +1,27 @@
 % Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
-127.0.0.1:4001
-%COM3
+%127.0.0.1:4001
+COM14
 % BaudRate
-4800
+9600
 % Timeout (in ms)
 1500
 % bSaveRawData
 1
+% bRevertToDefaultCfg
+1
+% bSetBaseCfg
+1
+% SurveyMode (0 : Disabled, 1 : Survey In, 2 : Fixed Mode (fixedLat, fixedLon, fixedAlt, fixedPosAcc needed))
+1
+% svinMinDur (in s)
+30
+% svinAccLimit (in m)
+10
+% fixedLat (in deg)
+0
+% fixedLon (in deg)
+0
+% fixedAlt (in m)
+0
+% fixedPosAcc (in m)
+10
