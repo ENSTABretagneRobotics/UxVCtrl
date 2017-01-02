@@ -8,11 +8,11 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "Config.h"
-#include "UBXDevice.h"
+#include "ublox.h"
 
-THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
+THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 {
-	UBXDEVICE ubxdevice;
+	UBLOX ublox;
 	UBXDATA ubxdata;
 	double dval = 0;
 	BOOL bConnected = FALSE;
@@ -39,62 +39,62 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 
 */
 
-	sprintf(szCfgFilePath, "UBXDevice%d.txt", deviceid);
+	sprintf(szCfgFilePath, "ublox%d.txt", deviceid);
 
-	memset(&ubxdevice, 0, sizeof(UBXDEVICE));
+	memset(&ublox, 0, sizeof(UBLOX));
 
-	bGPSOKUBXDevice[deviceid] = FALSE;
+	bGPSOKublox[deviceid] = FALSE;
 
 	for (;;)
 	{
 		//mSleep(100);
 
-		if (bPauseUBXDevice[deviceid])
+		if (bPauseublox[deviceid])
 		{
 			if (bConnected)
 			{
-				printf("UBXDevice paused.\n");
-				bGPSOKUBXDevice[deviceid] = FALSE;
+				printf("ublox paused.\n");
+				bGPSOKublox[deviceid] = FALSE;
 				bConnected = FALSE;
-				DisconnectUBXDevice(&ubxdevice);
+				Disconnectublox(&ublox);
 			}
 			if (bExit) break;
 			mSleep(100);
 			continue;
 		}
 
-		if (bRestartUBXDevice[deviceid])
+		if (bRestartublox[deviceid])
 		{
 			if (bConnected)
 			{
-				printf("Restarting a UBXDevice.\n");
-				bGPSOKUBXDevice[deviceid] = FALSE;
+				printf("Restarting a ublox.\n");
+				bGPSOKublox[deviceid] = FALSE;
 				bConnected = FALSE;
-				DisconnectUBXDevice(&ubxdevice);
+				Disconnectublox(&ublox);
 			}
-			bRestartUBXDevice[deviceid] = FALSE;
+			bRestartublox[deviceid] = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectUBXDevice(&ubxdevice, szCfgFilePath) == EXIT_SUCCESS) 
+			if (Connectublox(&ublox, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
 
-				if (ubxdevice.pfSaveFile != NULL)
+				if (ublox.pfSaveFile != NULL)
 				{
-					fclose(ubxdevice.pfSaveFile); 
-					ubxdevice.pfSaveFile = NULL;
+					fclose(ublox.pfSaveFile); 
+					ublox.pfSaveFile = NULL;
 				}
-				if ((ubxdevice.bSaveRawData)&&(ubxdevice.pfSaveFile == NULL)) 
+				if ((ublox.bSaveRawData)&&(ublox.pfSaveFile == NULL)) 
 				{
-					if (strlen(ubxdevice.szCfgFilePath) > 0)
+					if (strlen(ublox.szCfgFilePath) > 0)
 					{
-						sprintf(szTemp, "%.127s", ubxdevice.szCfgFilePath);
+						sprintf(szTemp, "%.127s", ublox.szCfgFilePath);
 					}
 					else
 					{
-						sprintf(szTemp, "ubxdevice");
+						sprintf(szTemp, "ublox");
 					}
 					// Remove the extension.
 					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
@@ -103,24 +103,24 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 					EnterCriticalSection(&strtimeCS);
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtime_fns());
 					LeaveCriticalSection(&strtimeCS);
-					ubxdevice.pfSaveFile = fopen(szSaveFilePath, "wb");
-					if (ubxdevice.pfSaveFile == NULL) 
+					ublox.pfSaveFile = fopen(szSaveFilePath, "wb");
+					if (ublox.pfSaveFile == NULL) 
 					{
-						printf("Unable to create UBXDevice data file.\n");
+						printf("Unable to create ublox data file.\n");
 						break;
 					}
 				}
 			}
 			else 
 			{
-				bGPSOKUBXDevice[deviceid] = FALSE;
+				bGPSOKublox[deviceid] = FALSE;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
 		}
 		else
 		{
-			if (GetDataUBXDevice(&ubxdevice, &ubxdata) == EXIT_SUCCESS)
+			if (GetDataublox(&ublox, &ubxdata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 
@@ -131,11 +131,11 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 					latitude = ubxdata.Latitude;
 					longitude = ubxdata.Longitude;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKUBXDevice[deviceid] = TRUE;
+					bGPSOKublox[deviceid] = TRUE;
 				}
 				else
 				{
-					bGPSOKUBXDevice[deviceid] = FALSE;
+					bGPSOKublox[deviceid] = FALSE;
 				}
 
 /*
@@ -147,26 +147,26 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 					latitude = ubxdata.Latitude;
 					longitude = ubxdata.Longitude;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKUBXDevice[deviceid] = TRUE;
+					bGPSOKublox[deviceid] = TRUE;
 				}
 				else
 				{
-					bGPSOKUBXDevice[deviceid] = FALSE;
+					bGPSOKublox[deviceid] = FALSE;
 				}
 
 				// Should check better if valid...
-				if ((ubxdevice.bEnableGPRMC&&(ubxdata.status == 'A'))||ubxdevice.bEnableGPVTG)
+				if ((ublox.bEnableGPRMC&&(ubxdata.status == 'A'))||ublox.bEnableGPVTG)
 				{
 					sog = ubxdata.SOG;
 					cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
 				}
 
-				if (ubxdevice.bEnableHCHDG)
+				if (ublox.bEnableHCHDG)
 				{
 					if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-ubxdata.Heading-angle_env);
 				}
 
-				if (ubxdevice.bEnableIIMWV||ubxdevice.bEnableWIMWV)
+				if (ublox.bEnableIIMWV||ublox.bEnableWIMWV)
 				{
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-ubxdata.ApparentWindDir+M_PI); 
@@ -178,7 +178,7 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
 				}
 
-				if (ubxdevice.bEnableWIMWD||ubxdevice.bEnableWIMDA)
+				if (ublox.bEnableWIMWD||ublox.bEnableWIMDA)
 				{
 					// True wind.
 					psitwind = fmod_2PI(M_PI/2.0-ubxdata.WindDir+M_PI-angle_env);
@@ -189,10 +189,10 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 			}
 			else
 			{
-				printf("Connection to a UBXDevice lost.\n");
-				bGPSOKUBXDevice[deviceid] = FALSE;
+				printf("Connection to a ublox lost.\n");
+				bGPSOKublox[deviceid] = FALSE;
 				bConnected = FALSE;
-				DisconnectUBXDevice(&ubxdevice);
+				Disconnectublox(&ublox);
 				mSleep(100);
 			}		
 		}
@@ -200,15 +200,15 @@ THREAD_PROC_RETURN_VALUE UBXDeviceThread(void* pParam)
 		if (bExit) break;
 	}
 
-	bGPSOKUBXDevice[deviceid] = FALSE;
+	bGPSOKublox[deviceid] = FALSE;
 
-	if (ubxdevice.pfSaveFile != NULL)
+	if (ublox.pfSaveFile != NULL)
 	{
-		fclose(ubxdevice.pfSaveFile); 
-		ubxdevice.pfSaveFile = NULL;
+		fclose(ublox.pfSaveFile); 
+		ublox.pfSaveFile = NULL;
 	}
 
-	if (bConnected) DisconnectUBXDevice(&ubxdevice);
+	if (bConnected) Disconnectublox(&ublox);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

@@ -78,7 +78,7 @@ BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
 BOOL bDisableSBG = FALSE;
 BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
-BOOL bDisableUBXDevice[MAX_NB_UBXDEVICE];
+BOOL bDisableublox[MAX_NB_UBLOX];
 BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bDisableSwarmonDevice = FALSE;
 BOOL bDisableUE9A = FALSE;
@@ -303,10 +303,10 @@ BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
 BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
 BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
-// UBXDevice variables.
-BOOL bGPSOKUBXDevice[MAX_NB_UBXDEVICE];
-BOOL bPauseUBXDevice[MAX_NB_UBXDEVICE];
-BOOL bRestartUBXDevice[MAX_NB_UBXDEVICE];
+// ublox variables.
+BOOL bGPSOKublox[MAX_NB_UBLOX];
+BOOL bPauseublox[MAX_NB_UBLOX];
+BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
 BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];

@@ -95,7 +95,7 @@ typedef enum KEYS KEYS;
 
 #define MAX_NB_VIDEO 3
 #define MAX_NB_NMEADEVICE 2
-#define MAX_NB_UBXDEVICE 2
+#define MAX_NB_UBLOX 2
 #define MAX_NB_MAVLINKDEVICE 2
 
 // Acoustic modem messages.
@@ -201,7 +201,7 @@ extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
 extern BOOL bDisableSBG;
 extern BOOL bDisableNMEADevice[MAX_NB_NMEADEVICE];
-extern BOOL bDisableUBXDevice[MAX_NB_UBXDEVICE];
+extern BOOL bDisableublox[MAX_NB_UBLOX];
 extern BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
@@ -426,10 +426,10 @@ extern BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
-// UBXDevice variables.
-extern BOOL bGPSOKUBXDevice[MAX_NB_UBXDEVICE];
-extern BOOL bPauseUBXDevice[MAX_NB_UBXDEVICE];
-extern BOOL bRestartUBXDevice[MAX_NB_UBXDEVICE];
+// ublox variables.
+extern BOOL bGPSOKublox[MAX_NB_UBLOX];
+extern BOOL bPauseublox[MAX_NB_UBLOX];
+extern BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
 extern BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -536,7 +536,7 @@ extern char logmissingworkertaskfilename[MAX_BUF_LEN];
 
 inline BOOL CheckGPSOK(void)
 {
-	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKUBXDevice[0]||bGPSOKUBXDevice[1]||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKSimulator);
+	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKublox[0]||bGPSOKublox[1]||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKSimulator);
 }
 
 inline int InitGlobals(void)
@@ -552,11 +552,11 @@ inline int InitGlobals(void)
 		bRestartNMEADevice[i] = FALSE;
 	}
 
-	for (i = 0; i < MAX_NB_UBXDEVICE; i++)
+	for (i = 0; i < MAX_NB_UBLOX; i++)
 	{
-		bGPSOKUBXDevice[i] = FALSE;
-		bPauseUBXDevice[i] = FALSE;
-		bRestartUBXDevice[i] = FALSE;
+		bGPSOKublox[i] = FALSE;
+		bPauseublox[i] = FALSE;
+		bRestartublox[i] = FALSE;
 	}
 
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
@@ -704,11 +704,11 @@ inline int ReleaseGlobals(void)
 		bGPSOKMAVLinkDevice[i] = FALSE;
 	}
 
-	for (i = MAX_NB_UBXDEVICE-1; i >= 0; i--)
+	for (i = MAX_NB_UBLOX-1; i >= 0; i--)
 	{
-		bRestartUBXDevice[i] = FALSE;
-		bPauseUBXDevice[i] = FALSE;
-		bGPSOKUBXDevice[i] = FALSE;
+		bRestartublox[i] = FALSE;
+		bPauseublox[i] = FALSE;
+		bGPSOKublox[i] = FALSE;
 	}
 
 	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)

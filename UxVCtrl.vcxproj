@@ -107,7 +107,7 @@
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
     <ClCompile Include="Hardware\SBG.cpp" />
-    <ClCompile Include="Hardware\UBXDevice.cpp" />
+    <ClCompile Include="Hardware\ublox.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MAVLinkInterface.cpp" />
     <ClCompile Include="MissingWorker.cpp" />
@@ -181,7 +181,7 @@
     <ClInclude Include="Hardware\RTCM2Protocol.h" />
     <ClInclude Include="Hardware\RTCM3Protocol.h" />
     <ClInclude Include="Hardware\SBG.h" />
-    <ClInclude Include="Hardware\UBXDevice.h" />
+    <ClInclude Include="Hardware\ublox.h" />
     <ClInclude Include="Hardware\UBXProtocol.h" />
     <ClInclude Include="MAVLinkInterface.h" />
     <ClInclude Include="MissingWorker.h" />
@@ -269,8 +269,8 @@
     <Text Include="MAVLinkDevice1.txt" />
     <Text Include="NMEADevice1.txt" />
     <Text Include="SBG0.txt" />
-    <Text Include="UBXDevice0.txt" />
-    <Text Include="UBXDevice1.txt" />
+    <Text Include="ublox0.txt" />
+    <Text Include="ublox1.txt" />
     <Text Include="UxVCtrl.txt" />
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />

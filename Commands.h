@@ -1855,12 +1855,12 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "ubxdeviceconfig %d %255s %d", &ival, str, &ival1) == 3)
+	else if (sscanf(line, "ubloxconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
-		if ((ival >= 0)&&(ival < MAX_NB_UBXDEVICE))
+		if ((ival >= 0)&&(ival < MAX_NB_UBLOX))
 		{
 			memset(str2, 0, sizeof(str2));
-			sprintf(str2, "UBXDevice%d.txt", ival);
+			sprintf(str2, "ublox%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
 				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
@@ -1878,8 +1878,8 @@ inline int Commands(char* line)
 				}
 			}
 			mSleep(500);
-			if (!ival1) bRestartUBXDevice[ival] = TRUE;
-			bPauseUBXDevice[ival] = ival1;
+			if (!ival1) bRestartublox[ival] = TRUE;
+			bPauseublox[ival] = ival1;
 		}
 		else
 		{

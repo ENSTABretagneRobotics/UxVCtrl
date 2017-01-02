@@ -415,11 +415,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UBXDevice0.txt"
+				RelativePath=".\ublox0.txt"
 				>
 			</File>
 			<File
-				RelativePath=".\UBXDevice1.txt"
+				RelativePath=".\ublox1.txt"
 				>
 			</File>
 			<File
@@ -983,11 +983,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Hardware\UBXDevice.cpp"
+				RelativePath=".\Hardware\ublox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Hardware\UBXDevice.h"
+				RelativePath=".\Hardware\ublox.h"
 				>
 			</File>
 			<File

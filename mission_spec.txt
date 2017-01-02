@@ -144,7 +144,7 @@
 %
 %nmeadeviceconfig deviceid NMEADevice.txt bPause
 %
-%ubxdeviceconfig deviceid UBXDevice.txt bPause
+%ubloxconfig deviceid ublox.txt bPause
 %
 %mavlinkdeviceconfig deviceid MAVLinkDevice.txt bPause
 %

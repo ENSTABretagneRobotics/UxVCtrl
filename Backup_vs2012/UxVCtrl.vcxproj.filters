@@ -219,7 +219,7 @@
     <ClCompile Include="Hardware\SBG.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="Hardware\UBXDevice.cpp">
+    <ClCompile Include="Hardware\ublox.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
   </ItemGroup>
@@ -500,9 +500,6 @@
     <ClInclude Include="Hardware\SBG.h">
       <Filter>Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="Hardware\UBXDevice.h">
-      <Filter>Hardware</Filter>
-    </ClInclude>
     <ClInclude Include="Hardware\UBXProtocol.h">
       <Filter>Hardware</Filter>
     </ClInclude>
@@ -516,6 +513,9 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="Hardware\RTCM3Protocol.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\ublox.h">
       <Filter>Hardware</Filter>
     </ClInclude>
   </ItemGroup>
@@ -602,10 +602,10 @@
     <Text Include="keys.txt">
       <Filter>Input Files</Filter>
     </Text>
-    <Text Include="UBXDevice0.txt">
+    <Text Include="ublox0.txt">
       <Filter>Input Files</Filter>
     </Text>
-    <Text Include="UBXDevice1.txt">
+    <Text Include="ublox1.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>
