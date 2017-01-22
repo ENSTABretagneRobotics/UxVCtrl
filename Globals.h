@@ -162,6 +162,9 @@ extern vector<interval> d_all_mes;
 extern deque<double> alpha_mes_vector;
 extern deque<double> d_mes_vector;
 extern deque< vector<interval> > d_all_mes_vector;
+extern deque<interval> xhat_history_vector;
+extern deque<interval> yhat_history_vector;
+extern deque<interval> thetahat_history_vector;
 // Echosounder.
 extern double altitude_sea_floor;
 // Modem.
@@ -495,6 +498,7 @@ extern BOOL bBrakeControl;
 extern BOOL bHeadingControl;
 extern BOOL bDepthControl;
 extern BOOL bAltitudeSeaFloorControl;
+extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];

@@ -1,15 +1,5 @@
 
-if (!bEnableHeadingControl)
-{
-	bEnableHeadingControl = TRUE;
-	wtheta = Center(thetahat);
-}
-else 
-{
-	bEnableHeadingControl = FALSE;
-}
-set wtheta to current when enabling headingcontrol, same for other controls?
-check if improvements can be made on AUV control (e.g. to avoid sinking and lose control...)
+check if improvements can be made to AUV control (e.g. to avoid sinking and lose control...)
 
 utiliser hokuyo/sonar pour estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...)
 
@@ -23,9 +13,12 @@ Faire détection plus robuste en regardant plusieurs images et selon un detection
 linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
 
-add a visual studio config for Linux, utiliser dernière version linux headers?
+add a visual studio config for Linux, utiliser dernière version linux headers?->extension vs_linux, qt .pro?
 
 bugs
+la localisation dynamique bloque trop longtemps les autres threads
+Bug C_q_in_XXX : Pourquoi il faut if ((imax == -1)||(imin == (int)(V.size()))) x = interval(); ?
+GUI bloquée plusieurs secondes avec buggy quand Unable to connect to a local/remote camera or open a video file
 null-terminated string en entrée de processnmea...
 check structure packing, alignement...
 pour plus tard : éviter les pragma pack...
@@ -51,7 +44,6 @@ race condition : vérifier que si 2 entercritical section différents se suivent, 
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 GTK : now the keys are randomly received by the 2 windows...
 Attention à la touche NUM LOCK dans les vm Linux!
-préparer qt .pro pour débugguer
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
@@ -271,7 +263,8 @@ attention aux valeurs au départ d'initialisation, attention au setstateestimatio
 surveiller divisions par 0..., vérifier cohérence paramètres par défaut
 surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
 
-deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme WaitForUserInput() au lieu de fgets...
+deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme WaitForUserInput() au lieu de fgets... Est-ce que ça marcherait pas mieux avec les cancel? Mais il se peut qu'il y ait des malloc dans la fonction Commands()... On peut peut-être désactiver le mode cancelable autour de l'appel à la fonction Commands()... En fait sous Windows c'est différent, les cancellation points sont quasiment que les fonctions en XXXEx...
+voir aussi rapport entre pthread_cleanup_push()/pthread_cleanup_pop() et QueueUserAPC()...
 
 robid, robid mask : regrouper sailboat et motorboat ensemble pour laisser de la place pour UGV et UAV?
 robid log file?
@@ -289,6 +282,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+abort dans procedure gere-t-il bien le return raté?
+
+Faire en sorte que generalstop implique abort?->non, ça supprimerait des possibilités en mode semi-autonome...
 
 renommer analyze en decode et qu'il retourne aussi l'adresse de payload et payloadlen? mais du coup ça fera beaucoup de paramètres à rajouter dans toutes les fonctions...
 GN/GL parfois utilisé à la place de GP dans NMEA?->$GN, $GP->"$G%c" && c0=='N' ||'P'

@@ -391,16 +391,40 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			DisableAllHorizontalControls(); // wtheta = 0;
 			break;
 		case 'g':
-			DisableAllControls();// wtheta = 0; wz = 0;
+			DisableAllControls(); // wtheta = 0; wz = 0;
 			break;
 		case 't':
-			bHeadingControl = !bHeadingControl;
+			if (!bHeadingControl)
+			{
+				bHeadingControl = TRUE;
+				wtheta = Center(thetahat);
+			}
+			else 
+			{
+				bHeadingControl = FALSE;
+			}
 			break;
 		case 'y':
-			bDepthControl = !bDepthControl;
+			if (!bDepthControl)
+			{
+				bDepthControl = TRUE;
+				wz = Center(zhat);
+			}
+			else 
+			{
+				bDepthControl = FALSE;
+			}
 			break;
 		case 'Y':
-			bAltitudeSeaFloorControl = !bAltitudeSeaFloorControl;
+			if (!bAltitudeSeaFloorControl)
+			{
+				bAltitudeSeaFloorControl = TRUE;
+				wasf = altitude_sea_floor;
+			}
+			else 
+			{
+				bAltitudeSeaFloorControl = FALSE;
+			}
 			break;
 		case 'b':
 			light += 0.1;
@@ -565,6 +589,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				xhat = P[1];
 				yhat = P[2];
 			}
+			break;
+		case 'D': 
+			// enabledynamicsonarlocalization/disabledynamicsonarlocalization
+			bDynamicSonarLocalization = !bDynamicSonarLocalization; 
 			break;
 		case 'P':
 			memset(strtime_snap, 0, sizeof(strtime_snap));
@@ -771,6 +799,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			if (bDynamicSonarLocalization)
+			{
+				sprintf(szText, "SNR DYN LOC"); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			}
 			if (CheckGPSOK())
 			{
 				if (bGPSLocalization) strcpy(szText, "GPS FIX (IN USE)"); else strcpy(szText, "GPS FIX"); 

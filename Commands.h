@@ -1153,6 +1153,14 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
+	else if (strncmp(line, "enabledynamicsonarlocalization", strlen("enabledynamicsonarlocalization")) == 0)
+	{
+		bDynamicSonarLocalization = TRUE;
+	}
+	else if (strncmp(line, "disabledynamicsonarlocalization", strlen("disabledynamicsonarlocalization")) == 0)
+	{
+		bDynamicSonarLocalization = FALSE;
+	}
 	else if (sscanf(line, "acousticmodemlocalization %lf", &delay) == 1)
 	{
 		delay = fabs(delay);

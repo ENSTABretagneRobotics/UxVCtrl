@@ -10,7 +10,7 @@
 #ifndef OBSERVER_H
 #define OBSERVER_H
 
-#include "Config.h"
+#include "Computations.h"
 
 THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam);
 

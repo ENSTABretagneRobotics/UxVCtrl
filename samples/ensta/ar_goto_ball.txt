@@ -1,3 +1,11 @@
+procedure 0
+stop
+depthreg 0
+wait 10
+abort
+return
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 0 1
+startballtracking
 setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
 wpfollowingconfig 0.25
 stop
@@ -102,3 +110,8 @@ thrust -0.5
 wait 1
 stop
 wait 3
+%
+stopballtracking
+stop
+depthreg 0
+wait 10

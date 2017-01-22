@@ -71,7 +71,7 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 			}
 		}
 	}
-	if (imax == -1) x = interval();
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
 	else x = interval(V[imin].val, V[imax].val);
 }
 
@@ -137,7 +137,7 @@ inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>
 			imin = min(imin, (int)i);
 		}
 	}
-	if (imax == -1) x = interval();
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
 	else x = interval(V[imin].val, V[imax].val);
 }
 
@@ -281,13 +281,62 @@ inline void Contract(box& P)
 	}
 }
 
-// d_all_hat_vector, deque<interval> alpha_hat_vector would be in the right coordinate system
-//inline box dynamicsonarlocalization(box P0, deque< vector<interval> > d_all_hat_vector, deque<interval> alpha_hat_vector)
-//{
-//	box P;
-//
-//	return P;
-//}
+inline void Contract_dyn(box& P)
+{
+	int i = 0, j = 0;
+
+	vector<box> Pi;
+	vector<int> Pigroup;
+	Pi.clear();
+	Pigroup.clear();
+	for (i = 0; i < (int)alpha_mes_vector.size(); i++)
+	{
+		vector<box> Pj;
+		Pj.clear();
+		alphahat = interval(alpha_mes_vector[i]-alpha_max_err,alpha_mes_vector[i]+alpha_max_err);
+		for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
+		{
+			dhat = d_all_mes_vector[i][j]+interval(-d_max_err,+d_max_err);
+			//
+			// Activate only if using getfirst or getlast...
+			// If no obstacle found...
+			//if ((Center(d_all_mes_vector[i][j]) < 0)||(Center(d_all_mes_vector[i][j]) > rangescale)||(d_all_mes_vector[i][j].isEmpty)) 
+			//{
+			//	dhat = interval(rangescale-d_max_err,oo);
+			//	printf("Bad dhat\n");
+			//}
+			//
+
+			box Pxyj = box(xhat_history_vector[i],yhat_history_vector[i]);
+			box Pt = box(interval(-oo,oo),interval(-oo,oo)); 
+			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat_history_vector[i], 1);
+			interval xt = Pt[1];
+			interval yt = Pt[2];
+			CinSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
+			if ((!xt.isEmpty)&&(!yt.isEmpty))
+			{
+				Pt = box(xt,yt);
+				BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat_history_vector[i], -1);
+				//Pj.push_back(Pxyj);
+				Pi.push_back(Pxyj);
+				Pigroup.push_back(i);
+			}
+		}
+		//box Pxy = Union(Pj);
+		//if (!Pxy.IsEmpty())
+		//{
+		//	Pi.push_back(Pxy);
+		//}
+	}
+	if (Pi.size() > 0)
+	{
+		//C_q_in_group(P, alpha_mes_vector.size()-nb_outliers, Pi, Pigroup, alpha_mes_vector.size());
+		C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
+		//C_q_in(P, Pi.size()-nb_outliers, Pi);
+		//C_q_in(P, alpha_mes_vector.size()-nb_outliers, Pi);
+		//C_acc(P, Pi);
+	}
+}
 
 inline box SIVIA(box P0)
 {   
@@ -349,6 +398,75 @@ inline box SIVIA(box P0)
 
 	return Union(Result);
 }
+
+inline box SIVIA_dyn(box P0)
+{   
+	list<box> L;
+	vector<box> Result;
+	box P, P1, P2;
+	int current_nbissect = 0;
+
+	L.push_back(P0);
+	while (!L.empty())
+	{ 
+		P = L.front();
+		L.pop_front();
+
+		Contract_dyn(P);
+
+		if (!P.IsEmpty())
+		{  
+			//if (P.Width() < 0.1)
+			if (current_nbissect > 10)
+			{
+
+				/*				//
+				COORDSYSTEM2IMG csMap2FullImg;
+
+				InitCS2ImgEx(&csMap2FullImg, &csMap, imgwidth, imgheight, BEST_RATIO_COORDSYSTEM2IMG);
+
+				cvRectangle(img, 
+				cvPoint(
+				XCS2JImg(&csMap2FullImg, Center(P[1])-0.5*Width(P[1])), 
+				YCS2IImg(&csMap2FullImg, Center(P[2])-0.5*Width(P[2]))), 
+				cvPoint(
+				XCS2JImg(&csMap2FullImg, Center(P[1])+0.5*Width(P[1])), 
+				YCS2IImg(&csMap2FullImg, Center(P[2])+0.5*Width(P[2]))), 
+				CV_RGB(0, 128, 128), CV_FILLED, 8, 0);
+				cvRectangle(img, 
+				cvPoint(
+				XCS2JImg(&csMap2FullImg, Center(P[1])-0.5*Width(P[1])), 
+				YCS2IImg(&csMap2FullImg, Center(P[2])-0.5*Width(P[2]))), 
+				cvPoint(
+				XCS2JImg(&csMap2FullImg, Center(P[1])+0.5*Width(P[1])), 
+				YCS2IImg(&csMap2FullImg, Center(P[2])+0.5*Width(P[2]))), 
+				CV_RGB(0, 255, 255), 1, 8, 0);
+				*/				//
+
+				Result.push_back(P);
+			}
+			else  
+			{   
+				Bisect(P, P1, P2);
+				L.push_back(P1);
+				L.push_back(P2);
+				current_nbissect++;
+			}
+		}
+	}
+
+	//printf("current_nbissect = %d\n", current_nbissect);
+
+	return Union(Result);
+}
+
+// d_all_hat_vector, deque<interval> alpha_hat_vector would be in the right coordinate system
+//inline box dynamicsonarlocalization(box P0, deque< vector<interval> > d_all_hat_vector, deque<interval> alpha_hat_vector)
+//{
+//	box P;
+//
+//	return P;
+//}
 
 /*
 The 'Dynamic Range Control' is a surface display function which has 2 parameters (which are sent

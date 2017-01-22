@@ -9,6 +9,9 @@ COM9
 1
 % RangeScale (in m)
 5
+%75
+%20
+%5
 % Gain (in %)
 50
 % Sensitivity (in [0..80] dB)

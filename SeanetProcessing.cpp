@@ -127,12 +127,18 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					alpha_mes_vector.push_back(alpha_mes);
 					d_mes_vector.push_back(d_mes);
 					d_all_mes_vector.push_back(d_all_mes);
+					xhat_history_vector.push_back(xhat);
+					yhat_history_vector.push_back(yhat);
+					thetahat_history_vector.push_back(thetahat);
 
 					if ((int)alpha_mes_vector.size() > NSteps)
 					{
 						alpha_mes_vector.pop_front();
 						d_mes_vector.pop_front();
 						d_all_mes_vector.pop_front();
+						xhat_history_vector.pop_front();
+						yhat_history_vector.pop_front();
+						thetahat_history_vector.pop_front();
 					}
 				}
 

@@ -80,6 +80,10 @@
 %
 %staticsonarlocalization t [nbretries, retryperiod?] (double [0,oo[ timeout in s, the function blocks until the timeout is reached[, nbretries : int [0,oo[ number of retries if the algorithm reports that the data might be unreliable, make the robot go backward and turn a little bit before a retry], this command can be used when the submarine is stopped to get a better estimation of the current position using sonar. If the algorithm reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
 %
+%enabledynamicsonarlocalization
+%
+%disabledynamicsonarlocalization
+%
 %acousticmodemlocalization t (double [0,oo[ timeout in s, the function blocks until the timeout is reached. Estimation of the current position using the last known acoustic modem position and range. If the acoustic modem position and range are not available or might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
 %
 %wpfollowingconfig r (r : double [0,oo[ validation radius in m)
@@ -330,10 +334,6 @@
 %
 %-------------------------------------------------
 % OLD
-%
-%startDL (start dynamic localization. Overrides the default dead reckoning localization algorithm)
-%
-%stopDL (stop dynamic localization)
 %
 %replay filename
 %end

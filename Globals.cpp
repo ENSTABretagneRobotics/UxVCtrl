@@ -39,6 +39,9 @@ vector<interval> d_all_mes;
 deque<double> alpha_mes_vector;
 deque<double> d_mes_vector;
 deque< vector<interval> > d_all_mes_vector;
+deque<interval> xhat_history_vector;
+deque<interval> yhat_history_vector;
+deque<interval> thetahat_history_vector;
 // Echosounder.
 double altitude_sea_floor = 0;
 // Modem.
@@ -372,6 +375,7 @@ BOOL bBrakeControl = FALSE;
 BOOL bHeadingControl = FALSE;
 BOOL bDepthControl = FALSE;
 BOOL bAltitudeSeaFloorControl = FALSE;
+BOOL bDynamicSonarLocalization = FALSE;
 BOOL bGPSLocalization = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];

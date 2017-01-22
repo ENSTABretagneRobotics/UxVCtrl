@@ -1,3 +1,7 @@
+126
+Heading, depth and altitude w.r.t. sea floor control inputs now set to current state when enabled.
+Added enabledynamicsonarlocalization/disabledynamicsonarlocalization commands (but not working well).
+
 125
 UBXDevice renamed as ublox.
 

@@ -856,7 +856,7 @@ inline int DisplayKeys(void)
 	printf("%c%c%c%c,fv,%c%c,%c(brake),space(stop),g(generalstop),t%c%c(control),"
 		"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),X(disableopencvgui),"
 		"+-(coordspace zoom),T(text color)"
-		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),"
+		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 		"bn(light),uj(tilt),46825(CISCREA OSD),"
 		"C(Switch),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n", 

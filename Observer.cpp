@@ -50,7 +50,10 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	vtwindhat = vtwind;
 	LeaveCriticalSection(&StateVariablesCS);
 
-	// GPS localization activated by default, use enable/disableautogpslocalization commands to enable/disable...
+	// Dynamic sonar localization disabled by default, use enable/disabledynamicsonarlocalization commands to enable/disable...
+	bDynamicSonarLocalization = FALSE;
+
+	// GPS localization enabled by default, use enable/disableautogpslocalization commands to enable/disable...
 	bGPSLocalization = TRUE;
 
 	t = 0;
@@ -192,6 +195,31 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			//}
 			//vxyhat = 0.9*vxyhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err));
 			//printf("vxyhat = %f\n", Center(vxyhat));
+		}
+
+		if (bDynamicSonarLocalization)
+		{
+
+			// What if there is no sonar connected...?
+
+			// Initial box to be able to contract...?
+			box P = box(xhat,yhat);
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			//Contract_dyn(P);
+			P = SIVIA_dyn(P);
+			if (P.IsEmpty()) 
+			{
+				// Expand initial box to be able to contract next time and because we are probably lost...
+				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+			}
+			else
+			{
+				// P is likely to be with a small width so we expand...
+				P = P+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+			}
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			xhat = P[1];
+			yhat = P[2];
 		}
 
 		if (bGPSLocalization)
