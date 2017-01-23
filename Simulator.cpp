@@ -118,7 +118,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		alpha = alpha_mes-alpha_bias_err-alpha_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		// Compute the distance to the first obstacle d. d might be oo if no obstacle found.
 		d1 = DistanceDirSegments(x,y,alpha+alphas+theta,walls_xa,walls_ya,walls_xb,walls_yb);
-		d2 = DistanceDirCercles(x,y,alpha+alphas+theta,circles_x,circles_y,circles_r);
+		d2 = DistanceDirCircles(x,y,alpha+alphas+theta,circles_x,circles_y,circles_r);
 		d = min(d1,d2);
 
 		// Generate outliers.

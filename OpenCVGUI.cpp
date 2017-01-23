@@ -733,7 +733,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
-				sprintf(szText, "%d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
+				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
 				break;
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
@@ -747,7 +747,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1); 
 				break;
 			default:
-				sprintf(szText, "%d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
+				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
 				break;
 			}
 			offset += 16;
@@ -1244,11 +1244,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		LeaveCriticalSection(&dispimgsCS[videoid]);
 		LeaveCriticalSection(&StateVariablesCS);
 
-		EnterCriticalSection(&OpenCVCS);
 		EnterCriticalSection(&dispimgsCS[videoid]);
 		cvShowImage(windowname, dispimgs[videoid]);
 		LeaveCriticalSection(&dispimgsCS[videoid]);
-		LeaveCriticalSection(&OpenCVCS);
 
 		if (bExit) break;
 	}

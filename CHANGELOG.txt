@@ -1,3 +1,10 @@
+127
+GUI blocked several seconds with buggy when "Unable to connect to a local/remote camera or open a video file" : deleted OpenCVCS around cvShowImage() in OpenCVGUI.
+Added LeaveCriticalSection(&StateVariablesCS) / EnterCriticalSection(&StateVariablesCS) in SIVIA_dyn() to avoid blocking too much the other threads.
+Do not bisect, only contract for dynamic sonar localization to speed up.
+Added white dot to display center in sonar display to know where the robot is w.r.t. blue lines indicating obstacles.
+Improved readability of thrusters power in OpenCVGUI.
+
 126
 Heading, depth and altitude w.r.t. sea floor control inputs now set to current state when enabled.
 Added enabledynamicsonarlocalization/disabledynamicsonarlocalization commands (but not working well).

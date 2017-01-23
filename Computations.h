@@ -409,6 +409,13 @@ inline box SIVIA_dyn(box P0)
 	L.push_back(P0);
 	while (!L.empty())
 	{ 
+
+		//
+
+		LeaveCriticalSection(&StateVariablesCS);
+		ThreadYield();
+		EnterCriticalSection(&StateVariablesCS);
+
 		P = L.front();
 		L.pop_front();
 

@@ -203,14 +203,15 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			// What if there is no sonar connected...?
 
 			// Initial box to be able to contract...?
-			box P = box(xhat,yhat);
-			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
-			//Contract_dyn(P);
-			P = SIVIA_dyn(P);
+			box P0 = box(xhat,yhat);
+			box P = P0;
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));			
+			Contract_dyn(P);
+			//P = SIVIA_dyn(P); // Contain LeaveCriticalSection(&StateVariablesCS) / EnterCriticalSection(&StateVariablesCS)...
 			if (P.IsEmpty()) 
 			{
 				// Expand initial box to be able to contract next time and because we are probably lost...
-				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+				P = P0+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
 			}
 			else
 			{

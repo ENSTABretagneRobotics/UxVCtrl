@@ -177,6 +177,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 		{
 			EnterCriticalSection(&StateVariablesCS);
 
+			cvCircle(overlayimage, cvPoint(overlayimage->width/2, overlayimage->height/2), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
 			for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 			{
 				for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
