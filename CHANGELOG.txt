@@ -1,3 +1,6 @@
+128
+Changed period for Simulator, SeanetProcessing, Observer, UE9, Controller.
+
 127
 GUI blocked several seconds with buggy when "Unable to connect to a local/remote camera or open a video file" : deleted OpenCVCS around cvShowImage() in OpenCVGUI.
 Added LeaveCriticalSection(&StateVariablesCS) / EnterCriticalSection(&StateVariablesCS) in SIVIA_dyn() to avoid blocking too much the other threads.

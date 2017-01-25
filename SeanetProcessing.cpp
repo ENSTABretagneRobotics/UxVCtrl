@@ -63,7 +63,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(100);
+		mSleep(50);
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 

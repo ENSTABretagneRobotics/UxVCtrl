@@ -24,7 +24,7 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(50);
+		mSleep(25);
 
 		if (bPauseUE9A) 
 		{

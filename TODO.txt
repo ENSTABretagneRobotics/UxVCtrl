@@ -1,6 +1,13 @@
+Dyn loc : marche peut-être mieux en release avec vrai robot
+mettre partie dessin de seanetprocessing dans opencvgui?
+
+change period also for other sensors/actuators?
 
 check if improvements can be made to AUV control (e.g. to avoid sinking and lose control...)
 
+Getubxdata->faire pour tout type de données
+Update aussi nmea device pour qu'il utilise les nouvelles fonctions?
+ 
 utiliser hokuyo/sonar pour estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...)
 
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v

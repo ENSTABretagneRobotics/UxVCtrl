@@ -320,6 +320,6 @@
 % z_gps_lim (profondeur à partir de laquelle le GPS est disponible en m)
 -0.5
 % simulatorperiod (in ms)
-70
+25
 % outliers_ratio
 0.25
