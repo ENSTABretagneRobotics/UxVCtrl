@@ -1,3 +1,8 @@
+129
+Reverted back to c_acc instead of c_acc_group due to possible bug.
+Expand box differently for sonar localization.
+Prevented too precise GPS position estimation while there was a bias.
+
 128
 Changed period for Simulator, SeanetProcessing, Observer, UE9, Controller.
 

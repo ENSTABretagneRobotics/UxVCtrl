@@ -1126,19 +1126,21 @@ inline int Commands(char* line)
 		{
 			EnterCriticalSection(&StateVariablesCS);
 			// Initial box to be able to contract...?
-			box P = box(xhat,yhat);
+			box P0 = box(xhat,yhat);
+			box P = P0;
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 			//Contract(P);
 			P = SIVIA(P);
 			if (P.IsEmpty()) 
 			{
 				// Expand initial box to be able to contract next time and because we are probably lost...
-				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+				P = P0+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
 			}
 			else
 			{
 				// P is likely to be with a small width so we expand...
-				P = P+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+				double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
+				P = P+box(interval(-snr_loc_max_err,snr_loc_max_err),interval(-snr_loc_max_err,snr_loc_max_err));
 			}
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 			xhat = P[1];

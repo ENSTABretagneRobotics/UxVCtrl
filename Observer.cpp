@@ -216,7 +216,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			else
 			{
 				// P is likely to be with a small width so we expand...
-				P = P+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+				double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
+				P = P+box(interval(-snr_loc_max_err,snr_loc_max_err),interval(-snr_loc_max_err,snr_loc_max_err));
 			}
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 			xhat = P[1];
@@ -234,8 +235,16 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
 				if (xhat.isEmpty || yhat.isEmpty)
 				{
-					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+					xhat = x_mes+interval(-x_max_err,x_max_err);
+					yhat = y_mes+interval(-y_max_err,y_max_err);
+				}
+				else
+				{
+					if ((Width(xhat) < x_max_err/2)||(Width(yhat) < y_max_err/2))
+					{
+						xhat = Center(xhat)+interval(-x_max_err,x_max_err);
+						yhat = Center(yhat)+interval(-y_max_err,y_max_err);
+					}
 				}
 			}
 		}

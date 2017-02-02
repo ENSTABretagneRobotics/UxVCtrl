@@ -6,9 +6,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -16,9 +16,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -26,9 +26,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -36,9 +36,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -46,9 +46,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -56,9 +56,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -66,9 +66,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -76,9 +76,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -86,9 +86,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -96,9 +96,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3

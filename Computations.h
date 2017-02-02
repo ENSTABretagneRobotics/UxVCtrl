@@ -274,10 +274,10 @@ inline void Contract(box& P)
 	if (Pi.size() > 0)
 	{
 		//C_q_in_group(P, alpha_mes_vector.size()-nb_outliers, Pi, Pigroup, alpha_mes_vector.size());
-		C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
+		//C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
 		//C_q_in(P, Pi.size()-nb_outliers, Pi);
 		//C_q_in(P, alpha_mes_vector.size()-nb_outliers, Pi);
-		//C_acc(P, Pi);
+		C_acc(P, Pi);
 	}
 }
 
@@ -331,10 +331,10 @@ inline void Contract_dyn(box& P)
 	if (Pi.size() > 0)
 	{
 		//C_q_in_group(P, alpha_mes_vector.size()-nb_outliers, Pi, Pigroup, alpha_mes_vector.size());
-		C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
+		//C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
 		//C_q_in(P, Pi.size()-nb_outliers, Pi);
 		//C_q_in(P, alpha_mes_vector.size()-nb_outliers, Pi);
-		//C_acc(P, Pi);
+		C_acc(P, Pi);
 	}
 }
 

@@ -4,7 +4,7 @@ depthreg 0
 wait 10
 abort
 return
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 0 1
+ballconfig 0 0 0 0 0 0 20 220 75 240 75 150 0.03 0.07 0 1.0 0 0 220 0.05 1 0 0 0 0 1
 startballtracking
 setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
 wpfollowingconfig 0.25
@@ -14,9 +14,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -24,9 +24,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -34,9 +34,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -44,9 +44,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -54,9 +54,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -64,9 +64,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -74,9 +74,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -84,9 +84,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -94,9 +94,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 0.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 0.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
@@ -104,9 +104,9 @@ wait 3
 staticsonarlocalization 3
 gotoxy 1.5 3.5
 wait 10
-thrust 0.3
+thrust 0.5
 gotoxyt 1.5 3.5 30
-thrust -0.5
+thrust -0.7
 wait 1
 stop
 wait 3
