@@ -1,3 +1,6 @@
+130
+Reverted back to x,y error for sonar localization.
+
 129
 Reverted back to c_acc instead of c_acc_group due to possible bug.
 Expand box differently for sonar localization.
