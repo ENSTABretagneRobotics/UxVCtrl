@@ -144,6 +144,8 @@
 60
 % sail_update_period (in s)
 20
+% controllerperiod (in ms)
+25
 % Observer parameters
 % x_max_err (in m)
 5.0
@@ -228,6 +230,8 @@
 %1 for Simulator and CISCREA
 %-1 for SAUCISSE and SARDINE
 % nb_outliers
+25
+% observerperiod (in ms)
 25
 % Wind, current and waves
 % vtwind_med (true wind speed in m/s, see also Observer and any wind sensor)
@@ -319,7 +323,7 @@
 2.3562
 % z_gps_lim (profondeur à partir de laquelle le GPS est disponible en m)
 -0.5
-% simulatorperiod (in ms)
-25
 % outliers_ratio
 0.25
+% simulatorperiod (in ms)
+25

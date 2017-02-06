@@ -1000,14 +1000,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
-					cvLine(dispimgs[videoid], 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, -0.4)), 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
-						CV_RGB(255, 128, 128), 4, 8, 0);
-					cvLine(dispimgs[videoid], 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.4)), 
-						CV_RGB(0, 255, 0), 4, 8, 0);
+					switch (robid)
+					{
+					case HOVERCRAFT_ROBID:
+					case TREX_ROBID:
+					case MOTORBOAT_ROBID:
+					case BUGGY_ROBID:
+					default:
+						cvLine(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, -0.4)), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
+							CV_RGB(255, 128, 128), 4, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.4)), 
+							CV_RGB(0, 255, 0), 4, 8, 0);
+						break;
+					}
 				}
 				else
 				{
@@ -1054,14 +1063,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
-					cvLine(dispimgs[videoid], 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
-						CV_RGB(255, 128, 0), 4, 8, 0);
-					cvLine(dispimgs[videoid], 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(thetahat)))), 
-						cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(thetahat)))), 
-						CV_RGB(0, 255, 0), 4, 8, 0);
+					switch (robid)
+					{
+					case HOVERCRAFT_ROBID:
+					case TREX_ROBID:
+					case MOTORBOAT_ROBID:
+					case BUGGY_ROBID:
+					default:
+						cvLine(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
+							CV_RGB(255, 128, 0), 4, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(thetahat)))), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(thetahat)))), 
+							CV_RGB(0, 255, 0), 4, 8, 0);
+						break;
+					}
 				}
 			}
 			if (bFullMap)
@@ -1144,14 +1162,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
-					cvLine(dispimgs[videoid], 
-						cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.4)), 
-						cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.0)), 
-						CV_RGB(255, 128, 0), 8, 8, 0);
-					cvLine(dispimgs[videoid], 
-						cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.0)), 
-						cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.4)), 
-						CV_RGB(0, 255, 0), 8, 8, 0);
+					switch (robid)
+					{
+					case HOVERCRAFT_ROBID:
+					case TREX_ROBID:
+					case MOTORBOAT_ROBID:
+					case BUGGY_ROBID:
+					default:
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.4)), 
+							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.0)), 
+							CV_RGB(255, 128, 0), 8, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.0)), 
+							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.4)), 
+							CV_RGB(0, 255, 0), 8, 8, 0);
+						break;
+					}
 				}
 				else
 				{
@@ -1198,14 +1225,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
-					cvLine(dispimgs[videoid], 
-						cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
-						cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
-						CV_RGB(255, 128, 0), 8, 8, 0);
-					cvLine(dispimgs[videoid], 
-						cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(thetahat)))), 
-						cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(thetahat)))), 
-						CV_RGB(0, 255, 0), 8, 8, 0);
+					switch (robid)
+					{
+					case HOVERCRAFT_ROBID:
+					case TREX_ROBID:
+					case MOTORBOAT_ROBID:
+					case BUGGY_ROBID:
+						{
+							//CvPoint* pts = NULL, int npts = 0, int contours = 0;
+							//cvPolyLine(dispimgs[videoid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
+						}
+					default:
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
+							CV_RGB(255, 128, 0), 8, 8, 0);
+						cvLine(dispimgs[videoid], 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(thetahat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(thetahat)))), 
+							CV_RGB(0, 255, 0), 8, 8, 0);
+						break;
+					}
 				}
 			}
 			EnterCriticalSection(&VideoRecordRequestsCS[videoid]);

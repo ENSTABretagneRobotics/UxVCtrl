@@ -85,6 +85,7 @@ inline int LoadConfig(void)
 	ksi = 0.87;
 	check_strategy_period = 60;
 	sail_update_period = 20;
+	controllerperiod = 25;
 	// Observer parameters.
 	x_max_err = 10;
 	y_max_err = 10;
@@ -111,6 +112,7 @@ inline int LoadConfig(void)
 	rangescale = 10;
 	sdir = 1;
 	nb_outliers = 25;
+	observerperiod = 25;
 	// Wind, current and waves.
 	vtwind_med = 0.01;
 	vtwind_var = 0.01;
@@ -143,8 +145,8 @@ inline int LoadConfig(void)
 	alphas = 0;
 	omegas = 2.3562;
 	z_gps_lim = -0.01;
-	simulatorperiod = 70;
 	outliers_ratio = 0.5;
+	simulatorperiod = 70;
 
 	file = fopen("UxVCtrl.txt", "r");
 	if (file != NULL)
@@ -273,6 +275,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &check_strategy_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &sail_update_period) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &controllerperiod) != 1) printf("Invalid configuration file.\n");
 
 		// Observer parameters.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -382,6 +386,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &sdir) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &nb_outliers) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &observerperiod) != 1) printf("Invalid configuration file.\n");
 
 		// Current and waves.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -484,9 +490,9 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &z_gps_lim) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &simulatorperiod) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &outliers_ratio) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &simulatorperiod) != 1) printf("Invalid configuration file.\n");
 
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 	}
@@ -612,6 +618,26 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : ksi.\n");
 		ksi = 0.87;
 	}
+	if (controllerperiod < 0)
+	{
+		printf("Invalid parameter : controllerperiod.\n");
+		controllerperiod = 25;
+	}
+	if (rangescale < 0)
+	{
+		printf("Invalid parameter : rangescale.\n");
+		rangescale = 10;
+	}
+	if (nb_outliers < 0)
+	{
+		printf("Invalid parameter : nb_outliers.\n");
+		nb_outliers = 25;
+	}
+	if (observerperiod < 0)
+	{
+		printf("Invalid parameter : observerperiod.\n");
+		observerperiod = 25;
+	}
 	if ((psitwind_med < -M_PI)||(psitwind_med > M_PI))
 	{
 		printf("Invalid parameter : psitwind_med.\n");
@@ -637,15 +663,15 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : psic_var.\n");
 		psic_var = 1.0*M_PI/8.0;
 	}
-	if (simulatorperiod <= 0)
-	{
-		printf("Invalid parameter : simulatorperiod.\n");
-		simulatorperiod = 70;
-	}
 	if (outliers_ratio < 0)
 	{
 		printf("Invalid parameter : outliers_ratio.\n");
 		outliers_ratio = 0.5;
+	}
+	if (simulatorperiod < 0)
+	{
+		printf("Invalid parameter : simulatorperiod.\n");
+		simulatorperiod = 70;
 	}
 
 	return EXIT_SUCCESS;

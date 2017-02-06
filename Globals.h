@@ -230,6 +230,7 @@ extern double betaarr;
 extern double ksi;
 extern int check_strategy_period;
 extern int sail_update_period;
+extern int controllerperiod;
 
 // Observer parameters.
 extern double x_max_err, y_max_err, z_max_err, theta_max_err, vxy_max_err, omega_max_err;
@@ -239,6 +240,7 @@ alphashat, omegashat,
 xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
 extern int rangescale, sdir;
 extern int nb_outliers;
+extern int observerperiod;
 
 // Wind, current and waves.
 extern double vtwind_med, vtwind_var, psitwind_med, psitwind_var, wind_filter_coef;
@@ -261,8 +263,8 @@ d_max_rand_err, d_bias_err,
 alphavxy, alphaomega, alphafvxy, alphafomega, alphaz, vzup, 
 alphas, omegas,
 z_gps_lim;
-extern int simulatorperiod;
 extern double outliers_ratio;
+extern int simulatorperiod;
 
 // Environment parameters.
 extern double angle_env, lat_env, long_env, alt_env;

@@ -107,6 +107,7 @@ double betaarr = 0;
 double ksi = 0;
 int check_strategy_period = 0;
 int sail_update_period = 0;
+int controllerperiod = 0;
 
 // Observer parameters.
 double x_max_err = 0, y_max_err = 0, z_max_err = 0, theta_max_err = 0, vxy_max_err = 0, omega_max_err = 0;
@@ -116,6 +117,7 @@ alphashat, omegashat,
 xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
+int observerperiod = 0;
 
 // Wind, current and waves.
 double vtwind_med = 0, vtwind_var = 0, psitwind_med = 0, psitwind_var = 0, wind_filter_coef = 0;
@@ -138,8 +140,8 @@ d_max_rand_err = 0, d_bias_err = 0,
 alphavxy = 0, alphaomega = 0, alphafvxy = 0, alphafomega = 0, alphaz = 0, vzup = 0, 
 alphas = 0, omegas = 0, 
 z_gps_lim = 0;
-int simulatorperiod = 0;
 double outliers_ratio = 0;
+int simulatorperiod = 0;
 
 // Environment parameters.
 double angle_env = 0, lat_env = 0, long_env = 0, alt_env = 0;

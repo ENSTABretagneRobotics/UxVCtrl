@@ -2,11 +2,10 @@ remplacer message GPS FIX (in use) par GPS FIX LOC pour coller avec SNR?
 
 problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais...
 
-Add controllerperiod, observerperiod params and set previous values for SAILBOAT
 devices period params?
-mon C_q_in_group est probablement faux car il choisit peut-être de prendre en compte le 1er ping du groupe et pas les autres, mais le 1er n'est pas forcément le bon...
+mon C_q_in_group est probablement faux car il choisit peut-être de prendre en compte le 1er ping du groupe et pas les autres, mais le 1er n'est pas forcément le bon...->voir formule de l'article
 
-Trouver mission autonome intelligente en intérieur pour buggy, faire en sorte qu'on puisse zoomer et se déplacer dans la vue de localisation comme en MATLAB
+Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
 
 mettre partie dessin de seanetprocessing dans opencvgui?
@@ -298,6 +297,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+faire en sorte qu'on puisse zoomer et se déplacer dans la vue de localisation comme en MATLAB->zoom déjà fait, et voir touche *
 
 Interval_adapt c_q_in->OK, c'est celui d'Ibex...
 

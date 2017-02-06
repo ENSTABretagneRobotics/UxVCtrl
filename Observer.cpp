@@ -64,7 +64,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(25);
+		mSleep(observerperiod);
 		t0 = t;
 		GetTimeElapsedChrono(&chrono, &t);
 		dt = t-t0;
