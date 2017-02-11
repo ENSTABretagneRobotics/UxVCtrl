@@ -1,9 +1,5 @@
-remplacer message GPS FIX (in use) par GPS FIX LOC pour coller avec SNR?
 
-problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais...
-
-devices period params?
-mon C_q_in_group est probablement faux car il choisit peut-être de prendre en compte le 1er ping du groupe et pas les autres, mais le 1er n'est pas forcément le bon...->voir formule de l'article
+problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais... est-ce que j'aurais pas mis trop de biais?
 
 Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
@@ -17,8 +13,6 @@ check if improvements can be made to AUV control (e.g. to avoid sinking and lose
 Getubxdata->faire pour tout type de données
 Update aussi nmea device pour qu'il utilise les nouvelles fonctions?
  
-utiliser hokuyo/sonar pour estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...)
-
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
 selon les accx_err, ça aura ou non une influence sur les équations d'état
 Gérer le -g dans acc...
@@ -32,8 +26,8 @@ rajouter commande setwindestimation/wgs avec unités des marins
 add a visual studio config for Linux, utiliser dernière version linux headers?->extension vs_linux, qt .pro?
 
 bugs
-la localisation dynamique bloque trop longtemps les autres threads, notamment simu, diminuer simulatorperiod, terme integral du controller..?
-Bug C_q_in_XXX : Pourquoi il faut if ((imax == -1)||(imin == (int)(V.size()))) x = interval(); ?
+mon C_q_in_group est probablement faux car il choisit peut-être de prendre en compte le 1er ping du groupe et pas les autres, mais le 1er n'est pas forcément le bon...->voir formule de l'article
+Bug C_q_XXX : Pourquoi il faut if ((imax == -1)||(imin == (int)(V.size()))) x = interval(); ?
 null-terminated string en entrée de processnmea...
 check structure packing, alignement...
 pour plus tard : éviter les pragma pack...
@@ -54,7 +48,6 @@ crash du programme lorsqu'on appuie sur p pour stopper mission : video recording
 why I need to press twice r to stop videorecording when it was started by a script?->c'est logique, il faudrait sans doute que la variable locale bVideoRecording soit réglée en fonction de videorecordrequests, peut-être la supprimer dans OpenCVGUI et rendre l'enregistrement indépendant du fait que la GUI soit enabled ou pas, les videorecordrequests étant juste soit 0, soit 1, seul l'appui de la touche r ou les command start/stop videorecording doivent controler l'enregistrement...
 protéger par OpenCVCS les VideoWriter? Mais s'il y a une webcam qui met du temps à se connecter ça va bloquer...
 tester mission crash vidéo sur sardine pendant longtemps, sur des missions, en appuyant sur tous les boutons...
-Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
 race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
 GTK : now the keys are randomly received by the 2 windows...
@@ -72,7 +65,7 @@ avec nouveau format, lognav2KML va être simplifié
 
 sonar, localisation, wf
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
-commencer à prévoir dl en utilisant staticloc avec la position des pings dessinée avec le dr, pour l'instant il faudrait juste appeler dl toutes les 10s par exemple et le seul avantage par rapport à static serait de ne pas devoir arrêter le robot...
+dessin des pings corrigés en angle et pos...
 Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé, faire un peu pareil pour la partie affichage...
 simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?
 c'est juste au niveau de l'affichage qu'on dessinera pareil...?
@@ -82,8 +75,7 @@ mindist, maxDist, threshold params... maintenant c'est peut-être plus sur adspan
 0.1*omegas...
 options pour enlever les outliers avant, après...
 repère dans lequel dessiner image sonar vs detection d'obstacles
-pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
-Utilisation de headingreg et depthreg pendant staticloc?
+Utilisation de headingreg et depthreg pendant staticloc, mouvements dues au propulseur vertical...
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
 données aberrantes vxyhat dans logstate?
 simu : au début convergence vers un intervalle tout petit correspondant au biais quand y a GPS, convergence vers un intervalle de vitesse tout petit...
@@ -91,7 +83,7 @@ vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 image sonar simu pas bonne?->portée sonar, autres params? Rajouter option pour que l'image soit corrigée en cap ou non...
 flux acoustique sur un mur pas tout à fait droit...
-LIDAR/sonar : mesurer vitesse si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
+LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...) si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
 
 GUI, video
 MAVLinkInterface : solve message Failed to update home location...
@@ -297,6 +289,12 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+la localisation dynamique bloque trop longtemps les autres threads, notamment simu
+Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
+pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
+
+remplacer message GPS FIX (in use) par GPS FIX LOC pour coller avec SNR?
 
 faire en sorte qu'on puisse zoomer et se déplacer dans la vue de localisation comme en MATLAB->zoom déjà fait, et voir touche *
 

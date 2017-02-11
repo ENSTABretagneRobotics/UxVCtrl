@@ -11,6 +11,7 @@
 #include "VideoRecord.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "SeanetProcessing.h"
+#include "SonarLocalization.h"
 #include "Wall.h"
 #include "Pipeline.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -70,6 +71,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER VideoRecordThreadId[MAX_NB_VIDEO];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER SeanetProcessingThreadId;
+	THREAD_IDENTIFIER SonarLocalizationThreadId;
 	THREAD_IDENTIFIER WallThreadId;
 	THREAD_IDENTIFIER PipelineThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -150,6 +152,7 @@ int main(int argc, char* argv[])
 
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(SeanetProcessingThread, NULL, &SeanetProcessingThreadId);
+	CreateDefaultThread(SonarLocalizationThread, NULL, &SonarLocalizationThreadId);
 	CreateDefaultThread(WallThread, NULL, &WallThreadId);
 	CreateDefaultThread(PipelineThread, NULL, &PipelineThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -333,6 +336,7 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	WaitForThread(PipelineThreadId);
 	WaitForThread(WallThreadId);
+	WaitForThread(SonarLocalizationThreadId);
 	WaitForThread(SeanetProcessingThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
 

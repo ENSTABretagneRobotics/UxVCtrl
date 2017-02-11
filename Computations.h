@@ -10,7 +10,9 @@
 #ifndef COMPUTATIONS_H
 #define COMPUTATIONS_H
 
-#include "Config.h"
+#include "OSCore.h"
+#include "rmatrix.h"
+#include <deque>
 #include <numeric>
 #include <list>
 
@@ -204,6 +206,58 @@ inline void C_acc(box& x, vector<box>& y)
 	}
 }
 
+inline void C_acc_opt(interval& x, vector<interval>& y)
+{
+	vector<bound> V;
+	if (x.isEmpty) return;
+	for (unsigned int i = 0; i < y.size(); i++)
+	{
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, 1));
+			V.push_back(bound(y[i].sup, -1, 1));
+		}
+	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, 0));
+	V.push_back(bound(x.sup, -1, 0));
+	sort(V.begin(), V.end());
+	int q = -1;
+	int sum = 0;
+	int imin = (int)(V.size());
+	int imax = -1;
+	for (unsigned int i = 0; i < V.size(); i++)
+	{
+		if ((sum >= q)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imax = i;
+		}
+		sum = sum + V[i].opening*(int)V[i].mark;
+		if ((sum > q)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			q = sum;
+			imin = i;
+		}
+	}
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
+	else x = interval(V[imin].val, V[imax].val);
+}
+
+inline void C_acc_opt(box& x, vector<box>& y)
+{
+	vector<interval> yi(y.size());
+	for (int i = 1; i <= x.dim; i++)
+	{
+		for (unsigned int j = 0; j < y.size(); j++)
+			yi[j] = y[j][i];
+		C_acc_opt(x[i], yi);
+	}
+}
+
 inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle, int sens)
 {
 	box P = box(2);
@@ -224,7 +278,11 @@ inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle,
 	}
 }
 
-inline void Contract(box& P)
+inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
+					 interval& thetahat, 
+					 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
+					 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
+					 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {
 	int i = 0, j = 0;
 
@@ -236,10 +294,10 @@ inline void Contract(box& P)
 	{
 		vector<box> Pj;
 		Pj.clear();
-		alphahat = interval(alpha_mes_vector[i]-alpha_max_err,alpha_mes_vector[i]+alpha_max_err);
+		interval alphahat = interval(alpha_mes_vector[i]-alpha_max_err,alpha_mes_vector[i]+alpha_max_err);
 		for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 		{
-			dhat = d_all_mes_vector[i][j]+interval(-d_max_err,+d_max_err);
+			interval dhat = d_all_mes_vector[i][j]+interval(-d_max_err,+d_max_err);
 			//
 			// Activate only if using getfirst or getlast...
 			// If no obstacle found...
@@ -281,7 +339,11 @@ inline void Contract(box& P)
 	}
 }
 
-inline void Contract_dyn(box& P)
+inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
+						 deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, deque<interval>& thetahat_history_vector, 
+						 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
+						 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
+						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {
 	int i = 0, j = 0;
 
@@ -293,10 +355,10 @@ inline void Contract_dyn(box& P)
 	{
 		vector<box> Pj;
 		Pj.clear();
-		alphahat = interval(alpha_mes_vector[i]-alpha_max_err,alpha_mes_vector[i]+alpha_max_err);
+		interval alphahat = interval(alpha_mes_vector[i]-alpha_max_err,alpha_mes_vector[i]+alpha_max_err);
 		for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 		{
-			dhat = d_all_mes_vector[i][j]+interval(-d_max_err,+d_max_err);
+			interval dhat = d_all_mes_vector[i][j]+interval(-d_max_err,+d_max_err);
 			//
 			// Activate only if using getfirst or getlast...
 			// If no obstacle found...
@@ -338,7 +400,11 @@ inline void Contract_dyn(box& P)
 	}
 }
 
-inline box SIVIA(box P0)
+inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
+				 interval& thetahat, 
+				 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
+				 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
+				 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {   
 	list<box> L;
 	vector<box> Result;
@@ -351,7 +417,11 @@ inline box SIVIA(box P0)
 		P = L.front();
 		L.pop_front();
 
-		Contract(P);
+		Contract(P, d_all_mes_vector, alpha_mes_vector, 
+			thetahat, 
+			d_max_err, alpha_max_err, sdir, alphashat, 
+			walls_xa, walls_ya, walls_xb, walls_yb, 
+			circles_x, circles_y, circles_r);
 
 		if (!P.IsEmpty())
 		{  
@@ -399,7 +469,11 @@ inline box SIVIA(box P0)
 	return Union(Result);
 }
 
-inline box SIVIA_dyn(box P0)
+inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
+						 deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, deque<interval>& thetahat_history_vector, 
+						 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
+						 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
+						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {   
 	list<box> L;
 	vector<box> Result;
@@ -409,17 +483,14 @@ inline box SIVIA_dyn(box P0)
 	L.push_back(P0);
 	while (!L.empty())
 	{ 
-
-		//
-
-		LeaveCriticalSection(&StateVariablesCS);
-		ThreadYield();
-		EnterCriticalSection(&StateVariablesCS);
-
 		P = L.front();
 		L.pop_front();
 
-		Contract_dyn(P);
+		Contract_dyn(P, d_all_mes_vector, alpha_mes_vector, 
+						 xhat_history_vector, yhat_history_vector, thetahat_history_vector, 
+						 d_max_err, alpha_max_err, sdir, alphashat, 
+						 walls_xa, walls_ya, walls_xb, walls_yb, 
+						 circles_x, circles_y, circles_r);
 
 		if (!P.IsEmpty())
 		{  
@@ -466,14 +537,6 @@ inline box SIVIA_dyn(box P0)
 
 	return Union(Result);
 }
-
-// d_all_hat_vector, deque<interval> alpha_hat_vector would be in the right coordinate system
-//inline box dynamicsonarlocalization(box P0, deque< vector<interval> > d_all_hat_vector, deque<interval> alpha_hat_vector)
-//{
-//	box P;
-//
-//	return P;
-//}
 
 /*
 The 'Dynamic Range Control' is a surface display function which has 2 parameters (which are sent

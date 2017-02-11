@@ -222,6 +222,9 @@
     <ClCompile Include="Hardware\ublox.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="SonarLocalization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -517,6 +520,9 @@
     </ClInclude>
     <ClInclude Include="Hardware\ublox.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="SonarLocalization.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,7 @@
 #ifndef SEANETPROCESSING_H
 #define SEANETPROCESSING_H
 
+#include "Config.h"
 #include "Computations.h"
 #include "Seanet.h"
 

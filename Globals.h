@@ -137,7 +137,7 @@ typedef enum STATE STATE;
 extern interval xhat, yhat, zhat, thetahat, vxyhat, omegahat;
 extern interval vchat, psichat, hwhat;
 extern interval vtwindhat, psitwindhat;
-extern interval alphahat, dhat;
+//extern interval alphahat, dhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
@@ -500,6 +500,7 @@ extern BOOL bBrakeControl;
 extern BOOL bHeadingControl;
 extern BOOL bDepthControl;
 extern BOOL bAltitudeSeaFloorControl;
+extern BOOL bStaticSonarLocalization;
 extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;
 extern CHRONO chrono_mission;

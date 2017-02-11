@@ -1,3 +1,6 @@
+132
+Added SonarLocalizationThread to handle some computations separately.
+
 131
 Added controllerperiod, observerperiod, moved simulatorperiod parameters.
 

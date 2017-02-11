@@ -117,6 +117,7 @@
     <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SonarLocalization.cpp" />
     <ClCompile Include="SurfaceVisualObstacle.cpp" />
     <ClCompile Include="VideoRecord.cpp" />
     <ClCompile Include="VisualObstacle.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SonarLocalization.h" />
     <ClInclude Include="SurfaceVisualObstacle.h" />
     <ClInclude Include="VideoRecord.h" />
     <ClInclude Include="VisualObstacle.h" />

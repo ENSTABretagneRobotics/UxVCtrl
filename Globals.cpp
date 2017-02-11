@@ -14,7 +14,7 @@ interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCER
 thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vxyhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+//interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
@@ -377,6 +377,7 @@ BOOL bBrakeControl = FALSE;
 BOOL bHeadingControl = FALSE;
 BOOL bDepthControl = FALSE;
 BOOL bAltitudeSeaFloorControl = FALSE;
+BOOL bStaticSonarLocalization = FALSE;
 BOOL bDynamicSonarLocalization = FALSE;
 BOOL bGPSLocalization = FALSE;
 CHRONO chrono_mission;

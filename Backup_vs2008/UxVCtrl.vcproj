@@ -235,6 +235,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SonarLocalization.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SurfaceVisualObstacle.cpp"
 				>
 			</File>
@@ -306,6 +310,10 @@
 			</File>
 			<File
 				RelativePath=".\Simulator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SonarLocalization.h"
 				>
 			</File>
 			<File

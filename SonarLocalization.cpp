@@ -1,0 +1,136 @@
+// Prevent Visual Studio Intellisense from defining _WIN32 and _MSC_VER when we use 
+// Visual Studio to edit Linux or Borland C++ code.
+#ifdef __linux__
+#	undef _WIN32
+#endif // __linux__
+#if defined(__GNUC__) || defined(__BORLANDC__)
+#	undef _MSC_VER
+#endif // defined(__GNUC__) || defined(__BORLANDC__)
+
+#include "SonarLocalization.h"
+
+THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
+{
+	CHRONO chrono_period;
+
+	UNREFERENCED_PARAMETER(pParam);
+
+	// Dynamic sonar localization disabled by default, use enable/disabledynamicsonarlocalization commands to enable/disable...
+	bDynamicSonarLocalization = FALSE;
+
+	StartChrono(&chrono_period);
+
+	for (;;)
+	{
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		mSleep(50);
+
+		if (bStaticSonarLocalization)
+		{
+
+			// What if there is no sonar connected...?
+
+
+			EnterCriticalSection(&StateVariablesCS);
+			// Initial box to be able to contract...?
+			box P0 = box(xhat,yhat);
+			box P = P0;
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));		
+
+			deque< vector<interval> > d_all_mes_vector_tmp = d_all_mes_vector; deque<double> alpha_mes_vector_tmp = alpha_mes_vector; 
+			interval thetahat_tmp = thetahat; 
+			double d_max_err_tmp = d_max_err; double alpha_max_err_tmp = alpha_max_err; int sdir_tmp = sdir; interval alphashat_tmp = alphashat; 
+			vector<double> walls_xa_tmp = walls_xa; vector<double> walls_ya_tmp = walls_ya; vector<double> walls_xb_tmp = walls_xb; vector<double> walls_yb_tmp = walls_yb; 
+			vector<double> circles_x_tmp = circles_x; vector<double> circles_y_tmp = circles_y; vector<double> circles_r_tmp = circles_r;
+			LeaveCriticalSection(&StateVariablesCS);
+
+			ThreadYield();
+
+			P = SIVIA(P, d_all_mes_vector_tmp, alpha_mes_vector_tmp, 
+				thetahat_tmp, 
+				d_max_err_tmp, alpha_max_err_tmp, sdir_tmp, alphashat_tmp, 
+				walls_xa_tmp, walls_ya_tmp, walls_xb_tmp, walls_yb_tmp, 
+				circles_x_tmp, circles_y_tmp, circles_r_tmp);
+
+			ThreadYield();
+
+			EnterCriticalSection(&StateVariablesCS);
+			if (P.IsEmpty()) 
+			{
+				// Expand initial box to be able to contract next time and because we are probably lost...
+				P = P0+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+			}
+			else
+			{
+				// P is likely to be with a small width so we expand...
+				//double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
+				P = P+box(interval(-x_max_err,y_max_err),interval(-x_max_err,y_max_err));
+			}
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			xhat = P[1];
+			yhat = P[2];
+			LeaveCriticalSection(&StateVariablesCS);
+
+			bStaticSonarLocalization = FALSE;
+		}
+
+		if (bDynamicSonarLocalization)
+		{
+
+			// What if there is no sonar connected...?
+
+
+			EnterCriticalSection(&StateVariablesCS);
+			// Initial box to be able to contract...?
+			box P0 = box(xhat,yhat);
+			box P = P0;
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));		
+
+			deque< vector<interval> > d_all_mes_vector_tmp = d_all_mes_vector; deque<double> alpha_mes_vector_tmp = alpha_mes_vector; 
+			deque<interval> xhat_history_vector_tmp = xhat_history_vector; deque<interval> yhat_history_vector_tmp = yhat_history_vector; deque<interval> thetahat_history_vector_tmp = thetahat_history_vector; 
+			double d_max_err_tmp = d_max_err; double alpha_max_err_tmp = alpha_max_err; int sdir_tmp = sdir; interval alphashat_tmp = alphashat; 
+			vector<double> walls_xa_tmp = walls_xa; vector<double> walls_ya_tmp = walls_ya; vector<double> walls_xb_tmp = walls_xb; vector<double> walls_yb_tmp = walls_yb; 
+			vector<double> circles_x_tmp = circles_x; vector<double> circles_y_tmp = circles_y; vector<double> circles_r_tmp = circles_r;
+			LeaveCriticalSection(&StateVariablesCS);
+
+			ThreadYield();
+
+			P = SIVIA_dyn(P, d_all_mes_vector_tmp, alpha_mes_vector_tmp, 
+				xhat_history_vector_tmp, yhat_history_vector_tmp, thetahat_history_vector_tmp, 
+				d_max_err_tmp, alpha_max_err_tmp, sdir_tmp, alphashat_tmp, 
+				walls_xa_tmp, walls_ya_tmp, walls_xb_tmp, walls_yb_tmp, 
+				circles_x_tmp, circles_y_tmp, circles_r_tmp);
+
+			ThreadYield();
+
+			EnterCriticalSection(&StateVariablesCS);
+			if (P.IsEmpty()) 
+			{
+				// Expand initial box to be able to contract next time and because we are probably lost...
+				P = P0+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+			}
+			else
+			{
+				// P is likely to be with a small width so we expand...
+				//double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
+				P = P+box(interval(-x_max_err,y_max_err),interval(-x_max_err,y_max_err));
+			}
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			xhat = P[1];
+			yhat = P[2];
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+
+		//printf("SonarLocalizationThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+
+		if (bExit) break;
+	}
+
+	StopChronoQuick(&chrono_period);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
+
+	return 0;
+}

@@ -7,12 +7,12 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
-#ifndef OBSERVER_H
-#define OBSERVER_H
+#ifndef SONARLOCALIZATION_H
+#define SONARLOCALIZATION_H
 
 #include "Config.h"
 #include "Computations.h"
 
-THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam);
+THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam);
 
-#endif // OBSERVER_H
+#endif // SONARLOCALIZATION_H
