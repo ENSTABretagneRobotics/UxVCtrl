@@ -65,8 +65,8 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 			else
 			{
 				// P is likely to be with a small width so we expand...
-				//double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
-				P = P+box(interval(-x_max_err,y_max_err),interval(-x_max_err,y_max_err));
+				double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
+				P = P+box(interval(-snr_loc_max_err,snr_loc_max_err),interval(-snr_loc_max_err,snr_loc_max_err));
 			}
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 			xhat = P[1];
@@ -114,8 +114,8 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 			else
 			{
 				// P is likely to be with a small width so we expand...
-				//double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
-				P = P+box(interval(-x_max_err,y_max_err),interval(-x_max_err,y_max_err));
+				double snr_loc_max_err = fabs(2*(d_max_err+sin(alpha_max_err)));
+				P = P+box(interval(-snr_loc_max_err,snr_loc_max_err),interval(-snr_loc_max_err,snr_loc_max_err));
 			}
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 			xhat = P[1];

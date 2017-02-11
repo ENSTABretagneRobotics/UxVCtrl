@@ -1,3 +1,7 @@
+133
+Corrected problem with too precise but inaccurate GPS position estimation.
+Expand box differently for sonar localization.
+
 132
 Added SonarLocalizationThread to handle some computations separately.
 

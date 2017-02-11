@@ -1,10 +1,6 @@
 
-problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais... est-ce que j'aurais pas mis trop de biais?
-
 Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
-
-mettre partie dessin de seanetprocessing dans opencvgui?
 
 change period also for other sensors/actuators?
 
@@ -66,9 +62,9 @@ avec nouveau format, lognav2KML va être simplifié
 sonar, localisation, wf
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 dessin des pings corrigés en angle et pos...
-Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé, faire un peu pareil pour la partie affichage...
 simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?
 c'est juste au niveau de l'affichage qu'on dessinera pareil...?
+mettre partie dessin de seanetprocessing dans opencvgui, isoler dessins dans thread séparé?
 Où mettre la partie dessin des images sonar en overlay, c'est commun en partie avec seanet et simulator... dans SeanetProcessing?
 statevars va être très ralenti à cause de dmes..., faire une cs spécifique?
 mindist, maxDist, threshold params... maintenant c'est peut-être plus sur adspan, adlow, gain qu'il faut jouer...
@@ -78,7 +74,6 @@ repère dans lequel dessiner image sonar vs detection d'obstacles
 Utilisation de headingreg et depthreg pendant staticloc, mouvements dues au propulseur vertical...
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
 données aberrantes vxyhat dans logstate?
-simu : au début convergence vers un intervalle tout petit correspondant au biais quand y a GPS, convergence vers un intervalle de vitesse tout petit...
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 image sonar simu pas bonne?->portée sonar, autres params? Rajouter option pour que l'image soit corrigée en cap ou non...
@@ -290,8 +285,12 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais... est-ce que j'aurais pas mis trop de biais?
+simu : au début convergence vers un intervalle tout petit correspondant au biais quand y a GPS, convergence vers un intervalle de vitesse tout petit...
+
 la localisation dynamique bloque trop longtemps les autres threads, notamment simu
 Quand je fais un lock des statevariables pour staticlocalization, vérifier que si le lock dure pas trop longtemps ça fait pas timeout et reconnexion des capteurs
+Contract a besoin de section critique pour dhat... isoler en une fonction qui utilise pas les variables globales mais prend tout le nécessaire en paramètres, bien voir ce qui en entrée et en sortie, et l'isoler dans un thread séparé...
 pendant une static localization, tout est bloqué à cause des sections critiques, il ne faut pas qu'il y ait une régulation en cap activé à ce moment!!!
 
 remplacer message GPS FIX (in use) par GPS FIX LOC pour coller avec SNR?

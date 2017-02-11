@@ -273,11 +273,11 @@
 0
 % Simulated submarine physical parameters
 % x_max_rand_err (in m)
-5.0
+3.0
 % x_bias_err (in m)
 2.0
 % y_max_rand_err (in m)
-5.0
+3.0
 % y_bias_err (in m)
 -1.0
 % z_max_rand_err (in m)
@@ -285,9 +285,9 @@
 % z_bias_err (in m)
 0.02
 % theta_max_rand_err (in rad)
-0.01
-% theta_bias_err (in rad)
 0.02
+% theta_bias_err (in rad)
+0.01
 % vxy_max_rand_err (in m/s)
 0.05
 % vxy_bias_err (in m/s)
@@ -324,6 +324,6 @@
 % z_gps_lim (profondeur à partir de laquelle le GPS est disponible en m)
 -0.5
 % outliers_ratio
-0.25
+0.5
 % simulatorperiod (in ms)
 25

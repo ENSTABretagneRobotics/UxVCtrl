@@ -205,16 +205,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
 				if (xhat.isEmpty || yhat.isEmpty)
 				{
-					xhat = x_mes+interval(-x_max_err,x_max_err);
-					yhat = y_mes+interval(-y_max_err,y_max_err);
-				}
-				else
-				{
-					if ((Width(xhat) < x_max_err/2)||(Width(yhat) < y_max_err/2))
-					{
-						xhat = Center(xhat)+interval(-x_max_err,x_max_err);
-						yhat = Center(yhat)+interval(-y_max_err,y_max_err);
-					}
+					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
 				}
 			}
 		}
