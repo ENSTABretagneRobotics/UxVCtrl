@@ -21,12 +21,12 @@ class bound
 public:
 	double val;
 	int opening;
-	int mark;
+	double mark;
 	bound()
 	{
 		val = 0; opening = 0; mark = 0;
 	}
-	bound(const double& v, const int& o, const int& m)
+	bound(const double& v, const int& o, const double& m)
 	{
 		val = v; opening = o; mark = m;
 	}
@@ -41,13 +41,23 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 {
 	vector<int> Vgroup(nbgroups); // >=0 when the group is allowed to add to the sum.
 	vector<bound> V;
-	V.push_back(bound(x.inf - 0.00001, 0, 0));
-	V.push_back(bound(x.sup + 0.00001, 0, 0));
+	if (x.isEmpty) return;
+	if (q <= 0) return;
 	for (unsigned int i = 0; i < y.size(); i++)
 	{
-		V.push_back(bound(y[i].inf, 1, ygroup[i]));
-		V.push_back(bound(y[i].sup, -1, ygroup[i]));
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, ygroup[i]));
+			V.push_back(bound(y[i].sup, -1, ygroup[i]));
+		}
 	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, -1));
+	V.push_back(bound(x.sup, -1, -1));
 	sort(V.begin(), V.end());
 	int sum = 0;
 	int imin = (int)(V.size());
@@ -56,17 +66,16 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 	{
 		if (V[i].opening < 0)
 		{
-			Vgroup[V[i].mark]++;
+			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]++;
 			if ((sum >= q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 			{
-				imax = max(imax, (int)i);			
-				//imax = (int)i;			
+				imax = i;			
 			}
 		}
-		if (Vgroup[V[i].mark] >= 0) sum = sum + V[i].opening;
+		if (V[i].mark >= 0) if (Vgroup[(unsigned int)V[i].mark] >= 0) sum = sum + V[i].opening;
 		if (V[i].opening > 0)
 		{
-			Vgroup[V[i].mark]--;
+			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]--;
 			if ((sum >= q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 			{
 				imin = min(imin, (int)i);
@@ -77,8 +86,14 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 	else x = interval(V[imin].val, V[imax].val);
 }
 
-inline void C_q_in_group(box& x, int q, vector<box>& y, vector<int>& ygroup, int nbgroups)
+// Group number in ygroup should be from 0 to nbgroups-1.
+inline void C_q_in_group(box& x, int q, vector<box>& yj, vector<int>& ygroup, int nbgroups)
 {
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
@@ -102,8 +117,13 @@ inline void C_acc_group(interval& x, vector<interval>& y, vector<int>& ygroup, i
 	}
 }
 
-inline void C_acc_group(box& x, vector<box>& y, vector<int>& ygroup, int nbgroups)
+inline void C_acc_group(box& x, vector<box>& yj, vector<int>& ygroup, int nbgroups)
 {
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
@@ -113,25 +133,299 @@ inline void C_acc_group(box& x, vector<box>& y, vector<int>& ygroup, int nbgroup
 	}
 }
 
-inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>& ymark)
+// Group number in ygroup should be from 0 to nbgroups-1.
+inline void C_acc_group_opt(interval& x, vector<interval>& y, vector<int>& ygroup, int nbgroups)
 {
+	vector<int> Vgroup(nbgroups); // >=0 when the group is allowed to add to the sum.
 	vector<bound> V;
-	V.push_back(bound(x.inf - 0.00001, 0, 0));
-	V.push_back(bound(x.sup + 0.00001, 0, 0));
+	if (x.isEmpty) return;
 	for (unsigned int i = 0; i < y.size(); i++)
 	{
-		V.push_back(bound(y[i].inf, 1, ymark[i]));
-		V.push_back(bound(y[i].sup, -1, ymark[i]));
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, ygroup[i]));
+			V.push_back(bound(y[i].sup, -1, ygroup[i]));
+		}
 	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, -1));
+	V.push_back(bound(x.sup, -1, -1));
 	sort(V.begin(), V.end());
+	int q = -1;
 	int sum = 0;
+	int imin = (int)(V.size());
+	int imax = -1;
+	for (unsigned int i = 0; i < V.size(); i++)
+	{
+		if (V[i].opening < 0)
+		{
+			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]++;
+			if ((sum >= q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+			{
+				imax = i;			
+			}
+		}
+		if (V[i].mark >= 0) if (Vgroup[(unsigned int)V[i].mark] >= 0) sum = sum + V[i].opening;
+		if (V[i].opening > 0)
+		{
+			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]--;
+			if ((sum > q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+			{
+				q = sum;
+				imin = i;
+			}
+		}
+	}
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
+	else x = interval(V[imin].val, V[imax].val);
+}
+
+// Group number in ygroup should be from 0 to nbgroups-1.
+inline void C_acc_group_opt(box& x, vector<box>& yj, vector<int>& ygroup, int nbgroups)
+{
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
+	vector<interval> yi(y.size());
+	for (int i = 1; i <= x.dim; i++)
+	{
+		for (unsigned int j = 0; j < y.size(); j++)
+			yi[j] = y[j][i];
+		C_acc_group_opt(x[i], yi, ygroup, nbgroups);
+	}
+}
+
+// Characteristic function associated with the interval z.
+inline int dzeta(double x, interval& z)
+{
+	if (z.isEmpty) return 0;
+	if ((z.inf <= x)&&(x <= z.sup)) return 1; else return 0;
+}
+
+// Characteristic function associated with the box z.
+inline int dzeta_box(box& x, box& z)
+{
+	if (In(x,z) != ifalse) return 1; else return 0;
+}
+
+inline double mu_q_in_mark_box(box& X, vector<box>& Z, void* pData)
+{
+	vector<double> zmark = *((vector<double>*)pData);
+	unsigned int m = Z.size();
+	unsigned int k = 0;
+	double res = 0;
+
+	for (k = 0; k < m; k++)
+	{
+		res = res+zmark[k]*dzeta_box(X, Z[k]);
+	}
+
+	return res;
+}
+
+inline double mu_q_in_mark(double x, vector<interval>& z, void* pData, int curdim)
+{
+	vector<double> zmark = *((vector<double>*)pData);
+	unsigned int m = z.size();
+	unsigned int k = 0;
+	double res = 0;
+
+	UNREFERENCED_PARAMETER(curdim);
+
+	for (k = 0; k < m; k++)
+	{
+		// res = res+zmark[k]*dzeta(x, z[k]);
+		if ((!z[k].isEmpty)&&(z[k].inf <= x)&&(x <= z[k].sup)) res = res+zmark[k];
+	}
+
+	return res;
+}
+
+inline double mu_q_in_box(box& X, vector<box>& Z, void* pData)
+{
+	unsigned int m = Z.size();
+	unsigned int k = 0;
+	double res = 0;
+
+	UNREFERENCED_PARAMETER(pData);
+
+	for (k = 0; k < m; k++)
+	{
+		res = res+dzeta_box(X, Z[k]);
+	}
+	res = res/m;
+
+	return res;
+}
+
+inline double mu_q_in(double x, vector<interval>& z, void* pData, int curdim)
+{
+	unsigned int m = z.size();
+	unsigned int k = 0;
+	double res = 0;
+
+	UNREFERENCED_PARAMETER(pData);
+	UNREFERENCED_PARAMETER(curdim);
+
+	for (k = 0; k < m; k++)
+	{
+		// res = res+dzeta(x, z[k]);
+		if ((!z[k].isEmpty)&&(z[k].inf <= x)&&(x <= z[k].sup)) res = res+1;
+	}
+	res = res/m;
+
+	return res;
+}
+
+inline void C_mu(interval& x, vector<interval>& y, double (*mu)(double, vector<interval>&, void*, int), double mu0, void* pData, int curdim)
+{
+	vector<bound> V;
+	if (x.isEmpty) return;
+	if (mu0 <= 0) return;
+	for (unsigned int i = 0; i < y.size(); i++)
+	{
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, 0));
+			V.push_back(bound(y[i].sup, -1, 0));
+		}
+	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, 0));
+	V.push_back(bound(x.sup, -1, 0));
+	sort(V.begin(), V.end());
+	double mu_res = 0;
+	int imin = (int)(V.size());
+	int imax = -1;
+	for (unsigned int i = 0; i < V.size(); i++)
+	{
+		mu_res = mu(V[i].val, y, pData, curdim);
+		if ((mu_res >= mu0)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imin = min(imin, (int)i);
+		}
+		if ((mu_res >= mu0)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imax = i;
+		}
+	}
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
+	else x = interval(V[imin].val, V[imax].val);
+}
+
+inline void C_mu(box& x, vector<box>& yj, double (*mu)(double, vector<interval>&, void*, int), double mu0, void* pData)
+{
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
+	vector<interval> yi(y.size());
+	for (int i = 1; i <= x.dim; i++)
+	{
+		for (unsigned int j = 0; j < y.size(); j++)
+			yi[j] = y[j][i];
+		C_mu(x[i], yi, mu, mu0, pData, i);
+	}
+}
+
+inline void C_acc_mu(interval& x, vector<interval>& y, double (*mu)(double, vector<interval>&, void*, int), void* pData, int curdim)
+{
+	vector<bound> V;
+	if (x.isEmpty) return;
+	for (unsigned int i = 0; i < y.size(); i++)
+	{
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, 0));
+			V.push_back(bound(y[i].sup, -1, 0));
+		}
+	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, 0));
+	V.push_back(bound(x.sup, -1, 0));
+	sort(V.begin(), V.end());
+	double mu0 = -1;
+	double mu_res = 0;
+	int imin = (int)(V.size());
+	int imax = -1;
+	for (unsigned int i = 0; i < V.size(); i++)
+	{
+		mu_res = mu(V[i].val, y, pData, curdim);
+		if ((mu_res > mu0)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			mu0 = mu_res;
+			imin = i;
+		}
+		if ((mu_res >= mu0)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imax = i;
+		}
+	}
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
+	else x = interval(V[imin].val, V[imax].val);
+}
+
+inline void C_acc_mu(box& x, vector<box>& yj, double (*mu)(double, vector<interval>&, void*, int), void* pData)
+{
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
+	vector<interval> yi(y.size());
+	for (int i = 1; i <= x.dim; i++)
+	{
+		for (unsigned int j = 0; j < y.size(); j++)
+			yi[j] = y[j][i];
+		C_acc_mu(x[i], yi, mu, pData, i);
+	}
+}
+
+// qmark should be >= 0.
+inline void C_q_in_mark(interval& x, double qmark, vector<interval>& y, vector<double>& ymark)
+{
+	vector<bound> V;
+	if (x.isEmpty) return;
+	if (qmark <= 0) return;
+	for (unsigned int i = 0; i < y.size(); i++)
+	{
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, ymark[i]));
+			V.push_back(bound(y[i].sup, -1, ymark[i]));
+		}
+	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, 0));
+	V.push_back(bound(x.sup, -1, 0));
+	sort(V.begin(), V.end());
+	double sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
 	for (unsigned int i = 0; i < V.size(); i++)
 	{
 		if ((sum >= qmark)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = max(imax, (int)i);
+			imax = i;
 		}
 		sum = sum + V[i].opening*V[i].mark;
 		if ((sum >= qmark)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
@@ -143,8 +437,127 @@ inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>
 	else x = interval(V[imin].val, V[imax].val);
 }
 
-inline void C_q_in_mark(box& x, int qmark, vector<box>& y, vector<int>& ymark)
+inline void C_q_in_mark(box& x, double qmark, vector<box>& yj, vector<double>& ymark)
 {
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
+	vector<interval> yi(y.size());
+	for (int i = 1; i <= x.dim; i++)
+	{
+		for (unsigned int j = 0; j < y.size(); j++)
+			yi[j] = y[j][i];
+		C_q_in_mark(x[i], qmark, yi, ymark);
+	}
+}
+
+inline void C_acc_mark(interval& x, vector<interval>& y, vector<double>& ymark)
+{
+	vector<bound> V;
+	if (x.isEmpty) return;
+	for (unsigned int i = 0; i < y.size(); i++)
+	{
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, ymark[i]));
+			V.push_back(bound(y[i].sup, -1, ymark[i]));
+		}
+	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, 0));
+	V.push_back(bound(x.sup, -1, 0));
+	sort(V.begin(), V.end());
+	double qmark = -oo;
+	double sum = 0;
+	int imin = (int)(V.size());
+	int imax = -1;
+	for (unsigned int i = 0; i < V.size(); i++)
+	{
+		if ((sum >= qmark)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imax = i;
+		}
+		sum = sum + V[i].opening*V[i].mark;
+		if ((sum > qmark)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			qmark = sum;
+			imin = i;
+		}
+	}
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
+	else x = interval(V[imin].val, V[imax].val);
+}
+
+inline void C_acc_mark(box& x, vector<box>& yj, vector<double>& ymark)
+{
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
+	vector<interval> yi(y.size());
+	for (int i = 1; i <= x.dim; i++)
+	{
+		for (unsigned int j = 0; j < y.size(); j++)
+			yi[j] = y[j][i];
+		C_acc_mark(x[i], yi, ymark);
+	}
+}
+
+// qmark should be >= 0.
+inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>& ymark)
+{
+	vector<bound> V;
+	if (x.isEmpty) return;
+	if (qmark <= 0) return;
+	for (unsigned int i = 0; i < y.size(); i++)
+	{
+		if (!y[i].isEmpty)
+		{
+			V.push_back(bound(y[i].inf, 1, ymark[i]));
+			V.push_back(bound(y[i].sup, -1, ymark[i]));
+		}
+	}
+	if (V.size() == 0)
+	{
+		x = interval();
+		return;
+	}
+	V.push_back(bound(x.inf, 1, 0));
+	V.push_back(bound(x.sup, -1, 0));
+	sort(V.begin(), V.end());
+	int sum = 0;
+	int imin = (int)(V.size());
+	int imax = -1;
+	for (unsigned int i = 0; i < V.size(); i++)
+	{
+		if ((sum >= qmark)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imax = i;
+		}
+		sum = sum + V[i].opening*(int)V[i].mark;
+		if ((sum >= qmark)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
+		{
+			imin = min(imin, (int)i);
+		}
+	}
+	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
+	else x = interval(V[imin].val, V[imax].val);
+}
+
+inline void C_q_in_mark(box& x, int qmark, vector<box>& yj, vector<int>& ymark)
+{
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
@@ -170,8 +583,13 @@ inline void C_acc_mark(interval& x, vector<interval>& y, vector<int>& ymark)
 	}
 }
 
-inline void C_acc_mark(box& x, vector<box>& y, vector<int>& ymark)
+inline void C_acc_mark(box& x, vector<box>& yj, vector<int>& ymark)
 {
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
@@ -195,14 +613,33 @@ inline void C_acc(interval& x, vector<interval>& y)
 	}
 }
 
-inline void C_acc(box& x, vector<box>& y)
+inline void C_acc(box& x, vector<box>& yj)
 {
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
 		for (unsigned int j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc(x[i], yi);
+	}
+}
+
+inline void C_acc_alternate(box& x, vector<box>& yj)
+{
+	for (unsigned int qi = yj.size(); qi >= 1; qi--)
+	{
+		box xi = x;
+		C_q_in(xi, qi, yj);
+		if (!xi.IsEmpty()) 
+		{
+			x = xi;
+			return;
+		}
 	}
 }
 
@@ -247,8 +684,13 @@ inline void C_acc_opt(interval& x, vector<interval>& y)
 	else x = interval(V[imin].val, V[imax].val);
 }
 
-inline void C_acc_opt(box& x, vector<box>& y)
+inline void C_acc_opt(box& x, vector<box>& yj)
 {
+	vector<box> y(yj.size());
+	for (unsigned int j = 0; j < y.size(); j++)
+	{
+		y[j] = x&yj[j];
+	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
@@ -258,13 +700,13 @@ inline void C_acc_opt(box& x, vector<box>& y)
 	}
 }
 
-inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle, int sens)
+inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle, int dir)
 {
 	box P = box(2);
 	interval xvect = distance*Cos(angle);
 	interval yvect = distance*Sin(angle);
 
-	if (sens == 1) 
+	if (dir == 1) 
 	{
 		P[1] = Src[1]+xvect;
 		P[2] = Src[2]+yvect;
@@ -278,6 +720,31 @@ inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle,
 	}
 }
 
+//// Not tested nor finished...
+//void CNotInSegment(interval& mx, interval& my, double ax, double ay, double bx, double by)
+//{      
+//	// contracte relativement à la contrainte : "m n'appartient pas au segment [a,b]"
+//	Cnotin(mx, Union(interval(ax, ax), interval(bx, bx)));
+//	Cnotin(my, Union(interval(ay, ay), interval(by, by)));
+//	interval ma_x = ax - mx;
+//	interval ma_y = ay - my;
+//	interval ma_x1 = ma_x;
+//	interval ma_y1 = ma_y;
+//	interval ma_x2 = ma_x;
+//	interval ma_y2 = ma_y;
+//	double ab_x = bx - ax;
+//	double ab_y = by - ay;
+//	interval z1 = interval(-oo, 0);
+//	interval z2 = interval(0, oo);
+//	CDet(z1, ab_x, ab_y, ma_x1, ma_y1, -1);
+//	CDet(z2, ab_x, ab_y, ma_x2, ma_y2, -1);
+//	ma_x = Inter(ma_x,Union(ma_x1,ma_x2));
+//	ma_y = Inter(ma_y,Union(ma_y1,ma_y2));
+//	Cmoins(ma_y, ay, my, -1);
+//	Cmoins(ma_x, ax, mx, -1);
+//	if ((mx.isEmpty) || (my.isEmpty)) { mx.isEmpty = true; my.isEmpty = true; };
+//}
+
 inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
 					 interval& thetahat, 
 					 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
@@ -285,9 +752,9 @@ inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<
 					 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {
 	int i = 0, j = 0;
-
 	vector<box> Pi;
 	vector<int> Pigroup;
+
 	Pi.clear();
 	Pigroup.clear();
 	for (i = 0; i < (int)alpha_mes_vector.size(); i++)
@@ -313,7 +780,7 @@ inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<
 			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat, 1);
 			interval xt = Pt[1];
 			interval yt = Pt[2];
-			CinSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
+			CPointInSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
 			if ((!xt.isEmpty)&&(!yt.isEmpty))
 			{
 				Pt = box(xt,yt);
@@ -335,7 +802,8 @@ inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<
 		//C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
 		//C_q_in(P, Pi.size()-nb_outliers, Pi);
 		//C_q_in(P, alpha_mes_vector.size()-nb_outliers, Pi);
-		C_acc(P, Pi);
+		C_acc_opt(P, Pi);
+		C_acc_opt(P, Pi);
 	}
 }
 
@@ -346,9 +814,9 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {
 	int i = 0, j = 0;
-
 	vector<box> Pi;
 	vector<int> Pigroup;
+
 	Pi.clear();
 	Pigroup.clear();
 	for (i = 0; i < (int)alpha_mes_vector.size(); i++)
@@ -374,7 +842,7 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat_history_vector[i], 1);
 			interval xt = Pt[1];
 			interval yt = Pt[2];
-			CinSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
+			CPointInSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
 			if ((!xt.isEmpty)&&(!yt.isEmpty))
 			{
 				Pt = box(xt,yt);
@@ -396,7 +864,8 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 		//C_acc_group(P, Pi, Pigroup, alpha_mes_vector.size());
 		//C_q_in(P, Pi.size()-nb_outliers, Pi);
 		//C_q_in(P, alpha_mes_vector.size()-nb_outliers, Pi);
-		C_acc(P, Pi);
+		C_acc_opt(P, Pi);
+		C_acc_opt(P, Pi);
 	}
 }
 
@@ -409,7 +878,7 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 	list<box> L;
 	vector<box> Result;
 	box P, P1, P2;
-	int current_nbissect = 0;
+	int nb_bisections = 0;
 
 	L.push_back(P0);
 	while (!L.empty())
@@ -426,7 +895,7 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 		if (!P.IsEmpty())
 		{  
 			//if (P.Width() < 0.1)
-			if (current_nbissect > 10)
+			if (nb_bisections > 10)
 			{
 
 				/*				//
@@ -459,14 +928,15 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 				Bisect(P, P1, P2);
 				L.push_back(P1);
 				L.push_back(P2);
-				current_nbissect++;
+				nb_bisections++;
 			}
 		}
 	}
 
-	//printf("current_nbissect = %d\n", current_nbissect);
+	P = Union(Result);
+	//printf("nb_bisections = %d\n", nb_bisections);
 
-	return Union(Result);
+	return P;
 }
 
 inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
@@ -478,7 +948,7 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 	list<box> L;
 	vector<box> Result;
 	box P, P1, P2;
-	int current_nbissect = 0;
+	int nb_bisections = 0;
 
 	L.push_back(P0);
 	while (!L.empty())
@@ -495,7 +965,7 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 		if (!P.IsEmpty())
 		{  
 			//if (P.Width() < 0.1)
-			if (current_nbissect > 10)
+			if (nb_bisections > 10)
 			{
 
 				/*				//
@@ -528,14 +998,15 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 				Bisect(P, P1, P2);
 				L.push_back(P1);
 				L.push_back(P2);
-				current_nbissect++;
+				nb_bisections++;
 			}
 		}
 	}
 
-	//printf("current_nbissect = %d\n", current_nbissect);
+	P = Union(Result);
+	//printf("nb_bisections = %d\n", nb_bisections);
 
-	return Union(Result);
+	return P;
 }
 
 /*
