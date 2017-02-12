@@ -635,17 +635,17 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->SurveyMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->svinMinDur) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &publox->svinMinDur) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->svinAccLimit) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &publox->svinAccLimit) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->fixedLat) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &publox->fixedLat) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->fixedLon) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &publox->fixedLon) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->fixedAlt) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &publox->fixedAlt) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->fixedPosAcc) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &publox->fixedPosAcc) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else

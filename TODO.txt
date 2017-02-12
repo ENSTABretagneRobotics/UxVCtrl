@@ -1,4 +1,6 @@
 
+bien revérifier toutes les modifs que j'ai faites ces derniers jours pour voir si elles posent problème...
+
 Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
 
@@ -8,11 +10,15 @@ check if improvements can be made to AUV control (e.g. to avoid sinking and lose
 
 Getubxdata->faire pour tout type de données
 Update aussi nmea device pour qu'il utilise les nouvelles fonctions?
- 
+
+rplidar...
+
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
 selon les accx_err, ça aura ou non une influence sur les équations d'état
 Gérer le -g dans acc...
 changer les theta en psi et rajouter équations voilier
+changer les bruits d'état en bruits discrétisés...?
+fusion de certains fichiers avec UxVDataViewer, notamment forward et backward...?
 
 Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
 

@@ -112,6 +112,7 @@ inline int LoadConfig(void)
 	rangescale = 10;
 	sdir = 1;
 	nb_outliers = 25;
+	dynamicsonarlocalization_period = 0.2;
 	observerperiod = 25;
 	// Wind, current and waves.
 	vtwind_med = 0.01;
@@ -272,9 +273,9 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &ksi) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &check_strategy_period) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &check_strategy_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &sail_update_period) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &sail_update_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &controllerperiod) != 1) printf("Invalid configuration file.\n");
 
@@ -386,6 +387,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &sdir) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &nb_outliers) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &dynamicsonarlocalization_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &observerperiod) != 1) printf("Invalid configuration file.\n");
 

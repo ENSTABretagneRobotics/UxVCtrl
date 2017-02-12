@@ -162,9 +162,11 @@ extern vector<interval> d_all_mes;
 extern deque<double> alpha_mes_vector;
 extern deque<double> d_mes_vector;
 extern deque< vector<interval> > d_all_mes_vector;
+extern deque<double> t_history_vector;
 extern deque<interval> xhat_history_vector;
 extern deque<interval> yhat_history_vector;
 extern deque<interval> thetahat_history_vector;
+extern deque<interval> vxyhat_history_vector;
 // Echosounder.
 extern double altitude_sea_floor;
 // Modem.
@@ -228,8 +230,8 @@ extern double radius; // Accuracy of line/waypoint following in m.
 extern double betatrav;
 extern double betaarr;
 extern double ksi;
-extern int check_strategy_period;
-extern int sail_update_period;
+extern double check_strategy_period;
+extern double sail_update_period;
 extern int controllerperiod;
 
 // Observer parameters.
@@ -240,6 +242,7 @@ alphashat, omegashat,
 xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
 extern int rangescale, sdir;
 extern int nb_outliers;
+extern double dynamicsonarlocalization_period;
 extern int observerperiod;
 
 // Wind, current and waves.

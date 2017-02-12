@@ -127,18 +127,22 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					alpha_mes_vector.push_back(alpha_mes);
 					d_mes_vector.push_back(d_mes);
 					d_all_mes_vector.push_back(d_all_mes);
+					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
 					xhat_history_vector.push_back(xhat);
 					yhat_history_vector.push_back(yhat);
 					thetahat_history_vector.push_back(thetahat);
+					vxyhat_history_vector.push_back(vxyhat);
 
 					if ((int)alpha_mes_vector.size() > NSteps)
 					{
 						alpha_mes_vector.pop_front();
 						d_mes_vector.pop_front();
 						d_all_mes_vector.pop_front();
+						t_history_vector.pop_front();
 						xhat_history_vector.pop_front();
 						yhat_history_vector.pop_front();
 						thetahat_history_vector.pop_front();
+						vxyhat_history_vector.pop_front();
 					}
 				}
 
@@ -173,7 +177,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			LeaveCriticalSection(&SeanetConnectingCS);
 		}
 
-		if (robid == SUBMARINE_SIMULATOR_ROBID)
+		if ((robid == SUBMARINE_SIMULATOR_ROBID)||(!bDisableHokuyo))
 		{
 			EnterCriticalSection(&StateVariablesCS);
 

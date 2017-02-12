@@ -68,12 +68,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		//printf("ObserverThread period : %f s.\n", dt);
 
-		// Time...
-		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS)
-		{
-			tv.tv_sec = 0;
-			tv.tv_usec = 0;
-		}
+		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 		EnterCriticalSection(&StateVariablesCS);
 

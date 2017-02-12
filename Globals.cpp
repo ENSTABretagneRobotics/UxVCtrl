@@ -39,9 +39,11 @@ vector<interval> d_all_mes;
 deque<double> alpha_mes_vector;
 deque<double> d_mes_vector;
 deque< vector<interval> > d_all_mes_vector;
+deque<double> t_history_vector;
 deque<interval> xhat_history_vector;
 deque<interval> yhat_history_vector;
 deque<interval> thetahat_history_vector;
+deque<interval> vxyhat_history_vector;
 // Echosounder.
 double altitude_sea_floor = 0;
 // Modem.
@@ -105,8 +107,8 @@ double radius = 0;
 double betatrav = 0;
 double betaarr = 0;
 double ksi = 0;
-int check_strategy_period = 0;
-int sail_update_period = 0;
+double check_strategy_period = 0;
+double sail_update_period = 0;
 int controllerperiod = 0;
 
 // Observer parameters.
@@ -117,6 +119,7 @@ alphashat, omegashat,
 xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
+double dynamicsonarlocalization_period = 0;
 int observerperiod = 0;
 
 // Wind, current and waves.

@@ -121,9 +121,9 @@
 0
 %0.78
 % wzradiushigh (accuracy of the depth control in m)
-0.1
+0.05
 % wzradiuslow (accuracy of the depth control in m)
-0.2
+0.05
 % wdradius (accuracy of the distance control in m)
 0.25
 % vxymax (0.4 : simu, 0.4 : SAUC'ISSE, 0.4 : SARDINE, 1.5 : CISCREA, Hovecraft : 2)
@@ -231,6 +231,8 @@
 %-1 for SAUCISSE and SARDINE
 % nb_outliers
 25
+% dynamicsonarlocalization_period (in s)
+3
 % observerperiod (in ms)
 25
 % Wind, current and waves
@@ -326,4 +328,4 @@
 % outliers_ratio
 0.5
 % simulatorperiod (in ms)
-25
+70

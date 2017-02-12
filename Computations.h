@@ -35,7 +35,7 @@ public:
 		return x.val < y.val;
 	}
 };
-
+#pragma region C_ACC_GROUP
 // Group number in ygroup should be from 0 to nbgroups-1.
 inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& ygroup, int nbgroups)
 {
@@ -200,7 +200,8 @@ inline void C_acc_group_opt(box& x, vector<box>& yj, vector<int>& ygroup, int nb
 		C_acc_group_opt(x[i], yi, ygroup, nbgroups);
 	}
 }
-
+#pragma endregion
+#pragma region C_ACC_MU
 // Characteristic function associated with the interval z.
 inline int dzeta(double x, interval& z)
 {
@@ -395,7 +396,8 @@ inline void C_acc_mu(box& x, vector<box>& yj, double (*mu)(double, vector<interv
 		C_acc_mu(x[i], yi, mu, pData, i);
 	}
 }
-
+#pragma endregion
+#pragma region C_ACC_MARK
 // qmark should be >= 0.
 inline void C_q_in_mark(interval& x, double qmark, vector<interval>& y, vector<double>& ymark)
 {
@@ -598,7 +600,8 @@ inline void C_acc_mark(box& x, vector<box>& yj, vector<int>& ymark)
 		C_acc_mark(x[i], yi, ymark);
 	}
 }
-
+#pragma endregion
+#pragma region C_ACC
 inline void C_acc(interval& x, vector<interval>& y)
 {
 	for (unsigned int qi = y.size(); qi >= 1; qi--)
@@ -699,7 +702,8 @@ inline void C_acc_opt(box& x, vector<box>& yj)
 		C_acc_opt(x[i], yi);
 	}
 }
-
+#pragma endregion
+#pragma region SIVIA
 inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle, int dir)
 {
 	box P = box(2);
@@ -808,12 +812,13 @@ inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<
 }
 
 inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
-						 deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, deque<interval>& thetahat_history_vector, 
+						 deque<double>& t_history_vector, deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, 
+						 deque<interval>& thetahat_history_vector, deque<interval>& vxyhat_history_vector, 
 						 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
 						 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
 						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
 {
-	int i = 0, j = 0;
+	int i = 0, j = 0, k = 0;
 	vector<box> Pi;
 	vector<int> Pigroup;
 
@@ -847,9 +852,25 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 			{
 				Pt = box(xt,yt);
 				BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat_history_vector[i], -1);
-				//Pj.push_back(Pxyj);
-				Pi.push_back(Pxyj);
-				Pigroup.push_back(i);
+
+				// Propagate forward to current position...
+				interval xk = xhat_history_vector[i] & Pxyj[1];
+				interval yk = yhat_history_vector[i] & Pxyj[2];
+				for (k = i; k < (int)alpha_mes_vector.size()-1; k++)
+				{
+					double dt = t_history_vector[k+1]-t_history_vector[k];
+					xk = xhat_history_vector[k+1] & (xk+dt*vxyhat_history_vector[k]*Cos(thetahat_history_vector[k]));
+					yk = yhat_history_vector[k+1] & (yk+dt*vxyhat_history_vector[k]*Sin(thetahat_history_vector[k]));
+					if ((xk.isEmpty)||(yk.isEmpty)) break;
+				}
+				Pxyj = box(xk,yk);
+
+				if (!Pxyj.IsEmpty())
+				{
+					//Pj.push_back(Pxyj);
+					Pi.push_back(Pxyj);
+					Pigroup.push_back(i);
+				}
 			}
 		}
 		//box Pxy = Union(Pj);
@@ -940,7 +961,8 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 }
 
 inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
-						 deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, deque<interval>& thetahat_history_vector, 
+						 deque<double>& t_history_vector, deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, 
+						 deque<interval>& thetahat_history_vector, deque<interval>& vxyhat_history_vector, 
 						 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
 						 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
 						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
@@ -957,10 +979,11 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 		L.pop_front();
 
 		Contract_dyn(P, d_all_mes_vector, alpha_mes_vector, 
-						 xhat_history_vector, yhat_history_vector, thetahat_history_vector, 
-						 d_max_err, alpha_max_err, sdir, alphashat, 
-						 walls_xa, walls_ya, walls_xb, walls_yb, 
-						 circles_x, circles_y, circles_r);
+			t_history_vector, xhat_history_vector, yhat_history_vector, 
+			thetahat_history_vector, vxyhat_history_vector,
+			d_max_err, alpha_max_err, sdir, alphashat, 
+			walls_xa, walls_ya, walls_xb, walls_yb, 
+			circles_x, circles_y, circles_r);
 
 		if (!P.IsEmpty())
 		{  
@@ -1008,7 +1031,8 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 
 	return P;
 }
-
+#pragma endregion
+#pragma region SONAR_DETECTIONS
 /*
 The 'Dynamic Range Control' is a surface display function which has 2 parameters (which are sent
 to the Sonar in the 'mtHeadCommand').
@@ -1391,5 +1415,5 @@ inline int GetAllObstaclesDist5(unsigned char* scanline, unsigned char threshold
 
 	return EXIT_SUCCESS;
 }
-
+#pragma endregion
 #endif // COMPUTATIONS_H
