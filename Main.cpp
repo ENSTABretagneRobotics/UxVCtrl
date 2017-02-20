@@ -19,6 +19,7 @@
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
+#include "ExternalVisualLocalization.h"
 #include "Pinger.h"
 #include "MissingWorker.h"
 #include "Simulator.h"
@@ -26,6 +27,7 @@
 #include "MDM.h"
 #include "Seanet.h"
 #include "Hokuyo.h"
+#include "RPLIDAR.h"
 #include "P33x.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRS.h"
@@ -79,6 +81,7 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
+	THREAD_IDENTIFIER ExternalVisualLocalizationThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
 	THREAD_IDENTIFIER MissingWorkerThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
@@ -86,6 +89,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MDMThreadId;
 	THREAD_IDENTIFIER SeanetThreadId;
 	THREAD_IDENTIFIER HokuyoThreadId;
+	THREAD_IDENTIFIER RPLIDARThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER RazorAHRSThreadId;
@@ -160,6 +164,7 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
+	CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
 	if (robid == SUBMARINE_SIMULATOR_ROBID) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
@@ -167,6 +172,7 @@ int main(int argc, char* argv[])
 	if (!bDisableMDM) CreateDefaultThread(MDMThread, NULL, &MDMThreadId);
 	if (!bDisableSeanet) CreateDefaultThread(SeanetThread, NULL, &SeanetThreadId);
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
+	if (!bDisableRPLIDAR) CreateDefaultThread(RPLIDARThread, NULL, &RPLIDARThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
@@ -322,6 +328,7 @@ int main(int argc, char* argv[])
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
+	if (!bDisableRPLIDAR) WaitForThread(RPLIDARThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);
 	if (!bDisableSeanet) WaitForThread(SeanetThreadId);
 	if (!bDisableMDM) WaitForThread(MDMThreadId);
@@ -329,6 +336,7 @@ int main(int argc, char* argv[])
 	if (robid == SUBMARINE_SIMULATOR_ROBID) WaitForThread(SimulatorThreadId);
 	WaitForThread(MissingWorkerThreadId);
 	WaitForThread(PingerThreadId);
+	WaitForThread(ExternalVisualLocalizationThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 	WaitForThread(VisualObstacleThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT

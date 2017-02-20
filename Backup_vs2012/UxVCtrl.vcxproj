@@ -100,12 +100,14 @@
     <ClCompile Include="Computations.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="ExternalVisualLocalization.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
     <ClCompile Include="Hardware\Maestro.cpp" />
     <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
+    <ClCompile Include="Hardware\RPLIDAR.cpp" />
     <ClCompile Include="Hardware\SBG.cpp" />
     <ClCompile Include="Hardware\ublox.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="Computations.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="ExternalVisualLocalization.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hardware\AIS.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
@@ -179,6 +182,7 @@
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
     <ClInclude Include="Hardware\NMEAProtocol.h" />
+    <ClInclude Include="Hardware\RPLIDAR.h" />
     <ClInclude Include="Hardware\RTCM2Protocol.h" />
     <ClInclude Include="Hardware\RTCM3Protocol.h" />
     <ClInclude Include="Hardware\SBG.h" />
@@ -270,6 +274,7 @@
     <Text Include="MAVLinkDevice0.txt" />
     <Text Include="MAVLinkDevice1.txt" />
     <Text Include="NMEADevice1.txt" />
+    <Text Include="RPLIDAR0.txt" />
     <Text Include="SBG0.txt" />
     <Text Include="ublox0.txt" />
     <Text Include="ublox1.txt" />

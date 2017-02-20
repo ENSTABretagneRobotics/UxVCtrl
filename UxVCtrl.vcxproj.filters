@@ -225,6 +225,12 @@
     <ClCompile Include="SonarLocalization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExternalVisualLocalization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\RPLIDAR.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -524,6 +530,12 @@
     <ClInclude Include="SonarLocalization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ExternalVisualLocalization.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\RPLIDAR.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -612,6 +624,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="ublox1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="RPLIDAR0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

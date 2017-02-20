@@ -1,3 +1,7 @@
+externalvisuallocalization->x,y,theta modulo 180?
+Changer x_mes en x_gps?
+
+option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
 
 bien revérifier toutes les modifs que j'ai faites ces derniers jours pour voir si elles posent problème...
 
@@ -67,9 +71,8 @@ avec nouveau format, lognav2KML va être simplifié
 
 sonar, localisation, wf
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
-dessin des pings corrigés en angle et pos...
+option dessin des pings corrigés en angle et pos...
 simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?
-c'est juste au niveau de l'affichage qu'on dessinera pareil...?
 mettre partie dessin de seanetprocessing dans opencvgui, isoler dessins dans thread séparé?
 Où mettre la partie dessin des images sonar en overlay, c'est commun en partie avec seanet et simulator... dans SeanetProcessing?
 statevars va être très ralenti à cause de dmes..., faire une cs spécifique?
@@ -82,7 +85,7 @@ seanet : index_scanlines est peut-être moyennement géré si sector scan...
 données aberrantes vxyhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps...
 hokuyo device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
-image sonar simu pas bonne?->portée sonar, autres params? Rajouter option pour que l'image soit corrigée en cap ou non...
+image sonar simu pas bonne?->portée sonar, autres params?
 flux acoustique sur un mur pas tout à fait droit...
 LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...) si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
 
@@ -129,7 +132,6 @@ dans la spec, il faudrait rajouter un message shh\n pour interrompre les sendxy 
 cohérence des messages : il faut regarder bit par bit (il faut qu'au moins 2 bits sur 3 soient cohérents à chaque fois)
 (modems envoient probablement par paquet de 4 octets (sans doute complété par des octets nuls))
 flush du modem quand il reçoit des données invalides?
-bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?
 add velocityofsound as env global param as necessary for echo message...
 rajouter param acousticmodem_r_max_err dans UxVCtrl.txt et MDM0.txt comme pour sonar...
 time-division method
@@ -290,6 +292,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?->déjà corrigé
 
 problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais... est-ce que j'aurais pas mis trop de biais?
 simu : au début convergence vers un intervalle tout petit correspondant au biais quand y a GPS, convergence vers un intervalle de vitesse tout petit...

@@ -199,6 +199,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ExternalVisualLocalization.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Globals.cpp"
 				>
 			</File>
@@ -278,6 +282,10 @@
 			</File>
 			<File
 				RelativePath=".\Controller.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExternalVisualLocalization.h"
 				>
 			</File>
 			<File
@@ -408,6 +416,10 @@
 			</File>
 			<File
 				RelativePath=".\RazorAHRS0.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\RPLIDAR0.txt"
 				>
 			</File>
 			<File
@@ -948,6 +960,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\RazorAHRS.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\RPLIDAR.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\RPLIDAR.h"
 				>
 			</File>
 			<File

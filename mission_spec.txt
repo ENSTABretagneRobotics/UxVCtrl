@@ -45,6 +45,14 @@
 %
 %stopsurfacevisualobstacleavoidance
 %
+%externalvisuallocalizationconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration d0 kh kv bBrake procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, d0 : double ]-oo,oo[ target distance in m, kh : double [0,1] horizontal regulation coefficient, kv : double [0,1] vertical regulation coefficient, bBrake : int [0,1] brake if the object is detected if 1 (no effect for tracking), procid : int [0,256] -1 does nothing when detected, otherwise stop tracking and execute procid (not implemented), videoid : int [0,oo] video id)
+%
+%externalvisuallocalizationdetection t (t : double [0,oo[ timeout in s, the function blocks until the object is detected or the timeout is reached)
+%
+%startexternalvisuallocalizationtracking (modify headingreg when externalvisuallocalization detected, keep any previous depthreg (might also change depth a little bit), thrust (could also reduce thrust when reaching the end of the externalvisuallocalization (yellow center in the bottom of the camera image), could turn slowly in the direction where the externalvisuallocalization was seen last time if lost))
+%
+%stopexternalvisuallocalizationtracking
+%
 %pingerconfig r- r+ g- g+ b- b+ h- h+ s- s+ l- l+ objMinRadiusRatio objRealRadius objMinDetectionDuration pulsefreq pulselen pulsepersec hyddist hydorient preferreddir bUseFile bBrakeSurfaceEnd procid videoid (r-, r+, g-, g+, b-, b+ : int [0,255] RGB intervals representing the colors of the object in MS Paint, h-, h+, s-, s+, l-, l+ : int [0,240] HSL intervals representing the colors of the object in MS Paint, objMinRadiusRatio : double [0,1] we only consider objects that have an estimated radius in pixels greater than width*objMinRadiusRatio, objRealRadius : double [0,1] real radius of the object in m, objMinDetectionDuration : double [0,oo[ min duration in s for the object to be considered as detected, pulsefreq : int [0,48000] frequency of the pulse in Hz, pulselen : double [0,oo[ pulse length in s, pulsepersec : double [0,oo[ number of pulse per s, hyddist : double [0,oo[ distance between the hydrophones in m, hydorient : double [0,360[ orientation of the hydrophones w.r.t. the robot in deg (0=hyd0 on the front and hyd1 on the rear, 90=hyd0 on the right and hyd1 on the left), preferreddir : double [0,360[ preferred direction w.r.t. the robot in deg to solve symmetry ambiguity (0=front, 90=right), bUseFile : int [0,1] use pingerdetection.txt info for tracking, bBrakeSurfaceEnd : int [0,1] brake, surface and stop the mission if the object is detected if 1, procid : int [0,256] -1 does nothing when detected, otherwise stop tracking and execute procid (not implemented), videoid : int [0,oo] video id)
 % Other coefficients related to hydrophones to add...?
 %
@@ -137,6 +145,8 @@
 %seanetconfig Seanet.txt bPause
 %
 %hokuyoconfig Hokuyo.txt bPause
+%
+%rplidarconfig RPLIDAR.txt bPause
 %
 %p33xconfig P33x.txt bPause
 %

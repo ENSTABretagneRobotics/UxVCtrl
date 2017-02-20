@@ -62,6 +62,8 @@
 1
 % bDisableHokuyo
 1
+% bDisableRPLIDAR
+1
 % bDisableP33x
 1
 % bDisableRazorAHRS

@@ -1,0 +1,31 @@
+% Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
+%127.0.0.1:55555
+COM9
+% BaudRate
+115200
+% Timeout (in ms)
+1000
+% bSaveRawData
+1
+% bForceSCIP20
+0
+% bHS (activate high sensitivity if available)
+0
+% SlitDivision
+1024
+% StartingStep (URG-04LX-UG01 : 44 (-119.531 deg))
+44
+% FrontStep (URG-04LX-UG01 : 384 (0 deg))
+384
+% EndStep (URG-04LX-UG01 : 725 (119.883 deg))
+725
+% ClusterCount
+0
+% ScanInterval
+0
+% bContinuousNumberOfScans
+1
+% alpha_max_err (in rad)
+0.01
+% d_max_err (in m)
+0.1

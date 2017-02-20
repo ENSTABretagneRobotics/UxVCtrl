@@ -1,3 +1,7 @@
+136
+Begginning of ExternalVisualLocalization integration.
+Begginning of RPLIDAR integration.
+
 135
 Increased accuracy of depth control.
 Updated Hokuyo w.r.t. sonar.

@@ -78,6 +78,7 @@ BOOL bDisableMES = FALSE;
 BOOL bDisableMDM = FALSE;
 BOOL bDisableSeanet = FALSE;
 BOOL bDisableHokuyo = FALSE;
+BOOL bDisableRPLIDAR = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
@@ -237,6 +238,22 @@ int procid_surfacevisualobstacle = 0;
 int videoid_surfacevisualobstacle = 0; 
 double u_surfacevisualobstacle = 0;
 
+// ExternalVisualLocalization variables.
+BOOL bExternalVisualLocalizationDetection = FALSE;
+BOOL bExternalVisualLocalizationTrackingControl = FALSE;
+CRITICAL_SECTION ExternalVisualLocalizationCS;
+CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
+IplImage* ExternalVisualLocalizationOverlayImg = NULL;
+int rmin_externalvisuallocalization = 0, rmax_externalvisuallocalization = 0, gmin_externalvisuallocalization = 0, gmax_externalvisuallocalization = 0, bmin_externalvisuallocalization = 0, bmax_externalvisuallocalization = 0; 
+int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, smin_externalvisuallocalization = 0, smax_externalvisuallocalization = 0, lmin_externalvisuallocalization = 0, lmax_externalvisuallocalization = 0;
+double objMinRadiusRatio_externalvisuallocalization = 0, objRealRadius_externalvisuallocalization = 0, objMinDetectionDuration_externalvisuallocalization = 0, d0_externalvisuallocalization = 0; 
+double kh_externalvisuallocalization = 0, kv_externalvisuallocalization = 0;
+int bBrake_externalvisuallocalization = 0;
+int procid_externalvisuallocalization = 0;
+int videoid_externalvisuallocalization = 0; 
+double u_externalvisuallocalization = 0;
+BOOL bExternalVisualLocalizationFound = FALSE;
+
 // Pinger variables.
 BOOL bPingerDetection = FALSE;
 BOOL bPingerTrackingControl = FALSE;
@@ -291,6 +308,9 @@ BOOL bPauseSeanet = FALSE, bRestartSeanet = FALSE;
 
 // Hokuyo variables.
 BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;
+
+// RPLIDAR variables.
+BOOL bPauseRPLIDAR = FALSE, bRestartRPLIDAR = FALSE;
 
 // P33x variables.
 BOOL bPauseP33x = FALSE, bRestartP33x = FALSE;
@@ -414,6 +434,9 @@ char logpipelinetaskfilename[MAX_BUF_LEN];
 
 FILE* logballtaskfile = NULL;
 char logballtaskfilename[MAX_BUF_LEN];
+
+FILE* logexternalvisuallocalizationtaskfile = NULL;
+char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
 
 FILE* logpingertaskfile = NULL;
 char logpingertaskfilename[MAX_BUF_LEN];

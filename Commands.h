@@ -861,6 +861,85 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 	}
+	else if (sscanf(line, "externalvisuallocalizationconfig "
+		"%d %d %d %d %d %d "
+		"%d %d %d %d %d %d "
+		"%lf %lf %lf %lf "
+		"%lf %lf "
+		"%d %d "
+		"%d", 
+		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
+		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
+		&dval1, &dval2, &dval3, &dval4, 
+		&dval5, &dval6, 
+		&ival13, &ival14, 
+		&ival15
+		) == 21)
+	{
+		EnterCriticalSection(&ExternalVisualLocalizationCS);
+		rmin_externalvisuallocalization = ival1; rmax_externalvisuallocalization = ival2; gmin_externalvisuallocalization = ival3; gmax_externalvisuallocalization = ival4; bmin_externalvisuallocalization = ival5; bmax_externalvisuallocalization = ival6; 
+		hmin_externalvisuallocalization = ival7; hmax_externalvisuallocalization = ival8; smin_externalvisuallocalization = ival9; smax_externalvisuallocalization = ival10; lmin_externalvisuallocalization = ival11; lmax_externalvisuallocalization = ival12; 
+		objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionDuration_externalvisuallocalization = dval3; d0_externalvisuallocalization = dval4; 
+		kh_externalvisuallocalization = dval5; kv_externalvisuallocalization = dval6; 
+		bBrake_externalvisuallocalization = ival13; procid_externalvisuallocalization = ival14; 
+		if ((ival15 >= 0)&&(ival15 < nbvideo))
+		{
+			videoid_externalvisuallocalization = ival15;
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+		bExternalVisualLocalizationFound = FALSE;
+		LeaveCriticalSection(&ExternalVisualLocalizationCS);
+	}
+	else if (sscanf(line, "externalvisuallocalizationdetection %lf", &delay) == 1)
+	{
+		EnterCriticalSection(&ExternalVisualLocalizationCS);
+		EnterCriticalSection(&StateVariablesCS);
+		u_externalvisuallocalization = u;
+		bExternalVisualLocalizationDetection = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&ExternalVisualLocalizationCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			if (!bExternalVisualLocalizationDetection) break;
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+		EnterCriticalSection(&ExternalVisualLocalizationCS);
+		bExternalVisualLocalizationDetection = FALSE;
+		if (bBrake_externalvisuallocalization) bBrakeControl = FALSE;
+		LeaveCriticalSection(&ExternalVisualLocalizationCS);
+	}
+	else if (strncmp(line, "startexternalvisuallocalizationtracking", strlen("startexternalvisuallocalizationtracking")) == 0)
+	{
+		EnterCriticalSection(&ExternalVisualLocalizationCS);
+		EnterCriticalSection(&StateVariablesCS);
+		u_externalvisuallocalization = u;
+		bExternalVisualLocalizationTrackingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&ExternalVisualLocalizationCS);
+	}
+	else if (strncmp(line, "stopexternalvisuallocalizationtracking", strlen("stopexternalvisuallocalizationtracking")) == 0)
+	{
+		EnterCriticalSection(&ExternalVisualLocalizationCS);
+		bExternalVisualLocalizationTrackingControl = FALSE;
+		//bDistanceControl = FALSE;
+		//if (bBrake_externalvisuallocalization) bBrakeControl = FALSE;
+		bHeadingControl = FALSE;
+		//bDepthControl = FALSE;
+		//bAltitudeSeaFloorControl = FALSE;
+		LeaveCriticalSection(&ExternalVisualLocalizationCS);
+	}
 	else if (sscanf(line, "pingerconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
@@ -1725,6 +1804,28 @@ inline int Commands(char* line)
 		mSleep(500);
 		if (!ival1) bRestartHokuyo = TRUE;
 		bPauseHokuyo = ival1;
+	}
+	else if (sscanf(line, "rplidarconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "RPLIDAR0.txt", strlen("RPLIDAR0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "RPLIDAR0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartRPLIDAR = TRUE;
+		bPauseRPLIDAR = ival1;
 	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{

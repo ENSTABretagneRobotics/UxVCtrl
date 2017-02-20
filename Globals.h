@@ -201,6 +201,7 @@ extern BOOL bDisableMES;
 extern BOOL bDisableMDM;
 extern BOOL bDisableSeanet;
 extern BOOL bDisableHokuyo;
+extern BOOL bDisableRPLIDAR;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
@@ -360,6 +361,22 @@ extern int procid_surfacevisualobstacle;
 extern int videoid_surfacevisualobstacle;
 extern double u_surfacevisualobstacle;
 
+// ExternalVisualLocalization variables.
+extern BOOL bExternalVisualLocalizationDetection;
+extern BOOL bExternalVisualLocalizationTrackingControl;
+extern CRITICAL_SECTION ExternalVisualLocalizationCS;
+extern CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
+extern IplImage* ExternalVisualLocalizationOverlayImg;
+extern int rmin_externalvisuallocalization, rmax_externalvisuallocalization, gmin_externalvisuallocalization, gmax_externalvisuallocalization, bmin_externalvisuallocalization, bmax_externalvisuallocalization; 
+extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smin_externalvisuallocalization, smax_externalvisuallocalization, lmin_externalvisuallocalization, lmax_externalvisuallocalization;
+extern double objMinRadiusRatio_externalvisuallocalization, objRealRadius_externalvisuallocalization, objMinDetectionDuration_externalvisuallocalization, d0_externalvisuallocalization; 
+extern double kh_externalvisuallocalization, kv_externalvisuallocalization;
+extern int bBrake_externalvisuallocalization;
+extern int procid_externalvisuallocalization;
+extern int videoid_externalvisuallocalization; 
+extern double u_externalvisuallocalization;
+extern BOOL bExternalVisualLocalizationFound;
+
 // Pinger variables.
 extern BOOL bPingerDetection;
 extern BOOL bPingerTrackingControl;
@@ -414,6 +431,9 @@ extern BOOL bPauseSeanet, bRestartSeanet;
 
 // Hokuyo variables.
 extern BOOL bPauseHokuyo, bRestartHokuyo;
+
+// RPLIDAR variables.
+extern BOOL bPauseRPLIDAR, bRestartRPLIDAR;
 
 // P33x variables.
 extern BOOL bPauseP33x, bRestartP33x;
@@ -538,6 +558,9 @@ extern char logpipelinetaskfilename[MAX_BUF_LEN];
 extern FILE* logballtaskfile;
 extern char logballtaskfilename[MAX_BUF_LEN];
 
+extern FILE* logexternalvisuallocalizationtaskfile;
+extern char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
+
 extern FILE* logpingertaskfile;
 extern char logpingertaskfilename[MAX_BUF_LEN];
 
@@ -607,6 +630,9 @@ inline int InitGlobals(void)
 	SurfaceVisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	ExternalVisualLocalizationOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+	cvSet(ExternalVisualLocalizationOverlayImg, CV_RGB(0, 0, 0), NULL);
+
 	PingerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
 
@@ -626,6 +652,8 @@ inline int InitGlobals(void)
 	InitCriticalSection(&VisualObstacleOverlayImgCS);
 	InitCriticalSection(&SurfaceVisualObstacleCS);
 	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
+	InitCriticalSection(&ExternalVisualLocalizationCS);
+	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	InitCriticalSection(&PingerCS);
 	InitCriticalSection(&PingerOverlayImgCS);
 	InitCriticalSection(&MissingWorkerCS);
@@ -666,6 +694,8 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&MissingWorkerCS);
 	DeleteCriticalSection(&PingerOverlayImgCS);
 	DeleteCriticalSection(&PingerCS);
+	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
+	DeleteCriticalSection(&ExternalVisualLocalizationCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleCS);
 	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
@@ -682,6 +712,8 @@ inline int ReleaseGlobals(void)
 	cvReleaseImage(&MissingWorkerOverlayImg);
 
 	cvReleaseImage(&PingerOverlayImg);
+
+	cvReleaseImage(&ExternalVisualLocalizationOverlayImg);
 
 	cvReleaseImage(&SurfaceVisualObstacleOverlayImg);
 
