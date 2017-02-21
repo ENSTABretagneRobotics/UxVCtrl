@@ -95,7 +95,9 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 	}
 
 	fprintf(logexternalvisuallocalizationtaskfile, 
-		"%% Time (in s); Distance to the externalvisuallocalization (in m);\n"
+		"%% Time (in s); Distance (in m); Bearing (in rad); Elevation (in rad); "
+		"x position (in m); y position (in m); z position (in m); theta orientation (in rad); "
+		"Latitude (in decimal degrees); Longitude (in decimal degrees); Altitude (in m); Heading (in deg);\n"
 		); 
 	fflush(logexternalvisuallocalizationtaskfile);
 
@@ -106,7 +108,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		mSleep(captureperiod);
 
 		if (bExit) break;
-		if ((!bExternalVisualLocalizationDetection)&&(!bExternalVisualLocalizationTrackingControl)) continue;
+		if (!bExternalVisualLocalization) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
@@ -416,13 +418,9 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
 			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
-			fprintf(logexternalvisuallocalizationtaskfile, "%f;%f;\n", 
-				GetTimeElapsedChronoQuick(&chrono), objDistance
-				);
-			fflush(logexternalvisuallocalizationtaskfile);
-
-			if (bExternalVisualLocalizationDetection)
+			if (pic_counter > (int)(1000/captureperiod))
 			{
+				pic_counter = 0;
 				// Save a picture showing the detection.
 				memset(strtime_pic, 0, sizeof(strtime_pic));
 				EnterCriticalSection(&strtimeCS);
@@ -438,56 +436,28 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				{
 					printf("Error saving a picture file.\n");
 				}
-
-				if (bBrake_externalvisuallocalization)
-				{
-					// Temporary...
-					EnterCriticalSection(&StateVariablesCS);
-					u = 0;
-					bDistanceControl = FALSE;
-					bBrakeControl = TRUE;
-					LeaveCriticalSection(&StateVariablesCS);
-					mSleep(3000);
-					EnterCriticalSection(&StateVariablesCS);
-					u = 0;
-					bBrakeControl = FALSE;
-					LeaveCriticalSection(&StateVariablesCS);
-				}
-				bExternalVisualLocalizationDetection = FALSE;
 			}
+			else pic_counter++;
 
-			if (bExternalVisualLocalizationTrackingControl)
-			{
-				if (pic_counter > (int)(1000/captureperiod))
-				{
-					pic_counter = 0;
-					// Save a picture showing the detection.
-					memset(strtime_pic, 0, sizeof(strtime_pic));
-					EnterCriticalSection(&strtimeCS);
-					strcpy(strtime_pic, strtime_fns());
-					LeaveCriticalSection(&strtimeCS);
-					sprintf(picfilename, PIC_FOLDER"pic_%.64s.jpg", strtime_pic);
-					if (!cvSaveImage(picfilename, image, 0))
-					{
-						printf("Error saving a picture file.\n");
-					}
-					sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
-					if (!cvSaveImage(picfilename, overlayimage, 0))
-					{
-						printf("Error saving a picture file.\n");
-					}
-				}
-				else pic_counter++;
+			EnterCriticalSection(&StateVariablesCS);
 
-				EnterCriticalSection(&StateVariablesCS);
-				u = u_externalvisuallocalization;
-				//wtheta = Center(thetahat)+objBearing;
-				wtheta = Center(thetahat)-kh_externalvisuallocalization*atan((objj-(double)videoimgwidth/2.0)/((double)videoimgwidth/2.0));
-				//bDistanceControl = FALSE;
-				//bBrakeControl = FALSE;
-				bHeadingControl = TRUE;
-				LeaveCriticalSection(&StateVariablesCS);
-			}
+			x_externalvisuallocalization = 0;
+			y_externalvisuallocalization = 0;
+			z_externalvisuallocalization = 0;
+			theta_externalvisuallocalization = 0;
+
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, 
+				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, 
+				&lat_externalvisuallocalization, &long_externalvisuallocalization, &alt_externalvisuallocalization);
+			heading_externalvisuallocalization = fmod_360_pos_rad2deg(-angle_env-theta_externalvisuallocalization+M_PI/2.0);
+			LeaveCriticalSection(&StateVariablesCS);
+
+			fprintf(logexternalvisuallocalizationtaskfile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
+				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, 
+				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, theta_externalvisuallocalization, 
+				lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization, heading_externalvisuallocalization
+				);
+			fflush(logexternalvisuallocalizationtaskfile);
 #pragma endregion
 		}
 		else

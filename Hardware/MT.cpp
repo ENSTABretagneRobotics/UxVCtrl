@@ -103,6 +103,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 						"StatusWord;"
 						"Acc_X;Acc_Y;Acc_Z;"
 						"Gyr_X;Gyr_Y;Gyr_Z;"
+						"Mag_X;Mag_Y;Mag_Z;"
 						"Roll;Pitch;Yaw;"
 						"Latitude;Longitude;Altitude;"
 						"Vel_X;Vel_Y;Vel_Z;"
@@ -167,12 +168,14 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 						"%f;%f;%f;"
 						"%f;%f;%f;"
 						"%f;%f;%f;"
+						"%f;%f;%f;"
 						"%d;%d;\n", 
 						(int)mtdata.TS, (int)0, 
 						(int)mtdata.UTCTime.Nanoseconds, (int)mtdata.UTCTime.Year, (int)mtdata.UTCTime.Month, (int)mtdata.UTCTime.Day, (int)mtdata.UTCTime.Hour, (int)mtdata.UTCTime.Minute, (double)mtdata.UTCTime.Seconds, (int)mtdata.UTCTime.Valid, 
 						(int)mtdata.Status, 
 						mtdata.accX, mtdata.accY, mtdata.accZ, 
 						mtdata.gyrX, mtdata.gyrY, mtdata.gyrZ, 
+						mtdata.magX, mtdata.magY, mtdata.magZ, 
 						mtdata.roll, mtdata.pitch, mtdata.yaw, 
 						mtdata.Lat, mtdata.Long, mtdata.Alt, 
 						mtdata.Vel_X, mtdata.Vel_Y, mtdata.Vel_Z, 

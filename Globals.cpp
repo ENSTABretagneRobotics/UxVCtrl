@@ -157,6 +157,21 @@ box box_env;
 // Environment variables.
 COORDSYSTEM csMap;
 
+// ExternalVisualLocalization variables.
+BOOL bExternalVisualLocalization = FALSE;
+CRITICAL_SECTION ExternalVisualLocalizationCS;
+CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
+IplImage* ExternalVisualLocalizationOverlayImg = NULL;
+int rmin_externalvisuallocalization = 0, rmax_externalvisuallocalization = 0, gmin_externalvisuallocalization = 0, gmax_externalvisuallocalization = 0, bmin_externalvisuallocalization = 0, bmax_externalvisuallocalization = 0; 
+int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, smin_externalvisuallocalization = 0, smax_externalvisuallocalization = 0, lmin_externalvisuallocalization = 0, lmax_externalvisuallocalization = 0;
+double objMinRadiusRatio_externalvisuallocalization = 0, objRealRadius_externalvisuallocalization = 0, objMinDetectionDuration_externalvisuallocalization = 0; 
+int videoid_externalvisuallocalization = 0; 
+double x_externalvisuallocalization = 0, y_externalvisuallocalization = 0, z_externalvisuallocalization = 0;
+double theta_externalvisuallocalization = 0;
+double lat_externalvisuallocalization = 0, long_externalvisuallocalization = 0, alt_externalvisuallocalization = 0;
+double heading_externalvisuallocalization = 0;
+BOOL bExternalVisualLocalizationFound = FALSE;
+
 // Wall variables.
 BOOL bWallDetection = FALSE;
 BOOL bWallTrackingControl = FALSE;
@@ -205,9 +220,10 @@ int bBrake_ball = 0;
 int procid_ball = 0;
 int videoid_ball = 0; 
 double u_ball = 0;
-double theta_ball = 0;
 double x_ball = 0, y_ball = 0, z_ball = 0;
+double theta_ball = 0;
 double lat_ball = 0, long_ball = 0, alt_ball = 0;
+double heading_ball = 0;
 BOOL bBallFound = FALSE;
 int lightStatus_ball = 0;
 
@@ -237,22 +253,6 @@ int bBrake_surfacevisualobstacle = 0;
 int procid_surfacevisualobstacle = 0;
 int videoid_surfacevisualobstacle = 0; 
 double u_surfacevisualobstacle = 0;
-
-// ExternalVisualLocalization variables.
-BOOL bExternalVisualLocalizationDetection = FALSE;
-BOOL bExternalVisualLocalizationTrackingControl = FALSE;
-CRITICAL_SECTION ExternalVisualLocalizationCS;
-CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
-IplImage* ExternalVisualLocalizationOverlayImg = NULL;
-int rmin_externalvisuallocalization = 0, rmax_externalvisuallocalization = 0, gmin_externalvisuallocalization = 0, gmax_externalvisuallocalization = 0, bmin_externalvisuallocalization = 0, bmax_externalvisuallocalization = 0; 
-int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, smin_externalvisuallocalization = 0, smax_externalvisuallocalization = 0, lmin_externalvisuallocalization = 0, lmax_externalvisuallocalization = 0;
-double objMinRadiusRatio_externalvisuallocalization = 0, objRealRadius_externalvisuallocalization = 0, objMinDetectionDuration_externalvisuallocalization = 0, d0_externalvisuallocalization = 0; 
-double kh_externalvisuallocalization = 0, kv_externalvisuallocalization = 0;
-int bBrake_externalvisuallocalization = 0;
-int procid_externalvisuallocalization = 0;
-int videoid_externalvisuallocalization = 0; 
-double u_externalvisuallocalization = 0;
-BOOL bExternalVisualLocalizationFound = FALSE;
 
 // Pinger variables.
 BOOL bPingerDetection = FALSE;
@@ -426,6 +426,9 @@ char logstatefilename[MAX_BUF_LEN];
 FILE* logmissionfile = NULL;
 char logmissionfilename[MAX_BUF_LEN];
 
+FILE* logexternalvisuallocalizationtaskfile = NULL;
+char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
+
 FILE* logwalltaskfile = NULL;
 char logwalltaskfilename[MAX_BUF_LEN];
 
@@ -434,9 +437,6 @@ char logpipelinetaskfilename[MAX_BUF_LEN];
 
 FILE* logballtaskfile = NULL;
 char logballtaskfilename[MAX_BUF_LEN];
-
-FILE* logexternalvisuallocalizationtaskfile = NULL;
-char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
 
 FILE* logpingertaskfile = NULL;
 char logpingertaskfilename[MAX_BUF_LEN];

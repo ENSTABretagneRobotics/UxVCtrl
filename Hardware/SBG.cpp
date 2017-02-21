@@ -103,6 +103,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						"StatusWord;"
 						"Acc_X;Acc_Y;Acc_Z;"
 						"Gyr_X;Gyr_Y;Gyr_Z;"
+						"Mag_X;Mag_Y;Mag_Z;"
 						"Roll;Pitch;Yaw;"
 						"Latitude;Longitude;Altitude;"
 						"Vel_X;Vel_Y;Vel_Z;"
@@ -169,12 +170,14 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						"%f;%f;%f;"
 						"%f;%f;%f;"
 						"%f;%f;%f;"
+						"%f;%f;%f;"
 						"%d;%d;\n", 
 						(int)sbgdata.TS, (int)0, 
 						(int)sbgdata.UTCTime.Nanoseconds, (int)sbgdata.UTCTime.Year, (int)sbgdata.UTCTime.Month, (int)sbgdata.UTCTime.Day, (int)sbgdata.UTCTime.Hour, (int)sbgdata.UTCTime.Minute, (double)sbgdata.UTCTime.Seconds, (int)sbgdata.UTCTime.Valid, 
 						(int)sbgdata.Status, 
 						sbgdata.accX, sbgdata.accY, sbgdata.accZ, 
 						sbgdata.gyrX, sbgdata.gyrY, sbgdata.gyrZ, 
+						sbgdata.magX, sbgdata.magY, sbgdata.magZ, 
 						sbgdata.roll, sbgdata.pitch, sbgdata.yaw, 
 						sbgdata.Lat, sbgdata.Long, sbgdata.Alt, 
 						sbgdata.Vel_X, sbgdata.Vel_Y, sbgdata.Vel_Z, 

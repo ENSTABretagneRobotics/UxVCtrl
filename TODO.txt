@@ -1,12 +1,16 @@
 externalvisuallocalization->x,y,theta modulo 180?
 Changer x_mes en x_gps?
+Gyr/omega mais du coup je peux pas désactiver la centrale...
 
+bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station…
+Si vr error grande, utiliser state eq, autrement n'utiliser que vr
 option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
 
 bien revérifier toutes les modifs que j'ai faites ces derniers jours pour voir si elles posent problème...
 
 Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
+Rename simulator_worspace en submarine_simulator puisqu'il y en aura peut-être d'autres, update also USERUpdtQuick.bat
 
 change period also for other sensors/actuators?
 

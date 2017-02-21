@@ -280,6 +280,21 @@ extern box box_env;
 // Environment variables.
 extern COORDSYSTEM csMap;
 
+// ExternalVisualLocalization variables.
+extern BOOL bExternalVisualLocalization;
+extern CRITICAL_SECTION ExternalVisualLocalizationCS;
+extern CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
+extern IplImage* ExternalVisualLocalizationOverlayImg;
+extern int rmin_externalvisuallocalization, rmax_externalvisuallocalization, gmin_externalvisuallocalization, gmax_externalvisuallocalization, bmin_externalvisuallocalization, bmax_externalvisuallocalization; 
+extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smin_externalvisuallocalization, smax_externalvisuallocalization, lmin_externalvisuallocalization, lmax_externalvisuallocalization;
+extern double objMinRadiusRatio_externalvisuallocalization, objRealRadius_externalvisuallocalization, objMinDetectionDuration_externalvisuallocalization; 
+extern int videoid_externalvisuallocalization; 
+extern double x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization;
+extern double theta_externalvisuallocalization;
+extern double lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization;
+extern double heading_externalvisuallocalization;
+extern BOOL bExternalVisualLocalizationFound;
+
 // Wall variables.
 extern BOOL bWallDetection;
 extern BOOL bWallTrackingControl;
@@ -328,9 +343,10 @@ extern int bBrake_ball;
 extern int procid_ball;
 extern int videoid_ball;
 extern double u_ball;
-extern double theta_ball; // Not used...
 extern double x_ball, y_ball, z_ball;
+extern double theta_ball; // Not used...
 extern double lat_ball, long_ball, alt_ball;
+extern double heading_ball; // Not used...
 extern BOOL bBallFound;
 extern int lightStatus_ball;
 
@@ -360,22 +376,6 @@ extern int bBrake_surfacevisualobstacle;
 extern int procid_surfacevisualobstacle;
 extern int videoid_surfacevisualobstacle;
 extern double u_surfacevisualobstacle;
-
-// ExternalVisualLocalization variables.
-extern BOOL bExternalVisualLocalizationDetection;
-extern BOOL bExternalVisualLocalizationTrackingControl;
-extern CRITICAL_SECTION ExternalVisualLocalizationCS;
-extern CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
-extern IplImage* ExternalVisualLocalizationOverlayImg;
-extern int rmin_externalvisuallocalization, rmax_externalvisuallocalization, gmin_externalvisuallocalization, gmax_externalvisuallocalization, bmin_externalvisuallocalization, bmax_externalvisuallocalization; 
-extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smin_externalvisuallocalization, smax_externalvisuallocalization, lmin_externalvisuallocalization, lmax_externalvisuallocalization;
-extern double objMinRadiusRatio_externalvisuallocalization, objRealRadius_externalvisuallocalization, objMinDetectionDuration_externalvisuallocalization, d0_externalvisuallocalization; 
-extern double kh_externalvisuallocalization, kv_externalvisuallocalization;
-extern int bBrake_externalvisuallocalization;
-extern int procid_externalvisuallocalization;
-extern int videoid_externalvisuallocalization; 
-extern double u_externalvisuallocalization;
-extern BOOL bExternalVisualLocalizationFound;
 
 // Pinger variables.
 extern BOOL bPingerDetection;
@@ -549,6 +549,9 @@ extern char logstatefilename[MAX_BUF_LEN];
 extern FILE* logmissionfile;
 extern char logmissionfilename[MAX_BUF_LEN];
 
+extern FILE* logexternalvisuallocalizationtaskfile;
+extern char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
+
 extern FILE* logwalltaskfile;
 extern char logwalltaskfilename[MAX_BUF_LEN];
 
@@ -557,9 +560,6 @@ extern char logpipelinetaskfilename[MAX_BUF_LEN];
 
 extern FILE* logballtaskfile;
 extern char logballtaskfilename[MAX_BUF_LEN];
-
-extern FILE* logexternalvisuallocalizationtaskfile;
-extern char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
 
 extern FILE* logpingertaskfile;
 extern char logpingertaskfilename[MAX_BUF_LEN];

@@ -1,3 +1,7 @@
+137
+Added magnetometers data in SBG and MT logs.
+Continuation of ExternalVisualLocalization integration.
+
 136
 Begginning of ExternalVisualLocalization integration.
 Begginning of RPLIDAR integration.

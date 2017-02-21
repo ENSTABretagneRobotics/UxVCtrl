@@ -148,6 +148,18 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		}
 		if (bShowOtherOverlays) 		
 		{
+			//if (bDynamicSonarLocalization) 		
+			//{
+			//	EnterCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
+			//	CopyOverlay(DynamicSonarLocalizationOverlayImg, dispimgs[videoid]);
+			//	LeaveCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
+			//}
+			if (bExternalVisualLocalization&&(videoid == videoid_externalvisuallocalization)) 		
+			{
+				EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
+				CopyOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[videoid]);
+				LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
+			}
 			if ((bWallDetection||bWallTrackingControl||bWallAvoidanceControl)) 		
 			{
 				EnterCriticalSection(&WallOverlayImgCS);
@@ -177,12 +189,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-			}
-			if ((bExternalVisualLocalizationDetection||bExternalVisualLocalizationTrackingControl)&&(videoid == videoid_externalvisuallocalization)) 		
-			{
-				EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-				CopyOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[videoid]);
-				LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 			}
 			if ((bPingerDetection||bPingerTrackingControl)&&(videoid == videoid_pinger)) 		
 			{
