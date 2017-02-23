@@ -1,3 +1,7 @@
+138
+Added HorizontalBeam and VerticalBeam parameters.
+Continuation of ExternalVisualLocalization integration.
+
 137
 Added magnetometers data in SBG and MT logs.
 Continuation of ExternalVisualLocalization integration.

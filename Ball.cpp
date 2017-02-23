@@ -32,6 +32,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	double objBoundWidth = 0, objBoundHeight = 0;
 	// Estimation of the orientation of the object (in rad).
 	double objAngle = 0;
+	BOOL bobjAngleValid = FALSE;
 	// Estimated d to the object (in m).
 	double objDistance = 0;
 	// Estimated bearing to the object (in rad).
@@ -41,8 +42,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	// Real radius of the object (in m).
 	//double objRealRadius = 0.15;
 	// Parameters of the camera.
-	double horizontalBeam = 70; // Horizontal beam (in degrees).
-	double pixelAngleSize = M_PI*horizontalBeam/(180.0*videoimgwidth); // Angular size of a pixel (in rad).
+	double pixelAngleSize = M_PI*HorizontalBeam/(180.0*videoimgwidth); // Angular size of a pixel (in rad).
 	// We only consider objects that covers that ratio of the picture (refers to the min size of the object on the picture).
 	//double objPixRatio = 1.0/256.0;
 	// We only consider objects that have an estimated radius (in pixels) greater than this one.
@@ -53,7 +53,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 
 	// Accuracy of the orientation of the object (in rad).
-	double thetastep = M_PI/16.0;
+	double thetastep = M_PI/32.0;
 	// Accuracy of the covering of the object for the computation of its orientation (w.r.t. object radius).
 	double dstepobjRadiusratio = 1.0/10.0;
 	// When this ratio of objRadius is outside the picture, the estimated orientation will not be considered as valid.
@@ -377,9 +377,9 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			double dstep = objRadius*dstepobjRadiusratio;
 			//int nbSelectedPixelstheta = 0;
 
-			for (theta = -M_PI; theta < M_PI; theta += thetastep)
+			for (theta = -M_PI/2.0; theta < M_PI/2.0; theta += thetastep)
 			{
-				for (d = 0.0; d < objRadius; d += dstep)
+				for (d = 0.0; d < objBoundWidth+objBoundHeight; d += dstep)
 				{
 					double costheta = cos(theta);
 					double sintheta = sin(theta);
@@ -427,6 +427,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				)
 				)
 			{
+				bobjAngleValid = TRUE;
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
@@ -434,6 +435,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			}
 			else
 			{
+				bobjAngleValid = FALSE;
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 

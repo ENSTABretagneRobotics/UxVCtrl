@@ -490,6 +490,7 @@ inline int Commands(char* line)
 	char str2[MAX_BUF_LEN];
 	unsigned char* buf = NULL;
 	size_t bytes = 0;
+	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 	double delay = 0, delay_station = 0;
 	CHRONO chrono, chrono_station;
 
@@ -1147,19 +1148,30 @@ inline int Commands(char* line)
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
 		"%lf %lf %lf "
+		"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
+		"%lf %lf "
+		"%lf %lf %lf %lf "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, 
-		&dval5, &dval6, 
-		&ival13, &ival14, 
+		&dval1, &dval2, &dval3, 
+		&T11, &T21, &T31, &T41, &T12, &T22, &T32, &T42, &T13, &T23, &T33, &T43, &T14, &T24, &T34, &T44, 
+		&dval4, &dval5, 
+		&dval6, &dval7, &dval8, &dval9, 
 		&ival15
-		) == 21)
+		) == 38)
 	{
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 		rmin_externalvisuallocalization = ival1; rmax_externalvisuallocalization = ival2; gmin_externalvisuallocalization = ival3; gmax_externalvisuallocalization = ival4; bmin_externalvisuallocalization = ival5; bmax_externalvisuallocalization = ival6; 
 		hmin_externalvisuallocalization = ival7; hmax_externalvisuallocalization = ival8; smin_externalvisuallocalization = ival9; smax_externalvisuallocalization = ival10; lmin_externalvisuallocalization = ival11; lmax_externalvisuallocalization = ival12; 
 		objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionDuration_externalvisuallocalization = dval3;
+		T_externalvisuallocalization = rmatrix(4,4);
+		T_externalvisuallocalization.SetVal(1,1,T11); T_externalvisuallocalization.SetVal(2,1,T21); T_externalvisuallocalization.SetVal(3,1,T31); T_externalvisuallocalization.SetVal(4,1,T41); 
+		T_externalvisuallocalization.SetVal(1,2,T12); T_externalvisuallocalization.SetVal(2,2,T22); T_externalvisuallocalization.SetVal(3,2,T32); T_externalvisuallocalization.SetVal(4,2,T42); 
+		T_externalvisuallocalization.SetVal(1,3,T13); T_externalvisuallocalization.SetVal(2,3,T23); T_externalvisuallocalization.SetVal(3,3,T33); T_externalvisuallocalization.SetVal(4,3,T43); 
+		T_externalvisuallocalization.SetVal(1,4,T14); T_externalvisuallocalization.SetVal(2,4,T24); T_externalvisuallocalization.SetVal(3,4,T34); T_externalvisuallocalization.SetVal(4,4,T44); 
+		coef1_angle_externalvisuallocalization = dval4; coef2_angle_externalvisuallocalization = dval5; 
+		xerr_externalvisuallocalization = dval6; yerr_externalvisuallocalization = dval7; zerr_externalvisuallocalization = dval8; thetaerr_externalvisuallocalization = dval9; 
 		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
 			videoid_externalvisuallocalization = ival15;

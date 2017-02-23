@@ -65,7 +65,7 @@ double xte = 0;
 
 // Parameters.
 int robid = 0, nbvideo = 0, 
-videoimgwidth = 0, videoimgheight = 0, captureperiod = 0; 
+videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0; 
 BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bMAVLinkInterface = FALSE;
@@ -165,6 +165,9 @@ IplImage* ExternalVisualLocalizationOverlayImg = NULL;
 int rmin_externalvisuallocalization = 0, rmax_externalvisuallocalization = 0, gmin_externalvisuallocalization = 0, gmax_externalvisuallocalization = 0, bmin_externalvisuallocalization = 0, bmax_externalvisuallocalization = 0; 
 int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, smin_externalvisuallocalization = 0, smax_externalvisuallocalization = 0, lmin_externalvisuallocalization = 0, lmax_externalvisuallocalization = 0;
 double objMinRadiusRatio_externalvisuallocalization = 0, objRealRadius_externalvisuallocalization = 0, objMinDetectionDuration_externalvisuallocalization = 0; 
+rmatrix T_externalvisuallocalization(4,4);
+double coef1_angle_externalvisuallocalization = 0, coef2_angle_externalvisuallocalization = 0;
+double xerr_externalvisuallocalization = 0, yerr_externalvisuallocalization = 0, zerr_externalvisuallocalization = 0, thetaerr_externalvisuallocalization = 0;
 int videoid_externalvisuallocalization = 0; 
 double x_externalvisuallocalization = 0, y_externalvisuallocalization = 0, z_externalvisuallocalization = 0;
 double theta_externalvisuallocalization = 0;

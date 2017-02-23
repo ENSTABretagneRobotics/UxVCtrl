@@ -188,7 +188,7 @@ extern double xte;
 
 // Parameters.
 extern int robid, nbvideo, 
-videoimgwidth, videoimgheight, captureperiod; 
+videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
 extern BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 extern BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
 extern BOOL bMAVLinkInterface;
@@ -288,6 +288,9 @@ extern IplImage* ExternalVisualLocalizationOverlayImg;
 extern int rmin_externalvisuallocalization, rmax_externalvisuallocalization, gmin_externalvisuallocalization, gmax_externalvisuallocalization, bmin_externalvisuallocalization, bmax_externalvisuallocalization; 
 extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smin_externalvisuallocalization, smax_externalvisuallocalization, lmin_externalvisuallocalization, lmax_externalvisuallocalization;
 extern double objMinRadiusRatio_externalvisuallocalization, objRealRadius_externalvisuallocalization, objMinDetectionDuration_externalvisuallocalization; 
+extern rmatrix T_externalvisuallocalization;
+extern double coef1_angle_externalvisuallocalization, coef2_angle_externalvisuallocalization;
+extern double xerr_externalvisuallocalization, yerr_externalvisuallocalization, zerr_externalvisuallocalization, thetaerr_externalvisuallocalization;
 extern int videoid_externalvisuallocalization; 
 extern double x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization;
 extern double theta_externalvisuallocalization;

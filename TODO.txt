@@ -1,12 +1,10 @@
-externalvisuallocalization->x,y,theta modulo 180?
-Changer x_mes en x_gps?
-Gyr/omega mais du coup je peux pas désactiver la centrale...
+Gyr/omega mais du coup je peux pas désactiver la centrale... voir pour pouvoir n'utiliser que gyros, utiliser options internes centrale? mais des fois je voudrais faire moi-même la fusion magnéto+gyros...
+ambiguités pour l'angle quand sort du champ de vision...
+rajouter params calcul objAngle, si tous à 0 désactiver?
 
 bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station…
 Si vr error grande, utiliser state eq, autrement n'utiliser que vr
 option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
-
-bien revérifier toutes les modifs que j'ai faites ces derniers jours pour voir si elles posent problème...
 
 Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
@@ -115,12 +113,12 @@ MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDis
 (walltracking overlay fait aussi walldetect, wallavoidance)
 bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
 pouvoir lancer un opencvgui independamment du nombre de cameras, dynamic resolution changes?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
+params videoimgwidth/height, Horizontal/VerticalBeam sont pour les images utilisées pour les calculs, il faudrait en plus des valeurs propres à chaque OpenCVGUI...
+Pour la taille des images partagées, prendre la résolution min des webcams?
 utiliser bCleanup dans tous les threads pour le cvSet()?
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
 essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...->pas forcément souhaitable
 Mettre en var globale les périphériques?
-Pour la taille des images partagées, prendre la résolution min des webcams
-Les paramètres globaux videoimgwidth/height n'ont peut-être plus d'utilité
 détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
 Dashboard : rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
 Appli gps qui affiche sog à partir des logs?

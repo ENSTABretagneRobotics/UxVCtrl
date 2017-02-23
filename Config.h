@@ -27,6 +27,8 @@ inline int LoadConfig(void)
 	videoimgwidth = 320; 
 	videoimgheight = 240; 
 	captureperiod = 100;
+	HorizontalBeam = 70;
+	VerticalBeam = 50;
 	bEnableOpenCVGUIs[0] = TRUE;
 	bEnableOpenCVGUIs[1] = FALSE;
 	bEnableOpenCVGUIs[2] = FALSE;
@@ -163,6 +165,10 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &videoimgheight) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &captureperiod) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &HorizontalBeam) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &VerticalBeam) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnableOpenCVGUIs[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -548,6 +554,16 @@ inline int LoadConfig(void)
 	{
 		printf("Invalid parameter : captureperiod.\n");
 		captureperiod = 100;
+	}
+	if ((HorizontalBeam <= 0)||(HorizontalBeam > 360))
+	{
+		printf("Invalid parameter : HorizontalBeam.\n");
+		HorizontalBeam = 70;
+	}
+	if ((VerticalBeam <= 0)||(VerticalBeam > 360))
+	{
+		printf("Invalid parameter : VerticalBeam.\n");
+		VerticalBeam = 50;
 	}
 	if (bEnableOpenCVGUIs[0]&&(nbvideo <= 0))
 	{

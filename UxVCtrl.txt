@@ -30,6 +30,10 @@
 240
 % captureperiod (in ms)
 100
+% HorizontalBeam (in ]0..360] deg)
+70
+% VerticalBeam (in ]0..360] deg)
+50
 % bEnableOpenCVGUIs[0]
 1
 % bEnableOpenCVGUIs[1]

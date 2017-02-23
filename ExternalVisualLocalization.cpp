@@ -30,6 +30,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 	double objBoundWidth = 0, objBoundHeight = 0;
 	// Estimation of the orientation of the object (in rad).
 	double objAngle = 0;
+	BOOL bobjAngleValid = FALSE;
 	// Estimated d to the object (in m).
 	double objDistance = 0;
 	// Estimated bearing to the object (in rad).
@@ -39,8 +40,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 	// Real radius of the object (in m).
 	//double objRealRadius = 0.15;
 	// Parameters of the camera.
-	double horizontalBeam = 70; // Horizontal beam (in degrees).
-	double pixelAngleSize = M_PI*horizontalBeam/(180.0*videoimgwidth); // Angular size of a pixel (in rad).
+	double pixelAngleSize = M_PI*HorizontalBeam/(180.0*videoimgwidth); // Angular size of a pixel (in rad).
 	// We only consider objects that covers that ratio of the picture (refers to the min size of the object on the picture).
 	//double objPixRatio = 1.0/256.0;
 	// We only consider objects that have an estimated radius (in pixels) greater than this one.
@@ -51,7 +51,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 
 	// Accuracy of the orientation of the object (in rad).
-	double thetastep = M_PI/16.0;
+	double thetastep = M_PI/32.0;
 	// Accuracy of the covering of the object for the computation of its orientation (w.r.t. object radius).
 	double dstepobjRadiusratio = 1.0/10.0;
 	// When this ratio of objRadius is outside the picture, the estimated orientation will not be considered as valid.
@@ -95,7 +95,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 	}
 
 	fprintf(logexternalvisuallocalizationtaskfile, 
-		"%% Time (in s); Distance (in m); Bearing (in rad); Elevation (in rad); "
+		"%% Time (in s); Distance (in m); Bearing (in rad); Elevation (in rad); Radius (in pixels); Orientation (in rad); Orientation validity; "
 		"x position (in m); y position (in m); z position (in m); theta orientation (in rad); "
 		"Latitude (in decimal degrees); Longitude (in decimal degrees); Altitude (in m); Heading (in deg);\n"
 		); 
@@ -197,7 +197,10 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 					//((r >= rmin_externalvisuallocalization)&&(r <= rmax_externalvisuallocalization))&&
 					//((g >= gmin_externalvisuallocalization)&&(g <= gmax_externalvisuallocalization))&&
 					//((b >= bmin_externalvisuallocalization)&&(b <= bmax_externalvisuallocalization))
-					((h >= hmin_externalvisuallocalization)&&(h <= hmax_externalvisuallocalization))&&
+					//((h >= hmin_externalvisuallocalization)&&(h <= hmax_externalvisuallocalization))&&
+					//((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization))&&
+					//((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization))
+					((h <= hmin_externalvisuallocalization)||(h >= hmax_externalvisuallocalization))&&
 					((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization))&&
 					((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization))
 					)
@@ -215,10 +218,10 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 					// Prepare the computation of the mean of selected pixels.
 					obji += i;
 					objj += j;
-					// Selected pixels are displayed in red.
+					// Selected pixels are displayed in green.
 					overlaydata[0+index] = 0;
-					overlaydata[1+index] = 0;
-					overlaydata[2+index] = 255;
+					overlaydata[1+index] = 255;
+					overlaydata[2+index] = 0;
 				}
 				else
 				{
@@ -296,7 +299,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			cvRectangle(overlayimage, 
 				cvPoint((int)objj-objRadius,(int)obji-objRadius), 
 				cvPoint((int)objj+objRadius,(int)obji+objRadius), 
-				CV_RGB(0,255,0));
+				CV_RGB(0,0,255));
 
 			objDistance = objRealRadius_externalvisuallocalization/tan(objRadius*pixelAngleSize);
 			objBearing = -(objj-image->width/2.0)*pixelAngleSize;
@@ -348,9 +351,9 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			double dstep = objRadius*dstepobjRadiusratio;
 			//int nbSelectedPixelstheta = 0;
 
-			for (theta = -M_PI; theta < M_PI; theta += thetastep)
+			for (theta = -M_PI/2.0; theta < M_PI/2.0; theta += thetastep)
 			{
-				for (d = 0.0; d < objRadius; d += dstep)
+				for (d = 0.0; d < objBoundWidth+objBoundHeight; d += dstep)
 				{
 					double costheta = cos(theta);
 					double sintheta = sin(theta);
@@ -398,13 +401,15 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				)
 				)
 			{
+				bobjAngleValid = TRUE;
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
-					CV_RGB(0,255,0));
+					CV_RGB(255,255,0));
 			}
 			else
 			{
+				bobjAngleValid = FALSE;
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
@@ -441,19 +446,57 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 			EnterCriticalSection(&StateVariablesCS);
 
-			x_externalvisuallocalization = 0;
-			y_externalvisuallocalization = 0;
-			z_externalvisuallocalization = 0;
-			theta_externalvisuallocalization = 0;
+			box X0 = box(4);
+			X0[1] = obji/image->height; 
+			X0[2] = objj/image->width; 
+			X0[3] = objDistance; 
+			X0[4] = 1;
+			box X1 = ToBox(T_externalvisuallocalization*X0);
+			x_externalvisuallocalization = Center(X1[1]);//(sin(objElevation)/sin(HorizontalBeam/2.0))*3.0/2;//-(obji/image->height-1)*3.0
+			y_externalvisuallocalization = Center(X1[2]);//(sin(objBearing)/sin(VerticalBeam/2.0))*4.0/2;//-(objj/image->width-1)*4.0
+			z_externalvisuallocalization = Center(X1[3]);//-objDistance+2.75
+			theta_externalvisuallocalization = coef1_angle_externalvisuallocalization*objAngle+coef2_angle_externalvisuallocalization;//objAngle-M_PI/2.0
 
 			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, 
 				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, 
 				&lat_externalvisuallocalization, &long_externalvisuallocalization, &alt_externalvisuallocalization);
 			heading_externalvisuallocalization = fmod_360_pos_rad2deg(-angle_env-theta_externalvisuallocalization+M_PI/2.0);
+			
+			box P = box(xhat,yhat);
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			P.Intersect(box(
+				interval(x_externalvisuallocalization-xerr_externalvisuallocalization,x_externalvisuallocalization+xerr_externalvisuallocalization),
+				interval(y_externalvisuallocalization-yerr_externalvisuallocalization,y_externalvisuallocalization+yerr_externalvisuallocalization)));
+			if (P.IsEmpty()) 
+			{
+				// Expand initial box to be able to contract next time and because we are probably lost...
+				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+			}
+			else
+			{
+				//zhat?
+
+				if ((coef1_angle_externalvisuallocalization != 0)&&(coef2_angle_externalvisuallocalization != 0)&&bobjAngleValid) 
+				{
+					// M_PI ambiguity...
+					if (fabs(fmod_2PI(theta_mes-theta_externalvisuallocalization)) < fabs(fmod_2PI(theta_mes-theta_externalvisuallocalization+M_PI)))
+					{
+						theta_mes = fmod_2PI(theta_externalvisuallocalization);
+					}
+					else
+					{
+						theta_mes = fmod_2PI(theta_externalvisuallocalization+M_PI);
+					}
+				}
+			}
+			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
+			xhat = P[1];
+			yhat = P[2];
+
 			LeaveCriticalSection(&StateVariablesCS);
 
-			fprintf(logexternalvisuallocalizationtaskfile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
-				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, 
+			fprintf(logexternalvisuallocalizationtaskfile, "%f;%f;%f;%f;%d;%f;%d;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
+				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, objRadius, objAngle, (int)bobjAngleValid, 
 				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, theta_externalvisuallocalization, 
 				lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization, heading_externalvisuallocalization
 				);
