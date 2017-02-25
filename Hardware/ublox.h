@@ -569,16 +569,33 @@ inline int SetBaseCfgublox(UBLOX* publox)
 }
 
 // Transfer data (e.g. RTCM extracted from MAVLink) without any interpretation...
-inline int TransferToublox(UBLOX* publox, unsigned char* sendbuf, int sendbuflen)
+inline int TransferToublox(UBLOX* publox, unsigned char* buf, int buflen)
 {
-	if (WriteAllRS232Port(&publox->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&publox->RS232Port, buf, buflen) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a ublox. \n");
 		return EXIT_FAILURE;
 	}
 	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
 	{
-		fwrite(sendbuf, sendbuflen, 1, publox->pfSaveFile);
+		fwrite(buf, buflen, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
+
+	return EXIT_SUCCESS;
+}
+
+// Get raw data (e.g. unknown RTCM data) without any interpretation...
+inline int GetRawDataublox(UBLOX* publox, unsigned char* buf, int buflen, int* pReceivedBytes)
+{
+	if (ReadRS232Port(&publox->RS232Port, buf, buflen, pReceivedBytes) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a ublox. \n");
+		return EXIT_FAILURE;
+	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(buf, *pReceivedBytes, 1, publox->pfSaveFile);
 		fflush(publox->pfSaveFile);
 	}
 
@@ -671,6 +688,17 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		printf("Unable to connect to a ublox.\n");
 		CloseRS232Port(&publox->RS232Port);
 		return EXIT_FAILURE;
+	}
+
+	if ((publox->fixedLat < -90)||(publox->fixedLat > 90))
+	{
+		printf("Invalid parameter : fixedLat.\n");
+		publox->fixedLat = 0;
+	}
+	if ((publox->fixedLon < -180)||(publox->fixedLon > 180))
+	{
+		printf("Invalid parameter : fixedLon.\n");
+		publox->fixedLon = 0;
 	}
 
 	if (publox->bRevertToDefaultCfg)

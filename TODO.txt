@@ -1,5 +1,8 @@
 Gyr/omega mais du coup je peux pas désactiver la centrale... voir pour pouvoir n'utiliser que gyros, utiliser options internes centrale? mais des fois je voudrais faire moi-même la fusion magnéto+gyros...
 ambiguités pour l'angle quand sort du champ de vision...
+ThetaEstimationMode : 0 normal, 1 gyro, 2 razor-like fusion mag+gyr, 3 with state eq…
+If Width(thetahat) < M_PI le prendre en compte pour gérer l'ambiguité
+quand on fait setstateestimation, thetahat et zhat sont tout de suite écrasés par theta_mes et z_mes, même s'ils sont invalides...
 rajouter params calcul objAngle, si tous à 0 désactiver?
 
 bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station…
@@ -8,14 +11,9 @@ option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éven
 
 Trouver mission autonome intelligente en intérieur pour buggy, 
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
-Rename simulator_worspace en submarine_simulator puisqu'il y en aura peut-être d'autres, update also USERUpdtQuick.bat
+Rename simulator_worspace en submarine_simulator puisqu'il y en aura peut-être d'autres, update also USERUpdtQuick.bat?
 
 change period also for other sensors/actuators?
-
-check if improvements can be made to AUV control (e.g. to avoid sinking and lose control...)
-
-Getubxdata->faire pour tout type de données
-Update aussi nmea device pour qu'il utilise les nouvelles fonctions?
 
 rplidar...
 
@@ -24,9 +22,7 @@ selon les accx_err, ça aura ou non une influence sur les équations d'état
 Gérer le -g dans acc...
 changer les theta en psi et rajouter équations voilier
 changer les bruits d'état en bruits discrétisés...?
-fusion de certains fichiers avec UxVDataViewer, notamment forward et backward...?
-
-Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS
+fusion de certains fichiers avec UxVDataViewer, notamment forward et backward..., intégrer sonarstaticlocstructured et lecture vidéo dans UxVDataViewer?
 
 linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
@@ -150,7 +146,7 @@ disableallcontrols désactive aussi toute commande acoustique... (sans doute parc
 Missions
 mettre logvid2imgoverlay sur github, corriger bug de flip ou autre avec vue rochers sauc-e, update rotation etc. with what is in Video
 Mosaiquing video avec les logs de 2014
-pour les détections, être plus robuste en regardant plusieurs images de suite : objMinDetectionDuration...
+Faire détection plus robuste en regardant plusieurs images et selon un detectionrate sur une durée quitte à augmenter un peu FPS : objMinDetectionDuration...
 Chercher l'anomalie avec toutes les caméras et sonar avec portée réduite car elle a été bougée pour la finale?
 station : rajouter bStationControl comme bBrakeControl, voir paper_vstab_rc.pdf
 manque statevariables cs dans MissionLogThread, idem logwall? theta_wall... voir Ball...
@@ -178,6 +174,10 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
+faire app comme remotewebcammultisrv pour permettre à plusieurs clients d'accéder à la base
+ublox et mavlinkinterface peuvent publier des données RTCM...
+Getubxdata->faire pour tout type de données, écriture dans fichier log...
+Update aussi nmea device pour qu'il utilise les nouvelles fonctions?
 tester le bon décodage de UBX NAV SVIN...
 garder quand même les paramètres bEnableGGA, etc. au cas où il faudrait vraiment les désactiver?
 faire fichiers UBXProtocol.h, NMEAProtocol.h, AISProtocol.h, MAVLinkProtocol.h pour pouvoir les utiliser aussi facilement dans file conversions ou ailleurs? ou alors ça fait trop de fichiers pour pas grand-chose?
@@ -194,7 +194,7 @@ hdop?
 comment savoir si GPS précis? pdod,hdop,vdop=5.0,2.8,4.4 quand GPS pas précis, peut-on en faire quelque chose pour déterminer précision?
 altitude GPS?
 utiliser nmeadeviceconfig bPause pour désactiver dynamiquement (par contre pas pour MTi-G à cause des angles...)
-add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti
+add rotation matrix multiplication to enable coordinate system change, convention abcdefgh comme mti ou T11,T21,T31...
 Razor invalid data au début parfois sous linux, jusqu'à 2048 octets invisibles invalides?
 rajouter support GPHDT pour cap dual GPS (comme HCHDG), GPZDA (date) et PRDID (angles)
 Add COG, SOG, pressure in MT, SBG, MAVLink
@@ -295,6 +295,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+Augmenter param z err
+
 bug code modem : xhat et yhat ne sont pas agrandis en cas d'ensembles vides après Cdistance(), seul P est agrandi...?->déjà corrigé
 
 problème phénomène de convergence du GPS qui donne position très précise mais fausse à cause du biais... est-ce que j'aurais pas mis trop de biais?
@@ -314,6 +316,8 @@ Interval_adapt c_q_in->OK, c'est celui d'Ibex...
 abort dans procedure gere-t-il bien le return raté?
 
 Faire en sorte que generalstop implique abort?->non, ça supprimerait des possibilités en mode semi-autonome...
+
+check if improvements can be made to AUV control (e.g. to avoid sinking and lose control...)
 
 renommer analyze en decode et qu'il retourne aussi l'adresse de payload et payloadlen? mais du coup ça fera beaucoup de paramètres à rajouter dans toutes les fonctions...
 GN/GL parfois utilisé à la place de GP dans NMEA?->$GN, $GP->"$G%c" && c0=='N' ||'P'

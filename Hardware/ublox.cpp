@@ -14,7 +14,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 {
 	UBLOX ublox;
 	UBXDATA ubxdata;
+	unsigned char rtcmdata[2048];
 	double dval = 0;
+	int res = 0;
 	BOOL bConnected = FALSE;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
@@ -120,74 +122,118 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 		}
 		else
 		{
-			if (GetDataublox(&ublox, &ubxdata) == EXIT_SUCCESS)
+			if (ublox.SurveyMode != DISABLED_SURVEY_RECEIVER_MODE_UBX)
 			{
-				EnterCriticalSection(&StateVariablesCS);
+				// This ublox is a RTK base, that should share RTCM corrections...
 
-				// lat/lon might be temporarily bad we this... 
-				if (ubxdata.nav_status_pl.gpsFix >= 0x02)
-				{
-					//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
-					latitude = ubxdata.Latitude;
-					longitude = ubxdata.Longitude;
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKublox[deviceid] = TRUE;
-				}
-				else
-				{
-					bGPSOKublox[deviceid] = FALSE;
-				}
+				int ReceivedBytes = 0;
+				res = GetRawDataublox(&ublox, rtcmdata, sizeof(rtcmdata), &ReceivedBytes);
 
-/*
-				//printf("GPS_quality_indicator : %d, status : %c\n", ubxdata.GPS_quality_indicator, ubxdata.status);
-
-				if ((ubxdata.GPS_quality_indicator > 0)||(ubxdata.status == 'A'))
+				if (res == EXIT_SUCCESS)
 				{
-					//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
-					latitude = ubxdata.Latitude;
-					longitude = ubxdata.Longitude;
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKublox[deviceid] = TRUE;
+					if (ReceivedBytes > 0) 
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						for (int k = 0; k < ReceivedBytes; k++)
+						{
+							unsigned char rtcmbyte = rtcmdata[k];
+							for (unsigned int j = 0; j < RTCMuserslist.size(); j++)
+							{
+								RTCMuserslist[j].push_back(rtcmbyte);
+								if (RTCMuserslist[j].size() > MAX_NB_BYTES_RTCM_PARTS) RTCMuserslist[j].pop_front();
+							}
+						}
+						LeaveCriticalSection(&StateVariablesCS);
+					}
 				}
-				else
-				{
-					bGPSOKublox[deviceid] = FALSE;
-				}
-
-				// Should check better if valid...
-				if ((ublox.bEnableGPRMC&&(ubxdata.status == 'A'))||ublox.bEnableGPVTG)
-				{
-					sog = ubxdata.SOG;
-					cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
-				}
-
-				if (ublox.bEnableHCHDG)
-				{
-					if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-ubxdata.Heading-angle_env);
-				}
-
-				if (ublox.bEnableIIMWV||ublox.bEnableWIMWV)
-				{
-					// Apparent wind (in robot coordinate system).
-					psiawind = fmod_2PI(-ubxdata.ApparentWindDir+M_PI); 
-					vawind = ubxdata.ApparentWindSpeed;
-					// True wind must be computed from apparent wind.
-					if (bDisableRollWindCorrectionSailboat)
-						psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
-					else
-						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
-				}
-
-				if (ublox.bEnableWIMWD||ublox.bEnableWIMDA)
-				{
-					// True wind.
-					psitwind = fmod_2PI(M_PI/2.0-ubxdata.WindDir+M_PI-angle_env);
-					vtwind = ubxdata.WindSpeed;
-				}
-*/
-				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
+			{
+				// This ublox is a RTK rover, that should receive any available RTCM corrections...
+
+				EnterCriticalSection(&StateVariablesCS);
+				int rtcmdatalen = min(RTCMusers[deviceid].size(), sizeof(rtcmdata));
+				for (int k = 0; k < rtcmdatalen; k++)
+				{
+					unsigned char rtcmbyte = RTCMusers[deviceid][RTCMusers[deviceid].size()-1];
+					RTCMusers[deviceid].pop_back();
+					rtcmdata[k] = rtcmbyte;
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+
+				if (rtcmdatalen > 0) res = TransferToublox(&ublox, rtcmdata, rtcmdatalen); else res = EXIT_SUCCESS;
+
+				if (res == EXIT_SUCCESS) res = GetDataublox(&ublox, &ubxdata);
+					
+				if (res == EXIT_SUCCESS)
+				{
+					EnterCriticalSection(&StateVariablesCS);
+
+					// lat/lon might be temporarily bad with this... 
+					if (ubxdata.nav_status_pl.gpsFix >= 0x02)
+					{
+						//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
+						latitude = ubxdata.Latitude;
+						longitude = ubxdata.Longitude;
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+						bGPSOKublox[deviceid] = TRUE;
+					}
+					else
+					{
+						bGPSOKublox[deviceid] = FALSE;
+					}
+
+/*
+					//printf("GPS_quality_indicator : %d, status : %c\n", ubxdata.GPS_quality_indicator, ubxdata.status);
+
+					if ((ubxdata.GPS_quality_indicator > 0)||(ubxdata.status == 'A'))
+					{
+						//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
+						latitude = ubxdata.Latitude;
+						longitude = ubxdata.Longitude;
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+						bGPSOKublox[deviceid] = TRUE;
+					}
+					else
+					{
+						bGPSOKublox[deviceid] = FALSE;
+					}
+
+					// Should check better if valid...
+					if ((ublox.bEnableGPRMC&&(ubxdata.status == 'A'))||ublox.bEnableGPVTG)
+					{
+						sog = ubxdata.SOG;
+						cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
+					}
+
+					if (ublox.bEnableHCHDG)
+					{
+						if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-ubxdata.Heading-angle_env);
+					}
+
+					if (ublox.bEnableIIMWV||ublox.bEnableWIMWV)
+					{
+						// Apparent wind (in robot coordinate system).
+						psiawind = fmod_2PI(-ubxdata.ApparentWindDir+M_PI); 
+						vawind = ubxdata.ApparentWindSpeed;
+						// True wind must be computed from apparent wind.
+						if (bDisableRollWindCorrectionSailboat)
+							psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
+						else
+							psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
+					}
+
+					if (ublox.bEnableWIMWD||ublox.bEnableWIMDA)
+					{
+						// True wind.
+						psitwind = fmod_2PI(M_PI/2.0-ubxdata.WindDir+M_PI-angle_env);
+						vtwind = ubxdata.WindSpeed;
+					}
+*/
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+			}
+			if (res != EXIT_SUCCESS)
 			{
 				printf("Connection to a ublox lost.\n");
 				bGPSOKublox[deviceid] = FALSE;

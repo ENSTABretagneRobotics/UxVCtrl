@@ -216,7 +216,28 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 				return EXIT_FAILURE;
 				}
 				}
-				*/			}
+				*/			
+			}
+/*
+			// Should read the data to try to get RTCM messages...
+			unsigned char rtcmdata[2048];
+
+
+			if (ReceivedBytes > 0) 
+			{
+				EnterCriticalSection(&StateVariablesCS);
+				for (int k = 0; k < ReceivedBytes; k++)
+				{
+					unsigned char rtcmbyte = rtcmdata[k];
+					for (unsigned int j = 0; j < RTCMuserslist.size(); j++)
+					{
+						RTCMuserslist[j].push_back(rtcmbyte);
+						if (RTCMuserslist[j].size() > MAX_NB_BYTES_RTCM_PARTS) RTCMuserslist[j].pop_front();
+					}
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+*/
 
 			if (handlemavlinkinterface() != EXIT_SUCCESS)
 			{

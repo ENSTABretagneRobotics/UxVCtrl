@@ -629,6 +629,9 @@
     <Text Include="RPLIDAR0.txt">
       <Filter>Input Files</Filter>
     </Text>
+    <Text Include="ublox2.txt">
+      <Filter>Input Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

@@ -84,6 +84,8 @@
 1
 % bDisableublox[1]
 1
+% bDisableublox[2]
+1
 % bDisableMAVLinkDevice[0]
 1
 % bDisableMAVLinkDevice[1]

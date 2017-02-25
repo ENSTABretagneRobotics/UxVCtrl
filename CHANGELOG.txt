@@ -1,3 +1,6 @@
+139
+Added support for a 3rd ublox, typically the RTK base.
+
 138
 Added HorizontalBeam and VerticalBeam parameters.
 Continuation of ExternalVisualLocalization integration.

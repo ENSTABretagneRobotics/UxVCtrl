@@ -10,9 +10,9 @@ COM14
 % bRevertToDefaultCfg
 1
 % bSetBaseCfg
-0
+1
 % SurveyMode (0 : Disabled, 1 : Survey In, 2 : Fixed Mode (fixedLat, fixedLon, fixedAlt, fixedPosAcc needed))
-0
+1
 % svinMinDur (in s)
 30
 % svinAccLimit (in m)

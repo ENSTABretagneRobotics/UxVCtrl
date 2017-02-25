@@ -443,6 +443,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ublox2.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\UE9A0.txt"
 				>
 			</File>

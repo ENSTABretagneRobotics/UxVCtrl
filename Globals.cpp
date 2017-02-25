@@ -31,6 +31,9 @@ double yaw = 0, pitch = 0, roll = 0;
 double latitude = 0, longitude = 0;
 double altitude = 0;
 double sog = 0, cog = 0;
+double xte = 0;
+vector< deque<unsigned char> > RTCMuserslist;
+deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Weather station.
 double vtwind = 0, psitwind = 0, vawind = 0, psiawind = 0;
 // Sonar.
@@ -60,8 +63,6 @@ double u1 = 0, u2 = 0, u3 = 0;
 double light = 0, tilt = 0;
 
 double rudderminangle = 0, ruddermaxangle = 0;
-
-double xte = 0;
 
 // Parameters.
 int robid = 0, nbvideo = 0, 

@@ -55,6 +55,7 @@ inline int LoadConfig(void)
 	bDisableNMEADevice[1] = TRUE;
 	bDisableublox[0] = TRUE;
 	bDisableublox[1] = TRUE;
+	bDisableublox[2] = TRUE;
 	bDisableMAVLinkDevice[0] = TRUE;
 	bDisableMAVLinkDevice[1] = TRUE;
 	bDisableSwarmonDevice = TRUE;
@@ -219,6 +220,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bDisableublox[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableublox[1]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableublox[2]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMAVLinkDevice[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

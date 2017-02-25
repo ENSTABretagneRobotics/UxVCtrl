@@ -95,7 +95,7 @@ typedef enum KEYS KEYS;
 
 #define MAX_NB_VIDEO 3
 #define MAX_NB_NMEADEVICE 2
-#define MAX_NB_UBLOX 2
+#define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 2
 
 // Acoustic modem messages.
@@ -154,6 +154,14 @@ extern double yaw, pitch, roll;
 extern double latitude, longitude;
 extern double altitude;
 extern double sog, cog;
+extern double xte;
+//extern vector< deque<unsigned char*> > RTCMuserslist;
+extern vector< deque<unsigned char> > RTCMuserslist;
+#define MAX_NB_BYTES_RTCM_PARTS 65536
+//#define MAX_NB_RTCM_PARTS 1024
+//#define MAX_NB_BYTES_RTCM_PART 4096
+//extern deque<unsigned char*> RTCMusers[MAX_NB_UBLOX]; // replace with deque< vector<unsigned char> > to get data and datalen? Or deque<unsigned char>, for each data byte...
+extern deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Weather station.
 extern double vtwind, psitwind, vawind, psiawind;
 // Sonar.
@@ -183,8 +191,6 @@ extern double u1, u2, u3;
 extern double light, tilt;
 
 extern double rudderminangle, ruddermaxangle;
-
-extern double xte;
 
 // Parameters.
 extern int robid, nbvideo, 
@@ -593,6 +599,7 @@ inline int InitGlobals(void)
 		bGPSOKublox[i] = FALSE;
 		bPauseublox[i] = FALSE;
 		bRestartublox[i] = FALSE;
+		RTCMuserslist.push_back(RTCMusers[i]);
 	}
 
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
@@ -744,6 +751,7 @@ inline int ReleaseGlobals(void)
 
 	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)
 	{
+		RTCMuserslist.pop_back();
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bGPSOKMAVLinkDevice[i] = FALSE;
