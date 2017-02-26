@@ -1,3 +1,6 @@
+140
+Added SonarAltitudeEstimation.
+
 139
 Added support for a 3rd ublox, typically the RTK base.
 

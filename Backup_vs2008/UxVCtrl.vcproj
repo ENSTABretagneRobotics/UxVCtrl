@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SonarAltitudeEstimation.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SonarLocalization.cpp"
 				>
 			</File>
@@ -318,6 +322,10 @@
 			</File>
 			<File
 				RelativePath=".\Simulator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SonarAltitudeEstimation.h"
 				>
 			</File>
 			<File

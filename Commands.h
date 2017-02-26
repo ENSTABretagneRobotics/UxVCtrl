@@ -1144,6 +1144,20 @@ inline int Commands(char* line)
 	{
 		bDynamicSonarLocalization = FALSE;
 	}
+	else if (sscanf(line, "sonaraltitudeestimationconfig %lf %lf", &dval1, &dval2) == 2)
+	{
+		EnterCriticalSection(&SonarAltitudeEstimationCS);
+		dmin_sonaraltitudeestimation = dval1; ratio_sonaraltitudeestimation = dval2; 
+		LeaveCriticalSection(&SonarAltitudeEstimationCS);
+	}
+	else if (strncmp(line, "enablesonaraltitudeestimation", strlen("enablesonaraltitudeestimation")) == 0)
+	{
+		bSonarAltitudeEstimation = TRUE;
+	}
+	else if (strncmp(line, "disablesonaraltitudeestimation", strlen("disablesonaraltitudeestimation")) == 0)
+	{
+		bSonarAltitudeEstimation = FALSE;
+	}
 	else if (sscanf(line, "externalvisuallocalizationconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "

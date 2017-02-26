@@ -12,6 +12,8 @@
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "SeanetProcessing.h"
 #include "SonarLocalization.h"
+#include "SonarAltitudeEstimation.h"
+#include "ExternalVisualLocalization.h"
 #include "Wall.h"
 #include "Pipeline.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -19,7 +21,6 @@
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
-#include "ExternalVisualLocalization.h"
 #include "Pinger.h"
 #include "MissingWorker.h"
 #include "Simulator.h"
@@ -74,6 +75,8 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER SeanetProcessingThreadId;
 	THREAD_IDENTIFIER SonarLocalizationThreadId;
+	THREAD_IDENTIFIER SonarAltitudeEstimationThreadId;
+	THREAD_IDENTIFIER ExternalVisualLocalizationThreadId;
 	THREAD_IDENTIFIER WallThreadId;
 	THREAD_IDENTIFIER PipelineThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -81,7 +84,6 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
-	THREAD_IDENTIFIER ExternalVisualLocalizationThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
 	THREAD_IDENTIFIER MissingWorkerThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
@@ -157,6 +159,8 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(SeanetProcessingThread, NULL, &SeanetProcessingThreadId);
 	CreateDefaultThread(SonarLocalizationThread, NULL, &SonarLocalizationThreadId);
+	CreateDefaultThread(SonarAltitudeEstimationThread, NULL, &SonarAltitudeEstimationThreadId);
+	CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
 	CreateDefaultThread(WallThread, NULL, &WallThreadId);
 	CreateDefaultThread(PipelineThread, NULL, &PipelineThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -164,7 +168,6 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
-	CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
 	if (robid == SUBMARINE_SIMULATOR_ROBID) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
@@ -336,7 +339,6 @@ int main(int argc, char* argv[])
 	if (robid == SUBMARINE_SIMULATOR_ROBID) WaitForThread(SimulatorThreadId);
 	WaitForThread(MissingWorkerThreadId);
 	WaitForThread(PingerThreadId);
-	WaitForThread(ExternalVisualLocalizationThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 	WaitForThread(VisualObstacleThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -344,6 +346,8 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	WaitForThread(PipelineThreadId);
 	WaitForThread(WallThreadId);
+	WaitForThread(ExternalVisualLocalizationThreadId);
+	WaitForThread(SonarAltitudeEstimationThreadId);
 	WaitForThread(SonarLocalizationThreadId);
 	WaitForThread(SeanetProcessingThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT

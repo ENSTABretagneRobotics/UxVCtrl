@@ -231,6 +231,9 @@
     <ClCompile Include="Hardware\RPLIDAR.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="SonarAltitudeEstimation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -535,6 +538,9 @@
     </ClInclude>
     <ClInclude Include="Hardware\RPLIDAR.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="SonarAltitudeEstimation.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -119,6 +119,7 @@
     <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SonarAltitudeEstimation.cpp" />
     <ClCompile Include="SonarLocalization.cpp" />
     <ClCompile Include="SurfaceVisualObstacle.cpp" />
     <ClCompile Include="VideoRecord.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="Pipeline.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SonarAltitudeEstimation.h" />
     <ClInclude Include="SonarLocalization.h" />
     <ClInclude Include="SurfaceVisualObstacle.h" />
     <ClInclude Include="VideoRecord.h" />

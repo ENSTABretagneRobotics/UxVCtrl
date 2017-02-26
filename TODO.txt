@@ -218,8 +218,8 @@ distancecomputation
 commande waitdistanceless/more/wgs x y d
 
 Altitude sonar, objects detection sonar
+sonaraltitudeestimation : chercher le plus petit rayon où il y a plus de 50% de pings qui ont une détection...
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
-l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
 essayer de déterminer un dmin et dmax entre lesquels on peut espérer voir des objets (zone < un certain seuil, avec la médiane)
 détecter les objets <= une certaine taille dans cette zone
@@ -294,6 +294,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
 
 Augmenter param z err
 

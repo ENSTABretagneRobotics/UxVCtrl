@@ -286,6 +286,11 @@ extern box box_env;
 // Environment variables.
 extern COORDSYSTEM csMap;
 
+// SonarAltitudeEstimation variables.
+extern BOOL bSonarAltitudeEstimation;
+extern CRITICAL_SECTION SonarAltitudeEstimationCS;
+extern double dmin_sonaraltitudeestimation, ratio_sonaraltitudeestimation; 
+
 // ExternalVisualLocalization variables.
 extern BOOL bExternalVisualLocalization;
 extern CRITICAL_SECTION ExternalVisualLocalizationCS;
@@ -625,6 +630,9 @@ inline int InitGlobals(void)
 		bRestartVideo[i] = FALSE;
 	}
 
+	ExternalVisualLocalizationOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+	cvSet(ExternalVisualLocalizationOverlayImg, CV_RGB(0, 0, 0), NULL);
+
 	WallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(WallOverlayImg, CV_RGB(0, 0, 0), NULL);
 
@@ -640,9 +648,6 @@ inline int InitGlobals(void)
 	SurfaceVisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 
-	ExternalVisualLocalizationOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-	cvSet(ExternalVisualLocalizationOverlayImg, CV_RGB(0, 0, 0), NULL);
-
 	PingerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
 
@@ -652,6 +657,9 @@ inline int InitGlobals(void)
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	InitCriticalSection(&SonarAltitudeEstimationCS);
+	InitCriticalSection(&ExternalVisualLocalizationCS);
+	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	InitCriticalSection(&WallCS);
 	InitCriticalSection(&WallOverlayImgCS);
 	InitCriticalSection(&PipelineCS);
@@ -662,8 +670,6 @@ inline int InitGlobals(void)
 	InitCriticalSection(&VisualObstacleOverlayImgCS);
 	InitCriticalSection(&SurfaceVisualObstacleCS);
 	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-	InitCriticalSection(&ExternalVisualLocalizationCS);
-	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	InitCriticalSection(&PingerCS);
 	InitCriticalSection(&PingerOverlayImgCS);
 	InitCriticalSection(&MissingWorkerCS);
@@ -704,8 +710,6 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&MissingWorkerCS);
 	DeleteCriticalSection(&PingerOverlayImgCS);
 	DeleteCriticalSection(&PingerCS);
-	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-	DeleteCriticalSection(&ExternalVisualLocalizationCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleCS);
 	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
@@ -716,14 +720,15 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&PipelineCS);
 	DeleteCriticalSection(&WallOverlayImgCS);
 	DeleteCriticalSection(&WallCS);
+	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
+	DeleteCriticalSection(&ExternalVisualLocalizationCS);
+	DeleteCriticalSection(&SonarAltitudeEstimationCS);
 
 	cvReleaseImage(&SeanetOverlayImg);
 
 	cvReleaseImage(&MissingWorkerOverlayImg);
 
 	cvReleaseImage(&PingerOverlayImg);
-
-	cvReleaseImage(&ExternalVisualLocalizationOverlayImg);
 
 	cvReleaseImage(&SurfaceVisualObstacleOverlayImg);
 
@@ -734,6 +739,8 @@ inline int ReleaseGlobals(void)
 	cvReleaseImage(&PipelineOverlayImg);
 
 	cvReleaseImage(&WallOverlayImg);
+
+	cvReleaseImage(&ExternalVisualLocalizationOverlayImg);
 
 	for (i = nbvideo-1; i >= 0; i--)
 	{

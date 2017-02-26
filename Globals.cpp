@@ -158,6 +158,11 @@ box box_env;
 // Environment variables.
 COORDSYSTEM csMap;
 
+// SonarAltitudeEstimation variables.
+BOOL bSonarAltitudeEstimation = FALSE;
+CRITICAL_SECTION SonarAltitudeEstimationCS;
+double dmin_sonaraltitudeestimation = 0, ratio_sonaraltitudeestimation = 0; 
+
 // ExternalVisualLocalization variables.
 BOOL bExternalVisualLocalization = FALSE;
 CRITICAL_SECTION ExternalVisualLocalizationCS;
