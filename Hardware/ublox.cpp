@@ -13,6 +13,7 @@
 THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 {
 	UBLOX ublox;
+	NMEADATA nmeadata;
 	UBXDATA ubxdata;
 	unsigned char rtcmdata[2048];
 	double dval = 0;
@@ -163,73 +164,90 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 				if (rtcmdatalen > 0) res = TransferToublox(&ublox, rtcmdata, rtcmdatalen); else res = EXIT_SUCCESS;
 
-				if (res == EXIT_SUCCESS) res = GetDataublox(&ublox, &ubxdata);
-					
+				if (res == EXIT_SUCCESS) 
+				{
+					// Temp...
+					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
+						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM) res = GetNMEASentenceublox(&ublox, &nmeadata);
+					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
+				}
+
 				if (res == EXIT_SUCCESS)
 				{
 					EnterCriticalSection(&StateVariablesCS);
 
-					// lat/lon might be temporarily bad with this... 
-					if (ubxdata.nav_status_pl.gpsFix >= 0x02)
+					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
+						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM)
 					{
-						//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
-						latitude = ubxdata.Latitude;
-						longitude = ubxdata.Longitude;
-						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-						bGPSOKublox[deviceid] = TRUE;
-					}
-					else
-					{
-						bGPSOKublox[deviceid] = FALSE;
-					}
+						//printf("GPS_quality_indicator : %d, status : %c\n", nmeadata.GPS_quality_indicator, nmeadata.status);
 
-/*
-					//printf("GPS_quality_indicator : %d, status : %c\n", ubxdata.GPS_quality_indicator, ubxdata.status);
-
-					if ((ubxdata.GPS_quality_indicator > 0)||(ubxdata.status == 'A'))
-					{
-						//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
-						latitude = ubxdata.Latitude;
-						longitude = ubxdata.Longitude;
-						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-						bGPSOKublox[deviceid] = TRUE;
-					}
-					else
-					{
-						bGPSOKublox[deviceid] = FALSE;
-					}
-
-					// Should check better if valid...
-					if ((ublox.bEnableGPRMC&&(ubxdata.status == 'A'))||ublox.bEnableGPVTG)
-					{
-						sog = ubxdata.SOG;
-						cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
-					}
-
-					if (ublox.bEnableHCHDG)
-					{
-						if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-ubxdata.Heading-angle_env);
-					}
-
-					if (ublox.bEnableIIMWV||ublox.bEnableWIMWV)
-					{
-						// Apparent wind (in robot coordinate system).
-						psiawind = fmod_2PI(-ubxdata.ApparentWindDir+M_PI); 
-						vawind = ubxdata.ApparentWindSpeed;
-						// True wind must be computed from apparent wind.
-						if (bDisableRollWindCorrectionSailboat)
-							psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
+						if ((nmeadata.GPS_quality_indicator > 0)||(nmeadata.status == 'A'))
+						{
+							//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
+							latitude = nmeadata.Latitude;
+							longitude = nmeadata.Longitude;
+							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+							bGPSOKublox[deviceid] = TRUE;
+						}
 						else
-							psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
+						{
+							bGPSOKublox[deviceid] = FALSE;
+						}
+
+						// Should check better if valid...
+						if ((ublox.bEnable_NMEA_RMC&&(nmeadata.status == 'A'))||ublox.bEnable_NMEA_VTG)
+						{
+							sog = nmeadata.SOG;
+							cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+						}
+
+						if (ublox.bEnable_NMEA_HDG)
+						{
+							if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+						}
+
+						if (ublox.bEnable_NMEA_MWV)
+						{
+							// Apparent wind (in robot coordinate system).
+							psiawind = fmod_2PI(-nmeadata.ApparentWindDir+M_PI); 
+							vawind = nmeadata.ApparentWindSpeed;
+							// True wind must be computed from apparent wind.
+							if (bDisableRollWindCorrectionSailboat)
+								psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
+							else
+								psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
+						}
+
+						if (ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA)
+						{
+							// True wind.
+							psitwind = fmod_2PI(M_PI/2.0-nmeadata.WindDir+M_PI-angle_env);
+							vtwind = nmeadata.WindSpeed;
+						}
 					}
 
-					if (ublox.bEnableWIMWD||ublox.bEnableWIMDA)
+					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
 					{
-						// True wind.
-						psitwind = fmod_2PI(M_PI/2.0-ubxdata.WindDir+M_PI-angle_env);
-						vtwind = ubxdata.WindSpeed;
+						// lat/lon might be temporarily bad with this... 
+						if (ubxdata.nav_status_pl.gpsFix >= 0x02)
+						{
+							//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
+							latitude = ubxdata.Latitude;
+							longitude = ubxdata.Longitude;
+							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+							bGPSOKublox[deviceid] = TRUE;
+							//if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)
+							{
+								sog = ubxdata.SOG;
+								cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
+							}
+						}
+						else
+						{
+							bGPSOKublox[deviceid] = FALSE;
+						}
 					}
-*/
+
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 			}

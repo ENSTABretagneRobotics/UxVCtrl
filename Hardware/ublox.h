@@ -52,15 +52,20 @@ struct UBLOX
 	double fixedLon;
 	double fixedAlt;
 	double fixedPosAcc;
-	BOOL bEnableGGA;
-	BOOL bEnableRMC;
-	BOOL bEnableGLL;
-	BOOL bEnableVTG;
-	BOOL bEnableHDG;
-	BOOL bEnableMWV;
-	BOOL bEnableMWD;
-	BOOL bEnableMDA;
-	BOOL bEnableVDM;
+	BOOL bEnable_NMEA_GGA;
+	BOOL bEnable_NMEA_RMC;
+	BOOL bEnable_NMEA_GLL;
+	BOOL bEnable_NMEA_VTG;
+	BOOL bEnable_NMEA_HDG;
+	BOOL bEnable_NMEA_MWV;
+	BOOL bEnable_NMEA_MWD;
+	BOOL bEnable_NMEA_MDA;
+	BOOL bEnable_NMEA_VDM;
+	BOOL bEnable_UBX_NAV_POSLLH;
+	BOOL bEnable_UBX_NAV_PVT;
+	BOOL bEnable_UBX_NAV_STATUS;
+	BOOL bEnable_UBX_NAV_SVIN;
+	BOOL bEnable_UBX_NAV_VELNED;
 };
 typedef struct UBLOX UBLOX;
 
@@ -142,6 +147,179 @@ inline int GetUBXPacketWithMIDublox(UBLOX* publox, int mclass, int mid, UBXDATA*
 	//}
 
 	if (ProcessPacketUBX(ptr, packetlen, mclass, mid, pUBXData) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int GetUBXPacketublox(UBLOX* publox, UBXDATA* pUBXData)
+{
+	unsigned char recvbuf[MAX_NB_BYTES_UBLOX];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	unsigned char* ptr = NULL;
+	int packetlen = 0;
+	int mclass = 0, mid = 0;
+	CHRONO chrono;
+
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_UBLOX-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired message...
+
+	nbBytesToRequest = MIN_PACKET_LENGTH_UBX;
+	if (ReadAllRS232Port(&publox->RS232Port, recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a ublox. \n");
+		return EXIT_FAILURE;
+	}
+	BytesReceived += nbBytesToRequest;
+	
+	for (;;)
+	{
+		res = FindPacketUBX(recvbuf, BytesReceived, &mclass, &mid, &packetlen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
+		{
+			nbBytesToRequest = nbBytesDiscarded;
+		}	
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
+		{
+			printf("Error reading data from a ublox : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+		if (ReadAllRS232Port(&publox->RS232Port, recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a ublox. \n");
+			return EXIT_FAILURE;
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
+		{
+			printf("Error reading data from a ublox : Packet timeout. \n");
+			return EXIT_TIMEOUT;
+		}
+	}
+
+	if (BytesReceived-nbBytesDiscarded-packetlen > 0)
+	{
+		printf("Warning getting data from a ublox : Unexpected data after a packet. \n");
+	}
+
+	//// Get data bytes.
+
+	//memset(databuf, 0, databuflen);
+
+	//// Check the number of data bytes before copy.
+	//if (databuflen < *ppacketlen)
+	//{
+	//	printf("Error getting data from a ublox : Too small data buffer. \n");
+	//	return EXIT_FAILURE;
+	//}
+
+	//// Copy the data bytes of the message.
+	//if (*ppacketlen > 0)
+	//{
+	//	memcpy(databuf, ptr, *ppacketlen);
+	//}
+
+	if (ProcessPacketUBX(ptr, packetlen, mclass, mid, pUBXData) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int GetNMEASentenceublox(UBLOX* publox, NMEADATA* pNMEAData)
+{
+	char recvbuf[MAX_NB_BYTES_UBLOX];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	char* ptr = NULL;
+	int sentencelen = 0;
+	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA];
+	char mnemonic[NB_BYTES_MNEMONIC_NMEA];
+	CHRONO chrono;
+
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_UBLOX-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired message...
+
+	nbBytesToRequest = MIN_NB_BYTES_SENTENCE_NMEA;
+	if (ReadAllRS232Port(&publox->RS232Port, (uint8*)recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a ublox. \n");
+		return EXIT_FAILURE;
+	}
+	BytesReceived += nbBytesToRequest;
+	
+	for (;;)
+	{
+		memset(talkerid, 0, sizeof(talkerid));
+		memset(mnemonic, 0, sizeof(mnemonic));
+		res = FindSentenceNMEA(recvbuf, BytesReceived, talkerid, mnemonic, &sentencelen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
+		{
+			nbBytesToRequest = nbBytesDiscarded;
+		}	
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
+		{
+			printf("Error reading data from a ublox : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+		if (ReadAllRS232Port(&publox->RS232Port, (uint8*)recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a ublox. \n");
+			return EXIT_FAILURE;
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
+		{
+			printf("Error reading data from a ublox : Sentence timeout. \n");
+			return EXIT_TIMEOUT;
+		}
+	}
+
+	if (BytesReceived-nbBytesDiscarded-sentencelen > 0)
+	{
+		printf("Warning getting data from a ublox : Unexpected data after a sentence. \n");
+	}
+
+	//// Get data bytes.
+
+	//memset(databuf, 0, databuflen);
+
+	//// Check the number of data bytes before copy.
+	//if (databuflen < *psentencelen)
+	//{
+	//	printf("Error getting data from a ublox : Too small data buffer. \n");
+	//	return EXIT_FAILURE;
+	//}
+
+	//// Copy the data bytes of the message.
+	//if (*psentencelen > 0)
+	//{
+	//	memcpy(databuf, ptr, *psentencelen);
+	//}
+
+	if (ProcessSentenceNMEA(ptr, sentencelen, talkerid, mnemonic, pNMEAData) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -317,28 +495,28 @@ inline int GetLatestDataublox(UBLOX* publox, UBXDATA* pUBXData)
 	// But normally we should not have to get more data unless we did not wait enough
 	// for the desired message...
 
-	if (publox->bEnableGGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
-	if (publox->bEnableRMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
-	if (publox->bEnableGLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
-	if (publox->bEnableVTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
-	if (publox->bEnableHDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
+	if (publox->bEnable_NMEA_GGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
+	if (publox->bEnable_NMEA_RMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
+	if (publox->bEnable_NMEA_GLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
+	if (publox->bEnable_NMEA_VTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
+	if (publox->bEnable_NMEA_HDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
 	if (publox->bEnableIIMWV) ptr_IIMWV = FindLatestSentenceNMEA("$IIMWV", recvbuf);
-	if (publox->bEnableMWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
-	if (publox->bEnableMWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
-	if (publox->bEnableMDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
-	if (publox->bEnableVDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
+	if (publox->bEnable_NMEA_MWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
+	if (publox->bEnable_NMEA_MWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
+	if (publox->bEnable_NMEA_MDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
+	if (publox->bEnable_NMEA_VDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
 
 	while (
-		(publox->bEnableGGA&&!ptr_GPGGA)||
-		(publox->bEnableRMC&&!ptr_GPRMC)||
-		(publox->bEnableGLL&&!ptr_GPGLL)||
-		(publox->bEnableVTG&&!ptr_GPVTG)||
-		(publox->bEnableHDG&&!ptr_HCHDG)||
+		(publox->bEnable_NMEA_GGA&&!ptr_GPGGA)||
+		(publox->bEnable_NMEA_RMC&&!ptr_GPRMC)||
+		(publox->bEnable_NMEA_GLL&&!ptr_GPGLL)||
+		(publox->bEnable_NMEA_VTG&&!ptr_GPVTG)||
+		(publox->bEnable_NMEA_HDG&&!ptr_HCHDG)||
 		(publox->bEnableIIMWV&&!ptr_IIMWV)||
-		(publox->bEnableMWV&&!ptr_WIMWV)||
-		(publox->bEnableMWD&&!ptr_WIMWD)||
-		(publox->bEnableMDA&&!ptr_WIMDA)||
-		(publox->bEnableVDM&&!ptr_AIVDM)
+		(publox->bEnable_NMEA_MWV&&!ptr_WIMWV)||
+		(publox->bEnable_NMEA_MWD&&!ptr_WIMWD)||
+		(publox->bEnable_NMEA_MDA&&!ptr_WIMDA)||
+		(publox->bEnable_NMEA_VDM&&!ptr_AIVDM)
 		)
 	{
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
@@ -363,16 +541,16 @@ inline int GetLatestDataublox(UBLOX* publox, UBXDATA* pUBXData)
 			fflush(publox->pfSaveFile);
 		}
 		BytesReceived += Bytes;
-		if (publox->bEnableGGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
-		if (publox->bEnableRMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
-		if (publox->bEnableGLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
-		if (publox->bEnableVTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
-		if (publox->bEnableHDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
+		if (publox->bEnable_NMEA_GGA) ptr_GPGGA = FindLatestSentenceNMEA("$GPGGA", recvbuf);
+		if (publox->bEnable_NMEA_RMC) ptr_GPRMC = FindLatestSentenceNMEA("$GPRMC", recvbuf);
+		if (publox->bEnable_NMEA_GLL) ptr_GPGLL = FindLatestSentenceNMEA("$GPGLL", recvbuf);
+		if (publox->bEnable_NMEA_VTG) ptr_GPVTG = FindLatestSentenceNMEA("$GPVTG", recvbuf);
+		if (publox->bEnable_NMEA_HDG) ptr_HCHDG = FindLatestSentenceNMEA("$HCHDG", recvbuf);
 		if (publox->bEnableIIMWV) ptr_IIMWV = FindLatestSentenceNMEA("$IIMWV", recvbuf);
-		if (publox->bEnableMWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
-		if (publox->bEnableMWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
-		if (publox->bEnableMDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
-		if (publox->bEnableVDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
+		if (publox->bEnable_NMEA_MWV) ptr_WIMWV = FindLatestSentenceNMEA("$WIMWV", recvbuf);
+		if (publox->bEnable_NMEA_MWD) ptr_WIMWD = FindLatestSentenceNMEA("$WIMWD", recvbuf);
+		if (publox->bEnable_NMEA_MDA) ptr_WIMDA = FindLatestSentenceNMEA("$WIMDA", recvbuf);
+		if (publox->bEnable_NMEA_VDM) ptr_AIVDM = FindLatestSentenceNMEA("!AIVDM", recvbuf);
 	}
 
 	// Analyze data.
@@ -624,14 +802,28 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->timeout = 1000;
 		publox->bSaveRawData = 1;
 		publox->bRevertToDefaultCfg = 1;
-		publox->bSetBaseCfg = 1;
-		publox->SurveyMode = 1;
+		publox->bSetBaseCfg = 0;
+		publox->SurveyMode = 0;
 		publox->svinMinDur = 30;
 		publox->svinAccLimit = 10;
 		publox->fixedLat = 0;
 		publox->fixedLon = 0;
 		publox->fixedAlt = 0;
 		publox->fixedPosAcc = 10;
+		publox->bEnable_NMEA_GGA = 0;
+		publox->bEnable_NMEA_RMC = 0;
+		publox->bEnable_NMEA_GLL = 0;
+		publox->bEnable_NMEA_VTG = 0;
+		publox->bEnable_NMEA_HDG = 0;
+		publox->bEnable_NMEA_MWV = 0;
+		publox->bEnable_NMEA_MWD = 0;
+		publox->bEnable_NMEA_MDA = 0;
+		publox->bEnable_NMEA_VDM = 0;
+		publox->bEnable_UBX_NAV_POSLLH = 1;
+		publox->bEnable_UBX_NAV_PVT = 1;
+		publox->bEnable_UBX_NAV_STATUS = 1;
+		publox->bEnable_UBX_NAV_SVIN = 0;
+		publox->bEnable_UBX_NAV_VELNED = 0;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -663,6 +855,34 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &publox->fixedAlt) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &publox->fixedPosAcc) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_GGA) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_RMC) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_GLL) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_VTG) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_HDG) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_MWV) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_MWD) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_MDA) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_VDM) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_POSLLH) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_PVT) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_STATUS) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_SVIN) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_VELNED) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else

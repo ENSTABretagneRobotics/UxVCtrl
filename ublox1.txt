@@ -25,3 +25,31 @@ COM14
 0
 % fixedPosAcc (in m)
 10
+% bEnable_NMEA_GGA
+0
+% bEnable_NMEA_RMC
+0
+% bEnable_NMEA_GLL
+0
+% bEnable_NMEA_VTG
+0
+% bEnable_NMEA_HDG
+0
+% bEnable_NMEA_MWV
+0
+% bEnable_NMEA_MWD
+0
+% bEnable_NMEA_MDA
+0
+% bEnable_NMEA_VDM
+0
+% bEnable_UBX_NAV_POSLLH
+1
+% bEnable_UBX_NAV_PVT
+1
+% bEnable_UBX_NAV_STATUS
+1
+% bEnable_UBX_NAV_SVIN
+0
+% bEnable_UBX_NAV_VELNED
+0

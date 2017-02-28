@@ -227,12 +227,12 @@ struct NAV_PVT_PL_UBX
 	long velE; // In mm/s.
 	long velD; // In mm/s.
 	long gSpeed; // In mm/s.
-	long headMot; // In 1e5 deg.
+	long headMot; // In 1e-5 deg.
 	unsigned long sAcc; // In mm/s.
-	unsigned long headAcc; // In 1e5 deg.
+	unsigned long headAcc; // In 1e-5 deg.
 	unsigned short pDOP; // In 0.01.
 	unsigned char reserved1[6];
-	long headVeh; // In 1e5 deg.
+	long headVeh; // In 1e-5 deg.
 	unsigned char reserved2[4];
 	//unsigned char padding[4];
 };
@@ -664,6 +664,8 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 	unsigned char* payload = packet+MIN_PACKET_LENGTH_UBX-NB_BYTES_CHECKSUM_UBX;
 	int payloadlen = packetlen-MIN_PACKET_LENGTH_UBX;
 
+	UNREFERENCED_PARAMETER(payloadlen);
+
 	//memset(pUBXData, 0, sizeof(UBXDATA));
 
 	switch (mclass)
@@ -701,6 +703,8 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 			pUBXData->hour = pUBXData->nav_pvt_pl.hour;
 			pUBXData->minute = pUBXData->nav_pvt_pl.minute; 
 			pUBXData->second = pUBXData->nav_pvt_pl.sec+0.000000001*pUBXData->nav_pvt_pl.nano;	
+			pUBXData->SOG = pUBXData->nav_pvt_pl.gSpeed/1000.0; // In m/s.
+			pUBXData->COG = pUBXData->nav_pvt_pl.headMot*0.00001*M_PI/180.0; // In rad.
 			break;
 		case NAV_STATUS_ID_UBX:
 			memcpy(&pUBXData->nav_status_pl, payload, sizeof(pUBXData->nav_status_pl));

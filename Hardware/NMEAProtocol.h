@@ -515,6 +515,8 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	char aisbuf[128];
 	int aisbuflen = 0, i = 0, offset = 0;
 
+	UNREFERENCED_PARAMETER(sentencelen);
+
 	//memset(pNMEAData, 0, sizeof(NMEADATA));
 
 	// GPS essential fix data.
