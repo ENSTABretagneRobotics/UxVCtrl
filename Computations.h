@@ -12,6 +12,7 @@
 
 #include "OSCore.h"
 #include "rmatrix.h"
+
 #include <deque>
 #include <numeric>
 #include <list>

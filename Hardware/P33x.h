@@ -32,20 +32,10 @@ struct P33X
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	double PressureRef;
+	double WaterDensity;
 };
 typedef struct P33X P33X;
-
-/*
-Get the depth from the pressure, assuming that the pressure at the surface is 1 bar.
-
-double pressure : (IN) Pressure in bar.
-
-Return : The depth in m.
-*/
-inline double Pressure2Height(double pressure)
-{
-	return -(pressure-1)*1e5/(1000.0*9.8);
-}
 
 /*
 Initialize a P33x.
@@ -246,6 +236,8 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 		pP33x->BaudRate = 9600;
 		pP33x->timeout = 1000;
 		pP33x->bSaveRawData = 1;
+		pP33x->PressureRef = 1;
+		pP33x->WaterDensity = 1000;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -259,6 +251,10 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pP33x->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pP33x->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pP33x->PressureRef) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pP33x->WaterDensity) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else

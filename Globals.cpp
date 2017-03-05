@@ -64,6 +64,8 @@ double light = 0, tilt = 0;
 
 double rudderminangle = 0, ruddermaxangle = 0;
 
+double Energy_electronics = 0, Energy_actuators = 0;
+
 // Parameters.
 int robid = 0, nbvideo = 0, 
 videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0; 
@@ -127,6 +129,10 @@ int observerperiod = 0;
 // Wind, current and waves.
 double vtwind_med = 0, vtwind_var = 0, psitwind_med = 0, psitwind_var = 0, wind_filter_coef = 0;
 double vc_med = 0, vc_var = 0, psic_med = 0, psic_var = 0, hw_var = 0;
+
+// Power consumption.
+double P_electronics_1 = 0, P_electronics_2 = 0, P_electronics_3 = 0, P_electronics_4 = 0;
+double P_actuators_1 = 0, P_actuators_2 = 0, P_actuators_3 = 0, P_actuators_4 = 0;
 
 // Simulator initial state.
 double x_0 = 0, y_0 = 0, z_0 = 0, theta_0 = 0, vxy_0 = 0, omega_0 = 0;

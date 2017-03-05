@@ -821,6 +821,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
+			if (bShowBatteryInfo)
+			{
+				sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", Energy_electronics, Energy_actuators); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			}
 			if (bWaypointControl)
 			{
 				if (bDispLLA)

@@ -129,6 +129,9 @@ inline int LoadConfig(void)
 	psic_med = 0.0*M_PI/2.0;
 	psic_var = 1.0*M_PI/8.0;
 	hw_var = 0.1;
+	// Power consumption.
+	P_electronics_1 = 0; P_electronics_2 = 0; P_electronics_3 = 0; P_electronics_4 = 0;
+	P_actuators_1 = 0; P_actuators_2 = 0; P_actuators_3 = 0; P_actuators_4 = 0;
 	// Simulated submarine initial state.
 	x_0 = 0; y_0 = 0; z_0 = 0; theta_0 = 0; vxy_0 = 0; omega_0 = 0;
 	alpha_0 = 0; d_0 = 0;
@@ -425,6 +428,24 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &psic_var) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &hw_var) != 1) printf("Invalid configuration file.\n");
+
+		// Power consumption.
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_electronics_1) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_electronics_2) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_electronics_3) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_electronics_4) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_actuators_1) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_actuators_2) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_actuators_3) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &P_actuators_4) != 1) printf("Invalid configuration file.\n");
 
 		// Simulated submarine initial state.
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

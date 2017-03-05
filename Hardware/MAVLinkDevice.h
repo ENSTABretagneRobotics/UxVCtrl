@@ -31,6 +31,19 @@
 #pragma warning(default : 4201) 
 #endif // _MSC_VER
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#if !defined(NOMINMAX)
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // min
+#endif // !defined(NOMINMAX)
+#endif // _WIN32
+
 #define TIMEOUT_MESSAGE_MAVLINKDEVICE 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_MAVLINKDEVICE 2048
@@ -840,5 +853,15 @@ inline int DisconnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice)
 #ifndef DISABLE_MAVLINKDEVICETHREAD
 THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam);
 #endif // DISABLE_MAVLINKDEVICETHREAD
+
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // _WIN32
 
 #endif // MAVLINKDEVICE_H

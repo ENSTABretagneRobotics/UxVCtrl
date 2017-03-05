@@ -245,8 +245,8 @@ inline int GetNMEASentenceublox(UBLOX* publox, NMEADATA* pNMEAData)
 	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
 	char* ptr = NULL;
 	int sentencelen = 0;
-	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA];
-	char mnemonic[NB_BYTES_MNEMONIC_NMEA];
+	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA+1]; // +1 for the null terminator character for strings.
+	char mnemonic[NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
 	CHRONO chrono;
 
 	StartChrono(&chrono);

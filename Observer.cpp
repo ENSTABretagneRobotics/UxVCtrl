@@ -35,7 +35,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	}
 
 	fprintf(logstatefile, 
-		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;tv_sec;tv_usec;lathat;longhat;althat;headinghat;\n"
+		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;tv_sec;tv_usec;lathat;longhat;althat;headinghat;Energy_electronics;Energy_actuators;\n"
 		); 
 	fflush(logstatefile);
 
@@ -209,9 +209,40 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 		headinghat = (fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
+		switch (robid)
+		{
+		case SUBMARINE_SIMULATOR_ROBID:
+		case SAUCISSE_ROBID:
+		case SARDINE_ROBID:
+		case VENI_ROBID:
+		case VEDI_ROBID:
+		case VICI_ROBID:
+		case JACK_ROBID:
+			Energy_electronics += dt*(P_electronics_4)/3600.0;
+			Energy_actuators += dt*((u1+u2+u3)*P_actuators_1+P_actuators_4)/3600.0;
+			break;
+		case VAIMOS_ROBID:
+		case SAILBOAT_ROBID:
+		case MOTORBOAT_ROBID:
+		case BUGGY_ROBID:
+			Energy_electronics += dt*(P_electronics_4)/3600.0;
+			Energy_actuators += dt*(u*P_actuators_1+uw*P_actuators_2+uw*P_actuators_4)/3600.0;
+			break;
+		case HOVERCRAFT_ROBID:
+		case TREX_ROBID:
+			Energy_electronics += dt*(P_electronics_4)/3600.0;
+			Energy_actuators += dt*((u1+u2)*P_actuators_1+P_actuators_4)/3600.0;
+			break;
+		case QUADRO_ROBID:
+		default:
+			Energy_electronics += dt*(P_electronics_4)/3600.0;
+			Energy_actuators += dt*((u+uw+uv+ul)*P_actuators_1+P_actuators_4)/3600.0;
+			break;
+		}
+
 		// Log.
 		fprintf(logstatefile, 			
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%f;%f;%f;%f;\n", 
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%f;%f;%f;%f;%.3f;%.3f;\n", 
 			t, 
 			Center(xhat), Center(yhat), Center(zhat), Center(thetahat), 
 			Center(vxyhat), Center(omegahat), 
@@ -219,7 +250,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			u, uw,
 			xhat.inf, xhat.sup, yhat.inf, yhat.sup, zhat.inf, zhat.sup, thetahat.inf, thetahat.sup, 
 			vxyhat.inf, vxyhat.sup, omegahat.inf, omegahat.sup,
-			(int)tv.tv_sec, (int)tv.tv_usec, lathat, longhat, althat, headinghat
+			(int)tv.tv_sec, (int)tv.tv_usec, lathat, longhat, althat, headinghat,
+			Energy_electronics, Energy_actuators
 			);
 		fflush(logstatefile);
 

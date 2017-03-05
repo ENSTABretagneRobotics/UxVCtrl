@@ -192,6 +192,8 @@ extern double light, tilt;
 
 extern double rudderminangle, ruddermaxangle;
 
+extern double Energy_electronics, Energy_actuators;
+
 // Parameters.
 extern int robid, nbvideo, 
 videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
@@ -255,6 +257,10 @@ extern int observerperiod;
 // Wind, current and waves.
 extern double vtwind_med, vtwind_var, psitwind_med, psitwind_var, wind_filter_coef;
 extern double vc_med, vc_var, psic_med, psic_var, hw_var;
+
+// Power consumption.
+extern double P_electronics_1, P_electronics_2, P_electronics_3, P_electronics_4;
+extern double P_actuators_1, P_actuators_2, P_actuators_3, P_actuators_4;
 
 // Simulator initial state.
 extern double x_0, y_0, z_0, theta_0, vxy_0, omega_0;

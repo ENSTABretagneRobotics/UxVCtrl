@@ -264,6 +264,23 @@
 0
 % hw_var (amplitude des vagues en m)
 0
+% Power consumption
+% P_electronics_1 (in W)
+0
+% P_electronics_2 (in W)
+0
+% P_electronics_3 (in W)
+0
+% P_electronics_4 (in W)
+35
+% P_actuators_1 (in W)
+90
+% P_actuators_2 (in W)
+0
+% P_actuators_3 (in W)
+0
+% P_actuators_4 (in W)
+0.4
 % Simulated submarine initial state
 % x_0 (in m)
 0

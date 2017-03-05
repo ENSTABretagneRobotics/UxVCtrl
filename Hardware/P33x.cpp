@@ -103,7 +103,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				EnterCriticalSection(&StateVariablesCS);
-				z_mes = Pressure2Height(pressure);
+				z_mes = Pressure2Height(pressure, p33x.PressureRef, p33x.WaterDensity);
 				LeaveCriticalSection(&StateVariablesCS);
 
 				if (p33x.bSaveRawData)
