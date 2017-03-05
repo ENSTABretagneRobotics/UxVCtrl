@@ -242,7 +242,15 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		// Log.
 		fprintf(logstatefile, 			
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%f;%f;%f;%f;%.3f;%.3f;\n", 
+			"%f;"
+			"%.3f;%.3f;%.3f;%f;"
+			"%f;%f;"
+			"%f;%f;%f;"
+			"%f;%f;"
+			"%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%f;%f;"
+			"%f;%f;%f;%f;"
+			"%d;%d;%.8f;%.8f;%.3f;%.1f;"
+			"%.3f;%.3f;\n", 
 			t, 
 			Center(xhat), Center(yhat), Center(zhat), Center(thetahat), 
 			Center(vxyhat), Center(omegahat), 

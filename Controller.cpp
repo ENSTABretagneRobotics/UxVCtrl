@@ -391,10 +391,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			}
 
 			// Temporary...
-			fprintf(lognavfile, "%d;%f;%f;%f;%.3f;%.3f;%.3f;"
+			fprintf(lognavfile, "%d;%f;%.8f;%.8f;%.3f;%.3f;%.3f;"
 				"%.3f;%.1f;%.3f;%.1f;%.3f;%.3f;%.3f;"
-				"%f;%f;%.2f;%.2f;%.2f;%.2f;%.2f;%.2f;%d;"
-				"%f;%f;%.2f;%.2f;%.2f;%d;"
+				"%.8f;%.8f;%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%d;"
+				"%.8f;%.8f;%.3f;%.3f;%.3f;%d;"
 				"%.3f;%.3f;%.3f;%.3f;%.3f;\n", 
 				counter, t, lat_env, long_env, roll, pitch, yaw, 
 				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.

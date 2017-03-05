@@ -67,7 +67,7 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			if (GetLatestDataSwarmonDevice(&swarmondevice, &swarmondata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
-				printf("%f;%f\n", swarmondata.Latitude, swarmondata.Longitude);
+				printf("%.8f;%.8f\n", swarmondata.Latitude, swarmondata.Longitude);
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else

@@ -156,7 +156,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 
 		// Log.
-		fprintf(logsimufile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
+		fprintf(logsimufile, "%f;%.3f;%.3f;%.3f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
 			t, x, y, z, theta, vxy, omega, alpha, d, u1, u2, u3,
 			(int)tv.tv_sec, (int)tv.tv_usec
 			);

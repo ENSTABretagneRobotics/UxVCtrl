@@ -172,7 +172,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						"%f;%f;%f;"
 						"%f;%f;%f;"
 						"%f;%f;%f;"
-						"%f;%f;%f;"
+						"%.8f;%.8f;%f;"
 						"%f;%f;%f;"
 						"%d;%d;\n", 
 						(int)sbgdata.TS, (int)0, 

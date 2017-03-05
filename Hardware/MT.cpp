@@ -170,7 +170,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 						"%f;%f;%f;"
 						"%f;%f;%f;"
 						"%f;%f;%f;"
-						"%f;%f;%f;"
+						"%.8f;%.8f;%f;"
 						"%f;%f;%f;"
 						"%d;%d;\n", 
 						(int)mtdata.TS, (int)0, 
