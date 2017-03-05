@@ -17,6 +17,19 @@
 #include "AIS.h"
 #endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#if !defined(NOMINMAX)
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // min
+#endif // !defined(NOMINMAX)
+#endif // _WIN32
+
 #pragma region NMEA-SPECIFIC DEFINITIONS
 // A NMEA sentence begins with a '$' and ends with a carriage return/line feed sequence and can 
 // be no longer than 80 characters of visible text (plus the line terminators). The data is contained 
@@ -102,7 +115,7 @@ inline void ComputeChecksumNMEA(char* sentence, int sentencelen, char* checksum)
 		res ^= sentence[i];
 		i++;
 	}
-	sprintf(checksum, "*%02x", (int)res);
+	sprintf(checksum, "*%02X", (int)res);
 }
 
 /*
@@ -154,11 +167,16 @@ inline int AnalyzeSentenceNMEA(char* buf, int buflen, char* talkerid, char* mnem
 	memset(talkerid, 0, MAX_NB_BYTES_TALKER_ID_NMEA+1); // +1 for the null terminator character for strings.
 	memset(mnemonic, 0, NB_BYTES_MNEMONIC_NMEA+1); // +1 for the null terminator character for strings.
 	// Start at i = 1 because of the start character...
-	for (i = 1; i <= MAX_NB_BYTES_ADDRESS_NMEA+1; i++)
+	for (i = 1; i < min(buflen, 1+MAX_NB_BYTES_ADDRESS_NMEA+1); i++)
 	{
 		if ((buf[i] == ',')||(buf[i] == '*')||(buf[i] == '\r')||(buf[i] == '\n')) break;
 	}
-	if (i == MIN_NB_BYTES_TALKER_ID_NMEA+NB_BYTES_MNEMONIC_NMEA+1)
+	if (i == buflen)
+	{
+		*pnbBytesToRequest = nb_bytes_end;
+		return EXIT_OUT_OF_MEMORY;
+	}
+	else if (i == MIN_NB_BYTES_TALKER_ID_NMEA+NB_BYTES_MNEMONIC_NMEA+1)
 	{
 		talkerid[0] = buf[1];
 	}
@@ -204,6 +222,10 @@ inline int AnalyzeSentenceNMEA(char* buf, int buflen, char* talkerid, char* mnem
 			nb_bytes_end = MAX_NB_BYTES_END_NMEA;
 		}
 	}
+	else
+	{
+		*psentencelen = offset;
+	}
 
 	// If there is a checksum, check it.
 	if (buf[*psentencelen-MAX_NB_BYTES_CHECKSUM_NMEA-nb_bytes_end] == '*')
@@ -211,6 +233,7 @@ inline int AnalyzeSentenceNMEA(char* buf, int buflen, char* talkerid, char* mnem
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
 		if ((buf[*psentencelen-2-nb_bytes_end] != checksum[1])||(buf[*psentencelen-1-nb_bytes_end] != checksum[2]))
 		{ 
+			printf("Warning : NMEA checksum error. \n");
 			*pnbBytesToDiscard = *psentencelen;
 			return EXIT_FAILURE;	
 		}
@@ -392,6 +415,10 @@ inline int AnalyzeSentenceWithAddressNMEA(char* buf, int buflen, char* talkerid,
 			nb_bytes_end = MAX_NB_BYTES_END_NMEA;
 		}
 	}
+	else
+	{
+		*psentencelen = offset;
+	}
 
 	// If there is a checksum, check it.
 	if (buf[*psentencelen-MAX_NB_BYTES_CHECKSUM_NMEA-nb_bytes_end] == '*')
@@ -399,6 +426,7 @@ inline int AnalyzeSentenceWithAddressNMEA(char* buf, int buflen, char* talkerid,
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
 		if ((buf[*psentencelen-2-nb_bytes_end] != checksum[1])||(buf[*psentencelen-1-nb_bytes_end] != checksum[2]))
 		{ 
+			printf("Warning : NMEA checksum error. \n");
 			*pnbBytesToDiscard = *psentencelen;
 			return EXIT_FAILURE;	
 		}
@@ -816,5 +844,15 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 
 	return EXIT_SUCCESS;
 }
+
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // _WIN32
 
 #endif // NMEAPROTOCOL_H

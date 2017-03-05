@@ -1,3 +1,7 @@
+143
+Updated ublox.
+Added bEnable_UBX_NAV_SOL parameter for ublox for ArduPilot compatibility.
+
 142
 Added PressureRef and WaterDensity parameters for P33x.
 Added P_electronics_XXX and P_actuators_XXX parameters for energy monitoring.

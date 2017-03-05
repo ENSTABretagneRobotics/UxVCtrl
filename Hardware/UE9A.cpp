@@ -55,6 +55,8 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 			if (ConnectUE9A(&ue9a, "UE9A0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				memset(pulseWidths, 0, sizeof(pulseWidths));
 			}
 			else 
 			{

@@ -69,6 +69,9 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			{
 				bConnected = TRUE; 
 
+				memset(&tv, 0, sizeof(tv));
+				memset(&mtdata, 0, sizeof(mtdata));
+
 				if (mt.pfSaveFile != NULL)
 				{
 					fclose(mt.pfSaveFile); 

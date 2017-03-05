@@ -66,6 +66,10 @@
 #include "OpenCVGUI.h"
 #include "Commands.h"
 
+#if !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
+#include <valgrind/memcheck.h>
+#endif // !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
+
 int main(int argc, char* argv[]) 
 {
 	int i = 0;
@@ -132,6 +136,10 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER OpenCVGUIThreadId[MAX_NB_VIDEO];
 
 	INIT_DEBUG;
+
+#if !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
+	VALGRIND_DO_LEAK_CHECK;
+#endif // !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
 
 	// Disable buffering for printf()...
 	setbuf(stdout, NULL);
@@ -216,6 +224,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 	if (bMAVLinkInterface) CreateDefaultThread(MAVLinkInterfaceThread, NULL, &MAVLinkInterfaceThreadId);
+	if (bMAVLinkInterface) DetachThread(MAVLinkInterfaceThreadId); // Not easy to stop it correctly...
 #endif // ENABLE_MAVLINK_SUPPORT
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
@@ -289,7 +298,7 @@ int main(int argc, char* argv[])
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
 #ifdef ENABLE_MAVLINK_SUPPORT
-	// No way to stop it correctly...
+	// Not easy to stop it correctly...
 	//if (bMAVLinkInterface) WaitForThread(MAVLinkInterfaceThreadId);
 	if (bMAVLinkInterface) mSleep(100);
 #endif // ENABLE_MAVLINK_SUPPORT

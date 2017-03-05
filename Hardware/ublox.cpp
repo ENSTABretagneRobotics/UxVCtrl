@@ -18,6 +18,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	unsigned char rtcmdata[2048];
 	double dval = 0;
 	int res = 0;
+	CHRONO chrono_svin;
 	BOOL bConnected = FALSE;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
@@ -28,18 +29,17 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	//UNREFERENCED_PARAMETER(pParam);
 
 /*
-
-	char* buf = "$GPRMC,163634.000,A,4825.0961,N,00428.3419,W,0.00,309.63,150512,,,A*70\r\n";
-	int buflen = strlen(buf)+1;
+	//char* buf = "$GPRMC,163634.000,A,4825.0961,N,00428.3419,W,0.00,309.63,150512,,,A*70\r\n";
+	//char* buf = "$GPRMC,163634.000,A,4825.0961,N,00428.3419,W,0.00,309.63,150512,,,A\n";
+	char* buf = "$GPR";
+	//int buflen = strlen(buf)+1;
+	int buflen = strlen(buf);
 	int sentencelen = 0, nbBytesToRequest = 0, nbBytesToDiscard = 0;
-	char talkerid[3];
-	char mnemonic[4];
+	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA+1]; // +1 for the null terminator character for strings.
+	char mnemonic[NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
 
 	AnalyzeSentenceNMEA(buf, buflen, talkerid, mnemonic, &sentencelen, 
 								  &nbBytesToRequest, &nbBytesToDiscard);
-
-
-
 */
 
 	sprintf(szCfgFilePath, "ublox%d.txt", deviceid);
@@ -47,6 +47,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	memset(&ublox, 0, sizeof(UBLOX));
 
 	bGPSOKublox[deviceid] = FALSE;
+
+	StartChrono(&chrono_svin);
 
 	for (;;)
 	{
@@ -83,6 +85,12 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			if (Connectublox(&ublox, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				memset(&nmeadata, 0, sizeof(nmeadata));
+				memset(&ubxdata, 0, sizeof(ubxdata));
+				memset(rtcmdata, 0, sizeof(rtcmdata));
+				StopChronoQuick(&chrono_svin);
+				StartChrono(&chrono_svin);
 
 				if (ublox.pfSaveFile != NULL)
 				{
@@ -123,28 +131,32 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 		}
 		else
 		{
+			res = EXIT_SUCCESS;
 			if (ublox.SurveyMode != DISABLED_SURVEY_RECEIVER_MODE_UBX)
 			{
 				// This ublox is a RTK base, that should share RTCM corrections...
 
-				int ReceivedBytes = 0;
-				res = GetRawDataublox(&ublox, rtcmdata, sizeof(rtcmdata), &ReceivedBytes);
-
-				if (res == EXIT_SUCCESS)
+				if ((!ublox.bSetBaseCfg)||(GetTimeElapsedChronoQuick(&chrono_svin) > ublox.svinMinDur+TIMEOUT_MESSAGE_UBLOX))
 				{
-					if (ReceivedBytes > 0) 
+					int ReceivedBytes = 0;
+					res = GetRawDataublox(&ublox, rtcmdata, sizeof(rtcmdata), &ReceivedBytes);
+
+					if (res == EXIT_SUCCESS)
 					{
-						EnterCriticalSection(&StateVariablesCS);
-						for (int k = 0; k < ReceivedBytes; k++)
+						if (ReceivedBytes > 0) 
 						{
-							unsigned char rtcmbyte = rtcmdata[k];
-							for (unsigned int j = 0; j < RTCMuserslist.size(); j++)
+							EnterCriticalSection(&StateVariablesCS);
+							for (int k = 0; k < ReceivedBytes; k++)
 							{
-								RTCMuserslist[j].push_back(rtcmbyte);
-								if (RTCMuserslist[j].size() > MAX_NB_BYTES_RTCM_PARTS) RTCMuserslist[j].pop_front();
+								unsigned char rtcmbyte = rtcmdata[k];
+								for (unsigned int j = 0; j < RTCMuserslist.size(); j++)
+								{
+									RTCMuserslist[j].push_back(rtcmbyte);
+									if (RTCMuserslist[j].size() > MAX_NB_BYTES_RTCM_PARTS) RTCMuserslist[j].pop_front();
+								}
 							}
+							LeaveCriticalSection(&StateVariablesCS);
 						}
-						LeaveCriticalSection(&StateVariablesCS);
 					}
 				}
 			}
@@ -153,11 +165,11 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				// This ublox is a RTK rover, that should receive any available RTCM corrections...
 
 				EnterCriticalSection(&StateVariablesCS);
-				int rtcmdatalen = min(RTCMusers[deviceid].size(), sizeof(rtcmdata));
+				int rtcmdatalen = min(RTCMuserslist[deviceid].size(), sizeof(rtcmdata));
 				for (int k = 0; k < rtcmdatalen; k++)
 				{
-					unsigned char rtcmbyte = RTCMusers[deviceid][RTCMusers[deviceid].size()-1];
-					RTCMusers[deviceid].pop_back();
+					unsigned char rtcmbyte = RTCMuserslist[deviceid][0];
+					RTCMuserslist[deviceid].pop_front();
 					rtcmdata[k] = rtcmbyte;
 				}
 				LeaveCriticalSection(&StateVariablesCS);
@@ -169,7 +181,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 					// Temp...
 					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
 						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM) res = GetNMEASentenceublox(&ublox, &nmeadata);
-					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
+					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
 				}
 
 				if (res == EXIT_SUCCESS)
@@ -226,7 +238,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						}
 					}
 
-					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
+					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
 					{
 						// lat/lon might be temporarily bad with this... 
 						if (ubxdata.nav_status_pl.gpsFix >= 0x02)
@@ -263,6 +275,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_svin);
 
 	bGPSOKublox[deviceid] = FALSE;
 

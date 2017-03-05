@@ -12,6 +12,19 @@
 
 #include "OSMisc.h"
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#if !defined(NOMINMAX)
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // min
+#endif // !defined(NOMINMAX)
+#endif // _WIN32
+
 //#pragma pack(show)
 
 // Check for potential paddings in bitfields and structs, check their size and the sum of the size of their fields!
@@ -86,7 +99,14 @@
 #define NMEA_STD_GSV_ID_UBX 0x03
 #define NMEA_STD_RMC_ID_UBX 0x04
 #define NMEA_STD_VTG_ID_UBX 0x05
-#define NMEA_STD_TXT_ID_UBX 0x41
+#define NMEA_STD_GRS_ID_UBX 0x06
+#define NMEA_STD_GST_ID_UBX 0x07
+#define NMEA_STD_ZDA_ID_UBX 0x08
+#define NMEA_STD_GBS_ID_UBX 0x09
+#define NMEA_STD_DTM_ID_UBX 0x0A
+#define NMEA_STD_GNS_ID_UBX 0x0D
+#define NMEA_STD_VLW_ID_UBX 0x0F
+//#define NMEA_STD_TXT_ID_UBX 0x41
 
 #define RTCM_1005_ID_UBX 0x05
 #define RTCM_1077_ID_UBX 0x4D
@@ -237,6 +257,37 @@ struct NAV_PVT_PL_UBX
 	//unsigned char padding[4];
 };
 // 8 bits = 1*sizeof(unsigned char).
+struct flags_NAV_SOL_PL_UBX
+{
+	unsigned char GPSFixOK : 1;
+	unsigned char DiffSoln : 1;
+	unsigned char WKNSET : 1;
+	unsigned char TOWSET : 1;
+	unsigned char reserved1 : 4;
+};
+#define MAX_LEN_NAV_SOL_PL_UBX 52
+struct NAV_SOL_PL_UBX
+{
+	unsigned long iTOW; // In ms.
+	long fTOW; // In ns.
+	short week;
+	unsigned char gpsFix;
+	struct flags_NAV_SOL_PL_UBX flags;
+	long ecefX; // In cm.
+	long ecefY; // In cm.
+	long ecefZ; // In cm.
+	unsigned long pAcc; // In cm.
+	long ecefVX; // In cm/s.
+	long ecefVY; // In cm/s.
+	long ecefVZ; // In cm/s.
+	unsigned long sAcc; // In cm/s.
+	unsigned short pDOP; // In 0.01.
+	unsigned char reserved1;
+	unsigned char numSV;
+	unsigned char reserved2[4];
+	//unsigned char padding[4];
+};
+// 8 bits = 1*sizeof(unsigned char).
 struct flags_NAV_STATUS_PL_UBX
 {
 	unsigned char gpsFixOK : 1;
@@ -311,6 +362,7 @@ struct UBXDATA
 {
 	struct NAV_POSLLH_PL_UBX nav_posllh_pl;
 	struct NAV_PVT_PL_UBX nav_pvt_pl;
+	struct NAV_SOL_PL_UBX nav_sol_pl;
 	struct NAV_STATUS_PL_UBX nav_status_pl;
 	struct NAV_SVIN_PL_UBX nav_svin_pl;
 	struct NAV_VELNED_PL_UBX nav_velned_pl;
@@ -417,6 +469,7 @@ inline int AnalyzePacketUBX(unsigned char* buf, int buflen, int* pmclass, int* p
 	}
 	if (CheckChecksumUBX(buf, *ppacketlen) != EXIT_SUCCESS)
 	{ 
+		printf("Warning : UBX checksum error. \n");
 		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes can be discarded...
 		return EXIT_FAILURE;	
 	}
@@ -556,6 +609,7 @@ inline int AnalyzePacketWithMIDUBX(unsigned char* buf, int buflen, int mclass, i
 	}
 	if (CheckChecksumUBX(buf, *ppacketlen) != EXIT_SUCCESS)
 	{ 
+		printf("Warning : UBX checksum error. \n");
 		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes can be discarded...
 		return EXIT_FAILURE;	
 	}
@@ -706,6 +760,9 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 			pUBXData->SOG = pUBXData->nav_pvt_pl.gSpeed/1000.0; // In m/s.
 			pUBXData->COG = pUBXData->nav_pvt_pl.headMot*0.00001*M_PI/180.0; // In rad.
 			break;
+		case NAV_SOL_ID_UBX:
+			memcpy(&pUBXData->nav_sol_pl, payload, sizeof(pUBXData->nav_sol_pl));
+			break;
 		case NAV_STATUS_ID_UBX:
 			memcpy(&pUBXData->nav_status_pl, payload, sizeof(pUBXData->nav_status_pl));
 			break;
@@ -732,5 +789,15 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 
 // Restore default alignment settings.
 #pragma pack(pop) 
+
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // _WIN32
 
 #endif // UBXPROTOCOL_H

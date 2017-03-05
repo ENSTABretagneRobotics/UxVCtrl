@@ -66,6 +66,8 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			{
 				bConnected = TRUE; 
 
+				memset(&nmeadata, 0, sizeof(nmeadata));
+
 				if (nmeadevice.pfSaveFile != NULL)
 				{
 					fclose(nmeadevice.pfSaveFile); 

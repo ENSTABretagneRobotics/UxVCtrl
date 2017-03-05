@@ -64,6 +64,9 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 			{
 				bConnected = TRUE; 
 
+				memset(&tv, 0, sizeof(tv));
+				memset(&razorahrsdata, 0, sizeof(razorahrsdata));
+
 				if (razorahrs.pfSaveFile != NULL)
 				{
 					fclose(razorahrs.pfSaveFile); 

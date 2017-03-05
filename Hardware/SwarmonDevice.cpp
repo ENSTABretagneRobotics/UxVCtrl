@@ -53,6 +53,8 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			if (ConnectSwarmonDevice(&swarmondevice, "SwarmonDevice0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				memset(&swarmondata, 0, sizeof(swarmondata));
 			}
 			else 
 			{

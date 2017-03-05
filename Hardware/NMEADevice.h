@@ -148,7 +148,7 @@ inline void ComputeNMEAChecksum(char* sentence, char* checksum)
 		i++;
 	}
 
-	sprintf(checksum, "*%02x", (int)res);
+	sprintf(checksum, "*%02X", (int)res);
 }
 
 // We suppose that read operations return when a message has just been completely sent, and not randomly.

@@ -69,6 +69,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				mSleep(50);
 				bConnected = TRUE; 
 
+				memset(&mavlinkdata, 0, sizeof(mavlinkdata));
 				StartChrono(&chrono_GPSOK);
 
 				if (mavlinkdevice.pfSaveFile != NULL)

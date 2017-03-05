@@ -8,7 +8,7 @@ COM14
 % bSaveRawData
 1
 % bRevertToDefaultCfg
-1
+0
 % bSetBaseCfg
 0
 % SurveyMode (0 : Disabled, 1 : Survey In, 2 : Fixed Mode (fixedLat, fixedLon, fixedAlt, fixedPosAcc needed))
@@ -46,10 +46,12 @@ COM14
 % bEnable_UBX_NAV_POSLLH
 1
 % bEnable_UBX_NAV_PVT
+0
+% bEnable_UBX_NAV_SOL
 1
 % bEnable_UBX_NAV_STATUS
 1
 % bEnable_UBX_NAV_SVIN
 0
 % bEnable_UBX_NAV_VELNED
-0
+1

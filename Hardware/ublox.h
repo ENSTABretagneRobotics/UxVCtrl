@@ -21,6 +21,19 @@
 #include "NMEAProtocol.h"
 #include "RTCM3Protocol.h"
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#if !defined(NOMINMAX)
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // min
+#endif // !defined(NOMINMAX)
+#endif // _WIN32
+
 //#pragma pack(show)
 
 // Check for potential paddings in bitfields and structs, check their size and the sum of the size of their fields!
@@ -63,6 +76,7 @@ struct UBLOX
 	BOOL bEnable_NMEA_VDM;
 	BOOL bEnable_UBX_NAV_POSLLH;
 	BOOL bEnable_UBX_NAV_PVT;
+	BOOL bEnable_UBX_NAV_SOL;
 	BOOL bEnable_UBX_NAV_STATUS;
 	BOOL bEnable_UBX_NAV_SVIN;
 	BOOL bEnable_UBX_NAV_VELNED;
@@ -94,6 +108,11 @@ inline int GetUBXPacketWithMIDublox(UBLOX* publox, int mclass, int mid, UBXDATA*
 		printf("Error reading data from a ublox. \n");
 		return EXIT_FAILURE;
 	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(recvbuf, nbBytesToRequest, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
 	BytesReceived += nbBytesToRequest;
 	
 	for (;;)
@@ -102,7 +121,7 @@ inline int GetUBXPacketWithMIDublox(UBLOX* publox, int mclass, int mid, UBXDATA*
 		if (res == EXIT_SUCCESS) break;
 		if (res == EXIT_FAILURE)
 		{
-			nbBytesToRequest = nbBytesDiscarded;
+			nbBytesToRequest = min(MIN_PACKET_LENGTH_UBX, nbBytesDiscarded);
 		}	
 		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
 		BytesReceived -= nbBytesDiscarded;
@@ -115,6 +134,11 @@ inline int GetUBXPacketWithMIDublox(UBLOX* publox, int mclass, int mid, UBXDATA*
 		{
 			printf("Error reading data from a ublox. \n");
 			return EXIT_FAILURE;
+		}
+		if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+		{
+			fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
+			fflush(publox->pfSaveFile);
 		}
 		BytesReceived += nbBytesToRequest;
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
@@ -179,6 +203,11 @@ inline int GetUBXPacketublox(UBLOX* publox, UBXDATA* pUBXData)
 		printf("Error reading data from a ublox. \n");
 		return EXIT_FAILURE;
 	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(recvbuf, nbBytesToRequest, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
 	BytesReceived += nbBytesToRequest;
 	
 	for (;;)
@@ -187,7 +216,7 @@ inline int GetUBXPacketublox(UBLOX* publox, UBXDATA* pUBXData)
 		if (res == EXIT_SUCCESS) break;
 		if (res == EXIT_FAILURE)
 		{
-			nbBytesToRequest = nbBytesDiscarded;
+			nbBytesToRequest = min(MIN_PACKET_LENGTH_UBX, nbBytesDiscarded);
 		}	
 		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
 		BytesReceived -= nbBytesDiscarded;
@@ -200,6 +229,11 @@ inline int GetUBXPacketublox(UBLOX* publox, UBXDATA* pUBXData)
 		{
 			printf("Error reading data from a ublox. \n");
 			return EXIT_FAILURE;
+		}
+		if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+		{
+			fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
+			fflush(publox->pfSaveFile);
 		}
 		BytesReceived += nbBytesToRequest;
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
@@ -265,6 +299,11 @@ inline int GetNMEASentenceublox(UBLOX* publox, NMEADATA* pNMEAData)
 		printf("Error reading data from a ublox. \n");
 		return EXIT_FAILURE;
 	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(recvbuf, nbBytesToRequest, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
 	BytesReceived += nbBytesToRequest;
 	
 	for (;;)
@@ -275,7 +314,7 @@ inline int GetNMEASentenceublox(UBLOX* publox, NMEADATA* pNMEAData)
 		if (res == EXIT_SUCCESS) break;
 		if (res == EXIT_FAILURE)
 		{
-			nbBytesToRequest = nbBytesDiscarded;
+			nbBytesToRequest = min(MIN_NB_BYTES_SENTENCE_NMEA, nbBytesDiscarded);
 		}	
 		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
 		BytesReceived -= nbBytesDiscarded;
@@ -288,6 +327,11 @@ inline int GetNMEASentenceublox(UBLOX* publox, NMEADATA* pNMEAData)
 		{
 			printf("Error reading data from a ublox. \n");
 			return EXIT_FAILURE;
+		}
+		if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+		{
+			fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
+			fflush(publox->pfSaveFile);
 		}
 		BytesReceived += nbBytesToRequest;
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
@@ -355,6 +399,11 @@ inline int GetDataublox(UBLOX* publox, UBXDATA* pUBXData)
 		printf("Error reading data from a ublox. \n");
 		return EXIT_FAILURE;
 	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(recvbuf, nbBytesToRequest, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
 	BytesReceived += nbBytesToRequest;
 	
 	for (;;)
@@ -363,7 +412,7 @@ inline int GetDataublox(UBLOX* publox, UBXDATA* pUBXData)
 		if (res == EXIT_SUCCESS) break;
 		if (res == EXIT_FAILURE)
 		{
-			nbBytesToRequest = nbBytesDiscarded;
+			nbBytesToRequest = min(min(MIN_PACKET_LENGTH_UBX, MIN_NB_BYTES_SENTENCE_NMEA), nbBytesDiscarded);
 		}	
 		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
 		BytesReceived -= nbBytesDiscarded;
@@ -376,6 +425,11 @@ inline int GetDataublox(UBLOX* publox, UBXDATA* pUBXData)
 		{
 			printf("Error reading data from a ublox. \n");
 			return EXIT_FAILURE;
+		}
+		if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+		{
+			fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
+			fflush(publox->pfSaveFile);
 		}
 		BytesReceived += nbBytesToRequest;
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
@@ -677,7 +731,7 @@ inline int SetBaseCfgublox(UBLOX* publox)
 	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
-	// Disable GGA, GLL, GSA, GSV, RMC, VTG, TXT NMEA messages.
+	// Disable GGA, GLL, GSA, GSV, RMC, VTG, GST, ZDA, GNS NMEA messages.
 	memset(cfg_msg_pl, 0, sizeof(cfg_msg_pl));
 	cfg_msg_pl[0] = NMEA_STD_CLASS_UBX;
 	cfg_msg_pl[1] = NMEA_STD_GGA_ID_UBX;
@@ -704,10 +758,22 @@ inline int SetBaseCfgublox(UBLOX* publox)
 	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
-	cfg_msg_pl[1] = NMEA_STD_TXT_ID_UBX;
+	cfg_msg_pl[1] = NMEA_STD_GST_ID_UBX;
 	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_ZDA_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = NMEA_STD_GNS_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	//cfg_msg_pl[1] = NMEA_STD_TXT_ID_UBX;
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	//memcpy(sendbuf+offset, packet, packetlen);
+	//offset += packetlen;
 
 	//UBX-CFG-PORT set RTCM 3 as Output Protocol
 
@@ -821,6 +887,7 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->bEnable_NMEA_VDM = 0;
 		publox->bEnable_UBX_NAV_POSLLH = 1;
 		publox->bEnable_UBX_NAV_PVT = 1;
+		publox->bEnable_UBX_NAV_SOL = 0;
 		publox->bEnable_UBX_NAV_STATUS = 1;
 		publox->bEnable_UBX_NAV_SVIN = 0;
 		publox->bEnable_UBX_NAV_VELNED = 0;
@@ -878,6 +945,8 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_PVT) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_SOL) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_STATUS) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_SVIN) != 1) printf("Invalid configuration file.\n");
@@ -929,6 +998,7 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			CloseRS232Port(&publox->RS232Port);
 			return EXIT_FAILURE;
 		}
+		mSleep(250);
 	}
 
 	if (publox->bSetBaseCfg)
@@ -939,6 +1009,7 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			CloseRS232Port(&publox->RS232Port);
 			return EXIT_FAILURE;
 		}
+		mSleep(250);
 	}
 
 	printf("ublox connected.\n");
@@ -965,5 +1036,15 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam);
 
 // Restore default alignment settings.
 #pragma pack(pop) 
+
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // _WIN32
 
 #endif // UBLOX_H

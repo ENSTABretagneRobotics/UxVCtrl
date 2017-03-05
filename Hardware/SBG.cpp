@@ -69,6 +69,9 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			{
 				bConnected = TRUE; 
 
+				memset(&tv, 0, sizeof(tv));
+				memset(&sbgdata, 0, sizeof(sbgdata));
+
 				if (sbg.pfSaveFile != NULL)
 				{
 					fclose(sbg.pfSaveFile); 
