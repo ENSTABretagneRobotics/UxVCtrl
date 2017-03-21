@@ -115,7 +115,11 @@ inline void ComputeChecksumNMEA(char* sentence, int sentencelen, char* checksum)
 		res ^= sentence[i];
 		i++;
 	}
-	sprintf(checksum, "*%02X", (int)res);
+	sprintf(checksum, "*%02X", (int)(unsigned char)res);
+	if (checksum[MAX_NB_BYTES_CHECKSUM_NMEA] != 0)
+	{
+		printf("Warning : NMEA checksum computation failed.");
+	}
 }
 
 /*
@@ -233,7 +237,7 @@ inline int AnalyzeSentenceNMEA(char* buf, int buflen, char* talkerid, char* mnem
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
 		if ((buf[*psentencelen-2-nb_bytes_end] != checksum[1])||(buf[*psentencelen-1-nb_bytes_end] != checksum[2]))
 		{ 
-			printf("Warning : NMEA checksum error. \n");
+			printf("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]);
 			*pnbBytesToDiscard = *psentencelen;
 			return EXIT_FAILURE;	
 		}
@@ -426,7 +430,7 @@ inline int AnalyzeSentenceWithAddressNMEA(char* buf, int buflen, char* talkerid,
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
 		if ((buf[*psentencelen-2-nb_bytes_end] != checksum[1])||(buf[*psentencelen-1-nb_bytes_end] != checksum[2]))
 		{ 
-			printf("Warning : NMEA checksum error. \n");
+			printf("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]);
 			*pnbBytesToDiscard = *psentencelen;
 			return EXIT_FAILURE;	
 		}

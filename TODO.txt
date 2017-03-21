@@ -1,4 +1,17 @@
 image en fond ou télécharger...
+rajouter estimation de vitesse dans SOG pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
+gestion des corrections RTCM probablement mal faite...
+
+waitxyt x y t
+waitxytrelative x y t
+waitxytwgs
+waitlinet
+waitlinetrelative
+waitlinetrelativerobot
+waitlinetwgs
+
+dans les linefollowing, bLineFollowingControl n'est pas changé quand on a fini?
+les variantes sans t ont peut-être peu d'utilité...?
 
 add a visual studio config for Linux, utiliser dernière version linux headers?->extension vs_linux, qt .pro?
 chiffres significatifs...
@@ -34,6 +47,9 @@ linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
 
 bugs
+Release GitHub : le dossier de binaires et de sources est téléchargé sous le même nom, faire un release Guerledan et inclure aussi les sources des prérequis principaux, on aura donc 2 dossiers release : 1 avec les binaires et un autre avec toutes les sources...
+crash simu mission guerlédan en tapant la commande exit, peut-être lié à MAVLinkInterface, qui était connectée?->aussi quand pas connecté...->peut-être lié au videorecording...->crash même quand mission interrompue par touche x...->crash même quand MAVLinkInterface désactivée...
+caractères NMEA invalides loggués parfois à la fin?
 Warning : NMEA checksum error?
 Warnings misleading indent, bug ublox, see Ubuntu 16.10/VS2017 and static/dynamic code analysis...?
 mon C_q_in_group est probablement faux car il choisit peut-être de prendre en compte le 1er ping du groupe et pas les autres, mais le 1er n'est pas forcément le bon...->voir formule de l'article
@@ -93,7 +109,7 @@ flux acoustique sur un mur pas tout à fait droit...
 LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...) si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
 
 GUI, video
-MAVLinkInterface : solve message Failed to update home location...
+MAVLinkInterface : solve message Failed to update home location, get Params gêne parfois sur dernier Mission Planner...
 Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
 modify waypoints/heading commands so that they do a line following in the case of a sailboat?
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
@@ -168,6 +184,7 @@ sauvegarder e,phi,delta_theta dans wall?
 
 Actuators
 revoir mon organisation des pwm pour qu'ils puissent apparaitre sur n'importe quel chan > 5 en m'inspirant de la gestion des analogin de maestro...
+Arm : mode not armable->set mode stabilize pour s'en sortir?
 MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM? rajouter touches spéciales pour changer mode (manual, stabilize, etc.), touches pour désactiver l'override...
 param midangle : changer les formules de conversion entre uw et rudder pour que ça puisse ne pas être symétrique...
 reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer des données...
@@ -179,7 +196,8 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
-faire app comme remotewebcammultisrv pour permettre à plusieurs clients d'accéder à la base
+Activer dans config ublox pseudo range, carrier phase->UBX-RXM-RAW, RAWX, penser à enregistrer config avec UBX-CFG, pour pouvoir faire post process avec rtklib
+RemoteRS232MultiSrv pour permettre à plusieurs clients d'accéder à la base->un peu moins utile sous Windows (VSPE), mais peut-être pour Linux
 ublox et mavlinkinterface peuvent publier des données RTCM...
 Getubxdata->faire pour tout type de données, écriture dans fichier log...
 Update aussi nmea device pour qu'il utilise les nouvelles fonctions?
@@ -206,6 +224,7 @@ MT, SBG specific NMEA messages... : attention, les trames NMEA sont mélangées au
 convert AIS to C code...
 rajouter OSComputerI2CPort rpi
 auto magnetic calbration algo in plane and space, see Matlab code in ptrbrtz, add magnetic declination in AHRS config files (or use yaworientation parameter)?
+gérer gpsd (Linux only?)
 gps éthernet, logguer cette heure, synchro heure pc avec GPS, prendre plutot gprmc?
 
 Obstacle avoidance

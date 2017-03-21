@@ -1664,6 +1664,67 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
+	else if (sscanf(line, "waitlinetrelative %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "waitlinetwgs %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxa, &wya, &dval);
+		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval3, dval4, 0, &wxb, &wyb, &dval);
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
 #pragma endregion
 #pragma region DEVICE COMMANDS
 	else bContinueElseIf = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...

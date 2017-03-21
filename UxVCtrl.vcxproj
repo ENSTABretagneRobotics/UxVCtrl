@@ -53,7 +53,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV2.4.9\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV2.4.9\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV249;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -75,7 +75,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV2.4.9\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV2.4.9\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV249;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -169,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
+    <ClInclude Include="..\Extensions\Misc\Misc.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="Computations.h" />

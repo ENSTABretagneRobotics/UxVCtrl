@@ -25,10 +25,10 @@
 200
 % Coordinate system used to display the map
 % xMin (in m)
--4
+-50
 % xMax (in m)
-4
+50
 % yMin (in m)
--4
+-50
 % yMax (in m)
-4
+50

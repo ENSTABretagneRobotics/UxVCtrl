@@ -37,6 +37,9 @@
     <Filter Include="Hardware">
       <UniqueIdentifier>{1c966b92-de35-4e6b-886e-f0906ff40a56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extensions\Misc">
+      <UniqueIdentifier>{deaeaca4-251b-4641-a946-595b0c0b637f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ball.cpp">
@@ -541,6 +544,9 @@
     </ClInclude>
     <ClInclude Include="SonarAltitudeEstimation.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Misc\Misc.h">
+      <Filter>Extensions\Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

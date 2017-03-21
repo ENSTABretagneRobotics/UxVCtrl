@@ -1,3 +1,7 @@
+145
+Added waitlinetrelative, waitlinetwgs commands (to check).
+Attempt to correct a bug in NMEA checksum computation.
+
 144
 Changed accuracy of some values in the log files.
 

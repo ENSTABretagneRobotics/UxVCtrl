@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
+				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV249;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
+				AdditionalIncludeDirectories="Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(ProgramFiles)\LabJack\Drivers;$(SystemDrive)\OpenCV2.4.9\include;$(ProgramFiles)\libmodbus-3.0.3-msvc\include;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;OPENCV249;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -679,6 +679,14 @@
 				</File>
 				<File
 					RelativePath="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Misc"
+				>
+				<File
+					RelativePath="..\Extensions\Misc\Misc.h"
 					>
 				</File>
 			</Filter>

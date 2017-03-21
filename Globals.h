@@ -155,10 +155,10 @@ extern double latitude, longitude;
 extern double altitude;
 extern double sog, cog;
 extern double xte;
-//extern vector< deque<unsigned char*> > RTCMuserslist;
-extern vector< deque<unsigned char> > RTCMuserslist;
 #define MAX_NB_BYTES_RTCM_PARTS 8192
 //#define MAX_NB_RTCM_PARTS 1024
+//extern vector< deque<unsigned char*> > RTCMuserslist;
+extern vector< deque<unsigned char> > RTCMuserslist;
 //extern deque<unsigned char*> RTCMusers[MAX_NB_UBLOX]; // replace with deque< vector<unsigned char> > to get data and datalen? Or deque<unsigned char>, for each data byte...
 extern deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Weather station.
