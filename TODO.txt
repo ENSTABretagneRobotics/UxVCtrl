@@ -1,11 +1,11 @@
 condition d'arrêt ComputeChecksumNMEA, utilisation dans encode, présence de *...
 
 gestion omegas, samplingrate hokuyo/RPLIDAR... et même pour sonar simulé, est-ce que c'est bon?
-omegas : should be overwritten automatically by the device?
+omegas : should be overwritten automatically by the device, and be specific to each device?
 seanetprocessing to rename...
 orientation de l'image sonar/lidar, couleur des distances?
+rajouter params deadzone?
 
-image en fond ou télécharger...
 rajouter estimation de vitesse dans SOG pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
 gestion des corrections RTCM probablement mal faite...
 
@@ -35,13 +35,12 @@ Si vr error grande, utiliser state eq, autrement n'utiliser que vr
 option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
 
 Trouver mission autonome intelligente en intérieur pour buggy, 
-Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides
+Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides->Mission Planner...
+image en fond ou télécharger...->Mission Planner...
 Rename simulator_worspace en submarine_simulator puisqu'il y en aura peut-être d'autres, update also USERUpdtQuick.bat?
 
 chrono_period...
 change period also for other sensors/actuators?
-
-rplidar...
 
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
 selon les accx_err, ça aura ou non une influence sur les équations d'état

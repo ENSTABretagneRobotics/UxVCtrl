@@ -8,7 +8,7 @@ COM9
 % bSaveRawData
 1
 % ScanMode (0 : SCAN, 1 : EXPRESS_SCAN, 2 : FORCE_SCAN)
-0
+1
 % motordelay (in ms)
 500
 % alpha_max_err (in rad)

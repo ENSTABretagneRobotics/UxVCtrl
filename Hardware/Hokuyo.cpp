@@ -29,7 +29,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(50);
+		//mSleep(50);
 
 		if (bPauseHokuyo) 
 		{

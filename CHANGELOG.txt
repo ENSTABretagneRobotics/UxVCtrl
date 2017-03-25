@@ -1,3 +1,6 @@
+147
+Added EXPRESS_SCAN support for RPLIDAR.
+
 146
 Continuation of RPLIDAR integration.
 Corrected Hokuyo w.r.t. sonar.

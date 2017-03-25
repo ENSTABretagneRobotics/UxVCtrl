@@ -25,31 +25,18 @@
 
 #define NB_BYTES_CHECKSUM_RPLIDAR 1
 
-#define NB_BYTES_SERIAL_NUMBER_RPLIDAR 16
-
 #define START_FLAG1_RPLIDAR 0xA5
 #define START_FLAG2_RPLIDAR 0x5A
 
 #define SEND_MODE_MASK_RPLIDAR 0x03
 #define DATA_RESPONSE_LENGTH_MASK_RPLIDAR (!SEND_MODE_MASK_RPLIDAR)
 #define DATA_RESPONSE_LENGTH_SHIFT_RPLIDAR 2
-#define SCAN_DATA_RESPONSE_CHECK_BIT_MASK_RPLIDAR 0x01
-#define SCAN_DATA_RESPONSE_START_BIT_MASK_RPLIDAR 0x01
-#define SCAN_DATA_RESPONSE_INVERTED_START_BIT_MASK_RPLIDAR 0x02
 
 // Single Request-Single Response Mode
 // Single Request-Multiple Response Mode
 // Single Request-No Response : need to wait a little bit after the request wince there will be no response...
 #define SINGLE_REQUEST_SINGLE_RESPONSE_SEND_MODE_RPLIDAR 0x00
 #define SINGLE_REQUEST_MULTIPLE_RESPONSE_SEND_MODE_RPLIDAR 0x01
-
-#define STATUS_OK_RPLIDAR 0x00
-#define STATUS_WARNING_RPLIDAR 0x01
-#define STATUS_ERROR_RPLIDAR 0x02
-
-// Undocumented...
-#define MAX_MOTOR_PWM_RPLIDAR 1023
-#define DEFAULT_MOTOR_PWM_RPLIDAR 660
 
 // Commands without payload and response.
 #define STOP_REQUEST_RPLIDAR 0x25
@@ -66,7 +53,7 @@
 #define EXPRESS_SCAN_REQUEST_RPLIDAR 0x82 // Added in FW ver 1.17.
 
 // Undocumented...
-// Added for A2 to set RPLIDAR motor PWM when using accessory board.
+// Commands added for A2 to set RPLIDAR motor PWM when using accessory board.
 #define SET_MOTOR_PWM_REQUEST_RPLIDAR 0xF0
 #define GET_ACC_BOARD_FLAG_REQUEST_RPLIDAR 0xFF
 
@@ -78,6 +65,29 @@
 #define SAMPLERATE_RESPONSE_RPLIDAR 0x15 // Added in FW ver 1.17.
 #define ACC_BOARD_FLAG_RESPONSE_RPLIDAR 0xFF
 
+#define NB_BYTES_SERIAL_NUMBER_RPLIDAR 16
+#define MAX_BUF_LEN_SERIAL_NUMBER_RPLIDAR (2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1)
+
+#define STATUS_OK_RPLIDAR 0x00
+#define STATUS_WARNING_RPLIDAR 0x01
+#define STATUS_ERROR_RPLIDAR 0x02
+
+// Undocumented...
+#define MAX_MOTOR_PWM_RPLIDAR 1023
+#define DEFAULT_MOTOR_PWM_RPLIDAR 660
+
+#define SCAN_MODE_RPLIDAR 0
+#define EXPRESS_SCAN_MODE_RPLIDAR 1
+#define FORCE_SCAN_MODE_RPLIDAR 2
+
+#define CHECK_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR 0x01
+#define START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR 0x01
+#define INVERTED_START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR 0x02
+
+#define NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR 84
+#define NB_CABINS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR 16
+#define NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR (2*NB_CABINS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)
+
 struct RPLIDAR
 {
 	RS232PORT RS232Port;
@@ -85,9 +95,10 @@ struct RPLIDAR
 	int hardware;
 	int firmware_major;
 	int firmware_minor;
-	char SerialNumber[2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1];
+	char SerialNumber[MAX_BUF_LEN_SERIAL_NUMBER_RPLIDAR];
 	int Tstandard; // Time in us used when RPLIDAR takes a single laser ranging in SCAN mode.
 	int Texpress; // Time in us used when RPLIDAR takes a single laser ranging in EXPRESS_SCAN mode.
+	unsigned char esdata_prev[NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	//RPLIDARDATA LastRPLIDARData;
 	char szCfgFilePath[256];
@@ -102,6 +113,12 @@ struct RPLIDAR
 	double d_max_err;
 };
 typedef struct RPLIDAR RPLIDAR;
+
+inline double AngleDiffRPLIDAR(double start_angle_1, double start_angle_2)
+{
+	if (start_angle_1 <= start_angle_2) return start_angle_2-start_angle_1;
+	else return 360+start_angle_2-start_angle_1;
+}
 
 // req must contain a valid request of reqlen bytes.
 inline unsigned char ComputeChecksumRPLIDAR(unsigned char* req, int reqlen)
@@ -243,13 +260,12 @@ inline int GetHealthRequestRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbProtectionStop)
 	return EXIT_SUCCESS;
 }
 
-// SerialNumber must be a null-terminated string of at least 2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1 bytes, including 0.
+// SerialNumber must be a null-terminated string of at least MAX_BUF_LEN_SERIAL_NUMBER_RPLIDAR bytes, including 0.
 inline int GetInfoRequestRPLIDAR(RPLIDAR* pRPLIDAR, int* pModelID, int* pHardwareVersion, int* pFirmwareMajor, int* pFirmwareMinor, char* SerialNumber)
 {
 	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,GET_INFO_REQUEST_RPLIDAR};
 	unsigned char descbuf[7];
 	unsigned char databuf[20];
-	unsigned char serialnumber[NB_BYTES_SERIAL_NUMBER_RPLIDAR];
 	int i = 0;
 
 	// Send request.
@@ -287,13 +303,12 @@ inline int GetInfoRequestRPLIDAR(RPLIDAR* pRPLIDAR, int* pModelID, int* pHardwar
 	*pFirmwareMinor = databuf[1];
 	*pFirmwareMajor = databuf[2];
 	*pHardwareVersion = databuf[3];
-	memcpy(serialnumber, databuf+4, NB_BYTES_SERIAL_NUMBER_RPLIDAR);
 
 	// 128bit unique serial number, when converting to text in hex, the Least Significant Byte prints first.
-	memset(SerialNumber, 0, 2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1);
+	memset(SerialNumber, 0, MAX_BUF_LEN_SERIAL_NUMBER_RPLIDAR);
 	for (i = 0; i < NB_BYTES_SERIAL_NUMBER_RPLIDAR; i++)
 	{
-		sprintf(SerialNumber+2*i, "%02X", (int)(unsigned char)serialnumber[i]);
+		sprintf(SerialNumber+2*i, "%02X", (int)(unsigned char)databuf[i+4]);
 	}
 
 	return EXIT_SUCCESS;
@@ -439,13 +454,13 @@ inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbNewScan, int* p
 	}
 
 	// Analyze the data response.
-	*pbNewScan = (SCAN_DATA_RESPONSE_START_BIT_MASK_RPLIDAR & databuf[0]);
-	if (*pbNewScan == ((SCAN_DATA_RESPONSE_INVERTED_START_BIT_MASK_RPLIDAR & databuf[0])>>1))
+	*pbNewScan = (START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR & databuf[0]);
+	if (*pbNewScan == ((INVERTED_START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR & databuf[0])>>1))
 	{ 
 		printf("A RPLIDAR is not responding correctly: Bad inversed start bit. \n");
 		return EXIT_FAILURE;	
 	}
-	if ((SCAN_DATA_RESPONSE_CHECK_BIT_MASK_RPLIDAR & databuf[1]) != 1)
+	if ((CHECK_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR & databuf[1]) != 1)
 	{ 
 		printf("A RPLIDAR is not responding correctly : Bad check bit. \n");
 		return EXIT_FAILURE;	
@@ -463,11 +478,12 @@ inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbNewScan, int* p
 	return EXIT_SUCCESS;
 }
 
-// Corresponding data response not yet implemented...
 inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 {
 	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,EXPRESS_SCAN_REQUEST_RPLIDAR,0x05,0,0,0,0,0,0x22};
 	unsigned char descbuf[7];
+	unsigned char sync = 0;
+	unsigned char ChkSum = 0;
 
 	// Send request.
 	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
@@ -490,6 +506,102 @@ inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 		printf("A RPLIDAR is not responding correctly. \n");
 		return EXIT_FAILURE;	
 	}
+
+	// Receive the first data response (2 data responses needed for angles computation...).
+	memset(pRPLIDAR->esdata_prev, 0, sizeof(pRPLIDAR->esdata_prev));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, pRPLIDAR->esdata_prev, sizeof(pRPLIDAR->esdata_prev)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Analyze the first data response.
+	sync = (pRPLIDAR->esdata_prev[0] & 0xF0)|(pRPLIDAR->esdata_prev[1]>>4);
+	if (sync != START_FLAG1_RPLIDAR)
+	{ 
+		printf("A RPLIDAR is not responding correctly : Bad sync1 or sync2. \n");
+		return EXIT_FAILURE;	
+	}
+
+	ChkSum = (pRPLIDAR->esdata_prev[1]<<4)|(pRPLIDAR->esdata_prev[0] & 0x0F);
+	// Force ComputeChecksumRPLIDAR() to compute until the last byte...
+	if (ChkSum != ComputeChecksumRPLIDAR(pRPLIDAR->esdata_prev+2, sizeof(pRPLIDAR->esdata_prev)-1))
+	{ 
+		printf("A RPLIDAR is not responding correctly : Bad ChkSum. \n");
+		return EXIT_FAILURE;	
+	}
+
+	return EXIT_SUCCESS;
+}
+
+// NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR angles, NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR distances...
+inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbNewScan, double* pAngles, double* pDistances)
+{
+	unsigned char databuf[NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
+	unsigned char sync = 0;
+	unsigned char ChkSum = 0;
+	unsigned short start_angle_q6 = 0;
+	unsigned short start_angle_q6_prev = 0;
+	unsigned short distance1 = 0;
+	unsigned short distance2 = 0;
+	unsigned char dtheta1_q3 = 0;
+	unsigned char dtheta2_q3 = 0;
+	double theta1 = 0;
+	double theta2 = 0;
+	int j = 0;
+
+	// Receive the data response.
+	memset(databuf, 0, sizeof(databuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Analyze the data response.
+	sync = (databuf[0] & 0xF0)|(databuf[1]>>4);
+	if (sync != START_FLAG1_RPLIDAR)
+	{ 
+		printf("A RPLIDAR is not responding correctly : Bad sync1 or sync2. \n");
+		return EXIT_FAILURE;	
+	}
+
+	ChkSum = (databuf[1]<<4)|(databuf[0] & 0x0F);
+	// Force ComputeChecksumRPLIDAR() to compute until the last byte...
+	if (ChkSum != ComputeChecksumRPLIDAR(databuf+2, sizeof(databuf)-1))
+	{ 
+		printf("A RPLIDAR is not responding correctly : Bad ChkSum. \n");
+		return EXIT_FAILURE;	
+	}
+
+	start_angle_q6 = ((databuf[3] & 0x7F)<<8) | databuf[2];
+
+	// Analyze the previous data response.
+	start_angle_q6_prev = ((pRPLIDAR->esdata_prev[3] & 0x7F)<<8) | pRPLIDAR->esdata_prev[2];
+	*pbNewScan = pRPLIDAR->esdata_prev[3]>>7;
+
+	//memset(pAngles, 0, NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR);
+	//memset(pDistances, 0, NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR);
+	for (j = 0; j < NB_CABINS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR; j++)
+	{
+		distance1 = ((pRPLIDAR->esdata_prev[4+5*j+1]<<8)|pRPLIDAR->esdata_prev[4+5*j+0])>>2;
+		distance2 = ((pRPLIDAR->esdata_prev[4+5*j+3]<<8)|pRPLIDAR->esdata_prev[5*j+2])>>2;
+		dtheta1_q3= ((pRPLIDAR->esdata_prev[4+5*j+0] & 0x03)<<4)|(pRPLIDAR->esdata_prev[4+5*j+4] & 0x0F);
+		dtheta2_q3= ((pRPLIDAR->esdata_prev[4+5*j+2] & 0x03)<<4)|(pRPLIDAR->esdata_prev[4+5*j+4]>>4);
+
+		theta1 = start_angle_q6_prev/64.0+AngleDiffRPLIDAR(start_angle_q6_prev/64.0, start_angle_q6/64.0)*(2*j+0)/(NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)-((char)dtheta1_q3)/8.0;
+		theta2 = start_angle_q6_prev/64.0+AngleDiffRPLIDAR(start_angle_q6_prev/64.0, start_angle_q6/64.0)*(2*j+1)/(NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)-((char)dtheta2_q3)/8.0;
+
+		// Convert in rad.
+		pAngles[2*j+0] = fmod_2PI_deg2rad(-theta1);
+		pAngles[2*j+1] = fmod_2PI_deg2rad(-theta2);
+
+		// Convert in m.
+		pDistances[2*j+0] = distance1/1000.0;
+		pDistances[2*j+1] = distance2/1000.0;
+	}
+
+	memcpy(pRPLIDAR->esdata_prev, databuf, NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR);
 
 	return EXIT_SUCCESS;
 }
@@ -612,32 +724,37 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 	if (StopRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a RPLIDAR : STOP failure.\n");
+		SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}
 
+	memset(pRPLIDAR->esdata_prev, 0, sizeof(pRPLIDAR->esdata_prev));
 	switch (pRPLIDAR->ScanMode)
 	{
-	case 0:
+	case SCAN_MODE_RPLIDAR:
 		if (StartScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to a RPLIDAR : SCAN failure.\n");
+			SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
 			CloseRS232Port(&pRPLIDAR->RS232Port);
 			return EXIT_FAILURE;
 		}
 		break;
-	//case 1:
-	//	if (StartExpressScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
-	//	{
-	//		printf("Unable to connect to a RPLIDAR : EXPRESS_SCAN failure.\n");
-	//		CloseRS232Port(&pRPLIDAR->RS232Port);
-	//		return EXIT_FAILURE;
-	//	}
-	//	break;
-	case 2:
+	case EXPRESS_SCAN_MODE_RPLIDAR:
+		if (StartExpressScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a RPLIDAR : EXPRESS_SCAN failure.\n");
+			SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
+			CloseRS232Port(&pRPLIDAR->RS232Port);
+			return EXIT_FAILURE;
+		}
+		break;
+	case FORCE_SCAN_MODE_RPLIDAR:
 		if (StartForceScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to a RPLIDAR : FORCE_SCAN failure.\n");
+			SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
 			CloseRS232Port(&pRPLIDAR->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -646,6 +763,7 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		if (StartScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to a RPLIDAR : SCAN failure.\n");
+			SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
 			CloseRS232Port(&pRPLIDAR->RS232Port);
 			return EXIT_FAILURE;
 		}

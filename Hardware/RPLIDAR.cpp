@@ -20,8 +20,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 	int quality = 0;
 	double angle = 0;
 	double distance = 0;
-	//double angles[MAX_SLITDIVISION_RPLIDAR];
-	//double distances[MAX_SLITDIVISION_RPLIDAR];
+	double angles[NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
+	double distances[NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
 	BOOL bConnected = FALSE;
 	int i = 0;
 	char szSaveFilePath[256];
@@ -66,8 +66,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 				bConnected = TRUE; 
 
 				memset(&tv, 0, sizeof(tv));
-				//memset(angles, 0, sizeof(angles));
-				//memset(distances, 0, sizeof(distances));
+				memset(angles, 0, sizeof(angles));
+				memset(distances, 0, sizeof(distances));
 
 				if (rplidar.pfSaveFile != NULL)
 				{
@@ -111,64 +111,126 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 		}
 		else
 		{
-			if (GetScanDataResponseRPLIDAR(&rplidar, &bNewScan, &quality, &angle, &distance) == EXIT_SUCCESS)
+			switch (rplidar.ScanMode)
 			{
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
-
-				EnterCriticalSection(&StateVariablesCS);
-
-				// Simulate a sonar...
-
-				d_mes = distance;
-				alpha_mes = angle;
-
-				d_all_mes.clear();
-				d_all_mes.push_back(d_mes);
-				alpha_mes_vector.push_back(alpha_mes);
-				d_mes_vector.push_back(d_mes);
-				d_all_mes_vector.push_back(d_all_mes);
-				t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-				xhat_history_vector.push_back(xhat);
-				yhat_history_vector.push_back(yhat);
-				thetahat_history_vector.push_back(thetahat);
-				vxyhat_history_vector.push_back(vxyhat);
-
-				if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+			case EXPRESS_SCAN_MODE_RPLIDAR:
+				if (GetExpressScanDataResponseRPLIDAR(&rplidar, &bNewScan, angles, distances) == EXIT_SUCCESS)
 				{
-					alpha_mes_vector.pop_front();
-					d_mes_vector.pop_front();
-					d_all_mes_vector.pop_front();
-					t_history_vector.pop_front();
-					xhat_history_vector.pop_front();
-					yhat_history_vector.pop_front();
-					thetahat_history_vector.pop_front();
-					vxyhat_history_vector.pop_front();
-				}
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
-				LeaveCriticalSection(&StateVariablesCS);
+					EnterCriticalSection(&StateVariablesCS);
 
-				if (rplidar.bSaveRawData)
-				{
-					//for (i = 0; i < rplidar.StepCount; i++)
-					//{
-					//	fprintf(rplidar.pfSaveFile, "%d;%d;%.3f;%.3f;\n", (int)tv.tv_sec, (int)tv.tv_usec, angles[i], distances[i]);
-					//}
-					fprintf(rplidar.pfSaveFile, "%d;%d;", (int)tv.tv_sec, (int)tv.tv_usec);
-					/*for (i = 0; i < rplidar.StepCount; i++)
+					for (i = 0; i < NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR; i++)
 					{
-						fprintf(rplidar.pfSaveFile, "%.3f;%.3f;", angles[i], distances[i]);
-					}*/
-					fprintf(rplidar.pfSaveFile, "%.3f;%.3f;", angle, distance);
-					fprintf(rplidar.pfSaveFile, "\n");
-					fflush(rplidar.pfSaveFile);
+						alpha_mes = angles[i];
+						d_mes = distances[i];
+
+						// Simulate a sonar...
+
+						d_all_mes.clear();
+						d_all_mes.push_back(d_mes);
+						alpha_mes_vector.push_back(alpha_mes);
+						d_mes_vector.push_back(d_mes);
+						d_all_mes_vector.push_back(d_all_mes);
+						t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+						xhat_history_vector.push_back(xhat);
+						yhat_history_vector.push_back(yhat);
+						thetahat_history_vector.push_back(thetahat);
+						vxyhat_history_vector.push_back(vxyhat);
+
+						if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+						{
+							alpha_mes_vector.pop_front();
+							d_mes_vector.pop_front();
+							d_all_mes_vector.pop_front();
+							t_history_vector.pop_front();
+							xhat_history_vector.pop_front();
+							yhat_history_vector.pop_front();
+							thetahat_history_vector.pop_front();
+							vxyhat_history_vector.pop_front();
+						}
+					}
+
+					LeaveCriticalSection(&StateVariablesCS);
+
+					if (rplidar.bSaveRawData)
+					{
+						//for (i = 0; i < NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR; i++)
+						//{
+						//	fprintf(rplidar.pfSaveFile, "%d;%d;%.3f;%.3f;\n", (int)tv.tv_sec, (int)tv.tv_usec, angles[i], distances[i]);
+						//}
+						fprintf(rplidar.pfSaveFile, "%d;%d;", (int)tv.tv_sec, (int)tv.tv_usec);
+						for (i = 0; i < NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR; i++)
+						{
+							fprintf(rplidar.pfSaveFile, "%.3f;%.3f;", angles[i], distances[i]);
+						}
+						fprintf(rplidar.pfSaveFile, "\n");
+						fflush(rplidar.pfSaveFile);
+					}
 				}
-			}
-			else
-			{
-				printf("Connection to a RPLIDAR lost.\n");
-				bConnected = FALSE;
-				DisconnectRPLIDAR(&rplidar);
-				mSleep(100);
+				else
+				{
+					printf("Connection to a RPLIDAR lost.\n");
+					bConnected = FALSE;
+					DisconnectRPLIDAR(&rplidar);
+					mSleep(100);
+				}
+				break;
+			case SCAN_MODE_RPLIDAR:
+			case FORCE_SCAN_MODE_RPLIDAR:
+			default:
+				if (GetScanDataResponseRPLIDAR(&rplidar, &bNewScan, &quality, &angle, &distance) == EXIT_SUCCESS)
+				{
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+
+					EnterCriticalSection(&StateVariablesCS);
+
+					alpha_mes = angle;
+					d_mes = distance;
+
+					// Simulate a sonar...
+
+					d_all_mes.clear();
+					d_all_mes.push_back(d_mes);
+					alpha_mes_vector.push_back(alpha_mes);
+					d_mes_vector.push_back(d_mes);
+					d_all_mes_vector.push_back(d_all_mes);
+					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+					xhat_history_vector.push_back(xhat);
+					yhat_history_vector.push_back(yhat);
+					thetahat_history_vector.push_back(thetahat);
+					vxyhat_history_vector.push_back(vxyhat);
+
+					if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+					{
+						alpha_mes_vector.pop_front();
+						d_mes_vector.pop_front();
+						d_all_mes_vector.pop_front();
+						t_history_vector.pop_front();
+						xhat_history_vector.pop_front();
+						yhat_history_vector.pop_front();
+						thetahat_history_vector.pop_front();
+						vxyhat_history_vector.pop_front();
+					}
+
+					LeaveCriticalSection(&StateVariablesCS);
+
+					if (rplidar.bSaveRawData)
+					{
+						fprintf(rplidar.pfSaveFile, "%d;%d;", (int)tv.tv_sec, (int)tv.tv_usec);
+						fprintf(rplidar.pfSaveFile, "%.3f;%.3f;", angle, distance);
+						fprintf(rplidar.pfSaveFile, "\n");
+						fflush(rplidar.pfSaveFile);
+					}
+				}
+				else
+				{
+					printf("Connection to a RPLIDAR lost.\n");
+					bConnected = FALSE;
+					DisconnectRPLIDAR(&rplidar);
+					mSleep(100);
+				}
+				break;
 			}
 		}
 
