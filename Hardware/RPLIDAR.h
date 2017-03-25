@@ -19,17 +19,75 @@
 
 #define TIMEOUT_MESSAGE_RPLIDAR 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
-#define MAX_NB_BYTES_RPLIDAR 8192
+#define MAX_NB_BYTES_RPLIDAR 1024
 
-#define MAX_SLITDIVISION_RPLIDAR 2048
+#define MIN_BUF_LEN_RPLIDAR 2
 
-#define MIN_STANDARD_BUF_LEN_RPLIDAR 29
+#define NB_BYTES_CHECKSUM_RPLIDAR 1
+
+#define NB_BYTES_SERIAL_NUMBER_RPLIDAR 16
+
+#define START_FLAG1_RPLIDAR 0xA5
+#define START_FLAG2_RPLIDAR 0x5A
+
+#define SEND_MODE_MASK_RPLIDAR 0x03
+#define DATA_RESPONSE_LENGTH_MASK_RPLIDAR (!SEND_MODE_MASK_RPLIDAR)
+#define DATA_RESPONSE_LENGTH_SHIFT_RPLIDAR 2
+#define SCAN_DATA_RESPONSE_CHECK_BIT_MASK_RPLIDAR 0x01
+#define SCAN_DATA_RESPONSE_START_BIT_MASK_RPLIDAR 0x01
+#define SCAN_DATA_RESPONSE_INVERTED_START_BIT_MASK_RPLIDAR 0x02
+
+// Single Request-Single Response Mode
+// Single Request-Multiple Response Mode
+// Single Request-No Response : need to wait a little bit after the request wince there will be no response...
+#define SINGLE_REQUEST_SINGLE_RESPONSE_SEND_MODE_RPLIDAR 0x00
+#define SINGLE_REQUEST_MULTIPLE_RESPONSE_SEND_MODE_RPLIDAR 0x01
+
+#define STATUS_OK_RPLIDAR 0x00
+#define STATUS_WARNING_RPLIDAR 0x01
+#define STATUS_ERROR_RPLIDAR 0x02
+
+// Undocumented...
+#define MAX_MOTOR_PWM_RPLIDAR 1023
+#define DEFAULT_MOTOR_PWM_RPLIDAR 660
+
+// Commands without payload and response.
+#define STOP_REQUEST_RPLIDAR 0x25
+#define SCAN_REQUEST_RPLIDAR 0x20
+#define FORCE_SCAN_REQUEST_RPLIDAR 0x21
+#define RESET_REQUEST_RPLIDAR 0x40
+
+// Commands without payload but have response
+#define GET_INFO_REQUEST_RPLIDAR 0x50
+#define GET_HEALTH_REQUEST_RPLIDAR 0x52
+#define GET_SAMPLERATE_REQUEST_RPLIDAR 0x59 // Added in FW ver 1.17.
+
+// Commands with payload and have response
+#define EXPRESS_SCAN_REQUEST_RPLIDAR 0x82 // Added in FW ver 1.17.
+
+// Undocumented...
+// Added for A2 to set RPLIDAR motor PWM when using accessory board.
+#define SET_MOTOR_PWM_REQUEST_RPLIDAR 0xF0
+#define GET_ACC_BOARD_FLAG_REQUEST_RPLIDAR 0xFF
+
+// Responses.
+#define DEVINFO_RESPONSE_RPLIDAR 0x04
+#define DEVHEALTH_RESPONSE_RPLIDAR 0x06
+#define MEASUREMENT_RESPONSE_RPLIDAR 0x81
+#define MEASUREMENT_CAPSULED_RESPONSE_RPLIDAR 0x82 // Added in FW ver 1.17.
+#define SAMPLERATE_RESPONSE_RPLIDAR 0x15 // Added in FW ver 1.17.
+#define ACC_BOARD_FLAG_RESPONSE_RPLIDAR 0xFF
 
 struct RPLIDAR
 {
 	RS232PORT RS232Port;
-	double StepAngleSize;
-	int StepCount;
+	int model;
+	int hardware;
+	int firmware_major;
+	int firmware_minor;
+	char SerialNumber[2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1];
+	int Tstandard; // Time in us used when RPLIDAR takes a single laser ranging in SCAN mode.
+	int Texpress; // Time in us used when RPLIDAR takes a single laser ranging in EXPRESS_SCAN mode.
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	//RPLIDARDATA LastRPLIDARData;
 	char szCfgFilePath[256];
@@ -38,318 +96,400 @@ struct RPLIDAR
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
-	BOOL bForceSCIP20;
-	BOOL bHS;
-	int SlitDivision; // NSteps
-	int StartingStep;
-	int FrontStep;
-	int EndStep;
-	int ClusterCount;
-	int ScanInterval;
-	BOOL bContinuousNumberOfScans;
+	int ScanMode;
+	int motordelay;
 	double alpha_max_err;
 	double d_max_err;
 };
 typedef struct RPLIDAR RPLIDAR;
 
-inline double k2angleRPLIDAR(RPLIDAR* pRPLIDAR, int k)
-{
-	return (k+pRPLIDAR->StartingStep-pRPLIDAR->FrontStep+pRPLIDAR->SlitDivision/2)*pRPLIDAR->StepAngleSize*M_PI/180.0-M_PI;
-}
-
-inline int angle2kRPLIDAR(RPLIDAR* pRPLIDAR, double angle)
-{
-	return (int)((fmod_2PI(angle)+M_PI)*180.0/(pRPLIDAR->StepAngleSize*M_PI)-pRPLIDAR->StartingStep+pRPLIDAR->FrontStep-pRPLIDAR->SlitDivision/2);
-}
-
-inline int CharacterDecodingRPLIDAR(char* buf, int buflen)
-{
-	int i = 0, value = 0;
-
-	for (i = 0; i < buflen; i++)
-	{
-		value <<= 6;
-		value &= ~0x3f;
-		value |= buf[i] - 0x30;
-	}
-
-	return value;
-}
-
-// If this function succeeds, the beginning of buf contains a valid message
-// but there might be other data at the end.
-inline int AnalyzeRPLIDARMessage(char* buf, int buflen)
+// req must contain a valid request of reqlen bytes.
+inline unsigned char ComputeChecksumRPLIDAR(unsigned char* req, int reqlen)
 {
 	int i = 0;
-	char Sum = 0;
+	unsigned char res = 0;
 
-	// Check number of bytes.
-	if (buflen < MIN_STANDARD_BUF_LEN_RPLIDAR)
+	while (i < reqlen-NB_BYTES_CHECKSUM_RPLIDAR)
 	{
-		//printf("Invalid number of bytes.\n");
-		return EXIT_FAILURE;
-	}
-	// Check first command character.
-	if (buf[0] != 'M')
-	{
-		return EXIT_FAILURE;
-	}
-	// Check second command character.
-	if (buf[1] != 'D')
-	{
-		return EXIT_FAILURE;
-	}
-	// Check the 26 first bytes.
-	if (sscanf(buf, "MD%04d%04d%02d%01d%02d\n99b\n%04d%c\n", &i, &i, &i, &i, &i, &i, &Sum) != 7)
-	{
-		return EXIT_FAILURE;
-	}
-	// Find the termination code ("\n\n").
-	i = 25;
-	for (;;)
-	{
-		if ((buf[i] == '\n')&&(buf[i+1] == '\n')) break;
+		res ^= req[i];
 		i++;
-		if (i >= buflen-1) return EXIT_FAILURE;
 	}
-
-	return EXIT_SUCCESS;
+	return res;
 }
 
-// If this function succeeds, the beginning of *pFoundMsg should contain a valid message
-// but there might be other data at the end. Data in the beginning of buf might have been discarded.
-inline int FindRPLIDARMessage(char* buf, int buflen, char** pFoundMsg, int* pFoundMsgTmpLen)
+// req must contain a valid request of reqlen bytes.
+inline int GetSendModeFromResponseDescriptorRPLIDAR(unsigned char* req, int reqlen)
 {
-	*pFoundMsg = buf;
-	*pFoundMsgTmpLen = buflen;
-
-	while (AnalyzeRPLIDARMessage(*pFoundMsg, *pFoundMsgTmpLen) != EXIT_SUCCESS)
-	{
-		(*pFoundMsg)++;
-		(*pFoundMsgTmpLen)--;
-		if (*pFoundMsgTmpLen < MIN_STANDARD_BUF_LEN_RPLIDAR)
-		{
-			*pFoundMsg = NULL;
-			*pFoundMsgTmpLen = 0;
-			return EXIT_FAILURE;
-		}
-	}
-
-	return EXIT_SUCCESS;
+	UNREFERENCED_PARAMETER(reqlen);
+	return (SEND_MODE_MASK_RPLIDAR & req[2]);
 }
 
-// If this function succeeds, the beginning of *pFoundMsg should contain the latest valid message
-// but there might be other data at the end. Data in the beginning of buf might have been discarded, 
-// including valid messages.
-inline int FindLatestRPLIDARMessage(char* buf, int buflen, char** pFoundMsg, int* pFoundMsgTmpLen)
+// req must contain a valid request of reqlen bytes.
+inline int GetDataResponseLengthFromResponseDescriptorRPLIDAR(unsigned char* req, int reqlen)
 {
-	char* ptr = NULL;
 	int len = 0;
-	int msglen = 0;
+	UNREFERENCED_PARAMETER(reqlen);
+	len = ((req[5]<<24)|(req[4]<<16)|(req[3]<<8)|(req[2]))>>DATA_RESPONSE_LENGTH_SHIFT_RPLIDAR;
+	return len;
+}
 
-	if (FindRPLIDARMessage(buf, buflen, &ptr, &len) != EXIT_SUCCESS)
+inline int StopRequestRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,STOP_REQUEST_RPLIDAR};
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
 	{
-		*pFoundMsg = NULL;
-		*pFoundMsgTmpLen = 0;
+		printf("Error writing data to a RPLIDAR. \n");
 		return EXIT_FAILURE;
 	}
-	for (;;) 
+
+	// Host systems should wait for at least 1 millisecond (ms) before sending another request.
+	mSleep(1);
+
+	return EXIT_SUCCESS;
+}
+
+inline int ResetRequestRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,RESET_REQUEST_RPLIDAR};
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
 	{
-		// Save the position of the beginning of the message.
-		*pFoundMsg = ptr;
-		*pFoundMsgTmpLen = len;
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
 
-		// Expected min message length.
-		msglen = MIN_STANDARD_BUF_LEN_RPLIDAR;
+	// Host systems should wait for at least 2 milliseconds (ms) before sending another request.
+	mSleep(2);
 
-		// Search just after the message.
-		if (FindRPLIDARMessage(*pFoundMsg+msglen, *pFoundMsgTmpLen-msglen, &ptr, &len) != EXIT_SUCCESS)
-		{
-			break;
-		}
+	return EXIT_SUCCESS;
+}
+
+// Undocumented...
+inline int GetStartupMessageRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	//unsigned char databuf[57]; // A2...
+	//unsigned char databuf[MAX_NB_BYTES_RPLIDAR];
+	//int nbReadBytes = 0;
+
+	//// Undocumented response for A2...
+	//memset(databuf, 0, sizeof(databuf));
+	//if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
+	//{ 
+	//	printf("A RPLIDAR is not responding correctly. \n");
+	//	return EXIT_FAILURE;	
+	//}
+
+	// Undocumented response...
+	mSleep(100);
+
+	//memset(databuf, 0, sizeof(databuf));
+	//if (ReadRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf), &nbReadBytes) != EXIT_SUCCESS)
+	//{ 
+	//	//printf("Warning : A RPLIDAR might not be responding correctly. \n");
+	//	//return EXIT_FAILURE;	
+	//}
+
+	if (PurgeRS232Port(&pRPLIDAR->RS232Port) != EXIT_SUCCESS)
+	{
+		printf("Warning : A RPLIDAR might not be responding correctly. \n");
+		return EXIT_FAILURE;
 	}
 
 	return EXIT_SUCCESS;
 }
 
-// If this function succeeds, *pFoundMsg should contain the latest valid message 
-// (of *pFoundMsgLen bytes).
-// Data in the beginning of buf (*pFoundMsg-buf bytes starting at buf address), including valid 
-// messages might have been discarded.
-// Other data at the end of buf (*pRemainingDataLen bytes, that should not contain any valid message) 
-// might be available in *pRemainingData.
-//int FindLatestRPLIDARMessage(char* buf, int buflen, 
-//						char** pFoundMsg, int* pFoundMsgLen, 
-//						char** pRemainingData, int* pRemainingDataLen);
-
-// We suppose that read operations return when a message has just been completely sent, and not randomly.
-inline int GetLatestRPLIDARMessageRPLIDAR(RPLIDAR* pRPLIDAR, char* databuf, int databuflen, int* pNbdatabytes)
+inline int GetHealthRequestRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbProtectionStop)
 {
-	char recvbuf[2*MAX_NB_BYTES_RPLIDAR];
-	char savebuf[MAX_NB_BYTES_RPLIDAR];
-	int BytesReceived = 0, Bytes = 0, recvbuflen = 0;
-	char* ptr = NULL;
-	int len = 0;
-	int i = 0, j = 0, k = 0, nbFullDataBlocks = 0, PartialDataBlockLen = 0;
-	CHRONO chrono;
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,GET_HEALTH_REQUEST_RPLIDAR};
+	unsigned char descbuf[7];
+	unsigned char databuf[3];
 
-	StartChrono(&chrono);
-
-	// Prepare the buffers.
-	memset(recvbuf, 0, sizeof(recvbuf));
-	memset(savebuf, 0, sizeof(savebuf));
-	recvbuflen = MAX_NB_BYTES_RPLIDAR-1; // The last character must be a 0 to be a valid string for sscanf.
-	BytesReceived = 0;
-
-	if (ReadRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen, &Bytes) != EXIT_SUCCESS)
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
 	{
-		printf("Error reading data from a RPLIDAR. \n");
-		return EXIT_FAILURE;
-	}
-	BytesReceived += Bytes;
-
-	if (BytesReceived >= recvbuflen)
-	{
-		// If the buffer is full and if the device always sends data, there might be old data to discard...
-
-		while (Bytes == recvbuflen)
-		{
-			if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_RPLIDAR)
-			{
-				printf("Error reading data from a RPLIDAR : Message timeout. \n");
-				return EXIT_TIMEOUT;
-			}
-			memcpy(savebuf, recvbuf, Bytes);
-			if (ReadRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen, &Bytes) != EXIT_SUCCESS)
-			{
-				printf("Error reading data from a RPLIDAR. \n");
-				return EXIT_FAILURE;
-			}
-			BytesReceived += Bytes;
-		}
-
-		// The desired message should be among all the data gathered, unless there was 
-		// so many other messages sent after that the desired message was in the 
-		// discarded data, or we did not wait enough...
-
-		memmove(recvbuf+recvbuflen-Bytes, recvbuf, Bytes);
-		memcpy(recvbuf, savebuf+Bytes, recvbuflen-Bytes);
-
-		// Only the last recvbuflen bytes received should be taken into account in what follows.
-		BytesReceived = recvbuflen;
-	}
-
-	// The data need to be analyzed and we must check if we need to get more data from 
-	// the device to get the desired message.
-	// But normally we should not have to get more data unless we did not wait enough
-	// for the desired message...
-
-	while (FindLatestRPLIDARMessage(recvbuf, BytesReceived, &ptr, &len) != EXIT_SUCCESS)
-	{
-		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_RPLIDAR)
-		{
-			printf("Error reading data from a RPLIDAR : Message timeout. \n");
-			return EXIT_TIMEOUT;
-		}
-		// The last character must be a 0 to be a valid string for sscanf.
-		if (BytesReceived >= 2*MAX_NB_BYTES_RPLIDAR-1)
-		{
-			printf("Error reading data from a RPLIDAR : Invalid data. \n");
-			return EXIT_INVALID_DATA;
-		}
-		if (ReadRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf+BytesReceived, 2*MAX_NB_BYTES_RPLIDAR-1-BytesReceived, &Bytes) != EXIT_SUCCESS)
-		{
-			printf("Error reading data from a RPLIDAR. \n");
-			return EXIT_FAILURE;
-		}
-		BytesReceived += Bytes;
-	}
-
-	// Get data bytes.
-	memset(databuf, 0, databuflen);
-		
-	// MD response...
-	// "MD%04d%04d%02d%01d%02d\n99b\n%04d%01d\n  %01d\n    %01d\n\n" ..., &RemainingScans, &TimeStamp, &sum
-
-	i = 25;
-	for (;;)
-	{
-		if ((ptr[i] == '\n')&&(ptr[i+1] == '\n')) break;
-		i++;
-		if (i >= len-1) 
-		{
-			printf("Error reading data from a RPLIDAR. \n");
-			return EXIT_FAILURE;
-		}
-	}
-
-	len = i+2;
-
-	nbFullDataBlocks = (len-27)/66;
-	PartialDataBlockLen = (len-27)%66-2;
-
-	// If PartialDataBlockLen <= 0, no partial block, only full of 64 bytes.
-	*pNbdatabytes = (PartialDataBlockLen <= 0)? 64*nbFullDataBlocks: 64*nbFullDataBlocks+PartialDataBlockLen;
-
-	// Check the number of data bytes before copy.
-	if (databuflen < *pNbdatabytes)
-	{
-		printf("Too small data buffer.\n");
+		printf("Error writing data to a RPLIDAR. \n");
 		return EXIT_FAILURE;
 	}
 
-	// Copy the data bytes of the message.
-	if (*pNbdatabytes > 0)
-	{
-		j = 0;
-		i = 26;
-		for (k = 0; k < nbFullDataBlocks; k++)
-		{
-			memcpy(databuf+j, ptr+i, 64);
-			j += 64;
-			i += 66;
-		}
-		if (PartialDataBlockLen > 0) memcpy(databuf+j, ptr+i, PartialDataBlockLen);
-	}
-
-	return EXIT_SUCCESS;
-}
-
-inline int GetLatestDataRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistances, double* pAngles)
-{
-	char databuf[MAX_NB_BYTES_RPLIDAR];
-	int nbdatabytes = 0;
-	int i = 0, k = 0;
-
-	memset(databuf, 0, sizeof(databuf));
-	nbdatabytes = 0;
-	if (GetLatestRPLIDARMessageRPLIDAR(pRPLIDAR, databuf, sizeof(databuf), &nbdatabytes)
-		!= EXIT_SUCCESS)
+	// Receive the response descriptor.
+	memset(descbuf, 0, sizeof(descbuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, descbuf, sizeof(descbuf)) != EXIT_SUCCESS)
 	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
 		return EXIT_FAILURE;	
 	}
 
-	// Analyze data.
-
-	//memset(pRPLIDARData, 0, sizeof(RPLIDARDATA));
-	
-	// Note : the scanner rotates in an anti-clockwise direction when viewed from top.
-
-	// 20-5600 mm, 682 pings...
-	
-	k = 0;
-	for (i = 0; i < nbdatabytes; i += 3)
-	{
-		pAngles[k] = (k+pRPLIDAR->StartingStep-pRPLIDAR->FrontStep+pRPLIDAR->SlitDivision/2)*pRPLIDAR->StepAngleSize*M_PI/180.0-M_PI;
-		pDistances[k] = CharacterDecodingRPLIDAR(databuf+i, 3)/1000.0;
-		k++;
+	// Quick check of the response descriptor.
+	if ((descbuf[2] != 0x03)||(descbuf[6] != DEVHEALTH_RESPONSE_RPLIDAR))
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
 	}
 
+	// Receive the data response.
+	memset(databuf, 0, sizeof(databuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
 
-	// File for data : tv_sec;tv_usec;angle (in rad, 0 is front);distance (in m);
+	// Analyze the data response.
+	*pbProtectionStop = (databuf[0] == STATUS_ERROR_RPLIDAR)? TRUE: FALSE;
 
+	return EXIT_SUCCESS;
+}
 
-	//pRPLIDAR->LastRPLIDARData = *pRPLIDARData;
+// SerialNumber must be a null-terminated string of at least 2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1 bytes, including 0.
+inline int GetInfoRequestRPLIDAR(RPLIDAR* pRPLIDAR, int* pModelID, int* pHardwareVersion, int* pFirmwareMajor, int* pFirmwareMinor, char* SerialNumber)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,GET_INFO_REQUEST_RPLIDAR};
+	unsigned char descbuf[7];
+	unsigned char databuf[20];
+	unsigned char serialnumber[NB_BYTES_SERIAL_NUMBER_RPLIDAR];
+	int i = 0;
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	// Receive the response descriptor.
+	memset(descbuf, 0, sizeof(descbuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, descbuf, sizeof(descbuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Quick check of the response descriptor.
+	if ((descbuf[2] != 0x14)||(descbuf[6] != DEVINFO_RESPONSE_RPLIDAR))
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Receive the data response.
+	memset(databuf, 0, sizeof(databuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Analyze the data response.
+	*pModelID = databuf[0];
+	*pFirmwareMinor = databuf[1];
+	*pFirmwareMajor = databuf[2];
+	*pHardwareVersion = databuf[3];
+	memcpy(serialnumber, databuf+4, NB_BYTES_SERIAL_NUMBER_RPLIDAR);
+
+	// 128bit unique serial number, when converting to text in hex, the Least Significant Byte prints first.
+	memset(SerialNumber, 0, 2*NB_BYTES_SERIAL_NUMBER_RPLIDAR+1);
+	for (i = 0; i < NB_BYTES_SERIAL_NUMBER_RPLIDAR; i++)
+	{
+		sprintf(SerialNumber+2*i, "%02X", (int)(unsigned char)serialnumber[i]);
+	}
+
+	return EXIT_SUCCESS;
+}
+
+// Tstandard, Texpress : Time in us used when RPLIDAR takes a single laser ranging in SCAN and EXPRESS_SCAN modes.
+inline int GetSampleRateRequestRPLIDAR(RPLIDAR* pRPLIDAR, int* pTstandard, int* pTexpress)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,GET_SAMPLERATE_REQUEST_RPLIDAR};
+	unsigned char descbuf[7];
+	unsigned char databuf[4];
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	// Receive the response descriptor.
+	memset(descbuf, 0, sizeof(descbuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, descbuf, sizeof(descbuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Quick check of the response descriptor.
+	if ((descbuf[2] != 0x04)||(descbuf[6] != SAMPLERATE_RESPONSE_RPLIDAR))
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Receive the data response.
+	memset(databuf, 0, sizeof(databuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Analyze the data response.
+	*pTstandard = (unsigned short)((databuf[1]<<8)|databuf[0]);
+	*pTexpress = (unsigned short)((databuf[3]<<8)|databuf[2]);
+
+	return EXIT_SUCCESS;
+}
+
+// Undocumented...
+inline int SetMotorPWMRequestRPLIDAR(RPLIDAR* pRPLIDAR, int pwm)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,SET_MOTOR_PWM_REQUEST_RPLIDAR,0x02,0,0,0};
+
+	reqbuf[3] = (unsigned char)pwm;
+	reqbuf[4] = (unsigned char)(pwm>>8);
+	reqbuf[5] = ComputeChecksumRPLIDAR(reqbuf, sizeof(reqbuf));
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	mSleep(500);
+
+	return EXIT_SUCCESS;
+}
+
+inline int StartScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,SCAN_REQUEST_RPLIDAR};
+	unsigned char descbuf[7];
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	// Receive the response descriptor.
+	memset(descbuf, 0, sizeof(descbuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, descbuf, sizeof(descbuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Quick check of the response descriptor.
+	if ((descbuf[2] != 0x05)||(descbuf[5] != 0x40)||(descbuf[6] != MEASUREMENT_RESPONSE_RPLIDAR))
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int StartForceScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,FORCE_SCAN_REQUEST_RPLIDAR};
+	unsigned char descbuf[7];
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	// Receive the response descriptor.
+	memset(descbuf, 0, sizeof(descbuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, descbuf, sizeof(descbuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Quick check of the response descriptor.
+	if ((descbuf[2] != 0x05)||(descbuf[5] != 0x40)||(descbuf[6] != MEASUREMENT_RESPONSE_RPLIDAR))
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbNewScan, int* pQuality, double* pAngle, double* pDistance)
+{
+	unsigned char databuf[5];
+	unsigned short angle_q6 = 0;
+	unsigned short distance_q2 = 0;
+
+	// Receive the data response.
+	memset(databuf, 0, sizeof(databuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Analyze the data response.
+	*pbNewScan = (SCAN_DATA_RESPONSE_START_BIT_MASK_RPLIDAR & databuf[0]);
+	if (*pbNewScan == ((SCAN_DATA_RESPONSE_INVERTED_START_BIT_MASK_RPLIDAR & databuf[0])>>1))
+	{ 
+		printf("A RPLIDAR is not responding correctly: Bad inversed start bit. \n");
+		return EXIT_FAILURE;	
+	}
+	if ((SCAN_DATA_RESPONSE_CHECK_BIT_MASK_RPLIDAR & databuf[1]) != 1)
+	{ 
+		printf("A RPLIDAR is not responding correctly : Bad check bit. \n");
+		return EXIT_FAILURE;	
+	}
+	*pQuality = (unsigned char)(databuf[0]>>2);
+	angle_q6 = (databuf[2]<<7)|(databuf[1]>>1);
+	distance_q2 = (databuf[4]<<8)|databuf[3];
+
+	// Convert in rad.
+	*pAngle = fmod_2PI_deg2rad(-angle_q6/64.0);
+
+	// Convert in m.
+	*pDistance = distance_q2/4000.0;
+
+	return EXIT_SUCCESS;
+}
+
+// Corresponding data response not yet implemented...
+inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,EXPRESS_SCAN_REQUEST_RPLIDAR,0x05,0,0,0,0,0,0x22};
+	unsigned char descbuf[7];
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	// Receive the response descriptor.
+	memset(descbuf, 0, sizeof(descbuf));
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, descbuf, sizeof(descbuf)) != EXIT_SUCCESS)
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
+
+	// Quick check of the response descriptor.
+	if ((descbuf[2] != 0x54)||(descbuf[5] != 0x40)||(descbuf[6] != MEASUREMENT_CAPSULED_RESPONSE_RPLIDAR))
+	{ 
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;	
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -359,12 +499,7 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 {
 	FILE* file = NULL;
 	char line[256];
-	char sendbuf[MAX_NB_BYTES_RPLIDAR];
-	int sendbuflen = 0;
-	char recvbuf[MAX_NB_BYTES_RPLIDAR];
-	int recvbuflen = 0;
-	int ivalue = 0, Status = 0;
-	char Sum = 0;
+	BOOL bProtectionStop = FALSE;
 
 	memset(pRPLIDAR->szCfgFilePath, 0, sizeof(pRPLIDAR->szCfgFilePath));
 	sprintf(pRPLIDAR->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -381,15 +516,8 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		pRPLIDAR->BaudRate = 115200;
 		pRPLIDAR->timeout = 1000;
 		pRPLIDAR->bSaveRawData = 1;
-		pRPLIDAR->bForceSCIP20 = 0;
-		pRPLIDAR->bHS = 0;
-		pRPLIDAR->SlitDivision = 1024;
-		pRPLIDAR->StartingStep = 44;
-		pRPLIDAR->FrontStep = 384;
-		pRPLIDAR->EndStep = 725;
-		pRPLIDAR->ClusterCount = 0;
-		pRPLIDAR->ScanInterval = 0;
-		pRPLIDAR->bContinuousNumberOfScans = 1;
+		pRPLIDAR->ScanMode = 0;
+		pRPLIDAR->motordelay = 500;
 		pRPLIDAR->alpha_max_err = 0.01;
 		pRPLIDAR->d_max_err = 0.1;
 
@@ -406,23 +534,9 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRPLIDAR->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->bForceSCIP20) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRPLIDAR->ScanMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->bHS) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->SlitDivision) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->StartingStep) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->FrontStep) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->EndStep) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->ClusterCount) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->ScanInterval) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pRPLIDAR->bContinuousNumberOfScans) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRPLIDAR->motordelay) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pRPLIDAR->alpha_max_err) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -434,20 +548,6 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 			printf("Configuration file not found.\n");
 		}
 	}
-
-	if (pRPLIDAR->SlitDivision <= 0)
-	{
-		printf("Invalid parameter : SlitDivision.\n");
-		pRPLIDAR->SlitDivision = 1024;
-	}
-	if (pRPLIDAR->ClusterCount < 0)
-	{
-		printf("Invalid parameter : ClusterCount.\n");
-		pRPLIDAR->ClusterCount = 0;
-	}
-		
-	pRPLIDAR->StepAngleSize = 360.0*(pRPLIDAR->ClusterCount+1)/pRPLIDAR->SlitDivision;
-	pRPLIDAR->StepCount = (pRPLIDAR->EndStep-pRPLIDAR->StartingStep+1)/(pRPLIDAR->ClusterCount+1);
 
 	// Used to save raw data, should be handled specifically...
 	//pRPLIDAR->pfSaveFile = NULL;
@@ -466,190 +566,95 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		return EXIT_FAILURE;
 	}
 
-	if (pRPLIDAR->bForceSCIP20)
-	{	
-		// Force SCIP2.0 mode.
+	GetStartupMessageRPLIDAR(pRPLIDAR);
 
-		// Prepare data to send to device.
-		memset(sendbuf, 0, sizeof(sendbuf));
-		strcpy(sendbuf, "SCIP2.0\n");
-		sendbuflen = (int)strlen(sendbuf);
-
-		if (WriteAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
-		{
-			printf("Unable to connect to a RPLIDAR.\n");
-			CloseRS232Port(&pRPLIDAR->RS232Port);
-			return EXIT_FAILURE;
-		}
-
-		// Prepare the buffers.
-		memset(recvbuf, 0, sizeof(recvbuf));
-		recvbuflen = 12;
-
-		if (ReadAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
-		{
-			printf("Unable to connect to a RPLIDAR.\n");
-			CloseRS232Port(&pRPLIDAR->RS232Port);
-			return EXIT_FAILURE;
-		}
-
-		// Check response.
-		if (strcmp(recvbuf, "SCIP2.0\n00\n\n") != 0)
-		{
-			printf("Unable to connect to a RPLIDAR.\n");
-			CloseRS232Port(&pRPLIDAR->RS232Port);
-			return EXIT_FAILURE;
-		}
-	}
-	
-	// RS command to reset.
-	
-	// Prepare data to send to device.
-	memset(sendbuf, 0, sizeof(sendbuf));
-	strcpy(sendbuf, "RS\n");
-	sendbuflen = (int)strlen(sendbuf);
-
-	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	memset(pRPLIDAR->SerialNumber, 0, sizeof(pRPLIDAR->SerialNumber));
+	if (GetInfoRequestRPLIDAR(pRPLIDAR, &pRPLIDAR->model, &pRPLIDAR->hardware, &pRPLIDAR->firmware_major, &pRPLIDAR->firmware_minor, pRPLIDAR->SerialNumber) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a RPLIDAR : RS command failure.\n");
-		CloseRS232Port(&pRPLIDAR->RS232Port);
-		return EXIT_FAILURE;
-	}
-		
-	// Prepare the buffers.
-	memset(recvbuf, 0, sizeof(recvbuf));
-	recvbuflen = 8;
-
-	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a RPLIDAR : RS command failure.\n");
+		printf("Unable to connect to a RPLIDAR : GET_INFO failure.\n");
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}
 
-	// Check response.
-	if (strcmp(recvbuf, "RS\n00P\n\n") != 0)
+	if (GetHealthRequestRPLIDAR(pRPLIDAR, &bProtectionStop) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a RPLIDAR : RS command failure.\n");
+		printf("Unable to connect to a RPLIDAR : GET_HEALTH failure.\n");
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}
 
-	// BM command to switch on the laser.
-
-	// Prepare data to send to device.
-	memset(sendbuf, 0, sizeof(sendbuf));
-	strcpy(sendbuf, "BM\n");
-	sendbuflen = (int)strlen(sendbuf);
-
-	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (bProtectionStop)
 	{
-		printf("Unable to connect to a RPLIDAR : BM command failure.\n");
-		CloseRS232Port(&pRPLIDAR->RS232Port);
-		return EXIT_FAILURE;
+		if (ResetRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a RPLIDAR : RESET failure.\n");
+			CloseRS232Port(&pRPLIDAR->RS232Port);
+			return EXIT_FAILURE;
+		}
+		GetStartupMessageRPLIDAR(pRPLIDAR);
 	}
-		
-	// Prepare the buffers.
-	memset(recvbuf, 0, sizeof(recvbuf));
-	recvbuflen = 8;
 
-	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (GetSampleRateRequestRPLIDAR(pRPLIDAR, &pRPLIDAR->Tstandard, &pRPLIDAR->Texpress) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a RPLIDAR : BM command failure.\n");
+		printf("Unable to connect to a RPLIDAR : GET_SAMPLERATE failure.\n");
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}
 
-	// Check response.
-	Status = 0; Sum = 0;
-	if ((sscanf(recvbuf, "BM\n%02d%c\n\n", &Status, &Sum) != 2)||((Status != 0)&&(Status != 2)))
+	if (SetMotorPWMRequestRPLIDAR(pRPLIDAR, DEFAULT_MOTOR_PWM_RPLIDAR) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to a RPLIDAR : BM command failure.\n");
+		printf("Unable to connect to a RPLIDAR : SET_MOTOR_PWM failure.\n");
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}
-	
-	if (pRPLIDAR->bHS)
+
+	// Stop any currently running scan.
+	if (StopRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 	{
-		// HS command to activate high sensitivity if available.
-
-		// Prepare data to send to device.
-		memset(sendbuf, 0, sizeof(sendbuf));
-		strcpy(sendbuf, "HS1\n");
-		sendbuflen = (int)strlen(sendbuf);
-
-		if (WriteAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
-		{
-			printf("Unable to connect to a RPLIDAR : HS command failure.\n");
-			CloseRS232Port(&pRPLIDAR->RS232Port);
-			return EXIT_FAILURE;
-		}
-
-		// Prepare the buffers.
-		memset(recvbuf, 0, sizeof(recvbuf));
-		recvbuflen = 9;
-
-		if (ReadAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
-		{
-			printf("Unable to connect to a RPLIDAR : HS command failure.\n");
-			CloseRS232Port(&pRPLIDAR->RS232Port);
-			return EXIT_FAILURE;
-		}
-
-		// Check response.
-		ivalue = 0; Status = 0; Sum = 0;
-		if ((sscanf(recvbuf, "HS%01d\n%02d%c\n\n", &ivalue, &Status, &Sum) != 3)||((Status != 0)&&(Status != 2)))
-		{
-			printf("Unable to connect to a RPLIDAR : HS command failure.\n");
-			CloseRS232Port(&pRPLIDAR->RS232Port);
-			return EXIT_FAILURE;
-		}
+		printf("Unable to connect to a RPLIDAR : STOP failure.\n");
+		CloseRS232Port(&pRPLIDAR->RS232Port);
+		return EXIT_FAILURE;
 	}
 
-	// Other mode not yet handled...
-
-	//if (pRPLIDAR->bContinuousNumberOfScans)
+	switch (pRPLIDAR->ScanMode)
 	{
-		// MD command to start data acquisition.
-
-		// Prepare data to send to device.
-		memset(sendbuf, 0, sizeof(sendbuf));
-		sprintf(sendbuf, "MD%04d%04d%02d%01d00\n", pRPLIDAR->StartingStep, pRPLIDAR->EndStep, pRPLIDAR->ClusterCount, pRPLIDAR->ScanInterval);
-		sendbuflen = (int)strlen(sendbuf);
-
-		if (WriteAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	case 0:
+		if (StartScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a RPLIDAR : MD command failure.\n");
+			printf("Unable to connect to a RPLIDAR : SCAN failure.\n");
 			CloseRS232Port(&pRPLIDAR->RS232Port);
 			return EXIT_FAILURE;
 		}
-
-		// Prepare the buffers.
-		memset(recvbuf, 0, sizeof(recvbuf));
-		recvbuflen = 21;
-
-		if (ReadAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+		break;
+	//case 1:
+	//	if (StartExpressScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
+	//	{
+	//		printf("Unable to connect to a RPLIDAR : EXPRESS_SCAN failure.\n");
+	//		CloseRS232Port(&pRPLIDAR->RS232Port);
+	//		return EXIT_FAILURE;
+	//	}
+	//	break;
+	case 2:
+		if (StartForceScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a RPLIDAR : MD command failure.\n");
+			printf("Unable to connect to a RPLIDAR : FORCE_SCAN failure.\n");
 			CloseRS232Port(&pRPLIDAR->RS232Port);
 			return EXIT_FAILURE;
 		}
-
-		// Check response.
-		ivalue = 0;
-		if (sscanf(recvbuf, "MD%04d%04d%02d%01d%02d\n00P\n\n", &ivalue, &ivalue, &ivalue, &ivalue, &ivalue) != 5)
+		break;
+	default:
+		if (StartScanRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a RPLIDAR : MD command failure.\n");
+			printf("Unable to connect to a RPLIDAR : SCAN failure.\n");
 			CloseRS232Port(&pRPLIDAR->RS232Port);
 			return EXIT_FAILURE;
 		}
-
-		// checking...
-		// sscanf("echo...%02d%c\n\n", &Status, &Sum);
-		// status == 0
-
+		break;
 	}
-	
+
+	// Wait for the motor rotation to become stable.
+	mSleep(pRPLIDAR->motordelay);
+
 	printf("RPLIDAR connected.\n");
 
 	return EXIT_SUCCESS;
@@ -657,43 +662,20 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 
 inline int DisconnectRPLIDAR(RPLIDAR* pRPLIDAR)
 {		
-	char sendbuf[4];
-	int sendbuflen = 0;
-	//char recvbuf[9];
-	//int recvbuflen = 0;
+	if (StopRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
+	{
+		printf("RPLIDAR disconnection failed.\n");
+		SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
+		CloseRS232Port(&pRPLIDAR->RS232Port);
+		return EXIT_FAILURE;
+	}
 
-	// QT command to switch off the laser.
-
-	// Prepare data to send to device.
-	memset(sendbuf, 0, sizeof(sendbuf));
-	strcpy(sendbuf, "QT\n");
-	sendbuflen = (int)strlen(sendbuf);
-
-	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0) != EXIT_SUCCESS)
 	{
 		printf("RPLIDAR disconnection failed.\n");
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}
-	
-	//// Prepare the buffers.
-	//memset(recvbuf, 0, sizeof(recvbuf));
-	//recvbuflen = 8;
-
-	//if (ReadAllRS232Port(&pRPLIDAR->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
-	//{
-	//	printf("RPLIDAR disconnection failed.\n");
-	//	CloseRS232Port(&pRPLIDAR->RS232Port);
-	//	return EXIT_FAILURE;
-	//}
-
-	//// Check response.
-	//if (strcmp(recvbuf, "QT\n00P\n\n") != 0)
-	//{
-	//	printf("RPLIDAR disconnection failed.\n");
-	//	CloseRS232Port(&pRPLIDAR->RS232Port);
-	//	return EXIT_FAILURE;
-	//}
 
 	if (CloseRS232Port(&pRPLIDAR->RS232Port) != EXIT_SUCCESS)
 	{

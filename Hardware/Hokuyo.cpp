@@ -113,29 +113,35 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				// Simulate a sonar...
-
-				d_all_mes.clear();
-				d_all_mes.push_back(d_mes);
-				alpha_mes_vector.push_back(alpha_mes);
-				d_mes_vector.push_back(d_mes);
-				d_all_mes_vector.push_back(d_all_mes);
-				t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-				xhat_history_vector.push_back(xhat);
-				yhat_history_vector.push_back(yhat);
-				thetahat_history_vector.push_back(thetahat);
-				vxyhat_history_vector.push_back(vxyhat);
-
-				if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+				for (i = 0; i < hokuyo.StepCount; i++)
 				{
-					alpha_mes_vector.pop_front();
-					d_mes_vector.pop_front();
-					d_all_mes_vector.pop_front();
-					t_history_vector.pop_front();
-					xhat_history_vector.pop_front();
-					yhat_history_vector.pop_front();
-					thetahat_history_vector.pop_front();
-					vxyhat_history_vector.pop_front();
+					alpha_mes = angles[i];
+					d_mes = distances[i];
+
+					// Simulate a sonar...
+
+					d_all_mes.clear();
+					d_all_mes.push_back(d_mes);
+					alpha_mes_vector.push_back(alpha_mes);
+					d_mes_vector.push_back(d_mes);
+					d_all_mes_vector.push_back(d_all_mes);
+					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+					xhat_history_vector.push_back(xhat);
+					yhat_history_vector.push_back(yhat);
+					thetahat_history_vector.push_back(thetahat);
+					vxyhat_history_vector.push_back(vxyhat);
+
+					if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+					{
+						alpha_mes_vector.pop_front();
+						d_mes_vector.pop_front();
+						d_all_mes_vector.pop_front();
+						t_history_vector.pop_front();
+						xhat_history_vector.pop_front();
+						yhat_history_vector.pop_front();
+						thetahat_history_vector.pop_front();
+						vxyhat_history_vector.pop_front();
+					}
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);

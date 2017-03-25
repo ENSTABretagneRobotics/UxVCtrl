@@ -1,3 +1,7 @@
+146
+Continuation of RPLIDAR integration.
+Corrected Hokuyo w.r.t. sonar.
+
 145
 Added waitlinetrelative, waitlinetwgs commands (to check).
 Attempt to correct a bug in NMEA checksum computation.

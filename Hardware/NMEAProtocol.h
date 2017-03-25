@@ -134,6 +134,7 @@ inline void EncodeSentenceNMEA(char* sentence, int* psentencelen, char* talkerid
 	strcpy(&sentence[1+strlen(talkerid)], mnemonic);
 	memcpy(&sentence[1+strlen(talkerid)+strlen(mnemonic)], payload, payloadlen);
 	*psentencelen = 1+strlen(talkerid)+strlen(mnemonic)+payloadlen+MAX_NB_BYTES_CHECKSUM_NMEA+MAX_NB_BYTES_END_NMEA;
+	sentence[*psentencelen-5] = '*';
 	ComputeChecksumNMEA(sentence, *psentencelen, checksum);
 	strcpy(&sentence[*psentencelen-MAX_NB_BYTES_END_NMEA-MAX_NB_BYTES_CHECKSUM_NMEA], checksum);
 	sentence[*psentencelen-2] = '\r';

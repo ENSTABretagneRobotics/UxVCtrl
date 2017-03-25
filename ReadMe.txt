@@ -70,6 +70,7 @@ Hardware support :
 - NMEADevice : GPS, Furuno WS200 weather station, AIS Receiver dAISy.
 - P33x : Keller pressure sensor PAA-33x.
 - RazorAHRS : SparkFun 9DOF Razor IMU.
+- RPLIDAR : RPLIDAR A2 laser telemeter.
 - SBG : SBG Systems Ellipse-N AHRS.
 - Seanet : Tritech Micron Sonar, Tritech Miniking Sonar.
 - SSC-32 : Lynxmotion SSC-32, SSC-32u servo controllers.

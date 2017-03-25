@@ -16,8 +16,12 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 	RPLIDAR rplidar;
 	//RPLIDARDATA rplidardata;
 	struct timeval tv;
-	double angles[MAX_SLITDIVISION_RPLIDAR];
-	double distances[MAX_SLITDIVISION_RPLIDAR];
+	BOOL bNewScan = 0;
+	int quality = 0;
+	double angle = 0;
+	double distance = 0;
+	//double angles[MAX_SLITDIVISION_RPLIDAR];
+	//double distances[MAX_SLITDIVISION_RPLIDAR];
 	BOOL bConnected = FALSE;
 	int i = 0;
 	char szSaveFilePath[256];
@@ -29,7 +33,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(50);
+		//mSleep(50);
 
 		if (bPauseRPLIDAR) 
 		{
@@ -62,8 +66,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 				bConnected = TRUE; 
 
 				memset(&tv, 0, sizeof(tv));
-				memset(angles, 0, sizeof(angles));
-				memset(distances, 0, sizeof(distances));
+				//memset(angles, 0, sizeof(angles));
+				//memset(distances, 0, sizeof(distances));
 
 				if (rplidar.pfSaveFile != NULL)
 				{
@@ -107,13 +111,16 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 		}
 		else
 		{
-			if (GetLatestDataRPLIDAR(&rplidar, distances, angles) == EXIT_SUCCESS)
+			if (GetScanDataResponseRPLIDAR(&rplidar, &bNewScan, &quality, &angle, &distance) == EXIT_SUCCESS)
 			{
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				EnterCriticalSection(&StateVariablesCS);
 
 				// Simulate a sonar...
+
+				d_mes = distance;
+				alpha_mes = angle;
 
 				d_all_mes.clear();
 				d_all_mes.push_back(d_mes);
@@ -147,10 +154,11 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					//	fprintf(rplidar.pfSaveFile, "%d;%d;%.3f;%.3f;\n", (int)tv.tv_sec, (int)tv.tv_usec, angles[i], distances[i]);
 					//}
 					fprintf(rplidar.pfSaveFile, "%d;%d;", (int)tv.tv_sec, (int)tv.tv_usec);
-					for (i = 0; i < rplidar.StepCount; i++)
+					/*for (i = 0; i < rplidar.StepCount; i++)
 					{
 						fprintf(rplidar.pfSaveFile, "%.3f;%.3f;", angles[i], distances[i]);
-					}
+					}*/
+					fprintf(rplidar.pfSaveFile, "%.3f;%.3f;", angle, distance);
 					fprintf(rplidar.pfSaveFile, "\n");
 					fflush(rplidar.pfSaveFile);
 				}
