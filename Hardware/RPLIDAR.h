@@ -88,6 +88,8 @@
 #define NB_CABINS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR 16
 #define NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR (2*NB_CABINS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)
 
+#define MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR 2048
+
 struct RPLIDAR
 {
 	RS232PORT RS232Port;
@@ -439,7 +441,7 @@ inline int StartForceScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 	return EXIT_SUCCESS;
 }
 
-inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbNewScan, int* pQuality, double* pAngle, double* pDistance)
+inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistance, double* pAngle, BOOL* pbNewScan, int* pQuality)
 {
 	unsigned char databuf[5];
 	unsigned short angle_q6 = 0;
@@ -534,8 +536,8 @@ inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 	return EXIT_SUCCESS;
 }
 
-// NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR angles, NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR distances...
-inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbNewScan, double* pAngles, double* pDistances)
+// NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR distances, NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR angles...
+inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistances, double* pAngles, BOOL* pbNewScan)
 {
 	unsigned char databuf[NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
 	unsigned char sync = 0;

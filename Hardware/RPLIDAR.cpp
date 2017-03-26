@@ -9,19 +9,18 @@
 
 #include "Config.h"
 #include "RPLIDAR.h"
-//#include "RPLIDARProcessing.h"
 
 THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 {
 	RPLIDAR rplidar;
 	//RPLIDARDATA rplidardata;
 	struct timeval tv;
-	BOOL bNewScan = 0;
-	int quality = 0;
-	double angle = 0;
-	double distance = 0;
 	double angles[NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
 	double distances[NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
+	BOOL bNewScan = 0;
+	double angle = 0;
+	double distance = 0;
+	int quality = 0;
 	BOOL bConnected = FALSE;
 	int i = 0;
 	char szSaveFilePath[256];
@@ -114,7 +113,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 			switch (rplidar.ScanMode)
 			{
 			case EXPRESS_SCAN_MODE_RPLIDAR:
-				if (GetExpressScanDataResponseRPLIDAR(&rplidar, &bNewScan, angles, distances) == EXIT_SUCCESS)
+				if (GetExpressScanDataResponseRPLIDAR(&rplidar, distances, angles, &bNewScan) == EXIT_SUCCESS)
 				{
 					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
@@ -125,7 +124,19 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						alpha_mes = angles[i];
 						d_mes = distances[i];
 
-						// Simulate a sonar...
+						// Simulate a Seanet...
+
+						if ((bNewScan&&((int)alpha_mes_vector.size() > 0))||((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
+						{
+							alpha_mes_vector.pop_front();
+							d_mes_vector.pop_front();
+							d_all_mes_vector.pop_front();
+							t_history_vector.pop_front();
+							xhat_history_vector.pop_front();
+							yhat_history_vector.pop_front();
+							thetahat_history_vector.pop_front();
+							vxyhat_history_vector.pop_front();
+						}
 
 						d_all_mes.clear();
 						d_all_mes.push_back(d_mes);
@@ -137,18 +148,6 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						yhat_history_vector.push_back(yhat);
 						thetahat_history_vector.push_back(thetahat);
 						vxyhat_history_vector.push_back(vxyhat);
-
-						if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
-						{
-							alpha_mes_vector.pop_front();
-							d_mes_vector.pop_front();
-							d_all_mes_vector.pop_front();
-							t_history_vector.pop_front();
-							xhat_history_vector.pop_front();
-							yhat_history_vector.pop_front();
-							thetahat_history_vector.pop_front();
-							vxyhat_history_vector.pop_front();
-						}
 					}
 
 					LeaveCriticalSection(&StateVariablesCS);
@@ -179,7 +178,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 			case SCAN_MODE_RPLIDAR:
 			case FORCE_SCAN_MODE_RPLIDAR:
 			default:
-				if (GetScanDataResponseRPLIDAR(&rplidar, &bNewScan, &quality, &angle, &distance) == EXIT_SUCCESS)
+				if (GetScanDataResponseRPLIDAR(&rplidar, &distance, &angle, &bNewScan, &quality) == EXIT_SUCCESS)
 				{
 					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
@@ -188,7 +187,19 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					alpha_mes = angle;
 					d_mes = distance;
 
-					// Simulate a sonar...
+					// Simulate a Seanet...
+
+					if ((bNewScan&&((int)alpha_mes_vector.size() > 0))||((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
+					{
+						alpha_mes_vector.pop_front();
+						d_mes_vector.pop_front();
+						d_all_mes_vector.pop_front();
+						t_history_vector.pop_front();
+						xhat_history_vector.pop_front();
+						yhat_history_vector.pop_front();
+						thetahat_history_vector.pop_front();
+						vxyhat_history_vector.pop_front();
+					}
 
 					d_all_mes.clear();
 					d_all_mes.push_back(d_mes);
@@ -200,18 +211,6 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					yhat_history_vector.push_back(yhat);
 					thetahat_history_vector.push_back(thetahat);
 					vxyhat_history_vector.push_back(vxyhat);
-
-					if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
-					{
-						alpha_mes_vector.pop_front();
-						d_mes_vector.pop_front();
-						d_all_mes_vector.pop_front();
-						t_history_vector.pop_front();
-						xhat_history_vector.pop_front();
-						yhat_history_vector.pop_front();
-						thetahat_history_vector.pop_front();
-						vxyhat_history_vector.pop_front();
-					}
 
 					LeaveCriticalSection(&StateVariablesCS);
 

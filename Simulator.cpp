@@ -105,7 +105,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			bGPSOKSimulator = FALSE;
 		}
 		// Sonar.
-		alpha_mes = alpha_mes+0.1*omegas;
+		alpha_mes = alpha_mes+(simulatorperiod/1000.0)*omegas;
 		if (alpha_mes > 2*M_PI+alpha_0)
 		{
 			alpha_mes = alpha_0;
@@ -143,7 +143,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		thetahat_history_vector.push_back(thetahat);
 		vxyhat_history_vector.push_back(vxyhat);
 
-		if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+		if ((int)alpha_mes_vector.size() > 2*M_PI/((simulatorperiod/1000.0)*omegas))
 		{
 			alpha_mes_vector.pop_front();
 			d_mes_vector.pop_front();

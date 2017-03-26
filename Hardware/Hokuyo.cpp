@@ -9,7 +9,6 @@
 
 #include "Config.h"
 #include "Hokuyo.h"
-//#include "HokuyoProcessing.h"
 
 THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 {
@@ -118,7 +117,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 					alpha_mes = angles[i];
 					d_mes = distances[i];
 
-					// Simulate a sonar...
+					// Simulate a Seanet...
 
 					d_all_mes.clear();
 					d_all_mes.push_back(d_mes);
@@ -131,7 +130,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 					thetahat_history_vector.push_back(thetahat);
 					vxyhat_history_vector.push_back(vxyhat);
 
-					if ((int)alpha_mes_vector.size() > 2*M_PI/(0.1*omegas))
+					if ((int)alpha_mes_vector.size() > hokuyo.StepCount)
 					{
 						alpha_mes_vector.pop_front();
 						d_mes_vector.pop_front();

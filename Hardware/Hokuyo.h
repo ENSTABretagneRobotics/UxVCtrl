@@ -315,6 +315,7 @@ inline int GetLatestHokuyoMessageHokuyo(HOKUYO* pHokuyo, char* databuf, int data
 	return EXIT_SUCCESS;
 }
 
+// MAX_SLITDIVISION_HOKUYO distances, MAX_SLITDIVISION_HOKUYO angles...
 inline int GetLatestDataHokuyo(HOKUYO* pHokuyo, double* pDistances, double* pAngles)
 {
 	char databuf[MAX_NB_BYTES_HOKUYO];
