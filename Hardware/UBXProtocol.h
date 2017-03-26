@@ -730,7 +730,7 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 		case ACK_ACK_ID_UBX:
 			break;
 		case ACK_NAK_ID_UBX:
-			printf("UBX packet not acknowledged : mclass = %02x, mid = %02x. \n", mclass, mid);
+			printf("UBX packet not acknowledged : mclass = %02x, mid = %02x. \n", (int)(unsigned char)mclass, (int)(unsigned char)mid);
 			return EXIT_FAILURE;
 		default:
 			// Unhandled...

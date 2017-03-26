@@ -1,3 +1,8 @@
+149
+Corrected the use of ComputeChecksumNMEA() in EncodeSentenceNMEA().
+Minor update in SonarAltitudeEstimation.
+Correction in EXPRESS_SCAN angles computations for RPLIDAR.
+
 148
 Corrected Hokuyo, RPLIDAR and simulator w.r.t. sonar.
 

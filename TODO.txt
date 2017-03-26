@@ -1,19 +1,12 @@
-condition d'arrêt ComputeChecksumNMEA, utilisation dans encode, présence de *...
-s'assurer que ça buggue pas avec fausses trames nmea trop grandes...
+tester longtemps en release sans debugger
+
+Utiliser NMEAProtocol.h dans NMEA2CSV pour être plus pratique, faire aussi UBX2CSV (u-center semble pas pouvoir convertir)...
+
+Stabilisation profondeur peut-être pas pratique, affichage bleu détection pas clair...
+rajouter touche bSonarAltitudeEstimation?
+rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
 
 rajouter estimation de vitesse dans SOG pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
-gestion des corrections RTCM probablement mal faite...
-
-waitxyt x y t
-waitxytrelative x y t
-waitxytwgs
-waitlinet
-waitlinetrelative
-waitlinetrelativerobot
-waitlinetwgs
-
-dans les linefollowing, bLineFollowingControl n'est pas changé quand on a fini?
-les variantes sans t ont peut-être peu d'utilité...?
 
 add a visual studio config for Linux, utiliser dernière version linux headers?->extension vs_linux, qt .pro?
 chiffres significatifs...
@@ -42,14 +35,27 @@ changer les theta en psi et rajouter équations voilier
 changer les bruits d'état en bruits discrétisés...?
 fusion de certains fichiers avec UxVDataViewer, notamment forward et backward..., intégrer sonarstaticlocstructured et lecture vidéo dans UxVDataViewer?
 
+waitxyt x y t
+waitxytrelative x y t
+waitxytwgs
+waitlinet
+waitlinetrelative
+waitlinetrelativerobot
+waitlinetwgs
+
+dans les linefollowing, bLineFollowingControl n'est pas changé quand on a fini?
+les variantes sans t ont peut-être peu d'utilité...?
+
 linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
 
 bugs
-Release GitHub : le dossier de binaires et de sources est téléchargé sous le même nom, faire un release Guerledan et inclure aussi les sources des prérequis principaux, on aura donc 2 dossiers release : 1 avec les binaires et un autre avec toutes les sources..., changer config sailboat pour que ça corresponde au voilier blanc
+Release GitHub : le dossier de binaires et de sources est téléchargé sous le même nom, faire un release UxVCtrl-GuerledanII2016-2017, publier sources comme UxVCtrl_Zip...
+rplidar en mode express : les angles ne sont pas toujours croissants, on dirait qu'il y a des inversions...?
+rplidar marche pas sous linux (SetMotorPWMRequestRPLIDAR, GET_ACC_BOARD_FLAG_REQUEST_RPLIDAR, paramètres d'ouverture du port série, utilisation de DTR...?), ublox non plus (problèmes de pragam pack, voir warning compilation)...
 crash simu mission guerlédan en tapant la commande exit, peut-être lié à MAVLinkInterface, qui était connectée?->aussi quand pas connecté...->peut-être lié au videorecording...->crash même quand mission interrompue par touche x...->crash même quand MAVLinkInterface désactivée...
 caractères NMEA invalides loggués parfois à la fin?
-Warning : NMEA checksum error?
+Warning : NMEA checksum error->s'assurer que ça buggue pas avec fausses trames nmea trop grandes venant de UBX-RAWX, vérifier plus en détail si le talkerid est connu...
 Warnings misleading indent, bug ublox, see Ubuntu 16.10/VS2017 and static/dynamic code analysis...?
 mon C_q_in_group est probablement faux car il choisit peut-être de prendre en compte le 1er ping du groupe et pas les autres, mais le 1er n'est pas forcément le bon...->voir formule de l'article
 Bug C_q_XXX : Pourquoi il faut if ((imax == -1)||(imin == (int)(V.size()))) x = interval(); ?
@@ -88,6 +94,7 @@ différents types d'altitude, AMSL, geoid, depth, sea floor...
 avec nouveau format, lognav2KML va être simplifié
 
 sonar, localisation, wf
+Faire mosaiquing sonar et aussi vidéo sonar corrigée en angle et position et affichée dans le repère env et pouvoir l'afficher dans seanet
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 option dessin des pings bruts, corrigés en angle, corrigés en anlge et pos...
 simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?
@@ -195,6 +202,7 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS
+gestion des corrections RTCM probablement mal faite (retards?)...->pas trop grave si on les injecte via VSPE...
 Activer dans config ublox pseudo range, carrier phase->UBX-RXM-RAW, RAWX, penser à enregistrer config avec UBX-CFG, pour pouvoir faire post process avec rtklib
 RemoteRS232MultiSrv pour permettre à plusieurs clients d'accéder à la base->un peu moins utile sous Windows (VSPE), mais peut-être pour Linux
 ublox et mavlinkinterface peuvent publier des données RTCM...
@@ -317,7 +325,20 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
-rajouter params deadzone sonar/lidar?->dépend des missions, algos...
+rplidar calcul angles : indices i et k devraient démarrer à 1?
+
+Zone morte sonar trop grande?->c'était juste lié au fait que d_mes_err était plus grand et que le repère était trop zoomé...
+
+Ublox sends NMEA+UBX-RAWX...
+
+NMEAProtocol.h
+AnalyzeSentenceNMEA()
+Stack around the variable 'checksum' was corrupted
+buf = 0x0c6fd844 "!k›A¸\x17,D"
+checksum = 0x0c6fd558 "*FFF...
+
+ComputeChecksumNMEA()
+sprintf(checksum, "*%02X", (int)res)
 
 Ubuntu 16.10 errors cv min, max, distinguer cas C et C++? Trouver où min et max sont définis en mode c++ (il y a aussi du min/max dans AIS.h)->min, max à define pour Linux seulement dans les fichiers où c'est vraiment nécessaire, et à undefine à la fin du fichier, e.g. OSMisc.h, SSC32.h...
 

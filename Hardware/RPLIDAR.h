@@ -361,6 +361,38 @@ inline int GetSampleRateRequestRPLIDAR(RPLIDAR* pRPLIDAR, int* pTstandard, int* 
 }
 
 // Undocumented...
+inline int CheckMotorControlSupportRequestRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,GET_ACC_BOARD_FLAG_REQUEST_RPLIDAR};
+	//unsigned char databuf[MAX_NB_BYTES_RPLIDAR];
+	//int nbReadBytes = 0;
+
+	// Send request.
+	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+
+	mSleep(100);
+
+	//memset(databuf, 0, sizeof(databuf));
+	//if (ReadRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf), &nbReadBytes) != EXIT_SUCCESS)
+	//{ 
+	//	//printf("Warning : A RPLIDAR might not be responding correctly. \n");
+	//	//return EXIT_FAILURE;	
+	//}
+
+	if (PurgeRS232Port(&pRPLIDAR->RS232Port) != EXIT_SUCCESS)
+	{
+		printf("Warning : A RPLIDAR might not be responding correctly. \n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+// Undocumented...
 inline int SetMotorPWMRequestRPLIDAR(RPLIDAR* pRPLIDAR, int pwm)
 {
 	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,SET_MOTOR_PWM_REQUEST_RPLIDAR,0x02,0,0,0};
@@ -546,8 +578,10 @@ inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistanc
 	unsigned short start_angle_q6_prev = 0;
 	unsigned short distance1 = 0;
 	unsigned short distance2 = 0;
-	unsigned char dtheta1_q3 = 0;
-	unsigned char dtheta2_q3 = 0;
+	char dtheta1_q3 = 0;
+	char dtheta2_q3 = 0;
+	double dtheta1 = 0;
+	double dtheta2 = 0;
 	double theta1 = 0;
 	double theta2 = 0;
 	int j = 0;
@@ -588,11 +622,15 @@ inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistanc
 	{
 		distance1 = ((pRPLIDAR->esdata_prev[4+5*j+1]<<8)|pRPLIDAR->esdata_prev[4+5*j+0])>>2;
 		distance2 = ((pRPLIDAR->esdata_prev[4+5*j+3]<<8)|pRPLIDAR->esdata_prev[5*j+2])>>2;
-		dtheta1_q3= ((pRPLIDAR->esdata_prev[4+5*j+0] & 0x03)<<4)|(pRPLIDAR->esdata_prev[4+5*j+4] & 0x0F);
-		dtheta2_q3= ((pRPLIDAR->esdata_prev[4+5*j+2] & 0x03)<<4)|(pRPLIDAR->esdata_prev[4+5*j+4]>>4);
+		dtheta1_q3 = ((pRPLIDAR->esdata_prev[4+5*j+0] & 0x03)<<4)|(pRPLIDAR->esdata_prev[4+5*j+4] & 0x0F);
+		dtheta2_q3 = ((pRPLIDAR->esdata_prev[4+5*j+2] & 0x03)<<4)|(pRPLIDAR->esdata_prev[4+5*j+4]>>4);
+		// Handle the sign bit...
+		dtheta1 = ((dtheta1_q3 & 0x20)>>5)? (-~(dtheta1_q3 & 0x1F))/8.0: (dtheta1_q3 & 0x1F)/8.0;
+		dtheta2 = ((dtheta2_q3 & 0x20)>>5)? (-~(dtheta2_q3 & 0x1F))/8.0: (dtheta2_q3 & 0x1F)/8.0;
 
-		theta1 = start_angle_q6_prev/64.0+AngleDiffRPLIDAR(start_angle_q6_prev/64.0, start_angle_q6/64.0)*(2*j+0)/(NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)-((char)dtheta1_q3)/8.0;
-		theta2 = start_angle_q6_prev/64.0+AngleDiffRPLIDAR(start_angle_q6_prev/64.0, start_angle_q6/64.0)*(2*j+1)/(NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)-((char)dtheta2_q3)/8.0;
+		// k indexes in the formula of the documentation start at 1...
+		theta1 = start_angle_q6_prev/64.0+AngleDiffRPLIDAR(start_angle_q6_prev/64.0, start_angle_q6/64.0)*(2*j+1)/(NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)-dtheta1;
+		theta2 = start_angle_q6_prev/64.0+AngleDiffRPLIDAR(start_angle_q6_prev/64.0, start_angle_q6/64.0)*(2*j+2)/(NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)-dtheta2;
 
 		// Convert in rad.
 		pAngles[2*j+0] = fmod_2PI_deg2rad(-theta1);
