@@ -21,6 +21,13 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_P33X 256
 
+union uFloat_P33X
+{
+	float v;  
+	uint8 c[4];
+};
+typedef union uFloat_P33X uFloat_P33X;
+
 struct P33X
 {
 	RS232PORT RS232Port;
@@ -134,7 +141,7 @@ inline int ReadChannelP33x(P33X* pP33x, uint8 Channel, float* pValue)
 	uint8 writebuf[5];
 	uint8 crc_h = 0;
 	uint8 crc_l = 0;
-	uFloat value;
+	uFloat_P33X value;
 	int stat = 0;
 
 	writebuf[0] = (uint8)0xfa; // device address = 250

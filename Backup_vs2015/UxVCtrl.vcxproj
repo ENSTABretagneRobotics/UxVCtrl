@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{30A6807A-5214-4E51-9ECA-AAFA08F9F6D8}</ProjectGuid>
+    <RootNamespace>UxVCtrl</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.61030.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV3.2.0\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV320;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <EnablePREfast>false</EnablePREfast>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;sbgEComd.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;opencv_world320d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV3.2.0\x86\vc14\lib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc14\lib;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\x86\vc14\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV3.2.0\include;$(KINECTSDK20_DIR)\inc;$(ProgramFiles)\MAVLinkSDK;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV320;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;sbgECom.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;opencv_world320.lib;libwebp.lib;ippicvmt.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV3.2.0\x86\vc14\staticlib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc14\staticlib;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\x86\vc14\staticlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Ball.cpp" />
+    <ClCompile Include="Commands.cpp" />
+    <ClCompile Include="Computations.cpp" />
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="ExternalVisualLocalization.cpp" />
+    <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hardware\Hokuyo.cpp" />
+    <ClCompile Include="Hardware\Maestro.cpp" />
+    <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
+    <ClCompile Include="Hardware\MiniSSC.cpp" />
+    <ClCompile Include="Hardware\IM483I.cpp" />
+    <ClCompile Include="Hardware\RPLIDAR.cpp" />
+    <ClCompile Include="Hardware\SBG.cpp" />
+    <ClCompile Include="Hardware\ublox.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MAVLinkInterface.cpp" />
+    <ClCompile Include="MissingWorker.cpp" />
+    <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="OpenCVGUI.cpp" />
+    <ClCompile Include="Pinger.cpp" />
+    <ClCompile Include="Pipeline.cpp" />
+    <ClCompile Include="SeanetProcessing.cpp" />
+    <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="SonarAltitudeEstimation.cpp" />
+    <ClCompile Include="SonarLocalization.cpp" />
+    <ClCompile Include="SurfaceVisualObstacle.cpp" />
+    <ClCompile Include="VideoRecord.cpp" />
+    <ClCompile Include="VisualObstacle.cpp" />
+    <ClCompile Include="Wall.cpp" />
+    <ClCompile Include="..\OSUtils\OSComputerRS232Port.c" />
+    <ClCompile Include="..\OSUtils\OSCore.c" />
+    <ClCompile Include="..\OSUtils\OSCriticalSection.c" />
+    <ClCompile Include="..\OSUtils\OSEv.c" />
+    <ClCompile Include="..\OSUtils\OSMisc.c" />
+    <ClCompile Include="..\OSUtils\OSNet.c" />
+    <ClCompile Include="..\OSUtils\OSSem.c" />
+    <ClCompile Include="..\OSUtils\OSThread.c" />
+    <ClCompile Include="..\OSUtils\OSTime.c" />
+    <ClCompile Include="..\OSUtils\OSTimer.c" />
+    <ClCompile Include="..\Extensions\Img\CvCore.c" />
+    <ClCompile Include="..\Extensions\Img\CvDisp.c" />
+    <ClCompile Include="..\Extensions\Img\CvDraw.c" />
+    <ClCompile Include="..\Extensions\Img\CvFiles.c" />
+    <ClCompile Include="..\Extensions\Img\CvProc.c" />
+    <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="..\interval\box.cpp" />
+    <ClCompile Include="..\interval\iboolean.cpp" />
+    <ClCompile Include="..\interval\imatrix.cpp" />
+    <ClCompile Include="..\interval\interval.cpp" />
+    <ClCompile Include="..\interval\rmatrix.cpp" />
+    <ClCompile Include="Hardware\CISCREA.cpp" />
+    <ClCompile Include="Hardware\MDM.cpp" />
+    <ClCompile Include="Hardware\MES.cpp" />
+    <ClCompile Include="Hardware\MT.cpp" />
+    <ClCompile Include="Hardware\NMEADevice.cpp" />
+    <ClCompile Include="Hardware\P33x.cpp" />
+    <ClCompile Include="Hardware\RazorAHRS.cpp" />
+    <ClCompile Include="Hardware\RS232Port.cpp" />
+    <ClCompile Include="Hardware\Seanet.cpp" />
+    <ClCompile Include="Hardware\SSC32.cpp" />
+    <ClCompile Include="Hardware\SwarmonDevice.cpp" />
+    <ClCompile Include="Hardware\UE9A.cpp" />
+    <ClCompile Include="Hardware\Video.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
+    <ClInclude Include="..\Extensions\Misc\Misc.h" />
+    <ClInclude Include="Ball.h" />
+    <ClInclude Include="Commands.h" />
+    <ClInclude Include="Computations.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="Controller.h" />
+    <ClInclude Include="ExternalVisualLocalization.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="Hardware\AIS.h" />
+    <ClInclude Include="Hardware\Hokuyo.h" />
+    <ClInclude Include="Hardware\Maestro.h" />
+    <ClInclude Include="Hardware\MAVLinkDevice.h" />
+    <ClInclude Include="Hardware\MiniSSC.h" />
+    <ClInclude Include="Hardware\IM483I.h" />
+    <ClInclude Include="Hardware\NMEAProtocol.h" />
+    <ClInclude Include="Hardware\RPLIDAR.h" />
+    <ClInclude Include="Hardware\RTCM2Protocol.h" />
+    <ClInclude Include="Hardware\RTCM3Protocol.h" />
+    <ClInclude Include="Hardware\SBG.h" />
+    <ClInclude Include="Hardware\ublox.h" />
+    <ClInclude Include="Hardware\UBXProtocol.h" />
+    <ClInclude Include="MAVLinkInterface.h" />
+    <ClInclude Include="MissingWorker.h" />
+    <ClInclude Include="Observer.h" />
+    <ClInclude Include="OpenCVGUI.h" />
+    <ClInclude Include="Pinger.h" />
+    <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="SeanetProcessing.h" />
+    <ClInclude Include="Simulator.h" />
+    <ClInclude Include="SonarAltitudeEstimation.h" />
+    <ClInclude Include="SonarLocalization.h" />
+    <ClInclude Include="SurfaceVisualObstacle.h" />
+    <ClInclude Include="VideoRecord.h" />
+    <ClInclude Include="VisualObstacle.h" />
+    <ClInclude Include="Wall.h" />
+    <ClInclude Include="..\OSUtils\OSComputerRS232Port.h" />
+    <ClInclude Include="..\OSUtils\OSCore.h" />
+    <ClInclude Include="..\OSUtils\OSCriticalSection.h" />
+    <ClInclude Include="..\OSUtils\OSEv.h" />
+    <ClInclude Include="..\OSUtils\OSMisc.h" />
+    <ClInclude Include="..\OSUtils\OSNet.h" />
+    <ClInclude Include="..\OSUtils\OSSem.h" />
+    <ClInclude Include="..\OSUtils\OSThread.h" />
+    <ClInclude Include="..\OSUtils\OSTime.h" />
+    <ClInclude Include="..\OSUtils\OSTimer.h" />
+    <ClInclude Include="..\OSUtils\OSUtils.h" />
+    <ClInclude Include="..\Extensions\Img\AxisOptions.h" />
+    <ClInclude Include="..\Extensions\Img\CoordSystem.h" />
+    <ClInclude Include="..\Extensions\Img\CoordSystem2Img.h" />
+    <ClInclude Include="..\Extensions\Img\CoordSystemChg.h" />
+    <ClInclude Include="..\Extensions\Img\CvCore.h" />
+    <ClInclude Include="..\Extensions\Img\CvDisp.h" />
+    <ClInclude Include="..\Extensions\Img\CvDraw.h" />
+    <ClInclude Include="..\Extensions\Img\CvFiles.h" />
+    <ClInclude Include="..\Extensions\Img\CvProc.h" />
+    <ClInclude Include="..\Extensions\Img\CvUtils.h" />
+    <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.h" />
+    <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.h" />
+    <ClInclude Include="..\interval\box.h" />
+    <ClInclude Include="..\interval\iboolean.h" />
+    <ClInclude Include="..\interval\imatrix.h" />
+    <ClInclude Include="..\interval\interval.h" />
+    <ClInclude Include="..\interval\rmatrix.h" />
+    <ClInclude Include="..\matrix_lib\jama_cholesky.h" />
+    <ClInclude Include="..\matrix_lib\jama_eig.h" />
+    <ClInclude Include="..\matrix_lib\jama_lu.h" />
+    <ClInclude Include="..\matrix_lib\jama_qr.h" />
+    <ClInclude Include="..\matrix_lib\jama_svd.h" />
+    <ClInclude Include="..\matrix_lib\tnt.h" />
+    <ClInclude Include="..\matrix_lib\tnt_array1d.h" />
+    <ClInclude Include="..\matrix_lib\tnt_array1d_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_array2d.h" />
+    <ClInclude Include="..\matrix_lib\tnt_array2d_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_array3d.h" />
+    <ClInclude Include="..\matrix_lib\tnt_array3d_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_cmat.h" />
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array1d.h" />
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array1d_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array2d.h" />
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array2d_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array3d.h" />
+    <ClInclude Include="..\matrix_lib\tnt_fortran_array3d_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_i_refvec.h" />
+    <ClInclude Include="..\matrix_lib\tnt_math_utils.h" />
+    <ClInclude Include="..\matrix_lib\tnt_sparse_matrix_csr.h" />
+    <ClInclude Include="..\matrix_lib\tnt_stopwatch.h" />
+    <ClInclude Include="..\matrix_lib\tnt_subscript.h" />
+    <ClInclude Include="..\matrix_lib\tnt_vec.h" />
+    <ClInclude Include="..\matrix_lib\tnt_version.h" />
+    <ClInclude Include="Hardware\CISCREA.h" />
+    <ClInclude Include="Hardware\MDM.h" />
+    <ClInclude Include="Hardware\MES.h" />
+    <ClInclude Include="Hardware\MT.h" />
+    <ClInclude Include="Hardware\NMEADevice.h" />
+    <ClInclude Include="Hardware\P33x.h" />
+    <ClInclude Include="Hardware\RazorAHRS.h" />
+    <ClInclude Include="Hardware\RS232Port.h" />
+    <ClInclude Include="Hardware\Seanet.h" />
+    <ClInclude Include="Hardware\SSC32.h" />
+    <ClInclude Include="Hardware\SwarmonDevice.h" />
+    <ClInclude Include="Hardware\UE9A.h" />
+    <ClInclude Include="Hardware\Video.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="keys.txt" />
+    <Text Include="MAVLinkDevice0.txt" />
+    <Text Include="MAVLinkDevice1.txt" />
+    <Text Include="NMEADevice1.txt" />
+    <Text Include="RPLIDAR0.txt" />
+    <Text Include="SBG0.txt" />
+    <Text Include="ublox0.txt" />
+    <Text Include="ublox1.txt" />
+    <Text Include="ublox2.txt" />
+    <Text Include="UxVCtrl.txt" />
+    <Text Include="CISCREA.txt" />
+    <Text Include="env.txt" />
+    <Text Include="Hokuyo0.txt" />
+    <Text Include="Maestro0.txt" />
+    <Text Include="MDM0.txt" />
+    <Text Include="MES0.txt" />
+    <Text Include="MiniSSC0.txt" />
+    <Text Include="mission.txt" />
+    <Text Include="MT0.txt" />
+    <Text Include="NMEADevice0.txt" />
+    <Text Include="P33x0.txt" />
+    <Text Include="RazorAHRS0.txt" />
+    <Text Include="IM483I0.txt" />
+    <Text Include="Seanet0.txt" />
+    <Text Include="SSC320.txt" />
+    <Text Include="SwarmonDevice0.txt" />
+    <Text Include="UE9A0.txt" />
+    <Text Include="Video0.txt" />
+    <Text Include="Video1.txt" />
+    <Text Include="Video2.txt" />
+    <Text Include="CHANGELOG.txt" />
+    <Text Include="mission_spec.txt" />
+    <Text Include="ReadMe.txt" />
+    <Text Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Makefile" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

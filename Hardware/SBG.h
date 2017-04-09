@@ -123,19 +123,19 @@ union uShort_SBG
 };
 typedef union uShort_SBG uShort_SBG;
 
-union usLong_SBG
+union usInt_SBG
 {
-	long v;
+	int v;
 	unsigned char c[4];
 };
-typedef union usLong_SBG usLong_SBG;
+typedef union usInt_SBG usInt_SBG;
 
-union uLong_SBG
+union uInt_SBG
 {
-	unsigned long v;
+	unsigned int v;
 	unsigned char c[4];
 };
-typedef union uLong_SBG uLong_SBG;
+typedef union uInt_SBG uInt_SBG;
 
 union uFloat_SBG
 {
@@ -153,7 +153,7 @@ typedef union uDouble_SBG uDouble_SBG;
 */
 struct UTC_Time_SBG
 {
-	unsigned long Nanoseconds;
+	unsigned int Nanoseconds;
 	unsigned short Year; 
 	unsigned char Month;
 	unsigned char Day;
@@ -415,7 +415,7 @@ inline int ConvertToDoubleSBG(int OutputSettings, unsigned char* buf, int offset
 		ul.c[1] = buf[2+offset];
 		ul.c[2] = buf[1+offset];
 		ul.c[3] = buf[0+offset];
-		li.HighPart = (long)uss.v;
+		li.HighPart = (int)uss.v;
 		li.LowPart = ul.v;
 		*pValue = (double)li.QuadPart/4294967296.0;
 		return offset+6;

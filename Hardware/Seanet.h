@@ -81,19 +81,19 @@ union uShort_SEANET
 };
 typedef union uShort_SEANET uShort_SEANET;
 
-union usLong_SEANET
+union usInt_SEANET
 {
-	long v;  
+	int v;  
 	unsigned char c[4];
 };
-typedef union usLong_SEANET usLong_SEANET;
+typedef union usInt_SEANET usInt_SEANET;
 
-union uLong_SEANET
+union uInt_SEANET
 {
-	unsigned long v;  
+	unsigned int v;  
 	unsigned char c[4];
 };
-typedef union uLong_SEANET uLong_SEANET;
+typedef union uInt_SEANET uInt_SEANET;
 
 union uFloat_SEANET
 {

@@ -219,19 +219,19 @@ union uShort_MT
 };
 typedef union uShort_MT uShort_MT;
 
-union usLong_MT
+union usInt_MT
 {
-	long v;
+	int v;
 	unsigned char c[4];
 };
-typedef union usLong_MT usLong_MT;
+typedef union usInt_MT usInt_MT;
 
-union uLong_MT
+union uInt_MT
 {
-	unsigned long v;
+	unsigned int v;
 	unsigned char c[4];
 };
-typedef union uLong_MT uLong_MT;
+typedef union uInt_MT uInt_MT;
 
 union uFloat_MT
 {
@@ -249,7 +249,7 @@ typedef union uDouble_MT uDouble_MT;
 
 struct UTC_Time_MT
 {
-	unsigned long Nanoseconds;
+	unsigned int Nanoseconds;
 	unsigned short Year; 
 	unsigned char Month;
 	unsigned char Day;
@@ -309,9 +309,9 @@ typedef struct MT MT;
 
 inline int ConvertToDoubleMT(int OutputSettings, unsigned char* buf, int offset, double* pValue)
 {
-	usLong_MT usl;
+	usInt_MT usl;
 	usShort_MT uss;
-	uLong_MT ul;
+	uInt_MT ul;
 	LARGE_INTEGER li;
 	uDouble_MT ud;
 	uFloat_MT uf;
@@ -336,7 +336,7 @@ inline int ConvertToDoubleMT(int OutputSettings, unsigned char* buf, int offset,
 		ul.c[1] = buf[2+offset];
 		ul.c[2] = buf[1+offset];
 		ul.c[3] = buf[0+offset];
-		li.HighPart = (long)uss.v;
+		li.HighPart = (int)uss.v;
 		li.LowPart = ul.v;
 		*pValue = (double)li.QuadPart/4294967296.0;
 		return offset+6;
@@ -362,7 +362,7 @@ inline int ConvertToDoubleMT(int OutputSettings, unsigned char* buf, int offset,
 inline void SetMTChecksum(unsigned char* msg, int msglen)
 {
 	int i = 0;
-	uLong_MT checksum;
+	uInt_MT checksum;
 
 	// If all message bytes excluding the preamble are summed and the lower byte value 
 	// of the result equals zero, the message is valid and it may be processed. The 
@@ -379,7 +379,7 @@ inline void SetMTChecksum(unsigned char* msg, int msglen)
 inline int CheckMTChecksum(unsigned char* msg, int msglen)
 {
 	int i = 0;
-	uLong_MT checksum;
+	uInt_MT checksum;
 
 	// If all message bytes excluding the preamble are summed and the lower byte value 
 	// of the result equals zero, the message is valid and it may be processed. The 
@@ -668,7 +668,7 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 	int size = 0;
 	int precisionoutputsettings = 0;
 	uShort_MT us;
-	uLong_MT ul;
+	uInt_MT ul;
 	double roll = 0, pitch = 0, yaw = 0;
 
 	memset(databuf, 0, sizeof(databuf));
@@ -848,7 +848,7 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 	int nbdatabytes = 0;
 	int offset = 0;
 	uShort_MT us;
-	uLong_MT ul;
+	uInt_MT ul;
 	double roll = 0, pitch = 0, yaw = 0;
 
 	// Warning : coordinate system might not be the same between legacy and normal modes!
@@ -1065,7 +1065,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 	unsigned char databuf[MAX_NB_BYTES_MT];
 	int nbdatabytes = 0;
 	uShort_MT OutputMode;
-	uLong_MT OutputSettings;
+	uInt_MT OutputSettings;
 
 	memset(pMT->szCfgFilePath, 0, sizeof(pMT->szCfgFilePath));
 	sprintf(pMT->szCfgFilePath, "%.255s", szCfgFilePath);

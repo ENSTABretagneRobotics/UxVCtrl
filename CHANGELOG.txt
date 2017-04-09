@@ -1,3 +1,7 @@
+150
+Added Visual Studio 2015 and VC Linux projects.
+Corrected problems with long size on Linux 64 bit.
+
 149
 Corrected the use of ComputeChecksumNMEA() in EncodeSentenceNMEA().
 Minor update in SonarAltitudeEstimation.

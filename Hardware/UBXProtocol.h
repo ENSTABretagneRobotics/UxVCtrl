@@ -196,34 +196,34 @@ struct CFG_TMODE3_PL_UBX
 	unsigned char version;
 	unsigned char reserved1;
 	struct flags_CFG_TMODE3_PL_UBX flags;
-	long ecefXOrLat;
-	long ecefYOrLon;
-	long ecefZOrAlt;
+	int ecefXOrLat;
+	int ecefYOrLon;
+	int ecefZOrAlt;
 	char ecefXOrLatHP;
 	char ecefYOrLonHP;
 	char ecefZOrAltHP;
 	unsigned char reserved2;
-	unsigned long fixedPosAcc;
-	unsigned long svinMinDur;
-	unsigned long svinAccLimit;
+	unsigned int fixedPosAcc;
+	unsigned int svinMinDur;
+	unsigned int svinAccLimit;
 	unsigned char reserved3[8];
 };
 #define MAX_LEN_NAV_POSLLH_PL_UBX 28
 struct NAV_POSLLH_PL_UBX
 {
-	unsigned long iTOW; // In ms.
-	long lon; // In 1e-7 deg.
-	long lat; // In 1e-7 deg.
-	long height; // In mm.
-	long hMSL; // In mm.
-	unsigned long hAcc; // In mm.
-	unsigned long vAcc; // In mm.
+	unsigned int iTOW; // In ms.
+	int lon; // In 1e-7 deg.
+	int lat; // In 1e-7 deg.
+	int height; // In mm.
+	int hMSL; // In mm.
+	unsigned int hAcc; // In mm.
+	unsigned int vAcc; // In mm.
 	//unsigned char padding[4];
 };
 #define MAX_LEN_NAV_PVT_PL_UBX 92
 struct NAV_PVT_PL_UBX
 {
-	unsigned long iTOW; // In ms.
+	unsigned int iTOW; // In ms.
 	unsigned short year;
 	unsigned char month;
 	unsigned char day;
@@ -231,28 +231,28 @@ struct NAV_PVT_PL_UBX
 	unsigned char minute;
 	unsigned char sec; // In s.
 	unsigned char valid;
-	unsigned long tAcc; // In ns.
-	long nano; // In ns.
+	unsigned int tAcc; // In ns.
+	int nano; // In ns.
 	unsigned char fixType;
 	unsigned char flags;
 	unsigned char flags2;
 	unsigned char numSV;
-	long lon; // In 1e-7 deg.
-	long lat; // In 1e-7 deg.
-	long height; // In mm.
-	long hMSL; // In mm.
-	unsigned long hAcc; // In mm.
-	unsigned long vAcc; // In mm.
-	long velN; // In mm/s.
-	long velE; // In mm/s.
-	long velD; // In mm/s.
-	long gSpeed; // In mm/s.
-	long headMot; // In 1e-5 deg.
-	unsigned long sAcc; // In mm/s.
-	unsigned long headAcc; // In 1e-5 deg.
+	int lon; // In 1e-7 deg.
+	int lat; // In 1e-7 deg.
+	int height; // In mm.
+	int hMSL; // In mm.
+	unsigned int hAcc; // In mm.
+	unsigned int vAcc; // In mm.
+	int velN; // In mm/s.
+	int velE; // In mm/s.
+	int velD; // In mm/s.
+	int gSpeed; // In mm/s.
+	int headMot; // In 1e-5 deg.
+	unsigned int sAcc; // In mm/s.
+	unsigned int headAcc; // In 1e-5 deg.
 	unsigned short pDOP; // In 0.01.
 	unsigned char reserved1[6];
-	long headVeh; // In 1e-5 deg.
+	int headVeh; // In 1e-5 deg.
 	unsigned char reserved2[4];
 	//unsigned char padding[4];
 };
@@ -268,19 +268,19 @@ struct flags_NAV_SOL_PL_UBX
 #define MAX_LEN_NAV_SOL_PL_UBX 52
 struct NAV_SOL_PL_UBX
 {
-	unsigned long iTOW; // In ms.
-	long fTOW; // In ns.
+	unsigned int iTOW; // In ms.
+	int fTOW; // In ns.
 	short week;
 	unsigned char gpsFix;
 	struct flags_NAV_SOL_PL_UBX flags;
-	long ecefX; // In cm.
-	long ecefY; // In cm.
-	long ecefZ; // In cm.
-	unsigned long pAcc; // In cm.
-	long ecefVX; // In cm/s.
-	long ecefVY; // In cm/s.
-	long ecefVZ; // In cm/s.
-	unsigned long sAcc; // In cm/s.
+	int ecefX; // In cm.
+	int ecefY; // In cm.
+	int ecefZ; // In cm.
+	unsigned int pAcc; // In cm.
+	int ecefVX; // In cm/s.
+	int ecefVY; // In cm/s.
+	int ecefVZ; // In cm/s.
+	unsigned int sAcc; // In cm/s.
 	unsigned short pDOP; // In 0.01.
 	unsigned char reserved1;
 	unsigned char numSV;
@@ -314,30 +314,30 @@ struct flags2_NAV_STATUS_PL_UBX
 #define MAX_LEN_NAV_STATUS_PL_UBX 16
 struct NAV_STATUS_PL_UBX
 {
-	unsigned long iTOW; // In ms.
+	unsigned int iTOW; // In ms.
 	unsigned char gpsFix;
 	struct flags_NAV_STATUS_PL_UBX flags;
 	struct fixStat_NAV_STATUS_PL_UBX fixStat;
 	struct flags2_NAV_STATUS_PL_UBX flags2;
-	unsigned long ttff; // In ms.
-	unsigned long msss; // In ms.
+	unsigned int ttff; // In ms.
+	unsigned int msss; // In ms.
 };
 #define MAX_LEN_NAV_SVIN_PL_UBX 40
 struct NAV_SVIN_PL_UBX
 {
 	unsigned char version;
 	unsigned char reserved1[3];
-	unsigned long iTOW; // In ms.
-	unsigned long dur; // In s.
-	long meanX; // In cm.
-	long meanY; // In cm.
-	long meanZ; // In cm.
+	unsigned int iTOW; // In ms.
+	unsigned int dur; // In s.
+	int meanX; // In cm.
+	int meanY; // In cm.
+	int meanZ; // In cm.
 	char meanXHP; // In 0.1 mm.
 	char meanYHP; // In 0.1 mm.
 	char meanZHP; // In 0.1 mm.
 	unsigned char reserved2;
-	unsigned long meanAcc; // In 0.1 mm.
-	unsigned long obs;
+	unsigned int meanAcc; // In 0.1 mm.
+	unsigned int obs;
 	unsigned char valid;
 	unsigned char active;
 	unsigned char reserved3[2];
@@ -345,15 +345,15 @@ struct NAV_SVIN_PL_UBX
 #define MAX_LEN_NAV_VELNED_PL_UBX 36
 struct NAV_VELNED_PL_UBX
 {
-	unsigned long iTOW; // In ms.
-	long velN; // In cm/s.
-	long velE; // In cm/s.
-	long velD; // In cm/s.
-	unsigned long speed; // In cm/s.
-	unsigned long gSpeed; // In cm/s.
-	long heading; // In 1e-5 deg.
-	unsigned long sAcc; // In cm/s.
-	unsigned long cAcc; // In 1e-5 deg.
+	unsigned int iTOW; // In ms.
+	int velN; // In cm/s.
+	int velE; // In cm/s.
+	int velD; // In cm/s.
+	unsigned int speed; // In cm/s.
+	unsigned int gSpeed; // In cm/s.
+	int heading; // In 1e-5 deg.
+	unsigned int sAcc; // In cm/s.
+	unsigned int cAcc; // In 1e-5 deg.
 	//unsigned char padding[4];
 };
 #pragma endregion
@@ -385,8 +385,8 @@ inline void SetChecksumUBX(unsigned char* packet, int packetlen)
 
 	for (i = 2; i < packetlen-2; i++)
 	{
-		CK_A = CK_A + packet[i];
-		CK_B = CK_B + CK_A;
+		CK_A = (unsigned char)(CK_A + packet[i]);
+		CK_B = (unsigned char)(CK_B + CK_A);
 	}
 	packet[packetlen-2] = CK_A;
 	packet[packetlen-1] = CK_B;
@@ -400,8 +400,8 @@ inline int CheckChecksumUBX(unsigned char* packet, int packetlen)
 
 	for (i = 2; i < packetlen-2; i++)
 	{
-		CK_A = CK_A + packet[i];
-		CK_B = CK_B + CK_A;
+		CK_A = (unsigned char)(CK_A + packet[i]);
+		CK_B = (unsigned char)(CK_B + CK_A);
 	}
 	if ((packet[packetlen-2] != CK_A)||(packet[packetlen-1] != CK_B))
 	{

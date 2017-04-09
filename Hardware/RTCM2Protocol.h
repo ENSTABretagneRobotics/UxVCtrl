@@ -34,12 +34,12 @@
 
 #define PREAMBLE_RTCM2 0x66
 
-union usLong_RTCM2
+union usInt_RTCM2
 {
-	long v;
+	int v;
 	unsigned char c[4];
 };
-typedef union usLong_RTCM2 usLong_RTCM2;
+typedef union usInt_RTCM2 usInt_RTCM2;
 
 // The message format is a sequence of 30 bits...
 

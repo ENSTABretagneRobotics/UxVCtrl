@@ -88,46 +88,46 @@ OSTimer.o: ../OSUtils/OSTimer.c ../OSUtils/OSTimer.h OSEv.o
 ############################# Extensions #############################
 
 labjackusb.o: ../Extensions/Devices/LabjackUtils/liblabjackusb/labjackusb.c ../Extensions/Devices/LabjackUtils/liblabjackusb/labjackusb.h
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 u3.o: ../Extensions/Devices/LabjackUtils/U3Utils/u3.c ../Extensions/Devices/LabjackUtils/U3Utils/u3.h labjackusb.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 U3Core.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Core.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Core.h u3.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 U3Cfg.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Cfg.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Cfg.h U3Core.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 U3Mgr.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Mgr.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Mgr.h U3Cfg.o OSCriticalSection.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 ue9.o: ../Extensions/Devices/LabjackUtils/UE9Utils/ue9.c ../Extensions/Devices/LabjackUtils/UE9Utils/ue9.h labjackusb.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 UE9Core.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Core.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Core.h ue9.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 UE9Cfg.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.h UE9Core.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 UE9Mgr.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Mgr.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Mgr.h UE9Cfg.o OSCriticalSection.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 CvCore.o: ../Extensions/Img/CvCore.c ../Extensions/Img/CvCore.h OSTime.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 CvFiles.o: ../Extensions/Img/CvFiles.c ../Extensions/Img/CvFiles.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 CvProc.o: ../Extensions/Img/CvProc.c ../Extensions/Img/CvProc.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 CvDraw.o: ../Extensions/Img/CvDraw.c ../Extensions/Img/CvDraw.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 CvDisp.o: ../Extensions/Img/CvDisp.c ../Extensions/Img/CvDisp.h CvCore.o
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
 
 ############################# interval #############################
 

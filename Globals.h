@@ -39,6 +39,11 @@
 
 #include "rmatrix.h"
 
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4459) 
+#endif // _MSC_VER
+
 // Robot id masks.
 #define SUBMARINE_ROBID_MASK 0x000000FF
 #define MOTORBOAT_ROBID_MASK 0x0000FF00
