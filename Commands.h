@@ -48,7 +48,7 @@ inline void DisableAllControls(void)
 	bBrakeControl = FALSE;
 	bHeadingControl = FALSE;
 	bDepthControl = FALSE;
-	bAltitudeSeaFloorControl = FALSE;
+	bAltitudeWrtFloorControl = FALSE;
 	u = 0; uw = 0; uv = 0;
 	LeaveCriticalSection(&StateVariablesCS);
 	EnterCriticalSection(&MDMCS);
@@ -647,7 +647,7 @@ inline int Commands(char* line)
 		//if (bBrake_pipeline) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
-		//bAltitudeSeaFloorControl = FALSE;
+		//bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&PipelineCS);
 	}
 	else if (sscanf(line, "ballconfig "
@@ -733,7 +733,7 @@ inline int Commands(char* line)
 		if (bDepth_ball) 
 		{
 			bDepthControl = FALSE;
-			bAltitudeSeaFloorControl = FALSE;
+			bAltitudeWrtFloorControl = FALSE;
 		}
 		LeaveCriticalSection(&BallCS);
 	}
@@ -941,7 +941,7 @@ inline int Commands(char* line)
 		//if (bBrake_pinger) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
-		//bAltitudeSeaFloorControl = FALSE;
+		//bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&PingerCS);
 	}
 	else if (sscanf(line, "missingworkerconfig "
@@ -1020,7 +1020,7 @@ inline int Commands(char* line)
 		//if (bBrake_missingworker) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
-		//bAltitudeSeaFloorControl = FALSE;
+		//bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
 #pragma endregion
@@ -2632,15 +2632,15 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		wz = dval;
 		bDepthControl = TRUE;
-		bAltitudeSeaFloorControl = FALSE;
+		bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (sscanf(line, "asfreg %lf", &dval) == 1)
+	else if (sscanf(line, "a_freg %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wasf = dval;
+		wa_f = dval;
 		bDepthControl = FALSE;
-		bAltitudeSeaFloorControl = TRUE;
+		bAltitudeWrtFloorControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "headingreg %lf", &dval) == 1)
@@ -2683,7 +2683,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		uv = dval;
 		bDepthControl = FALSE;
-		bAltitudeSeaFloorControl = FALSE;
+		bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "brake", strlen("brake")) == 0)

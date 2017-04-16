@@ -19,7 +19,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bOSD = TRUE;
 	BOOL bOrientationCircle = TRUE;
 	BOOL bDispLLA = FALSE;
-	BOOL bDispAltitudeSeaFloor = FALSE;
+	BOOL bDispAltitudeWrtFloor = FALSE;
 	BOOL bDispSOG = TRUE;
 	BOOL bDispYPR = TRUE;
 	BOOL bMap = TRUE;
@@ -311,9 +311,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					wz += 0.1;
 				}
-				else if (bAltitudeSeaFloorControl)
+				else if (bAltitudeWrtFloorControl)
 				{
-					wasf += 0.1;
+					wa_f += 0.1;
 				}
 				else
 				{
@@ -338,9 +338,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					wz -= 0.1;
 				}
-				else if (bAltitudeSeaFloorControl)
+				else if (bAltitudeWrtFloorControl)
 				{
-					wasf -= 0.1;
+					wa_f -= 0.1;
 				}
 				else
 				{
@@ -428,14 +428,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 		case 'Y':
-			if (!bAltitudeSeaFloorControl)
+			if (!bAltitudeWrtFloorControl)
 			{
-				bAltitudeSeaFloorControl = TRUE;
-				wasf = altitude_sea_floor;
+				bAltitudeWrtFloorControl = TRUE;
+				wa_f = altitude_wrt_floor;
 			}
 			else 
 			{
-				bAltitudeSeaFloorControl = FALSE;
+				bAltitudeWrtFloorControl = FALSE;
 			}
 			break;
 		case 'b':
@@ -457,7 +457,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'o': bOSD = !bOSD; break;
 		case 'c': bOrientationCircle = !bOrientationCircle; break;
 		case 'L': bDispLLA = !bDispLLA; break;
-		case 'A': bDispAltitudeSeaFloor = !bDispAltitudeSeaFloor; break;
+		case 'A': bDispAltitudeWrtFloor = !bDispAltitudeWrtFloor; break;
 		case 'V': bDispSOG = !bDispSOG; break;
 		case 'R': bDispYPR = !bDispYPR; break;
 		case 'm':
@@ -759,10 +759,25 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				else sprintf(szText, "%.1f/--", Center(zhat)); 
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-				if (bDispAltitudeSeaFloor)
+				if (bDispAltitudeWrtFloor)
 				{
-					if (bAltitudeSeaFloorControl) sprintf(szText, "ASF=%.1f/%.1f", altitude_sea_floor, wasf); 
-					else sprintf(szText, "ASF=%.1f/--", altitude_sea_floor); 
+					if (bAltitudeWrtFloorControl) sprintf(szText, "A_F=%.1f/%.1f", altitude_wrt_floor, wa_f); 
+					else sprintf(szText, "A_F=%.1f/--", altitude_wrt_floor); 
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				}
+			}
+			if (robid & AERIAL_ROBID_MASK) 
+			{
+				// In m in marine units...
+				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz); 
+				else sprintf(szText, "%.1f/--", Center(zhat)); 
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				if (bDispAltitudeWrtFloor)
+				{
+					if (bAltitudeWrtFloorControl) sprintf(szText, "A_F=%.1f/%.1f", altitude_wrt_floor, wa_f); 
+					else sprintf(szText, "A_F=%.1f/--", altitude_wrt_floor); 
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}

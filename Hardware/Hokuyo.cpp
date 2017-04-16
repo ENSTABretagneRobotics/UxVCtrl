@@ -117,7 +117,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 					alpha_mes = angles[i];
 					d_mes = distances[i];
 
-					// Simulate a Seanet...
+					// For compatibility with a Seanet...
 
 					d_all_mes.clear();
 					d_all_mes.push_back(d_mes);

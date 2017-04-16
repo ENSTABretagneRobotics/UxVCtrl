@@ -876,7 +876,7 @@ inline int LoadKeys(void)
 	keys[LAT_RIGHT_KEY] = 'e';
 	keys[BRAKE_KEY] = 'w';
 	keys[DEPTHCONTROL_KEY] = 'y';
-	keys[ALTITUDESEAFLOORCONTROL_KEY] = 'Y';
+	keys[ALTITUDEWRTFLOORCONTROL_KEY] = 'Y';
 
 	file = fopen("keys.txt", "r");
 	if (file != NULL)
@@ -917,7 +917,7 @@ inline int TranslateKeys(int c)
 	if (c == keys[LAT_RIGHT_KEY]) c = 'e';
 	if (c == keys[BRAKE_KEY]) c = 'w';
 	if (c == keys[DEPTHCONTROL_KEY]) c = 'y';
-	if (c == keys[ALTITUDESEAFLOORCONTROL_KEY]) c = 'Y';
+	if (c == keys[ALTITUDEWRTFLOORCONTROL_KEY]) c = 'Y';
 
 	return c;
 }
@@ -926,14 +926,14 @@ inline int DisplayKeys(void)
 {
 	printf("On OpenCVGUI : \n");
 	printf("%c%c%c%c,fv,%c%c,%c(brake),space(stop),g(generalstop),t%c%c(control),"
-		"o(osd),c(North and control),L(LLA),A(ASF),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),X(disableopencvgui),"
+		"o(osd),c(North and control),L(LLA),A(A_F),V(SOG),R(YPR),m(map),M(Map),*(rotate map),i(image),$(sonar),;(other overlays),X(disableopencvgui),"
 		"+-(coordspace zoom),T(text color)"
 		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snap),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
 		"bn(light),uj(tilt),46825(CISCREA OSD),"
 		"C(Switch),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
-		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDESEAFLOORCONTROL_KEY]);
+		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDEWRTFLOORCONTROL_KEY]);
 
 	return EXIT_SUCCESS;
 }

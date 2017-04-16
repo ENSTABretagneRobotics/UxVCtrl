@@ -20,7 +20,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double delta_angle = 0; // For heading control.
 	double wtheta_prev = 0; // For heading control.
 	double integral = 0; // For heading control.
-	double delta_asf = 0; // For altitude w.r.t. sea floor control.
+	double delta_a_f = 0; // For altitude w.r.t. floor control.
 	double delta_z = 0; // For depth control.
 
 #pragma region Sailboat supervisor
@@ -285,11 +285,11 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			integral = 0;
 		}
 
-		if (bAltitudeSeaFloorControl)
+		if (bAltitudeWrtFloorControl)
 		{
-			delta_asf = altitude_sea_floor-wasf;
-			if (delta_asf > wzradiushigh) uv = -uv_max;
-			else if (delta_asf < -wzradiuslow) uv = uv_max; 
+			delta_a_f = altitude_wrt_floor-wa_f;
+			if (delta_a_f > wzradiushigh) uv = -uv_max;
+			else if (delta_a_f < -wzradiuslow) uv = uv_max; 
 			else uv = 0;
 		}
 

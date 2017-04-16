@@ -21,8 +21,9 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 	double angle = 0;
 	double distance = 0;
 	int quality = 0;
+	int nbprev = 0, nb = 0;
 	BOOL bConnected = FALSE;
-	int i = 0;
+	int i = 0, j = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
 
@@ -67,6 +68,13 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
 				memset(distances, 0, sizeof(distances));
+
+				EnterCriticalSection(&StateVariablesCS);
+
+				nbprev = (int)alpha_mes_vector.size();
+				nb = 0;
+
+				LeaveCriticalSection(&StateVariablesCS);
 
 				if (rplidar.pfSaveFile != NULL)
 				{
@@ -119,24 +127,59 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 
 					EnterCriticalSection(&StateVariablesCS);
 
+					// bNewScan only sent at startup?
+
+					//if ((bNewScan)&&(rplidar.maxhist == 0))
+					//{
+					//	// Try to automatically remove old data...
+					//	for (j = nbprev-nb-1; j >= 0; j--)
+					//	{
+					//		if ((int)alpha_mes_vector.size() > 0)
+					//		{
+					//			alpha_mes_vector.pop_front();
+					//			d_mes_vector.pop_front();
+					//			d_all_mes_vector.pop_front();
+					//			t_history_vector.pop_front();
+					//			xhat_history_vector.pop_front();
+					//			yhat_history_vector.pop_front();
+					//			thetahat_history_vector.pop_front();
+					//			vxyhat_history_vector.pop_front();
+					//		}
+					//	}
+					//	nbprev = nb;
+					//	nb = 0;
+					//}
+
 					for (i = 0; i < NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR; i++)
 					{
 						alpha_mes = angles[i];
 						d_mes = distances[i];
-
-						// Simulate a Seanet...
-
-						if ((bNewScan&&((int)alpha_mes_vector.size() > 0))||((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
+						
+						if (rplidar.maxhist == 0)
 						{
-							alpha_mes_vector.pop_front();
-							d_mes_vector.pop_front();
-							d_all_mes_vector.pop_front();
-							t_history_vector.pop_front();
-							xhat_history_vector.pop_front();
-							yhat_history_vector.pop_front();
-							thetahat_history_vector.pop_front();
-							vxyhat_history_vector.pop_front();
+							// Try to automatically remove old data...
+
+							if (((int)alpha_mes_vector.size() > 0)&&((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI))
+							{
+								for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--) alpha_mes_vector[j] += 2*M_PI;
+							}
+							for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--)
+							{
+								if (alpha_mes_vector[j]-2*M_PI >= alpha_mes)
+								{
+									alpha_mes_vector.pop_front();
+									d_mes_vector.pop_front();
+									d_all_mes_vector.pop_front();
+									t_history_vector.pop_front();
+									xhat_history_vector.pop_front();
+									yhat_history_vector.pop_front();
+									thetahat_history_vector.pop_front();
+									vxyhat_history_vector.pop_front();
+								}
+							}
 						}
+
+						// For compatibility with a Seanet...
 
 						d_all_mes.clear();
 						d_all_mes.push_back(d_mes);
@@ -148,6 +191,37 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						yhat_history_vector.push_back(yhat);
 						thetahat_history_vector.push_back(thetahat);
 						vxyhat_history_vector.push_back(vxyhat);
+
+						//if (rplidar.maxhist == 0)
+						//{
+						//	// Try to automatically remove old data...
+						//	nb++;
+						//	if ((nb <= nbprev)&&((int)alpha_mes_vector.size() > 0))
+						//	{
+						//		alpha_mes_vector.pop_front();
+						//		d_mes_vector.pop_front();
+						//		d_all_mes_vector.pop_front();
+						//		t_history_vector.pop_front();
+						//		xhat_history_vector.pop_front();
+						//		yhat_history_vector.pop_front();
+						//		thetahat_history_vector.pop_front();
+						//		vxyhat_history_vector.pop_front();
+						//	}
+						//}
+						if (((rplidar.maxhist > 0)&&((int)alpha_mes_vector.size() > rplidar.maxhist))||
+							((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
+						{
+							alpha_mes_vector.pop_front();
+							d_mes_vector.pop_front();
+							d_all_mes_vector.pop_front();
+							t_history_vector.pop_front();
+							xhat_history_vector.pop_front();
+							yhat_history_vector.pop_front();
+							thetahat_history_vector.pop_front();
+							vxyhat_history_vector.pop_front();
+						}
+
+						//printf("%d\n", (int)alpha_mes_vector.size());
 					}
 
 					LeaveCriticalSection(&StateVariablesCS);
@@ -184,22 +258,57 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 
 					EnterCriticalSection(&StateVariablesCS);
 
+					// Angles not always decreasing?
+
+					if ((bNewScan)&&(rplidar.maxhist == 0))
+					{
+						// Try to automatically remove old data...
+						for (j = nbprev-nb-1; j >= 0; j--)
+						{
+							if ((int)alpha_mes_vector.size() > 0)
+							{
+								alpha_mes_vector.pop_front();
+								d_mes_vector.pop_front();
+								d_all_mes_vector.pop_front();
+								t_history_vector.pop_front();
+								xhat_history_vector.pop_front();
+								yhat_history_vector.pop_front();
+								thetahat_history_vector.pop_front();
+								vxyhat_history_vector.pop_front();
+							}
+						}
+						nbprev = nb;
+						nb = 0;
+					}
+
 					alpha_mes = angle;
 					d_mes = distance;
+					
+					//if (rplidar.maxhist == 0)
+					//{
+					//	// Try to automatically remove old data...
 
-					// Simulate a Seanet...
+					//	if (((int)alpha_mes_vector.size() > 0)&&((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI))
+					//	{
+					//		for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--) alpha_mes_vector[j] += 2*M_PI;
+					//	}
+					//	for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--)
+					//	{
+					//		if (alpha_mes_vector[j]-2*M_PI >= alpha_mes)
+					//		{
+					//			alpha_mes_vector.pop_front();
+					//			d_mes_vector.pop_front();
+					//			d_all_mes_vector.pop_front();
+					//			t_history_vector.pop_front();
+					//			xhat_history_vector.pop_front();
+					//			yhat_history_vector.pop_front();
+					//			thetahat_history_vector.pop_front();
+					//			vxyhat_history_vector.pop_front();
+					//		}
+					//	}
+					//}
 
-					if ((bNewScan&&((int)alpha_mes_vector.size() > 0))||((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
-					{
-						alpha_mes_vector.pop_front();
-						d_mes_vector.pop_front();
-						d_all_mes_vector.pop_front();
-						t_history_vector.pop_front();
-						xhat_history_vector.pop_front();
-						yhat_history_vector.pop_front();
-						thetahat_history_vector.pop_front();
-						vxyhat_history_vector.pop_front();
-					}
+					// For compatibility with a Seanet...
 
 					d_all_mes.clear();
 					d_all_mes.push_back(d_mes);
@@ -211,6 +320,37 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					yhat_history_vector.push_back(yhat);
 					thetahat_history_vector.push_back(thetahat);
 					vxyhat_history_vector.push_back(vxyhat);
+
+					if (rplidar.maxhist == 0)
+					{
+						// Try to automatically remove old data...
+						nb++;
+						if ((nb <= nbprev)&&((int)alpha_mes_vector.size() > 0))
+						{
+							alpha_mes_vector.pop_front();
+							d_mes_vector.pop_front();
+							d_all_mes_vector.pop_front();
+							t_history_vector.pop_front();
+							xhat_history_vector.pop_front();
+							yhat_history_vector.pop_front();
+							thetahat_history_vector.pop_front();
+							vxyhat_history_vector.pop_front();
+						}
+					}
+					if (((rplidar.maxhist > 0)&&((int)alpha_mes_vector.size() > rplidar.maxhist))||
+						((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
+					{
+						alpha_mes_vector.pop_front();
+						d_mes_vector.pop_front();
+						d_all_mes_vector.pop_front();
+						t_history_vector.pop_front();
+						xhat_history_vector.pop_front();
+						yhat_history_vector.pop_front();
+						thetahat_history_vector.pop_front();
+						vxyhat_history_vector.pop_front();
+					}
+
+					//printf("%d\n", (int)alpha_mes_vector.size());
 
 					LeaveCriticalSection(&StateVariablesCS);
 

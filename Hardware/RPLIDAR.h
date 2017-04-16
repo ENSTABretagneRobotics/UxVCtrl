@@ -111,6 +111,7 @@ struct RPLIDAR
 	BOOL bSaveRawData;
 	int ScanMode;
 	int motordelay;
+	int maxhist;
 	double alpha_max_err;
 	double d_max_err;
 };
@@ -668,8 +669,9 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		pRPLIDAR->BaudRate = 115200;
 		pRPLIDAR->timeout = 1000;
 		pRPLIDAR->bSaveRawData = 1;
-		pRPLIDAR->ScanMode = 0;
+		pRPLIDAR->ScanMode = SCAN_MODE_RPLIDAR;
 		pRPLIDAR->motordelay = 500;
+		pRPLIDAR->maxhist = 1024;
 		pRPLIDAR->alpha_max_err = 0.01;
 		pRPLIDAR->d_max_err = 0.1;
 
@@ -690,6 +692,8 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRPLIDAR->motordelay) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRPLIDAR->maxhist) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pRPLIDAR->alpha_max_err) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pRPLIDAR->d_max_err) != 1) printf("Invalid configuration file.\n");
@@ -699,6 +703,22 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pRPLIDAR->ScanMode < 0)
+	{
+		printf("Invalid parameter : ScanMode.\n");
+		pRPLIDAR->ScanMode = SCAN_MODE_RPLIDAR;
+	}
+	if (pRPLIDAR->motordelay < 0)
+	{
+		printf("Invalid parameter : motordelay.\n");
+		pRPLIDAR->motordelay = 500;
+	}
+	if ((pRPLIDAR->maxhist < 0)||(pRPLIDAR->maxhist > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
+	{
+		printf("Invalid parameter : maxhist.\n");
+		pRPLIDAR->maxhist = 1024;
 	}
 
 	// Used to save raw data, should be handled specifically...
@@ -746,12 +766,13 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		GetStartupMessageRPLIDAR(pRPLIDAR);
 	}
 
-	if (GetSampleRateRequestRPLIDAR(pRPLIDAR, &pRPLIDAR->Tstandard, &pRPLIDAR->Texpress) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a RPLIDAR : GET_SAMPLERATE failure.\n");
-		CloseRS232Port(&pRPLIDAR->RS232Port);
-		return EXIT_FAILURE;
-	}
+	// Incompatible with old RPLIDAR...
+	//if (GetSampleRateRequestRPLIDAR(pRPLIDAR, &pRPLIDAR->Tstandard, &pRPLIDAR->Texpress) != EXIT_SUCCESS)
+	//{
+	//	printf("Unable to connect to a RPLIDAR : GET_SAMPLERATE failure.\n");
+	//	CloseRS232Port(&pRPLIDAR->RS232Port);
+	//	return EXIT_FAILURE;
+	//}
 
 	if (SetMotorPWMRequestRPLIDAR(pRPLIDAR, DEFAULT_MOTOR_PWM_RPLIDAR) != EXIT_SUCCESS)
 	{

@@ -1,3 +1,8 @@
+151
+Improved compatibility with old RPLIDAR.
+Added the display of altitude for QUADRO.
+Added maxhist parameter for RPLIDAR.
+
 150
 Added Visual Studio 2015 and VC Linux projects.
 Corrected problems with long size on Linux 64 bit.

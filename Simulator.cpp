@@ -126,6 +126,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		d_mes = max(0.0, d_mes);
 		//d_mes = max(0.0, min((double)rangescale, d_mes));
 
+		// For compatibility with a Seanet...
+
 		d_all_mes.clear();
 /*		// Outlier before the wall.
 		d_all_mes.push_back(d_mes*(double)rand()/(double)RAND_MAX);

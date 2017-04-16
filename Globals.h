@@ -82,7 +82,7 @@ enum KEYS
 	LAT_RIGHT_KEY,
 	BRAKE_KEY,
 	DEPTHCONTROL_KEY,
-	ALTITUDESEAFLOORCONTROL_KEY,
+	ALTITUDEWRTFLOORCONTROL_KEY,
 
 	NB_CONFIGURABLE_KEYS
 };
@@ -148,7 +148,7 @@ extern interval vtwindhat, psitwindhat;
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 extern double u, uw, uv, ul, wx, wy, wz, wtheta, wd, wu;
 extern double wxa, wya, wxb, wyb;
-extern double wasf; // altitude_sea_floor.
+extern double wa_f; // altitude_wrt_floor.
 
 // Measurements
 extern double x_mes, y_mes, z_mes, theta_mes, vxy_mes, omega_mes;
@@ -180,7 +180,7 @@ extern deque<interval> yhat_history_vector;
 extern deque<interval> thetahat_history_vector;
 extern deque<interval> vxyhat_history_vector;
 // Echosounder.
-extern double altitude_sea_floor;
+extern double altitude_wrt_floor;
 // Modem.
 extern double acousticmodem_x, acousticmodem_y, acousticmodem_r;
 extern int opi_id;
@@ -546,7 +546,7 @@ extern BOOL bDistanceControl;
 extern BOOL bBrakeControl;
 extern BOOL bHeadingControl;
 extern BOOL bDepthControl;
-extern BOOL bAltitudeSeaFloorControl;
+extern BOOL bAltitudeWrtFloorControl;
 extern BOOL bStaticSonarLocalization;
 extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;

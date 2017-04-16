@@ -11,6 +11,8 @@ COM9
 1
 % motordelay (in ms)
 500
+% maxhist (if 0, try to automatically remove old data)
+0
 % alpha_max_err (in rad)
 0.01
 % d_max_err (in m)

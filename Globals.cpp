@@ -20,7 +20,7 @@ interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAIN
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wtheta = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wxb = 0, wyb = 0;
-double wasf = 0;
+double wa_f = 0;
 
 // Measurements
 double x_mes = 0, y_mes = 0, z_mes = 0, theta_mes = 0, vxy_mes = 0, omega_mes = 0;
@@ -48,7 +48,7 @@ deque<interval> yhat_history_vector;
 deque<interval> thetahat_history_vector;
 deque<interval> vxyhat_history_vector;
 // Echosounder.
-double altitude_sea_floor = 0;
+double altitude_wrt_floor = 0;
 // Modem.
 double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_r = 0;
 int opi_id = 0;
@@ -414,7 +414,7 @@ BOOL bDistanceControl = FALSE;
 BOOL bBrakeControl = FALSE;
 BOOL bHeadingControl = FALSE;
 BOOL bDepthControl = FALSE;
-BOOL bAltitudeSeaFloorControl = FALSE;
+BOOL bAltitudeWrtFloorControl = FALSE;
 BOOL bStaticSonarLocalization = FALSE;
 BOOL bDynamicSonarLocalization = FALSE;
 BOOL bGPSLocalization = FALSE;

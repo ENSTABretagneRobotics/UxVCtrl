@@ -328,7 +328,7 @@
 %
 %depthreg z (double ]-oo,oo[ in m in marine units)
 %
-%asfreg z (double ]-oo,oo[ in m in marine units)
+%a_freg z (double ]-oo,oo[ in m in marine units)
 %
 %headingreg orientation (double [0,360[ mod(360) in deg in marine units)
 %

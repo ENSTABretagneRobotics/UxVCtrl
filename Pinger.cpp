@@ -506,13 +506,13 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 					EnterCriticalSection(&StateVariablesCS);
 					wz = 0; // Surface...
 					bDepthControl = TRUE;
-					bAltitudeSeaFloorControl = FALSE;
+					bAltitudeWrtFloorControl = FALSE;
 					LeaveCriticalSection(&StateVariablesCS);
 					mSleep(30000);
 					EnterCriticalSection(&StateVariablesCS);
 					wz = 0;
 					bDepthControl = FALSE;
-					bAltitudeSeaFloorControl = FALSE;
+					bAltitudeWrtFloorControl = FALSE;
 					LeaveCriticalSection(&StateVariablesCS);					
 				}
 				bPingerDetection = FALSE;
@@ -563,13 +563,13 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 					EnterCriticalSection(&StateVariablesCS);
 					wz = 0; // Surface...
 					bDepthControl = TRUE;
-					bAltitudeSeaFloorControl = FALSE;
+					bAltitudeWrtFloorControl = FALSE;
 					LeaveCriticalSection(&StateVariablesCS);
 					mSleep(30000);
 					EnterCriticalSection(&StateVariablesCS);
 					wz = 0;
 					bDepthControl = FALSE;
-					bAltitudeSeaFloorControl = FALSE;
+					bAltitudeWrtFloorControl = FALSE;
 					LeaveCriticalSection(&StateVariablesCS);					
 				}
 			}

@@ -99,7 +99,7 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 
-				altitude_sea_floor = distance;
+				altitude_wrt_floor = distance;
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}
