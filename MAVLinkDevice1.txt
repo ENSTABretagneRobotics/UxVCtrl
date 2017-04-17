@@ -13,6 +13,20 @@ COM13
 0.0
 % bDefaultVrToZero
 0
+% bResetToDefault
+0
+% bDisableArmingCheck
+1
+% bArmAtStartup
+1
+% system_id
+255
+% component_id
+0
+% target_system
+1
+% target_component
+0
 % channel 0
 % MinPW (in us)
 1000

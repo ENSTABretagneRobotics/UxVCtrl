@@ -101,7 +101,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						break;
 					}
 					fprintf(mavlinkdevice.pfSaveFile, 
-						"tv_sec;tv_usec;sensor_id;type;autopilot;"
+						"tv_sec;tv_usec;type;autopilot;sensor_id;"
 						"fix_type;lat;lon;alt;eph;epv;vel;cog;satellites_visible;"
 						"roll (in rad);pitch (in rad);yaw (rad);rollspeed (in rad/s);pitchspeed (in rad/s);yawspeed (in rad/s);"
 						"press_abs (in bar);press_diff (in bar);temperature (in celsius degrees);"
@@ -252,7 +252,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%.4f;%.4f;%.4f;"
 						"\n", 
-						(int)tv.tv_sec, (int)tv.tv_usec, (int)mavlinkdata.optical_flow.sensor_id, (int)mavlinkdata.heartbeat.type, (int)mavlinkdata.heartbeat.autopilot,
+						(int)tv.tv_sec, (int)tv.tv_usec, (int)mavlinkdata.heartbeat.type, (int)mavlinkdata.heartbeat.autopilot, (int)mavlinkdata.optical_flow.sensor_id,
 						(int)mavlinkdata.gps_raw_int.fix_type, (int)mavlinkdata.gps_raw_int.lat, (int)mavlinkdata.gps_raw_int.lon, (int)mavlinkdata.gps_raw_int.alt,(int)mavlinkdata.gps_raw_int.eph, (int)mavlinkdata.gps_raw_int.epv, (int)mavlinkdata.gps_raw_int.vel, (int)mavlinkdata.gps_raw_int.cog, (int)mavlinkdata.gps_raw_int.satellites_visible,
 						(double)mavlinkdata.attitude.roll, (double)mavlinkdata.attitude.pitch, (double)mavlinkdata.attitude.yaw, (double)mavlinkdata.attitude.rollspeed, (double)mavlinkdata.attitude.pitchspeed, (double)mavlinkdata.attitude.yawspeed,
 						(double)(mavlinkdata.scaled_pressure.press_abs*0.001), (double)(mavlinkdata.scaled_pressure.press_diff*0.001), (double)(mavlinkdata.scaled_pressure.temperature*0.01), 

@@ -114,7 +114,7 @@ int handlemavlinkinterface()
 
 	LeaveCriticalSection(&StateVariablesCS);
 
-	mavlink_msg_heartbeat_encode(255, 1, &msg, &heartbeat);
+	mavlink_msg_heartbeat_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &heartbeat);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
 	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
@@ -122,7 +122,7 @@ int handlemavlinkinterface()
 		return EXIT_FAILURE;
 	}
 
-	mavlink_msg_gps_raw_int_encode(255, 1, &msg, &gps_raw_int);
+	mavlink_msg_gps_raw_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_raw_int);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
 	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
@@ -130,7 +130,7 @@ int handlemavlinkinterface()
 		return EXIT_FAILURE;
 	}
 
-	mavlink_msg_attitude_encode(255, 1, &msg, &attitude);
+	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
 	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)

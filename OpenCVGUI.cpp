@@ -473,15 +473,39 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case '$': bShowSonar = !bShowSonar; break;
 		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
 		case '+': 
-			if ((fabs(csMap.xMin) > 1)&&(fabs(csMap.xMax) > 1)&&(fabs(csMap.yMin) > 1)&&(fabs(csMap.yMax) > 1))
+			if ((fabs(csMap.xMin) > 0.1)&&(fabs(csMap.xMax) > 0.1)&&(fabs(csMap.yMin) > 0.1)&&(fabs(csMap.yMax) > 0.1))
 			{
-				csMap.xMin *= 0.9; csMap.xMax *= 0.9; csMap.yMin *= 0.9; csMap.yMax *= 0.9; 
+				csMap.xMin *= 0.9; csMap.xMax *= 0.9; csMap.yMin *= 0.9; csMap.yMax *= 0.9;
 			}
 			break;
 		case '-': 
-			if ((fabs(csMap.xMin) < 100000)&&(fabs(csMap.xMax) < 100000)&&(fabs(csMap.yMin) < 100000)&&(fabs(csMap.yMax) < 100000))
+			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
 			{
-				csMap.xMin /= 0.9; csMap.xMax /= 0.9; csMap.yMin /= 0.9; csMap.yMax /= 0.9; 
+				csMap.xMin /= 0.9; csMap.xMax /= 0.9; csMap.yMin /= 0.9; csMap.yMax /= 0.9;
+			}
+			break;
+		case 2490368: // Up arrow.
+			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
+			{
+				csMap.yMin += 1; csMap.yMax += 1;
+			}
+			break;
+		case 2621440: // Down arrow.
+			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
+			{
+				csMap.yMin -= 1; csMap.yMax -= 1;
+			}
+			break;
+		case 2424832: // Left arrow.
+			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
+			{
+				csMap.xMin -= 1; csMap.xMax -= 1;
+			}
+			break;
+		case 2555904: // Right arrow.
+			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
+			{
+				csMap.xMin += 1; csMap.xMax += 1;
 			}
 			break;
 		case 'T': 

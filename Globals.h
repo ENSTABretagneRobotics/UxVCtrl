@@ -207,6 +207,8 @@ extern BOOL bMAVLinkInterface;
 extern char szMAVLinkInterfacePath[MAX_BUF_LEN];
 extern int MAVLinkInterfaceBaudRate;
 extern int MAVLinkInterfaceTimeout;
+extern int MAVLinkInterface_system_id;
+extern int MAVLinkInterface_component_id;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 extern BOOL bDisableMES;

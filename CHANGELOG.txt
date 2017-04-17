@@ -1,3 +1,7 @@
+Added arrow keys to move in the view of OpenCVGUI (but disabled with key code cast).
+Enabled MAV_DATA_STREAM_POSITION messages in MAVLinkDevice.
+Added several parameters for MAVLinkDevice and MAVLinkInterface.
+
 153
 Performance improvement in automatic handling of RPLIDAR data history.
 

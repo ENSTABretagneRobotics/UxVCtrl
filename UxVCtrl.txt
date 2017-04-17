@@ -54,6 +54,10 @@
 115200
 % MAVLinkInterfaceTimeout (in ms)
 1500
+% MAVLinkInterface_system_id
+1
+% MAVLinkInterface_component_id
+0
 % bCommandPrompt
 1
 % bEcho

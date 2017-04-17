@@ -75,6 +75,8 @@ BOOL bMAVLinkInterface = FALSE;
 char szMAVLinkInterfacePath[MAX_BUF_LEN];
 int MAVLinkInterfaceBaudRate = 0;
 int MAVLinkInterfaceTimeout = 0;
+int MAVLinkInterface_system_id = 0;
+int MAVLinkInterface_component_id = 0;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 BOOL bDisableMES = FALSE;

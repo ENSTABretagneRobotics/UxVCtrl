@@ -40,6 +40,8 @@ inline int LoadConfig(void)
 	sprintf(szMAVLinkInterfacePath, ":5760");
 	MAVLinkInterfaceBaudRate = 115200;
 	MAVLinkInterfaceTimeout = 1500;
+	MAVLinkInterface_system_id = 1;
+	MAVLinkInterface_component_id = 0;
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
 	bDisableMES = TRUE;
@@ -193,6 +195,10 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &MAVLinkInterfaceBaudRate) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &MAVLinkInterfaceTimeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_system_id) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_component_id) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -603,6 +609,16 @@ inline int LoadConfig(void)
 	{
 		printf("Invalid parameter : bEnableOpenCVGUIs[2].\n");
 		bEnableOpenCVGUIs[2] = FALSE;
+	}
+	if ((MAVLinkInterface_system_id < 0)||(MAVLinkInterface_system_id >= 256))
+	{
+		printf("Invalid parameter : MAVLinkInterface_system_id.\n");
+		MAVLinkInterface_system_id = 1;
+	}
+	if ((MAVLinkInterface_component_id < 0)||(MAVLinkInterface_component_id >= 256))
+	{
+		printf("Invalid parameter : MAVLinkInterface_component_id.\n");
+		MAVLinkInterface_component_id = 0;
 	}
 	if ((u_max <= 0)||(u_max > 1))
 	{
