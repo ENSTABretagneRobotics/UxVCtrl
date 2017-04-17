@@ -1,3 +1,6 @@
+152
+Updated automatic handling of RPLIDAR data history.
+
 151
 Improved compatibility with old RPLIDAR.
 Added the display of altitude for QUADRO.

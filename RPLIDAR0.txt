@@ -11,7 +11,7 @@ COM9
 1
 % motordelay (in ms)
 500
-% maxhist (if 0, try to automatically remove old data)
+% maxhist (0 : try to automatically remove old data, around 168 : advised for SCAN mode, around 336 : advised for EXPRESS_SCAN mode)
 0
 % alpha_max_err (in rad)
 0.01
