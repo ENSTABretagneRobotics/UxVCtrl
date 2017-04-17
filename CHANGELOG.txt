@@ -1,3 +1,6 @@
+153
+Performance improvement in automatic handling of RPLIDAR data history.
+
 152
 Updated automatic handling of RPLIDAR data history.
 

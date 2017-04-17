@@ -21,7 +21,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 	double angle = 0;
 	double distance = 0;
 	int quality = 0;
-	//int nbprev = 0, nb = 0;
+	int nbprev = 0, nb = 0;
 	BOOL bConnected = FALSE;
 	int i = 0, j = 0;
 	char szSaveFilePath[256];
@@ -69,12 +69,12 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 				memset(angles, 0, sizeof(angles));
 				memset(distances, 0, sizeof(distances));
 
-				//EnterCriticalSection(&StateVariablesCS);
+				EnterCriticalSection(&StateVariablesCS);
 
-				//nbprev = (int)alpha_mes_vector.size();
-				//nb = 0;
+				nbprev = (int)alpha_mes_vector.size();
+				nb = 0;
 
-				//LeaveCriticalSection(&StateVariablesCS);
+				LeaveCriticalSection(&StateVariablesCS);
 
 				if (rplidar.pfSaveFile != NULL)
 				{
@@ -128,38 +128,16 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					EnterCriticalSection(&StateVariablesCS);
 
 					// Angles not always decreasing?
-					// bNewScan only sent at startup?
 
-					//if ((bNewScan)&&(rplidar.maxhist == 0))
-					//{
-					//	// Try to automatically remove old data...
-					//	for (j = nbprev-nb-1; j >= 0; j--)
-					//	{
-					//		if ((int)alpha_mes_vector.size() > 0)
-					//		{
-					//			alpha_mes_vector.pop_front();
-					//			d_mes_vector.pop_front();
-					//			d_all_mes_vector.pop_front();
-					//			t_history_vector.pop_front();
-					//			xhat_history_vector.pop_front();
-					//			yhat_history_vector.pop_front();
-					//			thetahat_history_vector.pop_front();
-					//			vxyhat_history_vector.pop_front();
-					//		}
-					//	}
-					//	nbprev = nb;
-					//	nb = 0;
-					//}
+					// bNewScan only sent at startup?
 
 					for (i = 0; i < NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR; i++)
 					{
 						alpha_mes = angles[i];
 						d_mes = distances[i];
-						
+
 						if (rplidar.maxhist == 0)
 						{
-							// Try to automatically remove old data...
-
 							// Try to detect the beginning of a new scan with the angle discontinuity...
 							// Try to be a little bit robust w.r.t. non-decreasing outliers...
 							if (((int)alpha_mes_vector.size() >= 5)&&
@@ -167,35 +145,70 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 								((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-4]) > M_PI)&&
 								((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-3]) > M_PI)&&
 								((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-2]) > M_PI)&&
-								((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI))
+								((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI)) 
+								bNewScan = TRUE; else bNewScan = FALSE;
+							if (bNewScan)
 							{
-								for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--) 
+								// Try to automatically remove old data...
+								for (j = nbprev-nb-1; j >= 0; j--)
 								{
-									// Mark existing data as old.
-									alpha_mes_vector[j] += 2*M_PI;
+									if ((int)alpha_mes_vector.size() > 0)
+									{
+										alpha_mes_vector.pop_front();
+										d_mes_vector.pop_front();
+										d_all_mes_vector.pop_front();
+										t_history_vector.pop_front();
+										xhat_history_vector.pop_front();
+										yhat_history_vector.pop_front();
+										thetahat_history_vector.pop_front();
+										vxyhat_history_vector.pop_front();
+									}
 								}
-							}
-							if (((int)alpha_mes_vector.size() > 0)&&
-								((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) < -M_PI))
-							{
-								// Non-decreasing outlier around the angle discontinuity, mark as old.
-								alpha_mes += 2*M_PI;
-							}
-							for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--)
-							{
-								if (alpha_mes_vector[j]-2*M_PI >= alpha_mes)
-								{
-									alpha_mes_vector.pop_front();
-									d_mes_vector.pop_front();
-									d_all_mes_vector.pop_front();
-									t_history_vector.pop_front();
-									xhat_history_vector.pop_front();
-									yhat_history_vector.pop_front();
-									thetahat_history_vector.pop_front();
-									vxyhat_history_vector.pop_front();
-								}
+								nbprev = nb;
+								nb = 0;
 							}
 						}
+
+						//if (rplidar.maxhist == 0)
+						//{
+						//	// Try to automatically remove old data...
+
+						//	// Try to detect the beginning of a new scan with the angle discontinuity...
+						//	// Try to be a little bit robust w.r.t. non-decreasing outliers...
+						//	if (((int)alpha_mes_vector.size() >= 5)&&
+						//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-5]) > M_PI)&&
+						//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-4]) > M_PI)&&
+						//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-3]) > M_PI)&&
+						//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-2]) > M_PI)&&
+						//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI))
+						//	{
+						//		for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--) 
+						//		{
+						//			// Mark existing data as old.
+						//			alpha_mes_vector[j] += 2*M_PI;
+						//		}
+						//	}
+						//	if (((int)alpha_mes_vector.size() > 0)&&
+						//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) < -M_PI))
+						//	{
+						//		// Non-decreasing outlier around the angle discontinuity, mark as old.
+						//		alpha_mes += 2*M_PI;
+						//	}
+						//	for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--)
+						//	{
+						//		if (alpha_mes_vector[j]-2*M_PI >= alpha_mes)
+						//		{
+						//			alpha_mes_vector.pop_front();
+						//			d_mes_vector.pop_front();
+						//			d_all_mes_vector.pop_front();
+						//			t_history_vector.pop_front();
+						//			xhat_history_vector.pop_front();
+						//			yhat_history_vector.pop_front();
+						//			thetahat_history_vector.pop_front();
+						//			vxyhat_history_vector.pop_front();
+						//		}
+						//	}
+						//}
 
 						// For compatibility with a Seanet...
 
@@ -210,22 +223,22 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						thetahat_history_vector.push_back(thetahat);
 						vxyhat_history_vector.push_back(vxyhat);
 
-						//if (rplidar.maxhist == 0)
-						//{
-						//	// Try to automatically remove old data...
-						//	nb++;
-						//	if ((nb <= nbprev)&&((int)alpha_mes_vector.size() > 0))
-						//	{
-						//		alpha_mes_vector.pop_front();
-						//		d_mes_vector.pop_front();
-						//		d_all_mes_vector.pop_front();
-						//		t_history_vector.pop_front();
-						//		xhat_history_vector.pop_front();
-						//		yhat_history_vector.pop_front();
-						//		thetahat_history_vector.pop_front();
-						//		vxyhat_history_vector.pop_front();
-						//	}
-						//}
+						if (rplidar.maxhist == 0)
+						{
+							// Try to automatically remove old data...
+							nb++;
+							if ((nb <= nbprev)&&((int)alpha_mes_vector.size() > 0))
+							{
+								alpha_mes_vector.pop_front();
+								d_mes_vector.pop_front();
+								d_all_mes_vector.pop_front();
+								t_history_vector.pop_front();
+								xhat_history_vector.pop_front();
+								yhat_history_vector.pop_front();
+								thetahat_history_vector.pop_front();
+								vxyhat_history_vector.pop_front();
+							}
+						}
 						if (((rplidar.maxhist > 0)&&((int)alpha_mes_vector.size() > rplidar.maxhist))||
 							((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
 						{
@@ -278,12 +291,61 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 
 					// Angles not always decreasing?
 
-					//if ((bNewScan)&&(rplidar.maxhist == 0))
+					alpha_mes = angle;
+					d_mes = distance;
+
+					if (rplidar.maxhist == 0)
+					{
+						if (bNewScan)
+						{
+							// Try to automatically remove old data...
+							for (j = nbprev-nb-1; j >= 0; j--)
+							{
+								if ((int)alpha_mes_vector.size() > 0)
+								{
+									alpha_mes_vector.pop_front();
+									d_mes_vector.pop_front();
+									d_all_mes_vector.pop_front();
+									t_history_vector.pop_front();
+									xhat_history_vector.pop_front();
+									yhat_history_vector.pop_front();
+									thetahat_history_vector.pop_front();
+									vxyhat_history_vector.pop_front();
+								}
+							}
+							nbprev = nb;
+							nb = 0;
+						}
+					}
+					
+					//if (rplidar.maxhist == 0)
 					//{
 					//	// Try to automatically remove old data...
-					//	for (j = nbprev-nb-1; j >= 0; j--)
+
+					//	// Try to detect the beginning of a new scan with the angle discontinuity...
+					//	// Try to be a little bit robust w.r.t. non-decreasing outliers...
+					//	if (((int)alpha_mes_vector.size() >= 5)&&
+					//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-5]) > M_PI)&&
+					//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-4]) > M_PI)&&
+					//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-3]) > M_PI)&&
+					//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-2]) > M_PI)&&
+					//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI))
 					//	{
-					//		if ((int)alpha_mes_vector.size() > 0)
+					//		for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--) 
+					//		{
+					//			// Mark existing data as old.
+					//			alpha_mes_vector[j] += 2*M_PI;
+					//		}
+					//	}
+					//	if (((int)alpha_mes_vector.size() > 0)&&
+					//		((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) < -M_PI))
+					//	{
+					//		// Non-decreasing outlier around the angle discontinuity, mark as old.
+					//		alpha_mes += 2*M_PI;
+					//	}
+					//	for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--)
+					//	{
+					//		if (alpha_mes_vector[j]-2*M_PI >= alpha_mes)
 					//		{
 					//			alpha_mes_vector.pop_front();
 					//			d_mes_vector.pop_front();
@@ -295,53 +357,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					//			vxyhat_history_vector.pop_front();
 					//		}
 					//	}
-					//	nbprev = nb;
-					//	nb = 0;
 					//}
-
-					alpha_mes = angle;
-					d_mes = distance;
-					
-					if (rplidar.maxhist == 0)
-					{
-						// Try to automatically remove old data...
-
-						// Try to detect the beginning of a new scan with the angle discontinuity...
-						// Try to be a little bit robust w.r.t. non-decreasing outliers...
-						if (((int)alpha_mes_vector.size() >= 5)&&
-							((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-5]) > M_PI)&&
-							((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-4]) > M_PI)&&
-							((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-3]) > M_PI)&&
-							((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-2]) > M_PI)&&
-							((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) > M_PI))
-						{
-							for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--) 
-							{
-								// Mark existing data as old.
-								alpha_mes_vector[j] += 2*M_PI;
-							}
-						}
-						if (((int)alpha_mes_vector.size() > 0)&&
-							((alpha_mes-alpha_mes_vector[(int)alpha_mes_vector.size()-1]) < -M_PI))
-						{
-							// Non-decreasing outlier around the angle discontinuity, mark as old.
-							alpha_mes += 2*M_PI;
-						}
-						for (j = (int)alpha_mes_vector.size()-1; j >= 0; j--)
-						{
-							if (alpha_mes_vector[j]-2*M_PI >= alpha_mes)
-							{
-								alpha_mes_vector.pop_front();
-								d_mes_vector.pop_front();
-								d_all_mes_vector.pop_front();
-								t_history_vector.pop_front();
-								xhat_history_vector.pop_front();
-								yhat_history_vector.pop_front();
-								thetahat_history_vector.pop_front();
-								vxyhat_history_vector.pop_front();
-							}
-						}
-					}
 
 					// For compatibility with a Seanet...
 
@@ -356,22 +372,22 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					thetahat_history_vector.push_back(thetahat);
 					vxyhat_history_vector.push_back(vxyhat);
 
-					//if (rplidar.maxhist == 0)
-					//{
-					//	// Try to automatically remove old data...
-					//	nb++;
-					//	if ((nb <= nbprev)&&((int)alpha_mes_vector.size() > 0))
-					//	{
-					//		alpha_mes_vector.pop_front();
-					//		d_mes_vector.pop_front();
-					//		d_all_mes_vector.pop_front();
-					//		t_history_vector.pop_front();
-					//		xhat_history_vector.pop_front();
-					//		yhat_history_vector.pop_front();
-					//		thetahat_history_vector.pop_front();
-					//		vxyhat_history_vector.pop_front();
-					//	}
-					//}
+					if (rplidar.maxhist == 0)
+					{
+						// Try to automatically remove old data...
+						nb++;
+						if ((nb <= nbprev)&&((int)alpha_mes_vector.size() > 0))
+						{
+							alpha_mes_vector.pop_front();
+							d_mes_vector.pop_front();
+							d_all_mes_vector.pop_front();
+							t_history_vector.pop_front();
+							xhat_history_vector.pop_front();
+							yhat_history_vector.pop_front();
+							thetahat_history_vector.pop_front();
+							vxyhat_history_vector.pop_front();
+						}
+					}
 					if (((rplidar.maxhist > 0)&&((int)alpha_mes_vector.size() > rplidar.maxhist))||
 						((int)alpha_mes_vector.size() > MAX_NB_MEASUREMENTS_PER_SCAN_RPLIDAR))
 					{
