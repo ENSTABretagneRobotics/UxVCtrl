@@ -569,102 +569,100 @@
     <Text Include="mission_spec.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
-    <Text Include="CISCREA.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="env.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Hokuyo0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="IM483I0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="keys.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Maestro0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MAVLinkDevice0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MAVLinkDevice1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MDM0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MES0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MiniSSC0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="mission.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MT0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="NMEADevice0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="NMEADevice1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="P33x0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="RazorAHRS0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="RPLIDAR0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="SBG0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Seanet0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="SSC320.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="SwarmonDevice0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="ublox0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="ublox1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="ublox2.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="UE9A0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="UxVCtrl.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Video0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Video1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Video2.txt">
-      <Filter>Input Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
     <None Include="ResetWorkspace.sh" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="dummy.wmv" />
+    <None Include="dummy.wmv" />
+    <None Include="CISCREA.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="env.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Hokuyo0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="IM483I0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="keys.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Maestro0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MAVLinkDevice0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MAVLinkDevice1.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MDM0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MES0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MiniSSC0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="mission.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MT0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="NMEADevice0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="NMEADevice1.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="P33x0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="RazorAHRS0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="RPLIDAR0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="SBG0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Seanet0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="SSC320.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="SwarmonDevice0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="ublox0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="ublox1.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="ublox2.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="UE9A0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="UxVCtrl.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Video0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Video1.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Video2.txt">
+      <Filter>Input Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

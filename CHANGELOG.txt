@@ -1,4 +1,8 @@
-Added arrow keys to move in the view of OpenCVGUI (but disabled with key code cast).
+155
+Minor corrections in VC Linux project.
+
+154
+Added arrows keys to move in the view of OpenCVGUI (but disabled with key code cast, need to check portability).
 Enabled MAV_DATA_STREAM_POSITION messages in MAVLinkDevice.
 Added several parameters for MAVLinkDevice and MAVLinkInterface.
 
