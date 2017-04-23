@@ -13,6 +13,7 @@
 # Build results
 [Dd]ebug*/
 [Rr]elease*/
+Win32/
 [Xx]64/
 [Xx]86/
 [Bb]uild/

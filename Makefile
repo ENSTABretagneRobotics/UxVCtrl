@@ -175,7 +175,7 @@ MiniSSC.o: ./Hardware/MiniSSC.cpp ./Hardware/MiniSSC.h
 MT.o: ./Hardware/MT.cpp ./Hardware/MT.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h ./Hardware/AIS.h
+NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h ./Hardware/NMEAProtocol.h ./Hardware/AIS.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 P33x.o: ./Hardware/P33x.cpp ./Hardware/P33x.h
@@ -202,7 +202,7 @@ SSC32.o: ./Hardware/SSC32.cpp ./Hardware/SSC32.h
 SwarmonDevice.o: ./Hardware/SwarmonDevice.cpp ./Hardware/SwarmonDevice.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-ublox.o: ./Hardware/ublox.cpp ./Hardware/ublox.h
+ublox.o: ./Hardware/ublox.cpp ./Hardware/ublox.h ./Hardware/UBXProtocol.h ./Hardware/NMEAProtocol.h ./Hardware/RTCM3Protocol.h ./Hardware/AIS.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 UE9A.o: ./Hardware/UE9A.cpp ./Hardware/UE9A.h
