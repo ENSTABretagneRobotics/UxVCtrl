@@ -16,10 +16,21 @@ TIMERCALLBACK_RETURN_VALUE VideoRecordCallbackFunction(void* pParam, BOOLEAN b)
 	UNREFERENCED_PARAMETER(b);
 
 	EnterCriticalSection(&imgsCS[videoid]);
-	if (!cvWriteFrame(videorecordfiles[videoid], imgs[videoid])) 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+	if (!cvWriteFrame(videorecordfiles[videoid], imgs[videoid]))
 	{
 		printf("Error writing to a video file.\n");
 	}
+#else
+	try
+	{
+		videorecordfiles[videoid].write(cv::cvarrToMat(imgs[videoid]));
+	}
+	catch (...)
+	{
+		printf("Error writing to a video file.\n");
+	}
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 	LeaveCriticalSection(&imgsCS[videoid]);
 }
 
@@ -39,6 +50,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 			if (!bVideoRecording) 
 			{
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 #ifdef USE_ALTERNATE_RECORDING
 				EnterCriticalSection(&strtimeCS);
 				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
@@ -61,12 +73,39 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				{
 					printf("Error creating a video file.\n");
 				}
+#else
+#ifdef USE_ALTERNATE_RECORDING
+				EnterCriticalSection(&strtimeCS);
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
+				LeaveCriticalSection(&strtimeCS);
+				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
+					CV_FOURCC('M','J','P','G'), 
+					//CV_FOURCC('D','I','V','X'), 
+					//CV_FOURCC('I', 'Y', 'U', 'V'), 
+#else
+				EnterCriticalSection(&strtimeCS);
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.wmv", videoid, strtime_fns());
+				LeaveCriticalSection(&strtimeCS);
+				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
+					CV_FOURCC('W','M','V','2'), 
+#endif // USE_ALTERNATE_RECORDING
+					1000.0/(double)captureperiod, 
+					cvSize(videoimgwidth,videoimgheight), 
+					1))
+				{
+					printf("Error creating a video file.\n");
+				}
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 				else
 				{
 					if (CreateTimer(&timer, VideoRecordCallbackFunction, (void*)(intptr_t)videoid, captureperiod, captureperiod) != EXIT_SUCCESS)
 					{
 						printf("Error creating a timer.\n");
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 						cvReleaseVideoWriter(&videorecordfiles[videoid]);
+#else
+						videorecordfiles[videoid].release();
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 					}
 					else
 						bVideoRecording = TRUE;
@@ -81,7 +120,11 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			{
 				DeleteTimer(&timer, FALSE);
 				mSleep(captureperiod);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvReleaseVideoWriter(&videorecordfiles[videoid]);
+#else
+				videorecordfiles[videoid].release();
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 				mSleep(captureperiod);
 				bVideoRecording = FALSE;
 			}
@@ -94,7 +137,11 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 	{
 		DeleteTimer(&timer, FALSE);
 		mSleep(captureperiod);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvReleaseVideoWriter(&videorecordfiles[videoid]);
+#else
+		videorecordfiles[videoid].release();
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 		mSleep(captureperiod);
 		bVideoRecording = FALSE;
 	}

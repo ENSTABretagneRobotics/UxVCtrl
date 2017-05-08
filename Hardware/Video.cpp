@@ -19,6 +19,8 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	char szCfgFilePath[256];
 
 	sprintf(szCfgFilePath, "Video%d.txt", videoid);
+	
+	memset(&video, 0, sizeof(VIDEO));
 
 	for (;;)
 	{

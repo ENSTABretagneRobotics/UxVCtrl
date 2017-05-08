@@ -561,7 +561,11 @@ extern int procstackids[MAX_NB_PROCEDURES];
 extern int procstack;
 extern char keys[NB_CONFIGURABLE_KEYS];
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
+#else
+extern cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 extern FILE* missionfile;
@@ -636,7 +640,9 @@ inline int InitGlobals(void)
 		dispimgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
 		VideoRecordRequests[i] = 0;
-		videorecordfiles[i] = 0;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+		videorecordfiles[i] = NULL;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 		bPauseVideo[i] = FALSE;
 		bRestartVideo[i] = FALSE;
@@ -759,7 +765,9 @@ inline int ReleaseGlobals(void)
 		bRestartVideo[i] = FALSE;
 		bPauseVideo[i] = FALSE;
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
-		videorecordfiles[i] = 0;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+		videorecordfiles[i] = NULL;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 		VideoRecordRequests[i] = 0;
 		cvReleaseImage(&dispimgs[i]);
 		cvReleaseImage(&imgs[i]);

@@ -443,6 +443,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		{
 			if (bCleanUp)
 			{
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvDestroyWindow("debug");
 				cvDestroyWindow("coucou");
 				cvDestroyWindow("output");
@@ -453,6 +454,18 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				cvDestroyWindow("HSV Filter");
 				cvDestroyWindow("Canny");
 				cvDestroyWindow("test");
+#else
+				cv::destroyWindow("debug");
+				cv::destroyWindow("coucou");
+				cv::destroyWindow("output");
+				cv::destroyWindow("horizon");
+				cv::destroyWindow("v");
+				cv::destroyWindow("s");
+				cv::destroyWindow("h");
+				cv::destroyWindow("HSV Filter");
+				cv::destroyWindow("Canny");
+				cv::destroyWindow("test");
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 				bCleanUp = FALSE;
 			}
 			continue;
@@ -470,11 +483,11 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		LeaveCriticalSection(&imgsCS[videoid_surfacevisualobstacle]);
 
 		// Convert image->imageData from char* to unsigned char* to work with color values in 0..255.
-		//		unsigned char* data = reinterpret_cast<unsigned char*>(image->imageData);
-		//		unsigned char* overlaydata = reinterpret_cast<unsigned char*>(overlayimage->imageData);
+		//unsigned char* data = reinterpret_cast<unsigned char*>(image->imageData);
+		//unsigned char* overlaydata = reinterpret_cast<unsigned char*>(overlayimage->imageData);
 
 		// Correction of bad lines on the borders of the video...
-		//		CorrectImageBordersRawBGR(data, videoimgwidth, videoimgheight, 2, 0, 0, 0);
+		//CorrectImageBordersRawBGR(data, videoimgwidth, videoimgheight, 2, 0, 0, 0);
 
 		frame = cv::cvarrToMat(image);
 
@@ -490,7 +503,11 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 			result = cv::Point2f(-1, 0);
 		}
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvWaitKey(1);
+#else
+		cv::waitKey(1);
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 
 		std::cout << "Resultat: " << result << "\n";
 

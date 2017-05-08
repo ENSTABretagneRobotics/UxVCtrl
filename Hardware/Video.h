@@ -53,7 +53,13 @@ extern "C" {
 
 struct VIDEO
 {
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	CvCapture* pCapture;
+#else
+	cv::VideoCapture* pCapture;
+	cv::Mat* pframemat;
+	IplImage frameipl;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 	SOCKET s;
 	char address[256];
 	char port[256];
@@ -591,12 +597,23 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 		}
 	case LOCAL_TYPE_VIDEO:
 		mSleep(pVideo->captureperiod);
+
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		pVideo->frame = cvQueryFrame(pVideo->pCapture);
 		if (!pVideo->frame)
 		{
 			printf("Error reading an image from a video.\n");
 			return EXIT_FAILURE;
 		}
+#else
+		if (!pVideo->pCapture->read(*pVideo->pframemat))
+		{
+			printf("Error reading an image from a video.\n");
+			return EXIT_FAILURE;
+		}
+		pVideo->frameipl = (IplImage)*pVideo->pframemat;
+		pVideo->frame = &pVideo->frameipl;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 		break;
 	case FILE_TYPE_VIDEO:
 #ifdef USE_FFMPEG_VIDEO
@@ -608,12 +625,22 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 		}
 #else
 		mSleep(pVideo->captureperiod);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		pVideo->frame = cvQueryFrame(pVideo->pCapture);
 		if (!pVideo->frame)
 		{
 			printf("Error reading an image from a video.\n");
 			return EXIT_FAILURE;
 		}
+#else
+		if (!pVideo->pCapture->read(*pVideo->pframemat))
+		{
+			printf("Error reading an image from a video.\n");
+			return EXIT_FAILURE;
+		}
+		pVideo->frameipl = (IplImage)*pVideo->pframemat;
+		pVideo->frame = &pVideo->frameipl;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 		break;
 	default:
@@ -848,6 +875,8 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		if ((strlen(pVideo->szDevPath) == 1)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
 		{
 			pVideo->DevType = LOCAL_TYPE_VIDEO;
+
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 			pVideo->pCapture = cvCreateCameraCapture(atoi(pVideo->szDevPath));
 			if (!pVideo->pCapture) 
 			{
@@ -885,6 +914,64 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				cvReleaseCapture(&pVideo->pCapture);
 				return EXIT_FAILURE;
 			}
+#else
+			pVideo->pframemat = new cv::Mat();
+			if (!pVideo->pframemat)
+			{
+				printf("Unable to connect to a local/remote camera or open a video file : Out of memory.\n");
+				return EXIT_FAILURE;
+			}
+			pVideo->pCapture = new cv::VideoCapture();
+			if (!pVideo->pCapture)
+			{
+				printf("Unable to connect to a local/remote camera or open a video file : Out of memory.\n");
+				delete pVideo->pframemat;
+				return EXIT_FAILURE;
+			}
+			if (!pVideo->pCapture->open(atoi(pVideo->szDevPath))) 
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				delete pVideo->pCapture;
+				delete pVideo->pframemat;
+				return EXIT_FAILURE;
+			}
+
+			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
+			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+
+			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
+			//if ((!pVideo->bForceSoftwareResize)&&
+			//	((pVideo->pCapture->get(CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+			//	(pVideo->pCapture->get(CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+			//{
+			//	printf("Unable to set desired video resolution.\n");
+			//	pVideo->pCapture->release();
+			//	delete pVideo->pCapture;
+			//	delete pVideo->pframemat;
+			//	return EXIT_FAILURE;
+			//}
+
+			// Sometimes the first images are bad, so wait a little bit and take
+			// several images in the beginning.
+			i = 0;
+			while (i < 4)
+			{
+				mSleep(500);
+				pVideo->pCapture->read(*pVideo->pframemat);
+				i++;
+			}
+
+			if (!pVideo->pCapture->read(*pVideo->pframemat))
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				pVideo->pCapture->release();
+				delete pVideo->pCapture;
+				delete pVideo->pframemat;
+				return EXIT_FAILURE;
+			}
+			pVideo->frameipl = (IplImage)*pVideo->pframemat;
+			pVideo->frame = &pVideo->frameipl;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 		}
 		else
 		{
@@ -903,6 +990,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				return EXIT_FAILURE;
 			}
 #else
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 			pVideo->pCapture = cvCreateFileCapture(pVideo->szDevPath);
 			if (!pVideo->pCapture) 
 			{
@@ -940,6 +1028,64 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				cvReleaseCapture(&pVideo->pCapture);
 				return EXIT_FAILURE;
 			}
+#else
+			pVideo->pframemat = new cv::Mat();
+			if (!pVideo->pframemat)
+			{
+				printf("Unable to connect to a local/remote camera or open a video file : Out of memory.\n");
+				return EXIT_FAILURE;
+			}
+			pVideo->pCapture = new cv::VideoCapture();
+			if (!pVideo->pCapture)
+			{
+				printf("Unable to connect to a local/remote camera or open a video file : Out of memory.\n");
+				delete pVideo->pframemat;
+				return EXIT_FAILURE;
+			}
+			if (!pVideo->pCapture->open(pVideo->szDevPath)) 
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				delete pVideo->pCapture;
+				delete pVideo->pframemat;
+				return EXIT_FAILURE;
+			}
+
+			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
+			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+
+			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
+			//if ((!pVideo->bForceSoftwareResize)&&
+			//	((pVideo->pCapture->get(CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+			//	(pVideo->pCapture->get(CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+			//{
+			//	printf("Unable to set desired video resolution.\n");
+			//	pVideo->pCapture->release();
+			//	delete pVideo->pCapture;
+			//	delete pVideo->pframemat;
+			//	return EXIT_FAILURE;
+			//}
+
+			// Sometimes the first images are bad, so wait a little bit and take
+			// several images in the beginning.
+			i = 0;
+			while (i < 4)
+			{
+				mSleep(500);
+				pVideo->pCapture->read(*pVideo->pframemat);
+				i++;
+			}
+
+			if (!pVideo->pCapture->read(*pVideo->pframemat))
+			{
+				printf("Unable to connect to a local/remote camera or open a video file.\n");
+				pVideo->pCapture->release();
+				delete pVideo->pCapture;
+				delete pVideo->pframemat;
+				return EXIT_FAILURE;
+			}
+			pVideo->frameipl = (IplImage)*pVideo->pframemat;
+			pVideo->frame = &pVideo->frameipl;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 		}
 	}
@@ -958,14 +1104,22 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				cvReleaseImage(&pVideo->frame);
 				return EXIT_FAILURE;
 			case LOCAL_TYPE_VIDEO:
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvReleaseCapture(&pVideo->pCapture);
+#else
+				pVideo->pCapture->release();
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 				return EXIT_FAILURE;
 			case FILE_TYPE_VIDEO:
 #ifdef USE_FFMPEG_VIDEO
 				ffmpegclose(pVideo);
 				cvReleaseImage(&pVideo->frame);
 #else
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvReleaseCapture(&pVideo->pCapture);
+#else
+				pVideo->pCapture->release();
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 				return EXIT_FAILURE;
 			default:
@@ -991,14 +1145,26 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	//		cvReleaseImage(&pVideo->frame);
 	//		return EXIT_FAILURE;
 	//	case LOCAL_TYPE_VIDEO:
+	//#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	//		cvReleaseCapture(&pVideo->pCapture);
+	//#else
+	//		pVideo->pCapture->release();
+	//		delete pVideo->pCapture;
+	//		delete pVideo->pframemat;
+	//#endif // USE_OPENCV_HIGHGUI_CPP_API
 	//		return EXIT_FAILURE;
 	//	case FILE_TYPE_VIDEO:
 	//#ifdef USE_FFMPEG_VIDEO
 	//		ffmpegclose(pVideo);
 	//		cvReleaseImage(&pVideo->frame);
 	//#else
+	//#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	//		cvReleaseCapture(&pVideo->pCapture);
+	//#else
+	//		pVideo->pCapture->release();
+	//		delete pVideo->pCapture;
+	//		delete pVideo->pframemat;
+	//#endif // USE_OPENCV_HIGHGUI_CPP_API
 	//#endif // USE_FFMPEG_VIDEO
 	//		return EXIT_FAILURE;
 	//	default:
@@ -1030,14 +1196,26 @@ inline int DisconnectVideo(VIDEO* pVideo)
 		cvReleaseImage(&pVideo->frame);
 		break;
 	case LOCAL_TYPE_VIDEO:
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvReleaseCapture(&pVideo->pCapture);
+#else
+		pVideo->pCapture->release();
+		delete pVideo->pCapture;
+		delete pVideo->pframemat;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 		break;
 	case FILE_TYPE_VIDEO:
 #ifdef USE_FFMPEG_VIDEO
 		ffmpegclose(pVideo);
 		cvReleaseImage(&pVideo->frame);
 #else
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvReleaseCapture(&pVideo->pCapture);
+#else
+		pVideo->pCapture->release();
+		delete pVideo->pCapture;
+		delete pVideo->pframemat;
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 		break;
 	default:

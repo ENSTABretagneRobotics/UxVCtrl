@@ -1,3 +1,6 @@
+156
+Added alternate implemention of video and GUI handling using OpenCV CPP API (but disabled by default).
+
 155
 Minor corrections in VC Linux project.
 

@@ -8,32 +8,33 @@ Check also proxy settings of Internet Explorer, and any other installed browser,
 It should work with the following software (see UDK\Software prerequisites, to install preferably in order (x86 versions should be installed only on 32 bit Windows operating system versions, x64 only on 64 bit Windows operating system versions), launch Install.bat file when provided, do not launch installation from a network share, copy first on your computer) :
 *** USER and DEVEL ***
 _ Windows XP Professional SP3 32 bit/Windows 8.1 Professional 64 bit
-_ 7-Zip (7zip_x86, 7zip_x64)
-_ Microsoft Visual C++ 2008 SP1 Redistributable Package and Microsoft Visual C++ 2012 Redistributable Package (vcredist)
+_ 7-Zip
+_ Microsoft Visual C++ 2008 SP1 Redistributable Package, Microsoft Visual C++ 2012 Redistributable Package, Microsoft Visual C++ 2015 Redistributable Package (vcredist)
 [_ Microsoft .NET Framework 3.5 Service Pack 1 (dotnetfx35)]
-[_ Microsoft .NET Framework 4]
-[_ Google Earth 6 (Google_Earth)]
+[_ Microsoft .NET Framework 4 (dotnetfx40)]
+[_ Google Earth]
 [_ MinGW et MSYS (MinGW, MinGW_x64)]
 [_ GPS data conversions (GPSDataConverter)]
 [_ Look@LAN (lalsetup250)]
 _ LabJack UD driver v3.15/v3.2X
-[_ MT SDK 2.7/3.3/4.1.5]
+[_ MT SDK 2.7/3.3/4.2.1/4.3]
 [_ Maestro Control Center]
 [_ OpenAL SDK 1.1]
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
 [_ ffmpeg 32 bit (ffmpeg-msvc)]
 _ Kinect v2 SDK (not available for Visual Studio 2008 and Windows XP)
-[_ Microsoft Office Excel 2003 (or equivalent .csv and .xls editor)]
-_ The specific prerequisites for CISSAU (libmodbus-3.0.3/libmodbus-3.0.6, see UDK\Software prerequisites\CISSAU_prereq)
+[_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
+_ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see CISSAU_prereq)
 *** DEVEL ***
-_ Visual Studio 2008 SP1/Visual Studio 2012
-_ OpenCV 2.4.9 (OpenCV2.4.9 or see http://www.ensta-bretagne.fr/lebars/Share/setup_qt2010.05_opencv249.pdf)
+_ Visual Studio 2008/2012/2015
+_ OpenCV 2.4.9/3.2.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2015_opencv249.pdf / http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf)
 _ MAVLink (not available for Visual Studio 2008)
-_ libmodbus 3.0.6
-_ SBG Systems Inertial SDK v3.5.0 (SBG)
+_ SBG Systems Inertial SDK v3.5.0
 
-It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested, see Makefile.
+To use a specific version of the Visual Studio solution, copy the project files from the Backup_vs20XX folder to the UxVCtrl folder to replace the default. To disable the need of any unnecessary prerequisites, run Compat_vs20XX.bat and follow its instructions.
+
+It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested. See provided Makefile or Visual Studio 2015 VC Linux project.
 
 Restart the computer after installation.
 
@@ -74,6 +75,7 @@ Hardware support :
 - SBG : SBG Systems Ellipse-N AHRS.
 - Seanet : Tritech Micron Sonar, Tritech Miniking Sonar.
 - SSC-32 : Lynxmotion SSC-32, SSC-32u servo controllers.
+- ublox : ublox GPS.
 - UE9A : LabJack UE9.
 - Video : USB webcam, SJCAM M10+ through Wi-Fi, Kinect v2.
 

@@ -429,7 +429,11 @@ int procstackids[MAX_NB_PROCEDURES];
 int procstack = 0;
 char keys[NB_CONFIGURABLE_KEYS];
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
+#else
+cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
+#endif // USE_OPENCV_HIGHGUI_CPP_API
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 FILE* missionfile = NULL;

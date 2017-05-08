@@ -106,7 +106,7 @@
 )
 
 @echo.
-@echo Please change Platform Toolset if needed
+@echo Please change Platform Toolset in Visual Studio project settings if needed
 @echo.
 
 @pause
