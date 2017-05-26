@@ -69,7 +69,7 @@ linefollowingrelativerobot relatif au cap
 rajouter commande setwindestimation/wgs avec unités des marins
 
 bugs
-Release GitHub : le dossier de binaires et de sources est téléchargé sous le même nom, faire un release UxVCtrl-Winter2017 en beta, publier sources comme UxVCtrl_Zip...
+SpeedBit Video Accelerator\Accelerator.dll seems to generate small bugs everytime a network function is called...
 crash simu mission guerlédan en tapant la commande exit, peut-être lié à MAVLinkInterface, qui était connectée?->aussi quand pas connecté...->peut-être lié au videorecording...->crash même quand mission interrompue par touche x...->crash même quand MAVLinkInterface désactivée...
 caractères NMEA invalides loggués parfois à la fin?
 Warning : NMEA checksum error->s'assurer que ça buggue pas avec fausses trames nmea trop grandes venant de UBX-RAWX, vérifier plus en détail si le talkerid est connu...
@@ -340,6 +340,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Release GitHub : le dossier de binaires et de sources est téléchargé sous le même nom, publier sources comme UxVCtrl_Zip...?
 
 possible bug in videocapture destructor in cv320, probably solved in next version...
 Pb cvqueryframe windows 10 sjcam ou autres caméras internes->utiliser les fonctions en cpp en options pour l'accès à la caméra?

@@ -1,5 +1,8 @@
+157
+Default project files are now with Visual Studio 2017 and OpenCV 2.4.13.
+
 156
-Added alternate implemention of video and GUI handling using OpenCV CPP API (but disabled by default).
+Added alternate implementation of video and GUI handling using OpenCV CPP API (but disabled by default).
 
 155
 Minor corrections in VC Linux project.

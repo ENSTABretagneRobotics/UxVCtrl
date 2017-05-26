@@ -9,7 +9,7 @@ It should work with the following software (see UDK\Software prerequisites, to i
 *** USER and DEVEL ***
 _ Windows XP Professional SP3 32 bit/Windows 8.1 Professional 64 bit
 _ 7-Zip
-_ Microsoft Visual C++ 2008 SP1 Redistributable Package, Microsoft Visual C++ 2012 Redistributable Package, Microsoft Visual C++ 2015 Redistributable Package (vcredist)
+_ Microsoft Visual C++ 2008 SP1 Redistributable Package, Microsoft Visual C++ 2012 Redistributable Package, Microsoft Visual C++ 2017 Redistributable Package (vcredist)
 [_ Microsoft .NET Framework 3.5 Service Pack 1 (dotnetfx35)]
 [_ Microsoft .NET Framework 4 (dotnetfx40)]
 [_ Google Earth]
@@ -27,14 +27,14 @@ _ Kinect v2 SDK (not available for Visual Studio 2008 and Windows XP)
 [_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see CISSAU_prereq)
 *** DEVEL ***
-_ Visual Studio 2008/2012/2015
-_ OpenCV 2.4.9/3.2.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2015_opencv249.pdf / http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf)
+_ Visual Studio 2008/2012/2017
+_ OpenCV 2.4.9/2.4.13/3.2.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2015_opencv249.pdf / http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf / http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf)
 _ MAVLink (not available for Visual Studio 2008)
 _ SBG Systems Inertial SDK v3.5.0
 
 To use a specific version of the Visual Studio solution, copy the project files from the Backup_vs20XX folder to the UxVCtrl folder to replace the default. To disable the need of any unnecessary prerequisites, run Compat_vs20XX.bat and follow its instructions.
 
-It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested. See provided Makefile or Visual Studio 2015 VC Linux project.
+It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested. See provided Makefile or Visual Studio 2017 VC Linux project (set Pre-Launch Command to export DISPLAY=:0.0 and Working Directory to $(RemoteProjectDir)/UxVCtrl).
 
 Restart the computer after installation.
 
