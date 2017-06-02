@@ -1,20 +1,19 @@
 This folder contains a program used to control and configure UGVs, USVs, UUVs used in WRSC, SAUC-E and euRathlon competitions.
 
-It is recommended to be connected with an administrator account, deactivate any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189. On Windows 7/8/10, choose Work/Private for the network type if asked when connecting to the different networks (avoid Public type, to check and change go to Network and Sharing Center and click on Public to be able to change to Work/Private, or go to PC Settings\Network, select the desired network and enable the option Find devices and content/Make this PC discoverable).
+It is recommended to be connected with an administrator account, deactivate any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189, 40XX network ports. On Windows 7/8/10, choose Work/Private for the network type if asked when connecting to the different networks (avoid Public type, to check and change go to Network and Sharing Center and click on Public to be able to change to Work/Private, or go to PC Settings\Network, select the desired network and enable the option Find devices and content/Make this PC discoverable).
 In Windows Explorer Folder Options, View tab, activate hidden files display, known files extensions display, protected system files and folders display.
 Check and change if needed Control Panel\Regional and Language Options\Customize\Numbers so that '.' is in Decimal symbol and ';' in List separator.
 Check also proxy settings of Internet Explorer, and any other installed browser, as well as FileZilla if necessary.
 
-It should work with the following software (see UDK\Software prerequisites, to install preferably in order (x86 versions should be installed only on 32 bit Windows operating system versions, x64 only on 64 bit Windows operating system versions), launch Install.bat file when provided, do not launch installation from a network share, copy first on your computer) :
+It should work with the following software :
 *** USER and DEVEL ***
-_ Windows XP Professional SP3 32 bit/Windows 8.1 Professional 64 bit
+_ Windows 8.1 Professional 64 bit
 _ 7-Zip
-_ Microsoft Visual C++ 2008 SP1 Redistributable Package, Microsoft Visual C++ 2012 Redistributable Package, Microsoft Visual C++ 2017 Redistributable Package (vcredist)
-[_ Microsoft .NET Framework 3.5 Service Pack 1 (dotnetfx35)]
-[_ Microsoft .NET Framework 4 (dotnetfx40)]
+_ Microsoft Visual C++ 2017 Redistributable Package
+_ Microsoft .NET Framework 4.7
 [_ Google Earth]
-[_ MinGW et MSYS (MinGW, MinGW_x64)]
-[_ GPS data conversions (GPSDataConverter)]
+[_ MinGW and MSYS]
+[_ GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
 [_ Look@LAN (lalsetup250)]
 _ LabJack UD driver v3.15/v3.2X
 [_ MT SDK 2.7/3.3/4.2.1/4.3]
@@ -23,20 +22,20 @@ _ LabJack UD driver v3.15/v3.2X
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
 [_ ffmpeg 32 bit (ffmpeg-msvc)]
-_ Kinect v2 SDK (not available for Visual Studio 2008 and Windows XP)
+_ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP)
 [_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
-_ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see CISSAU_prereq)
+_ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip )
 *** DEVEL ***
-_ Visual Studio 2008/2012/2017
-_ OpenCV 2.4.9/2.4.13/3.2.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2015_opencv249.pdf / http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf / http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf)
-_ MAVLink (not available for Visual Studio 2008)
-_ SBG Systems Inertial SDK v3.5.0
+_ Visual Studio 2017
+_ OpenCV 2.4.13 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf )
+_ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip )
+_ SBG Systems Inertial SDK v3.5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip )
+
+Restart the computer after installation.
 
 To use a specific version of the Visual Studio solution, copy the project files from the Backup_vs20XX folder to the UxVCtrl folder to replace the default. To disable the need of any unnecessary prerequisites, run Compat_vs20XX.bat and follow its instructions.
 
 It is also supposed to be compatible with Linux with equivalent prerequisites, although not fully tested. See provided Makefile or Visual Studio 2017 VC Linux project (set Pre-Launch Command to export DISPLAY=:0.0 and Working Directory to $(RemoteProjectDir)/UxVCtrl).
-
-Restart the computer after installation.
 
 The following are required sources dependencies :  
 _ ..\OSUtils : Windows/Linux abstraction layer (threads, network, serial port, time management...) as well as other useful functions.
