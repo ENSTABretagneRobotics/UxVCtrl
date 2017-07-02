@@ -6,11 +6,11 @@ Check and change if needed Control Panel\Regional and Language Options\Customize
 Check also proxy settings of Internet Explorer, and any other installed browser, as well as FileZilla if necessary.
 
 It should work with the following software :
-*** USER and DEVEL ***
+*** USER and DEVELOPER ***
 _ Windows 8.1 Professional 64 bit
-_ 7-Zip
-_ Microsoft Visual C++ 2017 Redistributable Package
-_ Microsoft .NET Framework 4.7
+_ Microsoft Visual C++ 2017 Redistributable Package ( https://go.microsoft.com/fwlink/?LinkId=746571 )
+_ Microsoft .NET Framework 4.7 ( http://go.microsoft.com/fwlink/?LinkId=825303 )
+[_ 7-Zip]
 [_ Google Earth]
 [_ MinGW and MSYS]
 [_ GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
@@ -25,7 +25,7 @@ _ LabJack UD driver v3.15/v3.2X
 _ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP)
 [_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip )
-*** DEVEL ***
+*** DEVELOPER ***
 _ Visual Studio 2017
 _ OpenCV 2.4.13 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf )
 _ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip )

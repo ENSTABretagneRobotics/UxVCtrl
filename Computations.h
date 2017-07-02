@@ -751,7 +751,7 @@ inline void BoxTranslate(box &Src, box &Dest, interval distance, interval angle,
 //}
 
 inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
-					 interval& thetahat, 
+					 interval& psihat, 
 					 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
 					 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
 					 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
@@ -782,14 +782,14 @@ inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<
 
 			box Pxyj = P;
 			box Pt = box(interval(-oo,oo),interval(-oo,oo)); 
-			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat, 1);
+			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+psihat, 1);
 			interval xt = Pt[1];
 			interval yt = Pt[2];
 			CPointInSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
 			if ((!xt.isEmpty)&&(!yt.isEmpty))
 			{
 				Pt = box(xt,yt);
-				BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat, -1);
+				BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+psihat, -1);
 				//Pj.push_back(Pxyj);
 				Pi.push_back(Pxyj);
 				Pigroup.push_back(i);
@@ -814,7 +814,7 @@ inline void Contract(box& P, deque< vector<interval> >& d_all_mes_vector, deque<
 
 inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
 						 deque<double>& t_history_vector, deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, 
-						 deque<interval>& thetahat_history_vector, deque<interval>& vxyhat_history_vector, 
+						 deque<interval>& psihat_history_vector, deque<interval>& vrxhat_history_vector, 
 						 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
 						 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
 						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
@@ -845,14 +845,14 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 
 			box Pxyj = box(xhat_history_vector[i],yhat_history_vector[i]);
 			box Pt = box(interval(-oo,oo),interval(-oo,oo)); 
-			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat_history_vector[i], 1);
+			BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+psihat_history_vector[i], 1);
 			interval xt = Pt[1];
 			interval yt = Pt[2];
 			CPointInSegmentsOrCircles(xt,yt,walls_xa,walls_ya,walls_xb,walls_yb,circles_x,circles_y,circles_r);
 			if ((!xt.isEmpty)&&(!yt.isEmpty))
 			{
 				Pt = box(xt,yt);
-				BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+thetahat_history_vector[i], -1);
+				BoxTranslate(Pxyj, Pt, dhat, sdir*alphahat+alphashat+psihat_history_vector[i], -1);
 
 				// Propagate forward to current position...
 				interval xk = xhat_history_vector[i] & Pxyj[1];
@@ -860,8 +860,8 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 				for (k = i; k < (int)alpha_mes_vector.size()-1; k++)
 				{
 					double dt = t_history_vector[k+1]-t_history_vector[k];
-					xk = xhat_history_vector[k+1] & (xk+dt*vxyhat_history_vector[k]*Cos(thetahat_history_vector[k]));
-					yk = yhat_history_vector[k+1] & (yk+dt*vxyhat_history_vector[k]*Sin(thetahat_history_vector[k]));
+					xk = xhat_history_vector[k+1] & (xk+dt*vrxhat_history_vector[k]*Cos(psihat_history_vector[k]));
+					yk = yhat_history_vector[k+1] & (yk+dt*vrxhat_history_vector[k]*Sin(psihat_history_vector[k]));
 					if ((xk.isEmpty)||(yk.isEmpty)) break;
 				}
 				Pxyj = box(xk,yk);
@@ -892,7 +892,7 @@ inline void Contract_dyn(box& P, deque< vector<interval> >& d_all_mes_vector, de
 }
 
 inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
-				 interval& thetahat, 
+				 interval& psihat, 
 				 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
 				 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
 				 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
@@ -909,7 +909,7 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 		L.pop_front();
 
 		Contract(P, d_all_mes_vector, alpha_mes_vector, 
-			thetahat, 
+			psihat, 
 			d_max_err, alpha_max_err, sdir, alphashat, 
 			walls_xa, walls_ya, walls_xb, walls_yb, 
 			circles_x, circles_y, circles_r);
@@ -963,7 +963,7 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 
 inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<double>& alpha_mes_vector, 
 						 deque<double>& t_history_vector, deque<interval>& xhat_history_vector, deque<interval>& yhat_history_vector, 
-						 deque<interval>& thetahat_history_vector, deque<interval>& vxyhat_history_vector, 
+						 deque<interval>& psihat_history_vector, deque<interval>& vrxhat_history_vector, 
 						 double& d_max_err, double& alpha_max_err, int& sdir, interval& alphashat, 
 						 vector<double>& walls_xa, vector<double>& walls_ya, vector<double>& walls_xb, vector<double>& walls_yb, 
 						 vector<double>& circles_x, vector<double>& circles_y, vector<double>& circles_r)
@@ -981,7 +981,7 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 
 		Contract_dyn(P, d_all_mes_vector, alpha_mes_vector, 
 			t_history_vector, xhat_history_vector, yhat_history_vector, 
-			thetahat_history_vector, vxyhat_history_vector,
+			psihat_history_vector, vrxhat_history_vector,
 			d_max_err, alpha_max_err, sdir, alphashat, 
 			walls_xa, walls_ya, walls_xb, walls_yb, 
 			circles_x, circles_y, circles_r);

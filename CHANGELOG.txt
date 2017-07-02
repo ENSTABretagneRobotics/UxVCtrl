@@ -1,3 +1,8 @@
+158
+Added ALT_SAILBOAT_CONTROLLER (to check).
+Replaced psi by psiw, thetahat by psihat, omegahat by psidothat, thetadot by psidot, omegadot by psidotdot, omega by psidot, psidots by omegas, theta_mes by psi_mes, theta_ by psi_ (except in OSUtils and Wall.h), wtheta by wpsi, vxyhat by vrxhat, vxy_mes by vrx_mes, vxy_dot by vrx_dot, vxy by vrx (with special cases), psidot by omegazdot (with special cases).
+Added a KML file with PhotoOverlay when pressing the snapshot key.
+
 157
 Default project files are now with Visual Studio 2017 and OpenCV 2.4.13.
 
@@ -587,7 +592,7 @@ Corrected heading control bug in lateral ball tracking.
 
 16
 Corrected name of OpenCVGUI windows.
-Corrected bug where omega_mes was never set by MT.
+Corrected bug where omegaz_mes was never set by MT.
 Corrected bug where the depth was meaningless in logmission.
 
 15
@@ -637,8 +642,8 @@ Corrected other logs header starting with a '%'.
 Changed conversions related to CISCREA thrusters.
 Corrected possible sign error in SAUC'ISSE heading control.
 Changed text colors.
-Added different possibilities to try to estimate vxy and omega.
-Added the possibility to easily add omega as state variable and measurement in the simulator if necessary.
+Added different possibilities to try to estimate vrx and omegaz.
+Added the possibility to easily add omegaz as state variable and measurement in the simulator if necessary.
 Changed the name of some parameters of the observer and simulator.
 Corrections for boost mode to keep the same rotation speed at maximum speed than at null speed.
 Added voltage monitoring for CISCREA with a Li-ion battery.

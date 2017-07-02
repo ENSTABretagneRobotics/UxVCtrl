@@ -130,8 +130,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
 					xhat_history_vector.push_back(xhat);
 					yhat_history_vector.push_back(yhat);
-					thetahat_history_vector.push_back(thetahat);
-					vxyhat_history_vector.push_back(vxyhat);
+					psihat_history_vector.push_back(psihat);
+					vrxhat_history_vector.push_back(vrxhat);
 
 					if ((int)alpha_mes_vector.size() > NSteps)
 					{
@@ -141,8 +141,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 						t_history_vector.pop_front();
 						xhat_history_vector.pop_front();
 						yhat_history_vector.pop_front();
-						thetahat_history_vector.pop_front();
-						vxyhat_history_vector.pop_front();
+						psihat_history_vector.pop_front();
+						vrxhat_history_vector.pop_front();
 					}
 				}
 
@@ -151,22 +151,22 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 				//if (!bSwitchView) 
 				{
-					DrawSeanetScreenshot(Center(thetahat), StepAngleSize, NBins, (unsigned char)AdLow, (unsigned char)AdSpan, Hdctrl.bits.adc8on, overlayimage);
+					DrawSeanetScreenshot(Center(psihat), StepAngleSize, NBins, (unsigned char)AdLow, (unsigned char)AdSpan, Hdctrl.bits.adc8on, overlayimage);
 					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 					{
 						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 						{
 							// Might be infinity, but does not seem to be a problem...
-							//DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(thetahat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(thetahat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
+							//DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
+							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
 						}
 					}
-					//DrawObstacleDist(x, y, sdir*alpha_mes+alphas+theta, rangescale);
+					//DrawObstacleDist(x, y, sdir*alpha_mes+alphas+psi, rangescale);
 					//DrawSonarWaterfallMiniature(NSteps, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
 				}
 
 				//if (bSwitchView) DrawSonarWaterfall(NSteps, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
-				//if (bSwitchView) DrawSeanetScreenshotMiniature(theta, StepAngleSize, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
+				//if (bSwitchView) DrawSeanetScreenshotMiniature(psi, StepAngleSize, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
 
 				//DrawScanlineMiniature(scanline, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
 				//DrawScanlineDiffMiniature(scanline, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
@@ -187,8 +187,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 				{
 					// Might be infinity, but does not seem to be a problem...
-					//DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(thetahat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
-					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(thetahat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
+					//DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
+					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, overlayimage);
 				}
 			}
 

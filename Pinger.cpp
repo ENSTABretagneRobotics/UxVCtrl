@@ -144,7 +144,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 				objBearing = fmod_2PI_deg2rad(-pingerdir);
 
 
-				wtheta = Center(thetahat)+objBearing-fmod_2PI_deg2rad(-preferreddir_pinger); // Try to always keep it to its side, e.g. preferreddir_pinger=345...
+				wpsi = Center(psihat)+objBearing-fmod_2PI_deg2rad(-preferreddir_pinger); // Try to always keep it to its side, e.g. preferreddir_pinger=345...
 				//bDistanceControl = FALSE;
 				//bBrakeControl = FALSE;
 				bHeadingControl = TRUE;

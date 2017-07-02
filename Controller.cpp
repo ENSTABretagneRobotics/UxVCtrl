@@ -18,7 +18,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double wxa_prev = 0, wya_prev = 0, wxb_prev = 0, wyb_prev = 0, wlata = 0, wlonga = 0, wlatb = 0, wlongb = 0, walt = 0; // For line following control.
 	double delta_d = 0; // For distance control.
 	double delta_angle = 0; // For heading control.
-	double wtheta_prev = 0; // For heading control.
+	double wpsi_prev = 0; // For heading control.
 	double integral = 0; // For heading control.
 	double delta_a_f = 0; // For altitude w.r.t. floor control.
 	double delta_z = 0; // For depth control.
@@ -53,7 +53,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		fprintf(lognavfile, 
 			"counter;t (in s);lat0 (in decimal degrees);long0 (in decimal degrees);roll (in rad);pitch (in rad);yaw (in rad);" 
-			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);theta (in rad);psi (in rad);" 
+			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);psi (in rad);psiw (in rad);" 
 			"latitude (in decimal degrees);longitude (in decimal degrees);x (in m);y (in m);ax (in m);ay (in m);bx (in m);by (in m);CurWP;" 
 			"wpslat[CurWP] (in decimal degrees);wpslong[CurWP] (in decimal degrees);e (in m);norm_ma (in m);norm_bm (in m);state;" 
 			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbattery1 (in V);vswitch (in V);\n"
@@ -113,12 +113,15 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 			xte = e; // XTE as in GPS...
 
-			wtheta = LineFollowing(phi, e, gamma_infinite, radius);
+			wpsi = LineFollowing(phi, e, gamma_infinite, radius);
 
 #pragma region Sailboat supervisor
 			if (robid & SAILBOAT_ROBID_MASK) 
 			{
-				double psi = Center(psitwindhat);				
+				double psiw = Center(psitwindhat);
+#ifdef ALT_SAILBOAT_CONTROLLER
+				double psi = Center(psihat);
+#endif // ALT_SAILBOAT_CONTROLLER
 
 				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
 				if (((state == STARBOARD_TACK_TRAJECTORY)&&(e > radius/2.0))||
@@ -133,8 +136,12 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					StopChronoQuick(&chrono_check_strategy);
 					bForceCheckStrategy = 0;
 					prevstate = state;
-					if ((cos(psi-wtheta)+cos(ksi) < 0)||
-						((cos(psi-phi)+cos(ksi) < 0)&&(fabs(e) < radius)))
+#ifndef ALT_SAILBOAT_CONTROLLER
+					if ((cos(psiw-wpsi)+cos(ksi) < 0)||
+						((cos(psiw-phi)+cos(ksi) < 0)&&(fabs(e) < radius)))
+#else
+					if (cos(psiw-psi)+cos(ksi) < 0)
+#endif // ALT_SAILBOAT_CONTROLLER
 					{
 						if (e < 0)
 						{
@@ -178,17 +185,20 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				switch (state)
 				{
 				case STARBOARD_TACK_TRAJECTORY:
-					wtheta = psi+M_PI+ksi; // Heading command.
+					wpsi = psiw+M_PI+ksi; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				case PORT_TACK_TRAJECTORY:
-					wtheta = psi+M_PI-ksi; // Heading command.
+					wpsi = psiw+M_PI-ksi; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				default: // DIRECT_TRAJECTORY
-					//wtheta = wtheta; // Heading command.
-					deltasmax = q1*pow((cos(psi-wtheta)+1.0)/2.0,q2); // Sail command.
-					//deltasmax = q1*pow((cos(psi-theta)+1.0)/2.0,q2); // Sail command.
+					//wpsi = wpsi; // Heading command.
+#ifndef ALT_SAILBOAT_CONTROLLER
+					deltasmax = q1*pow((cos(psiw-wpsi)+1.0)/2.0,q2); // Sail command.
+#else
+					deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0,q2); // Sail command.
+#endif // ALT_SAILBOAT_CONTROLLER
 					break;
 				}
 
@@ -208,7 +218,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		if (bWaypointControl)
 		{
-			wtheta = atan2(wy-Center(yhat), wx-Center(xhat));
+			wpsi = atan2(wy-Center(yhat), wx-Center(xhat));
 		}
 
 		// Low-level controls.
@@ -223,19 +233,19 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		if (bBrakeControl)
 		{
-			if (Center(vxyhat) > 0.05) u = -u_max;
-			else if (Center(vxyhat) < -0.05) u = u_max;
+			if (Center(vrxhat) > 0.05) u = -u_max;
+			else if (Center(vrxhat) < -0.05) u = u_max;
 			else u = 0;
 		}
 
 		if (bHeadingControl)
 		{
-			if (wtheta != wtheta_prev)
+			if (wpsi != wpsi_prev)
 			{
 				integral = 0;
 			}
 
-			delta_angle = Center(thetahat)-wtheta;
+			delta_angle = Center(psihat)-wpsi;
 
 			if (cos(delta_angle) > cosdelta_angle_threshold)
 			{
@@ -244,7 +254,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				//double error = 2.0*atan(tan(delta_angle/2.0))/M_PI; // Singularity at tan(M_PI/2)...
 				double error = fmod_2PI(delta_angle)/M_PI;
 				double abserror = fabs(error);
-				double speed = Center(omegahat)/omegamax;
+				double speed = Center(omegazhat)/omegazmax;
 
 				if ((robid & SAUCISSE_CLASS_ROBID_MASK)||(robid == SUBMARINE_SIMULATOR_ROBID))
 				{
@@ -254,14 +264,14 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				else if (robid & CISCREA_ROBID_MASK) 
 				{
 					//uw = -Kp*error
-					//	-(Kd1+Kd2*error*error*abserror)*Center(omegahat)*(fabs(Center(omegahat))>uw_derivative_max)
+					//	-(Kd1+Kd2*error*error*abserror)*Center(omegazhat)*(fabs(Center(omegazhat))>uw_derivative_max)
 					//	-Ki*integral;
 					uw = -Kp*error-Kd1*speed-Ki*integral;
 				}
 				else
 				{
 					//// We still (probably...) have to avoid the singularity at tan(M_PI/2)...
-					//uw = -Kp*atan(tan(delta_angle/2.0))-Kd1*Center(omegahat)-Ki*integral;
+					//uw = -Kp*atan(tan(delta_angle/2.0))-Kd1*Center(omegazhat)-Ki*integral;
 					uw = -Kp*error-Kd1*speed-Ki*integral;
 				}
 
@@ -278,7 +288,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				integral = 0;
 			}
 
-			wtheta_prev = wtheta;
+			wpsi_prev = wpsi;
 		}
 		else
 		{
@@ -352,8 +362,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("-------------------------------------------------------------------\n");
 				printf("Time is %.4f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
 				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
-				printf("Heading (theta) is %.1f deg in the reference coordinate system.\n", Center(thetahat)*180.0/M_PI);
-				printf("Wind angle (psi) is %.1f deg in the reference coordinate system.\n", Center(psitwindhat)*180.0/M_PI);
+				printf("Heading is %.1f deg in the reference coordinate system.\n", Center(psihat)*180.0/M_PI);
+				printf("Wind angle is %.1f deg in the reference coordinate system.\n", Center(psitwindhat)*180.0/M_PI);
 				printf("Yaw is %d deg in the NWU coordinate system, pitch is %d deg, roll is %d deg.\n", 
 					(int)(yaw*180.0/M_PI), (int)(pitch*180.0/M_PI), (int)(roll*180.0/M_PI));
 				printf("Wind direction w.r.t. North is %.1f deg (filtered %.1f deg), "
@@ -365,7 +375,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? vawind: vtwind, (robid == SAILBOAT_ROBID)? vawind*1.94: vtwind*1.94, 
 					Center(vtwindhat), Center(vtwindhat)*1.94, 
-					(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+					(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				printf("Position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", Center(xhat), Center(yhat), latitude, longitude);
 				printf("Waypoint position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", wxb, wyb, wlatb, wlongb);
 				printf("Distance to the waypoint is %.2f m, distance to the line is %.2f m.\n", norm_bm, e);
@@ -398,10 +408,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				"%.3f;%.3f;%.3f;%.3f;%.3f;\n", 
 				counter, t, lat_env, long_env, roll, pitch, yaw, 
 				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
-				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(thetahat), Center(psitwindhat), 
+				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
-				-uw*ruddermaxangle, u*q1, wtheta, vbattery1, vswitch);
+				-uw*ruddermaxangle, u*q1, wpsi, vbattery1, vswitch);
 			fflush(lognavfile);
 		}
 #pragma endregion

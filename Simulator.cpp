@@ -18,7 +18,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double dval = 0, d1 = 0, d2 = 0;
 
 	double vc = 0, psic = 0, hw = 0;
-	double x = 0, y = 0, z = 0, theta = 0, vxy = 0, omega = 0;
+	double x = 0, y = 0, z = 0, psi = 0, vrx = 0, omegaz = 0;
 	double alpha = 0, d = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
@@ -35,7 +35,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	}
 
 	fprintf(logsimufile, 
-		"t (in s);x (in m);y (in m);z (in m);theta (in rad);vxy (in m/s);omega (in rad/s);alpha (in rad);d (in m);u1;u2;u3;tv_sec;tv_usec;\n"
+		"t (in s);x (in m);y (in m);z (in m);psi (in rad);vrx (in m/s);omegaz (in rad/s);alpha (in rad);d (in m);u1;u2;u3;tv_sec;tv_usec;\n"
 		); 
 	fflush(logsimufile);
 
@@ -43,7 +43,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	t = 0;
 
-	x = x_0; y = y_0; z = z_0; theta = theta_0; vxy = vxy_0; omega = omega_0;
+	x = x_0; y = y_0; z = z_0; psi = psi_0; vrx = vrx_0; omegaz = omegaz_0;
 	alpha_mes = alpha_0; d = d_0;
 
 	StartChrono(&chrono);
@@ -70,23 +70,23 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		hw = hw_var*(2.0*rand()/(double)RAND_MAX-1.0);
 
 		// Evolution de l'état du sous-marin simulé.
-		double xdot = vxy*cos(theta)+vc*cos(psic);
-		double ydot = vxy*sin(theta)+vc*sin(psic);
+		double xdot = vrx*cos(psi)+vc*cos(psic);
+		double ydot = vrx*sin(psi)+vc*sin(psic);
 		double zdot = u3*alphaz+vzup;
-		double thetadot = (u1-u2)*alphaomega;
-		//double thetadot = omega;
-		double vxydot = (u1+u2)*alphavxy-vxy*alphafvxy;
-		//double omegadot = (u1-u2)*alphaomega-omega*alphafomega;
+		double psidot = (u1-u2)*alphaomegaz;
+		//double psidot = omegaz;
+		double vrxdot = (u1+u2)*alphavrx-vrx*alphafvrx;
+		//double omegazdot = (u1-u2)*alphaomegaz-omegaz*alphafomegaz;
 		x = x+dt*xdot;
 		y = y+dt*ydot;
 		z = min(z+dt*zdot,0.0); // z always negative.
-		theta = theta+dt*thetadot;
-		vxy = vxy+dt*vxydot;
-		//omega = omega+dt*omegadot;
+		psi = psi+dt*psidot;
+		vrx = vrx+dt*vrxdot;
+		//omegaz = omegaz+dt*omegazdot;
 
 		// Simulated sensors measurements.
 		// Compass.
-		theta_mes = theta+theta_bias_err+theta_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		psi_mes = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		// Pressure sensor.
 		// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
 		// Les vagues perturbent ses mesures.
@@ -96,7 +96,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		{
 			x_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			y_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			vxy_mes = vxy+vxy_bias_err+vxy_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, 0, &latitude, &longitude, &dval);
 			bGPSOKSimulator = TRUE;
 		}
@@ -112,8 +112,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 		alpha = alpha_mes-alpha_bias_err-alpha_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		// Compute the distance to the first obstacle d. d might be oo if no obstacle found.
-		d1 = DistanceDirSegments(x,y,alpha+alphas+theta,walls_xa,walls_ya,walls_xb,walls_yb);
-		d2 = DistanceDirCircles(x,y,alpha+alphas+theta,circles_x,circles_y,circles_r);
+		d1 = DistanceDirSegments(x,y,alpha+alphas+psi,walls_xa,walls_ya,walls_xb,walls_yb);
+		d2 = DistanceDirCircles(x,y,alpha+alphas+psi,circles_x,circles_y,circles_r);
 		d = min(d1,d2);
 
 		// Generate outliers.
@@ -142,8 +142,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
 		xhat_history_vector.push_back(xhat);
 		yhat_history_vector.push_back(yhat);
-		thetahat_history_vector.push_back(thetahat);
-		vxyhat_history_vector.push_back(vxyhat);
+		psihat_history_vector.push_back(psihat);
+		vrxhat_history_vector.push_back(vrxhat);
 
 		if ((int)alpha_mes_vector.size() > 2*M_PI/((simulatorperiod/1000.0)*omegas))
 		{
@@ -153,13 +153,13 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			t_history_vector.pop_front();
 			xhat_history_vector.pop_front();
 			yhat_history_vector.pop_front();
-			thetahat_history_vector.pop_front();
-			vxyhat_history_vector.pop_front();
+			psihat_history_vector.pop_front();
+			vrxhat_history_vector.pop_front();
 		}
 
 		// Log.
 		fprintf(logsimufile, "%f;%.3f;%.3f;%.3f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
-			t, x, y, z, theta, vxy, omega, alpha, d, u1, u2, u3,
+			t, x, y, z, psi, vrx, omegaz, alpha, d, u1, u2, u3,
 			(int)tv.tv_sec, (int)tv.tv_usec
 			);
 		fflush(logsimufile);

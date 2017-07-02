@@ -197,7 +197,7 @@ THREAD_PROC_RETURN_VALUE VisualObstacleThread(void* pParam)
 				EnterCriticalSection(&StateVariablesCS);
 				u = u_visualobstacle;
 				uw = 0;
-				//wtheta = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
+				//wpsi = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
 				if (bBrake_visualobstacle) bBrakeControl = FALSE;
 				//bHeadingControl = TRUE;
 

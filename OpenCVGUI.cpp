@@ -37,7 +37,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	CvPoint PlayingTrianglePoints[3];
 	int nbPlayingTrianglePoints = 3;
 	char strtime_snap[MAX_BUF_LEN];
-	char snapfilename[MAX_BUF_LEN];
+	char picsnapfilename[MAX_BUF_LEN];
+	char kmlsnapfilename[MAX_BUF_LEN];
+	FILE* kmlsnapfile = NULL;
 	char s = 0;
 	char szText[MAX_BUF_LEN];
 	char windowname[MAX_BUF_LEN];
@@ -278,8 +280,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'q':
 			if (bHeadingControl)
 			{
-				wtheta += 0.03;
-				wtheta = fmod_2PI(wtheta);
+				wpsi += 0.03;
+				wpsi = fmod_2PI(wpsi);
 			}
 			else
 			{
@@ -300,8 +302,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'd':
 			if (bHeadingControl)
 			{
-				wtheta -= 0.03;
-				wtheta = fmod_2PI(wtheta);
+				wpsi -= 0.03;
+				wpsi = fmod_2PI(wpsi);
 			}
 			else
 			{
@@ -423,16 +425,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = 0;
 			break;
 		case ' ':
-			DisableAllHorizontalControls(); // wtheta = 0;
+			DisableAllHorizontalControls(); // wpsi = 0;
 			break;
 		case 'g':
-			DisableAllControls(); // wtheta = 0; wz = 0;
+			DisableAllControls(); // wpsi = 0; wz = 0;
 			break;
 		case 't':
 			if (!bHeadingControl)
 			{
 				bHeadingControl = TRUE;
-				wtheta = Center(thetahat);
+				wpsi = Center(psihat);
 			}
 			else 
 			{
@@ -622,9 +624,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			xhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 			yhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 			zhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			thetahat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			vxyhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			omegahat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+			psihat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+			vrxhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+			omegazhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 			break;
 		case 'S':
 			// staticsonarlocalization
@@ -641,13 +643,38 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			LeaveCriticalSection(&strtimeCS);
 			for (i = 0; i < nbvideo; i++)
 			{
-				sprintf(snapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);							
+				sprintf(picsnapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);
 				EnterCriticalSection(&imgsCS[i]);
-				if (!cvSaveImage(snapfilename, imgs[i], 0))
+				if (!cvSaveImage(picsnapfilename, imgs[i], 0))
 				{
 					printf("Error saving a snapshot file.\n");
 				}
 				LeaveCriticalSection(&imgsCS[i]);
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
+				sprintf(kmlsnapfilename, PIC_FOLDER"snap%d_%.64s.kml", i, strtime_snap);
+				kmlsnapfile = fopen(kmlsnapfilename, "w");
+				if (kmlsnapfile == NULL)
+				{
+					printf("Error saving a snapshot file.\n");
+					continue;
+				}
+				fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+				fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+				fprintf(kmlsnapfile, "<Document>\n<name>snap%d_%.64s</name>\n", i, strtime_snap);
+				fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>snap%d_%.64s</name>\n", i, strtime_snap);
+				fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", d0, d1, d2);
+				fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
+				fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
+				fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
+				fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
+				fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
+				fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
+				fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", picsnapfilename);
+				fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
+				fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", d0, d1, d2);
+				fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
+				fprintf(kmlsnapfile, "</Document>\n</kml>\n");
+				fclose(kmlsnapfile);
 			}
 			printf("Snapshot.\n");
 			break;
@@ -794,9 +821,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			// In deg in marine units...
 			if (bHeadingControl) sprintf(szText, "%.1f/%.1f", 
-				(fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-				(fmod_2PI(-angle_env-wtheta+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
-			else sprintf(szText, "%.1f/--", (fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+				(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
+				(fmod_2PI(-angle_env-wpsi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+			else sprintf(szText, "%.1f/--", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			if (robid & SUBMARINE_ROBID_MASK) 
@@ -953,19 +980,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
 				if (robid & SAILBOAT_ROBID_MASK) 
 				{
-					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(thetahat);
+					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(psihat);
 					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
 						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 255), 2, 8, 0);
 				}
 				if (bHeadingControl) 
 				{
-					angle = M_PI/2.0+wtheta-Center(thetahat);
+					angle = M_PI/2.0+wpsi-Center(psihat);
 					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
 						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 0), 2, 8, 0);
 				}
-				angle = M_PI-angle_env-Center(thetahat);
+				angle = M_PI-angle_env-Center(psihat);
 				cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
 					cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 					CV_RGB(0, 0, 255), 2, 8, 0);
@@ -988,8 +1015,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 1, 8, 0);
 					}
@@ -998,12 +1025,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvLine(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(0, 255, 0), 1, 8, 0);
 					}
@@ -1012,14 +1039,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
@@ -1027,34 +1054,34 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvLine(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
@@ -1130,12 +1157,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case BUGGY_ROBID:
 					default:
 						cvLine(dispimgs[videoid], 
-							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
-							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(psihat)))), 
 							CV_RGB(255, 128, 0), 4, 8, 0);
 						cvLine(dispimgs[videoid], 
-							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(thetahat)))), 
-							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(thetahat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(thetahat)))), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(psihat)))), 
+							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(psihat)))), 
 							CV_RGB(0, 255, 0), 4, 8, 0);
 						break;
 					}
@@ -1151,8 +1178,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 2, 8, 0);
 					}
@@ -1161,12 +1188,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvLine(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(0, 255, 0), 2, 8, 0);
 					}
@@ -1175,14 +1202,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
@@ -1190,33 +1217,33 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvLine(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))), 
+							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))), 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[videoid], 
 							cvPoint(
-							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(thetahat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(thetahat))), 
-							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(thetahat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(thetahat)))
+							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
+							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
@@ -1296,12 +1323,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						}
 					default:
 						cvLine(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(thetahat)))), 
-							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(thetahat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(psihat)))), 
 							CV_RGB(255, 128, 0), 8, 8, 0);
 						cvLine(dispimgs[videoid], 
-							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(thetahat)))), 
-							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(thetahat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(thetahat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(psihat)))), 
+							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(psihat)))), 
 							CV_RGB(0, 255, 0), 8, 8, 0);
 						break;
 					}

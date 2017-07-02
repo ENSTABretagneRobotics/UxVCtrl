@@ -135,7 +135,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 
 				if (nmeadevice.bEnableHCHDG)
 				{
-					if (robid == SAILBOAT_ROBID) theta_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+					if (robid == SAILBOAT_ROBID) psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
 				}
 
 				if (nmeadevice.bEnableIIMWV||nmeadevice.bEnableWIMWV)
@@ -145,9 +145,9 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					vawind = nmeadata.ApparentWindSpeed;
 					// True wind must be computed from apparent wind.
 					if (bDisableRollWindCorrectionSailboat)
-						psitwind = fmod_2PI(psiawind+theta_mes); // Robot speed and roll not taken into account...
+						psitwind = fmod_2PI(psiawind+psi_mes); // Robot speed and roll not taken into account...
 					else
-						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+theta_mes); // Robot speed not taken into account, but with roll correction...
+						psitwind = fmod_2PI(atan2(sin(psiawind),cos(roll)*cos(psiawind))+psi_mes); // Robot speed not taken into account, but with roll correction...
 				}
 
 				if (nmeadevice.bEnableWIMWD||nmeadevice.bEnableWIMDA)

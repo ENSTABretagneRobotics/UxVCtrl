@@ -160,8 +160,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 										t_history_vector.pop_front();
 										xhat_history_vector.pop_front();
 										yhat_history_vector.pop_front();
-										thetahat_history_vector.pop_front();
-										vxyhat_history_vector.pop_front();
+										psihat_history_vector.pop_front();
+										vrxhat_history_vector.pop_front();
 									}
 								}
 								nbprev = nb;
@@ -204,8 +204,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						//			t_history_vector.pop_front();
 						//			xhat_history_vector.pop_front();
 						//			yhat_history_vector.pop_front();
-						//			thetahat_history_vector.pop_front();
-						//			vxyhat_history_vector.pop_front();
+						//			psihat_history_vector.pop_front();
+						//			vrxhat_history_vector.pop_front();
 						//		}
 						//	}
 						//}
@@ -220,8 +220,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
 						xhat_history_vector.push_back(xhat);
 						yhat_history_vector.push_back(yhat);
-						thetahat_history_vector.push_back(thetahat);
-						vxyhat_history_vector.push_back(vxyhat);
+						psihat_history_vector.push_back(psihat);
+						vrxhat_history_vector.push_back(vrxhat);
 
 						if (rplidar.maxhist == 0)
 						{
@@ -235,8 +235,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 								t_history_vector.pop_front();
 								xhat_history_vector.pop_front();
 								yhat_history_vector.pop_front();
-								thetahat_history_vector.pop_front();
-								vxyhat_history_vector.pop_front();
+								psihat_history_vector.pop_front();
+								vrxhat_history_vector.pop_front();
 							}
 						}
 						if (((rplidar.maxhist > 0)&&((int)alpha_mes_vector.size() > rplidar.maxhist))||
@@ -248,8 +248,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 							t_history_vector.pop_front();
 							xhat_history_vector.pop_front();
 							yhat_history_vector.pop_front();
-							thetahat_history_vector.pop_front();
-							vxyhat_history_vector.pop_front();
+							psihat_history_vector.pop_front();
+							vrxhat_history_vector.pop_front();
 						}
 
 						//printf("%d\n", (int)alpha_mes_vector.size());
@@ -309,8 +309,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 									t_history_vector.pop_front();
 									xhat_history_vector.pop_front();
 									yhat_history_vector.pop_front();
-									thetahat_history_vector.pop_front();
-									vxyhat_history_vector.pop_front();
+									psihat_history_vector.pop_front();
+									vrxhat_history_vector.pop_front();
 								}
 							}
 							nbprev = nb;
@@ -353,8 +353,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					//			t_history_vector.pop_front();
 					//			xhat_history_vector.pop_front();
 					//			yhat_history_vector.pop_front();
-					//			thetahat_history_vector.pop_front();
-					//			vxyhat_history_vector.pop_front();
+					//			psihat_history_vector.pop_front();
+					//			vrxhat_history_vector.pop_front();
 					//		}
 					//	}
 					//}
@@ -369,8 +369,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
 					xhat_history_vector.push_back(xhat);
 					yhat_history_vector.push_back(yhat);
-					thetahat_history_vector.push_back(thetahat);
-					vxyhat_history_vector.push_back(vxyhat);
+					psihat_history_vector.push_back(psihat);
+					vrxhat_history_vector.push_back(vrxhat);
 
 					if (rplidar.maxhist == 0)
 					{
@@ -384,8 +384,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 							t_history_vector.pop_front();
 							xhat_history_vector.pop_front();
 							yhat_history_vector.pop_front();
-							thetahat_history_vector.pop_front();
-							vxyhat_history_vector.pop_front();
+							psihat_history_vector.pop_front();
+							vrxhat_history_vector.pop_front();
 						}
 					}
 					if (((rplidar.maxhist > 0)&&((int)alpha_mes_vector.size() > rplidar.maxhist))||
@@ -397,8 +397,8 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 						t_history_vector.pop_front();
 						xhat_history_vector.pop_front();
 						yhat_history_vector.pop_front();
-						thetahat_history_vector.pop_front();
-						vxyhat_history_vector.pop_front();
+						psihat_history_vector.pop_front();
+						vrxhat_history_vector.pop_front();
 					}
 
 					//printf("%d\n", (int)alpha_mes_vector.size());

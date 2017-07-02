@@ -690,7 +690,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&BallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_ball = u;
-		theta_ball = Center(thetahat);
+		psi_ball = Center(psihat);
 		bBallDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&BallCS);
@@ -718,7 +718,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&BallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_ball = u;
-		theta_ball = Center(thetahat);
+		psi_ball = Center(psihat);
 		bBallTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&BallCS);
@@ -1102,9 +1102,9 @@ inline int Commands(char* line)
 		xhat = interval(dval1-dval2,dval1+dval2);
 		yhat = interval(dval3-dval4,dval3+dval4);
 		zhat = interval(dval5-dval6,dval5+dval6);
-		thetahat = fmod_2PI(M_PI/2.0-dval7*M_PI/180.0-angle_env)+interval(-dval8,dval8);
-		vxyhat = interval(dval9-dval10,dval9+dval10);
-		omegahat = -dval11*M_PI/180.0+interval(-dval12,dval12);
+		psihat = fmod_2PI(M_PI/2.0-dval7*M_PI/180.0-angle_env)+interval(-dval8,dval8);
+		vrxhat = interval(dval9-dval10,dval9+dval10);
+		omegazhat = -dval11*M_PI/180.0+interval(-dval12,dval12);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "setstateestimation %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
@@ -1114,9 +1114,9 @@ inline int Commands(char* line)
 		xhat = interval(dval1-dval2,dval1+dval2);
 		yhat = interval(dval3-dval4,dval3+dval4);
 		zhat = interval(dval5-dval6,dval5+dval6);
-		thetahat = interval(dval7-dval8,dval7+dval8);
-		vxyhat = interval(dval9-dval10,dval9+dval10);
-		omegahat = interval(dval11-dval12,dval11+dval12);
+		psihat = interval(dval7-dval8,dval7+dval8);
+		vrxhat = interval(dval9-dval10,dval9+dval10);
+		omegazhat = interval(dval11-dval12,dval11+dval12);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "staticsonarlocalization %lf", &delay) == 1)
@@ -1185,7 +1185,7 @@ inline int Commands(char* line)
 		T_externalvisuallocalization.SetVal(1,3,T13); T_externalvisuallocalization.SetVal(2,3,T23); T_externalvisuallocalization.SetVal(3,3,T33); T_externalvisuallocalization.SetVal(4,3,T43); 
 		T_externalvisuallocalization.SetVal(1,4,T14); T_externalvisuallocalization.SetVal(2,4,T24); T_externalvisuallocalization.SetVal(3,4,T34); T_externalvisuallocalization.SetVal(4,4,T44); 
 		coef1_angle_externalvisuallocalization = dval4; coef2_angle_externalvisuallocalization = dval5; 
-		xerr_externalvisuallocalization = dval6; yerr_externalvisuallocalization = dval7; zerr_externalvisuallocalization = dval8; thetaerr_externalvisuallocalization = dval9; 
+		xerr_externalvisuallocalization = dval6; yerr_externalvisuallocalization = dval7; zerr_externalvisuallocalization = dval8; psierr_externalvisuallocalization = dval9; 
 		if ((ival15 >= 0)&&(ival15 < nbvideo))
 		{
 			videoid_externalvisuallocalization = ival15;
@@ -2646,7 +2646,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "headingreg %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wtheta = M_PI/2.0-dval*M_PI/180.0-angle_env;
+		wpsi = M_PI/2.0-dval*M_PI/180.0-angle_env;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
 		bHeadingControl = TRUE;
@@ -2655,7 +2655,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "headingrelativereg %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wtheta = Center(thetahat)+M_PI/2.0-dval*M_PI/180.0-angle_env;
+		wpsi = Center(psihat)+M_PI/2.0-dval*M_PI/180.0-angle_env;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
 		bHeadingControl = TRUE;

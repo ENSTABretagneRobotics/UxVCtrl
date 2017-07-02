@@ -494,18 +494,18 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			switch (camdir_ball)
 			{
 			case 0:
-				x_ball = Center(xhat)+objDistance*cos(Center(thetahat)+objBearing); 
-				y_ball = Center(yhat)+objDistance*sin(Center(thetahat)+objBearing); 
+				x_ball = Center(xhat)+objDistance*cos(Center(psihat)+objBearing); 
+				y_ball = Center(yhat)+objDistance*sin(Center(psihat)+objBearing); 
 				z_ball = Center(zhat)+objDistance*sin(objElevation);
 				break;
 			case 1:
-				x_ball = Center(xhat)+objDistance*cos(Center(thetahat)+objBearing+M_PI/2.0); 
-				y_ball = Center(yhat)+objDistance*sin(Center(thetahat)+objBearing+M_PI/2.0); 
+				x_ball = Center(xhat)+objDistance*cos(Center(psihat)+objBearing+M_PI/2.0); 
+				y_ball = Center(yhat)+objDistance*sin(Center(psihat)+objBearing+M_PI/2.0); 
 				z_ball = Center(zhat)+objDistance*sin(objElevation);
 				break;
 			case -1:
-				x_ball = Center(xhat)+objDistance*cos(Center(thetahat)+objBearing-M_PI/2.0); 
-				y_ball = Center(yhat)+objDistance*sin(Center(thetahat)+objBearing-M_PI/2.0); 
+				x_ball = Center(xhat)+objDistance*cos(Center(psihat)+objBearing-M_PI/2.0); 
+				y_ball = Center(yhat)+objDistance*sin(Center(psihat)+objBearing-M_PI/2.0); 
 				z_ball = Center(zhat)+objDistance*sin(objElevation);
 				break;
 			case 2:
@@ -596,7 +596,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						dist = objDistance;
 						wd = d0_ball;
 						wu = u_ball;
-						wtheta = Center(thetahat)+objBearing;
+						wpsi = Center(psihat)+objBearing;
 						if (bDepth_ball) wz = Center(zhat)+objDistance*sin(objElevation);
 						bDistanceControl = TRUE;
 						bHeadingControl = TRUE;
@@ -610,7 +610,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					case 1:
 						EnterCriticalSection(&StateVariablesCS);
 						u = u_ball;
-						wtheta = Center(thetahat)+objBearing+u_ball*(M_PI/4.0)*sign(objDistance-d0_ball, wdradius);
+						wpsi = Center(psihat)+objBearing+u_ball*(M_PI/4.0)*sign(objDistance-d0_ball, wdradius);
 						if (bDepth_ball) wz = Center(zhat)+objDistance*sin(objElevation);
 						bHeadingControl = TRUE;
 						if (bDepth_ball) 
@@ -623,7 +623,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					case -1:
 						EnterCriticalSection(&StateVariablesCS);
 						u = u_ball;
-						wtheta = Center(thetahat)+objBearing-u_ball*(M_PI/4.0)*sign(objDistance-d0_ball, wdradius);
+						wpsi = Center(psihat)+objBearing-u_ball*(M_PI/4.0)*sign(objDistance-d0_ball, wdradius);
 						if (bDepth_ball) wz = Center(zhat)+objDistance*sin(objElevation);
 						bHeadingControl = TRUE;
 						if (bDepth_ball) 
@@ -638,7 +638,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						dist = objDistance*sin(objElevation);
 						wd = 0;
 						wu = u_ball;
-						wtheta = Center(thetahat)+objBearing;
+						wpsi = Center(psihat)+objBearing;
 						if (bDepth_ball) wz = Center(zhat)-objDistance+d0_ball;
 						bDistanceControl = TRUE;
 						bHeadingControl = TRUE;

@@ -13,11 +13,11 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 {
 	CHRONO chrono;
 	CHRONO chrono_v;
-	CHRONO chrono_omega;
+	CHRONO chrono_omegaz;
 	double dt = 0, t = 0, t0 = 0;
 	struct timeval tv;
 	//double dt_chrono = 0;
-	//interval xhat_prev_old, yhat_prev_old, thetahat_prev_old;
+	//interval xhat_prev_old, yhat_prev_old, psihat_prev_old;
 	double cosfilteredwinddir = 0, sinfilteredwinddir = 0;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 
@@ -35,7 +35,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	}
 
 	fprintf(logstatefile, 
-		"t (in s);xhat;yhat;zhat;thetahat;vxyhat;omegahat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;thetahat-;thetahat+;vxyhat-;vxyhat+;omegahat-;omegahat+;tv_sec;tv_usec;lathat;longhat;althat;headinghat;Energy_electronics;Energy_actuators;\n"
+		"t (in s);xhat;yhat;zhat;psihat;vrxhat;omegazhat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;psihat-;psihat+;vrxhat-;vrxhat+;omegazhat-;omegazhat+;tv_sec;tv_usec;lathat;longhat;althat;headinghat;Energy_electronics;Energy_actuators;\n"
 		); 
 	fflush(logstatefile);
 
@@ -57,7 +57,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 	StartChrono(&chrono);
 	StartChrono(&chrono_v);
-	StartChrono(&chrono_omega);
+	StartChrono(&chrono_omegaz);
 
 	for (;;)
 	{
@@ -75,9 +75,9 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		interval xhat_prev = xhat;
 		interval yhat_prev = yhat;
 		interval zhat_prev = zhat;
-		interval thetahat_prev = thetahat;
-		interval vxyhat_prev = vxyhat;
-		interval omegahat_prev = omegahat;
+		interval psihat_prev = psihat;
+		interval vrxhat_prev = vrxhat;
+		interval omegazhat_prev = omegazhat;
 
 		vchat = interval(vc_med-vc_var,vc_med+vc_var);
 		psichat = interval(psic_med-psic_var,psic_med+psic_var);
@@ -92,101 +92,101 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		if (robid & SUBMARINE_ROBID_MASK)
 		{
 			// State observer (just dead reckoning simulator...).
-			xhat = xhat+dt*(vxyhat*Cos(thetahat)+vchat*Cos(psichat)+xdotnoise);
-			yhat = yhat+dt*(vxyhat*Sin(thetahat)+vchat*Sin(psichat)+ydotnoise);
+			xhat = xhat+dt*(vrxhat*Cos(psihat)+vchat*Cos(psichat)+xdotnoise);
+			yhat = yhat+dt*(vrxhat*Sin(psihat)+vchat*Sin(psichat)+ydotnoise);
 			//zhat = Min(zhat+dt*(u3*alphazhat+vzuphat+zdotnoise),interval(0.0)); // z always negative.
 			//zhat = zhat & (interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
-			//thetahat = thetahat+dt*((u1-u2)*alphaomegahat+thetadotnoise);
-			//thetahat = thetahat & interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			vxyhat = (
-				(1.0-dt*alphafvxyhat)*vxyhat
-				+dt*(u1+u2)*alphavxyhat
-				+dt*vxydotnoise
+			//psihat = psihat+dt*((u1-u2)*alphaomegazhat+psidotnoise);
+			//psihat = psihat & interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = (
+				(1.0-dt*alphafvrxhat)*vrxhat
+				+dt*(u1+u2)*alphavrxhat
+				+dt*vrxdotnoise
 				); // Factorization.
-			// Should add vc,psic estimation influence in vxy?
+			// Should add vc,psic estimation influence in v?
 
-			// SAUC'ISSE and SARDINE can measure omega.
+			// SAUC'ISSE and SARDINE can measure omegaz.
 			if (robid & SAUCISSE_CLASS_ROBID_MASK)
 			{
-				omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+				omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 			}
 			else if (robid == SUBMARINE_SIMULATOR_ROBID)
 			{
-				omegahat = dt*((u1-u2)*alphaomegahat+thetadotnoise); // Why dt*...???
+				omegazhat = dt*((u1-u2)*alphaomegazhat+psidotnoise); // Why dt*...???
 
-				//omegahat = (
-				//	(1.0-dt*alphafomegahat)*omegahat
-				//	+dt*(u1-u2)*alphaomegahat
-				//	+dt*omegadotnoise
+				//omegazhat = (
+				//	(1.0-dt*alphafomegazhat)*omegazhat
+				//	+dt*(u1-u2)*alphaomegazhat
+				//	+dt*omegazdotnoise
 				//	); // Factorization.
 			}
 			else
 			{
 				// To handle modulo 2pi problems, we should use the following :
-				//omegahat = sin(Center(thetahat)-Center(thetahat_prev))/dt+interval(-omega_max_err,+omega_max_err);
+				//omegazhat = sin(Center(psihat)-Center(psihat_prev))/dt+interval(-omegaz_max_err,+omegaz_max_err);
 
-				//GetTimeElapsedChrono(&chrono_omega, &dt_chrono);
+				//GetTimeElapsedChrono(&chrono_omegaz, &dt_chrono);
 				//if (dt_chrono > 0.5)
 				//{
-				//	omegahat = sin(Center(thetahat)-Center(thetahat_prev_old))/dt_chrono+interval(-omega_max_err,+omega_max_err);
-				//	StopChronoQuick(&chrono_omega);
-				//	StartChrono(&chrono_omega);
-				//	thetahat_prev_old = thetahat;
+				//	omegazhat = sin(Center(psihat)-Center(psihat_prev_old))/dt_chrono+interval(-omegaz_max_err,+omegaz_max_err);
+				//	StopChronoQuick(&chrono_omegaz);
+				//	StartChrono(&chrono_omegaz);
+				//	psihat_prev_old = psihat;
 				//}
-				omegahat = 0.8*omegahat+0.2*(sin(Center(thetahat)-Center(thetahat_prev))/dt+interval(-omega_max_err,+omega_max_err));
+				omegazhat = 0.8*omegazhat+0.2*(sin(Center(psihat)-Center(psihat_prev))/dt+interval(-omegaz_max_err,+omegaz_max_err));
 
-				//printf("omegahat = %f\n", Center(omegahat));
+				//printf("omegazhat = %f\n", Center(omegazhat));
 			}
 		}
 		else if (robid == TREX_ROBID)
 		{
-			xhat = xhat+dt*(alphavxyhat*(u1+u2)*Cos(thetahat)+xdotnoise);
-			yhat = yhat+dt*(alphavxyhat*(u1+u2)*Sin(thetahat)+ydotnoise);
+			xhat = xhat+dt*(alphavrxhat*(u1+u2)*Cos(psihat)+xdotnoise);
+			yhat = yhat+dt*(alphavrxhat*(u1+u2)*Sin(psihat)+ydotnoise);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
-			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 		}
 		else if (robid == BUGGY_ROBID)
 		{
-			xhat = xhat+dt*(alphavxyhat*u*Cos(thetahat)*Cos(alphafomegahat*uw)+xdotnoise);
-			yhat = yhat+dt*(alphavxyhat*u*Sin(thetahat)*Cos(alphafomegahat*uw)+ydotnoise);
+			xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphafomegazhat*uw)+xdotnoise);
+			yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphafomegazhat*uw)+ydotnoise);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
-			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 		}
 		else if (robid == QUADRO_ROBID)
 		{
-			xhat = xhat+dt*(vrx*Cos(thetahat)-vry*Sin(thetahat)+xdotnoise);
-			yhat = yhat+dt*(vrx*Sin(thetahat)+vry*Cos(thetahat)+ydotnoise);
+			xhat = xhat+dt*(vrx*Cos(psihat)-vry*Sin(psihat)+xdotnoise);
+			yhat = yhat+dt*(vrx*Sin(psihat)+vry*Cos(psihat)+ydotnoise);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
-			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 		}
 		else
 		{
 			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
 			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
-			thetahat = interval(theta_mes-theta_max_err,theta_mes+theta_max_err);
-			vxyhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err);
-			omegahat = interval(omega_mes-omega_max_err,omega_mes+omega_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 
 			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
 			//if (dt_chrono > 1)
 			//{
-			//	vxyhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vxy_max_err,+vxy_max_err);
+			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vrx_max_err,+vrx_max_err);
 			//	StopChronoQuick(&chrono_v);
 			//	StartChrono(&chrono_v);
 			//	xhat_prev_old = xhat;
 			//	yhat_prev_old = yhat;
 			//}
-			//vxyhat = 0.9*vxyhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vxy_max_err,+vxy_max_err));
-			//printf("vxyhat = %f\n", Center(vxyhat));
+			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err));
+			//printf("vrxhat = %f\n", Center(vrxhat));
 		}
 
 		if (bGPSLocalization)
@@ -207,7 +207,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		}
 
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
-		headinghat = (fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+		headinghat = (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
 		switch (robid)
 		{
@@ -252,12 +252,12 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			"%d;%d;%.8f;%.8f;%.3f;%.1f;"
 			"%.3f;%.3f;\n", 
 			t, 
-			Center(xhat), Center(yhat), Center(zhat), Center(thetahat), 
-			Center(vxyhat), Center(omegahat), 
+			Center(xhat), Center(yhat), Center(zhat), Center(psihat), 
+			Center(vrxhat), Center(omegazhat), 
 			u1, u2, u3, 
 			u, uw,
-			xhat.inf, xhat.sup, yhat.inf, yhat.sup, zhat.inf, zhat.sup, thetahat.inf, thetahat.sup, 
-			vxyhat.inf, vxyhat.sup, omegahat.inf, omegahat.sup,
+			xhat.inf, xhat.sup, yhat.inf, yhat.sup, zhat.inf, zhat.sup, psihat.inf, psihat.sup, 
+			vrxhat.inf, vrxhat.sup, omegazhat.inf, omegazhat.sup,
 			(int)tv.tv_sec, (int)tv.tv_usec, lathat, longhat, althat, headinghat,
 			Energy_electronics, Energy_actuators
 			);
@@ -268,7 +268,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		if (bExit) break;
 	}
 
-	StopChronoQuick(&chrono_omega);
+	StopChronoQuick(&chrono_omegaz);
 	StopChronoQuick(&chrono_v);
 	StopChrono(&chrono, &t);
 

@@ -115,7 +115,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 				pitch = razorahrsdata.Pitch;
 				roll = razorahrsdata.Roll;
 
-				theta_mes = fmod_2PI(M_PI/2.0-razorahrsdata.Yaw-angle_env);
+				psi_mes = fmod_2PI(M_PI/2.0-razorahrsdata.Yaw-angle_env);
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}

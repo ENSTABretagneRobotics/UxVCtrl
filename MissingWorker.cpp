@@ -483,8 +483,8 @@ THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 				u = u_missingworker;
-				//wtheta = Center(thetahat)+objBearing;
-				wtheta = Center(thetahat)-kh_missingworker*atan((objj-(double)videoimgwidth/2.0)/((double)videoimgwidth/2.0));
+				//wpsi = Center(psihat)+objBearing;
+				wpsi = Center(psihat)-kh_missingworker*atan((objj-(double)videoimgwidth/2.0)/((double)videoimgwidth/2.0));
 				//bDistanceControl = FALSE;
 				//bBrakeControl = FALSE;
 				bHeadingControl = TRUE;

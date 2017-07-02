@@ -599,7 +599,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				EnterCriticalSection(&StateVariablesCS);
 				u = u_surfacevisualobstacle;
 				uw = 0;
-				//wtheta = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
+				//wpsi = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
 				if (bBrake_surfacevisualobstacle) bBrakeControl = FALSE;
 				//bHeadingControl = TRUE;
 

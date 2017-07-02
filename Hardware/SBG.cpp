@@ -134,8 +134,8 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				pitch = sbgdata.Pitch;
 				roll = sbgdata.Roll;
 
-				theta_mes = fmod_2PI(M_PI/2.0-sbgdata.Yaw-angle_env);
-				omega_mes = sbgdata.gyrZ;
+				psi_mes = fmod_2PI(M_PI/2.0-sbgdata.Yaw-angle_env);
+				omegaz_mes = sbgdata.gyrZ;
 
 				// Check accuracy at 3*sigma to use GPS data.
 				if ((sbgdata.positionStdDev[0] > 0)&&(sbgdata.positionStdDev[0] < sbg.gpsaccuracythreshold/3.0)&&

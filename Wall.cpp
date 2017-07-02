@@ -23,7 +23,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 	// collinear to the line and (x0, y0) is a point on the line.
 	double vx = 0, vy = 0, x0 = 0, y0 = 0;
 	double distance = 0;
-	double phi = 0, e = 0, delta_theta = 0;
+	double phi = 0, e = 0, delta_psi = 0;
 
 	char strtime_pic[MAX_BUF_LEN];
 	char picfilename[MAX_BUF_LEN];
@@ -146,13 +146,13 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 		//printf("distance = %f m, phi = %f deg, e = %f m\n", distance, fmod_2PI(phi)*180.0/M_PI, e);
 
-		delta_theta = LineFollowing(phi, e, gamma_infinite_wall, r_wall);
+		delta_psi = LineFollowing(phi, e, gamma_infinite_wall, r_wall);
 
 		char szText[256];
-		sprintf(szText, "RNG=%.2fm,ORN=%ddeg", distance, (int)((fmod_2PI(-angle_env-(Center(thetahat)+phi)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI));
+		sprintf(szText, "RNG=%.2fm,ORN=%ddeg", distance, (int)((fmod_2PI(-angle_env-(Center(psihat)+phi)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI));
 		cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
-		fprintf(logwalltaskfile, "%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), distance, Center(thetahat)+phi);
+		fprintf(logwalltaskfile, "%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), distance, Center(psihat)+phi);
 		fflush(logwalltaskfile);
 
 		if (bWallDetection)
@@ -207,7 +207,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 				u = u_wall;
-				wtheta = Center(thetahat)+delta_theta;
+				wpsi = Center(psihat)+delta_psi;
 				bHeadingControl = TRUE;
 				LeaveCriticalSection(&StateVariablesCS);
 			}
@@ -253,7 +253,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			EnterCriticalSection(&StateVariablesCS);
 			u = u_wall;
 			uw = 0;
-			//wtheta = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
+			//wpsi = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
 			if (bBrake_wall) bBrakeControl = FALSE;
 			//bHeadingControl = TRUE;
 

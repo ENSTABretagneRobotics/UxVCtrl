@@ -111,8 +111,8 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				theta_mes = fmod_2PI(M_PI/2.0-heading*M_PI/1800.0-angle_env);
-				//theta_mes = fmod_2PI(M_PI/2.0+Yaw-angle_env);
+				psi_mes = fmod_2PI(M_PI/2.0-heading*M_PI/1800.0-angle_env);
+				//psi_mes = fmod_2PI(M_PI/2.0+Yaw-angle_env);
 				z_mes = -depth/100.0;
 
 				// lecture des ordres et conversion -100% 100% => 0 - 250

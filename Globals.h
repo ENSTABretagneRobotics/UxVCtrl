@@ -139,19 +139,19 @@ enum STATE
 typedef enum STATE STATE;
 
 // Observer variables.
-extern interval xhat, yhat, zhat, thetahat, vxyhat, omegahat;
+extern interval xhat, yhat, zhat, psihat, vrxhat, omegazhat;
 extern interval vchat, psichat, hwhat;
 extern interval vtwindhat, psitwindhat;
 //extern interval alphahat, dhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-extern double u, uw, uv, ul, wx, wy, wz, wtheta, wd, wu;
+extern double u, uw, uv, ul, wx, wy, wz, wpsi, wd, wu;
 extern double wxa, wya, wxb, wyb;
 extern double wa_f; // altitude_wrt_floor.
 
 // Measurements
-extern double x_mes, y_mes, z_mes, theta_mes, vxy_mes, omega_mes;
+extern double x_mes, y_mes, z_mes, psi_mes, vrx_mes, omegaz_mes;
 extern double dist;
 // AHRS.
 extern double yaw, pitch, roll;
@@ -177,8 +177,8 @@ extern deque< vector<interval> > d_all_mes_vector;
 extern deque<double> t_history_vector;
 extern deque<interval> xhat_history_vector;
 extern deque<interval> yhat_history_vector;
-extern deque<interval> thetahat_history_vector;
-extern deque<interval> vxyhat_history_vector;
+extern deque<interval> psihat_history_vector;
+extern deque<interval> vrxhat_history_vector;
 // Echosounder.
 extern double altitude_wrt_floor;
 // Modem.
@@ -238,8 +238,8 @@ extern double uw_integral_max; // Max influence of the integral part of the head
 extern double cosdelta_angle_threshold; // For heading PID.
 extern double wzradiushigh, wzradiuslow; // Accuracy of the depth control in m.
 extern double wdradius; // Accuracy of the distance control in m.
-extern double vxymax; // Max submarine speed in rad/s.
-extern double omegamax; // Max submarine rotation speed in rad/s.
+extern double vrxmax; // Max submarine speed in rad/s.
+extern double omegazmax; // Max submarine rotation speed in rad/s.
 extern double gamma_infinite; // Angle to go towards the line when far, for line following in rad.
 extern double radius; // Accuracy of line/waypoint following in m.
 extern double betatrav;
@@ -250,11 +250,11 @@ extern double sail_update_period;
 extern int controllerperiod;
 
 // Observer parameters.
-extern double x_max_err, y_max_err, z_max_err, theta_max_err, vxy_max_err, omega_max_err;
+extern double x_max_err, y_max_err, z_max_err, psi_max_err, vrx_max_err, omegaz_max_err;
 extern double alpha_max_err, d_max_err;
-extern interval alphavxyhat, alphaomegahat, alphafvxyhat, alphafomegahat, alphazhat, vzuphat, 
+extern interval alphavrxhat, alphaomegazhat, alphafvrxhat, alphafomegazhat, alphazhat, vzuphat, 
 alphashat, omegashat, 
-xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
+xdotnoise, ydotnoise, zdotnoise, psidotnoise, vrxdotnoise, omegazdotnoise;
 extern int rangescale, sdir;
 extern int nb_outliers;
 extern double dynamicsonarlocalization_period;
@@ -269,7 +269,7 @@ extern double P_electronics_1, P_electronics_2, P_electronics_3, P_electronics_4
 extern double P_actuators_1, P_actuators_2, P_actuators_3, P_actuators_4;
 
 // Simulator initial state.
-extern double x_0, y_0, z_0, theta_0, vxy_0, omega_0;
+extern double x_0, y_0, z_0, psi_0, vrx_0, omegaz_0;
 extern double alpha_0, d_0;
 
 // Simulated submarine physical parameters.
@@ -277,12 +277,12 @@ extern double
 x_max_rand_err, x_bias_err, 
 y_max_rand_err, y_bias_err,
 z_max_rand_err, z_bias_err, 
-theta_max_rand_err, theta_bias_err, 
-vxy_max_rand_err, vxy_bias_err, 
-omega_max_rand_err, omega_bias_err, 
+psi_max_rand_err, psi_bias_err, 
+vrx_max_rand_err, vrx_bias_err, 
+omegaz_max_rand_err, omegaz_bias_err, 
 alpha_max_rand_err, alpha_bias_err, 
 d_max_rand_err, d_bias_err,
-alphavxy, alphaomega, alphafvxy, alphafomega, alphaz, vzup, 
+alphavrx, alphaomegaz, alphafvrx, alphafomegaz, alphaz, vzup, 
 alphas, omegas,
 z_gps_lim;
 extern double outliers_ratio;
@@ -313,10 +313,10 @@ extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smi
 extern double objMinRadiusRatio_externalvisuallocalization, objRealRadius_externalvisuallocalization, objMinDetectionDuration_externalvisuallocalization; 
 extern rmatrix T_externalvisuallocalization;
 extern double coef1_angle_externalvisuallocalization, coef2_angle_externalvisuallocalization;
-extern double xerr_externalvisuallocalization, yerr_externalvisuallocalization, zerr_externalvisuallocalization, thetaerr_externalvisuallocalization;
+extern double xerr_externalvisuallocalization, yerr_externalvisuallocalization, zerr_externalvisuallocalization, psierr_externalvisuallocalization;
 extern int videoid_externalvisuallocalization; 
 extern double x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization;
-extern double theta_externalvisuallocalization;
+extern double psi_externalvisuallocalization;
 extern double lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization;
 extern double heading_externalvisuallocalization;
 extern BOOL bExternalVisualLocalizationFound;
@@ -370,7 +370,7 @@ extern int procid_ball;
 extern int videoid_ball;
 extern double u_ball;
 extern double x_ball, y_ball, z_ball;
-extern double theta_ball; // Not used...
+extern double psi_ball; // Not used...
 extern double lat_ball, long_ball, alt_ball;
 extern double heading_ball; // Not used...
 extern BOOL bBallFound;

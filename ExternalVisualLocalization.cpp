@@ -455,12 +455,12 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			x_externalvisuallocalization = Center(X1[1]);//(sin(objElevation)/sin(HorizontalBeam/2.0))*3.0/2;//-(obji/image->height-1)*3.0
 			y_externalvisuallocalization = Center(X1[2]);//(sin(objBearing)/sin(VerticalBeam/2.0))*4.0/2;//-(objj/image->width-1)*4.0
 			z_externalvisuallocalization = Center(X1[3]);//-objDistance+2.75
-			theta_externalvisuallocalization = coef1_angle_externalvisuallocalization*objAngle+coef2_angle_externalvisuallocalization;//objAngle-M_PI/2.0
+			psi_externalvisuallocalization = coef1_angle_externalvisuallocalization*objAngle+coef2_angle_externalvisuallocalization;//objAngle-M_PI/2.0
 
 			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, 
 				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, 
 				&lat_externalvisuallocalization, &long_externalvisuallocalization, &alt_externalvisuallocalization);
-			heading_externalvisuallocalization = fmod_360_pos_rad2deg(-angle_env-theta_externalvisuallocalization+M_PI/2.0);
+			heading_externalvisuallocalization = fmod_360_pos_rad2deg(-angle_env-psi_externalvisuallocalization+M_PI/2.0);
 			
 			box P = box(xhat,yhat);
 			if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
@@ -479,13 +479,13 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				if ((coef1_angle_externalvisuallocalization != 0)&&(coef2_angle_externalvisuallocalization != 0)&&bobjAngleValid) 
 				{
 					// M_PI ambiguity...
-					if (fabs(fmod_2PI(theta_mes-theta_externalvisuallocalization)) < fabs(fmod_2PI(theta_mes-theta_externalvisuallocalization+M_PI)))
+					if (fabs(fmod_2PI(psi_mes-psi_externalvisuallocalization)) < fabs(fmod_2PI(psi_mes-psi_externalvisuallocalization+M_PI)))
 					{
-						theta_mes = fmod_2PI(theta_externalvisuallocalization);
+						psi_mes = fmod_2PI(psi_externalvisuallocalization);
 					}
 					else
 					{
-						theta_mes = fmod_2PI(theta_externalvisuallocalization+M_PI);
+						psi_mes = fmod_2PI(psi_externalvisuallocalization+M_PI);
 					}
 				}
 			}
@@ -497,7 +497,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 			fprintf(logexternalvisuallocalizationtaskfile, "%f;%f;%f;%f;%d;%f;%d;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
 				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, objRadius, objAngle, (int)bobjAngleValid, 
-				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, theta_externalvisuallocalization, 
+				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, psi_externalvisuallocalization, 
 				lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization, heading_externalvisuallocalization
 				);
 			fflush(logexternalvisuallocalizationtaskfile);

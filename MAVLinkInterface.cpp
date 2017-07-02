@@ -67,7 +67,7 @@ int handlemavlinkinterface()
 	EnterCriticalSection(&StateVariablesCS);
 
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
-	headinghat = (fmod_2PI(-angle_env-Center(thetahat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+	headinghat = (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
 	memset(&heartbeat, 0, sizeof(mavlink_heartbeat_t));
 	heartbeat.autopilot = MAV_AUTOPILOT_INVALID;
@@ -108,7 +108,7 @@ int handlemavlinkinterface()
 	gps_raw_int.satellites_visible = 255;
 
 	memset(&attitude, 0, sizeof(mavlink_attitude_t));
-	attitude.yaw = (float)fmod_2PI(-angle_env-Center(thetahat)+M_PI/2.0);
+	attitude.yaw = (float)fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
 	attitude.pitch = (float)pitch;
 	attitude.roll = (float)roll;
 

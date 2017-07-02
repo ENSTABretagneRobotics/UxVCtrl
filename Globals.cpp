@@ -11,19 +11,19 @@
 
 // Observer variables.
 interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vxyhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+psihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 //interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wtheta = 0, wd = 0, wu = 0;
+double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wxb = 0, wyb = 0;
 double wa_f = 0;
 
 // Measurements
-double x_mes = 0, y_mes = 0, z_mes = 0, theta_mes = 0, vxy_mes = 0, omega_mes = 0;
+double x_mes = 0, y_mes = 0, z_mes = 0, psi_mes = 0, vrx_mes = 0, omegaz_mes = 0;
 double dist = 0;
 // AHRS.
 double yaw = 0, pitch = 0, roll = 0;
@@ -45,8 +45,8 @@ deque< vector<interval> > d_all_mes_vector;
 deque<double> t_history_vector;
 deque<interval> xhat_history_vector;
 deque<interval> yhat_history_vector;
-deque<interval> thetahat_history_vector;
-deque<interval> vxyhat_history_vector;
+deque<interval> psihat_history_vector;
+deque<interval> vrxhat_history_vector;
 // Echosounder.
 double altitude_wrt_floor = 0;
 // Modem.
@@ -106,8 +106,8 @@ double uw_integral_max = 0;
 double cosdelta_angle_threshold = 0;
 double wzradiushigh = 0, wzradiuslow = 0;
 double wdradius = 0;
-double vxymax = 0;
-double omegamax = 0;
+double vrxmax = 0;
+double omegazmax = 0;
 double gamma_infinite = 0;
 double radius = 0;
 double betatrav = 0;
@@ -118,11 +118,11 @@ double sail_update_period = 0;
 int controllerperiod = 0;
 
 // Observer parameters.
-double x_max_err = 0, y_max_err = 0, z_max_err = 0, theta_max_err = 0, vxy_max_err = 0, omega_max_err = 0;
+double x_max_err = 0, y_max_err = 0, z_max_err = 0, psi_max_err = 0, vrx_max_err = 0, omegaz_max_err = 0;
 double alpha_max_err = 0, d_max_err = 0;
-interval alphavxyhat, alphaomegahat, alphafvxyhat, alphafomegahat, alphazhat, vzuphat, 
+interval alphavrxhat, alphaomegazhat, alphafvrxhat, alphafomegazhat, alphazhat, vzuphat, 
 alphashat, omegashat, 
-xdotnoise, ydotnoise, zdotnoise, thetadotnoise, vxydotnoise, omegadotnoise;
+xdotnoise, ydotnoise, zdotnoise, psidotnoise, vrxdotnoise, omegazdotnoise;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
 double dynamicsonarlocalization_period = 0;
@@ -137,7 +137,7 @@ double P_electronics_1 = 0, P_electronics_2 = 0, P_electronics_3 = 0, P_electron
 double P_actuators_1 = 0, P_actuators_2 = 0, P_actuators_3 = 0, P_actuators_4 = 0;
 
 // Simulator initial state.
-double x_0 = 0, y_0 = 0, z_0 = 0, theta_0 = 0, vxy_0 = 0, omega_0 = 0;
+double x_0 = 0, y_0 = 0, z_0 = 0, psi_0 = 0, vrx_0 = 0, omegaz_0 = 0;
 double alpha_0 = 0, d_0 = 0;
 
 // Simulated submarine physical parameters.
@@ -145,12 +145,12 @@ double
 x_max_rand_err = 0, x_bias_err = 0,
 y_max_rand_err = 0, y_bias_err = 0,
 z_max_rand_err = 0, z_bias_err = 0,
-theta_max_rand_err = 0, theta_bias_err = 0, 
-vxy_max_rand_err = 0, vxy_bias_err = 0,
-omega_max_rand_err = 0, omega_bias_err = 0,
+psi_max_rand_err = 0, psi_bias_err = 0, 
+vrx_max_rand_err = 0, vrx_bias_err = 0,
+omegaz_max_rand_err = 0, omegaz_bias_err = 0,
 alpha_max_rand_err = 0, alpha_bias_err = 0, 
 d_max_rand_err = 0, d_bias_err = 0, 
-alphavxy = 0, alphaomega = 0, alphafvxy = 0, alphafomega = 0, alphaz = 0, vzup = 0, 
+alphavrx = 0, alphaomegaz = 0, alphafvrx = 0, alphafomegaz = 0, alphaz = 0, vzup = 0, 
 alphas = 0, omegas = 0, 
 z_gps_lim = 0;
 double outliers_ratio = 0;
@@ -181,10 +181,10 @@ int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, sm
 double objMinRadiusRatio_externalvisuallocalization = 0, objRealRadius_externalvisuallocalization = 0, objMinDetectionDuration_externalvisuallocalization = 0; 
 rmatrix T_externalvisuallocalization(4,4);
 double coef1_angle_externalvisuallocalization = 0, coef2_angle_externalvisuallocalization = 0;
-double xerr_externalvisuallocalization = 0, yerr_externalvisuallocalization = 0, zerr_externalvisuallocalization = 0, thetaerr_externalvisuallocalization = 0;
+double xerr_externalvisuallocalization = 0, yerr_externalvisuallocalization = 0, zerr_externalvisuallocalization = 0, psierr_externalvisuallocalization = 0;
 int videoid_externalvisuallocalization = 0; 
 double x_externalvisuallocalization = 0, y_externalvisuallocalization = 0, z_externalvisuallocalization = 0;
-double theta_externalvisuallocalization = 0;
+double psi_externalvisuallocalization = 0;
 double lat_externalvisuallocalization = 0, long_externalvisuallocalization = 0, alt_externalvisuallocalization = 0;
 double heading_externalvisuallocalization = 0;
 BOOL bExternalVisualLocalizationFound = FALSE;
@@ -238,7 +238,7 @@ int procid_ball = 0;
 int videoid_ball = 0; 
 double u_ball = 0;
 double x_ball = 0, y_ball = 0, z_ball = 0;
-double theta_ball = 0;
+double psi_ball = 0;
 double lat_ball = 0, long_ball = 0, alt_ball = 0;
 double heading_ball = 0;
 BOOL bBallFound = FALSE;
