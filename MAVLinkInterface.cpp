@@ -55,6 +55,194 @@ int disconnectmavlinkinterface()
 
 int handlemavlinkinterface()
 {
+
+	// Get data from GCS...
+
+/*
+	char recvbuf[2*MAX_NB_BYTES_MAVLINKDEVICE];
+	char savebuf[MAX_NB_BYTES_MAVLINKDEVICE];
+	int BytesReceived = 0, Bytes = 0, recvbuflen = 0;
+	//char* ptr_GPGGA = NULL;
+	mavlink_message_t msg;
+	mavlink_status_t status;
+	int i = 0;
+	CHRONO chrono;
+
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	memset(savebuf, 0, sizeof(savebuf));
+	recvbuflen = MAX_NB_BYTES_MAVLINKDEVICE-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	if (ReadRS232Port(&pMAVLinkDevice->RS232Port, (unsigned char*)recvbuf, recvbuflen, &Bytes) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a MAVLinkDevice. \n");
+		return EXIT_FAILURE;
+	}
+	//if ((pMAVLinkDevice->bSaveRawData)&&(pMAVLinkDevice->pfSaveFile))
+	//{
+	//	fwrite(recvbuf, Bytes, 1, pMAVLinkDevice->pfSaveFile);
+	//	fflush(pMAVLinkDevice->pfSaveFile);
+	//}
+	BytesReceived += Bytes;
+
+	if (BytesReceived >= recvbuflen)
+	{
+		// If the buffer is full and if the device always sends data, there might be old data to discard...
+
+		while (Bytes == recvbuflen)
+		{
+			if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_MAVLINKDEVICE)
+			{
+				printf("Error reading data from a MAVLinkDevice : Message timeout. \n");
+				return EXIT_TIMEOUT;
+			}
+			memcpy(savebuf, recvbuf, Bytes);
+			if (ReadRS232Port(&pMAVLinkDevice->RS232Port, (unsigned char*)recvbuf, recvbuflen, &Bytes) != EXIT_SUCCESS)
+			{
+				printf("Error reading data from a MAVLinkDevice. \n");
+				return EXIT_FAILURE;
+			}
+			//if ((pMAVLinkDevice->bSaveRawData)&&(pMAVLinkDevice->pfSaveFile)) 
+			//{
+			//	fwrite(recvbuf, Bytes, 1, pMAVLinkDevice->pfSaveFile);
+			//	fflush(pMAVLinkDevice->pfSaveFile);
+			//}
+			BytesReceived += Bytes;
+		}
+
+		// The desired message should be among all the data gathered, unless there was 
+		// so many other messages sent after that the desired message was in the 
+		// discarded data, or we did not wait enough...
+
+		memmove(recvbuf+recvbuflen-Bytes, recvbuf, Bytes);
+		memcpy(recvbuf, savebuf+Bytes, recvbuflen-Bytes);
+
+		// Only the last recvbuflen bytes received should be taken into account in what follows.
+		BytesReceived = recvbuflen;
+	}
+
+	// The data need to be analyzed and we must check if we need to get more data from 
+	// the device to get the desired message.
+	// But normally we should not have to get more data unless we did not wait enough
+	// for the desired message...
+
+	// bEnableOpticalFlow... 
+
+	//if (pMAVLinkDevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
+
+	//while (
+	//	(pMAVLinkDevice->bEnableGPGGA&&!ptr_GPGGA)
+	//	)
+	//{
+	//	if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_MAVLINKDEVICE)
+	//	{
+	//		printf("Error reading data from a MAVLinkDevice : Message timeout. \n");
+	//		return EXIT_TIMEOUT;
+	//	}
+	//	// The last character must be a 0 to be a valid string for sscanf.
+	//	if (BytesReceived >= 2*MAX_NB_BYTES_MAVLINKDEVICE-1)
+	//	{
+	//		printf("Error reading data from a MAVLinkDevice : Invalid data. \n");
+	//		return EXIT_INVALID_DATA;
+	//	}
+	//	if (ReadRS232Port(&pMAVLinkDevice->RS232Port, (unsigned char*)recvbuf+BytesReceived, 2*MAX_NB_BYTES_MAVLINKDEVICE-1-BytesReceived, &Bytes) != EXIT_SUCCESS)
+	//	{
+	//		printf("Error reading data from a MAVLinkDevice. \n");
+	//		return EXIT_FAILURE;
+	//	}
+	//	//if ((pMAVLinkDevice->bSaveRawData)&&(pMAVLinkDevice->pfSaveFile)) 
+	//	//{
+	//	//	fwrite((unsigned char*)recvbuf+BytesReceived, Bytes, 1, pMAVLinkDevice->pfSaveFile);
+	//	//	fflush(pMAVLinkDevice->pfSaveFile);
+	//	//}
+	//	BytesReceived += Bytes;
+	//	if (pMAVLinkDevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
+	//}
+
+	// Analyze data.
+
+	memset(pMAVLinkData, 0, sizeof(MAVLINKDATA));
+
+	for (i = 0; i < BytesReceived; ++i)
+	{
+		if (mavlink_parse_char(MAVLINK_COMM_0, recvbuf[i], &msg, &status))
+		{
+			// Packet received
+			//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
+			switch (msg.msgid)
+			{
+			case MAVLINK_MSG_ID_HEARTBEAT:
+				//printf("MAVLINK_MSG_ID_HEARTBEAT\n");
+				mavlink_msg_heartbeat_decode(&msg, &pMAVLinkData->heartbeat);
+				break;
+			case MAVLINK_MSG_ID_GPS_RAW_INT:
+				//printf("MAVLINK_MSG_ID_GPS_RAW_INT\n");
+				mavlink_msg_gps_raw_int_decode(&msg, &pMAVLinkData->gps_raw_int);
+				break;
+			case MAVLINK_MSG_ID_ATTITUDE:
+				//printf("MAVLINK_MSG_ID_ATTITUDE\n");
+				mavlink_msg_attitude_decode(&msg, &pMAVLinkData->attitude);
+				break;
+			case MAVLINK_MSG_ID_SCALED_PRESSURE:
+				//printf("MAVLINK_MSG_ID_SCALED_PRESSURE\n");
+				mavlink_msg_scaled_pressure_decode(&msg, &pMAVLinkData->scaled_pressure);
+				break;
+			case MAVLINK_MSG_ID_OPTICAL_FLOW:
+				//printf("MAVLINK_MSG_ID_OPTICAL_FLOW\n");
+				mavlink_msg_optical_flow_decode(&msg, &pMAVLinkData->optical_flow);
+				//printf("quality = %d, ground_distance = %f, flow_comp_m_x = %f, flow_comp_m_y = %f\n", 
+				//	(int)pMAVLinkData->optical_flow.quality, (double)pMAVLinkData->optical_flow.ground_distance, 
+				//	(double)pMAVLinkData->optical_flow.flow_comp_m_x, (double)pMAVLinkData->optical_flow.flow_comp_m_y);
+				break;
+			case MAVLINK_MSG_ID_OPTICAL_FLOW_RAD:
+				//printf("MAVLINK_MSG_ID_OPTICAL_FLOW_RAD\n");
+				mavlink_msg_optical_flow_rad_decode(&msg, &pMAVLinkData->optical_flow_rad);
+				break;
+			case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
+				//printf("MAVLINK_MSG_ID_RC_CHANNELS_RAW\n");
+				mavlink_msg_rc_channels_raw_decode(&msg, &pMAVLinkData->rc_channels_raw);
+				break;
+			case MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
+				//printf("MAVLINK_MSG_ID_SERVO_OUTPUT_RAW\n");
+				mavlink_msg_servo_output_raw_decode(&msg, &pMAVLinkData->servo_output_raw);
+				break;
+			case MAVLINK_MSG_ID_VFR_HUD:
+				//printf("MAVLINK_MSG_ID_VFR_HUD\n");
+				mavlink_msg_vfr_hud_decode(&msg, &pMAVLinkData->vfr_hud);
+				break;
+			case MAVLINK_MSG_ID_STATUSTEXT:
+				//printf("MAVLINK_MSG_ID_STATUSTEXT\n");
+				mavlink_msg_statustext_decode(&msg, &pMAVLinkData->statustext);
+				printf("%.50s\n", pMAVLinkData->statustext.text);
+				break;
+			default:
+				//printf("Unhandled packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
+				break;
+			}
+		}
+	}
+*/
+
+/*
+MAV_CMD_DO_SET_HOME
+MAV_CMD_MISSION_START
+MAV_CMD_DO_SET_MODE
+MAV_CMD_NAV_WAYPOINT
+MAV_CMD_CONDITION_DELAY
+MAV_CMD_CONDITION_CHANGE_ALT
+MAV_CMD_CONDITION_YAW
+MAV_CMD_DO_CHANGE_SPEED
+MAV_CMD_DO_DIGICAM_CONTROL
+
+MAV_GET_PARMS_LIST et répondre qu'il n'y en a qu'un
+
+REQ_DATA_STREAM...
+
+*/
+
 	int sendbuflen = 0;
 	uint8 sendbuf[MAX_NB_BYTES_MAVLINKDEVICE];
 
@@ -188,7 +376,7 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 			break;
 		default:
 			{
-				/*				// Receive the GET request, but do not analyze it...
+/*				// Receive the GET request, but do not analyze it...
 				tv.tv_sec = (long)(timeout/1000);
 				tv.tv_usec = (long)((timeout%1000)*1000);
 				if (waitforsocket(sockcli, tv) == EXIT_SUCCESS)

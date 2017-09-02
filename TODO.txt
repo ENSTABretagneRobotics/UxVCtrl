@@ -1,8 +1,26 @@
+mavlinkdevice.external
+
+contrôle du bras...
+
+sauvegarder mavlink tlog pour mavlinkinterface et pour MAVLinkDevice
+
+Fly to specific location mode guided LAT LON ALT
+
+MAV_FRAME_GLOBAL frame : altitude AMSL
+MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
+
 Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
+Cap pas correctement envoyé en mavlink osd
+Envoyer aussi rssi
 qgroundcontrol reconnait pas la position gps...
 force mode marche pas, d'où mode non armable...->use chan 5?
 add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?...
 comment reprendre la main avec la télécommande facilement? Pouvoir désactiver le RC override...?
+
+https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
+Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
+Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
+https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
 
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...
 zoom pas fait au bon endroit
@@ -165,6 +183,7 @@ Appli gps qui affiche sog à partir des logs?
 Faire programme pour aider à la mag calib
 
 acousticmodemlocalization
+transmettre aussi t pour améliorer précision de localisation
 commande comme setstateestimation/gpslocalization qui contracte la position par acoustique
 quand il y a incohérence, agrandir et recommencer à contracter 3 fois?
 toutes les 5-10 s quand sous-marin envoie ask\n 3 fois (avec au moins 2 cohérentes), surface envoie xyzerr (4 int16) 3 fois et si au moins 2 messages cohérents le sous-marin envoie rng\n puis attend la réponse (3 fois, la réponse semble de la forme \n\rRange=0.9m\n\r) et si au moins 2 distances cohérentes (ici c'est pas bit à bit, ça peut légèrement varier entre 2 rng...), il contracte sa position

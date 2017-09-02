@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FollowMe.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Globals.cpp"
 				>
 			</File>
@@ -290,6 +294,10 @@
 			</File>
 			<File
 				RelativePath=".\ExternalVisualLocalization.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FollowMe.h"
 				>
 			</File>
 			<File
@@ -904,6 +912,26 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\MAVLinkDevice.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Hardware\MAVLinkProtocol.h"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

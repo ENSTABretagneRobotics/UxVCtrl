@@ -246,6 +246,9 @@
     <ClCompile Include="..\Extensions\Devices\LabjackUtils\liblabjackusb\labjackusb.c">
       <Filter>Extensions\labjackusb</Filter>
     </ClCompile>
+    <ClCompile Include="FollowMe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -562,6 +565,12 @@
     </ClInclude>
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\liblabjackusb\labjackusb.h">
       <Filter>Extensions\labjackusb</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MAVLinkProtocol.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="FollowMe.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

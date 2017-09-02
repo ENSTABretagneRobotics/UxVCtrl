@@ -20,6 +20,7 @@ interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAIN
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wxb = 0, wyb = 0;
+deque<double> wx_vector, wy_vector, wz_vector;
 double wa_f = 0;
 
 // Measurements
@@ -304,6 +305,15 @@ int videoid_missingworker = 0;
 double u_missingworker = 0;
 BOOL bMissingWorkerFound = FALSE;
 
+// Follow me variables.
+BOOL bFollowMeTrackingControl = FALSE;
+CRITICAL_SECTION FollowMeCS;
+double dmin_followme = 0, dmax_followme = 0;
+double umin_followme = 0, umax_followme = 0;
+double spaceperiod_followme = 0;
+int target_followme = 0, bDepth_followme = 0;
+double xtarget_followme = 0, ytarget_followme = 0, ztarget_followme = 0;
+
 // Simulator variables.
 BOOL bGPSOKSimulator = FALSE;
 
@@ -464,3 +474,6 @@ char logpingertaskfilename[MAX_BUF_LEN];
 
 FILE* logmissingworkertaskfile = NULL;
 char logmissingworkertaskfilename[MAX_BUF_LEN];
+
+FILE* logfollowmetaskfile = NULL;
+char logfollowmetaskfilename[MAX_BUF_LEN];

@@ -77,6 +77,7 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="ExternalVisualLocalization.cpp" />
+    <ClCompile Include="FollowMe.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
     <ClCompile Include="Hardware\Maestro.cpp" />
@@ -154,11 +155,13 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="ExternalVisualLocalization.h" />
+    <ClInclude Include="FollowMe.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hardware\AIS.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
     <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
+    <ClInclude Include="Hardware\MAVLinkProtocol.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
     <ClInclude Include="Hardware\NMEAProtocol.h" />

@@ -17,14 +17,14 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 	BOOL bConnected = FALSE;
 
 	UNREFERENCED_PARAMETER(pParam);
-	
+
 	memset(&swarmondevice, 0, sizeof(SWARMONDEVICE));
 
 	for (;;)
 	{
 		mSleep(100);
 
-		if (bPauseSwarmonDevice) 
+		if (bPauseSwarmonDevice)
 		{
 			if (bConnected)
 			{
@@ -37,7 +37,7 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			continue;
 		}
 
-		if (bRestartSwarmonDevice) 
+		if (bRestartSwarmonDevice)
 		{
 			if (bConnected)
 			{
@@ -50,13 +50,13 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 
 		if (!bConnected)
 		{
-			if (ConnectSwarmonDevice(&swarmondevice, "SwarmonDevice0.txt") == EXIT_SUCCESS) 
+			if (ConnectSwarmonDevice(&swarmondevice, "SwarmonDevice0.txt") == EXIT_SUCCESS)
 			{
-				bConnected = TRUE; 
+				bConnected = TRUE;
 
 				memset(&swarmondata, 0, sizeof(swarmondata));
 			}
-			else 
+			else
 			{
 				bConnected = FALSE;
 				mSleep(1000);
@@ -67,7 +67,8 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			if (GetLatestDataSwarmonDevice(&swarmondevice, &swarmondata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
-				printf("%.8f;%.8f\n", swarmondata.Latitude, swarmondata.Longitude);
+				//printf("%.8f;%.8f\n", swarmondata.Latitude, swarmondata.Longitude);
+				GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, swarmondata.Latitude, swarmondata.Longitude, 0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
@@ -75,7 +76,7 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 				printf("Connection to a SwarmonDevice lost.\n");
 				bConnected = FALSE;
 				DisconnectSwarmonDevice(&swarmondevice);
-			}		
+			}
 		}
 
 		if (bExit) break;

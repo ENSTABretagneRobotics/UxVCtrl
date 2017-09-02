@@ -148,6 +148,7 @@ extern interval vtwindhat, psitwindhat;
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 extern double u, uw, uv, ul, wx, wy, wz, wpsi, wd, wu;
 extern double wxa, wya, wxb, wyb;
+extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wa_f; // altitude_wrt_floor.
 
 // Measurements
@@ -436,6 +437,15 @@ extern int videoid_missingworker;
 extern double u_missingworker;
 extern BOOL bMissingWorkerFound;
 
+// Follow me variables.
+extern BOOL bFollowMeTrackingControl;
+extern CRITICAL_SECTION FollowMeCS;
+extern double dmin_followme, dmax_followme;
+extern double umin_followme, umax_followme;
+extern double spaceperiod_followme;
+extern int target_followme, bDepth_followme;
+extern double xtarget_followme, ytarget_followme, ztarget_followme;
+
 // Simulator variables.
 extern BOOL bGPSOKSimulator;
 
@@ -597,6 +607,9 @@ extern char logpingertaskfilename[MAX_BUF_LEN];
 extern FILE* logmissingworkertaskfile;
 extern char logmissingworkertaskfilename[MAX_BUF_LEN];
 
+extern FILE* logfollowmetaskfile;
+extern char logfollowmetaskfilename[MAX_BUF_LEN];
+
 inline BOOL CheckGPSOK(void)
 {
 	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKublox[0]||bGPSOKublox[1]||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKSimulator);
@@ -692,6 +705,7 @@ inline int InitGlobals(void)
 	InitCriticalSection(&PingerOverlayImgCS);
 	InitCriticalSection(&MissingWorkerCS);
 	InitCriticalSection(&MissingWorkerOverlayImgCS);
+	InitCriticalSection(&FollowMeCS);
 	InitCriticalSection(&MDMCS);
 	InitCriticalSection(&SeanetOverlayImgCS);
 	InitCriticalSection(&SeanetConnectingCS);
@@ -724,6 +738,7 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&SeanetConnectingCS);
 	DeleteCriticalSection(&SeanetOverlayImgCS);
 	DeleteCriticalSection(&MDMCS);
+	DeleteCriticalSection(&FollowMeCS);
 	DeleteCriticalSection(&MissingWorkerOverlayImgCS);
 	DeleteCriticalSection(&MissingWorkerCS);
 	DeleteCriticalSection(&PingerOverlayImgCS);

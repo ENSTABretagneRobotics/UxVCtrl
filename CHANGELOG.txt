@@ -1,3 +1,7 @@
+159
+Removed Visual Studio 2012 files.
+Added preliminary implementation of FollowMe.
+
 158
 Added ALT_SAILBOAT_CONTROLLER (to check).
 Replaced psi by psiw, thetahat by psihat, omegahat by psidothat, thetadot by psidot, omegadot by psidotdot, omega by psidot, psidots by omegas, theta_mes by psi_mes, theta_ by psi_ (except in OSUtils and Wall.h), wtheta by wpsi, vxyhat by vrxhat, vxy_mes by vrx_mes, vxy_dot by vrx_dot, vxy by vrx (with special cases), psidot by omegazdot (with special cases).

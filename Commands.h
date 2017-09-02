@@ -42,6 +42,7 @@ inline void DisableAllControls(void)
 	bSurfaceVisualObstacleAvoidanceControl = FALSE;
 	bPingerTrackingControl = FALSE;
 	bMissingWorkerTrackingControl = FALSE;
+	bFollowMeTrackingControl = FALSE;
 	bLineFollowingControl = FALSE;
 	bWaypointControl = FALSE;
 	bDistanceControl = FALSE;
@@ -1022,6 +1023,35 @@ inline int Commands(char* line)
 		//bDepthControl = FALSE;
 		//bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
+	}
+	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &ival1, &ival2) == 7)
+	{
+		EnterCriticalSection(&FollowMeCS);
+		dmin_followme = dval1; dmax_followme = dval2; umin_followme = dval3; umax_followme = dval4; spaceperiod_followme = dval5; target_followme = ival1; bDepth_followme = ival2;
+		LeaveCriticalSection(&FollowMeCS);
+	}
+	else if (strncmp(line, "startfollowmetracking", strlen("startfollowmetracking")) == 0)
+	{
+		EnterCriticalSection(&FollowMeCS);
+		EnterCriticalSection(&StateVariablesCS);
+		wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
+		bFollowMeTrackingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		LeaveCriticalSection(&FollowMeCS);
+	}
+	else if (strncmp(line, "stopfollowmetracking", strlen("stopfollowmetracking")) == 0)
+	{
+		EnterCriticalSection(&FollowMeCS);
+		bFollowMeTrackingControl = FALSE;
+		bLineFollowingControl = FALSE;
+		bHeadingControl = FALSE;
+		if (bDepth_followme) 
+		{
+			bDepthControl = FALSE;
+			bAltitudeWrtFloorControl = FALSE;
+		}
+		wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
+		LeaveCriticalSection(&FollowMeCS);
 	}
 #pragma endregion
 #pragma region LOCALIZATION AND ADVANCED MOVING COMMANDS

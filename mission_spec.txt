@@ -62,6 +62,12 @@
 %
 %stopmissingworkertracking
 %
+%followmeconfig dmin dmax umin umax spaceperiod source bDepth (dmin : double ]-oo,oo[ min distance in m, dmax : double ]-oo,oo[ max distance in m, u : double [-1,1] target thrust when too close, u : double [-1,1] target thrust when too far, spaceperiod : double ]0,oo[ space period in m to create waypoints from the target trajectory, target : int [0] 0 to follow from MAVLinkDevice2 data, bDepth : int [0,1] 1 to take depth into account (not implemented))
+%
+%startfollowmetracking (modify headingreg, depthreg, thrust using linefollowing)
+%
+%stopfollowmetracking
+%
 % LOCALIZATION AND ADVANCED MOVING COMMANDS
 %
 %setenvcoord lat_env long_env alt_env orientation_env (lat_env, long_env, alt_env : double ]-oo,oo[ in decimal deg and m, orientation_env : double [0,360[ mod(360) angle of the x axis of the environment coordinate system to the North in deg, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference in deg in marine units)
