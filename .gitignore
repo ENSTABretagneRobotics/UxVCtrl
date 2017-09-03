@@ -283,6 +283,8 @@ log/*.v4log
 log/*.V4LOG
 log/*.log
 log/*.LOG
+log/*.tlog
+log/*.TLOG
 pic/*.jpg
 pic/*.JPG
 pic/*.jpeg

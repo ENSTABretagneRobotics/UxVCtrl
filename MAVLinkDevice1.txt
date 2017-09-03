@@ -1,11 +1,13 @@
 % Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
-%127.0.0.1:55555
-COM13
+127.0.0.1:5762
+%COM13
 % BaudRate
 115200
 % Timeout (in ms)
 1500
 % bSaveRawData
+1
+% bExternal (0 if the data can be used for the state estimation, 1 otherwise and to enable Follow Me)
 1
 % quality_threshold
 1
@@ -16,9 +18,13 @@ COM13
 % bResetToDefault
 0
 % bDisableArmingCheck
-1
+0
+% bOverridePWMAtStartup
+0
+% bForceStabilizeModeAtStartup
+0
 % bArmAtStartup
-1
+0
 % system_id
 255
 % component_id
@@ -26,7 +32,9 @@ COM13
 % target_system
 1
 % target_component
-0
+1
+% overridechan (RC input channel used to disable RC override, from 1 to 12)
+9
 % channel 0
 % MinPW (in us)
 1000

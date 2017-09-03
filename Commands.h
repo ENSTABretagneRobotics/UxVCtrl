@@ -1024,16 +1024,17 @@ inline int Commands(char* line)
 		//bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
-	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &ival1, &ival2) == 7)
+	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &ival1, &ival2, &ival3) == 9)
 	{
 		EnterCriticalSection(&FollowMeCS);
-		dmin_followme = dval1; dmax_followme = dval2; umin_followme = dval3; umax_followme = dval4; spaceperiod_followme = dval5; target_followme = ival1; bDepth_followme = ival2;
+		dmin_followme = dval1; dmax_followme = dval2; uidle_followme = dval3; umin_followme = dval4; umax_followme = dval5; spaceperiod_followme = dval6; target_followme = ival1; mode_followme = ival2; bDepth_followme = ival3;
 		LeaveCriticalSection(&FollowMeCS);
 	}
 	else if (strncmp(line, "startfollowmetracking", strlen("startfollowmetracking")) == 0)
 	{
 		EnterCriticalSection(&FollowMeCS);
 		EnterCriticalSection(&StateVariablesCS);
+		wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0; 
 		wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
 		bFollowMeTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
@@ -1050,7 +1051,6 @@ inline int Commands(char* line)
 			bDepthControl = FALSE;
 			bAltitudeWrtFloorControl = FALSE;
 		}
-		wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
 		LeaveCriticalSection(&FollowMeCS);
 	}
 #pragma endregion

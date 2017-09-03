@@ -62,7 +62,7 @@
 %
 %stopmissingworkertracking
 %
-%followmeconfig dmin dmax umin umax spaceperiod source bDepth (dmin : double ]-oo,oo[ min distance in m, dmax : double ]-oo,oo[ max distance in m, u : double [-1,1] target thrust when too close, u : double [-1,1] target thrust when too far, spaceperiod : double ]0,oo[ space period in m to create waypoints from the target trajectory, target : int [0] 0 to follow from MAVLinkDevice2 data, bDepth : int [0,1] 1 to take depth into account (not implemented))
+%followmeconfig dmin dmax uidle umin umax spaceperiod target mode bDepth (dmin : double ]-oo,oo[ min distance in m, dmax : double ]-oo,oo[ max distance in m, uidle : double [-1,1] target thrust when <dmin, umin : double [-1,1] target thrust when between dmin and dmax, umax : double [-1,1] target thrust when >dmax, spaceperiod : double ]0,oo[ space period in m to create waypoints from the target trajectory, target : int [0,2] 0 to follow from SwarmonDevice0 data, 1 to follow from MAVLinkDevice0 data, 2 to follow from MAVLinkDevice1 data, 3 to follow from MDM0 data, mode : int [0] 0 to only follow on the target trajectory without going backwards if too close, bDepth : int [0,1] 1 to take depth into account (not implemented))
 %
 %startfollowmetracking (modify headingreg, depthreg, thrust using linefollowing)
 %

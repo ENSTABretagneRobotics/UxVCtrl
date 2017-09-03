@@ -53,6 +53,96 @@ int disconnectmavlinkinterface()
 
 //sendlatestdatamavlinkinterface()
 
+int inithandlemavlinkinterface()
+{
+	int sendbuflen = 0;
+	uint8 sendbuf[MAX_NB_BYTES_MAVLINKDEVICE];
+	mavlink_message_t msg;
+	mavlink_heartbeat_t heartbeat;
+	mavlink_param_value_t param_value;
+	mavlink_home_position_t home_position;
+	char Name[17];
+	int nbparams = 1;
+
+	memset(Name, 0, sizeof(Name));
+	
+	EnterCriticalSection(&StateVariablesCS);
+
+	memset(&heartbeat, 0, sizeof(mavlink_heartbeat_t));
+	heartbeat.autopilot = MAV_AUTOPILOT_INVALID;
+	heartbeat.base_mode = MAV_MODE_FLAG_SAFETY_ARMED;
+	heartbeat.system_status = MAV_STATE_ACTIVE;
+	heartbeat.type = MAV_TYPE_GENERIC;
+	if (robid & SUBMARINE_ROBID_MASK) heartbeat.type = MAV_TYPE_SUBMARINE;
+	if (robid & MOTORBOAT_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
+	if (robid & SAILBOAT_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
+	if (robid & GROUND_ROBID_MASK) heartbeat.type = MAV_TYPE_GROUND_ROVER;
+	switch (robid)
+	{
+	case QUADRO_ROBID:
+		heartbeat.type = MAV_TYPE_QUADROTOR;
+		break;
+	default:
+		break;
+	}
+
+	memset(&param_value, 0, sizeof(mavlink_param_value_t));
+	sprintf(Name, "REAL32_PARAM");
+	memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+	param_value.param_value = 0;
+	param_value.param_type = MAV_PARAM_TYPE_REAL32;
+	param_value.param_count = (uint16_t)nbparams;
+	param_value.param_index = 0;// (uint16_t)(-1) to ignore...?
+
+	memset(&home_position, 0, sizeof(mavlink_home_position_t));
+	home_position.latitude = (int32_t)(lat_env*10000000.0);
+	home_position.longitude = (int32_t)(long_env*10000000.0);
+	home_position.altitude = (int32_t)(alt_env*1000.0);
+
+	LeaveCriticalSection(&StateVariablesCS);
+
+	mavlink_msg_heartbeat_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &heartbeat);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+		
+	mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+		
+	mavlink_msg_home_position_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &home_position);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+
+	return EXIT_SUCCESS;
+}
+
 int handlemavlinkinterface()
 {
 
@@ -237,7 +327,7 @@ MAV_CMD_CONDITION_YAW
 MAV_CMD_DO_CHANGE_SPEED
 MAV_CMD_DO_DIGICAM_CONTROL
 
-MAV_GET_PARMS_LIST et répondre qu'il n'y en a qu'un
+MAV_GET_PARMS_LIST and answer 0 or 1 params...
 
 REQ_DATA_STREAM...
 
@@ -309,6 +399,11 @@ REQ_DATA_STREAM...
 	{
 		return EXIT_FAILURE;
 	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
 
 	mavlink_msg_gps_raw_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_raw_int);
 	memset(sendbuf, 0, sizeof(sendbuf));
@@ -317,6 +412,11 @@ REQ_DATA_STREAM...
 	{
 		return EXIT_FAILURE;
 	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
 
 	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
 	memset(sendbuf, 0, sizeof(sendbuf));
@@ -324,6 +424,11 @@ REQ_DATA_STREAM...
 	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
 	}
 
 	mSleep(50);
@@ -344,6 +449,8 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	if (MAVLinkInterfacePseudoRS232Port.DevType == TCP_SERVER_TYPE_RS232PORT) MAVLinkInterfacePseudoRS232Port.s = sockcli;
+				
+	inithandlemavlinkinterface();
 
 	for (;;)
 	{
@@ -448,6 +555,17 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
+	EnterCriticalSection(&strtimeCS);
+	sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtime_fns());
+	LeaveCriticalSection(&strtimeCS);
+	tlogfile = fopen(tlogfilename, "w");
+	if (tlogfile == NULL)
+	{
+		printf("Unable to create tlog file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
+		return 0;
+	}
+
 	// Try to determine whether it is a server TCP port.
 	if ((szMAVLinkInterfacePath[0] == ':')&&(atoi(szMAVLinkInterfacePath+1) > 0))
 	{
@@ -508,6 +626,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 				{
 					mSleep(50);
 					bConnected = TRUE; 
+
+					inithandlemavlinkinterface();
 				}
 				else 
 				{
@@ -540,6 +660,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 
 		if (bConnected) disconnectmavlinkinterface();
 	}
+
+	fclose(tlogfile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

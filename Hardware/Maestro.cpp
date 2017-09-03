@@ -14,7 +14,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 {
 	MAESTRO maestro;
 	double rudder = 0, thrust = 0, flux = 0;
-	double thrust1 = 0, thrust2 = 0;
+	double thrust1 = 0, thrust2 = 0, thrust3 = 0;
 	int ivalue = 0;
 	double winddir = 0;
 	double vbattery1_filter_coef = 0;
@@ -256,6 +256,24 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				mSleep(50);
 #endif // USE_MOTORBOAT_WITH_FLUX
+				break;
+			case QUADRO_ROBID:
+			case SAUCISSE_ROBID:
+			case SARDINE_ROBID:
+				EnterCriticalSection(&StateVariablesCS);
+				thrust1 = u1;
+				thrust2 = u2;
+				thrust3 = u3;
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrustersFluxMaestro(&maestro, 0, thrust1, thrust2, thrust3, 0) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					mSleep(50);
+					break;
+				}
+				mSleep(50);
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:

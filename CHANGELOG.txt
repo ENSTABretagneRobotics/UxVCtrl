@@ -1,6 +1,12 @@
+160
+Added recording of a tlog file to MAVLinkInterface (but only works when there is a connection).
+Updated Follow Me.
+Added new parameters to MAVLinkDevice.
+Added preliminary SAUC'ISSE support to Maestro.
+
 159
 Removed Visual Studio 2012 files.
-Added preliminary implementation of FollowMe.
+Added preliminary implementation of Follow Me.
 
 158
 Added ALT_SAILBOAT_CONTROLLER (to check).

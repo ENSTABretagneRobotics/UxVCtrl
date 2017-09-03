@@ -19,7 +19,7 @@ interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAIN
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
-double wxa = 0, wya = 0, wxb = 0, wyb = 0;
+double wxa = 0, wya = 0, wza = 0, wxb = 0, wyb = 0, wzb = 0;
 deque<double> wx_vector, wy_vector, wz_vector;
 double wa_f = 0;
 
@@ -51,7 +51,7 @@ deque<interval> vrxhat_history_vector;
 // Echosounder.
 double altitude_wrt_floor = 0;
 // Modem.
-double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_r = 0;
+double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_z = 0, acousticmodem_r = 0;
 int opi_id = 0;
 double opi_x = 0, opi_y = 0;
 // Optical flow.
@@ -309,9 +309,9 @@ BOOL bMissingWorkerFound = FALSE;
 BOOL bFollowMeTrackingControl = FALSE;
 CRITICAL_SECTION FollowMeCS;
 double dmin_followme = 0, dmax_followme = 0;
-double umin_followme = 0, umax_followme = 0;
+double uidle_followme = 0, umin_followme = 0, umax_followme = 0;
 double spaceperiod_followme = 0;
-int target_followme = 0, bDepth_followme = 0;
+int target_followme = 0, mode_followme = 0, bDepth_followme = 0;
 double xtarget_followme = 0, ytarget_followme = 0, ztarget_followme = 0;
 
 // Simulator variables.
@@ -456,6 +456,9 @@ char logstatefilename[MAX_BUF_LEN];
 
 FILE* logmissionfile = NULL;
 char logmissionfilename[MAX_BUF_LEN];
+
+FILE* tlogfile = NULL;
+char tlogfilename[MAX_BUF_LEN];
 
 FILE* logexternalvisuallocalizationtaskfile = NULL;
 char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];

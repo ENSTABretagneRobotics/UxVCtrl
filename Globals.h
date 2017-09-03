@@ -138,6 +138,16 @@ enum STATE
 };
 typedef enum STATE STATE;
 
+// Follow Me targets.
+enum FOLLOWME_TARGETS
+{
+	SWARMONDEVICE0_TARGET = 0,
+	MAVLINKDEVICE0_TARGET,
+	MAVLINKDEVICE1_TARGET,
+	MDM0_TARGET
+};
+typedef enum FOLLOWME_TARGETS FOLLOWME_TARGETS;
+
 // Observer variables.
 extern interval xhat, yhat, zhat, psihat, vrxhat, omegazhat;
 extern interval vchat, psichat, hwhat;
@@ -147,7 +157,7 @@ extern interval vtwindhat, psitwindhat;
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 extern double u, uw, uv, ul, wx, wy, wz, wpsi, wd, wu;
-extern double wxa, wya, wxb, wyb;
+extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wa_f; // altitude_wrt_floor.
 
@@ -183,7 +193,7 @@ extern deque<interval> vrxhat_history_vector;
 // Echosounder.
 extern double altitude_wrt_floor;
 // Modem.
-extern double acousticmodem_x, acousticmodem_y, acousticmodem_r;
+extern double acousticmodem_x, acousticmodem_y, acousticmodem_z, acousticmodem_r;
 extern int opi_id;
 extern double opi_x, opi_y;
 // Optical flow.
@@ -441,9 +451,9 @@ extern BOOL bMissingWorkerFound;
 extern BOOL bFollowMeTrackingControl;
 extern CRITICAL_SECTION FollowMeCS;
 extern double dmin_followme, dmax_followme;
-extern double umin_followme, umax_followme;
+extern double uidle_followme, umin_followme, umax_followme;
 extern double spaceperiod_followme;
-extern int target_followme, bDepth_followme;
+extern int target_followme, mode_followme, bDepth_followme;
 extern double xtarget_followme, ytarget_followme, ztarget_followme;
 
 // Simulator variables.
@@ -588,6 +598,9 @@ extern char logstatefilename[MAX_BUF_LEN];
 
 extern FILE* logmissionfile;
 extern char logmissionfilename[MAX_BUF_LEN];
+
+extern FILE* tlogfile;
+extern char tlogfilename[MAX_BUF_LEN];
 
 extern FILE* logexternalvisuallocalizationtaskfile;
 extern char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];

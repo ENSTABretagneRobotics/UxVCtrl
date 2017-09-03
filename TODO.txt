@@ -1,8 +1,6 @@
-mavlinkdevice.external
 
+simple reactive obstacle avodiance during line or waypoint following...
 contrôle du bras...
-
-sauvegarder mavlink tlog pour mavlinkinterface et pour MAVLinkDevice
 
 Fly to specific location mode guided LAT LON ALT
 
@@ -14,8 +12,7 @@ Cap pas correctement envoyé en mavlink osd
 Envoyer aussi rssi
 qgroundcontrol reconnait pas la position gps...
 force mode marche pas, d'où mode non armable...->use chan 5?
-add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?...
-comment reprendre la main avec la télécommande facilement? Pouvoir désactiver le RC override...?
+add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
 
 https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
 Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
@@ -44,7 +41,7 @@ rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant 
 
 rajouter estimation de vitesse dans SOG pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
 
-Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier?
+Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
 
 ublox : surveiller problèmes de pragma pack, taille de packet dans SetBaseCfg()...
 problèmes taille de long différente, éviter les long, beaucoup de long dans labjack, mais peut-être qu'il faut les laisser, voir pour mieux définir les uint32, uLong...
@@ -237,6 +234,7 @@ trim/offset, min max facilement réglables dans interface, certains paramètres re
 quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
 voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)->utiliser InitPW?->mais écrasé par u dans le thread...
 vérifier la bonne utilisation d'InitPW...
+save mavlink tlog for MAVLinkDevice?
 
 GPS, NMEA, waypoints, AHRS
 gestion des corrections RTCM probablement mal faite (retards?)...->pas trop grave si on les injecte via VSPE...
@@ -361,6 +359,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+comment reprendre la main avec la télécommande facilement?->utiliser un rc input channel pour désactiver le RC override?
 
 vxy->vrx, theta->psi (attention au psi du vent et autres éventuels phi à remplacer avant)
 

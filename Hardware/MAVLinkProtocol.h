@@ -64,10 +64,31 @@
 		}
 	}
 */
+/*
+// Convert UNIX time in us to GPS time of week in ms and week number.
+inline void UNIX2GPSTOW(uint64_t unix, unsigned int* pGMS, unsigned int* pGWk)
+{
+	time_t tt;
+	struct tm* pt = NULL;
+	struct tm gpsepoch;
+	int y = 1980, m = 1, d = 6;
 
-// Convert GPS time of week and week number to UNIX time in ms.
+	*pGMS = (unix/1000)%1000;
+	tt = unix/1000000;
+	pt = gmtime(&tt);
+
+	memset(&gpsepoch, 0, sizeof(gpsepoch));
+	gpsepoch.tm_year = y-1900;
+	gpsepoch.tm_mon = m-1;
+	gpsepoch.tm_mday = d;
+	gpsepoch.tm_isdst = 0;
+
+	//*pGWk?
+}
+*/
+// Convert GPS time of week in ms and week number to UNIX time in us.
 inline uint64_t GPSTOW2UNIX(unsigned int GMS, unsigned int GWk)
-{	
+{
 	int y = 1980, m = 1, d = 6;
 	struct tm t;
 	time_t tt;
@@ -81,21 +102,50 @@ inline uint64_t GPSTOW2UNIX(unsigned int GMS, unsigned int GWk)
 	return (uint64_t)GMS*1000+(uint64_t)tt*(uint64_t)1000000;
 }
 
-inline size_t fwrite_tlog(unsigned int GMS, unsigned int GWk, mavlink_message_t msg, FILE* file)
+inline size_t fwrite_tlog_gpstow(unsigned int GMS, unsigned int GWk, mavlink_message_t msg, FILE* file)
 {
-	size_t res = 0;
-	unsigned char sendbuf[MAX_PACKET_LEN_MAVLINK];
-	int sendbuflen = 0;
 	uint64_t datearray = 0;
+	unsigned char sendbuf[sizeof(datearray)+MAX_PACKET_LEN_MAVLINK];
+	int sendbuflen = 0;
 
 	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);
 	datearray = GPSTOW2UNIX(GMS, GWk);
 	SwapBytes((unsigned char*)&datearray, sizeof(datearray));
-	res += fwrite(&datearray, 1, sizeof(datearray), file);
-	if (res <= 0) return res;
-	res += fwrite(sendbuf, 1, sendbuflen, file);
-	return res;
+	memcpy(sendbuf, &datearray, sizeof(datearray));
+	sendbuflen += sizeof(datearray);
+	sendbuflen += mavlink_msg_to_send_buffer(sendbuf+sendbuflen, &msg);
+	return fwrite(sendbuf, 1, sendbuflen, file);
+}
+
+inline size_t fwrite_tlog_unix(uint64_t unix_time_us, mavlink_message_t msg, FILE* file)
+{
+	unsigned char sendbuf[sizeof(unix_time_us)+MAX_PACKET_LEN_MAVLINK];
+	int sendbuflen = 0;
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	SwapBytes((unsigned char*)&unix_time_us, sizeof(unix_time_us));
+	memcpy(sendbuf, &unix_time_us, sizeof(unix_time_us));
+	sendbuflen += sizeof(unix_time_us);
+	sendbuflen += mavlink_msg_to_send_buffer(sendbuf+sendbuflen, &msg);
+	return fwrite(sendbuf, 1, sendbuflen, file);
+}
+
+inline size_t fwrite_tlog(mavlink_message_t msg, FILE* file)
+{
+	uint64_t unix_time_us = 0;
+	struct timeval tv;
+	unsigned char sendbuf[sizeof(unix_time_us)+MAX_PACKET_LEN_MAVLINK];
+	int sendbuflen = 0;
+
+	if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+	unix_time_us = (uint64_t)tv.tv_sec*(uint64_t)1000000+(uint64_t)tv.tv_usec;
+	
+	memset(sendbuf, 0, sizeof(sendbuf));
+	SwapBytes((unsigned char*)&unix_time_us, sizeof(unix_time_us));
+	memcpy(sendbuf, &unix_time_us, sizeof(unix_time_us));
+	sendbuflen += sizeof(unix_time_us);
+	sendbuflen += mavlink_msg_to_send_buffer(sendbuf+sendbuflen, &msg);
+	return fwrite(sendbuf, 1, sendbuflen, file);
 }
 
 #endif // MAVLINKPROTOCOL_H

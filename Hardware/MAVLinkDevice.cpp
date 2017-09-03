@@ -129,114 +129,183 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				EnterCriticalSection(&StateVariablesCS);
-				
-				//if (mavlinkdata.gps_raw_int.fix_type > 0) printf("fix_type : %d\n", (int)mavlinkdata.gps_raw_int.fix_type);
-				
-				if (mavlinkdata.gps_raw_int.fix_type >= 2)
+
+				if (mavlinkdevice.bExternal)
 				{
-					//printf("%f;%f\n", mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.long/10000000.0);
-					latitude = mavlinkdata.gps_raw_int.lat/10000000.0;
-					longitude = mavlinkdata.gps_raw_int.lon/10000000.0;
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKMAVLinkDevice[deviceid] = TRUE;
-					StopChronoQuick(&chrono_GPSOK);
-					StartChrono(&chrono_GPSOK);
+					if (((target_followme == MAVLINKDEVICE0_TARGET)&&(deviceid == 0))||((target_followme == MAVLINKDEVICE1_TARGET)&&(deviceid == 1)))
+					{
+						if (mavlinkdata.gps_raw_int.fix_type >= 2)
+						{
+							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
+						}
+					}
+
+					LeaveCriticalSection(&StateVariablesCS);
+			
+					mSleep(25);
 				}
 				else
 				{
-					if (GetTimeElapsedChronoQuick(&chrono_GPSOK) > 2)
+#pragma region SENSORS
+					//if (mavlinkdata.gps_raw_int.fix_type > 0) printf("fix_type : %d\n", (int)mavlinkdata.gps_raw_int.fix_type);
+
+					if (mavlinkdata.gps_raw_int.fix_type >= 2)
 					{
-						bGPSOKMAVLinkDevice[deviceid] = FALSE;
+						//printf("%f;%f\n", mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.long/10000000.0);
+						latitude = mavlinkdata.gps_raw_int.lat/10000000.0;
+						longitude = mavlinkdata.gps_raw_int.lon/10000000.0;
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
+						bGPSOKMAVLinkDevice[deviceid] = TRUE;
+						StopChronoQuick(&chrono_GPSOK);
+						StartChrono(&chrono_GPSOK);
 					}
-				}
-
-				if (fabs(mavlinkdata.attitude.yaw) > 0) yaw = (double)mavlinkdata.attitude.yaw;
-				if (fabs(mavlinkdata.attitude.pitch) > 0) pitch = (double)mavlinkdata.attitude.pitch;
-				if (fabs(mavlinkdata.attitude.roll) > 0) roll = (double)mavlinkdata.attitude.roll;
-
-				if (fabs(mavlinkdata.attitude.yaw) > 0) psi_mes = fmod_2PI(M_PI/2.0-(double)mavlinkdata.attitude.yaw-angle_env);
-				if (fabs(mavlinkdata.attitude.yawspeed) > 0) omegaz_mes = -(double)mavlinkdata.attitude.yawspeed;
-
-				if (fabs(mavlinkdata.vfr_hud.alt) != 0) z_mes = (double)mavlinkdata.vfr_hud.alt;
-
-				// Better to invert x and y like on Pixhawk...
-
-				if (mavlinkdevice.bDefaultVrToZero)
-				{
-					vrx = 0;
-					vry = 0;
-				}
-
-				if (mavlinkdata.optical_flow.quality >= mavlinkdevice.quality_threshold)
-				{
-					//vrx = 0*vrx + 1*mavlinkdata.optical_flow.flow_comp_m_y;
-					//vry = 0*vry + 1*mavlinkdata.optical_flow.flow_comp_m_x;
-					if (fabs(mavlinkdata.optical_flow.flow_comp_m_y) > mavlinkdevice.flow_comp_m_threshold) vrx = mavlinkdata.optical_flow.flow_comp_m_y; else vrx = 0;
-					if (fabs(mavlinkdata.optical_flow.flow_comp_m_x) > mavlinkdevice.flow_comp_m_threshold) vry = mavlinkdata.optical_flow.flow_comp_m_x; else vry = 0;
-				}
-
-				LeaveCriticalSection(&StateVariablesCS);
-				
-				mSleep(25);
-								
-				// Temp...
-				int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
-				int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
-				switch (robid)
-				{
-				//case BUGGY_ROBID:
-				case QUADRO_ROBID:
-
-					if (bRearmAutopilot)
+					else
 					{
-						if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
+						if (GetTimeElapsedChronoQuick(&chrono_GPSOK) > 2)
 						{
-							printf("Connection to a MAVLinkDevice lost.\n");
 							bGPSOKMAVLinkDevice[deviceid] = FALSE;
-							bConnected = FALSE;
-							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
+						}
+					}
+
+					if (fabs(mavlinkdata.attitude.yaw) > 0) yaw = (double)mavlinkdata.attitude.yaw;
+					if (fabs(mavlinkdata.attitude.pitch) > 0) pitch = (double)mavlinkdata.attitude.pitch;
+					if (fabs(mavlinkdata.attitude.roll) > 0) roll = (double)mavlinkdata.attitude.roll;
+
+					if (fabs(mavlinkdata.attitude.yaw) > 0) psi_mes = fmod_2PI(M_PI/2.0-(double)mavlinkdata.attitude.yaw-angle_env);
+					if (fabs(mavlinkdata.attitude.yawspeed) > 0) omegaz_mes = -(double)mavlinkdata.attitude.yawspeed;
+
+					if (fabs(mavlinkdata.vfr_hud.alt) != 0) z_mes = (double)mavlinkdata.vfr_hud.alt;
+
+					// Better to invert x and y like on Pixhawk...
+
+					if (mavlinkdevice.bDefaultVrToZero)
+					{
+						vrx = 0;
+						vry = 0;
+					}
+
+					if (mavlinkdata.optical_flow.quality >= mavlinkdevice.quality_threshold)
+					{
+						//vrx = 0*vrx + 1*mavlinkdata.optical_flow.flow_comp_m_y;
+						//vry = 0*vry + 1*mavlinkdata.optical_flow.flow_comp_m_x;
+						if (fabs(mavlinkdata.optical_flow.flow_comp_m_y) > mavlinkdevice.flow_comp_m_threshold) vrx = mavlinkdata.optical_flow.flow_comp_m_y; else vrx = 0;
+						if (fabs(mavlinkdata.optical_flow.flow_comp_m_x) > mavlinkdevice.flow_comp_m_threshold) vry = mavlinkdata.optical_flow.flow_comp_m_x; else vry = 0;
+					}
+
+					if (mavlinkdata.rc_channels.chancount >= mavlinkdevice.overridechan)
+					{
+						switch (mavlinkdevice.overridechan)
+						{
+						case 1:
+							if (mavlinkdata.rc_channels.chan1_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan1_raw > 1750)? TRUE: FALSE;
+							break;
+						case 2:
+							if (mavlinkdata.rc_channels.chan2_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan2_raw > 1750)? TRUE: FALSE;
+							break;
+						case 3:
+							if (mavlinkdata.rc_channels.chan3_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan3_raw > 1750)? TRUE: FALSE;
+							break;
+						case 4:
+							if (mavlinkdata.rc_channels.chan4_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan4_raw > 1750)? TRUE: FALSE;
+							break;
+						case 5:
+							if (mavlinkdata.rc_channels.chan5_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan5_raw > 1750)? TRUE: FALSE;
+							break;
+						case 6:
+							if (mavlinkdata.rc_channels.chan6_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan6_raw > 1750)? TRUE: FALSE;
+							break;
+						case 7:
+							if (mavlinkdata.rc_channels.chan7_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan7_raw > 1750)? TRUE: FALSE;
+							break;
+						case 8:
+							if (mavlinkdata.rc_channels.chan8_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan8_raw > 1750)? TRUE: FALSE;
+							break;
+						case 9:
+							if (mavlinkdata.rc_channels.chan9_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan9_raw > 1750)? TRUE: FALSE;
+							break;
+						case 10:
+							if (mavlinkdata.rc_channels.chan10_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan10_raw > 1750)? TRUE: FALSE;
+							break;
+						case 11:
+							if (mavlinkdata.rc_channels.chan11_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan11_raw > 1750)? TRUE: FALSE;
+							break;
+						case 12:
+							if (mavlinkdata.rc_channels.chan12_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan12_raw > 1750)? TRUE: FALSE;
+							break;
+						default:
 							break;
 						}
-						mSleep(25);
-						bRearmAutopilot = FALSE;
 					}
-
-					memset(selectedchannels, 0, sizeof(selectedchannels));
-					memset(pws, 0, sizeof(pws));
-
-					EnterCriticalSection(&StateVariablesCS);
-					// Convert u (in [-1;1]) into pulse width (in us).
-					pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-					pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-					pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-					pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+#pragma endregion
 					LeaveCriticalSection(&StateVariablesCS);
-
-					pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-					pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-					pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-					pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-
-					selectedchannels[0] = 1;
-					selectedchannels[1] = 1;
-					selectedchannels[2] = 1;
-					selectedchannels[3] = 1;
-
-					if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+				
+					mSleep(25);
+#pragma region PWM
+					if (!mavlinkdevice.bDisablePWMOverride)
 					{
-						printf("Connection to a MAVLinkDevice lost.\n");
-						bGPSOKMAVLinkDevice[deviceid] = FALSE;
-						bConnected = FALSE;
-						DisconnectMAVLinkDevice(&mavlinkdevice);
-						mSleep(50);
-						break;
+						// Temp...
+						int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
+						int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
+						switch (robid)
+						{
+						case BUGGY_ROBID:
+						case TREX_ROBID:
+						case HOVERCRAFT_ROBID:
+						case MOTORBOAT_ROBID:
+						case QUADRO_ROBID:
+							if (bRearmAutopilot)
+							{
+								if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									bGPSOKMAVLinkDevice[deviceid] = FALSE;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+								mSleep(25);
+								bRearmAutopilot = FALSE;
+							}
+
+							memset(selectedchannels, 0, sizeof(selectedchannels));
+							memset(pws, 0, sizeof(pws));
+
+							EnterCriticalSection(&StateVariablesCS);
+							// Convert u (in [-1;1]) into pulse width (in us).
+							pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							LeaveCriticalSection(&StateVariablesCS);
+
+							pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+							pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+							pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+							pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+
+							selectedchannels[0] = 1;
+							selectedchannels[1] = 1;
+							selectedchannels[2] = 1;
+							selectedchannels[3] = 1;
+
+							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								bGPSOKMAVLinkDevice[deviceid] = FALSE;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+							mSleep(25);
+							break;
+						default:
+							mSleep(25);
+							break;
+						}
 					}
-					mSleep(25);
-					break;
-				default:
-					mSleep(25);
-					break;
+#pragma endregion								
 				}
 			
 				if (mavlinkdevice.bSaveRawData)

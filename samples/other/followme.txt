@@ -1,0 +1,4 @@
+followmeconfig 2 5 0 0.5 1 1 2 0 0
+startfollowmetracking
+wait 120
+stopfollowmetracking

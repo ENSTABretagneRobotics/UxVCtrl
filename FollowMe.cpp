@@ -14,7 +14,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	int i = 0;
-	double distance = 0, step = 0;
+	double distance = 0, step = 0, norm_ba = 0;
 
 	CHRONO chrono;
 
@@ -50,7 +50,17 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 		if (wx_vector.size() <= 0)
 		{
 			i = 0;
-			wx_vector.push_back(xtarget_followme); wy_vector.push_back(ytarget_followme); wz_vector.push_back(ztarget_followme); 
+			wx_vector.push_back(Center(xhat)); wy_vector.push_back(Center(yhat)); wz_vector.push_back(Center(zhat));
+			if ((xtarget_followme != 0)&&(ytarget_followme != 0))
+			{ 			
+				wx_vector.push_back(xtarget_followme); wy_vector.push_back(ytarget_followme); wz_vector.push_back(ztarget_followme);
+			}
+			else
+			{ 			
+				wx_vector.push_back(Center(xhat)); wy_vector.push_back(Center(yhat)); wz_vector.push_back(Center(zhat));
+			}
+			wxa = wx_vector[i]; wya = wy_vector[i]; wza = wz_vector[i]; wxb = wx_vector[i+1]; wyb = wy_vector[i+1]; wzb = wz_vector[i+1];
+			if (bDepth_followme) norm_ba = sqrt(sqr(wxa-wxb)+sqr(wya-wyb)+sqr(wza-wzb)); else norm_ba = sqrt(sqr(wxa-wxb)+sqr(wya-wyb));
 		}
 		if (bDepth_followme)
 		{
@@ -75,47 +85,85 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 
 		if (bFollowMeTrackingControl)
 		{
-			if (bDepth_followme)
+			EnterCriticalSection(&StateVariablesCS);
+			if (distance > dmax_followme)
 			{
-				printf("Unable to track depth followme : not implemented.\n");
+				u = umax_followme;
+				bLineFollowingControl = TRUE;
+				bWaypointControl = FALSE;
+				bHeadingControl = TRUE;
+				if (bDepth_followme)
+				{
+					bDepthControl = TRUE;
+					bAltitudeWrtFloorControl = FALSE;
+					wz = (norm_ba != 0)? (1-distance/norm_ba)*(wzb-wza)+wza: wzb;
+					wz = min(max(wz, wzb), wza);
+				}
+				// Check if the destination waypoint of the line was reached.
+				if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+				{
+					if (i < (int)wx_vector.size()-2)
+					{
+						i++;
+						wxa = wx_vector[i]; wya = wy_vector[i]; wza = wz_vector[i]; wxb = wx_vector[i+1]; wyb = wy_vector[i+1]; wzb = wz_vector[i+1];
+						if (bDepth_followme) norm_ba = sqrt(sqr(wxa-wxb)+sqr(wya-wyb)+sqr(wza-wzb)); else norm_ba = sqrt(sqr(wxa-wxb)+sqr(wya-wyb));
+					}
+					else
+					{
+						//printf("Warning : No more waypoints to follow.\n");
+						bLineFollowingControl = FALSE;
+						bWaypointControl = FALSE;
+						bHeadingControl = FALSE;
+						u = uidle_followme;
+						uw = 0;
+						// Should never stop the depth control...?
+					}
+				}
+			}
+			else if (distance > dmin_followme)
+			{
+				u = umin_followme;
+				bLineFollowingControl = TRUE;
+				bWaypointControl = FALSE;
+				bHeadingControl = TRUE;
+				if (bDepth_followme)
+				{
+					bDepthControl = TRUE;
+					bAltitudeWrtFloorControl = FALSE;
+					wz = (norm_ba != 0)? (1-distance/norm_ba)*(wzb-wza)+wza: wzb;
+					wz = min(max(wz, wzb), wza);
+				}
+				// Check if the destination waypoint of the line was reached.
+				if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+				{
+					if (i < (int)wx_vector.size()-2)
+					{
+						i++;
+						wxa = wx_vector[i]; wya = wy_vector[i]; wza = wz_vector[i]; wxb = wx_vector[i+1]; wyb = wy_vector[i+1]; wzb = wz_vector[i+1];
+						if (bDepth_followme) norm_ba = sqrt(sqr(wxa-wxb)+sqr(wya-wyb)+sqr(wza-wzb)); else norm_ba = sqrt(sqr(wxa-wxb)+sqr(wya-wyb));
+					}
+					else
+					{
+						//printf("Warning : No more waypoints to follow.\n");
+						bLineFollowingControl = FALSE;
+						bWaypointControl = FALSE;
+						bHeadingControl = FALSE;
+						u = uidle_followme;
+						uw = 0;
+						// Should never stop the depth control...?
+					}
+				}
 			}
 			else
 			{
-				EnterCriticalSection(&StateVariablesCS);
-				if (distance > dmin_followme)
-				{
-					u = umax_followme;
-					bLineFollowingControl = TRUE;
-					bWaypointControl = FALSE;
-					bHeadingControl = TRUE;
-					// Check if the destination waypoint of the line was reached.
-					if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
-					{
-						i++;
-						if ((i > 1)&&(i < (int)wx_vector.size()-1))
-						{
-							wxa = wx_vector[i]; wya = wx_vector[i]; wxb = wx_vector[i+1]; wyb = wx_vector[i+1];
-						}
-						else
-						{
-							bLineFollowingControl = FALSE;
-							bWaypointControl = FALSE;
-							bHeadingControl = FALSE;
-							u = umin_followme;
-							uw = 0;
-						}
-					}
-				}
-				else
-				{
-					bLineFollowingControl = FALSE;
-					bWaypointControl = FALSE;
-					bHeadingControl = FALSE;
-					u = umin_followme;
-					uw = 0;
-				}
-				LeaveCriticalSection(&StateVariablesCS);
+				bLineFollowingControl = FALSE;
+				bWaypointControl = FALSE;
+				bHeadingControl = FALSE;
+				u = uidle_followme;
+				uw = 0;
+				// Should never stop the depth control...?
 			}
+			LeaveCriticalSection(&StateVariablesCS);
 		}
 
 		LeaveCriticalSection(&FollowMeCS);

@@ -598,6 +598,10 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				break;
 			}
 #pragma endregion
+			if ((target_followme == MDM0_TARGET)&&(acousticmodem_x != 0)&&(acousticmodem_y != 0))
+			{
+				GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, acousticmodem_x, acousticmodem_y, acousticmodem_z, &xtarget_followme, &ytarget_followme, &ztarget_followme);
+			}
 			if (bError)
 			{
 				printf("Connection to a MDM lost.\n");

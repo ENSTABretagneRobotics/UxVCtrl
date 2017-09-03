@@ -68,7 +68,10 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 				//printf("%.8f;%.8f\n", swarmondata.Latitude, swarmondata.Longitude);
-				GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, swarmondata.Latitude, swarmondata.Longitude, 0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
+				if (target_followme == SWARMONDEVICE0_TARGET)
+				{
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, swarmondata.Latitude, swarmondata.Longitude, 0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
+				}
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
