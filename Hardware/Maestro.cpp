@@ -114,6 +114,21 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			switch (robid)
 			{
 			case BUGGY_ROBID:
+				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
+				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				thrust = u;
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrustersFluxMaestro(&maestro, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					mSleep(50);
+					break;
+				}
+				mSleep(50);
+				break;
 			case SAILBOAT_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
