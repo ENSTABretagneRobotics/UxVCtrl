@@ -311,8 +311,10 @@ CRITICAL_SECTION FollowMeCS;
 double dmin_followme = 0, dmax_followme = 0;
 double uidle_followme = 0, umin_followme = 0, umax_followme = 0;
 double spaceperiod_followme = 0;
+double forbidlat_followme = 0, forbidlong_followme = 0, forbidalt_followme = 0, forbidradius_followme = 0;
 int target_followme = 0, mode_followme = 0, bDepth_followme = 0;
 double xtarget_followme = 0, ytarget_followme = 0, ztarget_followme = 0;
+double forbidx_followme = 0, forbidy_followme = 0, forbidz_followme = 0;
 
 // Simulator variables.
 BOOL bGPSOKSimulator = FALSE;

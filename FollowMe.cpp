@@ -77,6 +77,12 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 		{
 			wx_vector.push_back(xtarget_followme); wy_vector.push_back(ytarget_followme); wz_vector.push_back(ztarget_followme); 
 		}
+		if ((forbidradius_followme > 0)&&(forbidradius_followme < sqrt(sqr(xtarget_followme-forbidx_followme)+sqr(ytarget_followme-forbidy_followme)+sqr(ztarget_followme-forbidz_followme))))
+		{
+			// Clear all the target trajectory, but in practice this does not really prevent the follower to go through the forbidden area...
+			wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0; 
+			wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
+		}
 
 		LeaveCriticalSection(&StateVariablesCS);
 

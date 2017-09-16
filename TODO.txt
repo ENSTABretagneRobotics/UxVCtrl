@@ -1,4 +1,7 @@
-faire en sorte que buggy s'arrete si perte de connection (bZSFullMode à faire et rajouter plus de précision dans le réglage de la puissance max
+Geofencing ou similaire pour follow me->juste centre et rayon?
+When program stopped maestro does not stop thrust?->to check after changing configuration file Maestro0.txt
+
+maybe bEnableRCMode always forces to use bEnableFullSpeedMode so they should be the same variable... 
 
 simple reactive obstacle avodiance during line or waypoint following, enable pause in waypoints following...
 contrôle du bras, servos pan and tilt au min...
@@ -360,6 +363,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+faire en sorte que buggy s'arrete si perte de connection (bFullSpeedMode à activer juste pour moteurs et rajouter plus de précision dans le réglage de la puissance max
 
 comment reprendre la main avec la télécommande facilement?->utiliser un rc input channel pour désactiver le RC override?
 

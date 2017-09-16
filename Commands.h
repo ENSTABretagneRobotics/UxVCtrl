@@ -1024,10 +1024,10 @@ inline int Commands(char* line)
 		//bAltitudeWrtFloorControl = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
-	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &ival1, &ival2, &ival3) == 9)
+	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
 	{
 		EnterCriticalSection(&FollowMeCS);
-		dmin_followme = dval1; dmax_followme = dval2; uidle_followme = dval3; umin_followme = dval4; umax_followme = dval5; spaceperiod_followme = dval6; target_followme = ival1; mode_followme = ival2; bDepth_followme = ival3;
+		dmin_followme = dval1; dmax_followme = dval2; uidle_followme = dval3; umin_followme = dval4; umax_followme = dval5; spaceperiod_followme = dval6; forbidlat_followme = dval7; forbidlong_followme = dval8; forbidalt_followme = dval9; forbidradius_followme = dval10; target_followme = ival1; mode_followme = ival2; bDepth_followme = ival3;
 		LeaveCriticalSection(&FollowMeCS);
 	}
 	else if (strncmp(line, "startfollowmetracking", strlen("startfollowmetracking")) == 0)
@@ -1036,6 +1036,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0; 
 		wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
+		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, forbidlat_followme, forbidlong_followme, forbidalt_followme, &forbidx_followme, &forbidy_followme, &forbidz_followme);
 		bFollowMeTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&FollowMeCS);

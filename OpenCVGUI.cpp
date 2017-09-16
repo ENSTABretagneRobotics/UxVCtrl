@@ -51,7 +51,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	switch (robid)
 	{
+	case HOVERCRAFT_ROBID:
 	case TREX_ROBID:
+		bEnableRCMode = TRUE;
+		bEnableFullSpeedMode = TRUE;
+		break;
+	case MOTORBOAT_ROBID:
+	case BUGGY_ROBID:
 		bEnableRCMode = TRUE;
 		bEnableFullSpeedMode = TRUE;
 		break;
@@ -240,10 +246,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = (u > u_max)? u_max: u;
 			switch (robid)
 			{
-			case MOTORBOAT_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+				break;
+			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
+				if (bEnableFullSpeedMode) u = u_max;
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
@@ -261,10 +269,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = (u < -u_max)? -u_max: u;
 			switch (robid)
 			{
-			case MOTORBOAT_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+				break;
+			case MOTORBOAT_ROBID:
 			case BUGGY_ROBID:
+				if (bEnableFullSpeedMode) u = -u_max;
 				break;
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
@@ -328,7 +338,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_ROBID:
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
-				u_max += 0.1;
+				u_max += 0.025;
 				u_max = (u_max > 1)? 1: u_max;
 				break;
 			default:
@@ -355,7 +365,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_ROBID:
 			case HOVERCRAFT_ROBID:
 			case TREX_ROBID:
-				u_max -= 0.1;
+				u_max -= 0.025;
 				u_max = (u_max < 0)? 0: u_max;
 				break;
 			default:
@@ -770,11 +780,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					switch (robid)
 					{
-					case MOTORBOAT_ROBID:
 					case VAIMOS_ROBID:
 					case SAILBOAT_ROBID:
-					case BUGGY_ROBID:
 						if (!bHeadingControl) uw = 0;
+						break;
+					case MOTORBOAT_ROBID:
+					case BUGGY_ROBID:
+						u = 0;
 						break;
 					default:
 						u = 0;

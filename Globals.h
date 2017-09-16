@@ -453,8 +453,10 @@ extern CRITICAL_SECTION FollowMeCS;
 extern double dmin_followme, dmax_followme;
 extern double uidle_followme, umin_followme, umax_followme;
 extern double spaceperiod_followme;
+extern double forbidlat_followme, forbidlong_followme, forbidalt_followme, forbidradius_followme;
 extern int target_followme, mode_followme, bDepth_followme;
 extern double xtarget_followme, ytarget_followme, ztarget_followme;
+extern double forbidx_followme, forbidy_followme, forbidz_followme;
 
 // Simulator variables.
 extern BOOL bGPSOKSimulator;
