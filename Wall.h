@@ -10,6 +10,7 @@
 #ifndef WALL_H
 #define WALL_H
 
+#include "Commands.h"
 #include "SeanetProcessing.h"
 
 THREAD_PROC_RETURN_VALUE WallThread(void* pParam);

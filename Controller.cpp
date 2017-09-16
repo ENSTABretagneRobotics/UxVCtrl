@@ -230,6 +230,12 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			else if (delta_d < -wdradius) u = -fabs(wu); 
 			else u = 0;
 		}
+				
+		//if (bReactiveAvoidanceControl)
+		//{
+		//	// Make a specific avoidance trajectory...?
+
+		//}
 
 		if (bBrakeControl)
 		{

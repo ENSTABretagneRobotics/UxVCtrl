@@ -1,4 +1,5 @@
-Geofencing ou similaire pour follow me->juste centre et rayon?
+ubx : rajouter param CFG-NMEA-DATA2 high precision mode?
+meilleur geofencing ou similaire pour follow me
 When program stopped maestro does not stop thrust?->to check after changing configuration file Maestro0.txt
 
 maybe bEnableRCMode always forces to use bEnableFullSpeedMode so they should be the same variable... 

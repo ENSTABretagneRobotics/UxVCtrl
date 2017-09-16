@@ -1,3 +1,6 @@
+163
+Added support of procid for wallavoidance.
+
 162
 Modified buggy keyboard control behavior.
 Added forbidden area to Follow Me.

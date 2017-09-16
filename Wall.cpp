@@ -263,6 +263,21 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 			LeaveCriticalSection(&StateVariablesCS);
 		}
+				
+		if (procid_wall != -1)
+		{
+			if ((bWallAvoidanceControl)&&(e > 0))
+			{
+				// stopwallavoidance to avoid multiple execute...
+				bWallAvoidanceControl = FALSE;
+				bDistanceControl = FALSE;
+				if (bBrake_wall) bBrakeControl = FALSE;
+				bHeadingControl = FALSE;
+			}
+			if (bEcho) printf("execute %d\n", procid_wall);
+			ExecuteProcedure(procid_wall);
+			bWaiting = FALSE; // To interrupt and force execution of the next commands...
+		}
 
 		LeaveCriticalSection(&WallCS);
 
