@@ -77,6 +77,9 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 	char strtime_pic[MAX_BUF_LEN];
 	char picfilename[MAX_BUF_LEN];
+	char dtcfilename[MAX_BUF_LEN];
+	char kmlfilename[MAX_BUF_LEN];
+	FILE* kmlsnapfile = NULL;
 	int pic_counter = 0;
 	CHRONO chrono;
 
@@ -536,10 +539,38 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				{
 					printf("Error saving a picture file.\n");
 				}
-				sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
-				if (!cvSaveImage(picfilename, overlayimage, 0))
+				sprintf(dtcfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
+				if (!cvSaveImage(dtcfilename, overlayimage, 0))
 				{
 					printf("Error saving a picture file.\n");
+				}
+				sprintf(kmlfilename, PIC_FOLDER"pic_%.64s.kml", strtime_pic);
+				kmlsnapfile = fopen(kmlfilename, "w");
+				if (kmlsnapfile != NULL)
+				{
+					EnterCriticalSection(&StateVariablesCS);
+					fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+					fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+					fprintf(kmlsnapfile, "<Document>\n<name>pic_%.64s</name>\n", strtime_pic);
+					fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>pic_%.64s</name>\n", strtime_pic);
+					fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", long_ball, lat_ball, alt_ball);
+					fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
+					fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
+					fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
+					fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
+					fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
+					fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
+					fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", picfilename);
+					fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
+					fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", long_ball, lat_ball, alt_ball);
+					fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
+					fprintf(kmlsnapfile, "</Document>\n</kml>\n");
+					LeaveCriticalSection(&StateVariablesCS);
+					fclose(kmlsnapfile);
+				}
+				else
+				{
+					printf("Error saving a kml file.\n");
 				}
 
 				if (bBrake_ball)
@@ -574,10 +605,38 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					{
 						printf("Error saving a picture file.\n");
 					}
-					sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
-					if (!cvSaveImage(picfilename, overlayimage, 0))
+					sprintf(dtcfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
+					if (!cvSaveImage(dtcfilename, overlayimage, 0))
 					{
 						printf("Error saving a picture file.\n");
+					}
+					sprintf(kmlfilename, PIC_FOLDER"pic_%.64s.kml", strtime_pic);
+					kmlsnapfile = fopen(kmlfilename, "w");
+					if (kmlsnapfile != NULL)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+						fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+						fprintf(kmlsnapfile, "<Document>\n<name>pic_%.64s</name>\n", strtime_pic);
+						fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>pic_%.64s</name>\n", strtime_pic);
+						fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", long_ball, lat_ball, alt_ball);
+						fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
+						fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
+						fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
+						fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
+						fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
+						fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
+						fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", picfilename);
+						fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
+						fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", long_ball, lat_ball, alt_ball);
+						fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
+						fprintf(kmlsnapfile, "</Document>\n</kml>\n");
+						LeaveCriticalSection(&StateVariablesCS);
+						fclose(kmlsnapfile);
+					}
+					else
+					{
+						printf("Error saving a kml file.\n");
 					}
 				}
 				else pic_counter++;

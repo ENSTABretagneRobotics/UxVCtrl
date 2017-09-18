@@ -1,3 +1,7 @@
+
+Rajouter génération de kml comme dans snapshot pour pipe aussi
+Rajouter détection de rouge sur pipe et support de procid
+
 ubx : rajouter param CFG-NMEA-DATA2 high precision mode?
 meilleur geofencing ou similaire pour follow me
 When program stopped maestro does not stop thrust?->to check after changing configuration file Maestro0.txt
