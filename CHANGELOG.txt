@@ -1,3 +1,6 @@
+165
+Corrected KML generated from snapshot.
+
 164
 Corrected inversion of latitude and longitude in KML generated from snapshot.
 Added a KML file with PhotoOverlay for ball.
