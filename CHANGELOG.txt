@@ -1,3 +1,7 @@
+166
+Modified KML generated from snapshot.
+Modifications in wallavoidance.
+
 165
 Corrected KML generated from snapshot.
 

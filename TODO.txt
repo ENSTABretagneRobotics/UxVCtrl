@@ -1,3 +1,4 @@
+Problème headingrelativereg?
 
 Rajouter génération de kml comme dans snapshot pour pipe aussi
 Rajouter détection de rouge sur pipe et support de procid

@@ -236,32 +236,35 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			}
 			//else pic_counter++;
 
-			EnterCriticalSection(&StateVariablesCS);
-			// Temporary...
+			if (procid_wall == -1)
+			{
+				EnterCriticalSection(&StateVariablesCS);
+				// Temporary...
 
-			BOOL bDistanceControl0 = bDistanceControl;
-			BOOL bBrakeControl0 = bBrakeControl;
-			BOOL bHeadingControl0 = bHeadingControl;
+				BOOL bDistanceControl0 = bDistanceControl;
+				BOOL bBrakeControl0 = bBrakeControl;
+				BOOL bHeadingControl0 = bHeadingControl;
 
-			if (bBrake_wall) u = 0;
-			if (sin(phi)*cos(phi) < 0) uw = -1; else uw = 1;
-			bDistanceControl = FALSE;
-			if (bBrake_wall) bBrakeControl = TRUE;
-			bHeadingControl = FALSE;
-			LeaveCriticalSection(&StateVariablesCS);
-			mSleep(1000);
-			EnterCriticalSection(&StateVariablesCS);
-			u = u_wall;
-			uw = 0;
-			//wpsi = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
-			if (bBrake_wall) bBrakeControl = FALSE;
-			//bHeadingControl = TRUE;
+				if (bBrake_wall) u = 0;
+				if (sin(phi)*cos(phi) < 0) uw = -1; else uw = 1;
+				bDistanceControl = FALSE;
+				if (bBrake_wall) bBrakeControl = TRUE;
+				bHeadingControl = FALSE;
+				LeaveCriticalSection(&StateVariablesCS);
+				mSleep(1000);
+				EnterCriticalSection(&StateVariablesCS);
+				u = u_wall;
+				uw = 0;
+				//wpsi = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
+				if (bBrake_wall) bBrakeControl = FALSE;
+				//bHeadingControl = TRUE;
 
-			bDistanceControl = bDistanceControl0;
-			bBrakeControl = bBrakeControl0;
-			bHeadingControl = bHeadingControl0;
+				bDistanceControl = bDistanceControl0;
+				bBrakeControl = bBrakeControl0;
+				bHeadingControl = bHeadingControl0;
 
-			LeaveCriticalSection(&StateVariablesCS);
+				LeaveCriticalSection(&StateVariablesCS);
+			}
 		}
 				
 		if (procid_wall != -1)
@@ -273,10 +276,11 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 				bDistanceControl = FALSE;
 				if (bBrake_wall) bBrakeControl = FALSE;
 				bHeadingControl = FALSE;
+				// Execute predefined procedure...
+				if (bEcho) printf("execute %d\n", procid_wall);
+				ExecuteProcedure(procid_wall);
+				bWaiting = FALSE; // To interrupt and force execution of the next commands...
 			}
-			if (bEcho) printf("execute %d\n", procid_wall);
-			ExecuteProcedure(procid_wall);
-			bWaiting = FALSE; // To interrupt and force execution of the next commands...
 		}
 
 		LeaveCriticalSection(&WallCS);
