@@ -1,0 +1,104 @@
+setmissionaction INIT
+wpfollowingconfig 0.25
+stop
+startvideorecording 0
+wait 1
+setmissionaction SURVEY
+thrust 0.7
+setmissionaction l0
+stop
+gotoxy 42.95412500 10.60216700
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95426900 10.60147300 42.95412500 10.60216700 31557600.000000
+setmissionaction l1
+stop
+gotoxy 42.95389500 10.60219800
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412500 10.60216700 42.95389500 10.60219800 31557600.000000
+setmissionaction l2
+stop
+gotoxy 42.95412700 10.60222600
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95389500 10.60219800 42.95412700 10.60222600 31557600.000000
+setmissionaction l3
+stop
+gotoxy 42.95389500 10.60226100
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412700 10.60222600 42.95389500 10.60226100 31557600.000000
+setmissionaction l4
+stop
+gotoxy 42.95412700 10.60228900
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95389500 10.60226100 42.95412700 10.60228900 31557600.000000
+setmissionaction l5
+stop
+gotoxy 42.95389600 10.60232700
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412700 10.60228900 42.95389600 10.60232700 31557600.000000
+setmissionaction l6
+stop
+gotoxy 42.95412700 10.60235700
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95389600 10.60232700 42.95412700 10.60235700 31557600.000000
+setmissionaction l7
+stop
+gotoxy 42.95389600 10.60239800
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412700 10.60235700 42.95389600 10.60239800 31557600.000000
+setmissionaction l8
+stop
+gotoxy 42.95412700 10.60242400
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95389600 10.60239800 42.95412700 10.60242400 31557600.000000
+setmissionaction l9
+stop
+gotoxy 42.95389600 10.60247100
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412700 10.60242400 42.95389600 10.60247100 31557600.000000
+setmissionaction l10
+stop
+gotoxy 42.95412700 10.60249500
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95389600 10.60247100 42.95412700 10.60249500 31557600.000000
+setmissionaction l11
+stop
+gotoxy 42.95389700 10.60254000
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412700 10.60249500 42.95389700 10.60254000 31557600.000000
+setmissionaction l12
+stop
+gotoxy 42.95412800 10.60256800
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95389700 10.60254000 42.95412800 10.60256800 31557600.000000
+setmissionaction l13
+stop
+gotoxy 42.95389600 10.60260900
+wait 5
+thrust 0.7
+linefollowingtwgs 42.95412800 10.60256800 42.95389600 10.60260900 31557600.000000
+setmissionaction WAIT_INVITATION
+stop
+waitrecvopimsgacousticmodem 1800
+setmissionaction GO_OPI
+thrust 0.7
+gotoopit 120
+stop
+wait 1200
+thrust 0.7
+gotoxytwgs 42.954202 10.601915 300
+stop
+wait 1
+generalstop

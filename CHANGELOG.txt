@@ -1,3 +1,7 @@
+167
+Temporary correction to handle multiple connections to MAVLinkInterface.
+Corrections in Follow Me.
+
 166
 Modified KML generated from snapshot.
 Modifications in wallavoidance.

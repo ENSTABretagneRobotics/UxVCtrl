@@ -1,3 +1,5 @@
+afficher followme fence
+afficher temps depuis début mission
 Problème headingrelativereg?
 
 Rajouter génération de kml comme dans snapshot pour pipe aussi
@@ -369,6 +371,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+si on a mavlinkdevice connecté à la mavlinkinterface et qu'on connecte mission planner, mission planner n'est pas mis à jour, mais c'est peut-être un problème d'ids...->MAVLinkInterfacePseudoRS232Port pas thread-safe
 
 faire en sorte que buggy s'arrete si perte de connection (bFullSpeedMode à activer juste pour moteurs et rajouter plus de précision dans le réglage de la puissance max
 

@@ -1,0 +1,229 @@
+setmissionaction INIT
+%gpssetenvcoordposition 3
+%setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
+disableautogpslocalization
+gpslocalization 1
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+setmissionaction SUBMERGE
+stop
+headingreg 180
+depthreg -1
+wait 20
+% go forward to reach middle
+setmissionaction GOMIDDLE
+thrust 1
+wait 118
+% stop
+thrust -1
+wait 3
+stop
+% 90 deg turn
+setmissionaction NINETYTURN
+headingreg 90
+wait 10
+% go forward to pass through the validation gate
+setmissionaction VALIDATIONGATE
+thrust 1
+wait 100
+setmissionaction GPS_FIX
+stop
+headingreg 90
+depthreg -0.3
+wait 90
+gpslocalization 3
+setmissionaction CHANGEDEPTHHEADING
+stop
+headingreg 90
+depthreg -2
+wait 20
+setmissionaction PLUME_AND_STRUCT_SURVEY
+ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0 1.0 0 0 220 0.05 1 0 2 1 -1 0
+startballtracking
+wait 1
+pipelineconfig 0 0 0 0 0 0 10 65 45 240 65 220 0.03 0.15 0 1 0.4 0 0 -1 0
+startpipelinetracking
+setmissionaction WP1
+thrust 0.7
+gotoxyt 55 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP2
+thrust 0.7
+gotoxyt 55 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP3
+thrust 0.7
+gotoxyt 57.5 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP4
+thrust 0.7
+gotoxyt 57.5 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP5
+thrust 0.7
+gotoxyt 60 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP6
+thrust 0.7
+gotoxyt 60 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP7
+thrust 0.7
+gotoxyt 62.5 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP8
+thrust 0.7
+gotoxyt 62.5 -35 120
+thrust -1
+wait 3
+stop
+setmissionaction WP9
+thrust 0.7
+gotoxyt 65 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP10
+thrust 0.7
+gotoxyt 65 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction GPS_FIX
+stop
+headingreg 90
+depthreg -0.3
+wait 90
+gpslocalization 3
+setmissionaction CHANGEDEPTHHEADING
+stop
+headingreg 90
+depthreg -2.5
+wait 20
+setmissionaction PLUME_AND_STRUCT_SURVEY
+wait 1
+setmissionaction WP11
+thrust 0.7
+gotoxyt 67.5 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP12
+thrust 0.7
+gotoxyt 67.5 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP13
+thrust 0.7
+gotoxyt 70 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP14
+thrust 0.7
+gotoxyt 70 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP15
+thrust 0.7
+gotoxyt 72.5 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP16
+thrust 0.7
+gotoxyt 72.5 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP17
+thrust 0.7
+gotoxyt 75 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP18
+thrust 0.7
+gotoxyt 75 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP19
+thrust 0.7
+gotoxyt 77.5 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP20
+thrust 0.7
+gotoxyt 77.5 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP21
+thrust 0.7
+gotoxyt 80 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP22
+thrust 0.7
+gotoxyt 80 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP23
+thrust 0.7
+gotoxyt 82.5 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP24
+thrust 0.7
+gotoxyt 82.5 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction WP25
+thrust 0.7
+gotoxyt 85 -20 120
+thrust -1
+wait 2
+stop
+setmissionaction WP26
+thrust 0.7
+gotoxyt 85 -35 120
+thrust -1
+wait 2
+stop
+setmissionaction END_PLUME_AND_STRUCT_SURVEY
+stoppipelinetracking
+wait 1
+stopballtracking
+% stop and surface
+setmissionaction SURFACE
+stop
+depthreg 5
+wait 60
+enableautogpslocalization
+wait 1

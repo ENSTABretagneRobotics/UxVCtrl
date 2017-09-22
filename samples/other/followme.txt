@@ -1,4 +1,5 @@
-followmeconfig 2 5 0 0.5 1 1 2 0 0
+%followmeconfig dmin dmax uidle umin umax spaceperiod forbidlat forbidlong forbidalt forbidradius target mode bDepth
+followmeconfig 5 10 0 0.5 1 1 42.954174 10.599893 0 12 2 0 0
 startfollowmetracking
 wait 120
 stopfollowmetracking

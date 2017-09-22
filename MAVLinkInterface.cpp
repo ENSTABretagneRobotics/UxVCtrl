@@ -13,21 +13,22 @@
 #define LOCAL_TYPE_MAVLINKINTERFACE 0
 #define REMOTE_TYPE_MAVLINKINTERFACE 1
 
+// Temp...
 RS232PORT MAVLinkInterfacePseudoRS232Port;
 
-int connectmavlinkinterface()
+int connectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
-	if (OpenRS232Port(&MAVLinkInterfacePseudoRS232Port, szMAVLinkInterfacePath) == EXIT_SUCCESS) 
+	if (OpenRS232Port(pMAVLinkInterfacePseudoRS232Port, szMAVLinkInterfacePath) == EXIT_SUCCESS) 
 	{
 		printf("Unable to connect to a MAVLinkInterface.\n");
 		return EXIT_FAILURE;
 	}
 
-	if (SetOptionsRS232Port(&MAVLinkInterfacePseudoRS232Port, MAVLinkInterfaceBaudRate, NOPARITY, FALSE, 8, 
+	if (SetOptionsRS232Port(pMAVLinkInterfacePseudoRS232Port, MAVLinkInterfaceBaudRate, NOPARITY, FALSE, 8, 
 		ONESTOPBIT, (UINT)MAVLinkInterfaceTimeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a MAVLinkInterface.\n");
-		CloseRS232Port(&MAVLinkInterfacePseudoRS232Port);
+		CloseRS232Port(pMAVLinkInterfacePseudoRS232Port);
 		return EXIT_FAILURE;
 	}
 
@@ -36,9 +37,9 @@ int connectmavlinkinterface()
 	return EXIT_SUCCESS;
 }
 
-int disconnectmavlinkinterface()
+int disconnectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
-	if (CloseRS232Port(&MAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
+	if (CloseRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 	{
 		printf("MAVLinkInterface disconnection failed.\n");
 		return EXIT_FAILURE;
@@ -49,11 +50,11 @@ int disconnectmavlinkinterface()
 	return EXIT_SUCCESS;
 }
 
-//recvlatestdatamavlinkinterface()
+//recvlatestdatamavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 
-//sendlatestdatamavlinkinterface()
+//sendlatestdatamavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 
-int inithandlemavlinkinterface()
+int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
 	int sendbuflen = 0;
 	uint8 sendbuf[MAX_NB_BYTES_MAVLINKDEVICE];
@@ -104,7 +105,7 @@ int inithandlemavlinkinterface()
 	mavlink_msg_heartbeat_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &heartbeat);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -117,7 +118,7 @@ int inithandlemavlinkinterface()
 	mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -130,7 +131,7 @@ int inithandlemavlinkinterface()
 	mavlink_msg_home_position_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &home_position);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -143,7 +144,7 @@ int inithandlemavlinkinterface()
 	return EXIT_SUCCESS;
 }
 
-int handlemavlinkinterface()
+int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
 
 	// Get data from GCS...
@@ -395,7 +396,7 @@ REQ_DATA_STREAM...
 	mavlink_msg_heartbeat_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &heartbeat);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -408,7 +409,7 @@ REQ_DATA_STREAM...
 	mavlink_msg_gps_raw_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_raw_int);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -421,7 +422,7 @@ REQ_DATA_STREAM...
 	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(&MAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -445,12 +446,15 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 	char httpbuf[2048];
 	*/
 	int timeout = 5;
+	RS232PORT MAVLinkInterfacePseudoRS232Port_tmp = MAVLinkInterfacePseudoRS232Port;
 
 	UNREFERENCED_PARAMETER(pParam);
 
-	if (MAVLinkInterfacePseudoRS232Port.DevType == TCP_SERVER_TYPE_RS232PORT) MAVLinkInterfacePseudoRS232Port.s = sockcli;
+	// Not thread-safe...
+
+	if (MAVLinkInterfacePseudoRS232Port_tmp.DevType == TCP_SERVER_TYPE_RS232PORT) MAVLinkInterfacePseudoRS232Port_tmp.s = sockcli;
 				
-	inithandlemavlinkinterface();
+	inithandlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port_tmp);
 
 	for (;;)
 	{
@@ -534,7 +538,7 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 			}
 */
 
-			if (handlemavlinkinterface() != EXIT_SUCCESS)
+			if (handlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port_tmp) != EXIT_SUCCESS)
 			{
 				return EXIT_FAILURE;
 			}
@@ -582,12 +586,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 /*
 		for (;;)
 		{
-			if (connectmavlinkinterface() == EXIT_SUCCESS) 
+			if (connectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 			{
 				mSleep(50);
 				for (;;)
 				{
-					if (handlemavlinkinterface() != EXIT_SUCCESS)
+					if (handlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port) != EXIT_SUCCESS)
 					{
 						printf("Connection to a MAVLinkInterface lost.\n");
 						break;
@@ -622,12 +626,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 
 			if (!bConnected)
 			{
-				if (connectmavlinkinterface() == EXIT_SUCCESS) 
+				if (connectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
 					mSleep(50);
 					bConnected = TRUE; 
 
-					inithandlemavlinkinterface();
+					inithandlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port);
 				}
 				else 
 				{
@@ -644,11 +648,11 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 				//	tv.tv_usec = 0;
 				//}
 
-				if (handlemavlinkinterface() != EXIT_SUCCESS)
+				if (handlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port) != EXIT_SUCCESS)
 				{
 					printf("Connection to a MAVLinkInterface lost.\n");
 					bConnected = FALSE;
-					disconnectmavlinkinterface();
+					disconnectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port);
 					mSleep(50);
 				}
 			}
@@ -658,7 +662,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 
 		//StopChrono(&chrono, &t);
 
-		if (bConnected) disconnectmavlinkinterface();
+		if (bConnected) disconnectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port);
 	}
 
 	fclose(tlogfile);

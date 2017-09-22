@@ -184,12 +184,12 @@
 % alphaomegazhat.sup 
 0.8
 % alphafvrxhat.inf
-0.70
-%0.70 for SARDINE
+0.725
+%0.725 for SARDINE
 %0.475 for SAUCISSE
 % alphafvrxhat.sup
-0.75
-%0.75 for SARDINE
+0.775
+%0.775 for SARDINE
 %0.525 for SAUCISSE
 % alphafomegazhat.inf
 0.20
@@ -344,8 +344,8 @@
 % alphaomegaz
 0.7
 % alphafvrx
-0.71
-%0.71 for SARDINE
+0.75
+%0.75 for SARDINE
 %0.5 for SAUCISSE
 % alphafomegaz
 0.21

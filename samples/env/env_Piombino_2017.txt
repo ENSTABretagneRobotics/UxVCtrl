@@ -69,10 +69,10 @@
 0
 % Coordinate system used to display the map
 % xMin (in m)
--100
+-200
 % xMax (in m)
-100
+200
 % yMin (in m)
--100
+-200
 % yMax (in m)
-100
+200

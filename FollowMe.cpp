@@ -77,17 +77,32 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 		{
 			wx_vector.push_back(xtarget_followme); wy_vector.push_back(ytarget_followme); wz_vector.push_back(ztarget_followme); 
 		}
-		if ((forbidradius_followme > 0)&&(forbidradius_followme < sqrt(sqr(xtarget_followme-forbidx_followme)+sqr(ytarget_followme-forbidy_followme)+sqr(ztarget_followme-forbidz_followme))))
+		if (bDepth_followme)
 		{
-			// Clear all the target trajectory, but in practice this does not really prevent the follower to go through the forbidden area...
-			wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0; 
-			wx_vector.clear(); wy_vector.clear(); wz_vector.clear(); 
+			if ((forbidradius_followme > 0)&&(sqrt(sqr(xtarget_followme-forbidx_followme)+sqr(ytarget_followme-forbidy_followme)+sqr(ztarget_followme-forbidz_followme)) < forbidradius_followme))
+			{
+				// Clear all the target trajectory, but in practice this does not really prevent the follower to go through the forbidden area...
+				wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0;
+				wx_vector.clear(); wy_vector.clear(); wz_vector.clear();
+			}
+		}
+		else
+		{
+			if ((forbidradius_followme > 0)&&(sqrt(sqr(xtarget_followme-forbidx_followme)+sqr(ytarget_followme-forbidy_followme)) < forbidradius_followme))
+			{
+				// Clear all the target trajectory, but in practice this does not really prevent the follower to go through the forbidden area...
+				wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0;
+				wx_vector.clear(); wy_vector.clear(); wz_vector.clear();
+			}
 		}
 
 		LeaveCriticalSection(&StateVariablesCS);
 
-		fprintf(logfollowmetaskfile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), xtarget_followme, ytarget_followme, ztarget_followme, distance, wx_vector[wx_vector.size()-1], wy_vector[wy_vector.size()-1], wz_vector[wz_vector.size()-1], step);
-		fflush(logfollowmetaskfile);
+		if (wx_vector.size() > 0)
+		{
+			fprintf(logfollowmetaskfile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), xtarget_followme, ytarget_followme, ztarget_followme, distance, wx_vector[wx_vector.size()-1], wy_vector[wy_vector.size()-1], wz_vector[wz_vector.size()-1], step);
+			fflush(logfollowmetaskfile);
+		}
 
 		if (bFollowMeTrackingControl)
 		{
@@ -108,7 +123,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 				// Check if the destination waypoint of the line was reached.
 				if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 				{
-					if (i < (int)wx_vector.size()-2)
+					if ((i >= 0)&&(i < (int)wx_vector.size()-2))
 					{
 						i++;
 						wxa = wx_vector[i]; wya = wy_vector[i]; wza = wz_vector[i]; wxb = wx_vector[i+1]; wyb = wy_vector[i+1]; wzb = wz_vector[i+1];
@@ -142,7 +157,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 				// Check if the destination waypoint of the line was reached.
 				if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 				{
-					if (i < (int)wx_vector.size()-2)
+					if ((i >= 0)&&(i < (int)wx_vector.size()-2))
 					{
 						i++;
 						wxa = wx_vector[i]; wya = wy_vector[i]; wza = wz_vector[i]; wxb = wx_vector[i+1]; wyb = wy_vector[i+1]; wzb = wz_vector[i+1];
