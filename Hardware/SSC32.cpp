@@ -175,8 +175,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}		
 #endif // USE_MOTORBOAT_WITH_FLUX
 				break;
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 			default:
 				EnterCriticalSection(&StateVariablesCS);
 				thrust1 = u1;

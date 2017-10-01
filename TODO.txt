@@ -1,3 +1,25 @@
+
+Snapshot should generate ply
+Tool to translate and rotate ply, utiliserait un env.txt et prendrait en param deltax, delay, deltaz en m, deltaroll, deltapitch, deltayaw en deg
+Tool to extract waypoints from a mission
+faire lognav2tlog
+
+Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval…
+
+Temps et status à mettre dans logs
+
+Rampe 6 roues quand on accélère
+Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour hovercraft
+
+Procid dans wallavoidance pour faire manoeuvre évitement auto robots terrestres, est-ce qu'on peut relancer le wallavoidance en fin de procédure?
+
+Data viewer: pouvoir rejouer en temps réel ou accéléré
+
+Exp image sonar pour mieux détecter murs?
+Faire un menu OSD pour changer certaines options car trop d'options
+
+Ardupilot2waypoints : gérer altitude...
+
 afficher followme fence
 afficher temps depuis début mission
 Problème headingrelativereg?
@@ -371,6 +393,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+rajouter dans samples un triangle sur place d'armes et terrain, et ar devant bat M
 
 si on a mavlinkdevice connecté à la mavlinkinterface et qu'on connecte mission planner, mission planner n'est pas mis à jour, mais c'est peut-être un problème d'ids...->MAVLinkInterfacePseudoRS232Port pas thread-safe
 

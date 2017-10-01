@@ -552,12 +552,13 @@ inline int LoadConfig(void)
 	case VEDI_ROBID:
 	case VICI_ROBID:
 	case JACK_ROBID:
-	case HOVERCRAFT_ROBID:
+	case BUBBLE_ROBID:
 	case MOTORBOAT_ROBID:
 	case VAIMOS_ROBID:
 	case SAILBOAT_ROBID:
+	case BUGGY_SIMULATOR_ROBID:
 	case BUGGY_ROBID:
-	case TREX_ROBID:
+	case ETAS_WHEEL_ROBID:
 	case QUADRO_ROBID:
 		break;
 	default:

@@ -177,7 +177,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			LeaveCriticalSection(&SeanetConnectingCS);
 		}
 
-		if ((robid == SUBMARINE_SIMULATOR_ROBID)||(!bDisableHokuyo)||(!bDisableRPLIDAR))
+		if ((robid & SIMULATOR_ROBID_MASK)||(!bDisableHokuyo)||(!bDisableRPLIDAR))
 		{
 			EnterCriticalSection(&StateVariablesCS);
 

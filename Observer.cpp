@@ -140,7 +140,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				//printf("omegazhat = %f\n", Center(omegazhat));
 			}
 		}
-		else if (robid == TREX_ROBID)
+		else if (robid == ETAS_WHEEL_ROBID)
 		{
 			xhat = xhat+dt*(alphavrxhat*(u1+u2)*Cos(psihat)+xdotnoise);
 			yhat = yhat+dt*(alphavrxhat*(u1+u2)*Sin(psihat)+ydotnoise);
@@ -149,10 +149,10 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
 			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 		}
-		else if (robid == BUGGY_ROBID)
+		else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID))
 		{
-			xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphafomegazhat*uw)+xdotnoise);
-			yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphafomegazhat*uw)+ydotnoise);
+			xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
+			yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
 			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
@@ -224,12 +224,13 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
 		case MOTORBOAT_ROBID:
+		case BUGGY_SIMULATOR_ROBID:
 		case BUGGY_ROBID:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
 			Energy_actuators += dt*(u*P_actuators_1+uw*P_actuators_2+uw*P_actuators_4)/3600.0;
 			break;
-		case HOVERCRAFT_ROBID:
-		case TREX_ROBID:
+		case BUBBLE_ROBID:
+		case ETAS_WHEEL_ROBID:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
 			Energy_actuators += dt*((u1+u2)*P_actuators_1+P_actuators_4)/3600.0;
 			break;

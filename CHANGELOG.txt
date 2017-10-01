@@ -1,3 +1,8 @@
+168
+Renamed Hovercraft to BUBBLE and TREX to ETAS_WHEEL.
+Added buggy simulator.
+Corrected heading control bug for Buggy and Motorboat when going backwards.
+
 167
 Temporary correction to handle multiple connections to MAVLinkInterface.
 Corrections in Follow Me.

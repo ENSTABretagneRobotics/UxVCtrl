@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
 	CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
-	if (robid == SUBMARINE_SIMULATOR_ROBID) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
+	if (robid & SIMULATOR_ROBID_MASK) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
 	if (!bDisableMES) CreateDefaultThread(MESThread, NULL, &MESThreadId);
 	if (!bDisableMDM) CreateDefaultThread(MDMThread, NULL, &MDMThreadId);
 	if (!bDisableSeanet) CreateDefaultThread(SeanetThread, NULL, &SeanetThreadId);
@@ -348,7 +348,7 @@ int main(int argc, char* argv[])
 	if (!bDisableSeanet) WaitForThread(SeanetThreadId);
 	if (!bDisableMDM) WaitForThread(MDMThreadId);
 	if (!bDisableMES) WaitForThread(MESThreadId);
-	if (robid == SUBMARINE_SIMULATOR_ROBID) WaitForThread(SimulatorThreadId);
+	if (robid & SIMULATOR_ROBID_MASK) WaitForThread(SimulatorThreadId);
 	WaitForThread(FollowMeThreadId);
 	WaitForThread(MissingWorkerThreadId);
 	WaitForThread(PingerThreadId);

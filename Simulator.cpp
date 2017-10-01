@@ -34,9 +34,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		return 0;
 	}
 
-	fprintf(logsimufile, 
+	fprintf(logsimufile,
 		"t (in s);x (in m);y (in m);z (in m);psi (in rad);vrx (in m/s);omegaz (in rad/s);alpha (in rad);d (in m);u1;u2;u3;tv_sec;tv_usec;\n"
-		); 
+	);
 	fflush(logsimufile);
 
 	bGPSOKSimulator = FALSE;
@@ -61,49 +61,75 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 		EnterCriticalSection(&StateVariablesCS);
 
-		// z should change when at the surface because of waves, but not underwater...
-		// z_mes should change underwater because of waves, but not at the surface...
-
-		// Evolution de l'environnement (courant et vagues).
-		vc = vc_med+vc_var*(2.0*rand()/(double)RAND_MAX-1.0);
-		psic = psic_med+psic_var*(2.0*rand()/(double)RAND_MAX-1.0);
-		hw = hw_var*(2.0*rand()/(double)RAND_MAX-1.0);
-
-		// Evolution de l'état du sous-marin simulé.
-		double xdot = vrx*cos(psi)+vc*cos(psic);
-		double ydot = vrx*sin(psi)+vc*sin(psic);
-		double zdot = u3*alphaz+vzup;
-		double psidot = (u1-u2)*alphaomegaz;
-		//double psidot = omegaz;
-		double vrxdot = (u1+u2)*alphavrx-vrx*alphafvrx;
-		//double omegazdot = (u1-u2)*alphaomegaz-omegaz*alphafomegaz;
-		x = x+dt*xdot;
-		y = y+dt*ydot;
-		z = min(z+dt*zdot,0.0); // z always negative.
-		psi = psi+dt*psidot;
-		vrx = vrx+dt*vrxdot;
-		//omegaz = omegaz+dt*omegazdot;
-
-		// Simulated sensors measurements.
-		// Compass.
-		psi_mes = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-		// Pressure sensor.
-		// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
-		// Les vagues perturbent ses mesures.
-		z_mes = z+z_bias_err+z_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+hw; // Waves influence...
-		// GPS available on surface.
-		if (z >= z_gps_lim)
+		if (robid == SUBMARINE_SIMULATOR_ROBID)
 		{
+			// z should change when at the surface because of waves, but not underwater...
+			// z_mes should change underwater because of waves, but not at the surface...
+
+			// Simulated environnement evolution (current and waves).
+			vc = vc_med+vc_var*(2.0*rand()/(double)RAND_MAX-1.0);
+			psic = psic_med+psic_var*(2.0*rand()/(double)RAND_MAX-1.0);
+			hw = hw_var*(2.0*rand()/(double)RAND_MAX-1.0);
+
+			// Simulated state evolution.
+			double xdot = vrx*cos(psi)+vc*cos(psic);
+			double ydot = vrx*sin(psi)+vc*sin(psic);
+			double zdot = u3*alphaz+vzup;
+			double psidot = (u1-u2)*alphaomegaz;
+			//double psidot = omegaz;
+			double vrxdot = (u1+u2)*alphavrx-vrx*alphafvrx;
+			//double omegazdot = (u1-u2)*alphaomegaz-omegaz*alphafomegaz;
+			x = x+dt*xdot;
+			y = y+dt*ydot;
+			z = min(z+dt*zdot, 0.0); // z always negative.
+			psi = psi+dt*psidot;
+			vrx = vrx+dt*vrxdot;
+			//omegaz = omegaz+dt*omegazdot;
+
+			// Simulated sensors measurements.
+			// Compass.
+			psi_mes = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			// Pressure sensor.
+			// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
+			// Les vagues perturbent ses mesures.
+			z_mes = z+z_bias_err+z_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+hw; // Waves influence...
+			// GPS available on surface.
+			if (z >= z_gps_lim)
+			{
+				x_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				y_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, 0, &latitude, &longitude, &dval);
+				bGPSOKSimulator = TRUE;
+			}
+			else
+			{
+				bGPSOKSimulator = FALSE;
+			}
+		}
+		else if (robid == BUGGY_SIMULATOR_ROBID)
+		{
+			vrx = alphavrx*u;
+
+			// Simulated state evolution.
+			double xdot = vrx*cos(psi)*cos(alphaomegaz*uw);
+			double ydot = vrx*sin(psi)*cos(alphaomegaz*uw);
+			double psidot = vrx*sin(alphaomegaz*uw)/alphaz;
+			x = x+dt*xdot;
+			y = y+dt*ydot;
+			psi = psi+dt*psidot;
+
+			// Simulated sensors measurements.
+			// Compass.
+			psi_mes = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			// GPS always available.
 			x_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			y_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, 0, &latitude, &longitude, &dval);
 			bGPSOKSimulator = TRUE;
 		}
-		else
-		{
-			bGPSOKSimulator = FALSE;
-		}
+
 		// Sonar.
 		alpha_mes = alpha_mes+(simulatorperiod/1000.0)*omegas;
 		if (alpha_mes > 2*M_PI+alpha_0)
@@ -112,9 +138,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 		alpha = alpha_mes-alpha_bias_err-alpha_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		// Compute the distance to the first obstacle d. d might be oo if no obstacle found.
-		d1 = DistanceDirSegments(x,y,alpha+alphas+psi,walls_xa,walls_ya,walls_xb,walls_yb);
-		d2 = DistanceDirCircles(x,y,alpha+alphas+psi,circles_x,circles_y,circles_r);
-		d = min(d1,d2);
+		d1 = DistanceDirSegments(x, y, alpha+alphas+psi, walls_xa, walls_ya, walls_xb, walls_yb);
+		d2 = DistanceDirCircles(x, y, alpha+alphas+psi, circles_x, circles_y, circles_r);
+		d = min(d1, d2);
 
 		// Generate outliers.
 		if ((double)rand()/(double)RAND_MAX < outliers_ratio)
@@ -129,13 +155,16 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		// For compatibility with a Seanet...
 
 		d_all_mes.clear();
-/*		// Outlier before the wall.
+		/*		
+		// Outlier before the wall.
 		d_all_mes.push_back(d_mes*(double)rand()/(double)RAND_MAX);
-*/		// Wall (or sometimes also an outlier...).
+		*/
+		// Wall (or sometimes also an outlier...).
 		d_all_mes.push_back(d_mes);
-/*		// Outlier after the wall.
+		/*		
+		// Outlier after the wall.
 		d_all_mes.push_back(d_mes+(rangescale-d_mes)*(double)rand()/(double)RAND_MAX);
-*/
+		*/
 		alpha_mes_vector.push_back(alpha_mes);
 		d_mes_vector.push_back(d_mes);
 		d_all_mes_vector.push_back(d_all_mes);
@@ -158,10 +187,10 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 
 		// Log.
-		fprintf(logsimufile, "%f;%.3f;%.3f;%.3f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n", 
+		fprintf(logsimufile, "%f;%.3f;%.3f;%.3f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n",
 			t, x, y, z, psi, vrx, omegaz, alpha, d, u1, u2, u3,
 			(int)tv.tv_sec, (int)tv.tv_usec
-			);
+		);
 		fflush(logsimufile);
 
 		LeaveCriticalSection(&StateVariablesCS);

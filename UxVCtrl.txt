@@ -1,24 +1,22 @@
 % Hexadecimal identifier of the robot (see Globals.h)
 % robid
-% Simulator
+% Submarine Simulator
 0x00000001
+% Buggy Simulator
+%0x01000000
 % SAUCISSE
 %0x00000002
 % SARDINE
 %0x00000004
-% CISCREA
-%0x00000060
-% Hovercraft
+% BUBBLE
 %0x00000200
 % Motorboat
 %0x00000400
-% VAIMOS
-%0x00020000
 % Sailboat
 %0x00040000
 % Buggy
 %0x02000000
-% TREX
+% ETAS WHEEL
 %0x04000000
 % QUADRO
 %0x20000000
@@ -177,12 +175,20 @@
 0.1
 % alphavrxhat.inf
 0.09
+%0.09 for submarine
+%1.9 for buggy
 % alphavrxhat.sup
 0.10
+%0.10 for submarine
+%2.0 for buggy
 % alphaomegazhat.inf
 0.7
+%0.7 for submarine
+%0.7 for buggy
 % alphaomegazhat.sup 
 0.8
+%0.8 for submarine
+%0.8 for buggy
 % alphafvrxhat.inf
 0.725
 %0.725 for SARDINE
@@ -197,8 +203,12 @@
 0.25
 % alphazhat.inf
 0.10
+%0.10 for submarine
+%0.49 for buggy
 % alphazhat.sup
 0.12
+%0.12 for submarine
+%0.51 for buggy
 % vzuphat.inf
 0.005
 % vzuphat.sup
@@ -306,7 +316,7 @@
 0
 % d_0 (in m)
 0
-% Simulated submarine physical parameters
+% Simulated submarine/buggy physical parameters
 % x_max_rand_err (in m)
 3.0
 % x_bias_err (in m)
@@ -341,8 +351,12 @@
 -0.1
 % alphavrx
 0.1
+%0.1 for submarine
+%2 for buggy
 % alphaomegaz
 0.7
+%0.7 for submarine
+%0.7 for buggy
 % alphafvrx
 0.75
 %0.75 for SARDINE
@@ -351,6 +365,8 @@
 0.21
 % alphaz
 0.1
+%0.1 for submarine
+%0.5 for buggy
 % vzup (speed due to the buoyancy in m/s)
 0.01
 % alphas
@@ -358,7 +374,7 @@
 %3.14
 % omegas
 2.3562
-% z_gps_lim (profondeur à partir de laquelle le GPS est disponible en m)
+% z_gps_lim (limit depth to get GPS in m)
 -0.5
 % outliers_ratio
 0.5

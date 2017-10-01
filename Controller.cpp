@@ -246,16 +246,16 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		if (bHeadingControl)
 		{
-			if (wpsi != wpsi_prev)
-			{
-				integral = 0;
-			}
+			if (wpsi != wpsi_prev) integral = 0;
 
 			delta_angle = Center(psihat)-wpsi;
 
 			if (cos(delta_angle) > cosdelta_angle_threshold)
 			{
 				// PID-like control w.r.t. desired heading.
+
+				// Depending on the type of robot, we need to invert if the robot is going backwards...
+
 				//double error = 2.0*asin(sin(delta_angle))/M_PI;
 				//double error = 2.0*atan(tan(delta_angle/2.0))/M_PI; // Singularity at tan(M_PI/2)...
 				double error = fmod_2PI(delta_angle)/M_PI;
@@ -274,6 +274,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					//	-Ki*integral;
 					uw = -Kp*error-Kd1*speed-Ki*integral;
 				}
+				else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_ROBID))
+				{
+					uw = sign(u, 0)*(-Kp*error-Kd1*speed-Ki*integral);
+				}
 				else
 				{
 					//// We still (probably...) have to avoid the singularity at tan(M_PI/2)...
@@ -290,7 +294,18 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			else
 			{
 				// Bang-bang control if far from desired heading.
-				if (sin(delta_angle) > 0) uw = -uw_max; else uw = uw_max;
+
+				// Depending on the type of robot, we need to invert if the robot is going backwards...
+
+				if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_ROBID))
+				{
+					uw = -sign(u, 0)*sign(sin(delta_angle), 0)*uw_max;
+				}
+				else
+				{
+					uw = -sign(sin(delta_angle), 0)*uw_max;
+				}
+
 				integral = 0;
 			}
 

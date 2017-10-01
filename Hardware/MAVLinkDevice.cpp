@@ -249,8 +249,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						switch (robid)
 						{
 						case BUGGY_ROBID:
-						case TREX_ROBID:
-						case HOVERCRAFT_ROBID:
+						case ETAS_WHEEL_ROBID:
+						case BUBBLE_ROBID:
 						case MOTORBOAT_ROBID:
 						case QUADRO_ROBID:
 							if (bRearmAutopilot)

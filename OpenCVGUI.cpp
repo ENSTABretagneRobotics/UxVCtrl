@@ -52,12 +52,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	switch (robid)
 	{
-	case HOVERCRAFT_ROBID:
-	case TREX_ROBID:
+	case BUBBLE_ROBID:
+	case ETAS_WHEEL_ROBID:
 		bEnableRCMode = TRUE;
 		bEnableFullSpeedMode = TRUE;
 		break;
 	case MOTORBOAT_ROBID:
+	case BUGGY_SIMULATOR_ROBID:
 	case BUGGY_ROBID:
 		bEnableRCMode = TRUE;
 		bEnableFullSpeedMode = TRUE;
@@ -251,11 +252,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case SAILBOAT_ROBID:
 				break;
 			case MOTORBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				if (bEnableFullSpeedMode) u = u_max;
 				break;
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				if (bEnableFullSpeedMode) u = u_max;
 				if (!bHeadingControl) uw = 0;
 				break;
@@ -274,11 +276,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case SAILBOAT_ROBID:
 				break;
 			case MOTORBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				if (bEnableFullSpeedMode) u = -u_max;
 				break;
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				if (bEnableFullSpeedMode) u = -u_max;
 				if (!bHeadingControl) uw = 0;
 				break;
@@ -300,8 +303,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				uw = (uw > uw_max)? uw_max: uw;
 				switch (robid)
 				{
-				case HOVERCRAFT_ROBID:
-				case TREX_ROBID:
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
 					if (bEnableFullSpeedMode) uw = uw_max;
 					break;
 				default:
@@ -322,8 +325,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				uw = (uw < -uw_max)? -uw_max: uw;
 				switch (robid)
 				{
-				case HOVERCRAFT_ROBID:
-				case TREX_ROBID:
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
 					if (bEnableFullSpeedMode) uw = -uw_max;
 					break;
 				default:
@@ -336,9 +339,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				u_max += 0.025;
 				u_max = (u_max > 1)? 1: u_max;
 				break;
@@ -363,9 +367,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				u_max -= 0.025;
 				u_max = (u_max < 0)? 0: u_max;
 				break;
@@ -392,6 +397,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case MOTORBOAT_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
 				break;
@@ -399,8 +405,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				ul += 0.1;
 				ul = (ul > 1)? 1: ul;
 				break;
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				uw_max += 0.1;
 				uw_max = (uw_max > 1)? 1: uw_max;
 				break;
@@ -414,6 +420,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case MOTORBOAT_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
 				break;
@@ -421,8 +428,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				ul -= 0.1;
 				ul = (ul < -1)? -1: ul;
 				break;
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				uw_max -= 0.1;
 				uw_max = (uw_max < 0)? 0: uw_max;
 				break;
@@ -787,6 +794,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						if (!bHeadingControl) uw = 0;
 						break;
 					case MOTORBOAT_ROBID:
+					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 						u = 0;
 						break;
@@ -808,11 +816,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			// Rounding...
 			switch (robid)
 			{
-			case HOVERCRAFT_ROBID:
-			case TREX_ROBID:
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 				sprintf(szText, "%d%% %d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw_max*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
 				break;
 			case MOTORBOAT_ROBID:
+			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
 				break;
@@ -1102,9 +1111,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Robot.
 					switch (robid)
 					{
-					case HOVERCRAFT_ROBID:
-					case TREX_ROBID:
+					case BUBBLE_ROBID:
+					case ETAS_WHEEL_ROBID:
 					case MOTORBOAT_ROBID:
+					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 					default:
 						cvLine(dispimgs[videoid], 
@@ -1165,9 +1175,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Robot.
 					switch (robid)
 					{
-					case HOVERCRAFT_ROBID:
-					case TREX_ROBID:
+					case BUBBLE_ROBID:
+					case ETAS_WHEEL_ROBID:
 					case MOTORBOAT_ROBID:
+					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 					default:
 						cvLine(dispimgs[videoid], 
@@ -1264,9 +1275,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Robot.
 					switch (robid)
 					{
-					case HOVERCRAFT_ROBID:
-					case TREX_ROBID:
+					case BUBBLE_ROBID:
+					case ETAS_WHEEL_ROBID:
 					case MOTORBOAT_ROBID:
+					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 					default:
 						cvLine(dispimgs[videoid], 
@@ -1327,14 +1339,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Robot.
 					switch (robid)
 					{
-					case HOVERCRAFT_ROBID:
-					case TREX_ROBID:
-					case MOTORBOAT_ROBID:
+					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 						{
-							//CvPoint* pts = NULL, int npts = 0, int contours = 0;
-							//cvPolyLine(dispimgs[videoid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
+							//CvPoint pts[10]; int npts = sizeof(pts); int contours = 0;
+							//pts[0] = cvPoint(videoimgwidth-28, 8-5);
+						
+							////cvPolyLine(dispimgs[videoid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
+							//cvFillConvexPoly(dispimgs[videoid], pts, npts, CV_RGB(0, 255, 0), 8, 0);
+							//break;
 						}
+					case BUBBLE_ROBID:
+					case ETAS_WHEEL_ROBID:
+					case MOTORBOAT_ROBID:
 					default:
 						cvLine(dispimgs[videoid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
