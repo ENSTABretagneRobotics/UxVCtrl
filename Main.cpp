@@ -28,6 +28,9 @@
 #include "MES.h"
 #include "MDM.h"
 #include "Seanet.h"
+#ifdef ENABLE_BLUEVIEW_SUPPORT
+#include "BlueView.h"
+#endif // ENABLE_BLUEVIEW_SUPPORT
 #include "Hokuyo.h"
 #include "RPLIDAR.h"
 #include "P33x.h"
@@ -96,6 +99,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MESThreadId;
 	THREAD_IDENTIFIER MDMThreadId;
 	THREAD_IDENTIFIER SeanetThreadId;
+#ifdef ENABLE_BLUEVIEW_SUPPORT
+	THREAD_IDENTIFIER BlueViewThreadId[MAX_NB_BLUEVIEW];
+#endif // ENABLE_BLUEVIEW_SUPPORT
 	THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER RPLIDARThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
@@ -185,6 +191,12 @@ int main(int argc, char* argv[])
 	if (!bDisableMES) CreateDefaultThread(MESThread, NULL, &MESThreadId);
 	if (!bDisableMDM) CreateDefaultThread(MDMThread, NULL, &MDMThreadId);
 	if (!bDisableSeanet) CreateDefaultThread(SeanetThread, NULL, &SeanetThreadId);
+#ifdef ENABLE_BLUEVIEW_SUPPORT
+	for (i = 0; i < MAX_NB_BLUEVIEW; i++)
+	{
+		if (!bDisableBlueView[i]) CreateDefaultThread(BlueViewThread, (void*)(intptr_t)i, &BlueViewThreadId[i]);
+	}
+#endif // ENABLE_BLUEVIEW_SUPPORT
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableRPLIDAR) CreateDefaultThread(RPLIDARThread, NULL, &RPLIDARThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
@@ -345,6 +357,12 @@ int main(int argc, char* argv[])
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
 	if (!bDisableRPLIDAR) WaitForThread(RPLIDARThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);
+#ifdef ENABLE_BLUEVIEW_SUPPORT
+	for (i = MAX_NB_BLUEVIEW-1; i >= 0; i--)
+	{
+		if (!bDisableBlueView[i]) WaitForThread(BlueViewThreadId[i]);
+	}
+#endif // ENABLE_BLUEVIEW_SUPPORT
 	if (!bDisableSeanet) WaitForThread(SeanetThreadId);
 	if (!bDisableMDM) WaitForThread(MDMThreadId);
 	if (!bDisableMES) WaitForThread(MESThreadId);

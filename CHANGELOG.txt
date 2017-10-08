@@ -1,3 +1,7 @@
+169
+Beginning of BlueView integration.
+Beginning of NMEAInterface integration.
+
 168
 Renamed Hovercraft to BUBBLE and TREX to ETAS_WHEEL.
 Added buggy simulator.

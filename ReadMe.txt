@@ -15,7 +15,7 @@ _ Microsoft .NET Framework 4.7 ( http://go.microsoft.com/fwlink/?LinkId=825303 )
 [_ MinGW and MSYS]
 [_ GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
 [_ Look@LAN (lalsetup250)]
-_ LabJack UD driver v3.15/v3.2X
+_ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.exe.zip )]
 [_ MT SDK 2.7/3.3/4.2.1/4.3]
 [_ Maestro Control Center]
 [_ OpenAL SDK 1.1]
@@ -23,6 +23,7 @@ _ LabJack UD driver v3.15/v3.2X
 [_ fftw 3.3.2 32 bit]
 [_ ffmpeg 32 bit (ffmpeg-msvc)]
 _ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP)
+_ ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt )
 [_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip )
 *** DEVELOPER ***

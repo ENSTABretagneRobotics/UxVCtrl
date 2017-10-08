@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NMEAInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Observer.cpp"
 				>
 			</File>
@@ -306,6 +310,10 @@
 			</File>
 			<File
 				RelativePath=".\MissingWorker.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NMEAInterface.h"
 				>
 			</File>
 			<File

@@ -249,6 +249,12 @@
     <ClCompile Include="FollowMe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\BlueView.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="NMEAInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -572,12 +578,24 @@
     <ClInclude Include="FollowMe.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\BlueView.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="NMEAInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
     <Text Include="mission_spec.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
+    <Text Include="BlueView0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="BlueView1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

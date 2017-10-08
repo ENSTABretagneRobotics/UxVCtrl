@@ -158,6 +158,8 @@
 %
 %seanetconfig Seanet.txt bPause
 %
+%blueviewconfig deviceid blueview.txt bPause
+%
 %hokuyoconfig Hokuyo.txt bPause
 %
 %rplidarconfig RPLIDAR.txt bPause

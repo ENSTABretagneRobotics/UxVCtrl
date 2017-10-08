@@ -78,11 +78,24 @@ int MAVLinkInterfaceBaudRate = 0;
 int MAVLinkInterfaceTimeout = 0;
 int MAVLinkInterface_system_id = 0;
 int MAVLinkInterface_component_id = 0;
+BOOL bNMEAInterface = FALSE;
+char szNMEAInterfacePath[MAX_BUF_LEN];
+int NMEAInterfaceBaudRate = 0;
+int NMEAInterfaceTimeout = 0;
+BOOL bEnable_NMEAInterface_GPGGA = FALSE;
+BOOL bEnable_NMEAInterface_GPRMC = FALSE;
+BOOL bEnable_NMEAInterface_GPGLL = FALSE;
+BOOL bEnable_NMEAInterface_GPVTG = FALSE;
+BOOL bEnable_NMEAInterface_HCHDG = FALSE;
+BOOL bEnable_NMEAInterface_HEHDT = FALSE;
+BOOL bEnable_NMEAInterface_HEROT = FALSE;
+BOOL bEnable_NMEAInterface_PRDID = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 BOOL bDisableMES = FALSE;
 BOOL bDisableMDM = FALSE;
 BOOL bDisableSeanet = FALSE;
+BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 BOOL bDisableHokuyo = FALSE;
 BOOL bDisableRPLIDAR = FALSE;
 BOOL bDisableP33x = FALSE;
@@ -334,6 +347,10 @@ BOOL bPauseMES = FALSE, bRestartMES = FALSE;
 CRITICAL_SECTION SeanetOverlayImgCS;
 IplImage* SeanetOverlayImg = NULL;
 BOOL bPauseSeanet = FALSE, bRestartSeanet = FALSE;
+
+// BlueView variables.
+BOOL bPauseBlueView[MAX_NB_BLUEVIEW];
+BOOL bRestartBlueView[MAX_NB_BLUEVIEW];
 
 // Hokuyo variables.
 BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;

@@ -1,14 +1,19 @@
+blueview, seanet, es, lidar qui pourraient marcher en même temps...
+minrange param, zone morte pour tous les sonar et echosondeurs...?
 
-Snapshot should generate ply
+rajouter aussi NMEAInterface...
+pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
+
+Maestro : avoir plus de flexibilité sur quel channel fait quoi...
+
 Tool to translate and rotate ply, utiliserait un env.txt et prendrait en param deltax, delay, deltaz en m, deltaroll, deltapitch, deltayaw en deg
-Tool to extract waypoints from a mission
 faire lognav2tlog
 
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval…
 
-Temps et status à mettre dans logs
+Temps et status à mettre dans logs kml
 
-Rampe 6 roues quand on accélère
+Rampe 6 roues quand on accélère, en option...?
 Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour hovercraft
 
 Procid dans wallavoidance pour faire manoeuvre évitement auto robots terrestres, est-ce qu'on peut relancer le wallavoidance en fin de procédure?
@@ -16,7 +21,7 @@ Procid dans wallavoidance pour faire manoeuvre évitement auto robots terrestres,
 Data viewer: pouvoir rejouer en temps réel ou accéléré
 
 Exp image sonar pour mieux détecter murs?
-Faire un menu OSD pour changer certaines options car trop d'options
+Faire un menu OSD pour changer certaines options car trop d'options?
 
 Ardupilot2waypoints : gérer altitude...
 
@@ -24,6 +29,7 @@ afficher followme fence
 afficher temps depuis début mission
 Problème headingrelativereg?
 
+Snapshot should generate ply
 Rajouter génération de kml comme dans snapshot pour pipe aussi
 Rajouter détection de rouge sur pipe et support de procid
 
@@ -393,6 +399,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Nouveau seanet pro pour problème portée?->pas mieux, pareil avec micron software…
+
+Renommer dossiers AUVs\2016-2017 en UxVs\Latest, et mettre à jour script USERUpdtQuick et UpgradeOSUtils et dans GitHub pour chaque PC?
 
 rajouter dans samples un triangle sur place d'armes et terrain, et ar devant bat M
 

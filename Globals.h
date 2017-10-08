@@ -100,6 +100,7 @@ typedef enum KEYS KEYS;
 #define MAX_NB_PROCEDURES 256
 
 #define MAX_NB_VIDEO 3
+#define MAX_NB_BLUEVIEW 2
 #define MAX_NB_NMEADEVICE 2
 #define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 2
@@ -221,11 +222,24 @@ extern int MAVLinkInterfaceBaudRate;
 extern int MAVLinkInterfaceTimeout;
 extern int MAVLinkInterface_system_id;
 extern int MAVLinkInterface_component_id;
+extern BOOL bNMEAInterface;
+extern char szNMEAInterfacePath[MAX_BUF_LEN];
+extern int NMEAInterfaceBaudRate;
+extern int NMEAInterfaceTimeout;
+extern BOOL bEnable_NMEAInterface_GPGGA;
+extern BOOL bEnable_NMEAInterface_GPRMC;
+extern BOOL bEnable_NMEAInterface_GPGLL;
+extern BOOL bEnable_NMEAInterface_GPVTG;
+extern BOOL bEnable_NMEAInterface_HCHDG;
+extern BOOL bEnable_NMEAInterface_HEHDT;
+extern BOOL bEnable_NMEAInterface_HEROT;
+extern BOOL bEnable_NMEAInterface_PRDID;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 extern BOOL bDisableMES;
 extern BOOL bDisableMDM;
 extern BOOL bDisableSeanet;
+extern BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 extern BOOL bDisableHokuyo;
 extern BOOL bDisableRPLIDAR;
 extern BOOL bDisableP33x;
@@ -478,6 +492,10 @@ extern CRITICAL_SECTION SeanetOverlayImgCS;
 extern IplImage* SeanetOverlayImg;
 extern BOOL bPauseSeanet, bRestartSeanet;
 
+// BlueView variables.
+extern BOOL bPauseBlueView[MAX_NB_BLUEVIEW];
+extern BOOL bRestartBlueView[MAX_NB_BLUEVIEW];
+
 // Hokuyo variables.
 extern BOOL bPauseHokuyo, bRestartHokuyo;
 
@@ -636,6 +654,12 @@ inline int InitGlobals(void)
 	int i = 0;
 
 	// Missing error checking...
+
+	for (i = 0; i < MAX_NB_BLUEVIEW; i++)
+	{
+		bPauseBlueView[i] = FALSE;
+		bRestartBlueView[i] = FALSE;
+	}
 
 	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
 	{
@@ -827,6 +851,12 @@ inline int ReleaseGlobals(void)
 		bRestartNMEADevice[i] = FALSE;
 		bPauseNMEADevice[i] = FALSE;
 		bGPSOKNMEADevice[i] = FALSE;
+	}
+
+	for (i = MAX_NB_BLUEVIEW-1; i >= 0; i--)
+	{
+		bRestartBlueView[i] = FALSE;
+		bPauseBlueView[i] = FALSE;
 	}
 
 	return EXIT_SUCCESS;

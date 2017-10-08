@@ -3,6 +3,7 @@
 @md "%TMP%\UxVCtrl"
 
 @set /P DISABLE_KINECT2="Disable Kinect2 (0, 1 (recommended)) : "
+@set /P DISABLE_BLUEVIEW="Disable BlueView (0, 1 (recommended)) : "
 @set /P DISABLE_MAVLINK="Disable MAVLink (0, 1) : "
 @set /P DISABLE_LABJACK="Disable LabJack (0, 1) : "
 @set /P DISABLE_LIBMODBUS="Disable libmodbus (0, 1) : "
@@ -26,6 +27,25 @@
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 )
 
+@if "%DISABLE_BLUEVIEW%"=="1" (
+
+@echo Disabling BlueView
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_BLUEVIEW_SUPPORT" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(BVTSDK_DIR)\include" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(BVTSDK_DIR)\x86\vc15\lib" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";bvtsdk4.lib" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@echo Please manually exclude from build BlueView.cpp/.h
+)
+
 @if "%DISABLE_MAVLINK%"=="1" (
 
 @echo Disabling MAVLink 
@@ -33,7 +53,7 @@
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_MAVLINK_SUPPORT" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(ProgramFiles)\MAVLinkSDK" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(MAVLINK_SDK_DIR)" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
 @echo Please manually exclude from build MAVLinkDevice.cpp/.h, MAVLinkInterface.cpp/.h
@@ -87,13 +107,13 @@
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_SBG_SUPPORT" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\common;$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\src" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\x86\vc15\lib" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SBG_SDK_DIR)\x86\vc15\lib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(ProgramFiles)\SBG Systems\Inertial SDK\Software Development\sbgECom\x86\vc15\staticlib" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SBG_SDK_DIR)\x86\vc15\staticlib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";sbgEComd.lib" /replacestr ""
@@ -114,7 +134,3 @@
 @rd /s /q "%TMP%\UxVCtrl"
 
 @exit
-
-rem replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "_CONSOLE" /replacestr "_CONSOLE;ENABLE_CVKINECT2SDKHOOK"
-
-rem WS2_32.lib;Kinect20.lib
