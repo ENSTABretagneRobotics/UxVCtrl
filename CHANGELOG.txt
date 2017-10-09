@@ -1,3 +1,6 @@
+170
+Corrected bug introduced in previous version in the parsing of UxVCtrl.
+
 169
 Beginning of BlueView integration.
 Beginning of NMEAInterface integration.

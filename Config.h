@@ -213,6 +213,8 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &MAVLinkInterface_system_id) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_component_id) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bNMEAInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%[^\r\n]255s", szNMEAInterfacePath) != 1) printf("Invalid configuration file.\n");
@@ -236,8 +238,6 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_HEROT) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_PRDID) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &MAVLinkInterface_component_id) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
