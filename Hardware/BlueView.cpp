@@ -12,7 +12,6 @@
 
 THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 {
-#ifdef TEST
 	BLUEVIEW blueview;
 	int res = 0;
 	BOOL bConnected = FALSE;
@@ -62,12 +61,15 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 			{
 				bConnected = TRUE; 
 
-				if (blueview.pfSaveFile != NULL)
+				if (strlen(blueview.szSaveFile) > 0)
 				{
-					fclose(blueview.pfSaveFile); 
-					blueview.pfSaveFile = NULL;
+#if (BVTSDK_VERSION >= 4)
+					BVTHead_Destroy(blueview.file_head);
+#endif // (BVTSDK_VERSION >= 4)
+					BVTSonar_Destroy(blueview.file); 
+					memset(blueview.szSaveFile, 0, sizeof(blueview.szSaveFile));
 				}
-				if ((blueview.bSaveRawData)&&(blueview.pfSaveFile == NULL)) 
+				if ((blueview.bSaveRawData)&&(strlen(blueview.szSaveFile) == 0)) 
 				{
 					if (strlen(blueview.szCfgFilePath) > 0)
 					{
@@ -84,10 +86,13 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 					EnterCriticalSection(&strtimeCS);
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtime_fns());
 					LeaveCriticalSection(&strtimeCS);
-					blueview.pfSaveFile = fopen(szSaveFilePath, "wb");
-					if (blueview.pfSaveFile == NULL) 
+					blueview.file = BVTSonar_Create();
+					blueview.file_head = NULL;
+					if ((BVTSonar_CreateFile(blueview.file, szSaveFilePath, blueview.sonar, "") != BVT_SUCCESS)||
+						(BVTSonar_GetHead(blueview.sonar, blueview.head_num, &blueview.file_head) != BVT_SUCCESS))
 					{
 						printf("Unable to create blueview data file.\n");
+						memset(blueview.szSaveFile, 0, sizeof(blueview.szSaveFile));
 						break;
 					}
 				}
@@ -100,7 +105,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 		}
 		else
 		{
-			res = EXIT_SUCCESS;
+			res = GetLatestDataBlueView(&blueview);
 			if (res != EXIT_SUCCESS)
 			{
 				printf("Connection to a blueview lost.\n");
@@ -113,16 +118,19 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 		if (bExit) break;
 	}
 
-	if (blueview.pfSaveFile != NULL)
+	if (strlen(blueview.szSaveFile) > 0)
 	{
-		fclose(blueview.pfSaveFile); 
-		blueview.pfSaveFile = NULL;
+#if (BVTSDK_VERSION >= 4)
+		BVTHead_Destroy(blueview.file_head);
+#endif // (BVTSDK_VERSION >= 4)
+		BVTSonar_Destroy(blueview.file);
+		memset(blueview.szSaveFile, 0, sizeof(blueview.szSaveFile));
 	}
 
 	if (bConnected) DisconnectBlueView(&blueview);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
-#endif
+
 	return 0;
 }
 

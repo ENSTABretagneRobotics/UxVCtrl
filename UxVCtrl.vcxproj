@@ -67,7 +67,7 @@
       </DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>WinMM.lib;WS2_32.lib;sbgEComd.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;opencv_core2413d.lib;opencv_imgproc2413d.lib;opencv_highgui2413d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgEComd.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;opencv_core2413d.lib;opencv_imgproc2413d.lib;opencv_highgui2413d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.13\x86\vc15\lib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\lib;$(SBG_SDK_DIR)\x86\vc15\lib;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -88,7 +88,7 @@
       </DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>WinMM.lib;WS2_32.lib;sbgECom.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;opencv_core2413.lib;opencv_imgproc2413.lib;opencv_highgui2413.lib;IlmImf.lib;IlmImf.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgECom.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;opencv_core2413.lib;opencv_imgproc2413.lib;opencv_highgui2413.lib;IlmImf.lib;IlmImf.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV2.4.13\x86\vc15\staticlib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\staticlib;$(SBG_SDK_DIR)\x86\vc15\staticlib;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>

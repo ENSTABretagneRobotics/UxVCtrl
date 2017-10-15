@@ -29,55 +29,33 @@
 
 struct BLUEVIEW
 {
-	RS232PORT RS232Port;
+	BVTSonar sonar;
+	BVTSonar file;
+	BVTHead sonar_head;
+	BVTHead file_head;
 	double StepAngleSize;
 	int StepCount;
-	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
+	//FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
+	char szSaveFile[256]; // Used to save raw data, should be handled specifically...
 	//BlueViewDATA LastBlueViewData;
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
-	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
-	BOOL bForceSCIP20;
-	BOOL bHS;
-	int SlitDivision; // NSteps
-	int StartingStep;
-	int FrontStep;
-	int EndStep;
-	int ClusterCount;
-	int ScanInterval;
-	BOOL bContinuousNumberOfScans;
+	int head_num;
+	double MinRange;
+	double MaxRange;
+	double Gain;
+	double TVGSlope;
+	int VelocityOfSound; // In m/s.
 	double alpha_max_err;
 	double d_max_err;
+	int HorizontalBeam;
+	int VerticalBeam;
 };
 typedef struct BLUEVIEW BLUEVIEW;
-
-inline double k2angleBlueView(BLUEVIEW* pBlueView, int k)
-{
-	return (k+pBlueView->StartingStep-pBlueView->FrontStep+pBlueView->SlitDivision/2)*pBlueView->StepAngleSize*M_PI/180.0-M_PI;
-}
-
-inline int angle2kBlueView(BLUEVIEW* pBlueView, double angle)
-{
-	return (int)((fmod_2PI(angle)+M_PI)*180.0/(pBlueView->StepAngleSize*M_PI)-pBlueView->StartingStep+pBlueView->FrontStep-pBlueView->SlitDivision/2);
-}
-
-inline int CharacterDecodingBlueView(char* buf, int buflen)
-{
-	int i = 0, value = 0;
-
-	for (i = 0; i < buflen; i++)
-	{
-		value <<= 6;
-		value &= ~0x3f;
-		value |= buf[i] - 0x30;
-	}
-
-	return value;
-}
-
+/*
 // If this function succeeds, the beginning of buf contains a valid message
 // but there might be other data at the end.
 inline int AnalyzeBlueViewMessage(char* buf, int buflen)
@@ -316,40 +294,33 @@ inline int GetLatestBlueViewMessageBlueView(BLUEVIEW* pBlueView, char* databuf, 
 
 	return EXIT_SUCCESS;
 }
-
-// MAX_SLITDIVISION_BLUEVIEW distances, MAX_SLITDIVISION_BLUEVIEW angles...
-inline int GetLatestDataBlueView(BLUEVIEW* pBlueView, double* pDistances, double* pAngles)
+*/
+inline int GetLatestDataBlueView(BLUEVIEW* pBlueView)
 {
-	char databuf[MAX_NB_BYTES_BLUEVIEW];
-	int nbdatabytes = 0;
-	int i = 0, k = 0;
+	//char databuf[MAX_NB_BYTES_BLUEVIEW];
+	//int nbdatabytes = 0;
+	//int i = 0, k = 0;
 
-	memset(databuf, 0, sizeof(databuf));
-	nbdatabytes = 0;
-	if (GetLatestBlueViewMessageBlueView(pBlueView, databuf, sizeof(databuf), &nbdatabytes)
-		!= EXIT_SUCCESS)
+	//memset(databuf, 0, sizeof(databuf));
+	//nbdatabytes = 0;
+
+
+	BVTPing ping = NULL; 
+	if (BVTHead_GetPing(pBlueView->sonar_head, -1, &ping) != BVT_SUCCESS)
 	{ 
+		printf("BlueView ping error.\n");
 		return EXIT_FAILURE;	
 	}
+	if (BVTHead_PutPing(pBlueView->file_head, ping) != BVT_SUCCESS)
+	{ 
+		printf("BlueView .son error.\n");
+	}
+	BVTPing_Destroy(ping);
+
 
 	// Analyze data.
 
 	//memset(pBlueViewData, 0, sizeof(BlueViewDATA));
-	
-	// Note : the scanner rotates in an anti-clockwise direction when viewed from top.
-
-	// 20-5600 mm, 682 pings...
-	
-	k = 0;
-	for (i = 0; i < nbdatabytes; i += 3)
-	{
-		pAngles[k] = (k+pBlueView->StartingStep-pBlueView->FrontStep+pBlueView->SlitDivision/2)*pBlueView->StepAngleSize*M_PI/180.0-M_PI;
-		pDistances[k] = CharacterDecodingBlueView(databuf+i, 3)/1000.0;
-		k++;
-	}
-
-
-	// File for data : tv_sec;tv_usec;angle (in rad, 0 is front);distance (in m);
 
 
 	//pBlueView->LastBlueViewData = *pBlueViewData;
@@ -374,19 +345,13 @@ inline int ConnectBlueView(BLUEVIEW* pBlueView, char* szCfgFilePath)
 
 		// Default values.
 		memset(pBlueView->szDevPath, 0, sizeof(pBlueView->szDevPath));
-		sprintf(pBlueView->szDevPath, "COM1");
-		pBlueView->BaudRate = 115200;
+		sprintf(pBlueView->szDevPath, "192.168.1.45");
 		pBlueView->timeout = 1000;
-		pBlueView->bSaveRawData = 1;
-		pBlueView->bForceSCIP20 = 0;
-		pBlueView->bHS = 0;
-		pBlueView->SlitDivision = 1024;
-		pBlueView->StartingStep = 44;
-		pBlueView->FrontStep = 384;
-		pBlueView->EndStep = 725;
-		pBlueView->ClusterCount = 0;
-		pBlueView->ScanInterval = 0;
-		pBlueView->bContinuousNumberOfScans = 1;
+		pBlueView->head_num = 0;
+		pBlueView->MinRange = 1;
+		pBlueView->MaxRange = 10;
+		pBlueView->Gain = 0;
+		pBlueView->VelocityOfSound = 1500;
 		pBlueView->alpha_max_err = 0.01;
 		pBlueView->d_max_err = 0.1;
 
@@ -397,29 +362,19 @@ inline int ConnectBlueView(BLUEVIEW* pBlueView, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%255s", pBlueView->szDevPath) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->BaudRate) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pBlueView->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pBlueView->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->bForceSCIP20) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pBlueView->head_num) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->bHS) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pBlueView->MinRange) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->SlitDivision) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pBlueView->MaxRange) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->StartingStep) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pBlueView->Gain) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->FrontStep) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->EndStep) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->ClusterCount) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->ScanInterval) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pBlueView->bContinuousNumberOfScans) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pBlueView->VelocityOfSound) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pBlueView->alpha_max_err) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -432,50 +387,42 @@ inline int ConnectBlueView(BLUEVIEW* pBlueView, char* szCfgFilePath)
 		}
 	}
 
-	if (pBlueView->SlitDivision <= 0)
-	{
-		printf("Invalid parameter : SlitDivision.\n");
-		pBlueView->SlitDivision = 1024;
-	}
-	if (pBlueView->ClusterCount < 0)
-	{
-		printf("Invalid parameter : ClusterCount.\n");
-		pBlueView->ClusterCount = 0;
-	}
-		
-	pBlueView->StepAngleSize = 360.0*(pBlueView->ClusterCount+1)/pBlueView->SlitDivision;
-	pBlueView->StepCount = (pBlueView->EndStep-pBlueView->StartingStep+1)/(pBlueView->ClusterCount+1);
-
 	// Used to save raw data, should be handled specifically...
 	//pBlueView->pfSaveFile = NULL;
 
-	if (OpenRS232Port(&pBlueView->RS232Port, pBlueView->szDevPath) != EXIT_SUCCESS)
+	pBlueView->sonar = BVTSonar_Create();
+	if (BVTSonar_Open(pBlueView->sonar, "NET", pBlueView->szDevPath) != BVT_SUCCESS)
 	{
 		printf("Unable to connect to a BlueView.\n");
 		return EXIT_FAILURE;
+	}
+	pBlueView->sonar_head = NULL;
+	if (BVTSonar_GetHead(pBlueView->sonar, pBlueView->head_num, &pBlueView->sonar_head) != BVT_SUCCESS)
+	{
+		printf("Unable to connect to a BlueView.\n");
+		BVTSonar_Destroy(pBlueView->sonar);
+		return EXIT_FAILURE;
+	}
+	if (BVTHead_SetRange(pBlueView->sonar_head, (float)pBlueView->MinRange, (float)pBlueView->MaxRange) != BVT_SUCCESS)
+	{
+		printf("Unable to set BlueView range.\n");
+	}
+	if (BVTHead_SetSoundSpeed(pBlueView->sonar_head, pBlueView->VelocityOfSound) != BVT_SUCCESS)
+	{
+		printf("Unable to set BlueView sound speed.\n");
 	}
 
-	if (SetOptionsRS232Port(&pBlueView->RS232Port, pBlueView->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, (UINT)pBlueView->timeout) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a BlueView.\n");
-		CloseRS232Port(&pBlueView->RS232Port);
-		return EXIT_FAILURE;
-	}
-	
 	printf("BlueView connected.\n");
 
 	return EXIT_SUCCESS;
 }
 
 inline int DisconnectBlueView(BLUEVIEW* pBlueView)
-{		
-
-	if (CloseRS232Port(&pBlueView->RS232Port) != EXIT_SUCCESS)
-	{
-		printf("BlueView disconnection failed.\n");
-		return EXIT_FAILURE;
-	}
+{
+#if (BVTSDK_VERSION >= 4)
+	BVTHead_Destroy(pBlueView->sonar_head);
+#endif // (BVTSDK_VERSION >= 4)
+	BVTSonar_Destroy(pBlueView->sonar);
 
 	printf("BlueView disconnected.\n");
 

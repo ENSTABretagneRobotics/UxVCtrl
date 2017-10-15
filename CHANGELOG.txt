@@ -1,3 +1,6 @@
+172
+Continuation of BlueView integration.
+
 171
 Corrected bug for BlueView in Makefile.
 Updated logstate and logsimu file formats.

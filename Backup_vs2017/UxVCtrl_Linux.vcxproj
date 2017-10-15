@@ -471,7 +471,7 @@
       <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
-      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;pthread;rt;m</LibraryDependencies>
+      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteProjectDir)/UxVCtrl &amp;&amp; chmod +x ./ResetWorkspace.sh &amp;&amp; sh ./ResetWorkspace.sh</Command>
@@ -485,7 +485,7 @@
       <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
-      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;pthread;rt;m</LibraryDependencies>
+      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteProjectDir)/UxVCtrl &amp;&amp; chmod +x ./ResetWorkspace.sh &amp;&amp; sh ./ResetWorkspace.sh</Command>
@@ -499,7 +499,7 @@
       <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
-      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;pthread;rt;m</LibraryDependencies>
+      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteProjectDir)/UxVCtrl &amp;&amp; chmod +x ./ResetWorkspace.sh &amp;&amp; sh ./ResetWorkspace.sh</Command>
@@ -513,7 +513,7 @@
       <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
-      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;pthread;rt;m</LibraryDependencies>
+      <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>cd $(RemoteProjectDir)/UxVCtrl &amp;&amp; chmod +x ./ResetWorkspace.sh &amp;&amp; sh ./ResetWorkspace.sh</Command>

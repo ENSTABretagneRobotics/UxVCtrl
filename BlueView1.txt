@@ -4,26 +4,26 @@
 1500
 % bSaveRawData
 1
-% HeadType
+% head_num
 0
-% MaxRange (in m)
-5
 % MinRange (in m)
-5
+1
+% MaxRange (in m)
+10
 % Gain (in %)
-50
-% Sensitivity (in [0..80] dB)
-3
-% Contrast (in [0..80] dB)
-25
-% ScanDirection (in [0..359] deg)
 0
+% Sensitivity (in [0..80] dB)
+%3
+% Contrast (in [0..80] dB)
+%25
+% ScanDirection (in [0..359] deg)
+%0
 % ScanWidth (in [2..360] deg)
-360
+%360
 % StepAngleSize (in deg, angle between 2 pings) => Resolution/Steps (Ult : 8 (=0.45 deg), High : 16 (=0.9 deg), Med : 32 (=1.8 deg), Low : 64 (=3.6 deg), number of 1/16 of Gradians between 2 pings)
-3.6
+%3.6
 % NBins (corresponds to the resolution of a ping, max 800)
-200
+%200
 % VelocityOfSound (in m/s)
 1475
 %1530
@@ -35,6 +35,6 @@
 %0.1
 %0.5
 % HorizontalBeam (in ]0..360] deg)
-3
+%3
 % VerticalBeam (in ]0..360] deg)
-40
+%40

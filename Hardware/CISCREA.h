@@ -12,6 +12,10 @@
 
 #include "OSMisc.h"
 
+#ifndef DISABLE_CISCREATHREAD
+#include "OSThread.h"
+#endif // DISABLE_CISCREATHREAD
+
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
 #pragma warning(disable : 4005) 
@@ -24,9 +28,10 @@
 #pragma warning(default : 4005) 
 #endif // _MSC_VER
 
-#ifndef DISABLE_CISCREATHREAD
-#include "OSThread.h"
-#endif // DISABLE_CISCREATHREAD
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4459) 
+#endif // _MSC_VER
 
 #define calib_rov1_light 135
 #define calib_rov2_light 135
@@ -899,5 +904,10 @@ inline int CheckAlarmsStatusAndGetHeadingAndDepthAndVoltageCISCREA(modbus_t* mb,
 #ifndef DISABLE_CISCREATHREAD
 THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam);
 #endif // DISABLE_CISCREATHREAD
+
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4459) 
+#endif // _MSC_VER
 
 #endif // CISCREA_H
