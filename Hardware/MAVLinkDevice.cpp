@@ -174,7 +174,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					if (fabs(mavlinkdata.attitude.yaw) > 0) psi_mes = fmod_2PI(M_PI/2.0-(double)mavlinkdata.attitude.yaw-angle_env);
 					if (fabs(mavlinkdata.attitude.yawspeed) > 0) omegaz_mes = -(double)mavlinkdata.attitude.yawspeed;
 
-					if (fabs(mavlinkdata.vfr_hud.alt) != 0) z_mes = (double)mavlinkdata.vfr_hud.alt;
+					if (fabs(mavlinkdata.scaled_pressure.press_abs) > 0) pressure_mes = mavlinkdata.scaled_pressure.press_abs*0.001;
+
+					if (fabs(mavlinkdata.vfr_hud.alt) > 0) z_mes = (double)mavlinkdata.vfr_hud.alt;
+					if (fabs(mavlinkdata.vfr_hud.airspeed) > 0) fluidspeed = (double)mavlinkdata.vfr_hud.airspeed;
 
 					// Better to invert x and y like on Pixhawk...
 

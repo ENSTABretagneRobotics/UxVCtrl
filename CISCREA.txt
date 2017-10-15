@@ -10,7 +10,7 @@ COM8
 % Compass calibration
 % yawsign (1 or -1)
 1
-% yaworientation
+% yaworientation (in rad)
 0
 % yawp1
 0

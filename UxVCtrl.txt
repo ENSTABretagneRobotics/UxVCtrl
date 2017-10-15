@@ -203,40 +203,44 @@
 0.1
 % alphavrxhat.inf
 0.09
-%0.09 for submarine
-%2.4 for buggy
+%0.09 for submarines
+%2.4 for Buggy
+%0.49 for Catamaran
 % alphavrxhat.sup
 0.10
-%0.10 for submarine
-%2.6 for buggy
+%0.10 for submarines
+%2.6 for Buggy
+%0.50 for Catamaran
 % alphaomegazhat.inf
 0.7
-%0.7 for submarine
-%0.7 for buggy
+%0.7 for submarines
+%0.7 for Buggy
 % alphaomegazhat.sup 
 0.8
-%0.8 for submarine
-%0.8 for buggy
+%0.8 for submarines
+%0.8 for Buggy
 % alphafvrxhat.inf
 0.725
 %0.725 for SARDINE
 %0.475 for SAUCISSE
+%0.275 for Catamaran
 % alphafvrxhat.sup
 0.775
 %0.775 for SARDINE
 %0.525 for SAUCISSE
+%0.325 for Catamaran
 % alphafomegazhat.inf
 0.20
 % alphafomegazhat.sup
 0.25
 % alphazhat.inf
 0.10
-%0.10 for submarine
-%0.49 for buggy
+%0.10 for submarines
+%0.49 for Buggy
 % alphazhat.sup
 0.12
-%0.12 for submarine
-%0.51 for buggy
+%0.12 for submarines
+%0.51 for Buggy
 % vzuphat.inf
 0.005
 % vzuphat.sup
@@ -379,22 +383,24 @@
 -0.1
 % alphavrx
 0.1
-%0.1 for submarine
-%2.5 for buggy
+%0.1 for submarines
+%2.5 for Buggy
+%0.5 for Catamaran
 % alphaomegaz
 0.7
-%0.7 for submarine
-%0.7 for buggy
+%0.7 for submarines
+%0.7 for Buggy
 % alphafvrx
 0.75
 %0.75 for SARDINE
 %0.5 for SAUCISSE
+%0.3 for Catamaran
 % alphafomegaz
 0.21
 % alphaz
 0.1
-%0.1 for submarine
-%0.5 for buggy
+%0.1 for submarines
+%0.5 for Buggy
 % vzup (speed due to the buoyancy in m/s)
 0.01
 % alphas

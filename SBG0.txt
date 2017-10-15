@@ -11,19 +11,19 @@ COM5
 1
 % gpsaccuracythreshold (in m)
 10.0
-% rollorientation
+% rollorientation (in rad)
 0.0
 % rollp1
 0.0
 % rollp2
 0.0
-% pitchorientation
+% pitchorientation (in rad)
 0.0
 % pitchp1
 0.0
 % pitchp2
 0.0
-% yaworientation
+% yaworientation (in rad)
 0
 % yawp1
 0

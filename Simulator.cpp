@@ -12,7 +12,7 @@
 THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 {
 	CHRONO chrono;
-	double dt = 0, t = 0, t0 = 0;
+	double dt = 0, t = 0, t0 = 0, t_epoch = 0, utc = 0;
 	struct timeval tv;
 
 	double dval = 0, d1 = 0, d2 = 0;
@@ -20,6 +20,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double vc = 0, psic = 0, hw = 0;
 	double x = 0, y = 0, z = 0, psi = 0, vrx = 0, omegaz = 0;
 	double alpha = 0, d = 0;
+
+	double lat = 0, lon = 0, alt = 0, hdg = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
 
@@ -35,7 +37,12 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	}
 
 	fprintf(logsimufile,
-		"t (in s);x (in m);y (in m);z (in m);psi (in rad);vrx (in m/s);omegaz (in rad/s);alpha (in rad);d (in m);u1;u2;u3;tv_sec;tv_usec;\n"
+		"t_epoch (in s);lat;lon;alt;hdg;cog;sog;pressure (in bar);fluiddir;fluidspeed;range;bearing;utc (in ms);"
+		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
+		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
+		"wx;wy;wz;wpsi;wd;wu;wa_f;"
+		"u;uw;uv;ul;up;ur;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
+		"Energy_electronics;Energy_actuators;\n"
 	);
 	fflush(logsimufile);
 
@@ -58,6 +65,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		//printf("SimulatorThread period : %f s.\n", dt);
 
 		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+		t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
+		utc = 1000.0*tv.tv_sec+0.001*tv.tv_usec;
 
 		EnterCriticalSection(&StateVariablesCS);
 
@@ -185,12 +194,28 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			psihat_history_vector.pop_front();
 			vrxhat_history_vector.pop_front();
 		}
+		
+		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x, y, z, &lat, &lon, &alt);
+		hdg = (fmod_2PI(-angle_env-psi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
 		// Log.
-		fprintf(logsimufile, "%f;%.3f;%.3f;%.3f;%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;\n",
-			t, x, y, z, psi, vrx, omegaz, alpha, d, u1, u2, u3,
-			(int)tv.tv_sec, (int)tv.tv_usec
-		);
+		fprintf(logsimufile, 			
+			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;"
+			"%.3f;%.3f;%.3f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+			"%.3f;%.3f;\n",
+			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, d, alpha, utc,
+			t, x, y, z, 0.0, 0.0, psi,
+			vrx, 0.0, 0.0, 0.0, 0.0, omegaz,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, u1, u2, u3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0);
 		fflush(logsimufile);
 
 		LeaveCriticalSection(&StateVariablesCS);

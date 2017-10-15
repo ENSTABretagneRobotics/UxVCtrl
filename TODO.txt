@@ -1,24 +1,30 @@
+équations d'état bateaux... add bDisableStateEstimation, E key, like bGPSLocalization...
+
+remplacer ublox bSetBaseCfg par SetCfg (0 : keep current, 1 : default for rover, 2 : default for base)
+ubx : rajouter param CFG-NMEA-DATA2 high precision mode?
+préparer fonctions get_short/uint...(addr, endianness2endianness)
+
 blueview, seanet, es, lidar qui pourraient marcher en même temps...
 minrange param, zone morte pour tous les sonar et echosondeurs...?
 
 rajouter aussi NMEAInterface...
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
 
+Maestro, MAVLinkDevice : rajouter plus de channel PWM (24, 14), peut-être rajouter paramètre bEnable pour chacun si pas déjà plus ou moins fait, s'inspirer aussi de l'interface de Maestro Control Center...
 Maestro : avoir plus de flexibilité sur quel channel fait quoi...
 
 Tool to translate and rotate ply, utiliserait un env.txt et prendrait en param deltax, delay, deltaz en m, deltaroll, deltapitch, deltayaw en deg
-faire lognav2tlog
 
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval…
 
 Temps et status à mettre dans logs kml
 
 Rampe 6 roues quand on accélère, en option...?
-Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour hovercraft
+Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour bubble
 
 Procid dans wallavoidance pour faire manoeuvre évitement auto robots terrestres, est-ce qu'on peut relancer le wallavoidance en fin de procédure?
 
-Data viewer: pouvoir rejouer en temps réel ou accéléré
+Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planner...
 
 Exp image sonar pour mieux détecter murs?
 Faire un menu OSD pour changer certaines options car trop d'options?
@@ -33,7 +39,6 @@ Snapshot should generate ply
 Rajouter génération de kml comme dans snapshot pour pipe aussi
 Rajouter détection de rouge sur pipe et support de procid
 
-ubx : rajouter param CFG-NMEA-DATA2 high precision mode?
 meilleur geofencing ou similaire pour follow me
 When program stopped maestro does not stop thrust?->to check after changing configuration file Maestro0.txt
 
@@ -59,7 +64,7 @@ Regarding changing mode, I see you are using a MAV_MODE enum value in the first 
 Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
 https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
 
-en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...
+en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
 pour image sonar ça fait un peu n'importe quoi...
 Si je passe presque tout en cv cpp, peut-être que ça va résoudre les problèmes de fenêtres sous Linux...
@@ -79,7 +84,7 @@ Stabilisation profondeur peut-être pas pratique, affichage bleu détection pas cl
 rajouter touche bSonarAltitudeEstimation?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
 
-rajouter estimation de vitesse dans SOG pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
+rajouter estimation de vitesse dans SOG (sum(delta_xi)/(i*dt)) pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
 
 Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
 
@@ -101,9 +106,6 @@ Si vr error grande, utiliser state eq, autrement n'utiliser que vr
 option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
 pas sur que px4flow soit fiable, plutôt utiliser hokuyo pour estimer vrx et vry...?
 
-Trouver mission autonome intelligente en intérieur pour buggy, 
-Rename simulator_worspace en submarine_simulator puisqu'il y en aura peut-être d'autres, update also USERUpdtQuick.bat?
-
 chrono_period...
 change period also for other sensors/actuators?
 
@@ -111,7 +113,7 @@ Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gy
 selon les accx_err, ça aura ou non une influence sur les équations d'état
 Gérer le -g dans acc...
 changer les bruits d'état en bruits discrétisés...?
-fusion de certains fichiers avec UxVDataViewer, notamment forward et backward..., intégrer sonarstaticlocstructured et lecture vidéo dans UxVDataViewer?
+fusion de certains fichiers avec UxVDataViewer, notamment forward et backward..., intégrer sonarstaticlocstructured et lecture vidéo dans UxVDataViewer, afficher date, heure, min, sec?
 
 waitxyt x y t
 waitxytrelative x y t
@@ -161,8 +163,7 @@ déco temp mti-g sardine->probably internal mti-g bug, its position estimation an
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
 
 logs
-dans logstate et logsimu, remplacer t par valeur decimale depuis l'Epoch et rajouter colonne t_app à la fin qui correspond à ce qu'il y a actuellement...?
-logstate était compatible avec le début de logsimu à l'origine...->modifier logsimu pour qu'il soit toujours un peu compatible?->tout faire comme logstate, avec alpha, d en plus à la fin
+fluiddir, fluidspeed, d_mes, alpha_mes units...
 différents types d'altitude, AMSL, geoid, depth, sea floor...
 avec nouveau format, lognav2KML va être simplifié
 
@@ -399,6 +400,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+logstate était compatible avec le début de logsimu à l'origine...->modifier logsimu pour qu'il soit toujours un peu compatible?->tout faire comme logstate
 
 Nouveau seanet pro pour problème portée?->pas mieux, pareil avec micron software…
 

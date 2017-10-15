@@ -1,3 +1,7 @@
+171
+Corrected bug for BlueView in Makefile.
+Updated logstate and logsimu file formats.
+
 170
 Corrected bug introduced in previous version in the parsing of UxVCtrl.
 

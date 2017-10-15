@@ -198,7 +198,7 @@ SBG.o: ./Hardware/SBG.cpp ./Hardware/SBG.h
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Seanet.o: ./Hardware/BlueView.cpp ./Hardware/BlueView.h
+BlueView.o: ./Hardware/BlueView.cpp ./Hardware/BlueView.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 SSC32.o: ./Hardware/SSC32.cpp ./Hardware/SSC32.h

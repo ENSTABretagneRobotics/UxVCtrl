@@ -527,6 +527,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				csMap.xMin /= 0.9; csMap.xMax /= 0.9; csMap.yMin /= 0.9; csMap.yMax /= 0.9;
 			}
 			break;
+			
+			// Disabled because casted to char, because problems on Linux if int, especially when using SHIFT...
+
+#ifdef TEST_OPENCVGUI_ARROWS
 		case 2490368: // Up arrow.
 			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
 			{
@@ -551,6 +555,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				csMap.xMin += 1; csMap.xMax += 1;
 			}
 			break;
+#endif // TEST_OPENCVGUI_ARROWS
 		case 'T': 
 #pragma region COLORS
 			colortextid++;

@@ -14,7 +14,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	CHRONO chrono;
 	CHRONO chrono_v;
 	CHRONO chrono_omegaz;
-	double dt = 0, t = 0, t0 = 0;
+	double dt = 0, t = 0, t0 = 0, t_epoch = 0, utc = 0;
 	struct timeval tv;
 	//double dt_chrono = 0;
 	//interval xhat_prev_old, yhat_prev_old, psihat_prev_old;
@@ -34,8 +34,13 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		return 0;
 	}
 
-	fprintf(logstatefile, 
-		"t (in s);xhat;yhat;zhat;psihat;vrxhat;omegazhat;u1;u2;u3;u;uw;xhat-;xhat+;yhat-;yhat+;zhat-;zhat+;psihat-;psihat+;vrxhat-;vrxhat+;omegazhat-;omegazhat+;tv_sec;tv_usec;lathat;longhat;althat;headinghat;Energy_electronics;Energy_actuators;\n"
+	fprintf(logstatefile,
+		"t_epoch (in s);lat;lon;alt;hdg;cog;sog;pressure (in bar);fluiddir;fluidspeed;range;bearing;utc (in ms);"
+		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
+		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
+		"wx;wy;wz;wpsi;wd;wu;wa_f;"
+		"u;uw;uv;ul;up;ur;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
+		"Energy_electronics;Energy_actuators;\n"
 		); 
 	fflush(logstatefile);
 
@@ -69,6 +74,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		//printf("ObserverThread period : %f s.\n", dt);
 
 		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+		t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
+		utc = 1000.0*tv.tv_sec+0.001*tv.tv_usec;
 
 		EnterCriticalSection(&StateVariablesCS);
 
@@ -149,6 +156,40 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
 			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 		}
+		else if (robid == BUBBLE_ROBID)
+		{
+			//// Temp...
+			//xhat = xhat+dt*(vrxhat*Cos(psihat)+vchat*Cos(psichat)+xdotnoise);
+			//yhat = yhat+dt*(vrxhat*Sin(psihat)+vchat*Sin(psichat)+ydotnoise);
+			//zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			//vrxhat = (
+			//	(1.0-dt*alphafvrxhat)*vrxhat
+			//	+dt*(u1+u2)*alphavrxhat
+			//	+dt*vrxdotnoise
+			//	); // Factorization.
+			//// Should add vc,psic estimation influence in v?
+			//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+
+			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+
+			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
+			//if (dt_chrono > 1)
+			//{
+			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vrx_max_err,+vrx_max_err);
+			//	StopChronoQuick(&chrono_v);
+			//	StartChrono(&chrono_v);
+			//	xhat_prev_old = xhat;
+			//	yhat_prev_old = yhat;
+			//}
+			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err));
+			//printf("vrxhat = %f\n", Center(vrxhat));
+		}
 		else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID))
 		{
 			xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
@@ -157,6 +198,35 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
 			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+		}
+		else if (robid == MOTORBOAT_ROBID)
+		{
+			//// Temp...
+			//xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
+			//yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
+			//zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+
+			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
+			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
+			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
+			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+
+			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
+			//if (dt_chrono > 1)
+			//{
+			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vrx_max_err,+vrx_max_err);
+			//	StopChronoQuick(&chrono_v);
+			//	StartChrono(&chrono_v);
+			//	xhat_prev_old = xhat;
+			//	yhat_prev_old = yhat;
+			//}
+			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err));
+			//printf("vrxhat = %f\n", Center(vrxhat));
 		}
 		else if (robid == QUADRO_ROBID)
 		{
@@ -171,7 +241,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		{
 			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
 			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
+			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
 			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
 			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
@@ -241,27 +311,38 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			break;
 		}
 
+		switch (robid)
+		{
+		case VAIMOS_ROBID:
+		case SAILBOAT_ROBID:
+		case MOTORBOAT_ROBID:
+		case BUBBLE_ROBID:
+			fluiddir = psitwind;
+			fluidspeed = vtwind;
+			break;
+		case QUADRO_ROBID:
+		default:
+			break;
+		}
+
 		// Log.
-		fprintf(logstatefile, 			
-			"%f;"
-			"%.3f;%.3f;%.3f;%f;"
-			"%f;%f;"
-			"%f;%f;%f;"
-			"%f;%f;"
-			"%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%f;%f;"
-			"%f;%f;%f;%f;"
-			"%d;%d;%.8f;%.8f;%.3f;%.1f;"
-			"%.3f;%.3f;\n", 
-			t, 
-			Center(xhat), Center(yhat), Center(zhat), Center(psihat), 
-			Center(vrxhat), Center(omegazhat), 
-			u1, u2, u3, 
-			u, uw,
-			xhat.inf, xhat.sup, yhat.inf, yhat.sup, zhat.inf, zhat.sup, psihat.inf, psihat.sup, 
-			vrxhat.inf, vrxhat.sup, omegazhat.inf, omegazhat.sup,
-			(int)tv.tv_sec, (int)tv.tv_usec, lathat, longhat, althat, headinghat,
-			Energy_electronics, Energy_actuators
-			);
+		fprintf(logstatefile,
+			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;"
+			"%.3f;%.3f;%.3f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+			"%.3f;%.3f;\n",
+			t_epoch, lathat, longhat, althat, headinghat, cog, sog, pressure_mes, fluiddir, fluidspeed, d_mes, alpha_mes, utc,
+			t, Center(xhat), Center(yhat), Center(zhat), Center(phihat), Center(thetahat), Center(psihat),
+			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat),
+			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
+			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0),
+			wx, wy, wz, wpsi, wd, wu, wa_f, 
+			u, uw, uv, ul, up, ur, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
+			Energy_electronics, Energy_actuators);
 		fflush(logstatefile);
 
 		LeaveCriticalSection(&StateVariablesCS);

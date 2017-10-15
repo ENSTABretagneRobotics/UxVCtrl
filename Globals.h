@@ -151,20 +151,20 @@ enum FOLLOWME_TARGETS
 typedef enum FOLLOWME_TARGETS FOLLOWME_TARGETS;
 
 // Observer variables.
-extern interval xhat, yhat, zhat, psihat, vrxhat, omegazhat;
+extern interval xhat, yhat, zhat, phihat, thetahat, psihat, vrxhat, vryhat, vrzhat, omegaxhat, omegayhat, omegazhat;
 extern interval vchat, psichat, hwhat;
 extern interval vtwindhat, psitwindhat;
 //extern interval alphahat, dhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-extern double u, uw, uv, ul, wx, wy, wz, wpsi, wd, wu;
+extern double u, uw, uv, ul, up, ur, wx, wy, wz, wpsi, wd, wu;
 extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
-extern double wa_f; // altitude_wrt_floor.
+extern double wa_f; // Altitude w.r.t. floor.
 
 // Measurements
-extern double x_mes, y_mes, z_mes, psi_mes, vrx_mes, omegaz_mes;
+extern double x_mes, y_mes, z_mes, phi_mes, theta_mes, psi_mes, vrx_mes, vry_mes, vrz_mes, omegax_mes, omegay_mes, omegaz_mes;
 extern double dist;
 // AHRS.
 extern double yaw, pitch, roll;
@@ -179,6 +179,10 @@ extern double xte;
 extern vector< deque<unsigned char> > RTCMuserslist;
 //extern deque<unsigned char*> RTCMusers[MAX_NB_UBLOX]; // replace with deque< vector<unsigned char> > to get data and datalen? Or deque<unsigned char>, for each data byte...
 extern deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
+// Barometer, pressure sensor...
+extern double pressure_mes;
+// Wind/air/water current sensor...
+extern double fluiddir, fluidspeed;
 // Weather station.
 extern double vtwind, psitwind, vawind, psiawind;
 // Sonar.
@@ -203,7 +207,7 @@ extern double vrx, vry;
 
 // Equivalent thusters.
 // u1 : right, u2 : left, u3 : bottom.
-extern double u1, u2, u3;
+extern double u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14;
 
 extern double light, tilt;
 

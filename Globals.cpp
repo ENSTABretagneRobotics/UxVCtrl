@@ -11,20 +11,22 @@
 
 // Observer variables.
 interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-psihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+phihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
+vrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vryhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vrzhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
+omegaxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegayhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 //interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-double u = 0, uw = 0, uv = 0, ul = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
+double u = 0, uw = 0, uv = 0, ul = 0, up = 0, ur = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wza = 0, wxb = 0, wyb = 0, wzb = 0;
 deque<double> wx_vector, wy_vector, wz_vector;
 double wa_f = 0;
 
 // Measurements
-double x_mes = 0, y_mes = 0, z_mes = 0, psi_mes = 0, vrx_mes = 0, omegaz_mes = 0;
+double x_mes = 0, y_mes = 0, z_mes = 0, phi_mes = 0, theta_mes = 0, psi_mes = 0, vrx_mes = 0, vry_mes = 0, vrz_mes = 0, omegax_mes = 0, omegay_mes = 0, omegaz_mes = 0;
 double dist = 0;
 // AHRS.
 double yaw = 0, pitch = 0, roll = 0;
@@ -35,6 +37,10 @@ double sog = 0, cog = 0;
 double xte = 0;
 vector< deque<unsigned char> > RTCMuserslist;
 deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
+// Barometer, pressure sensor...
+double pressure_mes = 0;
+// Wind/air/water current sensor...
+double fluiddir = 0, fluidspeed = 0;
 // Weather station.
 double vtwind = 0, psitwind = 0, vawind = 0, psiawind = 0;
 // Sonar.
@@ -59,7 +65,7 @@ double vrx = 0, vry = 0;
 
 // Equivalent thusters.
 // u1 : right, u2 : left, u3 : bottom.
-double u1 = 0, u2 = 0, u3 = 0;
+double u1 = 0, u2 = 0, u3 = 0, u4 = 0, u5 = 0, u6 = 0, u7 = 0, u8 = 0, u9 = 0, u10 = 0, u11 = 0, u12 = 0, u13 = 0, u14 = 0;
 
 double light = 0, tilt = 0;
 
