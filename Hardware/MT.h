@@ -749,6 +749,12 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 			pitch = -asin(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2);
 			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
 			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
+			
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pMTData->roll = roll*180.0/M_PI;
+			pMTData->pitch = pitch*180.0/M_PI;
+			pMTData->yaw = yaw*180.0/M_PI;
+
 			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 			pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
 			pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
@@ -762,6 +768,7 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 			pitch = pMTData->pitch*M_PI/180.0;
 			yaw = pMTData->yaw*M_PI/180.0;
 			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
+	
 			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 			pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
 			pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
@@ -781,6 +788,12 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 			pitch = -asin(pMTData->c);
 			yaw = atan2(pMTData->b,pMTData->a);
 			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
+		
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pMTData->roll = roll*180.0/M_PI;
+			pMTData->pitch = pitch*180.0/M_PI;
+			pMTData->yaw = yaw*180.0/M_PI;
+
 			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 			pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
 			pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));

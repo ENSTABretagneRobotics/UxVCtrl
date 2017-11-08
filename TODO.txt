@@ -1,3 +1,26 @@
+Ardupilot2waypoints : gérer altitude...
+Tool to translate and rotate ply, utiliserait un env.txt et prendrait en param deltax, delay, deltaz en m, deltaroll, deltapitch, deltayaw en deg
+
+check sign of omegaz for SBG on SAUC'ISSE!
+
+Gate
+Définir 1 point de départ fixe, utiliser un peu sonar pour mesurer distance au mur devant ou derrière le robot? En fait l'algo de localisation dynamique est peut-être quand même mieux, la partie difficile est l'estimation statique au départ...
+
+fmod_2PI avec des intervalles...?
+
+Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?
+
+Altitude from sonar : use qinter to allow outliers and take into account position of the sonar on the submarine as well as roll and pitch
+no phi_max_err, theta_max_err defined...
+
+try to compute utc from NMEADevice, ublox, SBG, MT if valid...
+
+logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
+
+le changement de alphafvxy n'a peut-être pas été fait dans le bon sens pour SARDINE, vérifier notamment avec le passage du gate dans données sonar, regarder aussi pour SAUC-E 2016 et euRathlon 2014 et 2015...
+
+Oscillations des bateaux : à cause de précision du linefollowing?->et aussi utilisé gotoxy au lieu de gotoxywgs!
+
 équations d'état bateaux... add bDisableStateEstimation, E key, like bGPSLocalization...
 
 remplacer ublox bSetBaseCfg par SetCfg (0 : keep current, 1 : default for rover, 2 : default for base)
@@ -13,13 +36,11 @@ pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps
 Maestro, MAVLinkDevice : rajouter plus de channel PWM (24, 14), peut-être rajouter paramètre bEnable pour chacun si pas déjà plus ou moins fait, s'inspirer aussi de l'interface de Maestro Control Center...
 Maestro : avoir plus de flexibilité sur quel channel fait quoi...
 
-Tool to translate and rotate ply, utiliserait un env.txt et prendrait en param deltax, delay, deltaz en m, deltaroll, deltapitch, deltayaw en deg
-
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval…
 
 Temps et status à mettre dans logs kml
 
-Rampe 6 roues quand on accélère, en option...?
+Rampe etas quand on accélère, en option...?
 Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour bubble
 
 Procid dans wallavoidance pour faire manoeuvre évitement auto robots terrestres, est-ce qu'on peut relancer le wallavoidance en fin de procédure?
@@ -28,8 +49,6 @@ Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planne
 
 Exp image sonar pour mieux détecter murs?
 Faire un menu OSD pour changer certaines options car trop d'options?
-
-Ardupilot2waypoints : gérer altitude...
 
 afficher followme fence
 afficher temps depuis début mission
@@ -401,6 +420,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+Vrai UTC à mettre dans log et ne rien mettre si on l'a pas
+phi, theta, psi Razor, SBG, MT, MAVLinkDevice, MAVLinkInterface, Observer, Controller, check also values on OpenCVGUI and for wind roll correction (Maestro, NMEADevice, ublox), remove old raw roll, pitch, yaw...
+Rajouter depth et altitude dans log file, différencier altitude AGL (above ground), AMSL, altitude_pressure/depth
+
 logstate était compatible avec le début de logsimu à l'origine...->modifier logsimu pour qu'il soit toujours un peu compatible?->tout faire comme logstate
 
 Nouveau seanet pro pour problème portée?->pas mieux, pareil avec micron software…
@@ -456,6 +479,8 @@ Ubuntu 16.10 errors cv min, max, distinguer cas C et C++? Trouver où min et max 
 dans env rajouter pressure at the surface, water density, water velocity of sound,...?->peut-être pas car des fois le capteur change de config et ça dépend donc vraiment des conditions du capteur...
 
 utiliser les bEnableGGA, etc. pour voir si on appelle GetUBXPacket() ou GetNMEASentence()?
+
+Ne pas faire de reset de la base rtk et setbasecfg tout le temps!
 
 l'ouverture angulaire verticale totale du sonar est de vbeam=40 deg donc h=d*sin(vbeam/2.0)
 

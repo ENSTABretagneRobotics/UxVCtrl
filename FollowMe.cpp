@@ -116,7 +116,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 				if (bDepth_followme)
 				{
 					bDepthControl = TRUE;
-					bAltitudeWrtFloorControl = FALSE;
+					bAltitudeAGLControl = FALSE;
 					wz = (norm_ba != 0)? (1-distance/norm_ba)*(wzb-wza)+wza: wzb;
 					wz = min(max(wz, wzb), wza);
 				}
@@ -150,7 +150,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 				if (bDepth_followme)
 				{
 					bDepthControl = TRUE;
-					bAltitudeWrtFloorControl = FALSE;
+					bAltitudeAGLControl = FALSE;
 					wz = (norm_ba != 0)? (1-distance/norm_ba)*(wzb-wza)+wza: wzb;
 					wz = min(max(wz, wzb), wza);
 				}

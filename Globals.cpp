@@ -23,13 +23,11 @@ interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAIN
 double u = 0, uw = 0, uv = 0, ul = 0, up = 0, ur = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wza = 0, wxb = 0, wyb = 0, wzb = 0;
 deque<double> wx_vector, wy_vector, wz_vector;
-double wa_f = 0;
+double wagl = 0;
 
 // Measurements
 double x_mes = 0, y_mes = 0, z_mes = 0, phi_mes = 0, theta_mes = 0, psi_mes = 0, vrx_mes = 0, vry_mes = 0, vrz_mes = 0, omegax_mes = 0, omegay_mes = 0, omegaz_mes = 0;
 double dist = 0;
-// AHRS.
-double yaw = 0, pitch = 0, roll = 0;
 // GPS.
 double latitude = 0, longitude = 0;
 double altitude = 0;
@@ -55,7 +53,7 @@ deque<interval> yhat_history_vector;
 deque<interval> psihat_history_vector;
 deque<interval> vrxhat_history_vector;
 // Echosounder.
-double altitude_wrt_floor = 0;
+double altitude_AGL = 0;
 // Modem.
 double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_z = 0, acousticmodem_r = 0;
 int opi_id = 0;
@@ -451,7 +449,7 @@ BOOL bDistanceControl = FALSE;
 BOOL bBrakeControl = FALSE;
 BOOL bHeadingControl = FALSE;
 BOOL bDepthControl = FALSE;
-BOOL bAltitudeWrtFloorControl = FALSE;
+BOOL bAltitudeAGLControl = FALSE;
 BOOL bStaticSonarLocalization = FALSE;
 BOOL bDynamicSonarLocalization = FALSE;
 BOOL bGPSLocalization = FALSE;

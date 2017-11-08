@@ -130,10 +130,10 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				yaw = mtdata.Yaw;
-				pitch = mtdata.Pitch;
-				roll = mtdata.Roll;
-
+				phi_mes = fmod_2PI(mtdata.Roll);
+				omegax_mes = mtdata.gyrX;
+				theta_mes = fmod_2PI(mtdata.Pitch);
+				omegay_mes = mtdata.gyrY;
 				psi_mes = fmod_2PI(M_PI/2.0+mtdata.Yaw-angle_env);
 				omegaz_mes = mtdata.gyrZ;
 
@@ -154,14 +154,6 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 				if (mt.bSaveRawData)
 				{
-					// If raw Euler angles were not sent, ensure that they would still be in the log file.
-					if ((mtdata.roll == 0)&&(mtdata.pitch == 0)&&(mtdata.yaw == 0)&&
-						((mtdata.q0 != sqrt(3.0)/2.0)||(mtdata.q1 != 0)||(mtdata.q2 != 0)||(mtdata.q3 != 0)))
-					{
-						mtdata.roll = roll*M_PI/180.0;
-						mtdata.pitch = pitch*M_PI/180.0;
-						mtdata.yaw = yaw*M_PI/180.0;
-					}
 					fprintf(mt.pfSaveFile, 
 						"%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%f;%d;"

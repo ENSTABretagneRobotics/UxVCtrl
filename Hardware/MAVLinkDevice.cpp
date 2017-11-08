@@ -167,10 +167,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						}
 					}
 
-					if (fabs(mavlinkdata.attitude.yaw) > 0) yaw = (double)mavlinkdata.attitude.yaw;
-					if (fabs(mavlinkdata.attitude.pitch) > 0) pitch = (double)mavlinkdata.attitude.pitch;
-					if (fabs(mavlinkdata.attitude.roll) > 0) roll = (double)mavlinkdata.attitude.roll;
-
+					if (fabs(mavlinkdata.attitude.roll) > 0) phi_mes = fmod_2PI((double)mavlinkdata.attitude.roll);
+					if (fabs(mavlinkdata.attitude.rollspeed) > 0) omegax_mes = (double)mavlinkdata.attitude.rollspeed;
+					if (fabs(mavlinkdata.attitude.pitch) > 0) theta_mes = fmod_2PI(-(double)mavlinkdata.attitude.pitch);
+					if (fabs(mavlinkdata.attitude.pitchspeed) > 0) omegay_mes = -(double)mavlinkdata.attitude.pitchspeed;
 					if (fabs(mavlinkdata.attitude.yaw) > 0) psi_mes = fmod_2PI(M_PI/2.0-(double)mavlinkdata.attitude.yaw-angle_env);
 					if (fabs(mavlinkdata.attitude.yawspeed) > 0) omegaz_mes = -(double)mavlinkdata.attitude.yawspeed;
 

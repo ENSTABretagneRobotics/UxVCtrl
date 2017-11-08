@@ -665,7 +665,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						if (bDepth_ball) 
 						{
 							bDepthControl = TRUE;
-							bAltitudeWrtFloorControl = FALSE;
+							bAltitudeAGLControl = FALSE;
 						}
 						LeaveCriticalSection(&StateVariablesCS);
 						break;
@@ -678,7 +678,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						if (bDepth_ball) 
 						{
 							bDepthControl = TRUE;
-							bAltitudeWrtFloorControl = FALSE;
+							bAltitudeAGLControl = FALSE;
 						}
 						LeaveCriticalSection(&StateVariablesCS);
 						break;
@@ -691,7 +691,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						if (bDepth_ball) 
 						{
 							bDepthControl = TRUE;
-							bAltitudeWrtFloorControl = FALSE;
+							bAltitudeAGLControl = FALSE;
 						}
 						LeaveCriticalSection(&StateVariablesCS);
 						break;
@@ -707,7 +707,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						if (bDepth_ball) 
 						{
 							bDepthControl = TRUE;
-							bAltitudeWrtFloorControl = FALSE;
+							bAltitudeAGLControl = FALSE;
 						}
 						LeaveCriticalSection(&StateVariablesCS);
 						break;
@@ -729,7 +729,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					if (bDepth_ball) 
 					{
 						bDepthControl = FALSE;
-						bAltitudeWrtFloorControl = FALSE;
+						bAltitudeAGLControl = FALSE;
 					}
 				}
 				if (bEcho) printf("execute %d\n", procid_ball);

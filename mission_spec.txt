@@ -334,9 +334,9 @@
 %
 % SIMPLE MOVING COMMANDS
 %
-%depthreg z (double ]-oo,oo[ in m in marine units)
+%depthreg z (double ]-oo,oo[ in m (negative underwater), enable depth control)
 %
-%a_freg z (double ]-oo,oo[ in m in marine units)
+%aglreg z (double ]-oo,oo[ in m, enable altitude Above Ground Level control)
 %
 %headingreg orientation (double [0,360[ mod(360) in deg in marine units)
 %

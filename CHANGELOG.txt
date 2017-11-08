@@ -1,3 +1,7 @@
+173
+Updated logstate and logsimu file formats.
+Corrected handling of phi, theta, psi.
+
 172
 Continuation of BlueView integration.
 

@@ -7,7 +7,7 @@ Check also proxy settings of Internet Explorer, and any other installed browser,
 
 It should work with the following software :
 *** USER and DEVELOPER ***
-_ Windows 8.1 Professional 64 bit
+_ Windows 10 Professional 64 bit
 _ Microsoft Visual C++ 2017 Redistributable Package ( https://go.microsoft.com/fwlink/?LinkId=746571 )
 _ Microsoft .NET Framework 4.7 ( http://go.microsoft.com/fwlink/?LinkId=825303 )
 [_ 7-Zip]
@@ -48,7 +48,7 @@ Most of the time, it should not be necessary to modify them.
 
 Please do not try to build the program in a directory that contains commas! Mind the line endings in the configuration files depending on the OS (use e.g. the command dos2unix *.txt to convert line endings for Linux)!
 
-The principle of execution of the program is the following : main() launches all the devices, controller, observer, missions, GUI and the command interpreter threads depending on the UxVCtrl.txt configuration file. After all initializations, the program should be waiting for user input through the GUI and/or the command interpreter, or run the mission specified as argument if any. The program should exit depending on GUI interaction, commands typed or mission scripts. Type 'h' on an OpenCVGUI window to get the list of available keyboard controls. Available commands are described in mission_spec.txt. A lot of parameters can be modified in the UxVCtrl.txt configuration file, as well as in the other device-specific configuration files to modify the behavior of the program. 
+The principle of execution of the program is the following : main() launches all the devices, controller, observer, missions, GUI and the command interpreter threads depending on the UxVCtrl.txt configuration file. After all initializations, the program should be waiting for user input through the GUI and/or the command interpreter, or run the mission specified as argument if any. The program should exit depending on GUI interaction, commands typed or mission scripts. Type 'h' on an OpenCVGUI window to get the list of available keyboard controls, e.g. z,q,s,d keys are used to control the horizontal movement of most of the robots, f,v keys the vertical movement or thrust limit, space key stops horizontal movement and g key stops all movements. Available commands are described in mission_spec.txt. A lot of parameters can be modified in the UxVCtrl.txt configuration file, as well as in the other device-specific configuration files to modify the behavior of the program. 
 
 During the program execution, a lot of variables make available to read/write the sensors and actuators data, with critical sections to be thread-safe (the same critical section is often used to protect a group of related variables for simplicity, e.g. StateVariablesCS for most observer and controller variables). Most the time, commands and mission threads do not set directly the actuators, they enable/disable low-level controls and set the desired inputs for these controls (e.g. Ball tracking activate heading control, depth control and distance control with inputs corresponding to the desired and current heading, depth and distance w.r.t. the detected ball). Check ControllerThread() to see which variables should be used for each control. Similarly, the variables computed by ObserverThread() should be used to get information on the current state of the robot, instead of raw sensor values. They are expressed in units common to most of the existing commands and missions.
 

@@ -387,9 +387,9 @@ REQ_DATA_STREAM...
 	gps_raw_int.satellites_visible = 255;
 
 	memset(&attitude, 0, sizeof(mavlink_attitude_t));
+	attitude.roll = (float)fmod_2PI(Center(phihat));
+	attitude.pitch = (float)fmod_2PI(-Center(thetahat));
 	attitude.yaw = (float)fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
-	attitude.pitch = (float)pitch;
-	attitude.roll = (float)roll;
 
 	LeaveCriticalSection(&StateVariablesCS);
 

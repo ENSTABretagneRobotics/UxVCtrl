@@ -83,7 +83,7 @@ enum KEYS
 	LAT_RIGHT_KEY,
 	BRAKE_KEY,
 	DEPTHCONTROL_KEY,
-	ALTITUDEWRTFLOORCONTROL_KEY,
+	ALTITUDEAGLCONTROL_KEY,
 
 	NB_CONFIGURABLE_KEYS
 };
@@ -161,13 +161,11 @@ extern interval vtwindhat, psitwindhat;
 extern double u, uw, uv, ul, up, ur, wx, wy, wz, wpsi, wd, wu;
 extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
-extern double wa_f; // Altitude w.r.t. floor.
+extern double wagl; // Altitude Above Ground Level.
 
 // Measurements
 extern double x_mes, y_mes, z_mes, phi_mes, theta_mes, psi_mes, vrx_mes, vry_mes, vrz_mes, omegax_mes, omegay_mes, omegaz_mes;
 extern double dist;
-// AHRS.
-extern double yaw, pitch, roll;
 // GPS.
 extern double latitude, longitude;
 extern double altitude;
@@ -197,7 +195,7 @@ extern deque<interval> yhat_history_vector;
 extern deque<interval> psihat_history_vector;
 extern deque<interval> vrxhat_history_vector;
 // Echosounder.
-extern double altitude_wrt_floor;
+extern double altitude_AGL;
 // Modem.
 extern double acousticmodem_x, acousticmodem_y, acousticmodem_z, acousticmodem_r;
 extern int opi_id;
@@ -593,7 +591,7 @@ extern BOOL bDistanceControl;
 extern BOOL bBrakeControl;
 extern BOOL bHeadingControl;
 extern BOOL bDepthControl;
-extern BOOL bAltitudeWrtFloorControl;
+extern BOOL bAltitudeAGLControl;
 extern BOOL bStaticSonarLocalization;
 extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;

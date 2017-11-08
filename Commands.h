@@ -49,7 +49,7 @@ inline void DisableAllControls(void)
 	bBrakeControl = FALSE;
 	bHeadingControl = FALSE;
 	bDepthControl = FALSE;
-	bAltitudeWrtFloorControl = FALSE;
+	bAltitudeAGLControl = FALSE;
 	u = 0; uw = 0; uv = 0;
 	LeaveCriticalSection(&StateVariablesCS);
 	EnterCriticalSection(&MDMCS);
@@ -648,7 +648,7 @@ inline int Commands(char* line)
 		//if (bBrake_pipeline) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
-		//bAltitudeWrtFloorControl = FALSE;
+		//bAltitudeAGLControl = FALSE;
 		LeaveCriticalSection(&PipelineCS);
 	}
 	else if (sscanf(line, "ballconfig "
@@ -734,7 +734,7 @@ inline int Commands(char* line)
 		if (bDepth_ball) 
 		{
 			bDepthControl = FALSE;
-			bAltitudeWrtFloorControl = FALSE;
+			bAltitudeAGLControl = FALSE;
 		}
 		LeaveCriticalSection(&BallCS);
 	}
@@ -942,7 +942,7 @@ inline int Commands(char* line)
 		//if (bBrake_pinger) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
-		//bAltitudeWrtFloorControl = FALSE;
+		//bAltitudeAGLControl = FALSE;
 		LeaveCriticalSection(&PingerCS);
 	}
 	else if (sscanf(line, "missingworkerconfig "
@@ -1021,7 +1021,7 @@ inline int Commands(char* line)
 		//if (bBrake_missingworker) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
-		//bAltitudeWrtFloorControl = FALSE;
+		//bAltitudeAGLControl = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
 	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
@@ -1050,7 +1050,7 @@ inline int Commands(char* line)
 		if (bDepth_followme) 
 		{
 			bDepthControl = FALSE;
-			bAltitudeWrtFloorControl = FALSE;
+			bAltitudeAGLControl = FALSE;
 		}
 		LeaveCriticalSection(&FollowMeCS);
 	}
@@ -2694,15 +2694,15 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		wz = dval;
 		bDepthControl = TRUE;
-		bAltitudeWrtFloorControl = FALSE;
+		bAltitudeAGLControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (sscanf(line, "a_freg %lf", &dval) == 1)
+	else if (sscanf(line, "aglreg %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wa_f = dval;
+		wagl = dval;
 		bDepthControl = FALSE;
-		bAltitudeWrtFloorControl = TRUE;
+		bAltitudeAGLControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "headingreg %lf", &dval) == 1)
@@ -2745,7 +2745,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		uv = dval;
 		bDepthControl = FALSE;
-		bAltitudeWrtFloorControl = FALSE;
+		bAltitudeAGLControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "brake", strlen("brake")) == 0)

@@ -35,10 +35,10 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	}
 
 	fprintf(logstatefile,
-		"t_epoch (in s);lat;lon;alt;hdg;cog;sog;pressure (in bar);fluiddir;fluidspeed;range;bearing;utc (in ms);"
+		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
 		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
 		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
-		"wx;wy;wz;wpsi;wd;wu;wa_f;"
+		"wx;wy;wz;wpsi;wd;wu;wagl;"
 		"u;uw;uv;ul;up;ur;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
 		"Energy_electronics;Energy_actuators;\n"
 		); 
@@ -75,7 +75,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 		t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
-		utc = 1000.0*tv.tv_sec+0.001*tv.tv_usec;
+		//utc = 1000.0*tv.tv_sec+0.001*tv.tv_usec;
 
 		EnterCriticalSection(&StateVariablesCS);
 
@@ -95,6 +95,14 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		sinfilteredwinddir = wind_filter_coef*sinfilteredwinddir+(1.0-wind_filter_coef)*sin(psitwind);
 		psitwindhat = fmod_2PI(atan2(sinfilteredwinddir,cosfilteredwinddir))+interval(-psitwind_var,psitwind_var); // Bounds might go outside modulo...
 		vtwindhat = wind_filter_coef*Center(vtwindhat)+(1.0-wind_filter_coef)*vtwind+interval(-vtwind_var,vtwind_var);
+
+		// Temporary...
+		phihat = interval(phi_mes-psi_max_err, phi_mes+psi_max_err);
+		thetahat = interval(theta_mes-psi_max_err, theta_mes+psi_max_err);
+		//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+		omegaxhat = interval(omegax_mes-omegaz_max_err, omegax_mes+omegaz_max_err);
+		omegayhat = interval(omegay_mes-omegaz_max_err, omegay_mes+omegaz_max_err);
+		//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 
 		if (robid & SUBMARINE_ROBID_MASK)
 		{
@@ -327,7 +335,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		// Log.
 		fprintf(logstatefile,
-			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;%.3f;%f;%f;%f;"
@@ -335,12 +343,12 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			"%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
-			t_epoch, lathat, longhat, althat, headinghat, cog, sog, pressure_mes, fluiddir, fluidspeed, d_mes, alpha_mes, utc,
+			t_epoch, lathat, longhat, althat, headinghat, cog, sog, altitude_AGL, pressure_mes, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
 			t, Center(xhat), Center(yhat), Center(zhat), Center(phihat), Center(thetahat), Center(psihat),
 			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat),
 			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
 			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0),
-			wx, wy, wz, wpsi, wd, wu, wa_f, 
+			wx, wy, wz, wpsi, wd, wu, wagl, 
 			u, uw, uv, ul, up, ur, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
 			Energy_electronics, Energy_actuators);
 		fflush(logstatefile);

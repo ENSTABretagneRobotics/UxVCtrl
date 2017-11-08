@@ -19,7 +19,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bOSD = TRUE;
 	BOOL bOrientationCircle = TRUE;
 	BOOL bDispLLA = FALSE;
-	BOOL bDispAltitudeWrtFloor = FALSE;
+	BOOL bDispAltitudeAGL = FALSE;
 	BOOL bDispSOG = TRUE;
 	BOOL bDispYPR = TRUE;
 	BOOL bMap = TRUE;
@@ -29,13 +29,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bShowOtherOverlays = TRUE;
 	COORDSYSTEM2IMG csMap2FullImg;
 	BOOL bVideoRecording = FALSE;
-	BOOL bDispRecordingCircle = FALSE;
-	BOOL bDispPlayingTriangle = FALSE;
+	BOOL bDispRecordSymbol = FALSE;
+	BOOL bDispPlaySymbol = FALSE;
+	BOOL bDispPauseSymbol = FALSE;
 	BOOL bEnableRCMode = FALSE;
 	BOOL bEnableFullSpeedMode = FALSE;
 	BOOL bZQSDPressed = FALSE;
-	CvPoint PlayingTrianglePoints[3];
-	int nbPlayingTrianglePoints = 3;
+	CvPoint PlaySymbolPoints[3];
+	int nbPlaySymbolPoints = sizeof(PlaySymbolPoints);
+	CvPoint PauseSymbolPoints[4];
+	int nbPauseSymbolPoints = sizeof(PauseSymbolPoints);
 	char strtime_snap[MAX_BUF_LEN];
 	char snapfilename[MAX_BUF_LEN];
 	char picsnapfilename[MAX_BUF_LEN];
@@ -49,6 +52,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	CvFont font;
 	CHRONO chrono_recording;
 	CHRONO chrono_playing;
+	CHRONO chrono_pausing;
 
 	switch (robid)
 	{
@@ -74,6 +78,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	StartChrono(&chrono_recording);
 	StartChrono(&chrono_playing);
+	StartChrono(&chrono_pausing);
 
 	// Sometimes needed on Linux to get windows-related functions working properly in multiple threads, sometimes not...
 	//EnterCriticalSection(&OpenCVCS);
@@ -138,12 +143,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					VideoRecordRequests[videoid]--;
 					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 					bVideoRecording = FALSE;
-					bDispRecordingCircle = FALSE;
+					bDispRecordSymbol = FALSE;
 				}
 				if (bMissionRunning)
 				{	
 					//AbortMission();
-					bDispPlayingTriangle = FALSE;
+					bDispPlaySymbol = FALSE;
 				}
 				EnterCriticalSection(&OpenCVCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -351,9 +356,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					wz += 0.1;
 				}
-				else if (bAltitudeWrtFloorControl)
+				else if (bAltitudeAGLControl)
 				{
-					wa_f += 0.1;
+					wagl += 0.1;
 				}
 				else
 				{
@@ -379,9 +384,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					wz -= 0.1;
 				}
-				else if (bAltitudeWrtFloorControl)
+				else if (bAltitudeAGLControl)
 				{
-					wa_f -= 0.1;
+					wagl -= 0.1;
 				}
 				else
 				{
@@ -471,14 +476,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 		case 'Y':
-			if (!bAltitudeWrtFloorControl)
+			if (!bAltitudeAGLControl)
 			{
-				bAltitudeWrtFloorControl = TRUE;
-				wa_f = altitude_wrt_floor;
+				bAltitudeAGLControl = TRUE;
+				wagl = altitude_AGL;
 			}
 			else 
 			{
-				bAltitudeWrtFloorControl = FALSE;
+				bAltitudeAGLControl = FALSE;
 			}
 			break;
 		case 'b':
@@ -500,7 +505,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'o': bOSD = !bOSD; break;
 		case 'c': bOrientationCircle = !bOrientationCircle; break;
 		case 'L': bDispLLA = !bDispLLA; break;
-		case 'A': bDispAltitudeWrtFloor = !bDispAltitudeWrtFloor; break;
+		case 'A': bDispAltitudeAGL = !bDispAltitudeAGL; break;
 		case 'V': bDispSOG = !bDispSOG; break;
 		case 'R': bDispYPR = !bDispYPR; break;
 		case 'm':
@@ -709,7 +714,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				VideoRecordRequests[videoid] = 0; // Force recording to stop.
 				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 				bVideoRecording = FALSE;
-				bDispRecordingCircle = FALSE;
+				bDispRecordSymbol = FALSE;
 			}
 			else
 			{		
@@ -717,7 +722,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				VideoRecordRequests[videoid] = 1; // Force recording to start.
 				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 				bVideoRecording = TRUE;
-				bDispRecordingCircle = TRUE;
+				bDispRecordSymbol = TRUE;
 				StartChrono(&chrono_recording);
 			}
 			break;
@@ -725,12 +730,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bMissionRunning)
 			{	
 				AbortMission();
-				bDispPlayingTriangle = FALSE;
+				bDispPlaySymbol = FALSE;
+
+				//if (bMissionPaused)
+				//{
+				//	bMissionPaused = FALSE;
+				//	ResumeMission();
+				//	bDispPauseSymbol = FALSE;
+				//}
+				//else
+				//{
+				//	bMissionPaused = TRUE;
+				//	PauseMission();
+				//	bDispPauseSymbol = TRUE;
+				//	StartChrono(&chrono_pausing);
+				//}
+
 			}
 			else
 			{
 				CallMission("mission.txt");
-				bDispPlayingTriangle = TRUE;
+				bDispPlaySymbol = TRUE;
 				StartChrono(&chrono_playing);
 			}
 			break;
@@ -823,12 +843,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
-				sprintf(szText, "%d%% %d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw_max*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
+				sprintf(szText, "%d%% %d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw_max*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
-				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05)); 
+				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05));
 				break;
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
@@ -839,10 +859,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case PORT_TACK_TRAJECTORY: s = 'P'; break;
 				default: s = 'I'; break;
 				}
-				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1); 
+				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1);
 				break;
 			default:
-				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05)); 
+				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
 			}
 			offset += 16;
@@ -850,36 +870,34 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			// In deg in marine units...
 			if (bHeadingControl) sprintf(szText, "%.1f/%.1f", 
 				(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-				(fmod_2PI(-angle_env-wpsi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
-			else sprintf(szText, "%.1f/--", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+				(fmod_2PI(-angle_env-wpsi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+			else sprintf(szText, "%.1f/--", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			if (robid & SUBMARINE_ROBID_MASK) 
 			{
-				// In m in marine units...
-				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz); 
-				else sprintf(szText, "%.1f/--", Center(zhat)); 
+				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz);
+				else sprintf(szText, "%.1f/--", Center(zhat));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-				if (bDispAltitudeWrtFloor)
+				if (bDispAltitudeAGL)
 				{
-					if (bAltitudeWrtFloorControl) sprintf(szText, "A_F=%.1f/%.1f", altitude_wrt_floor, wa_f); 
-					else sprintf(szText, "A_F=%.1f/--", altitude_wrt_floor); 
+					if (bAltitudeAGLControl) sprintf(szText, "AGL=%.1f/%.1f", altitude_AGL, wagl);
+					else sprintf(szText, "AGL=%.1f/--", altitude_AGL);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
 			if (robid & AERIAL_ROBID_MASK) 
 			{
-				// In m in marine units...
-				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz); 
-				else sprintf(szText, "%.1f/--", Center(zhat)); 
+				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz);
+				else sprintf(szText, "%.1f/--", Center(zhat));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-				if (bDispAltitudeWrtFloor)
+				if (bDispAltitudeAGL)
 				{
-					if (bAltitudeWrtFloorControl) sprintf(szText, "A_F=%.1f/%.1f", altitude_wrt_floor, wa_f); 
-					else sprintf(szText, "A_F=%.1f/--", altitude_wrt_floor); 
+					if (bAltitudeAGLControl) sprintf(szText, "A_F=%.1f/%.1f", altitude_AGL, wagl);
+					else sprintf(szText, "A_F=%.1f/--", altitude_AGL);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
@@ -889,35 +907,35 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "%.1f/%.1f", 
 					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bDispLLA)
 			{
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
-				sprintf(szText, "POS:%.6f,%.6f", d0, d1); 
+				sprintf(szText, "POS:%.6f,%.6f", d0, d1);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			else
 			{
-				sprintf(szText, "POS:%.1f,%.1f", Center(xhat), Center(yhat)); 
+				sprintf(szText, "POS:%.1f,%.1f", Center(xhat), Center(yhat));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
-			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0); 
+			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0);
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			if (bDynamicSonarLocalization)
 			{
-				sprintf(szText, "SNR DYN LOC"); 
+				sprintf(szText, "SNR DYN LOC");
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (CheckGPSOK())
 			{
-				if (bGPSLocalization) strcpy(szText, "GPS FIX (IN USE)"); else strcpy(szText, "GPS FIX"); 
+				if (bGPSLocalization) strcpy(szText, "GPS FIX (IN USE)"); else strcpy(szText, "GPS FIX");
 			}
 			else strcpy(szText, "NO FIX");
 			offset += 16;
@@ -925,22 +943,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,0));
 			if (bDispSOG)
 			{
-				sprintf(szText, "SOG:%.1f", sog); 
+				sprintf(szText, "SOG:%.1f", sog);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-				sprintf(szText, "COG:%.1f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI); 
+				sprintf(szText, "COG:%.1f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bDispYPR)
 			{
-				sprintf(szText, "YPR:%d,%d,%d", (int)(yaw*180.0/M_PI), (int)(pitch*180.0/M_PI), (int)(roll*180.0/M_PI)); 
+				// ENU coordinate system...
+				sprintf(szText, "YPR:%d,%d,%d", (int)fmod_360_rad2deg(Center(psihat)), (int)fmod_360_rad2deg(Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bShowBatteryInfo)
 			{
-				sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", Energy_electronics, Energy_actuators); 
+				sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", Energy_electronics, Energy_actuators);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
@@ -949,25 +968,25 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bDispLLA)
 				{
 					EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wx, wy, wz, &d0, &d1, &d2);
-					sprintf(szText, "WPT:%.6f,%.6f", d0, d1); 
+					sprintf(szText, "WPT:%.6f,%.6f", d0, d1);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				else
 				{
-					sprintf(szText, "WPT:%.1f,%.1f", wx, wy); 
+					sprintf(szText, "WPT:%.1f,%.1f", wx, wy);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				d0 = sqrt(pow(wx-Center(xhat),2)+pow(wy-Center(yhat),2));
-				sprintf(szText, "DIS:%.1f", d0); 
+				sprintf(szText, "DIS:%.1f", d0);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispSOG)
 				{
 					if (sog > 0) d1 = d0/sog; else d1 = 0;
 					DecSec2DaysHoursMinSec(d1, &days, &hours, &minutes, &seconds, &deccsec);
-					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds); 
+					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
@@ -977,28 +996,28 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bDispLLA)
 				{
 					EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxb, wyb, wz, &d0, &d1, &d2);
-					sprintf(szText, "WPT:%.6f,%.6f", d0, d1); 
+					sprintf(szText, "WPT:%.6f,%.6f", d0, d1);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				else
 				{
-					sprintf(szText, "WPT:%.1f,%.1f", wxb, wyb); 
+					sprintf(szText, "WPT:%.1f,%.1f", wxb, wyb);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
-				sprintf(szText, "XTE:%.1f", xte); 
+				sprintf(szText, "XTE:%.1f", xte);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				d0 = sqrt(pow(wxb-Center(xhat),2)+pow(wyb-Center(yhat),2));
-				sprintf(szText, "DIS:%.1f", d0); 
+				sprintf(szText, "DIS:%.1f", d0);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispSOG)
 				{
 					if (sog > 0) d1 = d0/sog; else d1 = 0;
 					DecSec2DaysHoursMinSec(d1, &days, &hours, &minutes, &seconds, &deccsec);
-					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds); 
+					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
@@ -1377,10 +1396,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (GetTimeElapsedChronoQuick(&chrono_recording) > 0.5)
 				{
 					StopChronoQuick(&chrono_recording);
-					bDispRecordingCircle = !bDispRecordingCircle;
+					bDispRecordSymbol = !bDispRecordSymbol;
 					StartChrono(&chrono_recording);
 				}
-				if (bDispRecordingCircle) cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
+				if (bDispRecordSymbol) cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
 			}
 			else
 			{
@@ -1391,16 +1410,37 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (GetTimeElapsedChronoQuick(&chrono_playing) > 0.5)
 				{
 					StopChronoQuick(&chrono_playing);
-					bDispPlayingTriangle = !bDispPlayingTriangle;
+					bDispPlaySymbol = !bDispPlaySymbol;
 					StartChrono(&chrono_playing);
 				}
-				if (bDispPlayingTriangle) 
+				if (bDispPlaySymbol) 
 				{
-					nbPlayingTrianglePoints = 3;
-					PlayingTrianglePoints[0] = cvPoint(videoimgwidth-28, 8-5);
-					PlayingTrianglePoints[1] = cvPoint(videoimgwidth-28, 8+5);
-					PlayingTrianglePoints[2] = cvPoint(videoimgwidth-18, 8);
-					cvFillConvexPoly(dispimgs[videoid], PlayingTrianglePoints, nbPlayingTrianglePoints, CV_RGB(0, 255, 0), 8, 0);
+					nbPlaySymbolPoints = 3;
+					PlaySymbolPoints[0] = cvPoint(videoimgwidth-28, 8-5);
+					PlaySymbolPoints[1] = cvPoint(videoimgwidth-28, 8+5);
+					PlaySymbolPoints[2] = cvPoint(videoimgwidth-18, 8);
+					cvFillConvexPoly(dispimgs[videoid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+				}
+				if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
+				{
+					StopChronoQuick(&chrono_pausing);
+					bDispPauseSymbol = !bDispPauseSymbol;
+					StartChrono(&chrono_pausing);
+				}
+				if (bDispPauseSymbol) 
+				{
+					nbPauseSymbolPoints = 4;
+					PauseSymbolPoints[0] = cvPoint(videoimgwidth-28, 8-5);
+					PauseSymbolPoints[1] = cvPoint(videoimgwidth-28, 8+5);
+					PauseSymbolPoints[2] = cvPoint(videoimgwidth-25, 8+5);
+					PauseSymbolPoints[3] = cvPoint(videoimgwidth-25, 8-5);
+					cvFillConvexPoly(dispimgs[videoid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					nbPauseSymbolPoints = 4;
+					PauseSymbolPoints[0] = cvPoint(videoimgwidth-21, 8-5);
+					PauseSymbolPoints[1] = cvPoint(videoimgwidth-21, 8+5);
+					PauseSymbolPoints[2] = cvPoint(videoimgwidth-18, 8+5);
+					PauseSymbolPoints[3] = cvPoint(videoimgwidth-18, 8-5);
+					cvFillConvexPoly(dispimgs[videoid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
 			}
 		}
@@ -1425,12 +1465,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		VideoRecordRequests[videoid]--;
 		LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 		bVideoRecording = FALSE;
-		bDispRecordingCircle = FALSE;
+		bDispRecordSymbol = FALSE;
 	}
 	if (bMissionRunning)
 	{	
 		//AbortMission();
-		bDispPlayingTriangle = FALSE;
+		bDispPlaySymbol = FALSE;
+		//if (bMissionPaused)
+		//{	
+		//	bDispPauseSymbol = FALSE;
+		//}
 	}
 	if (windowname[0] != 0)
 	{
@@ -1448,6 +1492,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		memset(windowname, 0, sizeof(windowname));
 	}
 
+	StopChronoQuick(&chrono_pausing);
 	StopChronoQuick(&chrono_playing);
 	StopChronoQuick(&chrono_recording);
 

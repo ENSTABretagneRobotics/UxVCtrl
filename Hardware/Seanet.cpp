@@ -171,7 +171,7 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 					{
 						EnterCriticalSection(&StateVariablesCS);
 
-						altitude_wrt_floor = distance;
+						altitude_AGL = distance;
 
 						LeaveCriticalSection(&StateVariablesCS);
 					}

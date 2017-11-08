@@ -57,7 +57,7 @@ THREAD_PROC_RETURN_VALUE SonarAltitudeEstimationThread(void* pParam)
 		// Sonar VerticalBeam = 40 deg should be in global...
 
 		std::vector<double>::iterator it = std::min_element(Vdistances_filtered.begin(), Vdistances_filtered.end());
-		if ((it != Vdistances_filtered.end())&&((*it) < rangescale)) altitude_wrt_floor = (*it)*sin(0.5*40.0*M_PI/180.0);
+		if ((it != Vdistances_filtered.end())&&((*it) < rangescale)) altitude_AGL = (*it)*sin(0.5*40.0*M_PI/180.0);
 		
 		LeaveCriticalSection(&StateVariablesCS);
 

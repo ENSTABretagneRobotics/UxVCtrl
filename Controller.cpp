@@ -20,7 +20,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double delta_angle = 0; // For heading control.
 	double wpsi_prev = 0; // For heading control.
 	double integral = 0; // For heading control.
-	double delta_a_f = 0; // For altitude w.r.t. floor control.
+	double delta_agl = 0; // For altitude Above Ground Level control.
 	double delta_z = 0; // For depth control.
 
 #pragma region Sailboat supervisor
@@ -316,11 +316,11 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			integral = 0;
 		}
 
-		if (bAltitudeWrtFloorControl)
+		if (bAltitudeAGLControl)
 		{
-			delta_a_f = altitude_wrt_floor-wa_f;
-			if (delta_a_f > wzradiushigh) uv = -uv_max;
-			else if (delta_a_f < -wzradiuslow) uv = uv_max; 
+			delta_agl = altitude_AGL-wagl;
+			if (delta_agl > wzradiushigh) uv = -uv_max;
+			else if (delta_agl < -wzradiuslow) uv = uv_max; 
 			else uv = 0;
 		}
 
@@ -385,8 +385,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
 				printf("Heading is %.1f deg in the reference coordinate system.\n", Center(psihat)*180.0/M_PI);
 				printf("Wind angle is %.1f deg in the reference coordinate system.\n", Center(psitwindhat)*180.0/M_PI);
-				printf("Yaw is %d deg in the NWU coordinate system, pitch is %d deg, roll is %d deg.\n", 
-					(int)(yaw*180.0/M_PI), (int)(pitch*180.0/M_PI), (int)(roll*180.0/M_PI));
+				printf("Yaw is %d deg, pitch is %d deg, roll is %d deg in the NWU coordinate system.\n", 
+					(int)fmod_360_rad2deg(Center(psihat)+angle_env-M_PI/2.0), (int)fmod_360_rad2deg(Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
 				printf("Wind direction w.r.t. North is %.1f deg (filtered %.1f deg), "
 					"wind speed is %.1f m/s or %.1f kn (filtered %.1f m/s or %.1f kn), "
 					"heading w.r.t. North is %.1f deg.\n", 
@@ -427,7 +427,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				"%.8f;%.8f;%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%d;"
 				"%.8f;%.8f;%.3f;%.3f;%.3f;%d;"
 				"%.3f;%.3f;%.3f;%.3f;%.3f;\n", 
-				counter, t, lat_env, long_env, roll, pitch, yaw, 
+				counter, t, lat_env, long_env, fmod_2PI(Center(phihat)), fmod_2PI(Center(thetahat)), fmod_2PI(Center(psihat)+angle_env-M_PI/2.0), 
 				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat), 
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 

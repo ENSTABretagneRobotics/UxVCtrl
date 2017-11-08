@@ -310,6 +310,11 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		roll = atan2(2*pSBG->LastSBGData.q2*pSBG->LastSBGData.q3+2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q1,2*sqr(pSBG->LastSBGData.q0)+2*sqr(pSBG->LastSBGData.q3)-1);
 		pitch = -asin(2*pSBG->LastSBGData.q1*pSBG->LastSBGData.q3-2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q2);
 		yaw = atan2(2*pSBG->LastSBGData.q1*pSBG->LastSBGData.q2+2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q3,2*sqr(pSBG->LastSBGData.q0)+2*sqr(pSBG->LastSBGData.q1)-1);
+		
+		// If raw Euler angles were not sent, ensure that they would still be in the log file.
+		pSBG->LastSBGData.roll = sbgRadToDegF((float)roll);
+		pSBG->LastSBGData.pitch = sbgRadToDegF((float)pitch);
+		pSBG->LastSBGData.yaw = sbgRadToDegF((float)yaw);
 
 		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 		pSBG->LastSBGData.Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
