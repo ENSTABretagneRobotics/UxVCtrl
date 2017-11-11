@@ -183,6 +183,9 @@ NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h ./Hardware/NMEAP
 P33x.o: ./Hardware/P33x.cpp ./Hardware/P33x.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+PathfinderDVL.o: ./Hardware/PathfinderDVL.cpp ./Hardware/PathfinderDVL.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 RazorAHRS.o: ./Hardware/RazorAHRS.cpp ./Hardware/RazorAHRS.h
 	$(CXX) $(CXXFLAGS) -c $<
 
@@ -290,7 +293,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o BlueView.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o BlueView.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

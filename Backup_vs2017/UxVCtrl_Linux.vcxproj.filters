@@ -255,6 +255,9 @@
     <ClCompile Include="NMEAInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\PathfinderDVL.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -584,6 +587,9 @@
     <ClInclude Include="NMEAInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\PathfinderDVL.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
@@ -594,6 +600,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="BlueView1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="PathfinderDVL0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

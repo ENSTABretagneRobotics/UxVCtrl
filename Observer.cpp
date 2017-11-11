@@ -14,7 +14,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	CHRONO chrono;
 	CHRONO chrono_v;
 	CHRONO chrono_omegaz;
-	double dt = 0, t = 0, t0 = 0, t_epoch = 0, utc = 0;
+	double dt = 0, t = 0, t0 = 0, t_epoch = 0;
 	struct timeval tv;
 	//double dt_chrono = 0;
 	//interval xhat_prev_old, yhat_prev_old, psihat_prev_old;
@@ -97,11 +97,11 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		vtwindhat = wind_filter_coef*Center(vtwindhat)+(1.0-wind_filter_coef)*vtwind+interval(-vtwind_var,vtwind_var);
 
 		// Temporary...
-		phihat = interval(phi_mes-psi_max_err, phi_mes+psi_max_err);
-		thetahat = interval(theta_mes-psi_max_err, theta_mes+psi_max_err);
+		phihat = interval(phi_mes-phi_max_err, phi_mes+phi_max_err);
+		thetahat = interval(theta_mes-theta_max_err, theta_mes+theta_max_err);
 		//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-		omegaxhat = interval(omegax_mes-omegaz_max_err, omegax_mes+omegaz_max_err);
-		omegayhat = interval(omegay_mes-omegaz_max_err, omegay_mes+omegaz_max_err);
+		omegaxhat = interval(omegax_mes-omegax_max_err, omegax_mes+omegax_max_err);
+		omegayhat = interval(omegay_mes-omegay_max_err, omegay_mes+omegay_max_err);
 		//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
 
 		if (robid & SUBMARINE_ROBID_MASK)

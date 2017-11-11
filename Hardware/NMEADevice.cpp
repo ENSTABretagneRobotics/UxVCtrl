@@ -14,6 +14,8 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 {
 	NMEADEVICE nmeadevice;
 	NMEADATA nmeadata;
+	struct tm t;
+	time_t tt;
 	double dval = 0;
 	BOOL bConnected = FALSE;
 	int deviceid = (intptr_t)pParam;
@@ -131,6 +133,15 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				{
 					sog = nmeadata.SOG;
 					cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+				}
+
+				if (nmeadevice.bEnableGPRMC&&(nmeadata.status == 'A'))
+				{
+					// Get UTC as ms.
+					memset(&t, 0, sizeof(t));
+					t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+					tt = timegm(&t);
+					utc = tt*1000.0+nmeadata.second*1000.0;
 				}
 
 				if (nmeadevice.bEnableHCHDG)

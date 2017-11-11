@@ -25,6 +25,7 @@
 #include "MissingWorker.h"
 #include "FollowMe.h"
 #include "Simulator.h"
+#include "PathfinderDVL.h"
 #include "MES.h"
 #include "MDM.h"
 #include "Seanet.h"
@@ -96,6 +97,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MissingWorkerThreadId;
 	THREAD_IDENTIFIER FollowMeThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
+	THREAD_IDENTIFIER PathfinderDVLThreadId;
 	THREAD_IDENTIFIER MESThreadId;
 	THREAD_IDENTIFIER MDMThreadId;
 	THREAD_IDENTIFIER SeanetThreadId;
@@ -188,6 +190,7 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
 	CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
+	if (!bDisablePathfinderDVL) CreateDefaultThread(PathfinderDVLThread, NULL, &PathfinderDVLThreadId);
 	if (!bDisableMES) CreateDefaultThread(MESThread, NULL, &MESThreadId);
 	if (!bDisableMDM) CreateDefaultThread(MDMThread, NULL, &MDMThreadId);
 	if (!bDisableSeanet) CreateDefaultThread(SeanetThread, NULL, &SeanetThreadId);
@@ -366,6 +369,7 @@ int main(int argc, char* argv[])
 	if (!bDisableSeanet) WaitForThread(SeanetThreadId);
 	if (!bDisableMDM) WaitForThread(MDMThreadId);
 	if (!bDisableMES) WaitForThread(MESThreadId);
+	if (!bDisablePathfinderDVL) WaitForThread(PathfinderDVLThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) WaitForThread(SimulatorThreadId);
 	WaitForThread(FollowMeThreadId);
 	WaitForThread(MissingWorkerThreadId);

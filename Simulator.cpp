@@ -12,7 +12,7 @@
 THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 {
 	CHRONO chrono;
-	double dt = 0, t = 0, t0 = 0, t_epoch = 0, utc = 0;
+	double dt = 0, t = 0, t0 = 0, t_epoch = 0;
 	struct timeval tv;
 
 	double dval = 0, d1 = 0, d2 = 0;

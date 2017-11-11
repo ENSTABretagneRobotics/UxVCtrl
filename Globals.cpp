@@ -29,10 +29,7 @@ double wagl = 0;
 double x_mes = 0, y_mes = 0, z_mes = 0, phi_mes = 0, theta_mes = 0, psi_mes = 0, vrx_mes = 0, vry_mes = 0, vrz_mes = 0, omegax_mes = 0, omegay_mes = 0, omegaz_mes = 0;
 double dist = 0;
 // GPS.
-double latitude = 0, longitude = 0;
-double altitude = 0;
-double sog = 0, cog = 0;
-double xte = 0;
+double latitude = 0, longitude = 0, altitude = 0, sog = 0, cog = 0, xte = 0, utc = 0;
 vector< deque<unsigned char> > RTCMuserslist;
 deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Barometer, pressure sensor...
@@ -71,7 +68,7 @@ double rudderminangle = 0, ruddermaxangle = 0;
 
 double Energy_electronics = 0, Energy_actuators = 0;
 
-// Parameters.
+#pragma region General parameters
 int robid = 0, nbvideo = 0, 
 videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0; 
 BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
@@ -96,6 +93,9 @@ BOOL bEnable_NMEAInterface_HEROT = FALSE;
 BOOL bEnable_NMEAInterface_PRDID = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
+#pragma endregion
+#pragma region Devices parameters
+BOOL bDisablePathfinderDVL = FALSE;
 BOOL bDisableMES = FALSE;
 BOOL bDisableMDM = FALSE;
 BOOL bDisableSeanet = FALSE;
@@ -115,8 +115,8 @@ BOOL bDisableSSC32 = FALSE;
 BOOL bDisableMaestro = FALSE;
 BOOL bDisableMiniSSC = FALSE;
 BOOL bDisableIM483I = FALSE;
-
-// Controller parameters.
+#pragma endregion
+#pragma region Controller parameters
 double u_max = 0, uw_max = 0, uv_max = 0, u_coef = 0, uw_coef = 0;
 double Kp = 0, Ki = 0, Kd1 = 0, Kd2 = 0;
 double uw_derivative_max = 0;
@@ -134,31 +134,33 @@ double ksi = 0;
 double check_strategy_period = 0;
 double sail_update_period = 0;
 int controllerperiod = 0;
-
-// Observer parameters.
-double x_max_err = 0, y_max_err = 0, z_max_err = 0, psi_max_err = 0, vrx_max_err = 0, omegaz_max_err = 0;
+#pragma endregion
+#pragma region Observer parameters
+double x_max_err = 0, y_max_err = 0, z_max_err = 0, phi_max_err = 0, theta_max_err = 0, psi_max_err = 0, 
+vrx_max_err = 0, vry_max_err = 0, vrz_max_err = 0, omegax_max_err = 0, omegay_max_err = 0, omegaz_max_err = 0;
 double alpha_max_err = 0, d_max_err = 0;
 interval alphavrxhat, alphaomegazhat, alphafvrxhat, alphafomegazhat, alphazhat, vzuphat, 
 alphashat, omegashat, 
-xdotnoise, ydotnoise, zdotnoise, psidotnoise, vrxdotnoise, omegazdotnoise;
+xdotnoise, ydotnoise, zdotnoise, phidotnoise, thetadotnoise, psidotnoise, 
+vrxdotnoise, vrydotnoise, vrzdotnoise, omegaxdotnoise, omegaydotnoise, omegazdotnoise;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
 double dynamicsonarlocalization_period = 0;
 int observerperiod = 0;
-
-// Wind, current and waves.
+#pragma endregion
+#pragma region Wind, current and waves
 double vtwind_med = 0, vtwind_var = 0, psitwind_med = 0, psitwind_var = 0, wind_filter_coef = 0;
 double vc_med = 0, vc_var = 0, psic_med = 0, psic_var = 0, hw_var = 0;
-
-// Power consumption.
+#pragma endregion
+#pragma region Power consumption
 double P_electronics_1 = 0, P_electronics_2 = 0, P_electronics_3 = 0, P_electronics_4 = 0;
 double P_actuators_1 = 0, P_actuators_2 = 0, P_actuators_3 = 0, P_actuators_4 = 0;
-
-// Simulator initial state.
+#pragma endregion
+#pragma region Simulator initial state
 double x_0 = 0, y_0 = 0, z_0 = 0, psi_0 = 0, vrx_0 = 0, omegaz_0 = 0;
 double alpha_0 = 0, d_0 = 0;
-
-// Simulated submarine physical parameters.
+#pragma endregion
+#pragma region Simulator physical parameters
 double 
 x_max_rand_err = 0, x_bias_err = 0,
 y_max_rand_err = 0, y_bias_err = 0,
@@ -173,6 +175,7 @@ alphas = 0, omegas = 0,
 z_gps_lim = 0;
 double outliers_ratio = 0;
 int simulatorperiod = 0;
+#pragma endregion
 
 // Environment parameters.
 double angle_env = 0, lat_env = 0, long_env = 0, alt_env = 0;
@@ -207,6 +210,7 @@ double lat_externalvisuallocalization = 0, long_externalvisuallocalization = 0, 
 double heading_externalvisuallocalization = 0;
 BOOL bExternalVisualLocalizationFound = FALSE;
 
+#pragma region MISSIONS
 // Wall variables.
 BOOL bWallDetection = FALSE;
 BOOL bWallTrackingControl = FALSE;
@@ -332,6 +336,7 @@ double forbidlat_followme = 0, forbidlong_followme = 0, forbidalt_followme = 0, 
 int target_followme = 0, mode_followme = 0, bDepth_followme = 0;
 double xtarget_followme = 0, ytarget_followme = 0, ztarget_followme = 0;
 double forbidx_followme = 0, forbidy_followme = 0, forbidz_followme = 0;
+#pragma endregion
 
 // Simulator variables.
 BOOL bGPSOKSimulator = FALSE;
@@ -339,13 +344,17 @@ BOOL bGPSOKSimulator = FALSE;
 // CISCREA variables.
 BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;
 
+#pragma region DEVICES
+// PathfinderDVL variables.
+BOOL bPausePathfinderDVL = FALSE, bRestartPathfinderDVL = FALSE;
+
+// MES variables.
+BOOL bPauseMES = FALSE, bRestartMES = FALSE;
+
 // MDM variables.
 CRITICAL_SECTION MDMCS;
 int AcousticCommandMDM = 0;
 BOOL bPauseMDM = FALSE, bRestartMDM = FALSE;
-
-// MES variables.
-BOOL bPauseMES = FALSE, bRestartMES = FALSE;
 
 // Seanet variables.
 CRITICAL_SECTION SeanetOverlayImgCS;
@@ -414,6 +423,7 @@ CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 IplImage* imgs[MAX_NB_VIDEO];
 BOOL bPauseVideo[MAX_NB_VIDEO];
 BOOL bRestartVideo[MAX_NB_VIDEO];
+#pragma endregion
 
 // Other.
 IplImage* dispimgs[MAX_NB_VIDEO];

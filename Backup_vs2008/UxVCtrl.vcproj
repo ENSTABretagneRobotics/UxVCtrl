@@ -439,6 +439,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PathfinderDVL0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\RazorAHRS0.txt"
 				>
 			</File>
@@ -1008,6 +1012,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\P33x.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\PathfinderDVL.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\PathfinderDVL.h"
 				>
 			</File>
 			<File

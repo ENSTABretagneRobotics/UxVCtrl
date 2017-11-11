@@ -16,6 +16,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	NMEADATA nmeadata;
 	UBXDATA ubxdata;
 	unsigned char rtcmdata[2048];
+	struct tm t;
+	time_t tt;
 	double dval = 0;
 	int res = 0;
 	CHRONO chrono_svin;
@@ -213,6 +215,15 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
 						}
 
+						if (ublox.bEnable_NMEA_RMC&&(nmeadata.status == 'A'))
+						{
+							// Get UTC as ms.
+							memset(&t, 0, sizeof(t));
+							t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+							tt = timegm(&t);
+							utc = tt*1000.0+nmeadata.second*1000.0;
+						}
+
 						if (ublox.bEnable_NMEA_HDG)
 						{
 							if (robid == SAILBOAT_ROBID) psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
@@ -252,6 +263,14 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							{
 								sog = ubxdata.SOG;
 								cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
+							}
+							if (ublox.bEnable_UBX_NAV_PVT)
+							{
+								// Get UTC as ms.
+								memset(&t, 0, sizeof(t));
+								t.tm_year = ubxdata.year-1900; t.tm_mon = ubxdata.month-1; t.tm_mday = ubxdata.day; t.tm_hour = ubxdata.hour; t.tm_min = ubxdata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+								tt = timegm(&t);
+								utc = tt*1000.0+ubxdata.second*1000.0;
 							}
 						}
 						else

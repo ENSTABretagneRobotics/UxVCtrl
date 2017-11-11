@@ -84,6 +84,8 @@
 1
 % bEcho
 1
+% bDisablePathfinderDVL
+1
 % bDisableMES
 1
 % bDisableMDM
@@ -191,9 +193,21 @@
 5.0
 % z_max_err (in m)
 0.1
+% phi_max_err (in rad)
+0.1
+% theta_max_err (in rad)
+0.1
 % psi_max_err (in rad)
 0.1
 % vrx_max_err (in m/s)
+0.1
+% vry_max_err (in m/s)
+0.1
+% vrz_max_err (in m/s)
+0.1
+% omegax_max_err (in rad/s)
+0.1
+% omegay_max_err (in rad/s)
 0.1
 % omegaz_max_err (in rad/s)
 0.1
@@ -269,6 +283,14 @@
 -0.001
 % zdotnoise.sup
 0.001
+% phidotnoise.inf
+-0.001
+% phidotnoise.sup
+0.001
+% thetadotnoise.inf
+-0.001
+% thetadotnoise.sup
+0.001
 % psidotnoise.inf
 -0.001
 % psidotnoise.sup
@@ -276,6 +298,22 @@
 % vrxdotnoise.inf
 -0.001
 % vrxdotnoise.sup
+0.001
+% vrydotnoise.inf
+-0.001
+% vrydotnoise.sup
+0.001
+% vrzdotnoise.inf
+-0.001
+% vrzdotnoise.sup
+0.001
+% omegaxdotnoise.inf
+-0.001
+% omegaxdotnoise.sup
+0.001
+% omegaydotnoise.inf
+-0.001
+% omegaydotnoise.sup
 0.001
 % omegazdotnoise.inf
 -0.001

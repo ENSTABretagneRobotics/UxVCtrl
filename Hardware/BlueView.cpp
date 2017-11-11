@@ -23,7 +23,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 
 	//UNREFERENCED_PARAMETER(pParam);
 
-	sprintf(szCfgFilePath, "blueview%d.txt", deviceid);
+	sprintf(szCfgFilePath, "BlueView%d.txt", deviceid);
 
 	memset(&blueview, 0, sizeof(BLUEVIEW));
 
@@ -77,7 +77,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 					}
 					else
 					{
-						sprintf(szTemp, "blueview");
+						sprintf(szTemp, "BlueView");
 					}
 					// Remove the extension.
 					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
@@ -91,7 +91,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 					if ((BVTSonar_CreateFile(blueview.file, szSaveFilePath, blueview.sonar, "") != BVT_SUCCESS)||
 						(BVTSonar_GetHead(blueview.sonar, blueview.head_num, &blueview.file_head) != BVT_SUCCESS))
 					{
-						printf("Unable to create blueview data file.\n");
+						printf("Unable to create BlueView data file.\n");
 						memset(blueview.szSaveFile, 0, sizeof(blueview.szSaveFile));
 						break;
 					}
@@ -108,7 +108,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 			res = GetLatestDataBlueView(&blueview);
 			if (res != EXIT_SUCCESS)
 			{
-				printf("Connection to a blueview lost.\n");
+				printf("Connection to a BlueView lost.\n");
 				bConnected = FALSE;
 				DisconnectBlueView(&blueview);
 				mSleep(100);

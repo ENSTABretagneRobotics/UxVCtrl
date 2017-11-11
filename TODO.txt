@@ -1,4 +1,7 @@
-Ardupilot2waypoints : gérer altitude...
+
+logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
+add in log and params wphi, wtheta and other things related to lateral movements like in quadrotors..
+
 Tool to translate and rotate ply, utiliserait un env.txt et prendrait en param deltax, delay, deltaz en m, deltaroll, deltapitch, deltayaw en deg
 
 check sign of omegaz for SBG on SAUC'ISSE!
@@ -11,15 +14,8 @@ fmod_2PI avec des intervalles...?
 Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?
 
 Altitude from sonar : use qinter to allow outliers and take into account position of the sonar on the submarine as well as roll and pitch
-no phi_max_err, theta_max_err defined...
-
-try to compute utc from NMEADevice, ublox, SBG, MT if valid...
-
-logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
 
 le changement de alphafvxy n'a peut-être pas été fait dans le bon sens pour SARDINE, vérifier notamment avec le passage du gate dans données sonar, regarder aussi pour SAUC-E 2016 et euRathlon 2014 et 2015...
-
-Oscillations des bateaux : à cause de précision du linefollowing?->et aussi utilisé gotoxy au lieu de gotoxywgs!
 
 équations d'état bateaux... add bDisableStateEstimation, E key, like bGPSLocalization...
 
@@ -63,8 +59,10 @@ When program stopped maestro does not stop thrust?->to check after changing conf
 
 maybe bEnableRCMode always forces to use bEnableFullSpeedMode so they should be the same variable... 
 
-simple reactive obstacle avodiance during line or waypoint following, enable pause in waypoints following...
+simple reactive obstacle avoidance during line or waypoint following, enable pause in waypoints following...
 contrôle du bras, servos pan and tilt au min...
+
+command sethome, RTH/Land/Surface after a timeout valid even when no mission running...
 
 Fly to specific location mode guided LAT LON ALT
 

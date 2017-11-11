@@ -21,7 +21,7 @@ inline int LoadConfig(void)
 	memset(line, 0, sizeof(line));
 
 	// Default values.
-	// General parameters.
+#pragma region General parameters
 	robid = SUBMARINE_SIMULATOR_ROBID;
 	nbvideo = 2;
 	videoimgwidth = 320; 
@@ -57,6 +57,9 @@ inline int LoadConfig(void)
 	bEnable_NMEAInterface_PRDID = FALSE;
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
+#pragma endregion
+#pragma region Devices parameters
+	bDisablePathfinderDVL = TRUE;
 	bDisableMES = TRUE;
 	bDisableMDM = TRUE;
 	bDisableSeanet = TRUE;
@@ -81,7 +84,8 @@ inline int LoadConfig(void)
 	bDisableMaestro = TRUE;
 	bDisableMiniSSC = TRUE;
 	bDisableIM483I = TRUE;
-	// Controller parameters.
+#pragma endregion
+#pragma region Controller parameters
 	u_max = 1;
 	uw_max = 1;
 	uv_max = 1;
@@ -107,12 +111,19 @@ inline int LoadConfig(void)
 	check_strategy_period = 60;
 	sail_update_period = 20;
 	controllerperiod = 25;
-	// Observer parameters.
+#pragma endregion
+#pragma region Observer parameters
 	x_max_err = 10;
 	y_max_err = 10;
 	z_max_err = 0.1;
+	phi_max_err = 0.1;
+	theta_max_err = 0.1;
 	psi_max_err = 0.1;
 	vrx_max_err = 0.1;
+	vry_max_err = 0.1;
+	vrz_max_err = 0.1;
+	omegax_max_err = 0.1;
+	omegay_max_err = 0.1;
 	omegaz_max_err = 0.1;
 	alpha_max_err = 0.01;
 	d_max_err = 0.1;
@@ -127,15 +138,22 @@ inline int LoadConfig(void)
 	xdotnoise = interval(-0.001,+0.001);
 	ydotnoise = interval(-0.001,+0.001);
 	zdotnoise = interval(-0.001,+0.001);
+	phidotnoise = interval(-0.001,+0.001);
+	thetadotnoise = interval(-0.001,+0.001);
 	psidotnoise = interval(-0.001,+0.001);
 	vrxdotnoise = interval(-0.001,+0.001);
+	vrydotnoise = interval(-0.001,+0.001);
+	vrzdotnoise = interval(-0.001,+0.001);
+	omegaxdotnoise = interval(-0.001,+0.001);
+	omegaydotnoise = interval(-0.001,+0.001);
 	omegazdotnoise = interval(-0.001,+0.001);
 	rangescale = 10;
 	sdir = 1;
 	nb_outliers = 25;
 	dynamicsonarlocalization_period = 0.2;
 	observerperiod = 25;
-	// Wind, current and waves.
+#pragma endregion
+#pragma region Wind, current and waves
 	vtwind_med = 0.01;
 	vtwind_var = 0.01;
 	psitwind_med = 0.0*M_PI/2.0;
@@ -146,13 +164,16 @@ inline int LoadConfig(void)
 	psic_med = 0.0*M_PI/2.0;
 	psic_var = 1.0*M_PI/8.0;
 	hw_var = 0.1;
-	// Power consumption.
+#pragma endregion
+#pragma region Power consumption
 	P_electronics_1 = 0; P_electronics_2 = 0; P_electronics_3 = 0; P_electronics_4 = 0;
 	P_actuators_1 = 0; P_actuators_2 = 0; P_actuators_3 = 0; P_actuators_4 = 0;
-	// Simulated submarine initial state.
+#pragma endregion
+#pragma region Simulator initial state
 	x_0 = 0; y_0 = 0; z_0 = 0; psi_0 = 0; vrx_0 = 0; omegaz_0 = 0;
 	alpha_0 = 0; d_0 = 0;
-	// Simulated submarine physical parameters.
+#pragma endregion
+#pragma region Simulator physical parameters
 	x_max_rand_err = 5; x_bias_err = 2;
 	y_max_rand_err = 5; y_bias_err = -1;
 	z_max_rand_err = 0.05; z_bias_err = 0.02;
@@ -172,10 +193,12 @@ inline int LoadConfig(void)
 	z_gps_lim = -0.01;
 	outliers_ratio = 0.5;
 	simulatorperiod = 70;
+#pragma endregion
 
 	file = fopen("UxVCtrl.txt", "r");
 	if (file != NULL)
 	{
+#pragma region General parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%i", &robid) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -242,6 +265,10 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
+#pragma endregion
+#pragma region Devices parameters
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablePathfinderDVL) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMES) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -290,8 +317,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bDisableMiniSSC) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableIM483I) != 1) printf("Invalid configuration file.\n");
-
-		// Controller parameters.
+#pragma endregion
+#pragma region Controller parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &u_max) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -342,8 +369,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &sail_update_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &controllerperiod) != 1) printf("Invalid configuration file.\n");
-
-		// Observer parameters.
+#pragma endregion
+#pragma region Observer parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &x_max_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -351,9 +378,21 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &z_max_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &phi_max_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &theta_max_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &psi_max_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &vrx_max_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vry_max_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vrz_max_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegax_max_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegay_max_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &omegaz_max_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -431,6 +470,18 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
+		phidotnoise = interval(d0,d1);
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
+		thetadotnoise = interval(d0,d1);
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
 		psidotnoise = interval(d0,d1);
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -438,6 +489,30 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
 		vrxdotnoise = interval(d0,d1);
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
+		vrydotnoise = interval(d0,d1);
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
+		vrzdotnoise = interval(d0,d1);
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
+		omegaxdotnoise = interval(d0,d1);
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
+		omegaydotnoise = interval(d0,d1);
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &d0) != 1) printf("Invalid configuration file.\n");
@@ -455,8 +530,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &dynamicsonarlocalization_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &observerperiod) != 1) printf("Invalid configuration file.\n");
-
-		// Current and waves.
+#pragma endregion
+#pragma region Current and waves
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &vtwind_med) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -477,8 +552,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &psic_var) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &hw_var) != 1) printf("Invalid configuration file.\n");
-
-		// Power consumption.
+#pragma endregion
+#pragma region Power consumption
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &P_electronics_1) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -495,8 +570,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &P_actuators_3) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &P_actuators_4) != 1) printf("Invalid configuration file.\n");
-
-		// Simulated submarine initial state.
+#pragma endregion
+#pragma region Simulated submarine initial state
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &x_0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -513,8 +588,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &alpha_0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &d_0) != 1) printf("Invalid configuration file.\n");
-
-		// Simulated submarine physical parameters.
+#pragma endregion
+#pragma region Simulated submarine physical parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &x_max_rand_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -578,6 +653,7 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &outliers_ratio) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &simulatorperiod) != 1) printf("Invalid configuration file.\n");
+#pragma endregion
 
 		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 	}

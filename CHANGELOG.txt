@@ -1,3 +1,8 @@
+174
+Beginning of PathfinderDVL integration.
+Added parameters related to 3D observer.
+Try to compute utc from NMEADevice, ublox, SBG, MT if valid.
+
 173
 Updated logstate and logsimu file formats.
 Corrected handling of phi, theta, psi.

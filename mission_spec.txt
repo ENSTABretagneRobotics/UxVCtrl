@@ -148,17 +148,19 @@
 %
 %waitlinetwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
 %
-% DEVICE COMMANDS
+% DEVICES COMMANDS
 %
 %ciscreaconfig CISCREA.txt bPause
 %
-%mdmconfig MDM.txt bPause
+%pathfinderdvlconfig PathfinderDVL.txt bPause
 %
 %mesconfig MES.txt bPause
 %
+%mdmconfig MDM.txt bPause
+%
 %seanetconfig Seanet.txt bPause
 %
-%blueviewconfig deviceid blueview.txt bPause
+%blueviewconfig deviceid BlueView.txt bPause
 %
 %hokuyoconfig Hokuyo.txt bPause
 %

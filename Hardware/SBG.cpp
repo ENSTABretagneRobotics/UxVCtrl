@@ -15,6 +15,8 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 	SBG sbg;
 	struct timeval tv;
 	SBGDATA sbgdata;
+	struct tm t;
+	time_t tt;
 	double dval = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -146,6 +148,11 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 					longitude = sbgdata.Long;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
 					bGPSOKSBG = TRUE;
+					// Get UTC as ms.
+					memset(&t, 0, sizeof(t));
+					t.tm_year = sbgdata.UTCTime.Year-1900; t.tm_mon = sbgdata.UTCTime.Month-1; t.tm_mday = sbgdata.UTCTime.Day; t.tm_hour = sbgdata.UTCTime.Hour; t.tm_min = sbgdata.UTCTime.Minute; t.tm_sec = sbgdata.UTCTime.Seconds; t.tm_isdst = 0;
+					tt = timegm(&t);
+					utc = tt*1000.0+sbgdata.UTCTime.Nanoseconds/1000000.0;
 				}
 				else
 				{

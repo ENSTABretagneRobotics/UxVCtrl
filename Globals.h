@@ -167,10 +167,7 @@ extern double wagl; // Altitude Above Ground Level.
 extern double x_mes, y_mes, z_mes, phi_mes, theta_mes, psi_mes, vrx_mes, vry_mes, vrz_mes, omegax_mes, omegay_mes, omegaz_mes;
 extern double dist;
 // GPS.
-extern double latitude, longitude;
-extern double altitude;
-extern double sog, cog;
-extern double xte;
+extern double latitude, longitude, altitude, sog, cog, xte, utc;
 #define MAX_NB_BYTES_RTCM_PARTS 8192
 //#define MAX_NB_RTCM_PARTS 1024
 //extern vector< deque<unsigned char*> > RTCMuserslist;
@@ -213,7 +210,7 @@ extern double rudderminangle, ruddermaxangle;
 
 extern double Energy_electronics, Energy_actuators;
 
-// Parameters.
+#pragma region General parameters
 extern int robid, nbvideo, 
 videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
 extern BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
@@ -238,6 +235,9 @@ extern BOOL bEnable_NMEAInterface_HEROT;
 extern BOOL bEnable_NMEAInterface_PRDID;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
+#pragma endregion
+#pragma region Devices parameters
+extern BOOL bDisablePathfinderDVL;
 extern BOOL bDisableMES;
 extern BOOL bDisableMDM;
 extern BOOL bDisableSeanet;
@@ -257,8 +257,8 @@ extern BOOL bDisableSSC32;
 extern BOOL bDisableMaestro;
 extern BOOL bDisableMiniSSC;
 extern BOOL bDisableIM483I;
-
-// Controller parameters.
+#pragma endregion
+#pragma region Controller parameters
 extern double u_max, uw_max, uv_max, u_coef, uw_coef;
 extern double Kp, Ki, Kd1, Kd2; // For heading PID.
 extern double uw_derivative_max;
@@ -276,31 +276,33 @@ extern double ksi;
 extern double check_strategy_period;
 extern double sail_update_period;
 extern int controllerperiod;
-
-// Observer parameters.
-extern double x_max_err, y_max_err, z_max_err, psi_max_err, vrx_max_err, omegaz_max_err;
+#pragma endregion
+#pragma region Observer parameters
+extern double x_max_err, y_max_err, z_max_err, phi_max_err, theta_max_err, psi_max_err, 
+vrx_max_err, vry_max_err, vrz_max_err, omegax_max_err, omegay_max_err, omegaz_max_err;
 extern double alpha_max_err, d_max_err;
 extern interval alphavrxhat, alphaomegazhat, alphafvrxhat, alphafomegazhat, alphazhat, vzuphat, 
 alphashat, omegashat, 
-xdotnoise, ydotnoise, zdotnoise, psidotnoise, vrxdotnoise, omegazdotnoise;
+xdotnoise, ydotnoise, zdotnoise, phidotnoise, thetadotnoise, psidotnoise, 
+vrxdotnoise, vrydotnoise, vrzdotnoise, omegaxdotnoise, omegaydotnoise, omegazdotnoise;
 extern int rangescale, sdir;
 extern int nb_outliers;
 extern double dynamicsonarlocalization_period;
 extern int observerperiod;
-
-// Wind, current and waves.
+#pragma endregion
+#pragma region Wind, current and waves
 extern double vtwind_med, vtwind_var, psitwind_med, psitwind_var, wind_filter_coef;
 extern double vc_med, vc_var, psic_med, psic_var, hw_var;
-
-// Power consumption.
+#pragma endregion
+#pragma region Power consumption
 extern double P_electronics_1, P_electronics_2, P_electronics_3, P_electronics_4;
 extern double P_actuators_1, P_actuators_2, P_actuators_3, P_actuators_4;
-
-// Simulator initial state.
+#pragma endregion
+#pragma region Simulator initial state
 extern double x_0, y_0, z_0, psi_0, vrx_0, omegaz_0;
 extern double alpha_0, d_0;
-
-// Simulated submarine physical parameters.
+#pragma endregion
+#pragma region Simulator physical parameters
 extern double 
 x_max_rand_err, x_bias_err, 
 y_max_rand_err, y_bias_err,
@@ -315,6 +317,7 @@ alphas, omegas,
 z_gps_lim;
 extern double outliers_ratio;
 extern int simulatorperiod;
+#pragma endregion
 
 // Environment parameters.
 extern double angle_env, lat_env, long_env, alt_env;
@@ -349,6 +352,7 @@ extern double lat_externalvisuallocalization, long_externalvisuallocalization, a
 extern double heading_externalvisuallocalization;
 extern BOOL bExternalVisualLocalizationFound;
 
+#pragma region MISSIONS
 // Wall variables.
 extern BOOL bWallDetection;
 extern BOOL bWallTrackingControl;
@@ -474,6 +478,7 @@ extern double forbidlat_followme, forbidlong_followme, forbidalt_followme, forbi
 extern int target_followme, mode_followme, bDepth_followme;
 extern double xtarget_followme, ytarget_followme, ztarget_followme;
 extern double forbidx_followme, forbidy_followme, forbidz_followme;
+#pragma endregion
 
 // Simulator variables.
 extern BOOL bGPSOKSimulator;
@@ -481,13 +486,17 @@ extern BOOL bGPSOKSimulator;
 // CISCREA variables.
 extern BOOL bPauseCISCREA, bRestartCISCREA;
 
+#pragma region DEVICES
+// PathfinderDVL variables.
+extern BOOL bPausePathfinderDVL, bRestartPathfinderDVL;
+
+// MES variables.
+extern BOOL bPauseMES, bRestartMES;
+
 // MDM variables.
 extern CRITICAL_SECTION MDMCS;
 extern int AcousticCommandMDM;
 extern BOOL bPauseMDM, bRestartMDM;
-
-// MES variables.
-extern BOOL bPauseMES, bRestartMES;
 
 // Seanet variables.
 extern CRITICAL_SECTION SeanetOverlayImgCS;
@@ -556,6 +565,7 @@ extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 extern IplImage* imgs[MAX_NB_VIDEO];
 extern BOOL bPauseVideo[MAX_NB_VIDEO];
 extern BOOL bRestartVideo[MAX_NB_VIDEO];
+#pragma endregion
 
 // Other.
 extern IplImage* dispimgs[MAX_NB_VIDEO];

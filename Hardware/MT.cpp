@@ -15,6 +15,8 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	MT mt;
 	struct timeval tv;
 	MTDATA mtdata;
+	struct tm t;
+	time_t tt;
 	double dval = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -144,6 +146,11 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 					longitude = mtdata.Long;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
 					bGPSOKMT = TRUE;
+					// Get UTC as ms.
+					memset(&t, 0, sizeof(t));
+					t.tm_year = mtdata.UTCTime.Year-1900; t.tm_mon = mtdata.UTCTime.Month-1; t.tm_mday = mtdata.UTCTime.Day; t.tm_hour = mtdata.UTCTime.Hour; t.tm_min = mtdata.UTCTime.Minute; t.tm_sec = mtdata.UTCTime.Seconds; t.tm_isdst = 0;
+					tt = timegm(&t);
+					utc = tt*1000.0+mtdata.UTCTime.Nanoseconds/1000000.0;
 				}
 				else
 				{
