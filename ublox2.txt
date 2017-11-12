@@ -9,7 +9,7 @@
 1
 % bRevertToDefaultCfg
 0
-% bSetBaseCfg
+% SetCfg (0 : keep current, 1 : default for rover, 2 : default for base)
 0
 % SurveyMode (0 : Disabled, 1 : Survey In, 2 : Fixed Mode (fixedLat, fixedLon, fixedAlt, fixedPosAcc needed))
 1

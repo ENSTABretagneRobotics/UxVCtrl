@@ -45,6 +45,10 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_UBLOX 4096
 
+#define KEEP_CURRENT_CFG_UBX 0
+#define SET_ROVER_CFG_UBX 1
+#define SET_BASE_CFG_UBX 2
+
 struct UBLOX
 {
 	RS232PORT RS232Port;
@@ -57,7 +61,7 @@ struct UBLOX
 	int timeout;
 	BOOL bSaveRawData;
 	BOOL bRevertToDefaultCfg;
-	BOOL bSetBaseCfg;
+	int SetCfg;
 	int SurveyMode;
 	double svinMinDur;
 	double svinAccLimit;
@@ -682,7 +686,8 @@ inline int RevertToDefaultCfgublox(UBLOX* publox)
 	cfg_cfg_pl.deviceMask.devFlash = 1;
 	cfg_cfg_pl.deviceMask.devEEPROM = 1;
 	cfg_cfg_pl.deviceMask.devSpiFlash = 1;
-	EncodePacketUBX(sendbuf, &sendbuflen, CFG_CLASS_UBX, CFG_CFG_ID_UBX, (unsigned char*)&cfg_cfg_pl, sizeof(cfg_cfg_pl));
+	EncodePacketUBX(sendbuf, &sendbuflen, CFG_CLASS_UBX, CFG_CFG_ID_UBX, (unsigned char*)&cfg_cfg_pl, LEN_CFG_CFG_PL_UBX);
+	//EncodePacketUBX(sendbuf, &sendbuflen, CFG_CLASS_UBX, CFG_CFG_ID_UBX, (unsigned char*)&cfg_cfg_pl, sizeof(cfg_cfg_pl));
 
 	if (WriteAllRS232Port(&publox->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
@@ -708,6 +713,7 @@ inline int SetBaseCfgublox(UBLOX* publox)
 	unsigned char packet[128];
 	int packetlen = 0;
 	unsigned char cfg_msg_pl[8];
+	struct CFG_NMEA_PL_UBX cfg_nmea_pl;
 	struct CFG_TMODE3_PL_UBX cfg_tmode3_pl;
 
 	// Enable 1005, 1077, 1087, 1127 RTCM messages on UART1 and USB.
@@ -716,66 +722,91 @@ inline int SetBaseCfgublox(UBLOX* publox)
 	cfg_msg_pl[1] = RTCM_1005_ID_UBX;
 	cfg_msg_pl[3] = 1; // UART1 rate.
 	cfg_msg_pl[5] = 1; // USB rate.
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = RTCM_1077_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = RTCM_1087_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = RTCM_1127_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	// Disable GGA, GLL, GSA, GSV, RMC, VTG, GST, ZDA, GNS NMEA messages.
 	memset(cfg_msg_pl, 0, sizeof(cfg_msg_pl));
 	cfg_msg_pl[0] = NMEA_STD_CLASS_UBX;
 	cfg_msg_pl[1] = NMEA_STD_GGA_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_GLL_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_GSA_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_GSV_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_RMC_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_VTG_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_GST_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_ZDA_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	cfg_msg_pl[1] = NMEA_STD_GNS_ID_UBX;
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
 	//cfg_msg_pl[1] = NMEA_STD_TXT_ID_UBX;
-	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	////EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	//memcpy(sendbuf+offset, packet, packetlen);
 	//offset += packetlen;
 
-	//UBX-CFG-PORT set RTCM 3 as Output Protocol
+	// Set NMEA high precision mode.
+	memset(&cfg_nmea_pl, 0, sizeof(cfg_nmea_pl));
+	cfg_nmea_pl.nmeaVersion = NMEA_VERSION_2_3_UBX;
+	cfg_nmea_pl.flags.consider = 1;
+	cfg_nmea_pl.flags.highPrec = 1;
+	cfg_nmea_pl.version = 1;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_NMEA_ID_UBX, (unsigned char*)&cfg_nmea_pl, LEN_CFG_NMEA_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_NMEA_ID_UBX, (unsigned char*)&cfg_nmea_pl, sizeof(cfg_nmea_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+
+	//UBX-CFG-PORT set RTCM 3 as Output Protocol...
 
 	// Activate Self-Survey-In or Fixed-Position-Mode.
 	memset(&cfg_tmode3_pl, 0, sizeof(cfg_tmode3_pl));
@@ -790,9 +821,67 @@ inline int SetBaseCfgublox(UBLOX* publox)
 	cfg_tmode3_pl.fixedPosAcc = (unsigned int)(publox->fixedPosAcc*10000);
 	cfg_tmode3_pl.svinMinDur = (unsigned int)publox->svinMinDur;
 	cfg_tmode3_pl.svinAccLimit = (unsigned int)(publox->svinAccLimit*10000);
-	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_TMODE3_ID_UBX, (unsigned char*)&cfg_tmode3_pl, sizeof(cfg_tmode3_pl));
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_TMODE3_ID_UBX, (unsigned char*)&cfg_tmode3_pl, LEN_CFG_TMODE3_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_TMODE3_ID_UBX, (unsigned char*)&cfg_tmode3_pl, sizeof(cfg_tmode3_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
+	
+	sendbuflen = offset;
+
+	if (WriteAllRS232Port(&publox->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a ublox. \n");
+		return EXIT_FAILURE;
+	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
+
+	// Should check ACK...
+
+	return EXIT_SUCCESS;
+}
+
+inline int SetRoverCfgublox(UBLOX* publox)
+{
+	unsigned char sendbuf[512];
+	int sendbuflen = 0;
+	int offset = 0;
+	unsigned char packet[128];
+	int packetlen = 0;
+	//unsigned char cfg_msg_pl[8];
+	struct CFG_NMEA_PL_UBX cfg_nmea_pl;
+
+	//// Enable GGA, RMC NMEA messages.
+	//memset(cfg_msg_pl, 0, sizeof(cfg_msg_pl));
+	//cfg_msg_pl[0] = NMEA_STD_CLASS_UBX;
+	//cfg_msg_pl[1] = NMEA_STD_GGA_ID_UBX;
+	//cfg_msg_pl[3] = 4; // UART1 rate.
+	//cfg_msg_pl[5] = 4; // USB rate.
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	////EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	//memcpy(sendbuf+offset, packet, packetlen);
+	//offset += packetlen;
+	//cfg_msg_pl[1] = NMEA_STD_RMC_ID_UBX;
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	////EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	//memcpy(sendbuf+offset, packet, packetlen);
+	//offset += packetlen;
+
+	// Set NMEA high precision mode.
+	memset(&cfg_nmea_pl, 0, sizeof(cfg_nmea_pl));
+	cfg_nmea_pl.nmeaVersion = NMEA_VERSION_2_3_UBX;
+	cfg_nmea_pl.flags.consider = 1;
+	cfg_nmea_pl.flags.highPrec = 1;
+	cfg_nmea_pl.version = 1;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_NMEA_ID_UBX, (unsigned char*)&cfg_nmea_pl, LEN_CFG_NMEA_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_NMEA_ID_UBX, (unsigned char*)&cfg_nmea_pl, sizeof(cfg_nmea_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+
+	//UBX-CFG-PORT set RTCM 3 as Input Protocol and UBX+NMEA(+RTCM3) as Output Protocol...
 	
 	sendbuflen = offset;
 
@@ -868,8 +957,8 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->timeout = 1000;
 		publox->bSaveRawData = 1;
 		publox->bRevertToDefaultCfg = 1;
-		publox->bSetBaseCfg = 0;
-		publox->SurveyMode = 0;
+		publox->SetCfg = KEEP_CURRENT_CFG_UBX;
+		publox->SurveyMode = DISABLED_SURVEY_RECEIVER_MODE_UBX;
 		publox->svinMinDur = 30;
 		publox->svinAccLimit = 10;
 		publox->fixedLat = 0;
@@ -907,7 +996,7 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bRevertToDefaultCfg) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->bSetBaseCfg) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->SetCfg) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->SurveyMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -994,22 +1083,36 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 	{
 		if (RevertToDefaultCfgublox(publox) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a ublox.\n");
+			printf("Unable to configure a ublox.\n");
 			CloseRS232Port(&publox->RS232Port);
 			return EXIT_FAILURE;
 		}
 		mSleep(250);
 	}
 
-	if (publox->bSetBaseCfg)
+	switch (publox->SetCfg)
 	{
+	case SET_BASE_CFG_UBX:
 		if (SetBaseCfgublox(publox) != EXIT_SUCCESS)
 		{
-			printf("Unable to connect to a ublox.\n");
+			printf("Unable to configure a ublox.\n");
 			CloseRS232Port(&publox->RS232Port);
 			return EXIT_FAILURE;
 		}
 		mSleep(250);
+		break;
+	case SET_ROVER_CFG_UBX:
+		if (SetRoverCfgublox(publox) != EXIT_SUCCESS)
+		{
+			printf("Unable to configure a ublox.\n");
+			CloseRS232Port(&publox->RS232Port);
+			return EXIT_FAILURE;
+		}
+		mSleep(250);
+		break;
+	case KEEP_CURRENT_CFG_UBX:
+	default:
+		break;
 	}
 
 	printf("ublox connected.\n");

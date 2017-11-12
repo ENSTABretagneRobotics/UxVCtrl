@@ -15,7 +15,9 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	NMEADEVICE nmeadevice;
 	NMEADATA nmeadata;
 	struct tm t;
-	time_t tt;
+	time_t tt = 0;
+	struct timeval tv;
+	struct tm* timeptr = NULL;
 	double dval = 0;
 	BOOL bConnected = FALSE;
 	int deviceid = (intptr_t)pParam;
@@ -120,8 +122,25 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
 					latitude = nmeadata.Latitude;
 					longitude = nmeadata.Longitude;
+					altitude = nmeadata.Altitude;
+					// GPS altitude not used since not always reliable...
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
 					bGPSOKNMEADevice[deviceid] = TRUE;
+					if ((!nmeadevice.bEnableGPRMC)&&(nmeadevice.bEnableGPGGA||nmeadevice.bEnableGPGLL))
+					{
+						// Try to extrapolate UTC as ms from the computer date since not all the time and date data are available in GGA or GLL...
+						memset(&t, 0, sizeof(t));
+						if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+						tt = tv.tv_sec;
+						timeptr = gmtime(&tt);
+						if (timeptr != NULL)
+						{
+							t.tm_year = timeptr->tm_year; t.tm_mon = timeptr->tm_mon; t.tm_mday = timeptr->tm_mday;
+						}
+						t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+						tt = timegm(&t);
+						utc = tt*1000.0+nmeadata.second*1000.0;
+					}
 				}
 				else
 				{
@@ -139,7 +158,8 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				{
 					// Get UTC as ms.
 					memset(&t, 0, sizeof(t));
-					t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+					t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; 
+					t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
 					tt = timegm(&t);
 					utc = tt*1000.0+nmeadata.second*1000.0;
 				}

@@ -8,9 +8,9 @@
 % bSaveRawData
 1
 % bEnableGPGGA
-1
-% bEnableGPRMC
 0
+% bEnableGPRMC
+1
 % bEnableGPGLL
 0
 % bEnableGPVTG

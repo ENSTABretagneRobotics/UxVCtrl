@@ -17,7 +17,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	UBXDATA ubxdata;
 	unsigned char rtcmdata[2048];
 	struct tm t;
-	time_t tt;
+	time_t tt = 0;
+	struct timeval tv;
+	struct tm* timeptr = NULL;
 	double dval = 0;
 	int res = 0;
 	CHRONO chrono_svin;
@@ -138,14 +140,17 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			{
 				// This ublox is a RTK base, that should share RTCM corrections...
 
-				if ((!ublox.bSetBaseCfg)||(GetTimeElapsedChronoQuick(&chrono_svin) > ublox.svinMinDur+TIMEOUT_MESSAGE_UBLOX))
+				// If SET_BASE_CFG_UBX and SELF_SURVEY_IN_RECEIVER_MODE_UBX were set, we need to wait for the survey to finish before trying 
+				// to get data, otherwise we suppose that the survey has already been done so we can try to get data immediately...
+				if ((ublox.SetCfg != SET_BASE_CFG_UBX)||(ublox.SurveyMode != SELF_SURVEY_IN_RECEIVER_MODE_UBX)||
+					(GetTimeElapsedChronoQuick(&chrono_svin) > ublox.svinMinDur+TIMEOUT_MESSAGE_UBLOX))
 				{
 					int ReceivedBytes = 0;
 					res = GetRawDataublox(&ublox, rtcmdata, sizeof(rtcmdata), &ReceivedBytes);
 
 					if (res == EXIT_SUCCESS)
 					{
-						if (ReceivedBytes > 0) 
+						if (ReceivedBytes > 0)
 						{
 							EnterCriticalSection(&StateVariablesCS);
 							for (int k = 0; k < ReceivedBytes; k++)
@@ -200,8 +205,25 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
 							latitude = nmeadata.Latitude;
 							longitude = nmeadata.Longitude;
+							altitude = nmeadata.Altitude;
+							// GPS altitude not used since not always reliable...
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
 							bGPSOKublox[deviceid] = TRUE;
+							if ((!ublox.bEnable_NMEA_RMC)&&(ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_GLL))
+							{
+								// Try to extrapolate UTC as ms from the computer date since not all the time and date data are available in GGA or GLL...
+								memset(&t, 0, sizeof(t));
+								if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+								tt = tv.tv_sec;
+								timeptr = gmtime(&tt);
+								if (timeptr != NULL)
+								{
+									t.tm_year = timeptr->tm_year; t.tm_mon = timeptr->tm_mon; t.tm_mday = timeptr->tm_mday;
+								}
+								t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+								tt = timegm(&t);
+								utc = tt*1000.0+nmeadata.second*1000.0;
+							}
 						}
 						else
 						{
@@ -219,7 +241,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						{
 							// Get UTC as ms.
 							memset(&t, 0, sizeof(t));
-							t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+							t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; 
+							t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
 							tt = timegm(&t);
 							utc = tt*1000.0+nmeadata.second*1000.0;
 						}
@@ -257,6 +280,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
 							latitude = ubxdata.Latitude;
 							longitude = ubxdata.Longitude;
+							altitude = ubxdata.Altitude;
+							// GPS altitude not used since not always reliable...
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
 							bGPSOKublox[deviceid] = TRUE;
 							//if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)
@@ -268,7 +293,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							{
 								// Get UTC as ms.
 								memset(&t, 0, sizeof(t));
-								t.tm_year = ubxdata.year-1900; t.tm_mon = ubxdata.month-1; t.tm_mday = ubxdata.day; t.tm_hour = ubxdata.hour; t.tm_min = ubxdata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+								t.tm_year = ubxdata.year-1900; t.tm_mon = ubxdata.month-1; t.tm_mday = ubxdata.day; 
+								t.tm_hour = ubxdata.hour; t.tm_min = ubxdata.minute; t.tm_sec = 0; t.tm_isdst = 0;
 								tt = timegm(&t);
 								utc = tt*1000.0+ubxdata.second*1000.0;
 							}

@@ -1,7 +1,11 @@
+175
+Updated bSetBaseCfg to SetCfg in ublox.
+Try to extrapolate UTC when only GGA and GLL available.
+
 174
 Beginning of PathfinderDVL integration.
 Added parameters related to 3D observer.
-Try to compute utc from NMEADevice, ublox, SBG, MT if valid.
+Try to compute UTC from NMEADevice, ublox, SBG, MT if valid.
 
 173
 Updated logstate and logsimu file formats.

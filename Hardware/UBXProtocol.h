@@ -28,6 +28,8 @@
 //#pragma pack(show)
 
 // Check for potential paddings in bitfields and structs, check their size and the sum of the size of their fields!
+// Potential solution if it is not the case : uncomment the padding fields in the structures, and for copy operations
+// change the size to copy to the corresponding XXX_LEN constants when needed...
 
 // To prevent unexpected padding in struct...
 #pragma pack(push,1) 
@@ -46,6 +48,11 @@
 #define DISABLED_SURVEY_RECEIVER_MODE_UBX 0
 #define SELF_SURVEY_IN_RECEIVER_MODE_UBX 1
 #define FIXED_POSITION_RECEIVER_MODE_UBX 2
+
+#define NMEA_VERSION_4_1_UBX 0x41
+#define NMEA_VERSION_4_0_UBX 0x40
+#define NMEA_VERSION_2_3_UBX 0x23
+#define NMEA_VERSION_2_1_UBX 0x21
 
 #define NAV_CLASS_UBX 0x01
 #define RXM_CLASS_UBX 0x02
@@ -120,14 +127,14 @@ union uShort_UBX
 };
 typedef union uShort_UBX uShort_UBX;
 
-#define MAX_LEN_ACK_ACK_PL_UBX 2
+#define LEN_ACK_ACK_PL_UBX 2
 struct ACK_ACK_PL_UBX
 {
 	unsigned char clsID;
 	unsigned char msgID;	
 	//unsigned char padding[6];
 };
-#define MAX_LEN_ACK_NAK_PL_UBX 2
+#define LEN_ACK_NAK_PL_UBX 2
 struct ACK_NAK_PL_UBX
 {
 	unsigned char clsID;
@@ -160,7 +167,7 @@ struct deviceMask_CFG_CFG_PL_UBX
 	unsigned char devSpiFlash : 1;
 	unsigned char reserved2 : 3;
 };
-#define MAX_LEN_CFG_CFG_PL_UBX 13
+#define LEN_CFG_CFG_PL_UBX 13
 struct CFG_CFG_PL_UBX
 {
 	struct actionMask_CFG_CFG_PL_UBX clearMask;
@@ -176,7 +183,7 @@ struct CFG_CFG_PL_UBX
 //	dest[2] = ;
 //	return 13;
 //}
-#define MAX_LEN_CFG_MSG_PL_UBX 8
+#define LEN_CFG_MSG_PL_UBX 8
 struct CFG_MSG_PL_UBX
 {
 	unsigned char msgClass;
@@ -190,7 +197,7 @@ struct flags_CFG_TMODE3_PL_UBX
 	unsigned short lla : 1;
 	unsigned short reserved1 : 7;
 };
-#define MAX_LEN_CFG_TMODE3_PL_UBX 40
+#define LEN_CFG_TMODE3_PL_UBX 40
 struct CFG_TMODE3_PL_UBX
 {
 	unsigned char version;
@@ -208,7 +215,54 @@ struct CFG_TMODE3_PL_UBX
 	unsigned int svinAccLimit;
 	unsigned char reserved3[8];
 };
-#define MAX_LEN_NAV_POSLLH_PL_UBX 28
+// 8 bits = 1*sizeof(unsigned char).
+struct filter_CFG_NMEA_PL_UBX
+{
+	unsigned char posFilt : 1;
+	unsigned char mskPosFilt : 1;
+	unsigned char timeFilt : 1;
+	unsigned char dateFilt : 1;
+	unsigned char gpsOnlyFilter : 1;
+	unsigned char trackFilt : 1;
+	unsigned char reserved1 : 2;
+};
+// 8 bits = 1*sizeof(unsigned char).
+struct flags_CFG_NMEA_PL_UBX
+{
+	unsigned char compat : 1;
+	unsigned char consider : 1;
+	unsigned char limit82 : 1;
+	unsigned char highPrec : 1;
+	unsigned char reserved1 : 4;
+};
+// 32 bits = 1*sizeof(unsigned int).
+struct gnssToFilter_CFG_NMEA_PL_UBX
+{
+	unsigned int gps : 1;
+	unsigned int sbas : 1;
+	unsigned int reserved1 : 2;
+	unsigned int qzss : 1;
+	unsigned int glonass : 1;
+	unsigned int beidou : 1;
+	unsigned int reserved2 : 25;
+};
+#define LEN_CFG_NMEA_PL_UBX 20
+struct CFG_NMEA_PL_UBX
+{
+	struct filter_CFG_NMEA_PL_UBX filter;
+	unsigned char nmeaVersion;
+	unsigned char numSV;
+	struct flags_CFG_NMEA_PL_UBX flags;
+	struct gnssToFilter_CFG_NMEA_PL_UBX gnssToFilter;
+	unsigned char svNumbering;
+	unsigned char mainTalkerId;
+	unsigned char gsvTalkerId;
+	unsigned char version;
+	char bdsTalkerId[2];
+	unsigned char reserved1[6];
+	//unsigned char padding[4];
+};
+#define LEN_NAV_POSLLH_PL_UBX 28
 struct NAV_POSLLH_PL_UBX
 {
 	unsigned int iTOW; // In ms.
@@ -220,7 +274,7 @@ struct NAV_POSLLH_PL_UBX
 	unsigned int vAcc; // In mm.
 	//unsigned char padding[4];
 };
-#define MAX_LEN_NAV_PVT_PL_UBX 92
+#define LEN_NAV_PVT_PL_UBX 92
 struct NAV_PVT_PL_UBX
 {
 	unsigned int iTOW; // In ms.
@@ -265,7 +319,7 @@ struct flags_NAV_SOL_PL_UBX
 	unsigned char TOWSET : 1;
 	unsigned char reserved1 : 4;
 };
-#define MAX_LEN_NAV_SOL_PL_UBX 52
+#define LEN_NAV_SOL_PL_UBX 52
 struct NAV_SOL_PL_UBX
 {
 	unsigned int iTOW; // In ms.
@@ -311,7 +365,7 @@ struct flags2_NAV_STATUS_PL_UBX
 	unsigned char spoofDetState : 2;
 	unsigned char reserved2 : 3;
 };
-#define MAX_LEN_NAV_STATUS_PL_UBX 16
+#define LEN_NAV_STATUS_PL_UBX 16
 struct NAV_STATUS_PL_UBX
 {
 	unsigned int iTOW; // In ms.
@@ -322,7 +376,7 @@ struct NAV_STATUS_PL_UBX
 	unsigned int ttff; // In ms.
 	unsigned int msss; // In ms.
 };
-#define MAX_LEN_NAV_SVIN_PL_UBX 40
+#define LEN_NAV_SVIN_PL_UBX 40
 struct NAV_SVIN_PL_UBX
 {
 	unsigned char version;
@@ -342,7 +396,7 @@ struct NAV_SVIN_PL_UBX
 	unsigned char active;
 	unsigned char reserved3[2];
 };
-#define MAX_LEN_NAV_VELNED_PL_UBX 36
+#define LEN_NAV_VELNED_PL_UBX 36
 struct NAV_VELNED_PL_UBX
 {
 	unsigned int iTOW; // In ms.
@@ -741,13 +795,15 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 		switch (mid)
 		{
 		case NAV_POSLLH_ID_UBX:
-			memcpy(&pUBXData->nav_posllh_pl, payload, sizeof(pUBXData->nav_posllh_pl));
+			memcpy(&pUBXData->nav_posllh_pl, payload, LEN_NAV_POSLLH_PL_UBX);
+			//memcpy(&pUBXData->nav_posllh_pl, payload, sizeof(pUBXData->nav_posllh_pl));
 			pUBXData->Latitude = pUBXData->nav_posllh_pl.lat*0.0000001; // In decimal degrees.
 			pUBXData->Longitude = pUBXData->nav_posllh_pl.lon*0.0000001; // In decimal degrees.
 			pUBXData->Altitude = pUBXData->nav_posllh_pl.height*1000; // In m.
 			break;
 		case NAV_PVT_ID_UBX:
-			memcpy(&pUBXData->nav_pvt_pl, payload, sizeof(pUBXData->nav_pvt_pl));
+			memcpy(&pUBXData->nav_pvt_pl, payload, LEN_NAV_PVT_PL_UBX);
+			//memcpy(&pUBXData->nav_pvt_pl, payload, sizeof(pUBXData->nav_pvt_pl));
 			pUBXData->Latitude = pUBXData->nav_pvt_pl.lat*0.0000001; // In decimal degrees.
 			pUBXData->Longitude = pUBXData->nav_pvt_pl.lon*0.0000001; // In decimal degrees.
 			pUBXData->Altitude = pUBXData->nav_pvt_pl.height*1000; // In m.
@@ -761,16 +817,20 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 			pUBXData->COG = pUBXData->nav_pvt_pl.headMot*0.00001*M_PI/180.0; // In rad.
 			break;
 		case NAV_SOL_ID_UBX:
-			memcpy(&pUBXData->nav_sol_pl, payload, sizeof(pUBXData->nav_sol_pl));
+			memcpy(&pUBXData->nav_sol_pl, payload, LEN_NAV_SOL_PL_UBX);
+			//memcpy(&pUBXData->nav_sol_pl, payload, sizeof(pUBXData->nav_sol_pl));
 			break;
 		case NAV_STATUS_ID_UBX:
-			memcpy(&pUBXData->nav_status_pl, payload, sizeof(pUBXData->nav_status_pl));
+			memcpy(&pUBXData->nav_status_pl, payload, LEN_NAV_STATUS_PL_UBX);
+			//memcpy(&pUBXData->nav_status_pl, payload, sizeof(pUBXData->nav_status_pl));
 			break;
 		case NAV_SVIN_ID_UBX:
-			memcpy(&pUBXData->nav_svin_pl, payload, sizeof(pUBXData->nav_svin_pl));
+			memcpy(&pUBXData->nav_svin_pl, payload, LEN_NAV_SVIN_PL_UBX);
+			//memcpy(&pUBXData->nav_svin_pl, payload, sizeof(pUBXData->nav_svin_pl));
 			break;
 		case NAV_VELNED_ID_UBX:
-			memcpy(&pUBXData->nav_velned_pl, payload, sizeof(pUBXData->nav_velned_pl));
+			memcpy(&pUBXData->nav_velned_pl, payload, LEN_NAV_VELNED_PL_UBX);
+			//memcpy(&pUBXData->nav_velned_pl, payload, sizeof(pUBXData->nav_velned_pl));
 			pUBXData->SOG = pUBXData->nav_velned_pl.gSpeed/100.0; // In m/s.
 			pUBXData->COG = pUBXData->nav_velned_pl.heading*0.00001*M_PI/180.0; // In rad.
 			break;
