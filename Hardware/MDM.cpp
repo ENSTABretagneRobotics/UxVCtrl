@@ -37,17 +37,18 @@ inline int PurgeDataAndWaitNsMDM(MDM* pMDM, BOOL* pbError, int n)
 	return EXIT_SUCCESS;
 }
 
-inline int SendNbSimpleMessageAndWaitNsMDM(MDM* pMDM, BOOL* pbError, int n, int nb, int msgid, char msg[4])
+// msg should be always 4 bytes...
+inline int SendNbSimpleMessageAndWaitNsMDM(MDM* pMDM, BOOL* pbError, int n, int nb, int msgid, char* msg)
 {
 	uint8 buf[4];
 	int i = 0;
 	struct timeval tv;
 
 	memset(buf, 0, sizeof(buf));
-	strcpy((char*)buf, msg);
+	if (msg[3] == 0) strcpy((char*)buf, msg); else memcpy(buf, msg, sizeof(buf));
 	for (i = 0; i < nb; i++)
 	{
-		if (SendAllDataMDM(pMDM, buf, strlen((char*)buf)) != EXIT_SUCCESS)
+		if (SendAllDataMDM(pMDM, buf, sizeof(buf)) != EXIT_SUCCESS)
 		{
 			*pbError = TRUE;
 			return EXIT_FAILURE;

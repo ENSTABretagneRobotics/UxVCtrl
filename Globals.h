@@ -158,7 +158,7 @@ extern interval vtwindhat, psitwindhat;
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-extern double u, uw, uv, ul, up, ur, wx, wy, wz, wpsi, wd, wu;
+extern double u, uw, uv, ul, up, ur, wx, wy, wz, wphi, wtheta, wpsi, wd, wu;
 extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.

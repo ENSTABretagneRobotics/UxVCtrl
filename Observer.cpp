@@ -38,8 +38,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
 		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
 		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
-		"wx;wy;wz;wpsi;wd;wu;wagl;"
-		"u;uw;uv;ul;up;ur;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
+		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
+		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
 		"Energy_electronics;Energy_actuators;\n"
 		); 
 	fflush(logstatefile);
@@ -340,7 +340,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			"%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;%.3f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
 			t_epoch, lathat, longhat, althat, headinghat, cog, sog, altitude_AGL, pressure_mes, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
@@ -348,8 +348,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat),
 			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
 			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0),
-			wx, wy, wz, wpsi, wd, wu, wagl, 
-			u, uw, uv, ul, up, ur, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
+			wx, wy, wz, wphi, wtheta, wpsi, wd, wu, wagl, 
+			u, ul, uv, ur, up, uw, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
 			Energy_electronics, Energy_actuators);
 		fflush(logstatefile);
 

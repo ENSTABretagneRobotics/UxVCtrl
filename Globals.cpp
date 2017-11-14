@@ -20,7 +20,7 @@ interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAIN
 
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
-double u = 0, uw = 0, uv = 0, ul = 0, up = 0, ur = 0, wx = 0, wy = 0, wz = 0, wpsi = 0, wd = 0, wu = 0;
+double u = 0, uw = 0, uv = 0, ul = 0, up = 0, ur = 0, wx = 0, wy = 0, wz = 0, wphi = 0, wtheta = 0, wpsi = 0, wd = 0, wu = 0;
 double wxa = 0, wya = 0, wza = 0, wxb = 0, wyb = 0, wzb = 0;
 deque<double> wx_vector, wy_vector, wz_vector;
 double wagl = 0;
