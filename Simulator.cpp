@@ -37,7 +37,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	}
 
 	fprintf(logsimufile,
-		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
+		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
 		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
 		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
 		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
@@ -200,7 +200,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 		// Log.
 		fprintf(logsimufile, 			
-			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;%.3f;%f;%f;%f;"
@@ -208,7 +208,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
-			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d, fmod_360_rad2deg(alpha), 0.0, utc,
+			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d, fmod_360_rad2deg(alpha), 0.0, utc,
 			t, x, y, z, 0.0, 0.0, psi,
 			vrx, 0.0, 0.0, 0.0, 0.0, omegaz,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

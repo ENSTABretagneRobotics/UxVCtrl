@@ -151,7 +151,7 @@ enum FOLLOWME_TARGETS
 typedef enum FOLLOWME_TARGETS FOLLOWME_TARGETS;
 
 // Observer variables.
-extern interval xhat, yhat, zhat, phihat, thetahat, psihat, vrxhat, vryhat, vrzhat, omegaxhat, omegayhat, omegazhat;
+extern interval xhat, yhat, zhat, phihat, thetahat, psihat, vrxhat, vryhat, vrzhat, omegaxhat, omegayhat, omegazhat, accrxhat, accryhat, accrzhat;
 extern interval vchat, psichat, hwhat;
 extern interval vtwindhat, psitwindhat;
 //extern interval alphahat, dhat;
@@ -164,7 +164,7 @@ extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
 
 // Measurements
-extern double x_mes, y_mes, z_mes, phi_mes, theta_mes, psi_mes, vrx_mes, vry_mes, vrz_mes, omegax_mes, omegay_mes, omegaz_mes;
+extern double x_mes, y_mes, z_mes, phi_mes, theta_mes, psi_mes, vrx_mes, vry_mes, vrz_mes, omegax_mes, omegay_mes, omegaz_mes, accrx_mes, accry_mes, accrz_mes;
 extern double dist;
 // GPS.
 extern double latitude, longitude, altitude, sog, cog, xte, utc;
@@ -177,7 +177,7 @@ extern deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Barometer, pressure sensor...
 extern double pressure_mes;
 // Wind/air/water current sensor...
-extern double fluiddir, fluidspeed;
+extern double fluiddira, fluidspeeda, fluiddir, fluidspeed;
 // Weather station.
 extern double vtwind, psitwind, vawind, psiawind;
 // Sonar.

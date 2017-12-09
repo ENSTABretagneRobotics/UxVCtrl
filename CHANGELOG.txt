@@ -1,3 +1,6 @@
+177
+Updated logstate and logsimu file formats.
+
 176
 Corrected bug in SendNbSimpleMessageAndWaitNsMDM().
 Updated logstate and logsimu file formats.

@@ -260,29 +260,29 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				//double error = 2.0*atan(tan(delta_angle/2.0))/M_PI; // Singularity at tan(M_PI/2)...
 				double error = fmod_2PI(delta_angle)/M_PI;
 				double abserror = fabs(error);
-				double speed = Center(omegazhat)/omegazmax;
+				double derivative = Center(omegazhat)/omegazmax;
 
 				if ((robid & SAUCISSE_CLASS_ROBID_MASK)||(robid == SUBMARINE_SIMULATOR_ROBID))
 				{
-					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*speed/(Kd2+abserror)-Ki*integral;
-					else uw = Kp*sqrt(abserror)-Kd1*speed/(Kd2+abserror)-Ki*integral;
+					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*integral;
+					else uw = Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*integral;
 				}
 				else if (robid & CISCREA_ROBID_MASK) 
 				{
 					//uw = -Kp*error
 					//	-(Kd1+Kd2*error*error*abserror)*Center(omegazhat)*(fabs(Center(omegazhat))>uw_derivative_max)
 					//	-Ki*integral;
-					uw = -Kp*error-Kd1*speed-Ki*integral;
+					uw = -Kp*error-Kd1*derivative-Ki*integral;
 				}
 				else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_ROBID))
 				{
-					uw = sign(u, 0)*(-Kp*error-Kd1*speed-Ki*integral);
+					uw = sign(u, 0)*(-Kp*error-Kd1*derivative-Ki*integral);
 				}
 				else
 				{
 					//// We still (probably...) have to avoid the singularity at tan(M_PI/2)...
 					//uw = -Kp*atan(tan(delta_angle/2.0))-Kd1*Center(omegazhat)-Ki*integral;
-					uw = -Kp*error-Kd1*speed-Ki*integral;
+					uw = -Kp*error-Kd1*derivative-Ki*integral;
 				}
 
 				integral = integral+error*dt;

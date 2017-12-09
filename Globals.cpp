@@ -13,7 +13,8 @@
 interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
 phihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
 vrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vryhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vrzhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-omegaxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegayhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+omegaxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegayhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
+accrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), accryhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), accrzhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 //interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
@@ -26,7 +27,7 @@ deque<double> wx_vector, wy_vector, wz_vector;
 double wagl = 0;
 
 // Measurements
-double x_mes = 0, y_mes = 0, z_mes = 0, phi_mes = 0, theta_mes = 0, psi_mes = 0, vrx_mes = 0, vry_mes = 0, vrz_mes = 0, omegax_mes = 0, omegay_mes = 0, omegaz_mes = 0;
+double x_mes = 0, y_mes = 0, z_mes = 0, phi_mes = 0, theta_mes = 0, psi_mes = 0, vrx_mes = 0, vry_mes = 0, vrz_mes = 0, omegax_mes = 0, omegay_mes = 0, omegaz_mes = 0, accrx_mes = 0, accry_mes = 0, accrz_mes = 0;
 double dist = 0;
 // GPS.
 double latitude = 0, longitude = 0, altitude = 0, sog = 0, cog = 0, xte = 0, utc = 0;
@@ -35,7 +36,7 @@ deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Barometer, pressure sensor...
 double pressure_mes = 0;
 // Wind/air/water current sensor...
-double fluiddir = 0, fluidspeed = 0;
+double fluiddira = 0, fluidspeeda = 0, fluiddir = 0, fluidspeed = 0;
 // Weather station.
 double vtwind = 0, psitwind = 0, vawind = 0, psiawind = 0;
 // Sonar.
