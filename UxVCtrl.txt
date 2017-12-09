@@ -86,6 +86,8 @@
 1
 % bDisablePathfinderDVL
 1
+% bDisableNortekDVL
+1
 % bDisableMES
 1
 % bDisableMDM

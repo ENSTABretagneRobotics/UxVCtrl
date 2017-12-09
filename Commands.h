@@ -1818,6 +1818,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartPathfinderDVL = TRUE;
 		bPausePathfinderDVL = ival1;
 	}
+	else if (sscanf(line, "nortekconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "NortekDVL0.txt", strlen("NortekDVL0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "NortekDVL0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartNortekDVL = TRUE;
+		bPauseNortekDVL = ival1;
+	}
 	else if (sscanf(line, "mesconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "MES0.txt", strlen("MES0.txt")) != 0)

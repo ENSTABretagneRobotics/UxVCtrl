@@ -115,6 +115,7 @@
     <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
+    <ClCompile Include="Hardware\NortekDVL.cpp" />
     <ClCompile Include="Hardware\PathfinderDVL.cpp" />
     <ClCompile Include="Hardware\RPLIDAR.cpp" />
     <ClCompile Include="Hardware\SBG.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
     <ClInclude Include="Hardware\NMEAProtocol.h" />
+    <ClInclude Include="Hardware\NortekDVL.h" />
     <ClInclude Include="Hardware\PathfinderDVL.h" />
     <ClInclude Include="Hardware\RPLIDAR.h" />
     <ClInclude Include="Hardware\RTCM2Protocol.h" />
@@ -294,6 +296,7 @@
     <Text Include="MAVLinkDevice0.txt" />
     <Text Include="MAVLinkDevice1.txt" />
     <Text Include="NMEADevice1.txt" />
+    <Text Include="NortekDVL0.txt" />
     <Text Include="PathfinderDVL0.txt" />
     <Text Include="RPLIDAR0.txt" />
     <Text Include="SBG0.txt" />

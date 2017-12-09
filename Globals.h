@@ -238,6 +238,7 @@ extern BOOL bEcho;
 #pragma endregion
 #pragma region Devices parameters
 extern BOOL bDisablePathfinderDVL;
+extern BOOL bDisableNortekDVL;
 extern BOOL bDisableMES;
 extern BOOL bDisableMDM;
 extern BOOL bDisableSeanet;
@@ -489,6 +490,9 @@ extern BOOL bPauseCISCREA, bRestartCISCREA;
 #pragma region DEVICES
 // PathfinderDVL variables.
 extern BOOL bPausePathfinderDVL, bRestartPathfinderDVL;
+
+// NortekDVL variables.
+extern BOOL bPauseNortekDVL, bRestartNortekDVL;
 
 // MES variables.
 extern BOOL bPauseMES, bRestartMES;

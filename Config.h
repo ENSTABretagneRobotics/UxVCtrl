@@ -60,6 +60,7 @@ inline int LoadConfig(void)
 #pragma endregion
 #pragma region Devices parameters
 	bDisablePathfinderDVL = TRUE;
+	bDisableNortekDVL = TRUE;
 	bDisableMES = TRUE;
 	bDisableMDM = TRUE;
 	bDisableSeanet = TRUE;
@@ -269,6 +270,8 @@ inline int LoadConfig(void)
 #pragma region Devices parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisablePathfinderDVL) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableNortekDVL) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMES) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

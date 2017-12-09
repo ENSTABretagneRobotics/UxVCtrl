@@ -154,6 +154,8 @@
 %
 %pathfinderdvlconfig PathfinderDVL.txt bPause
 %
+%nortekdvlconfig NortekDVL.txt bPause
+%
 %mesconfig MES.txt bPause
 %
 %mdmconfig MDM.txt bPause

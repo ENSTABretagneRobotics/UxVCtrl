@@ -435,6 +435,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NortekDVL0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\P33x0.txt"
 				>
 			</File>
@@ -1004,6 +1008,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\NMEAProtocol.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\NortekDVL.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\NortekDVL.h"
 				>
 			</File>
 			<File

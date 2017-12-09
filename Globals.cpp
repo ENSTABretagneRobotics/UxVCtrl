@@ -97,6 +97,7 @@ BOOL bEcho = FALSE;
 #pragma endregion
 #pragma region Devices parameters
 BOOL bDisablePathfinderDVL = FALSE;
+BOOL bDisableNortekDVL = FALSE;
 BOOL bDisableMES = FALSE;
 BOOL bDisableMDM = FALSE;
 BOOL bDisableSeanet = FALSE;
@@ -348,6 +349,9 @@ BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;
 #pragma region DEVICES
 // PathfinderDVL variables.
 BOOL bPausePathfinderDVL = FALSE, bRestartPathfinderDVL = FALSE;
+
+// NortekDVL variables.
+BOOL bPauseNortekDVL = FALSE, bRestartNortekDVL = FALSE;
 
 // MES variables.
 BOOL bPauseMES = FALSE, bRestartMES = FALSE;

@@ -1,3 +1,6 @@
+178
+Beginning of NortekDVL integration.
+
 177
 Updated logstate and logsimu file formats.
 

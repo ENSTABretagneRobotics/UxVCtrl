@@ -249,6 +249,9 @@
     <ClCompile Include="Hardware\PathfinderDVL.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\NortekDVL.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -575,6 +578,9 @@
     <ClInclude Include="Hardware\PathfinderDVL.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\NortekDVL.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -678,6 +684,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="PathfinderDVL0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="NortekDVL0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>
