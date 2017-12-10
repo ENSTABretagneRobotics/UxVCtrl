@@ -1,34 +1,23 @@
-send Razor calib params like ROS (params bROSmode, bSendCalib)?
-Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
 
-Serial.available() equivalent?
+//wz : we keep as it is at the moment...
+//wy
+...
+//wx
+Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx,
+u_min_wx, u_max_wx, error_min_wx, error_max_wx, omega_max_wx
+//z/depth/altitude should share same values...
+Kp_z, Kd_z, Ki_z, up_max_z, ud_max_z, ui_max_z,
+u_min_z, u_max_z, error_min_z, error_max_z, dz_max_z
 
-Uxv et fileconv : vérifier les conversions entre repère NWU, NED, etc., bug calcul angles d'euler à partir de quaternions (valeurs devant rester dans [-1,1])?
-check sign of omegaz for SBG on SAUC'ISSE!
-check ublox default values for CFG_NMEA...
+concept de boost mode en lien avec les régulations en z et pitch et roll?
+Ui=matrix*[uvx,uvy,uvz,uwx,uwy,uwz] dans fichier de config principal...? Mais si on veut relations non linéaires?->et on en a déjà avec le boost mode...->to hardcode depending on the robot?
+add in params wphi, wtheta and other things related to lateral movements like in quadrotors, key to activate roll and pitch control? in ArduPilot it depends on the mode...->to hardcode depending on the robot for the moment since the robots that need roll and pitch stabilization usally always need it...
 
-logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
-Log add accrx, accry, accrz hat/err? Maybe not really necessary...
+razor : add param to send #o1, #ox if needed...?
 
-add in params wphi, wtheta and other things related to lateral movements like in quadrotors...
-
-//PID_angle_control...
-//Kp_wz
-//Kd_wz
-//Ki_wz
-//uwz_derivative_max
-//uwz_integral_max
-//cosdelta_psi_threshold
-//omegazmax
-
-sign(u, 0) buggy (movement direction if necessary)
-
-Ui=matrix*[ux,uy,uz,uwx,uwy,uwz] dans fichier de config principal...? Mais si on veut relations non linéaires?->et on en a déjà avec le boost mode...
 altitude from GPS vs pressure?->Should add code in Observer that make the fusion depending on the robot and the sensors currently enabled, do not update z_mes directly in the sensors files... 
 rename global latitude,longitude,altitude to _GPS...
-add specific columns for raw GPS data in log file?->maybe not necessary since already in raw data log files, that can be easily replayed...
 baro data from mavlink, sbg, mt...
-
 Altitude from sonar : use qinter to allow outliers and take into account position of the sonar on the submarine as well as roll and pitch
 
 équations d'état bateaux... add bDisableStateEstimation, E key, like bGPSLocalization...
@@ -38,14 +27,13 @@ minrange param, zone morte pour tous les sonar et echosondeurs...?
 
 rajouter aussi NMEAInterface...
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
+Serial.available() equivalent?
 
 Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planner...
 
-Exp image sonar pour mieux détecter murs?
-
-Problème headingrelativereg?
-
 maybe bEnableRCMode always forces to use bEnableFullSpeedMode so they should be the same variable... 
+
+Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
 
 Fly to specific location mode guided LAT LON ALT
 
@@ -109,6 +97,11 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+NED, NWU, marine units...
+Uxv et fileconv : vérifier les conversions entre repère NWU, NED, etc., bug calcul angles d'euler à partir de quaternions (valeurs devant rester dans [-1,1])?
+check sign of omegaz for SBG on SAUC'ISSE!
+check ublox default values for CFG_NMEA...
+Problème headingrelativereg?
 Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour bubble
 le changement de alphafvxy n'a peut-être pas été fait dans le bon sens pour SARDINE, vérifier notamment avec le passage du gate dans données sonar, regarder aussi pour SAUC-E 2016 et euRathlon 2014 et 2015...
 When program stopped maestro does not stop thrust?->to check after changing configuration file Maestro0.txt
@@ -152,9 +145,11 @@ déco temp mti-g sardine->probably internal mti-g bug, its position estimation an
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
 
 logs
+logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
 fluiddir, fluidspeed, d_mes, alpha_mes units...
 différents types d'altitude, AMSL, venant d'un GPS imprécis, depth, AGL...
-avec nouveau format, lognav2KML va être simplifié
+add specific columns for raw GPS data in log file?->maybe not necessary since already in raw data log files, that can be easily replayed...
+Log add accrx, accry, accrz hat/err? Maybe not really necessary...
 
 sonar, localisation, wf
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
@@ -173,6 +168,7 @@ vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps... vr...
 hokuyo/RPLIDAR device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 flux acoustique sur un mur pas tout à fait droit...
 LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...) si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
+Exp image sonar pour mieux détecter murs?
 
 GUI, video
 Stabilisation profondeur peut-être pas pratique, affichage bleu détection pas clair...
@@ -322,6 +318,7 @@ rajouter OSComputerI2CPort rpi
 auto magnetic calbration algo in plane and space, see Matlab code in ptrbrtz, add magnetic declination in AHRS config files (or use yaworientation parameter)?
 gérer gpsd (Linux only?)
 Should be possible to remove NMEADevice now if necessary...
+send Razor calib params like ROS (param bSendCalib)?
 
 Obstacle avoidance
 enable/disablegeofence coordinates/file command, in 3D
@@ -412,6 +409,13 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+notations régulation en position vs régulations en vitesse, e.g. en z?
+en followme on fait une régulation en vitesse, sauf qu'en pratique c'est que des vitesses limites, umin, umax, uidle...->en fait c'est plus une régulation en distance...
+
+sign(u, 0) buggy (movement direction if necessary)
+constrain, map, sq
+non-symmetrical control...->keep as it is...
 
 Commande proportionnelle à e.g. sqrt(error), sin…->à traiter comme cas particuliers…
 

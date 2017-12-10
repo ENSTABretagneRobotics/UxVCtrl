@@ -385,8 +385,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
 				printf("Heading is %.1f deg in the reference coordinate system.\n", Center(psihat)*180.0/M_PI);
 				printf("Wind angle is %.1f deg in the reference coordinate system.\n", Center(psitwindhat)*180.0/M_PI);
-				printf("Yaw is %d deg, pitch is %d deg, roll is %d deg in the NWU coordinate system.\n", 
-					(int)fmod_360_rad2deg(Center(psihat)+angle_env-M_PI/2.0), (int)fmod_360_rad2deg(Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
+				printf("Yaw is %d deg, pitch is %d deg, roll is %d deg in the NED coordinate system.\n", 
+					(int)fmod_360_rad2deg(-Center(psihat)-angle_env), (int)fmod_360_rad2deg(-Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
 				printf("Wind direction w.r.t. North is %.1f deg (filtered %.1f deg), "
 					"wind speed is %.1f m/s or %.1f kn (filtered %.1f m/s or %.1f kn), "
 					"heading w.r.t. North is %.1f deg.\n", 

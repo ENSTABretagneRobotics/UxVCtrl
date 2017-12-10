@@ -21,14 +21,12 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_RAZORAHRS 256
 
-#define PREAMBLE_RAZORAHRS "#YPR="
-
 struct RAZORAHRSDATA
 {
-	double yaw, pitch, roll;
-	double Yaw; // In rad.
-	double Pitch; // In rad.
-	double Roll; // In rad.
+	double yaw, pitch, roll; // In deg in NED coordinate system.
+	double accx, accy, accz; // In units of 1.0 = 1/256 G (9.8/256 m/s^2) in NED coordinate system.
+	double gyrx, gyry, gyrz; // In rad/s in NED coordinate system.
+	double Roll, Pitch, Yaw; // In rad in ENU coordinate system.
 };
 typedef struct RAZORAHRSDATA RAZORAHRSDATA;
 
@@ -121,6 +119,7 @@ inline int GetLatestDataRazorAHRS(RAZORAHRS* pRazorAHRS, RAZORAHRSDATA* pRazorAH
 	char savebuf[MAX_NB_BYTES_RAZORAHRS];
 	int BytesReceived = 0, Bytes = 0, recvbuflen = 0;
 	char* ptr_YPR = NULL;
+	char* ptr_YPRAG = NULL;
 	double roll = 0, pitch = 0, yaw = 0;
 	CHRONO chrono;
 
@@ -186,8 +185,9 @@ inline int GetLatestDataRazorAHRS(RAZORAHRS* pRazorAHRS, RAZORAHRSDATA* pRazorAH
 	// for the desired message...
 
 	ptr_YPR = FindLatestRazorAHRSSentence("#YPR=", recvbuf);
+	ptr_YPRAG = FindLatestRazorAHRSSentence("#YPRAG=", recvbuf);
 
-	while (!ptr_YPR)
+	while ((!ptr_YPR)&&(!ptr_YPRAG))
 	{
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_RAZORAHRS)
 		{
@@ -212,17 +212,32 @@ inline int GetLatestDataRazorAHRS(RAZORAHRS* pRazorAHRS, RAZORAHRSDATA* pRazorAH
 		}
 		BytesReceived += Bytes;
 		ptr_YPR = FindLatestRazorAHRSSentence("#YPR=", recvbuf);
+		ptr_YPRAG = FindLatestRazorAHRSSentence("#YPRAG=", recvbuf);
 	}
 
 	// Analyze data.
 
 	memset(pRazorAHRSData, 0, sizeof(RAZORAHRSDATA));
 
-	if (sscanf(ptr_YPR, "#YPR=%lf,%lf,%lf", 
-		&pRazorAHRSData->yaw, &pRazorAHRSData->pitch, &pRazorAHRSData->roll) != 3)
+	if (ptr_YPRAG)
 	{
-		printf("Error reading data from a RazorAHRS : Invalid data. \n");
-		return EXIT_FAILURE;
+		if (sscanf(ptr_YPRAG, "#YPRAG=%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf",
+			&pRazorAHRSData->yaw, &pRazorAHRSData->pitch, &pRazorAHRSData->roll, 
+			&pRazorAHRSData->accx, &pRazorAHRSData->accy, &pRazorAHRSData->accz, 
+			&pRazorAHRSData->gyrx, &pRazorAHRSData->gyry, &pRazorAHRSData->gyrz) != 9)
+		{
+			printf("Error reading data from a RazorAHRS : Invalid data. \n");
+			return EXIT_FAILURE;
+		}
+	}
+	else
+	{
+		if (sscanf(ptr_YPR, "#YPR=%lf,%lf,%lf",
+			&pRazorAHRSData->yaw, &pRazorAHRSData->pitch, &pRazorAHRSData->roll) != 3)
+		{
+			printf("Error reading data from a RazorAHRS : Invalid data. \n");
+			return EXIT_FAILURE;
+		}
 	}
 
 	// Convert orientation information in angles in rad with corrections.

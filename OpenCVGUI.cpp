@@ -867,7 +867,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-			// In deg in marine units...
+			// In deg in NED coordinate system.
 			if (bHeadingControl) sprintf(szText, "%.1f/%.1f", 
 				(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 				(fmod_2PI(-angle_env-wpsi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
@@ -952,7 +952,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			if (bDispYPR)
 			{
-				// ENU coordinate system...
+				// In deg in ENU coordinate system.
 				sprintf(szText, "YPR:%d,%d,%d", (int)fmod_360_rad2deg(Center(psihat)), (int)fmod_360_rad2deg(Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);

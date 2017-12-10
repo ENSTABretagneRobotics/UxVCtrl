@@ -275,9 +275,7 @@ struct MTDATA
 	unsigned char Status;
 	unsigned short TS; 
 	struct UTC_Time_MT UTCTime;
-	double Roll; // In rad.
-	double Pitch; // In rad.
-	double Yaw; // In rad.
+	double Roll, Pitch, Yaw; // In rad.
 };
 typedef struct MTDATA MTDATA;
 

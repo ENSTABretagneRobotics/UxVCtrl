@@ -186,9 +186,7 @@ struct SBGDATA
 	unsigned char Status;
 	unsigned short TS; 
 	struct UTC_Time_SBG UTCTime;
-	double Roll; // In rad.
-	double Pitch; // In rad.
-	double Yaw; // In rad.
+	double Roll, Pitch, Yaw; // In rad.
 };
 typedef struct SBGDATA SBGDATA;
 

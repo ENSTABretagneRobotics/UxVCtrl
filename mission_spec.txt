@@ -70,7 +70,7 @@
 %
 % LOCALIZATION AND ADVANCED MOVING COMMANDS
 %
-%setenvcoord lat_env long_env alt_env orientation_env (lat_env, long_env, alt_env : double ]-oo,oo[ in decimal deg and m, orientation_env : double [0,360[ mod(360) angle of the x axis of the environment coordinate system to the North in deg, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference in deg in marine units)
+%setenvcoord lat_env long_env alt_env orientation_env (lat_env, long_env, alt_env : double ]-oo,oo[ in decimal deg and m, orientation_env : double [0,360[ mod(360) angle of the x axis of the environment coordinate system to the North in deg, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference in deg in North - East - Down coordinate system)
 %
 %gpssetenvcoordposition t (double [0,oo[ timeout in s, the function blocks until the timeout is reached. Set the position of the environment coordinate system from the current position using GPS. If the GPS is not available or reports that the data might be unreliable, the environment coordinate system is not modified.)
 %
@@ -342,9 +342,9 @@
 %
 %aglreg z (double ]-oo,oo[ in m, enable altitude Above Ground Level control)
 %
-%headingreg orientation (double [0,360[ mod(360) in deg in marine units)
+%headingreg orientation (double [0,360[ mod(360) in deg in North - East - Down coordinate system)
 %
-%headingrelativereg orientation (double [0,360[ mod(360) in deg in marine units)
+%headingrelativereg orientation (double [0,360[ mod(360) in deg in North - East - Down coordinate system)
 %
 %thrust u (double [-1,1])
 %
