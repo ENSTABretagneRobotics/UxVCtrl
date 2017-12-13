@@ -41,6 +41,7 @@ struct RAZORAHRS
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	BOOL bROSMode;
 	double rollorientation;
 	double rollp1;
 	double rollp2;
@@ -261,6 +262,8 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 {
 	FILE* file = NULL;
 	char line[256];
+	char* outputmodebuf = "#ox";
+	char* streammodebuf = "#o1";
 
 	memset(pRazorAHRS->szCfgFilePath, 0, sizeof(pRazorAHRS->szCfgFilePath));
 	sprintf(pRazorAHRS->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -277,6 +280,7 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		pRazorAHRS->BaudRate = 57600;
 		pRazorAHRS->timeout = 2000;
 		pRazorAHRS->bSaveRawData = 1;
+		pRazorAHRS->bROSMode = 1;
 		pRazorAHRS->rollorientation = 0;
 		pRazorAHRS->rollp1 = 0;
 		pRazorAHRS->rollp2 = 0;
@@ -299,6 +303,8 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pRazorAHRS->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRazorAHRS->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRazorAHRS->bROSMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pRazorAHRS->rollorientation) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -342,6 +348,22 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		printf("Unable to connect to a RazorAHRS.\n");
 		CloseRS232Port(&pRazorAHRS->RS232Port);
 		return EXIT_FAILURE;
+	}
+
+	if (pRazorAHRS->bROSMode)
+	{
+		if (WriteAllRS232Port(&pRazorAHRS->RS232Port, (uint8*)outputmodebuf, strlen(outputmodebuf)) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a RazorAHRS : Initialization failure.\n");
+			CloseRS232Port(&pRazorAHRS->RS232Port);
+			return EXIT_FAILURE;
+		}
+		if (WriteAllRS232Port(&pRazorAHRS->RS232Port, (uint8*)streammodebuf, strlen(streammodebuf)) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a RazorAHRS : Initialization failure.\n");
+			CloseRS232Port(&pRazorAHRS->RS232Port);
+			return EXIT_FAILURE;
+		}
 	}
 
 	printf("RazorAHRS connected.\n");

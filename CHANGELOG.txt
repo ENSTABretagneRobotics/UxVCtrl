@@ -1,3 +1,6 @@
+180
+Added bROSMode parameter to RazorAHRS.
+
 179
 Updated RazorAHRS to support #YPRAG sentence.
 
