@@ -306,7 +306,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		pSBG->LastSBGData.eulerStdDev[1] = pLogData->ekfQuatData.eulerStdDev[1];
 		pSBG->LastSBGData.eulerStdDev[2] = pLogData->ekfQuatData.eulerStdDev[2];
 		roll = atan2(2*pSBG->LastSBGData.q2*pSBG->LastSBGData.q3+2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q1,2*sqr(pSBG->LastSBGData.q0)+2*sqr(pSBG->LastSBGData.q3)-1);
-		pitch = -asin(2*pSBG->LastSBGData.q1*pSBG->LastSBGData.q3-2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q2);
+		pitch = -asin(constrain(2*pSBG->LastSBGData.q1*pSBG->LastSBGData.q3-2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q2, -1, 1)); // Attempt to avoid potential NAN...
 		yaw = atan2(2*pSBG->LastSBGData.q1*pSBG->LastSBGData.q2+2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q3,2*sqr(pSBG->LastSBGData.q0)+2*sqr(pSBG->LastSBGData.q1)-1);
 		
 		// If raw Euler angles were not sent, ensure that they would still be in the log file.
@@ -833,6 +833,9 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->roll);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->pitch);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->yaw);
+			roll = pSBGData->roll*M_PI/180.0;
+			pitch = pSBGData->pitch*M_PI/180.0;
+			yaw = pSBGData->yaw*M_PI/180.0;
 			break;
 		case MATRIX:
 			// Orientation data output mode - Matrix.
@@ -845,6 +848,14 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->g);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->h);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->i);
+			roll = atan2(pSBGData->f,pSBGData->i);
+			pitch = -asin(constrain(pSBGData->c, -1, 1)); // Attempt to avoid potential NAN...
+			yaw = atan2(pSBGData->b,pSBGData->a);
+			
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pMTData->roll = roll*180.0/M_PI;
+			pMTData->pitch = pitch*180.0/M_PI;
+			pMTData->yaw = yaw*180.0/M_PI;
 			break;
 		default:
 			// Orientation data output mode - Quaternion.
@@ -852,8 +863,21 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->q1);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->q2);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->q3);
+			roll = atan2(2*pSBGData->q2*pSBGData->q3+2*pSBGData->q0*pSBGData->q1,2*sqr(pSBGData->q0)+2*sqr(pSBGData->q3)-1);
+			pitch = -asin(constrain(2*pSBGData->q1*pSBGData->q3-2*pSBGData->q0*pSBGData->q2, -1, 1)); // Attempt to avoid potential NAN...
+			yaw = atan2(2*pSBGData->q1*pSBGData->q2+2*pSBGData->q0*pSBGData->q3,2*sqr(pSBGData->q0)+2*sqr(pSBGData->q1)-1);
+			
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pMTData->roll = roll*180.0/M_PI;
+			pMTData->pitch = pitch*180.0/M_PI;
+			pMTData->yaw = yaw*180.0/M_PI;
 			break;
 		}
+
+		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+		pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
+		pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
+		pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
 	}
 
 	if (pSBG->OutputMode & AUXILIARY_BIT)
@@ -932,37 +956,6 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 		offset += 1;
 		pSBGData->UTCTime.Valid = databuf[offset];
 		offset += 1;
-	}
-
-	// Convert orientation information in angles in rad with corrections.
-	if (pSBG->OutputMode & ORIENTATION_BIT)
-	{
-		switch (pSBG->OutputSettings & ORIENTATION_MODE_MASK)
-		{
-		case EULER_ANGLES:
-			// Orientation data output mode - Euler angles.
-			roll = pSBGData->roll*M_PI/180.0;
-			pitch = pSBGData->pitch*M_PI/180.0;
-			yaw = pSBGData->yaw*M_PI/180.0;
-			break;
-		case MATRIX:
-			// Orientation data output mode - Matrix.
-			roll = atan2(pSBGData->f,pSBGData->i);
-			pitch = -asin(pSBGData->c);
-			yaw = atan2(pSBGData->b,pSBGData->a);
-			break;
-		default:
-			// Orientation data output mode - Quaternion.
-			roll = atan2(2*pSBGData->q2*pSBGData->q3+2*pSBGData->q0*pSBGData->q1,2*sqr(pSBGData->q0)+2*sqr(pSBGData->q3)-1);
-			pitch = -asin(2*pSBGData->q1*pSBGData->q3-2*pSBGData->q0*pSBGData->q2);
-			yaw = atan2(2*pSBGData->q1*pSBGData->q2+2*pSBGData->q0*pSBGData->q3,2*sqr(pSBGData->q0)+2*sqr(pSBGData->q1)-1);
-			break;
-		}
-
-		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
-		pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
-		pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
-		pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
 	}
 
 	pSBG->LastSBGData = *pSBGData;

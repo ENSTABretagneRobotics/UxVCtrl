@@ -744,7 +744,7 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q2);
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q3);
 			roll = atan2(2*pMTData->q2*pMTData->q3+2*pMTData->q0*pMTData->q1,2*sqr(pMTData->q0)+2*sqr(pMTData->q3)-1);
-			pitch = -asin(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2);
+			pitch = -asin(constrain(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2, -1, 1)); // Attempt to avoid potential NAN...
 			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
 			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
 			
@@ -783,7 +783,7 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->h);
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->i);
 			roll = atan2(pMTData->f,pMTData->i);
-			pitch = -asin(pMTData->c);
+			pitch = -asin(constrain(pMTData->c, -1, 1)); // Attempt to avoid potential NAN...
 			yaw = atan2(pMTData->b,pMTData->a);
 			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
 		
@@ -928,6 +928,9 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->roll);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->pitch);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->yaw);
+			roll = pMTData->roll*M_PI/180.0;
+			pitch = pMTData->pitch*M_PI/180.0;
+			yaw = pMTData->yaw*M_PI/180.0;
 			break;
 		case MATRIX:
 			// Orientation data output mode - Matrix.
@@ -940,6 +943,14 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->g);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->h);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->i);
+			roll = atan2(pMTData->f,pMTData->i);
+			pitch = -asin(constrain(pMTData->c, -1, 1)); // Attempt to avoid potential NAN...
+			yaw = atan2(pMTData->b,pMTData->a);
+			
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pMTData->roll = roll*180.0/M_PI;
+			pMTData->pitch = pitch*180.0/M_PI;
+			pMTData->yaw = yaw*180.0/M_PI;
 			break;
 		default:
 			// Orientation data output mode - Quaternion.
@@ -947,8 +958,21 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->q1);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->q2);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->q3);
+			roll = atan2(2*pMTData->q2*pMTData->q3+2*pMTData->q0*pMTData->q1,2*sqr(pMTData->q0)+2*sqr(pMTData->q3)-1);
+			pitch = -asin(constrain(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2, -1, 1)); // Attempt to avoid potential NAN...
+			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
+			
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pMTData->roll = roll*180.0/M_PI;
+			pMTData->pitch = pitch*180.0/M_PI;
+			pMTData->yaw = yaw*180.0/M_PI;
 			break;
 		}
+
+		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+		pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
+		pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
+		pMTData->Yaw = fmod_2PI(yaw+pMT->yaworientation+pMT->yawp1*cos(yaw+pMT->yawp2));
 	}
 
 	if (pMT->OutputMode & AUXILIARY_BIT)
@@ -1027,37 +1051,6 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 		offset += 1;
 		pMTData->UTCTime.Valid = databuf[offset];
 		offset += 1;
-	}
-
-	// Convert orientation information in angles in rad with corrections.
-	if (pMT->OutputMode & ORIENTATION_BIT)
-	{
-		switch (pMT->OutputSettings & ORIENTATION_MODE_MASK)
-		{
-		case EULER_ANGLES:
-			// Orientation data output mode - Euler angles.
-			roll = pMTData->roll*M_PI/180.0;
-			pitch = pMTData->pitch*M_PI/180.0;
-			yaw = pMTData->yaw*M_PI/180.0;
-			break;
-		case MATRIX:
-			// Orientation data output mode - Matrix.
-			roll = atan2(pMTData->f,pMTData->i);
-			pitch = -asin(pMTData->c);
-			yaw = atan2(pMTData->b,pMTData->a);
-			break;
-		default:
-			// Orientation data output mode - Quaternion.
-			roll = atan2(2*pMTData->q2*pMTData->q3+2*pMTData->q0*pMTData->q1,2*sqr(pMTData->q0)+2*sqr(pMTData->q3)-1);
-			pitch = -asin(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2);
-			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
-			break;
-		}
-
-		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
-		pMTData->Roll = fmod_2PI(roll+pMT->rollorientation+pMT->rollp1*cos(roll+pMT->rollp2));
-		pMTData->Pitch = fmod_2PI(pitch+pMT->pitchorientation+pMT->pitchp1*cos(pitch+pMT->pitchp2));
-		pMTData->Yaw = fmod_2PI(yaw+pMT->yaworientation+pMT->yawp1*cos(yaw+pMT->yawp2));
 	}
 
 	pMT->LastMTData = *pMTData;

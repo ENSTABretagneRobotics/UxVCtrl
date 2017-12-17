@@ -1,3 +1,6 @@
+181
+Attempt to prevent NAN in MT and SBG.
+
 180
 Added bROSMode parameter to RazorAHRS.
 
