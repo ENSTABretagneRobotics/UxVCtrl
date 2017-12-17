@@ -56,8 +56,6 @@ double altitude_AGL = 0;
 double acousticmodem_x = 0, acousticmodem_y = 0, acousticmodem_z = 0, acousticmodem_r = 0;
 int opi_id = 0;
 double opi_x = 0, opi_y = 0;
-// Optical flow.
-double vrx = 0, vry = 0;
 
 // Equivalent thusters.
 // u1 : right, u2 : left, u3 : bottom.

@@ -23,6 +23,12 @@
 
 #define MESSAGE_LEN_PATHFINDERDVL 1024
 
+/*
+PD0 Header ID is 7F7Fh
+
+*/
+
+
 struct PATHFINDERDVL
 {
 	RS232PORT RS232Port;
@@ -241,7 +247,7 @@ inline int ConnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, char* szCfgFilePa
 		// Default values.
 		memset(pPathfinderDVL->szDevPath, 0, sizeof(pPathfinderDVL->szDevPath));
 		sprintf(pPathfinderDVL->szDevPath, "COM1");
-		pPathfinderDVL->BaudRate = 9600;
+		pPathfinderDVL->BaudRate = 115200;
 		pPathfinderDVL->timeout = 1500;
 		pPathfinderDVL->bSaveRawData = 1;
 

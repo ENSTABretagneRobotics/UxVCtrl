@@ -2,7 +2,7 @@
 %127.0.0.1:55555
 COM15
 % BaudRate
-9600
+115200
 % Timeout (in ms)
 1500
 % bSaveRawData

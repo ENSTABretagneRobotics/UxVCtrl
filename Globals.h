@@ -197,8 +197,6 @@ extern double altitude_AGL;
 extern double acousticmodem_x, acousticmodem_y, acousticmodem_z, acousticmodem_r;
 extern int opi_id;
 extern double opi_x, opi_y;
-// Optical flow.
-extern double vrx, vry;
 
 // Equivalent thusters.
 // u1 : right, u2 : left, u3 : bottom.

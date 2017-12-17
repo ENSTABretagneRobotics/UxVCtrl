@@ -43,6 +43,18 @@
 0
 % bEnable_NMEA_VDM
 0
+% bEnable_NMEA_PD6_SA
+0
+% bEnable_NMEA_PD6_TS
+0
+% bEnable_NMEA_PD6_BI
+0
+% bEnable_NMEA_PD6_BS
+0
+% bEnable_NMEA_PD6_BE
+0
+% bEnable_NMEA_PD6_BD
+0
 % bEnable_UBX_NAV_POSLLH
 0
 % bEnable_UBX_NAV_PVT

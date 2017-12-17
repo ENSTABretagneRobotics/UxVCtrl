@@ -238,8 +238,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		}
 		else if (robid == QUADRO_ROBID)
 		{
-			xhat = xhat+dt*(vrx*Cos(psihat)-vry*Sin(psihat)+xdotnoise);
-			yhat = yhat+dt*(vrx*Sin(psihat)+vry*Cos(psihat)+ydotnoise);
+			xhat = xhat+dt*(vrx_mes*Cos(psihat)-vry_mes*Sin(psihat)+xdotnoise);
+			yhat = yhat+dt*(vrx_mes*Sin(psihat)+vry_mes*Cos(psihat)+ydotnoise);
 			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
 			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);

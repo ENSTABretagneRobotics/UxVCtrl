@@ -187,8 +187,11 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				{
 					// Temp...
 					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
-						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM) res = GetNMEASentenceublox(&ublox, &nmeadata);
-					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
+						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM||
+						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
+						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD) res = GetNMEASentenceublox(&ublox, &nmeadata);
+					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||
+						ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
 				}
 
 				if (res == EXIT_SUCCESS)
@@ -196,7 +199,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 					EnterCriticalSection(&StateVariablesCS);
 
 					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
-						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM)
+						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM||
+						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
+						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD)
 					{
 						//printf("GPS_quality_indicator : %d, status : %c\n", nmeadata.GPS_quality_indicator, nmeadata.status);
 
@@ -270,9 +275,41 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							psitwind = fmod_2PI(M_PI/2.0-nmeadata.WindDir+M_PI-angle_env);
 							vtwind = nmeadata.WindSpeed;
 						}
+
+						if (ublox.bEnable_NMEA_PD6_SA)
+						{
+							psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+							theta_mes = -nmeadata.Pitch;
+							phi_mes = nmeadata.Roll;
+						}
+
+						if (ublox.bEnable_NMEA_PD6_BS)
+						{
+							if (nmeadata.vstatus_ship == 'A')
+							{
+								vrx_mes = nmeadata.vl_ship;
+								vry_mes = -nmeadata.vt_ship;
+								vrz_mes = nmeadata.vn_ship;
+							}
+						}
+
+						if (ublox.bEnable_NMEA_PD6_BE)
+						{
+							if (nmeadata.vstatus_earth == 'A')
+							{
+								sog = nmeadata.SOG;
+								cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+							}
+						}
+
+						if (ublox.bEnable_NMEA_PD6_BD)
+						{
+							if (nmeadata.timesincelastgood < 4) altitude_AGL = nmeadata.Altitude_AGL;
+						}
 					}
 
-					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
+					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||
+						ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
 					{
 						// lat/lon might be temporarily bad with this... 
 						if (ubxdata.nav_status_pl.gpsFix >= 0x02)

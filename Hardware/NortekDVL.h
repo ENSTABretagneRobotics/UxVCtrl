@@ -23,6 +23,111 @@
 
 #define MESSAGE_LEN_NORTEKDVL 1024
 
+
+// Modes.
+#define COMMAND_MODE_NORTEKDVL 0
+#define DATA_RETRIEVAL_MODE_NORTEKDVL 0
+#define MEASUREMENT_MODE_NORTEKDVL 0
+#define CONFIRMATION_MODE_NORTEKDVL 0
+
+/*
+BREAK
+START
+MC
+CO
+RM
+
+
+BREAK will either set the instrument in Confirmation mode or restart Command mode
+@@@@@@ <delay 100 milliseconds> K1W%!Q <delay 300 milliseconds> K1W%!Q
+
+The parameter range for the various arguments can be retrieved through the
+appropriate GETxxxLIM command, e.g. GETDVLLIM,SR to read the valid range of cell sizes
+
+All command parameters should be set explicitly, e.g.
+SETDVL,SR=1.0,SA=35.0
+OK
+A configuration of the instrument should always start with setting the default configuration, e.g.
+SETDEFAULT,CONFIG
+OK
+*/
+
+#define COMMAND_TERMINATOR_NORTEKDVL "\r\n"
+
+
+/*
+Port 9000 is a telnet-protocol ASCII interface (require username / password authentication)
+Port 9001 is a raw (binary) interface (requires username / password authentication)
+Port 9002 is a data only channel (no input accepted)
+Port 9004 is an ASCII data only channel (no input accepted).
+Port 9010/9011 - Additional Output Data Format
+
+telnet 127.0.0.1 9000
+Signature Username: nortek
+Password:
+Nortek Signature Command Interface
+*/
+// Telnet.
+#define BREAK_COMMAND_NORTEKDVL 0x03
+#define TERMINATE_COMMAND_NORTEKDVL 0x18
+
+
+/*
+When first connecting
+to a data listening port, the string "\r\nNortek name Data Interface\r\n" (name is replaced by the
+instrument host name)
+
+
+*/
+// Raw.
+
+
+// List of commands.
+#define START_COMMAND_NORTEKDVL 0 // Go in measurement mode.
+#define MC_COMMAND_NORTEKDVL 0 // .
+#define RM_COMMAND_NORTEKDVL 0 // .
+#define CO_COMMAND_NORTEKDVL 0 // .
+#define INQ_COMMAND_NORTEKDVL 0 // .
+#define SETINST_COMMAND_NORTEKDVL 0 // .
+#define GETINST_COMMAND_NORTEKDVL 0 // .
+#define GETINSTLIM_COMMAND_NORTEKDVL 0 // .
+
+
+
+
+typedef struct
+{
+	unsigned char sync;
+	unsigned char hdrSize;
+	unsigned char ID;
+	unsigned char family;
+	unsigned short dataSize;
+	unsigned short dataChecksum;
+	unsigned short hdrChecksum;
+} CommandHeaderNortekDVL_t;
+
+inline unsigned short calculateChecksumNortekDVL(unsigned short *pData, unsigned short size)
+{
+	unsigned short checksum = 0xB58C;
+	unsigned short nbshorts = (size >> 1);
+	int i;
+	for (i = 0; i < nbshorts; i++)
+	{
+		checksum += *pData;
+		size -= 2;
+		pData++;
+	}
+	if (size > 0)
+	{
+		checksum += ((unsigned short)(*pData)) << 8;
+	}
+	return checksum;
+}
+
+
+
+
+
 struct NORTEKDVL
 {
 	RS232PORT RS232Port;

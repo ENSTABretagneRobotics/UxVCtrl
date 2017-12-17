@@ -78,6 +78,12 @@ struct UBLOX
 	BOOL bEnable_NMEA_MWD;
 	BOOL bEnable_NMEA_MDA;
 	BOOL bEnable_NMEA_VDM;
+	BOOL bEnable_NMEA_PD6_SA;
+	BOOL bEnable_NMEA_PD6_TS;
+	BOOL bEnable_NMEA_PD6_BI;
+	BOOL bEnable_NMEA_PD6_BS;
+	BOOL bEnable_NMEA_PD6_BE;
+	BOOL bEnable_NMEA_PD6_BD;
 	BOOL bEnable_UBX_NAV_POSLLH;
 	BOOL bEnable_UBX_NAV_PVT;
 	BOOL bEnable_UBX_NAV_SOL;
@@ -284,7 +290,7 @@ inline int GetNMEASentenceublox(UBLOX* publox, NMEADATA* pNMEAData)
 	char* ptr = NULL;
 	int sentencelen = 0;
 	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA+1]; // +1 for the null terminator character for strings.
-	char mnemonic[NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
+	char mnemonic[MAX_NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
 	CHRONO chrono;
 
 	StartChrono(&chrono);
@@ -974,6 +980,12 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->bEnable_NMEA_MWD = 0;
 		publox->bEnable_NMEA_MDA = 0;
 		publox->bEnable_NMEA_VDM = 0;
+		publox->bEnable_NMEA_PD6_SA = 0;
+		publox->bEnable_NMEA_PD6_TS = 0;
+		publox->bEnable_NMEA_PD6_BI = 0;
+		publox->bEnable_NMEA_PD6_BS = 0;
+		publox->bEnable_NMEA_PD6_BE = 0;
+		publox->bEnable_NMEA_PD6_BD = 0;
 		publox->bEnable_UBX_NAV_POSLLH = 1;
 		publox->bEnable_UBX_NAV_PVT = 1;
 		publox->bEnable_UBX_NAV_SOL = 0;
@@ -1029,6 +1041,18 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (sscanf(line, "%d", &publox->bEnable_NMEA_MDA) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_NMEA_VDM) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_SA) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_TS) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_BI) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_BS) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_BE) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_BD) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_POSLLH) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

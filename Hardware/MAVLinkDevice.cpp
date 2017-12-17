@@ -183,16 +183,16 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 					if (mavlinkdevice.bDefaultVrToZero)
 					{
-						vrx = 0;
-						vry = 0;
+						vrx_mes = 0;
+						vry_mes = 0;
 					}
 
 					if (mavlinkdata.optical_flow.quality >= mavlinkdevice.quality_threshold)
 					{
-						//vrx = 0*vrx + 1*mavlinkdata.optical_flow.flow_comp_m_y;
-						//vry = 0*vry + 1*mavlinkdata.optical_flow.flow_comp_m_x;
-						if (fabs(mavlinkdata.optical_flow.flow_comp_m_y) > mavlinkdevice.flow_comp_m_threshold) vrx = mavlinkdata.optical_flow.flow_comp_m_y; else vrx = 0;
-						if (fabs(mavlinkdata.optical_flow.flow_comp_m_x) > mavlinkdevice.flow_comp_m_threshold) vry = mavlinkdata.optical_flow.flow_comp_m_x; else vry = 0;
+						//vrx_mes = 0*vrx_mes + 1*mavlinkdata.optical_flow.flow_comp_m_y;
+						//vry_mes = 0*vry_mes + 1*mavlinkdata.optical_flow.flow_comp_m_x;
+						if (fabs(mavlinkdata.optical_flow.flow_comp_m_y) > mavlinkdevice.flow_comp_m_threshold) vrx_mes = mavlinkdata.optical_flow.flow_comp_m_y; else vrx_mes = 0;
+						if (fabs(mavlinkdata.optical_flow.flow_comp_m_x) > mavlinkdevice.flow_comp_m_threshold) vry_mes = mavlinkdata.optical_flow.flow_comp_m_x; else vry_mes = 0;
 					}
 
 					if (mavlinkdata.rc_channels.chancount >= mavlinkdevice.overridechan)
