@@ -7,3 +7,15 @@ COM15
 1500
 % bSaveRawData
 1
+% bEnable_PD6_SA
+0
+% bEnable_PD6_TS
+0
+% bEnable_PD6_BI
+0
+% bEnable_PD6_BS
+1
+% bEnable_PD6_BE
+0
+% bEnable_D6_BD
+0

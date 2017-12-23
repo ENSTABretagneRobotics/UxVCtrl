@@ -13,6 +13,7 @@
 THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 {
 	PATHFINDERDVL pathfinderdvl;
+	NMEADATA nmeadata;
 	//double vrx = 0, vry = 0, vrz = 0, alt = 0;
 	BOOL bConnected = FALSE;
 	int i = 0;
@@ -25,7 +26,7 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		//mSleep(100);
 
 		if (bPausePathfinderDVL)
 		{
@@ -56,6 +57,8 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 			if (ConnectPathfinderDVL(&pathfinderdvl, "PathfinderDVL0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				memset(&nmeadata, 0, sizeof(nmeadata));
 
 				if (pathfinderdvl.pfSaveFile != NULL)
 				{
@@ -95,11 +98,44 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 		}
 		else
 		{
-			if (GetLatestDataPathfinderDVL(&pathfinderdvl) == EXIT_SUCCESS)
+			if (GetNMEASentencePathfinderDVL(&pathfinderdvl, &nmeadata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 
-				//altitude_AGL = alt;
+				if (pathfinderdvl.bEnable_PD6_SA||pathfinderdvl.bEnable_PD6_TS||pathfinderdvl.bEnable_PD6_BI||pathfinderdvl.bEnable_PD6_BS||
+					pathfinderdvl.bEnable_PD6_BE||pathfinderdvl.bEnable_PD6_BD)
+				{
+					if (pathfinderdvl.bEnable_PD6_SA)
+					{
+						psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+						theta_mes = -nmeadata.Pitch;
+						phi_mes = nmeadata.Roll;
+					}
+
+					if (pathfinderdvl.bEnable_PD6_BS)
+					{
+						if (nmeadata.vstatus_ship == 'A')
+						{
+							vrx_mes = nmeadata.vl_ship;
+							vry_mes = -nmeadata.vt_ship;
+							vrz_mes = nmeadata.vn_ship;
+						}
+					}
+
+					if (pathfinderdvl.bEnable_PD6_BE)
+					{
+						if (nmeadata.vstatus_earth == 'A')
+						{
+							sog = nmeadata.SOG;
+							cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+						}
+					}
+
+					if (pathfinderdvl.bEnable_PD6_BD)
+					{
+						if (nmeadata.timesincelastgood < 4) altitude_AGL = nmeadata.Altitude_AGL;
+					}
+				}
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}
@@ -108,6 +144,7 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 				printf("Connection to a PathfinderDVL lost.\n");
 				bConnected = FALSE;
 				DisconnectPathfinderDVL(&pathfinderdvl);
+				mSleep(100);
 			}
 		}
 

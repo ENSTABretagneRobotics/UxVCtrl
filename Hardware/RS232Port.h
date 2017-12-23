@@ -338,6 +338,37 @@ inline int DrainRS232Port(RS232PORT* pRS232Port)
 #endif // ENABLE_DRAINRS232PORT
 
 /*
+Check for any data available to read on a RS232 port.
+
+RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
+a RS232 port.
+
+Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is currently no data
+ available or EXIT_FAILURE if there is an error.
+*/
+inline int CheckAvailableBytesRS232Port(RS232PORT* pRS232Port)
+{
+	struct timeval tv;
+
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	switch (pRS232Port->DevType)
+	{
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
+		return waitforsocket(pRS232Port->s, tv);
+	case LOCAL_TYPE_RS232PORT:
+		return CheckAvailableBytesComputerRS232Port(pRS232Port->hDev);
+	default:
+		PRINT_DEBUG_ERROR_RS232PORT(("CheckAvailableBytesRS232Port error (%s) : %s(pRS232Port=%#x)\n", 
+			strtime_m(), 
+			"Invalid device type. ", 
+			pRS232Port));
+		return EXIT_FAILURE;
+	}
+}
+
+/*
 Write data to a RS232 port.
 
 RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 

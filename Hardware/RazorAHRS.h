@@ -358,11 +358,21 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 			CloseRS232Port(&pRazorAHRS->RS232Port);
 			return EXIT_FAILURE;
 		}
+		if ((pRazorAHRS->bSaveRawData)&&(pRazorAHRS->pfSaveFile)) 
+		{
+			fwrite(outputmodebuf, strlen(outputmodebuf), 1, pRazorAHRS->pfSaveFile);
+			fflush(pRazorAHRS->pfSaveFile);
+		}
 		if (WriteAllRS232Port(&pRazorAHRS->RS232Port, (uint8*)streammodebuf, strlen(streammodebuf)) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to a RazorAHRS : Initialization failure.\n");
 			CloseRS232Port(&pRazorAHRS->RS232Port);
 			return EXIT_FAILURE;
+		}
+		if ((pRazorAHRS->bSaveRawData)&&(pRazorAHRS->pfSaveFile)) 
+		{
+			fwrite(streammodebuf, strlen(streammodebuf), 1, pRazorAHRS->pfSaveFile);
+			fflush(pRazorAHRS->pfSaveFile);
 		}
 	}
 

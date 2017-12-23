@@ -1,8 +1,17 @@
+pouvoir changer la couleur des données lidar/sonar...
+touches menu à mettre toutes sur chiffres, grouper plus options...
+
+Disp DVL fix in use en petit comme GPS, à mettre aussi en petit, prévoir commande comme GPS pour choisir d'utiliser ou non les données DVL...
+commande pour choisir aussi quelles équations d'état on utilise, désignées par une id?
+rajouter DVL au simulateur
+
 revoir mes noms de variables pour les mesures, devraient être des intervalles avec le nom du périphérique, et la largeur de l'intervalle doit être fixée par le capteur...?
 dans observer, c'est pas facile de choisir les bonnes equations d'état selon les capteurs dispos et l'état de leurs données (e.g. quadro avec optical flow, submarine avec DVL, précision GPS RTK...), si on fait avec la largeur des intervalles, définie dans les périphériques ça pourra aider...
+commande pour régler les erreurs des capterus, et aussi en paramètres globaux?
 
-Nortek DVL supports RDI PD0, send Pathfinder command script...
-calib mag du DVL?
+Nortek DVL supports RDI PD0, send Pathfinder commands, faire fichier RDIPD0Protocol.h?
+calib mag du DVL Nortek?
+prévoir commande pour mettre en veille le PathfinderDVL (avec warning s'il est en Ethernet)
 
 pour tous les capteurs rajouter : signx, signy, signz, signphi, signtheta, signpsi (changement de repère), x, y, z, phi, theta, psi (position du device dans robot), psip1, psip2 (calib mag pour corriger les perturbations en dernier recours)
 MT : Coordinate system different from legacy mode, hardcode harmonization or not...?
@@ -35,7 +44,6 @@ blueview, seanet, es, lidar qui pourraient marcher en même temps...
 minrange param, zone morte pour tous les sonar et echosondeurs...?
 
 rajouter aussi NMEAInterface, pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
-Serial.available() equivalent?
 
 Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planner...
 

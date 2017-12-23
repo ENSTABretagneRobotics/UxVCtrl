@@ -13,6 +13,7 @@
 THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam)
 {
 	NORTEKDVL nortekdvl;
+	NMEADATA nmeadata;
 	//double vrx = 0, vry = 0, vrz = 0, alt = 0;
 	BOOL bConnected = FALSE;
 	int i = 0;
@@ -25,7 +26,7 @@ THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		//mSleep(100);
 
 		if (bPauseNortekDVL)
 		{
@@ -56,6 +57,8 @@ THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam)
 			if (ConnectNortekDVL(&nortekdvl, "NortekDVL0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				memset(&nmeadata, 0, sizeof(nmeadata));
 
 				if (nortekdvl.pfSaveFile != NULL)
 				{
@@ -95,11 +98,44 @@ THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam)
 		}
 		else
 		{
-			if (GetLatestDataNortekDVL(&nortekdvl) == EXIT_SUCCESS)
+			if (GetNMEASentenceNortekDVL(&nortekdvl, &nmeadata) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&StateVariablesCS);
 
-				//altitude_AGL = alt;
+				if (nortekdvl.bEnable_PD6_SA||nortekdvl.bEnable_PD6_TS||nortekdvl.bEnable_PD6_BI||nortekdvl.bEnable_PD6_BS||
+					nortekdvl.bEnable_PD6_BE||nortekdvl.bEnable_PD6_BD)
+				{
+					if (nortekdvl.bEnable_PD6_SA)
+					{
+						psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+						theta_mes = -nmeadata.Pitch;
+						phi_mes = nmeadata.Roll;
+					}
+
+					if (nortekdvl.bEnable_PD6_BS)
+					{
+						if (nmeadata.vstatus_ship == 'A')
+						{
+							vrx_mes = nmeadata.vl_ship;
+							vry_mes = -nmeadata.vt_ship;
+							vrz_mes = nmeadata.vn_ship;
+						}
+					}
+
+					if (nortekdvl.bEnable_PD6_BE)
+					{
+						if (nmeadata.vstatus_earth == 'A')
+						{
+							sog = nmeadata.SOG;
+							cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+						}
+					}
+
+					if (nortekdvl.bEnable_PD6_BD)
+					{
+						if (nmeadata.timesincelastgood < 4) altitude_AGL = nmeadata.Altitude_AGL;
+					}
+				}
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}
@@ -108,6 +144,7 @@ THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam)
 				printf("Connection to a NortekDVL lost.\n");
 				bConnected = FALSE;
 				DisconnectNortekDVL(&nortekdvl);
+				mSleep(100);
 			}
 		}
 

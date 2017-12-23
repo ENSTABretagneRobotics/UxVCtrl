@@ -17,9 +17,24 @@
 #include "OSThread.h"
 #endif // DISABLE_NORTEKDVLTHREAD
 
+#include "NMEAProtocol.h"
+
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#if !defined(NOMINMAX)
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // min
+#endif // !defined(NOMINMAX)
+#endif // _WIN32
+
 #define TIMEOUT_MESSAGE_NORTEKDVL 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
-#define MAX_NB_BYTES_NORTEKDVL 1024
+#define MAX_NB_BYTES_NORTEKDVL 4096
 
 #define MESSAGE_LEN_NORTEKDVL 1024
 
@@ -142,6 +157,12 @@ struct NORTEKDVL
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	BOOL bEnable_PD6_SA;
+	BOOL bEnable_PD6_TS;
+	BOOL bEnable_PD6_BI;
+	BOOL bEnable_PD6_BS;
+	BOOL bEnable_PD6_BE;
+	BOOL bEnable_PD6_BD;
 };
 typedef struct NORTEKDVL NORTEKDVL;
 /*
@@ -328,6 +349,104 @@ inline int GetLatestDataNortekDVL(NORTEKDVL* pNortekDVL)
 	return EXIT_SUCCESS;
 }
 
+inline int GetNMEASentenceNortekDVL(NORTEKDVL* pNortekDVL, NMEADATA* pNMEAData)
+{
+	char recvbuf[MAX_NB_BYTES_NORTEKDVL];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	char* ptr = NULL;
+	int sentencelen = 0;
+	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA+1]; // +1 for the null terminator character for strings.
+	char mnemonic[MAX_NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
+	CHRONO chrono;
+
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_NORTEKDVL-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired message...
+
+	nbBytesToRequest = MIN_NB_BYTES_SENTENCE_NMEA;
+	if (ReadAllRS232Port(&pNortekDVL->RS232Port, (uint8*)recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a NortekDVL. \n");
+		return EXIT_FAILURE;
+	}
+	if ((pNortekDVL->bSaveRawData)&&(pNortekDVL->pfSaveFile))
+	{
+		fwrite(recvbuf, nbBytesToRequest, 1, pNortekDVL->pfSaveFile);
+		fflush(pNortekDVL->pfSaveFile);
+	}
+	BytesReceived += nbBytesToRequest;
+	
+	for (;;)
+	{
+		memset(talkerid, 0, sizeof(talkerid));
+		memset(mnemonic, 0, sizeof(mnemonic));
+		res = FindSentenceNMEA(recvbuf, BytesReceived, talkerid, mnemonic, &sentencelen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
+		{
+			nbBytesToRequest = min(MIN_NB_BYTES_SENTENCE_NMEA, nbBytesDiscarded);
+		}	
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
+		{
+			printf("Error reading data from a NortekDVL : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+		if (ReadAllRS232Port(&pNortekDVL->RS232Port, (uint8*)recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a NortekDVL. \n");
+			return EXIT_FAILURE;
+		}
+		if ((pNortekDVL->bSaveRawData)&&(pNortekDVL->pfSaveFile))
+		{
+			fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, pNortekDVL->pfSaveFile);
+			fflush(pNortekDVL->pfSaveFile);
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_NORTEKDVL)
+		{
+			printf("Error reading data from a NortekDVL : Sentence timeout. \n");
+			return EXIT_TIMEOUT;
+		}
+	}
+
+	if (BytesReceived-nbBytesDiscarded-sentencelen > 0)
+	{
+		printf("Warning getting data from a NortekDVL : Unexpected data after a sentence. \n");
+	}
+
+	//// Get data bytes.
+
+	//memset(databuf, 0, databuflen);
+
+	//// Check the number of data bytes before copy.
+	//if (databuflen < *psentencelen)
+	//{
+	//	printf("Error getting data from a NortekDVL : Too small data buffer. \n");
+	//	return EXIT_FAILURE;
+	//}
+
+	//// Copy the data bytes of the message.
+	//if (*psentencelen > 0)
+	//{
+	//	memcpy(databuf, ptr, *psentencelen);
+	//}
+
+	if (ProcessSentenceNMEA(ptr, sentencelen, talkerid, mnemonic, pNMEAData) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 // NORTEKDVL must be initialized to 0 before (e.g. NORTEKDVL nortekdvl; memset(&nortekdvl, 0, sizeof(NORTEKDVL));)!
 inline int ConnectNortekDVL(NORTEKDVL* pNortekDVL, char* szCfgFilePath)
 {
@@ -349,6 +468,12 @@ inline int ConnectNortekDVL(NORTEKDVL* pNortekDVL, char* szCfgFilePath)
 		pNortekDVL->BaudRate = 9600;
 		pNortekDVL->timeout = 1500;
 		pNortekDVL->bSaveRawData = 1;
+		pNortekDVL->bEnable_PD6_SA = 0;
+		pNortekDVL->bEnable_PD6_TS = 0;
+		pNortekDVL->bEnable_PD6_BI = 0;
+		pNortekDVL->bEnable_PD6_BS = 1;
+		pNortekDVL->bEnable_PD6_BE = 0;
+		pNortekDVL->bEnable_PD6_BD = 0;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -362,6 +487,18 @@ inline int ConnectNortekDVL(NORTEKDVL* pNortekDVL, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pNortekDVL->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNortekDVL->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->bEnable_PD6_SA) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->bEnable_PD6_TS) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->bEnable_PD6_BI) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->bEnable_PD6_BS) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->bEnable_PD6_BE) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->bEnable_PD6_BD) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else
@@ -410,5 +547,15 @@ inline int DisconnectNortekDVL(NORTEKDVL* pNortekDVL)
 #ifndef DISABLE_NORTEKDVLTHREAD
 THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam);
 #endif // DISABLE_NORTEKDVLTHREAD
+
+// min and max might cause incompatibilities on Linux...
+#ifndef _WIN32
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // _WIN32
 
 #endif // NORTEKDVL_H

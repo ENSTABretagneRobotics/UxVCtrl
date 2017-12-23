@@ -1,5 +1,5 @@
 % Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
-%127.0.0.1:55555
+%127.0.0.1:1033
 COM15
 % BaudRate
 115200
@@ -7,3 +7,47 @@ COM15
 1500
 % bSaveRawData
 1
+% bSendBreak
+1
+% BreakMode (0 : double Hard and Soft Break, 1 : Hard and Soft Break, 2 : Hard Break, 3 : Soft Break, 4: double Hard Break, 5 : double Soft Break)
+1
+% BreakDuration (in ms)
+300
+% bRetrieveParameters
+1
+% Parameters (0 : user defaults, 1 : factory defaults, 2 : Ethernet parameters)
+1
+% bSetHeadingAlignment
+1
+% HeadingAlignment (in deg)
+45
+% bSetRollPitchMisalignment
+0
+% RollMisalignment (in deg)
+0
+% PitchMisalignment (in deg)
+0
+% bUpOrientation (0 : down, 1 : up)
+0
+% bSelectDataStream
+1
+% DataStream
+6
+% bEnableAutoPing
+0
+% bKeepAsUserDefaults
+1
+% bStartPinging
+1
+% bEnable_PD6_SA
+0
+% bEnable_PD6_TS
+0
+% bEnable_PD6_BI
+0
+% bEnable_PD6_BS
+1
+% bEnable_PD6_BE
+0
+% bEnable_D6_BD
+0
