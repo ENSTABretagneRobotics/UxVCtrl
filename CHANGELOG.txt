@@ -1,3 +1,6 @@
+184
+Added menu in OpenCVGUI.
+
 183
 Continuation of DVLs integration.
 

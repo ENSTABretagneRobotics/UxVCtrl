@@ -1067,11 +1067,12 @@ inline int DisplayKeys(void)
 	printf("%c%c%c%c(horizontal control),fv(vertical control or thrust limit),%c%c(lateral),%c(brake),space(stop),g(generalstop),t%c%c(heading, depth, alt_agl control),"
 		"o(toggle OSD),c(toggle North and control),L(toggle LLA),A(toggle alt AGL),V(toggle SOG),R(toggle YPR),"
 		"m(toggle map),M(toggle Map),*(rotate map),i(toggle image),$(toggle sonar),;(other overlays),X(disableopencvgui),+-(coordspace zoom),"
-		"T(text color),O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),"
+		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),"
 		"Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snapshot),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
-		"bn(light),uj(tilt),46825(CISCREA OSD),"
-		"C(switch),W(roll wind correction),B(Motorboat backwards),7(RC mode),1(ZQSD full mode),9(rearm)\n", 
+		"bn(light),uj(tilt),"
+		"0(RC mode),F(ZQSD full mode),.(rearm),"
+		"ENTER(extended menu), ESC(exit)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
 		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDEAGLCONTROL_KEY]);
 

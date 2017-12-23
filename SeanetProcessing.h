@@ -27,7 +27,7 @@ extern double* anglestsort;
 extern unsigned char* wtftsort;
 extern unsigned char* wtfasort;
 
-inline void DrawObstacleDistError(double x, double y, double alpha, double d, double d_err, IplImage* img)
+inline void DrawObstacleDistError(double x, double y, double alpha, double d, double d_err, CvScalar color, IplImage* img)
 {
 	COORDSYSTEM2IMG csMap2Img;
 
@@ -36,7 +36,7 @@ inline void DrawObstacleDistError(double x, double y, double alpha, double d, do
 	cvLine(img, 
 		cvPoint(XCS2JImg(&csMap2Img, x+(d-d_err)*cos(alpha)), YCS2IImg(&csMap2Img, y+(d-d_err)*sin(alpha))), 
 		cvPoint(XCS2JImg(&csMap2Img, x+(d+d_err)*cos(alpha)), YCS2IImg(&csMap2Img, y+(d+d_err)*sin(alpha))), 
-		CV_RGB(0, 0, 255), 1, 1, 0);
+		color, 1, 1, 0);
 }
 
 inline void DrawSeanetScreenshot(double theta, double StepAngleSize, int NBins, unsigned char ADLow, unsigned char ADSpan, int adc8on, IplImage* img)

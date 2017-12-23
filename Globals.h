@@ -585,6 +585,7 @@ extern double vbattery1;
 extern double vswitch;
 extern double vswitchcoef;
 extern double vswitchthreshold;
+extern CvScalar colorsonarlidar;
 extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
 extern BOOL bStdOutDetailedInfo;
@@ -741,6 +742,7 @@ inline int InitGlobals(void)
 
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
+	colorsonarlidar = CV_RGB(0, 0, 255);
 
 	InitCriticalSection(&SonarAltitudeEstimationCS);
 	InitCriticalSection(&ExternalVisualLocalizationCS);

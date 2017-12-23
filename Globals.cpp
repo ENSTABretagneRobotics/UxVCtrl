@@ -444,6 +444,7 @@ double vbattery1 = 0;
 double vswitch = 0; 
 double vswitchcoef = 0; 
 double vswitchthreshold = 0; 
+CvScalar colorsonarlidar;
 char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;
 BOOL bStdOutDetailedInfo = FALSE;

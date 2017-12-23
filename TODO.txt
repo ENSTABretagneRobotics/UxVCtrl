@@ -1,5 +1,3 @@
-pouvoir changer la couleur des données lidar/sonar...
-touches menu à mettre toutes sur chiffres, grouper plus options...
 
 Disp DVL fix in use en petit comme GPS, à mettre aussi en petit, prévoir commande comme GPS pour choisir d'utiliser ou non les données DVL...
 commande pour choisir aussi quelles équations d'état on utilise, désignées par une id?
@@ -193,7 +191,6 @@ Stabilisation profondeur peut-être pas pratique, affichage bleu détection pas cl
 rajouter estimation de vitesse dans SOG (sum(delta_xi)/(i*dt)) pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
 afficher followme fence
 afficher temps depuis début mission
-Faire un menu OSD pour changer certaines options car trop d'options?
 Rampe etas quand on accélère, en option...?
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
@@ -230,7 +227,6 @@ opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut 
 essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...->pas forcément souhaitable
 Mettre en var globale les périphériques?
 détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
-faire sorte d'OSD option menu avec machine à état pour les options de couleurs, affichage...
 Dashboard : rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
 Appli gps qui affiche sog à partir des logs?
 Faire programme pour aider à la mag calib

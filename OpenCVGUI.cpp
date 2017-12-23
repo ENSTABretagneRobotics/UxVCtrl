@@ -35,6 +35,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bEnableRCMode = FALSE;
 	BOOL bEnableFullSpeedMode = FALSE;
 	BOOL bZQSDPressed = FALSE;
+	BOOL bExtendedMenu = FALSE;
+	BOOL bColorsExtendedMenu = FALSE;
+	BOOL bCISCREAOSDExtendedMenu = FALSE;
 	CvPoint PlaySymbolPoints[3];
 	int nbPlaySymbolPoints = sizeof(PlaySymbolPoints);
 	CvPoint PauseSymbolPoints[4];
@@ -48,7 +51,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	char szText[MAX_BUF_LEN];
 	char windowname[MAX_BUF_LEN];
 	int colortextid = 0;
+	int colorsonarlidarid = 0;
+	int colormapid = 0;
 	CvScalar colortext;
+	CvScalar colormap;
 	CvFont font;
 	CHRONO chrono_recording;
 	CHRONO chrono_playing;
@@ -91,11 +97,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0.0, 1, 8);
 	colortextid = 0;
-	colortext = CV_RGB(0,255,128);
+	colortext = CV_RGB(0, 255, 128);
+	colorsonarlidarid = 0;
+	colormapid = 0;
+	colormap = CV_RGB(0, 255, 0);
 
 	for (;;)
 	{
-		if (windowname[0] != 0)	
+		if (windowname[0] != 0)
 		{
 #ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 			EnterCriticalSection(&OpenCVCS);
@@ -112,12 +121,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			c = cv::waitKey(captureperiod);
 #endif // USE_OPENCV_HIGHGUI_CPP_API
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
-		}
+	}
 		else mSleep(captureperiod);
 
 		if (bExit) break;
 #pragma region IMAGES
-		if (bEnableOpenCVGUIs[videoid]) 
+		if (bEnableOpenCVGUIs[videoid])
 		{
 			if (windowname[0] == 0)
 			{
@@ -146,7 +155,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					bDispRecordSymbol = FALSE;
 				}
 				if (bMissionRunning)
-				{	
+				{
 					//AbortMission();
 					bDispPlaySymbol = FALSE;
 				}
@@ -168,7 +177,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		}
 
 		EnterCriticalSection(&dispimgsCS[videoid]);
-		if (bShowVideoOpenCVGUIs[videoid]) 
+		if (bShowVideoOpenCVGUIs[videoid])
 		{
 			EnterCriticalSection(&imgsCS[videoid]);
 			cvCopy(imgs[videoid], dispimgs[videoid], 0);
@@ -178,13 +187,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		{
 			cvSet(dispimgs[videoid], CV_RGB(0, 0, 0), NULL);
 		}
-		if (bShowSonar) 		
+		if (bShowSonar)
 		{
 			EnterCriticalSection(&SeanetOverlayImgCS);
 			CopyOverlay(SeanetOverlayImg, dispimgs[videoid]);
 			LeaveCriticalSection(&SeanetOverlayImgCS);
 		}
-		if (bShowOtherOverlays) 		
+		if (bShowOtherOverlays)
 		{
 			//if (bDynamicSonarLocalization) 		
 			//{
@@ -192,49 +201,49 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			//	CopyOverlay(DynamicSonarLocalizationOverlayImg, dispimgs[videoid]);
 			//	LeaveCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
 			//}
-			if (bExternalVisualLocalization&&(videoid == videoid_externalvisuallocalization)) 		
+			if (bExternalVisualLocalization&&(videoid == videoid_externalvisuallocalization))
 			{
 				EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 				CopyOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 			}
-			if ((bWallDetection||bWallTrackingControl||bWallAvoidanceControl)) 		
+			if ((bWallDetection||bWallTrackingControl||bWallAvoidanceControl))
 			{
 				EnterCriticalSection(&WallOverlayImgCS);
 				CopyOverlay(WallOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&WallOverlayImgCS);
 			}
-			if ((bPipelineDetection||bPipelineTrackingControl)&&(videoid == videoid_pipeline)) 		
+			if ((bPipelineDetection||bPipelineTrackingControl)&&(videoid == videoid_pipeline))
 			{
 				EnterCriticalSection(&PipelineOverlayImgCS);
 				CopyOverlay(PipelineOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&PipelineOverlayImgCS);
 			}
-			if ((bBallDetection||bBallTrackingControl)&&(videoid == videoid_ball)) 		
+			if ((bBallDetection||bBallTrackingControl)&&(videoid == videoid_ball))
 			{
 				EnterCriticalSection(&BallOverlayImgCS);
 				CopyOverlay(BallOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&BallOverlayImgCS);
 			}
-			if ((bVisualObstacleDetection||bVisualObstacleAvoidanceControl)&&(videoid == videoid_visualobstacle)) 		
+			if ((bVisualObstacleDetection||bVisualObstacleAvoidanceControl)&&(videoid == videoid_visualobstacle))
 			{
 				EnterCriticalSection(&VisualObstacleOverlayImgCS);
 				CopyOverlay(VisualObstacleOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&VisualObstacleOverlayImgCS);
 			}
-			if ((bSurfaceVisualObstacleDetection||bSurfaceVisualObstacleAvoidanceControl)&&(videoid == videoid_surfacevisualobstacle)) 		
+			if ((bSurfaceVisualObstacleDetection||bSurfaceVisualObstacleAvoidanceControl)&&(videoid == videoid_surfacevisualobstacle))
 			{
 				EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 			}
-			if ((bPingerDetection||bPingerTrackingControl)&&(videoid == videoid_pinger)) 		
+			if ((bPingerDetection||bPingerTrackingControl)&&(videoid == videoid_pinger))
 			{
 				EnterCriticalSection(&PingerOverlayImgCS);
 				CopyOverlay(PingerOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&PingerOverlayImgCS);
 			}
-			if ((bMissingWorkerDetection||bMissingWorkerTrackingControl)&&(videoid == videoid_missingworker)) 		
+			if ((bMissingWorkerDetection||bMissingWorkerTrackingControl)&&(videoid == videoid_missingworker))
 			{
 				EnterCriticalSection(&MissingWorkerOverlayImgCS);
 				CopyOverlay(MissingWorkerOverlayImg, dispimgs[videoid]);
@@ -368,7 +377,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			}
 			break;
-		case 'v':			
+		case 'v':
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
@@ -396,7 +405,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			}
 			break;
-		case 'a':		
+		case 'a':
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
@@ -419,7 +428,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			}
 			break;
-		case 'e':	
+		case 'e':
 			switch (robid)
 			{
 			case MOTORBOAT_ROBID:
@@ -459,7 +468,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				bHeadingControl = TRUE;
 				wpsi = Center(psihat);
 			}
-			else 
+			else
 			{
 				bHeadingControl = FALSE;
 			}
@@ -470,7 +479,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				bDepthControl = TRUE;
 				wz = Center(zhat);
 			}
-			else 
+			else
 			{
 				bDepthControl = FALSE;
 			}
@@ -481,7 +490,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				bAltitudeAGLControl = TRUE;
 				wagl = altitude_AGL;
 			}
-			else 
+			else
 			{
 				bAltitudeAGLControl = FALSE;
 			}
@@ -520,19 +529,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'i': bShowVideoOpenCVGUIs[videoid] = !bShowVideoOpenCVGUIs[videoid]; break;
 		case '$': bShowSonar = !bShowSonar; break;
 		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
-		case '+': 
+		case '+':
 			if ((fabs(csMap.xMin) > 0.1)&&(fabs(csMap.xMax) > 0.1)&&(fabs(csMap.yMin) > 0.1)&&(fabs(csMap.yMax) > 0.1))
 			{
 				csMap.xMin *= 0.9; csMap.xMax *= 0.9; csMap.yMin *= 0.9; csMap.yMax *= 0.9;
 			}
 			break;
-		case '-': 
+		case '-':
 			if ((fabs(csMap.xMin) < 10000000)&&(fabs(csMap.xMax) < 10000000)&&(fabs(csMap.yMin) < 10000000)&&(fabs(csMap.yMax) < 10000000))
 			{
 				csMap.xMin /= 0.9; csMap.xMax /= 0.9; csMap.yMin /= 0.9; csMap.yMax /= 0.9;
 			}
 			break;
-			
+
 			// Disabled because casted to char, because problems on Linux if int, especially when using SHIFT...
 
 #ifdef TEST_OPENCVGUI_ARROWS
@@ -561,63 +570,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 #endif // TEST_OPENCVGUI_ARROWS
-		case 'T': 
-#pragma region COLORS
-			colortextid++;
-			switch (colortextid)
-			{
-			case 0:
-				colortext = CV_RGB(0,255,128);
-				break;
-			case 1:
-				colortext = CV_RGB(255,128,0);
-				break;
-			case 2:
-				colortext = CV_RGB(128,0,255);
-				break;
-			case 3:
-				colortext = CV_RGB(128,255,0);
-				break;
-			case 4:
-				colortext = CV_RGB(255,0,128);
-				break;
-			case 5:
-				colortext = CV_RGB(0,128,255);
-				break;
-			case 6:
-				colortext = CV_RGB(0,255,0);
-				break;
-			case 7:
-				colortext = CV_RGB(255,0,0);
-				break;
-			case 8:
-				colortext = CV_RGB(0,0,255);
-				break;
-			case 9:
-				colortext = CV_RGB(255,255,0);
-				break;
-			case 10:
-				colortext = CV_RGB(255,0,255);
-				break;
-			case 11:
-				colortext = CV_RGB(0,255,255);
-				break;
-			case 12:
-				colortext = CV_RGB(0,0,0);
-				break;
-			case 13:
-				colortext = CV_RGB(128,128,128);
-				break;
-			case 14:
-				colortext = CV_RGB(255,255,255);
-				break;
-			default:
-				colortextid = 0;
-				colortext = CV_RGB(0,255,128);
-				break;
-			}
-#pragma endregion
-			break;
 		case 'O':
 			// gpssetenvcoordposition
 			if (CheckGPSOK())
@@ -634,35 +586,35 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				// Should add speed...?
 				// Should add altitude with a big error...?
 				// Assume that x_mes,y_mes is only updated by GPS...
-				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
-				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
+				xhat = xhat & interval(x_mes-x_max_err, x_mes+x_max_err);
+				yhat = yhat & interval(y_mes-y_max_err, y_mes+y_max_err);
 				if (xhat.isEmpty || yhat.isEmpty)
 				{
-					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+					xhat = interval(x_mes-x_max_err, x_mes+x_max_err);
+					yhat = interval(y_mes-y_max_err, y_mes+y_max_err);
 				}
 			}
 			break;
-		case 'J': 
+		case 'J':
 			// enableautogpslocalization/disableautogpslocalization
-			bGPSLocalization = !bGPSLocalization; 
+			bGPSLocalization = !bGPSLocalization;
 			break;
 		case 'Z':
 			// (re)setstateestimation
-			xhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			yhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			zhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			psihat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			vrxhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-			omegazhat = interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+			xhat = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+			yhat = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+			zhat = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+			psihat = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+			vrxhat = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+			omegazhat = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 			break;
 		case 'S':
 			// staticsonarlocalization
 			bStaticSonarLocalization = TRUE;
 			break;
-		case 'D': 
+		case 'D':
 			// enabledynamicsonarlocalization/disabledynamicsonarlocalization
-			bDynamicSonarLocalization = !bDynamicSonarLocalization; 
+			bDynamicSonarLocalization = !bDynamicSonarLocalization;
 			break;
 		case 'P':
 			memset(strtime_snap, 0, sizeof(strtime_snap));
@@ -717,7 +669,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				bDispRecordSymbol = FALSE;
 			}
 			else
-			{		
+			{
 				EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
 				VideoRecordRequests[videoid] = 1; // Force recording to start.
 				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
@@ -728,7 +680,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'p':
 			if (bMissionRunning)
-			{	
+			{
 				AbortMission();
 				bDispPlaySymbol = FALSE;
 
@@ -758,11 +710,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			AbortMission();
 			break;
 		case 'h': DisplayHelp(); break;
-		case 'K':
-			LoadKeys();
-			printf("Keys updated.\n");
-			DisplayKeys();
-			break;
 		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
 			bDisableBatteryAlarm = !bDisableBatteryAlarm;
@@ -770,39 +717,75 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("Battery alarm enabled.\n");
 			break;
 		case '?': bShowBatteryInfo = !bShowBatteryInfo; break;
-		case '4': OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; break;
-		case '6': OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; break;
-		case '8': OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; break;
-		case '2': OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; break;
-		case '5': OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; break;
-		case 'C': bShowSwitchInfo = !bShowSwitchInfo; break;
-		case 'W': 
-			bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat; 
-			if (bDisableRollWindCorrectionSailboat) printf("Sailboat roll wind correction disabled.\n");
-			else printf("Sailboat roll wind correction enabled.\n");
+		case '.':
+			bRearmAutopilot = TRUE;
+			printf("Rearm.\n");
 			break;
-		case 'B': 
-			bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat; 
-			if (bEnableBackwardsMotorboat) printf("Motorboat backwards enabled.\n");
-			else printf("Motorboat backwards disabled.\n");
-			break;
-		case '7': 
-			bEnableRCMode = !bEnableRCMode; 
+		case '0':
+			bEnableRCMode = !bEnableRCMode;
 			if (bEnableRCMode) printf("RC mode enabled.\n");
 			else printf("RC mode disabled.\n");
 			break;
-		case '1': 
-			bEnableFullSpeedMode = !bEnableFullSpeedMode; 
+		case 'F':
+			bEnableFullSpeedMode = !bEnableFullSpeedMode;
 			if (bEnableFullSpeedMode) printf("Full speed mode enabled.\n");
 			else printf("Full speed mode disabled.\n");
 			break;
-		case '9': 
-			bRearmAutopilot = TRUE; 
-			printf("Rearm.\n");
-			break;
-		case 'X': 
+		case 'X':
 			bEnableOpenCVGUIs[videoid] = FALSE;
 			break;
+#pragma region EXTENDED MENU
+		case '1':
+			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 0));
+			else if (bExtendedMenu) bColorsExtendedMenu = TRUE;
+			break;
+		case '2':
+			if (bColorsExtendedMenu) CvCycleColors(&colorsonarlidarid, &colorsonarlidar, CV_RGB(0, 0, 255));
+			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bExtendedMenu) bCISCREAOSDExtendedMenu = TRUE;
+			break;
+		case '3':
+			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
+			else if (bExtendedMenu) bShowSwitchInfo = !bShowSwitchInfo;
+			break;
+		case '4': 
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; } 
+			else if (bExtendedMenu)
+			{
+				bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat;
+				if (bDisableRollWindCorrectionSailboat) printf("Sailboat roll wind correction disabled.\n");
+				else printf("Sailboat roll wind correction enabled.\n");
+			}
+			break;
+		case '5': 
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; } 
+			else if (bExtendedMenu)
+			{
+				bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat;
+				if (bEnableBackwardsMotorboat) printf("Motorboat backwards enabled.\n");
+				else printf("Motorboat backwards disabled.\n");
+			}
+			break;
+		case '6': 
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; } 
+			else if (bExtendedMenu)
+			{
+				LoadKeys();
+				printf("Keys updated.\n");
+				DisplayKeys();
+			}
+			break;
+		case '8': if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; } break;
+		case 13: // ENTER
+			if (bExtendedMenu) 
+			{
+				if (bColorsExtendedMenu) bColorsExtendedMenu = FALSE;
+				else if (bCISCREAOSDExtendedMenu) bCISCREAOSDExtendedMenu = FALSE;
+				else bExtendedMenu = FALSE;
+			}
+			else bExtendedMenu = TRUE;
+			break;
+#pragma endregion
 		case 27: // ESC
 			bExit = TRUE;
 			break;
@@ -834,8 +817,60 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		}
 #pragma endregion
 		EnterCriticalSection(&dispimgsCS[videoid]);
+#pragma region EXTENDED MENU
+		if ((bExtendedMenu)&&(!bCISCREAOSDExtendedMenu))
+		{
+			if (bColorsExtendedMenu)
+			{
+				offset = 0;
+				offset += 16;
+				strcpy(szText, "EXTENDED MENU\\COLORS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[1] TEXT (%03u,%03u,%03u)", (unsigned int)colortext.val[2], (unsigned int)colortext.val[1], (unsigned int)colortext.val[0]);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[2] SONAR/LIDAR (%03u,%03u,%03u)", (unsigned int)colorsonarlidar.val[2], (unsigned int)colorsonarlidar.val[1], (unsigned int)colorsonarlidar.val[0]);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[3] MAP (%03u,%03u,%03u)", (unsigned int)colormap.val[2], (unsigned int)colormap.val[1], (unsigned int)colormap.val[0]);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[ENTER] EXIT");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+			}
+			else
+			{
+				offset = 0;
+				offset += 16;
+				strcpy(szText, "EXTENDED MENU");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[1] COLORS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[2] CISCREA OSD (46825)");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[3] SHOW SWITCH INFO");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[4] SAILBOAT ROLL WIND CORRECTION");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[5] MOTORBOAT BACKWARDS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[6] LOAD KEYS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[ENTER] EXIT");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+			}
+		}
+#pragma endregion
 #pragma region OSD
-		if (bOSD)
+		if ((bOSD)&&(!bExtendedMenu))
 		{
 			offset = 0;
 			// Rounding...
@@ -1065,7 +1100,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsj+XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 1, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 1, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
@@ -1079,7 +1114,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsj+XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							CV_RGB(0, 255, 0), 1, 8, 0);
+							colormap, 1, 8, 0);
 					}
 					// Waypoint.
 					if (bWaypointControl)
@@ -1159,7 +1194,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, circles_x[i]), detailsi+YCS2IImg(&csMap2FullImg, circles_y[i])), 
-							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 1, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 1, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
@@ -1167,7 +1202,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						cvLine(dispimgs[videoid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, walls_xa[i]), detailsi+YCS2IImg(&csMap2FullImg, walls_ya[i])), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, walls_xb[i]), detailsi+YCS2IImg(&csMap2FullImg, walls_yb[i])), 
-							CV_RGB(0, 255, 0), 1, 8, 0);
+							colormap, 1, 8, 0);
 					}
 					// Waypoint.
 					if (bWaypointControl)
@@ -1230,7 +1265,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 2, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 2, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
@@ -1244,7 +1279,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							XCS2JImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_yb[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (walls_xb[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_yb[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							CV_RGB(0, 255, 0), 2, 8, 0);
+							colormap, 2, 8, 0);
 					}
 					// Waypoint.
 					if (bWaypointControl)
@@ -1323,7 +1358,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[videoid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, circles_x[i]), YCS2IImg(&csMap2FullImg, circles_y[i])), 
-							(int)(circles_r[i]*csMap2FullImg.JXRatio), CV_RGB(0, 255, 0), 2, 8, 0);
+							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 2, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
@@ -1331,7 +1366,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						cvLine(dispimgs[videoid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, walls_xa[i]), YCS2IImg(&csMap2FullImg, walls_ya[i])), 
 							cvPoint(XCS2JImg(&csMap2FullImg, walls_xb[i]), YCS2IImg(&csMap2FullImg, walls_yb[i])), 
-							CV_RGB(0, 255, 0), 2, 8, 0);
+							colormap, 2, 8, 0);
 					}
 					// Waypoint.
 					if (bWaypointControl)
