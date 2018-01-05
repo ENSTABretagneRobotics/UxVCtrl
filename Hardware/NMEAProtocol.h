@@ -73,12 +73,13 @@ struct NMEADATA
 	char szlatdeg[3];
 	char szlongdeg[4];
 	char north, east;
-	int GPS_quality_indicator;
+	int GPS_quality_indicator; // Possible values for quality: 0 = No fix, 1 = Autonomous GNSS fix, 2 = Differential GNSS fix, 4 = RTK fixed, 5 = RTK float, 6 = Estimated/Dead reckoning fix.
 	int nbsat;
 	double hdop;
 	double height_geoid;
-	char status;
-	double sog, cog, mag_cog; // Respectively in knots, deg in NED coordinate system.
+	char status; // Possible values for status: V = Data invalid, A = Data valid.
+	char posMode; // Possible values for posMode: N = No fix, E = Estimated/Dead reckoning fix, A = Autonomous GNSS fix, D = Differential GNSS fix, F = RTK float, R = RTK fixed.
+	double sog, kph, cog, mag_cog; // Respectively in knots, km/h, deg in NED coordinate system.
 	double heading, deviation, variation; // Respectively in deg in NED coordinate system.
 	char dev_east, var_east;
 	// AIS.
@@ -152,7 +153,7 @@ inline void EncodeSentenceNMEA(char* sentence, int* psentencelen, char* talkerid
 	strcpy(&sentence[1], talkerid);
 	strcpy(&sentence[1+strlen(talkerid)], mnemonic);
 	memcpy(&sentence[1+strlen(talkerid)+strlen(mnemonic)], payload, payloadlen);
-	*psentencelen = 1+strlen(talkerid)+strlen(mnemonic)+payloadlen+MAX_NB_BYTES_CHECKSUM_NMEA+MAX_NB_BYTES_END_NMEA;
+	*psentencelen = 1+(int)strlen(talkerid)+(int)strlen(mnemonic)+payloadlen+MAX_NB_BYTES_CHECKSUM_NMEA+MAX_NB_BYTES_END_NMEA;
 	sentence[*psentencelen-MAX_NB_BYTES_END_NMEA-MAX_NB_BYTES_CHECKSUM_NMEA] = '*'; // Needed for ComputeChecksumNMEA().
 	ComputeChecksumNMEA(sentence, *psentencelen, checksum);
 	strcpy(&sentence[*psentencelen-MAX_NB_BYTES_END_NMEA-MAX_NB_BYTES_CHECKSUM_NMEA+1], checksum+1);
@@ -600,7 +601,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// GPS essential fix data.
 	if (strstr(mnemonic, "GGA"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		memset(pNMEAData->szlatdeg, 0, sizeof(pNMEAData->szlatdeg));
 		memset(pNMEAData->szlongdeg, 0, sizeof(pNMEAData->szlongdeg));
 
@@ -650,15 +651,25 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// GPS recommended minimum data.
 	if (strstr(mnemonic, "RMC"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		memset(pNMEAData->szlatdeg, 0, sizeof(pNMEAData->szlatdeg));
 		memset(pNMEAData->szlongdeg, 0, sizeof(pNMEAData->szlongdeg));
 
 		if (
+			(sscanf(sentence+offset, "RMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,%lf,%c,%c", &pNMEAData->utc, &pNMEAData->status, 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
+			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date, &pNMEAData->variation, &pNMEAData->var_east, &pNMEAData->posMode) != 17)
+			&&
 			(sscanf(sentence+offset, "RMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,%lf,%c", &pNMEAData->utc, &pNMEAData->status, 
 			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
 			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
 			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date, &pNMEAData->variation, &pNMEAData->var_east) != 16)
+			&&
+			(sscanf(sentence+offset, "RMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf,,,%c", &pNMEAData->utc, &pNMEAData->status, 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east,
+			&pNMEAData->sog, &pNMEAData->cog, &pNMEAData->date, &pNMEAData->posMode) != 15)
 			&&
 			(sscanf(sentence+offset, "RMC,%lf,%c,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%lf,%lf", &pNMEAData->utc, &pNMEAData->status, 
 			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
@@ -710,11 +721,15 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// GPS position, latitude / longitude and time.
 	if (strstr(mnemonic, "GLL"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		memset(pNMEAData->szlatdeg, 0, sizeof(pNMEAData->szlatdeg));
 		memset(pNMEAData->szlongdeg, 0, sizeof(pNMEAData->szlongdeg));
 
-		if ((sscanf(sentence+offset, "GLL,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%c", 
+		if ((sscanf(sentence+offset, "GLL,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%c,%c", 
+			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
+			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east, 
+			&pNMEAData->utc, &pNMEAData->status, &pNMEAData->posMode) != 12)&&
+			(sscanf(sentence+offset, "GLL,%c%c%lf,%c,%c%c%c%lf,%c,%lf,%c", 
 			&pNMEAData->szlatdeg[0], &pNMEAData->szlatdeg[1], &pNMEAData->latmin, &pNMEAData->north, 
 			&pNMEAData->szlongdeg[0], &pNMEAData->szlongdeg[1], &pNMEAData->szlongdeg[2], &pNMEAData->longmin, &pNMEAData->east, 
 			&pNMEAData->utc, &pNMEAData->status) != 11)&&
@@ -746,13 +761,22 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// GPS COG and SOG.
 	if (strstr(mnemonic, "VTG"))
 	{
-		offset = 1+strlen(talkerid);
-		if ((sscanf(sentence+offset, "VTG,%lf,T,%lf,M,%lf,N", &pNMEAData->cog, &pNMEAData->mag_cog, &pNMEAData->sog) != 3)&&
+		offset = 1+(int)strlen(talkerid);
+		if ((sscanf(sentence+offset, "VTG,%lf,T,%lf,M,%lf,N,%lf,K,%c", &pNMEAData->cog, &pNMEAData->mag_cog, &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 5)&&
+			(sscanf(sentence+offset, "VTG,%lf,T,,M,%lf,N,%lf,K,%c", &pNMEAData->cog, &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 4)&&
+			(sscanf(sentence+offset, "VTG,%lf,T,,,%lf,N,%lf,K,%c", &pNMEAData->cog, &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 4)&&
+			(sscanf(sentence+offset, "VTG,%lf,T,%lf,M,%lf,N", &pNMEAData->cog, &pNMEAData->mag_cog, &pNMEAData->sog) != 3)&&
 			(sscanf(sentence+offset, "VTG,%lf,T,,M,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)&&
 			(sscanf(sentence+offset, "VTG,%lf,T,,,%lf,N", &pNMEAData->cog, &pNMEAData->sog) != 2)&&
+			(sscanf(sentence+offset, "VTG,nan,T,nan,M,%lf,N,%lf,K,%c", &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 3)&&
+			(sscanf(sentence+offset, "VTG,NAN,T,NAN,M,%lf,N,%lf,K,%c", &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 3)&&
+			(sscanf(sentence+offset, "VTG,NaN,T,NaN,M,%lf,N,%lf,K,%c", &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 3)&&
 			(sscanf(sentence+offset, "VTG,nan,T,nan,M,%lf,N", &pNMEAData->sog) != 1)&&
 			(sscanf(sentence+offset, "VTG,NAN,T,NAN,M,%lf,N", &pNMEAData->sog) != 1)&&
 			(sscanf(sentence+offset, "VTG,NaN,T,NaN,M,%lf,N", &pNMEAData->sog) != 1)&&
+			(sscanf(sentence+offset, "VTG,nan,T,,,%lf,N,%lf,K,%c", &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 3)&&
+			(sscanf(sentence+offset, "VTG,NAN,T,,,%lf,N,%lf,K,%c", &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 3)&&
+			(sscanf(sentence+offset, "VTG,NaN,T,,,%lf,N,%lf,K,%c", &pNMEAData->sog, &pNMEAData->kph, &pNMEAData->posMode) != 3)&&
 			(sscanf(sentence+offset, "VTG,nan,T,,,%lf,N", &pNMEAData->sog) != 1)&&
 			(sscanf(sentence+offset, "VTG,NAN,T,,,%lf,N", &pNMEAData->sog) != 1)&&
 			(sscanf(sentence+offset, "VTG,NaN,T,,,%lf,N", &pNMEAData->sog) != 1))
@@ -769,7 +793,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// Heading data.
 	if (strstr(mnemonic, "HDG"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		if (sscanf(sentence+offset, "HDG,%lf,%lf,%c,%lf,%c", 
 			&pNMEAData->heading, &pNMEAData->deviation, &pNMEAData->dev_east, &pNMEAData->variation, &pNMEAData->var_east) != 5)
 		{
@@ -785,7 +809,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// Wind speed and angle, in relation to the vessel's bow/centerline.
 	if (strstr(mnemonic, "MWV"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		if (sscanf(sentence+offset, "MWV,%lf,R,%lf,%c,A", 
 			&pNMEAData->awinddir, &pNMEAData->awindspeed, &pNMEAData->cawindspeed) != 3)
 		{
@@ -810,7 +834,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// Wind direction and speed, with respect to north.
 	if (strstr(mnemonic, "MWD"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		if (sscanf(sentence+offset, "MWD,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
 			&pNMEAData->winddir, &pNMEAData->cwinddir, &f1, &c1, &f2, &c2, &pNMEAData->windspeed, &pNMEAData->cwindspeed) != 8)
 		{
@@ -828,7 +852,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// Meteorological composite data.
 	if (strstr(mnemonic, "MDA"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		if (sscanf(sentence+offset, "MDA,%lf,%c,%lf,%c,%lf,%c,,,,,,,%lf,%c,%lf,%c,%lf,%c,%lf,%c", 
 			&f0, &c0, &pNMEAData->pressure, &pNMEAData->cpressure, &pNMEAData->temperature, &pNMEAData->ctemperature,  
 			&pNMEAData->winddir, &pNMEAData->cwinddir, &f1, &c1, &f2, &c2, &pNMEAData->windspeed, &pNMEAData->cwindspeed) != 14)
@@ -847,7 +871,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	// AIS data.
 	if (strstr(mnemonic, "VDM"))
 	{
-		offset = 1+strlen(talkerid);
+		offset = 1+(int)strlen(talkerid);
 		memset(aisbuf, 0, sizeof(aisbuf));
 		if (sscanf(sentence+offset, "VDM,%d,%d,,%c,%128s", 
 			&pNMEAData->nbsentences, &pNMEAData->sentence_number, &pNMEAData->AIS_channel, aisbuf) != 4)

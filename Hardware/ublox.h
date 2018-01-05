@@ -19,7 +19,7 @@
 
 #include "UBXProtocol.h"
 #include "NMEAProtocol.h"
-#include "RTCM3Protocol.h"
+//#include "RTCM3Protocol.h"
 
 // Need to be undefined at the end of the file...
 // min and max might cause incompatibilities on Linux...

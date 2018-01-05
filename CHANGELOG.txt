@@ -1,3 +1,6 @@
+185
+Updated NMEA and ublox to get more info about the GNSS fix quality.
+
 184
 Added menu in OpenCVGUI.
 

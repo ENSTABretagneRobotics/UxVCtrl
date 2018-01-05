@@ -274,6 +274,31 @@ struct NAV_POSLLH_PL_UBX
 	unsigned int vAcc; // In mm.
 	//unsigned char padding[4];
 };
+// 8 bits = 1*sizeof(unsigned char).
+struct valid_NAV_PVT_PL_UBX
+{
+	unsigned char validDate : 1;
+	unsigned char validTime : 1;
+	unsigned char fullyResolved : 1;
+	unsigned char reserved1 : 5;
+};
+// 8 bits = 1*sizeof(unsigned char).
+struct flags_NAV_PVT_PL_UBX
+{
+	unsigned char gnssFixOK : 1;
+	unsigned char diffSoln : 1;
+	unsigned char psmState : 3;
+	unsigned char headVehValid : 1;
+	unsigned char carrSoln : 2;
+};
+// 8 bits = 1*sizeof(unsigned char).
+struct flags2_NAV_PVT_PL_UBX
+{
+	unsigned char reserved1 : 5;
+	unsigned char confirmedAvai : 1;
+	unsigned char confirmedDate : 1;
+	unsigned char confirmedTime : 1;
+};
 #define LEN_NAV_PVT_PL_UBX 92
 struct NAV_PVT_PL_UBX
 {
@@ -284,12 +309,12 @@ struct NAV_PVT_PL_UBX
 	unsigned char hour;
 	unsigned char minute;
 	unsigned char sec; // In s.
-	unsigned char valid;
+	struct valid_NAV_PVT_PL_UBX valid;
 	unsigned int tAcc; // In ns.
 	int nano; // In ns.
 	unsigned char fixType;
-	unsigned char flags;
-	unsigned char flags2;
+	struct flags_NAV_PVT_PL_UBX flags;
+	struct flags2_NAV_PVT_PL_UBX flags2;
 	unsigned char numSV;
 	int lon; // In 1e-7 deg.
 	int lat; // In 1e-7 deg.
@@ -353,7 +378,7 @@ struct flags_NAV_STATUS_PL_UBX
 // 8 bits = 1*sizeof(unsigned char).
 struct fixStat_NAV_STATUS_PL_UBX
 {
-	unsigned char dgpsIStat : 1;
+	unsigned char diffCorr : 1;
 	unsigned char reserved1 : 5;
 	unsigned char mapMatching : 2;
 };

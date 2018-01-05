@@ -63,6 +63,7 @@ All the shared variables should be declared in Globals.cpp/.h and protected by c
 When enabled (see bMAVLinkInterface setting in UxVCtrl.txt), a MAVLink server is listening on TCP port 5760. You can use Mission Planner to connect to it and get partial position info (cancel the "Get Params" or "Home altitude" dialogs if they appear).
 
 Hardware support : 
+- BlueView : Teledyne BlueView M450/900/2250-130 sonars.
 - Hokuyo : Hokuyo URG-04LX-UG01 laser telemeter.
 - Maestro : Pololu Mini Maestro 6, 18, 24 servo controllers.
 - MAVLinkDevice : ArduPilot/ArduFlyer/HKPilot Mega (APM 2.5), PX4FLOW.
@@ -70,6 +71,7 @@ Hardware support :
 - MT : Xsens MTi, MTi-G AHRS.
 - NMEADevice : GPS, Furuno WS200 weather station, AIS Receiver dAISy.
 - P33x : Keller pressure sensor PAA-33x.
+- PathfinderDVL : TRDI Pathfinder DVL.
 - RazorAHRS : SparkFun 9DOF Razor IMU.
 - RPLIDAR : RPLIDAR A2 laser telemeter.
 - SBG : SBG Systems Ellipse-N AHRS.
