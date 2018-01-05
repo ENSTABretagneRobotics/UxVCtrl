@@ -189,29 +189,31 @@
 % controllerperiod (in ms)
 25
 % Observer parameters
-% x_max_err (in m)
-5.0
-% y_max_err (in m)
-5.0
-% z_max_err (in m)
+% z_pressure_acc (in m)
 0.1
-% phi_max_err (in rad)
+% dvl_acc (in m/s)
 0.1
-% theta_max_err (in rad)
+% of_acc (in m/s)
 0.1
-% psi_max_err (in rad)
+% acousticmodem_acc (in m)
+5
+% phi_ahrs_acc (in rad)
 0.1
-% vrx_max_err (in m/s)
+% theta_ahrs_acc (in rad)
 0.1
-% vry_max_err (in m/s)
+% psi_ahrs_acc (in rad)
 0.1
-% vrz_max_err (in m/s)
+% accrx_ahrs_acc (in m/s2)
 0.1
-% omegax_max_err (in rad/s)
+% accry_ahrs_acc (in m/s2)
 0.1
-% omegay_max_err (in rad/s)
+% accrz_ahrs_acc (in m/s2)
 0.1
-% omegaz_max_err (in rad/s)
+% omegax_ahrs_acc (in rad/s)
+0.1
+% omegay_ahrs_acc (in rad/s)
+0.1
+% omegaz_ahrs_acc (in rad/s)
 0.1
 % alpha_max_err (in rad, modified by Seanet)
 0.01
@@ -321,6 +323,32 @@
 -0.001
 % omegazdotnoise.sup
 0.001
+% RTK_fixed_acc (in m)
+0.025
+% RTK_float_acc (in m)
+0.5
+% GPS_high_acc (in m)
+2.5
+% GPS_high_acc_HDOP (<=)
+0.8
+% GPS_high_acc_nbsat (>=)
+8
+% GPS_med_acc (in m)
+5
+% GPS_med_acc_HDOP (<=)
+1
+% GPS_med_acc_nbsat (>=)
+6
+% GPS_low_acc (in m)
+10
+% GPS_low_acc_HDOP (<=)
+2
+% GPS_low_acc_nbsat (in m, >=)
+4
+% GPS_min_sat_signal (in [0;99])
+20
+% GPS_submarine_depth_limit (in m, >=)
+-0.5
 % rangescale (in m, modified by Seanet)
 10
 % sdir
@@ -448,8 +476,6 @@
 %3.14
 % omegas
 2.3562
-% z_gps_lim (limit depth to get GPS in m)
--0.5
 % outliers_ratio
 0.5
 % simulatorperiod (in ms)

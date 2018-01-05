@@ -373,6 +373,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 		if (robid & SAILBOAT_ROBID_MASK) 
 		{
+			double latitude = 0, longitude = 0, altitude = 0;
+
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
+
 			if ((bStdOutDetailedInfo)&&(counter%10 == 0))
 			{
 				int days = 0, hours = 0, minutes = 0, seconds = 0;

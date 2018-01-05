@@ -572,26 +572,28 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #endif // TEST_OPENCVGUI_ARROWS
 		case 'O':
 			// gpssetenvcoordposition
-			if (CheckGPSOK())
+			if (bCheckGNSSOK())
 			{
+				double latitude = 0, longitude = 0, altitude = 0;
+
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
 				lat_env = latitude; long_env = longitude;
 			}
 			break;
 		case 'G':
 			// gpslocalization
-			if (CheckGPSOK())
+			if (bCheckGNSSOK())
 			{
 				// Should add speed...?
 				// Should add altitude with a big error...?
-				// Assume that x_mes,y_mes is only updated by GPS...
-				xhat = xhat & interval(x_mes-x_max_err, x_mes+x_max_err);
-				yhat = yhat & interval(y_mes-y_max_err, y_mes+y_max_err);
+				xhat = xhat & x_gps;
+				yhat = yhat & y_gps;
 				if (xhat.isEmpty || yhat.isEmpty)
 				{
-					xhat = interval(x_mes-x_max_err, x_mes+x_max_err);
-					yhat = interval(y_mes-y_max_err, y_mes+y_max_err);
+					xhat = x_gps;
+					yhat = y_gps;
 				}
 			}
 			break;
@@ -736,7 +738,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 #pragma region EXTENDED MENU
 		case '1':
-			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 0));
+			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 128));
 			else if (bExtendedMenu) bColorsExtendedMenu = TRUE;
 			break;
 		case '2':
@@ -968,14 +970,42 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
-			if (CheckGPSOK())
-			{
-				if (bGPSLocalization) strcpy(szText, "GPS FIX (IN USE)"); else strcpy(szText, "GPS FIX");
-			}
-			else strcpy(szText, "NO FIX");
 			offset += 16;
-			if (CheckGPSOK()) cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-			else cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, CV_RGB(255,0,0));
+			switch (GetGNSSlevel())
+			{
+			case GNSS_ACC_LEVEL_RTK_FIXED:
+				if (bGPSLocalization) strcpy(szText, "RTK FIX (IN USE)"); else strcpy(szText, "RTK FIX");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				break;
+			case GNSS_ACC_LEVEL_RTK_FLOAT:
+				if (bGPSLocalization) strcpy(szText, "RTK FLT (IN USE)"); else strcpy(szText, "RTK FLT");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				break;
+			case GNSS_ACC_LEVEL_RTK_UNREL:
+				if (bGPSLocalization) strcpy(szText, "RTK ? (IN USE)"); else strcpy(szText, "RTK ?");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+				break;
+			case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
+				if (bGPSLocalization) strcpy(szText, "GPS HIGH (IN USE)"); else strcpy(szText, "GPS HIGH");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				break;
+			case GNSS_ACC_LEVEL_GNSS_FIX_MED:
+				if (bGPSLocalization) strcpy(szText, "GPS MED (IN USE)"); else strcpy(szText, "GPS MED");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				break;
+			case GNSS_ACC_LEVEL_GNSS_FIX_LOW:
+				if (bGPSLocalization) strcpy(szText, "GPS LOW (IN USE)"); else strcpy(szText, "GPS LOW");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				break;
+			case GNSS_ACC_LEVEL_GNSS_FIX_UNREL:
+				if (bGPSLocalization) strcpy(szText, "GPS ? (IN USE)"); else strcpy(szText, "GPS ?");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+				break;
+			default:
+				strcpy(szText, "NO FIX");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+				break;
+			}
 			if (bDispSOG)
 			{
 				sprintf(szText, "SOG:%.1f", sog);

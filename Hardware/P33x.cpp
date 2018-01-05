@@ -104,7 +104,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 				pressure_mes = pressure;
-				z_mes = Pressure2Height(pressure, p33x.PressureRef, p33x.WaterDensity);
+				z_pressure = Pressure2Height(pressure, p33x.PressureRef, p33x.WaterDensity)+interval(-z_pressure_acc, z_pressure_acc);
 				LeaveCriticalSection(&StateVariablesCS);
 
 				if (p33x.bSaveRawData)

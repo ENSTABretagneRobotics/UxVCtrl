@@ -17,7 +17,6 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	MTDATA mtdata;
 	struct tm t;
 	time_t tt = 0;
-	double dval = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -28,7 +27,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 	memset(&mt, 0, sizeof(MT));
 
-	bGPSOKMT = FALSE;
+	GNSSqualityMT = GNSS_NO_FIX;
 
 	StartChrono(&chrono_period);
 
@@ -44,7 +43,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			if (bConnected)
 			{
 				printf("MT paused.\n");
-				bGPSOKMT = FALSE;
+				GNSSqualityMT = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
@@ -58,7 +57,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a MT.\n");
-				bGPSOKMT = FALSE;
+				GNSSqualityMT = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
@@ -119,7 +118,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKMT = FALSE;
+				GNSSqualityMT = GNSS_NO_FIX;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -132,22 +131,19 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				phi_mes = fmod_2PI(mtdata.Roll);
-				omegax_mes = mtdata.gyrX;
-				theta_mes = fmod_2PI(mtdata.Pitch);
-				omegay_mes = mtdata.gyrY;
-				psi_mes = fmod_2PI(M_PI/2.0+mtdata.Yaw-angle_env);
-				omegaz_mes = mtdata.gyrZ;
+				phi_ahrs = fmod_2PI(mtdata.Roll)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+				omegax_ahrs = mtdata.gyrX+interval(-omegax_ahrs_acc, omegax_ahrs_acc);
+				theta_ahrs = fmod_2PI(mtdata.Pitch)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+				omegay_ahrs = mtdata.gyrY+interval(-omegay_ahrs_acc, omegay_ahrs_acc);
+				psi_ahrs = fmod_2PI(M_PI/2.0+mtdata.Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+				omegaz_ahrs = mtdata.gyrZ+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
+
+				// accel...
 
 				if ((int)mtdata.UTCTime.Valid >= VALID_UTC_UTC_TIME_FLAG_MT)
 				{
-					//printf("%f;%f\n", mtdata.Lat, mtdata.Long);
-					latitude = mtdata.Lat;
-					longitude = mtdata.Long;
-					altitude = mtdata.Alt;
-					// GPS altitude not used since not always reliable...
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKMT = TRUE;
+					GNSSqualityMT = AUTONOMOUS_GNSS_FIX;
+					ComputeGNSSPosition(mtdata.Lat, mtdata.Long, mtdata.Alt, GNSSqualityMT, 0, 0);
 					// Get UTC as ms.
 					memset(&t, 0, sizeof(t));
 					t.tm_year = mtdata.UTCTime.Year-1900; t.tm_mon = mtdata.UTCTime.Month-1; t.tm_mday = mtdata.UTCTime.Day; 
@@ -157,7 +153,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 				}
 				else
 				{
-					bGPSOKMT = FALSE;
+					GNSSqualityMT = GNSS_NO_FIX;
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);
@@ -192,7 +188,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			else
 			{
 				printf("Connection to a MT lost.\n");
-				bGPSOKMT = FALSE;
+				GNSSqualityMT = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMT(&mt);
 			}
@@ -205,7 +201,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 	StopChronoQuick(&chrono_period);
 
-	bGPSOKMT = FALSE;
+	GNSSqualityMT = GNSS_NO_FIX;
 
 	if (mt.pfSaveFile != NULL)
 	{

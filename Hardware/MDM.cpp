@@ -576,15 +576,15 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						box P = box(xhat,yhat);
 						if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 						box M = box(
-							interval(acousticmodem_x-x_max_err,acousticmodem_x+x_max_err),
-							interval(acousticmodem_y-y_max_err,acousticmodem_y+y_max_err)
+							interval(acousticmodem_x-acousticmodem_acc,acousticmodem_x+acousticmodem_acc),
+							interval(acousticmodem_y-acousticmodem_acc,acousticmodem_y+acousticmodem_acc)
 							);
-						interval R = interval(acousticmodem_r-(x_max_err+y_max_err)/2.0,acousticmodem_r+(x_max_err+y_max_err)/2.0);
+						interval R = interval(acousticmodem_r-acousticmodem_acc,acousticmodem_r+acousticmodem_acc);
 						Cdistance(R, P, M);
 						if (R.isEmpty||P.IsEmpty()||M.IsEmpty()) 
 						{
 							// Expand initial box to be able to contract next time and because we are probably lost...
-							P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+							P = box(xhat,yhat)+box(interval(-acousticmodem_acc,acousticmodem_acc),interval(-acousticmodem_acc,acousticmodem_acc));
 						}
 						if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 						xhat = P[1];

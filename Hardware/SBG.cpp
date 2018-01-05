@@ -17,7 +17,6 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 	SBGDATA sbgdata;
 	struct tm t;
 	time_t tt = 0;
-	double dval = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -28,7 +27,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 
 	memset(&sbg, 0, sizeof(SBG));
 
-	bGPSOKSBG = FALSE;
+	GNSSqualitySBG = GNSS_NO_FIX;
 
 	StartChrono(&chrono_period);
 
@@ -44,7 +43,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			if (bConnected)
 			{
 				printf("SBG paused.\n");
-				bGPSOKSBG = FALSE;
+				GNSSqualitySBG = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectSBG(&sbg);
 			}
@@ -58,7 +57,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a SBG.\n");
-				bGPSOKSBG = FALSE;
+				GNSSqualitySBG = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectSBG(&sbg);
 			}
@@ -119,7 +118,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKSBG = FALSE;
+				GNSSqualitySBG = GNSS_NO_FIX;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -132,24 +131,19 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				phi_mes = fmod_2PI(sbgdata.Roll);
-				omegax_mes = sbgdata.gyrX;
-				theta_mes = fmod_2PI(-sbgdata.Pitch);
-				omegay_mes = -sbgdata.gyrY;
-				psi_mes = fmod_2PI(M_PI/2.0-sbgdata.Yaw-angle_env);
-				omegaz_mes = -sbgdata.gyrZ;
+				phi_ahrs = fmod_2PI(sbgdata.Roll)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+				omegax_ahrs = sbgdata.gyrX+interval(-omegax_ahrs_acc, omegax_ahrs_acc);
+				theta_ahrs = fmod_2PI(-sbgdata.Pitch)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+				omegay_ahrs = -sbgdata.gyrY+interval(-omegay_ahrs_acc, omegay_ahrs_acc);
+				psi_ahrs = fmod_2PI(M_PI/2.0-sbgdata.Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+				omegaz_ahrs = -sbgdata.gyrZ+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
 
 				// Check accuracy at 3*sigma to use GPS data.
 				if ((sbgdata.positionStdDev[0] > 0)&&(sbgdata.positionStdDev[0] < sbg.gpsaccuracythreshold/3.0)&&
 					(sbgdata.positionStdDev[1] > 0)&&(sbgdata.positionStdDev[1] < sbg.gpsaccuracythreshold/3.0))
 				{
-					//printf("%f;%f\n", sbgdata.Lat, sbgdata.Long);
-					latitude = sbgdata.Lat;
-					longitude = sbgdata.Long;
-					altitude = sbgdata.Alt;
-					// GPS altitude not used since not always reliable...
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKSBG = TRUE;
+					GNSSqualitySBG = AUTONOMOUS_GNSS_FIX;
+					ComputeGNSSPosition(sbgdata.Lat, sbgdata.Long, sbgdata.Alt, GNSSqualitySBG, 0, 0);
 					// Get UTC as ms.
 					memset(&t, 0, sizeof(t));
 					t.tm_year = sbgdata.UTCTime.Year-1900; t.tm_mon = sbgdata.UTCTime.Month-1; t.tm_mday = sbgdata.UTCTime.Day; 
@@ -159,7 +153,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				}
 				else
 				{
-					bGPSOKSBG = FALSE;
+					GNSSqualitySBG = GNSS_NO_FIX;
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);
@@ -194,7 +188,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			else
 			{
 				printf("Connection to a SBG lost.\n");
-				bGPSOKSBG = FALSE;
+				GNSSqualitySBG = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectSBG(&sbg);
 			}
@@ -207,7 +201,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 
 	StopChronoQuick(&chrono_period);
 
-	bGPSOKSBG = FALSE;
+	GNSSqualitySBG = GNSS_NO_FIX;
 
 	if (sbg.pfSaveFile != NULL)
 	{

@@ -114,18 +114,19 @@ inline int LoadConfig(void)
 	controllerperiod = 25;
 #pragma endregion
 #pragma region Observer parameters
-	x_max_err = 10;
-	y_max_err = 10;
-	z_max_err = 0.1;
-	phi_max_err = 0.1;
-	theta_max_err = 0.1;
-	psi_max_err = 0.1;
-	vrx_max_err = 0.1;
-	vry_max_err = 0.1;
-	vrz_max_err = 0.1;
-	omegax_max_err = 0.1;
-	omegay_max_err = 0.1;
-	omegaz_max_err = 0.1;
+	z_pressure_acc = 0.1;
+	dvl_acc = 0.1;
+	of_acc = 0.1;
+	acousticmodem_acc = 5;
+	phi_ahrs_acc = 0.1;
+	theta_ahrs_acc = 0.1;
+	psi_ahrs_acc = 0.1;
+	accrx_ahrs_acc = 0.1;
+	accry_ahrs_acc = 0.1;
+	accrz_ahrs_acc = 0.1;
+	omegax_ahrs_acc = 0.1;
+	omegay_ahrs_acc = 0.1;
+	omegaz_ahrs_acc = 0.1;
 	alpha_max_err = 0.01;
 	d_max_err = 0.1;
 	alphavrxhat = interval(0.09,0.10);
@@ -148,6 +149,19 @@ inline int LoadConfig(void)
 	omegaxdotnoise = interval(-0.001,+0.001);
 	omegaydotnoise = interval(-0.001,+0.001);
 	omegazdotnoise = interval(-0.001,+0.001);
+	RTK_fixed_acc = 0.025;
+	RTK_float_acc = 0.5;
+	GPS_high_acc = 2.5;
+	GPS_high_acc_HDOP = 0.8;
+	GPS_high_acc_nbsat = 8;
+	GPS_med_acc = 5;
+	GPS_med_acc_HDOP = 1;
+	GPS_med_acc_nbsat = 6;
+	GPS_low_acc = 10;
+	GPS_low_acc_HDOP = 2;
+	GPS_low_acc_nbsat = 4;
+	GPS_min_sat_signal = 20;
+	GPS_submarine_depth_limit = -0.5;
 	rangescale = 10;
 	sdir = 1;
 	nb_outliers = 25;
@@ -191,7 +205,6 @@ inline int LoadConfig(void)
 	vzup = 0.01;
 	alphas = 0;
 	omegas = 2.3562;
-	z_gps_lim = -0.01;
 	outliers_ratio = 0.5;
 	simulatorperiod = 70;
 #pragma endregion
@@ -375,29 +388,31 @@ inline int LoadConfig(void)
 #pragma endregion
 #pragma region Observer parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &x_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &z_pressure_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &y_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &dvl_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &z_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &of_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &phi_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &acousticmodem_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &theta_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &phi_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &psi_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &theta_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &vrx_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &psi_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &vry_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &accrx_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &vrz_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &accry_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &omegax_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &accrz_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &omegay_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegax_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &omegaz_max_err) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegay_ahrs_acc) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegaz_ahrs_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &alpha_max_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -523,6 +538,32 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &d1) != 1) printf("Invalid configuration file.\n");
 		omegazdotnoise = interval(d0,d1);
 
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &RTK_fixed_acc) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &RTK_float_acc) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_high_acc) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_high_acc_HDOP) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &GPS_high_acc_nbsat) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_med_acc) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_med_acc_HDOP) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &GPS_med_acc_nbsat) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_low_acc) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_low_acc_HDOP) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &GPS_low_acc_nbsat) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &GPS_min_sat_signal) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_submarine_depth_limit) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &rangescale) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -651,8 +692,6 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &omegas) != 1) printf("Invalid configuration file.\n");
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &z_gps_lim) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &outliers_ratio) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &simulatorperiod) != 1) printf("Invalid configuration file.\n");
@@ -664,7 +703,7 @@ inline int LoadConfig(void)
 	{
 		printf("Configuration file not found.\n");
 	}
-
+#pragma region Parameters check
 	switch (robid)
 	{
 	case SUBMARINE_SIMULATOR_ROBID:
@@ -808,6 +847,26 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : controllerperiod.\n");
 		controllerperiod = 25;
 	}
+	if (GPS_high_acc_nbsat < 0)
+	{
+		printf("Invalid parameter : GPS_high_acc_nbsat.\n");
+		GPS_high_acc_nbsat = 8;
+	}
+	if (GPS_med_acc_nbsat < 0)
+	{
+		printf("Invalid parameter : GPS_med_acc_nbsat.\n");
+		GPS_med_acc_nbsat = 6;
+	}
+	if (GPS_low_acc_nbsat < 0)
+	{
+		printf("Invalid parameter : GPS_low_acc_nbsat.\n");
+		GPS_low_acc_nbsat = 4;
+	}
+	if ((GPS_min_sat_signal < 0)||(GPS_min_sat_signal > 99))
+	{
+		printf("Invalid parameter : GPS_min_sat_signal.\n");
+		GPS_min_sat_signal = 20;
+	}
 	if (rangescale < 0)
 	{
 		printf("Invalid parameter : rangescale.\n");
@@ -858,7 +917,7 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : simulatorperiod.\n");
 		simulatorperiod = 70;
 	}
-
+#pragma endregion
 	return EXIT_SUCCESS;
 }
 

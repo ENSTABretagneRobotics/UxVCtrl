@@ -10,13 +10,13 @@
 #include "Globals.h"
 
 // Observer variables.
-interval xhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-phihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), thetahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psihat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-vrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vryhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), vrzhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-omegaxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegayhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), 
-accrxhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), accryhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), accrzhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-interval vchat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
-interval vtwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
+interval xhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), yhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), zhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
+phihat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), thetahat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psihat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
+vrxhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vryhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrzhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
+omegaxhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegayhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegazhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
+accrxhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accryhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accrzhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval vchat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psichat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), hwhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval vtwindhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 //interval alphahat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY), dhat(-MAX_UNCERTAINTY,MAX_UNCERTAINTY);
 
 // Controller variables.
@@ -26,11 +26,18 @@ double wxa = 0, wya = 0, wza = 0, wxb = 0, wyb = 0, wzb = 0;
 deque<double> wx_vector, wy_vector, wz_vector;
 double wagl = 0;
 
-// Measurements
-double x_mes = 0, y_mes = 0, z_mes = 0, phi_mes = 0, theta_mes = 0, psi_mes = 0, vrx_mes = 0, vry_mes = 0, vrz_mes = 0, omegax_mes = 0, omegay_mes = 0, omegaz_mes = 0, accrx_mes = 0, accry_mes = 0, accrz_mes = 0;
+// Measurements.
+interval x_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), y_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), z_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval phi_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), theta_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psi_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
+omegax_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegay_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegaz_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
+accrx_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accry_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accrz_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval vrx_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval vrx_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval z_pressure(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+// Objects to track, distance control...
 double dist = 0;
 // GPS.
-double latitude = 0, longitude = 0, altitude = 0, sog = 0, cog = 0, xte = 0, utc = 0;
+double sog = 0, cog = 0, xte = 0, utc = 0;
 vector< deque<unsigned char> > RTCMuserslist;
 deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Barometer, pressure sensor...
@@ -136,13 +143,27 @@ double sail_update_period = 0;
 int controllerperiod = 0;
 #pragma endregion
 #pragma region Observer parameters
-double x_max_err = 0, y_max_err = 0, z_max_err = 0, phi_max_err = 0, theta_max_err = 0, psi_max_err = 0, 
-vrx_max_err = 0, vry_max_err = 0, vrz_max_err = 0, omegax_max_err = 0, omegay_max_err = 0, omegaz_max_err = 0;
+double z_pressure_acc = 0;
+double dvl_acc = 0;
+double of_acc = 0;
+double acousticmodem_acc = 0;
+double phi_ahrs_acc = 0, theta_ahrs_acc = 0, psi_ahrs_acc = 0, 
+accrx_ahrs_acc = 0, accry_ahrs_acc = 0, accrz_ahrs_acc = 0, 
+omegax_ahrs_acc = 0, omegay_ahrs_acc = 0, omegaz_ahrs_acc = 0;
 double alpha_max_err = 0, d_max_err = 0;
 interval alphavrxhat, alphaomegazhat, alphafvrxhat, alphafomegazhat, alphazhat, vzuphat, 
 alphashat, omegashat, 
 xdotnoise, ydotnoise, zdotnoise, phidotnoise, thetadotnoise, psidotnoise, 
 vrxdotnoise, vrydotnoise, vrzdotnoise, omegaxdotnoise, omegaydotnoise, omegazdotnoise;
+double RTK_fixed_acc = 0, RTK_float_acc = 0;
+double GPS_high_acc = 0, GPS_high_acc_HDOP = 0;
+int GPS_high_acc_nbsat = 0;
+double GPS_med_acc = 0, GPS_med_acc_HDOP = 0;
+int GPS_med_acc_nbsat = 0;
+double GPS_low_acc = 0, GPS_low_acc_HDOP = 0;
+int GPS_low_acc_nbsat = 0;
+int GPS_min_sat_signal = 0;
+double GPS_submarine_depth_limit = 0;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
 double dynamicsonarlocalization_period = 0;
@@ -171,8 +192,7 @@ omegaz_max_rand_err = 0, omegaz_bias_err = 0,
 alpha_max_rand_err = 0, alpha_bias_err = 0, 
 d_max_rand_err = 0, d_bias_err = 0, 
 alphavrx = 0, alphaomegaz = 0, alphafvrx = 0, alphafomegaz = 0, alphaz = 0, vzup = 0, 
-alphas = 0, omegas = 0, 
-z_gps_lim = 0;
+alphas = 0, omegas = 0;
 double outliers_ratio = 0;
 int simulatorperiod = 0;
 #pragma endregion
@@ -339,7 +359,7 @@ double forbidx_followme = 0, forbidy_followme = 0, forbidz_followme = 0;
 #pragma endregion
 
 // Simulator variables.
-BOOL bGPSOKSimulator = FALSE;
+int GNSSqualitySimulator = 0;
 
 // CISCREA variables.
 BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;
@@ -381,25 +401,25 @@ BOOL bPauseP33x = FALSE, bRestartP33x = FALSE;
 BOOL bPauseRazorAHRS = FALSE, bRestartRazorAHRS = FALSE;
 
 // MT variables.
-BOOL bGPSOKMT = FALSE;
+int GNSSqualityMT = 0;
 BOOL bPauseMT = FALSE, bRestartMT = FALSE;
 
 // SBG variables.
-BOOL bGPSOKSBG = FALSE;
+int GNSSqualitySBG = 0;
 BOOL bPauseSBG = FALSE, bRestartSBG = FALSE;
 
 // NMEADevice variables.
-BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
+int GNSSqualityNMEADevice[MAX_NB_NMEADEVICE];
 BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
 BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
 // ublox variables.
-BOOL bGPSOKublox[MAX_NB_UBLOX];
+int GNSSqualityublox[MAX_NB_UBLOX];
 BOOL bPauseublox[MAX_NB_UBLOX];
 BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
-BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 

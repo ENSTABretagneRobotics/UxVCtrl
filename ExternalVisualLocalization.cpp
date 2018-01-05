@@ -470,7 +470,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			if (P.IsEmpty()) 
 			{
 				// Expand initial box to be able to contract next time and because we are probably lost...
-				P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+				P = box(xhat,yhat)+box(interval(-xerr_externalvisuallocalization,xerr_externalvisuallocalization),interval(-yerr_externalvisuallocalization,yerr_externalvisuallocalization));
 			}
 			else
 			{
@@ -479,13 +479,13 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				if ((coef1_angle_externalvisuallocalization != 0)&&(coef2_angle_externalvisuallocalization != 0)&&bobjAngleValid) 
 				{
 					// M_PI ambiguity...
-					if (fabs(fmod_2PI(psi_mes-psi_externalvisuallocalization)) < fabs(fmod_2PI(psi_mes-psi_externalvisuallocalization+M_PI)))
+					if (fabs(fmod_2PI(Center(psi_ahrs)-psi_externalvisuallocalization)) < fabs(fmod_2PI(Center(psi_ahrs)-psi_externalvisuallocalization+M_PI)))
 					{
-						psi_mes = fmod_2PI(psi_externalvisuallocalization);
+						psi_ahrs = fmod_2PI(psi_externalvisuallocalization)+interval(-psierr_externalvisuallocalization, psierr_externalvisuallocalization);
 					}
 					else
 					{
-						psi_mes = fmod_2PI(psi_externalvisuallocalization+M_PI);
+						psi_ahrs = fmod_2PI(psi_externalvisuallocalization+M_PI)+interval(-psierr_externalvisuallocalization, psierr_externalvisuallocalization);
 					}
 				}
 			}

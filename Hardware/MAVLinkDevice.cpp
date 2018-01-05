@@ -15,7 +15,6 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	MAVLINKDEVICE mavlinkdevice;
 	struct timeval tv;
 	MAVLINKDATA mavlinkdata;
-	double dval = 0;
 	CHRONO chrono_GPSOK;
 	BOOL bConnected = FALSE;
 	int deviceid = (intptr_t)pParam;
@@ -30,7 +29,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 	memset(&mavlinkdevice, 0, sizeof(MAVLINKDEVICE));
 
-	bGPSOKMAVLinkDevice[deviceid] = FALSE;
+	GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 
 	for (;;)
 	{
@@ -41,7 +40,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			if (bConnected)
 			{
 				printf("MAVLinkDevice paused.\n");
-				bGPSOKMAVLinkDevice[deviceid] = FALSE;
+				GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
 			}
@@ -55,7 +54,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a MAVLinkDevice.\n");
-				bGPSOKMAVLinkDevice[deviceid] = FALSE;
+				GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
 			}
@@ -117,7 +116,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKMAVLinkDevice[deviceid] = FALSE;
+				GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -134,6 +133,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				{
 					if (((target_followme == MAVLINKDEVICE0_TARGET)&&(deviceid == 0))||((target_followme == MAVLINKDEVICE1_TARGET)&&(deviceid == 1)))
 					{
+						// GNSSqualityMAVLinkDevice[deviceid] should not be set in that case...
 						if (mavlinkdata.gps_raw_int.fix_type >= 2)
 						{
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
@@ -147,52 +147,82 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				else
 				{
 #pragma region SENSORS
-					//if (mavlinkdata.gps_raw_int.fix_type > 0) printf("fix_type : %d\n", (int)mavlinkdata.gps_raw_int.fix_type);
+					switch (mavlinkdata.gps_raw_int.fix_type)
+					{
+					case 2: // 2D Fix. To check...
+					case 3: // 3D Fix.
+						GNSSqualityMAVLinkDevice[deviceid] = AUTONOMOUS_GNSS_FIX;
+						StopChronoQuick(&chrono_GPSOK);
+						StartChrono(&chrono_GPSOK);
+						break;
+					case 4: // DGPS.
+						GNSSqualityMAVLinkDevice[deviceid] = DIFFERENTIAL_GNSS_FIX;
+						StopChronoQuick(&chrono_GPSOK);
+						StartChrono(&chrono_GPSOK);
+						break;
+					case 5: // RTK.
+						// Might be underestimated...
+						GNSSqualityMAVLinkDevice[deviceid] = RTK_FLOAT;
+						StopChronoQuick(&chrono_GPSOK);
+						StartChrono(&chrono_GPSOK);
+						break;
+					case 0: // No Fix or empty field.
+					case 1: // No Fix.
+					default:
+						// Timeout to handle temporary empty fields...
+						if (GetTimeElapsedChronoQuick(&chrono_GPSOK) > mavlinkdevice.timeout)
+						{
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+						}
+						break;
+					}
 
 					if (mavlinkdata.gps_raw_int.fix_type >= 2)
 					{
-						//printf("%f;%f\n", mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.long/10000000.0);
-						latitude = mavlinkdata.gps_raw_int.lat/10000000.0;
-						longitude = mavlinkdata.gps_raw_int.lon/10000000.0;
-						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-						bGPSOKMAVLinkDevice[deviceid] = TRUE;
-						StopChronoQuick(&chrono_GPSOK);
-						StartChrono(&chrono_GPSOK);
-					}
-					else
-					{
-						if (GetTimeElapsedChronoQuick(&chrono_GPSOK) > 2)
-						{
-							bGPSOKMAVLinkDevice[deviceid] = FALSE;
-						}
+						double cog_deg = 0;
+						ComputeGNSSPosition(mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0,
+							GNSSqualityMAVLinkDevice[deviceid],
+							(mavlinkdata.gps_raw_int.satellites_visible == 255? 0: mavlinkdata.gps_raw_int.satellites_visible),
+							(mavlinkdata.gps_raw_int.eph == UINT16_MAX? 0: mavlinkdata.gps_raw_int.eph)/100.0);
+						sog = (mavlinkdata.gps_raw_int.vel == UINT16_MAX? 0: mavlinkdata.gps_raw_int.vel)/100.0;
+						cog_deg = (mavlinkdata.gps_raw_int.cog == UINT16_MAX? 0: mavlinkdata.gps_raw_int.cog)/100.0;
+						cog = fmod_2PI(M_PI/2.0-cog_deg*M_PI/180.0-angle_env);
 					}
 
-					if (fabs(mavlinkdata.attitude.roll) > 0) phi_mes = fmod_2PI((double)mavlinkdata.attitude.roll);
-					if (fabs(mavlinkdata.attitude.rollspeed) > 0) omegax_mes = (double)mavlinkdata.attitude.rollspeed;
-					if (fabs(mavlinkdata.attitude.pitch) > 0) theta_mes = fmod_2PI(-(double)mavlinkdata.attitude.pitch);
-					if (fabs(mavlinkdata.attitude.pitchspeed) > 0) omegay_mes = -(double)mavlinkdata.attitude.pitchspeed;
-					if (fabs(mavlinkdata.attitude.yaw) > 0) psi_mes = fmod_2PI(M_PI/2.0-(double)mavlinkdata.attitude.yaw-angle_env);
-					if (fabs(mavlinkdata.attitude.yawspeed) > 0) omegaz_mes = -(double)mavlinkdata.attitude.yawspeed;
+					if (fabs(mavlinkdata.attitude.roll) > 0) phi_ahrs = fmod_2PI((double)mavlinkdata.attitude.roll)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+					if (fabs(mavlinkdata.attitude.rollspeed) > 0) omegax_ahrs = (double)mavlinkdata.attitude.rollspeed+interval(-omegax_ahrs_acc, omegax_ahrs_acc);
+					if (fabs(mavlinkdata.attitude.pitch) > 0) theta_ahrs = fmod_2PI(-(double)mavlinkdata.attitude.pitch)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+					if (fabs(mavlinkdata.attitude.pitchspeed) > 0) omegay_ahrs = -(double)mavlinkdata.attitude.pitchspeed+interval(-omegay_ahrs_acc, omegay_ahrs_acc);
+					if (fabs(mavlinkdata.attitude.yaw) > 0) psi_ahrs = fmod_2PI(M_PI/2.0-(double)mavlinkdata.attitude.yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+					if (fabs(mavlinkdata.attitude.yawspeed) > 0) omegaz_ahrs = -(double)mavlinkdata.attitude.yawspeed+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
 
 					if (fabs(mavlinkdata.scaled_pressure.press_abs) > 0) pressure_mes = mavlinkdata.scaled_pressure.press_abs*0.001;
 
-					if (fabs(mavlinkdata.vfr_hud.alt) > 0) z_mes = (double)mavlinkdata.vfr_hud.alt;
+					if (fabs(mavlinkdata.vfr_hud.alt) > 0) z_pressure = (double)mavlinkdata.vfr_hud.alt+interval(-z_pressure_acc, z_pressure_acc); // To check...
 					if (fabs(mavlinkdata.vfr_hud.airspeed) > 0) fluidspeed = (double)mavlinkdata.vfr_hud.airspeed;
 
 					// Better to invert x and y like on Pixhawk...
 
 					if (mavlinkdevice.bDefaultVrToZero)
 					{
-						vrx_mes = 0;
-						vry_mes = 0;
+						vrx_of = interval(-of_acc, of_acc);
+						vry_of = interval(-of_acc, of_acc);
 					}
+
+					// Which case would correspond to out of range...?
 
 					if (mavlinkdata.optical_flow.quality >= mavlinkdevice.quality_threshold)
 					{
-						//vrx_mes = 0*vrx_mes + 1*mavlinkdata.optical_flow.flow_comp_m_y;
-						//vry_mes = 0*vry_mes + 1*mavlinkdata.optical_flow.flow_comp_m_x;
-						if (fabs(mavlinkdata.optical_flow.flow_comp_m_y) > mavlinkdevice.flow_comp_m_threshold) vrx_mes = mavlinkdata.optical_flow.flow_comp_m_y; else vrx_mes = 0;
-						if (fabs(mavlinkdata.optical_flow.flow_comp_m_x) > mavlinkdevice.flow_comp_m_threshold) vry_mes = mavlinkdata.optical_flow.flow_comp_m_x; else vry_mes = 0;
+						//vrx_of = 0*vrx_of + 1*mavlinkdata.optical_flow.flow_comp_m_y;
+						//vry_of = 0*vry_of + 1*mavlinkdata.optical_flow.flow_comp_m_x;
+						if (fabs(mavlinkdata.optical_flow.flow_comp_m_y) > mavlinkdevice.flow_comp_m_threshold) 
+							vrx_of = mavlinkdata.optical_flow.flow_comp_m_y+interval(-of_acc, of_acc); 
+						else 
+							vrx_of = interval(-of_acc, of_acc);
+						if (fabs(mavlinkdata.optical_flow.flow_comp_m_x) > mavlinkdevice.flow_comp_m_threshold) 
+							vry_of = mavlinkdata.optical_flow.flow_comp_m_x+interval(-of_acc, of_acc); 
+						else 
+							vry_of = interval(-of_acc, of_acc);
 					}
 
 					if (mavlinkdata.rc_channels.chancount >= mavlinkdevice.overridechan)
@@ -261,7 +291,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
 								{
 									printf("Connection to a MAVLinkDevice lost.\n");
-									bGPSOKMAVLinkDevice[deviceid] = FALSE;
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 									bConnected = FALSE;
 									DisconnectMAVLinkDevice(&mavlinkdevice);
 									mSleep(50);
@@ -295,7 +325,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
 							{
 								printf("Connection to a MAVLinkDevice lost.\n");
-								bGPSOKMAVLinkDevice[deviceid] = FALSE;
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
 								mSleep(50);
@@ -340,7 +370,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 			else
 			{
 				printf("Connection to a MAVLinkDevice lost.\n");
-				bGPSOKMAVLinkDevice[deviceid] = FALSE;
+				GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
 				mSleep(50);
@@ -350,7 +380,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 		if (bExit) break;
 	}
 
-	bGPSOKMAVLinkDevice[deviceid] = FALSE;
+	GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 
 	if (mavlinkdevice.pfSaveFile != NULL)
 	{

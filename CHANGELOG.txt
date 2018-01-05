@@ -1,3 +1,7 @@
+186
+Added GetGNSSlevel() to get more info about the GNSS fix quality.
+Updated the main measurements as intervals.
+
 185
 Updated NMEA and ublox to get more info about the GNSS fix quality.
 

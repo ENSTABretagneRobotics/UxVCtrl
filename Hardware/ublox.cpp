@@ -20,7 +20,6 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	time_t tt = 0;
 	struct timeval tv;
 	struct tm* timeptr = NULL;
-	double dval = 0;
 	int res = 0;
 	CHRONO chrono_svin;
 	BOOL bConnected = FALSE;
@@ -32,25 +31,11 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 	//UNREFERENCED_PARAMETER(pParam);
 
-/*
-	//char* buf = "$GPRMC,163634.000,A,4825.0961,N,00428.3419,W,0.00,309.63,150512,,,A*70\r\n";
-	//char* buf = "$GPRMC,163634.000,A,4825.0961,N,00428.3419,W,0.00,309.63,150512,,,A\n";
-	char* buf = "$GPR";
-	//int buflen = strlen(buf)+1;
-	int buflen = strlen(buf);
-	int sentencelen = 0, nbBytesToRequest = 0, nbBytesToDiscard = 0;
-	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA+1]; // +1 for the null terminator character for strings.
-	char mnemonic[NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
-
-	AnalyzeSentenceNMEA(buf, buflen, talkerid, mnemonic, &sentencelen, 
-								  &nbBytesToRequest, &nbBytesToDiscard);
-*/
-
 	sprintf(szCfgFilePath, "ublox%d.txt", deviceid);
 
 	memset(&ublox, 0, sizeof(UBLOX));
 
-	bGPSOKublox[deviceid] = FALSE;
+	GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 
 	StartChrono(&chrono_svin);
 
@@ -63,7 +48,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			if (bConnected)
 			{
 				printf("ublox paused.\n");
-				bGPSOKublox[deviceid] = FALSE;
+				GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				Disconnectublox(&ublox);
 			}
@@ -77,7 +62,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a ublox.\n");
-				bGPSOKublox[deviceid] = FALSE;
+				GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				Disconnectublox(&ublox);
 			}
@@ -128,7 +113,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKublox[deviceid] = FALSE;
+				GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -203,17 +188,97 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
 						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD)
 					{
-						//printf("GPS_quality_indicator : %d, status : %c\n", nmeadata.GPS_quality_indicator, nmeadata.status);
-
-						if ((nmeadata.GPS_quality_indicator > 0)||(nmeadata.status == 'A'))
+						// GNSS quality determination...
+						if ((ublox.bEnable_NMEA_RMC)||(ublox.bEnable_NMEA_GLL))
 						{
-							//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
-							latitude = nmeadata.Latitude;
-							longitude = nmeadata.Longitude;
-							altitude = nmeadata.Altitude;
-							// GPS altitude not used since not always reliable...
-							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-							bGPSOKublox[deviceid] = TRUE;
+							switch (nmeadata.status)
+							{
+							case 'V':
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 'A':
+								// Might be underestimated...								
+								if (GNSSqualityublox[deviceid] == GNSS_NO_FIX) GNSSqualityublox[deviceid] = AUTONOMOUS_GNSS_FIX;
+								break;
+							default:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							}
+						}
+						if ((ublox.bEnable_NMEA_RMC)||(ublox.bEnable_NMEA_GLL)||(ublox.bEnable_NMEA_VTG))
+						{
+							switch (nmeadata.posMode)
+							{
+							case 'N':
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 'A':
+								GNSSqualityublox[deviceid] = AUTONOMOUS_GNSS_FIX;
+								break;
+							case 'D':
+								if ((ublox.bEnable_NMEA_GLL)||(ublox.bEnable_NMEA_VTG))
+								{
+									// Might be underestimated...
+									if ((GNSSqualityublox[deviceid] == GNSS_NO_FIX)||(GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||
+										(GNSSqualityublox[deviceid] == GNSS_ESTIMATED_FIX))
+										GNSSqualityublox[deviceid] = DIFFERENTIAL_GNSS_FIX;
+								}
+								break;
+							case 'R':
+								GNSSqualityublox[deviceid] = RTK_FIXED;
+								break;
+							case 'F':
+								GNSSqualityublox[deviceid] = RTK_FLOAT;
+								break;
+							case 'E':
+								GNSSqualityublox[deviceid] = GNSS_ESTIMATED_FIX;
+								break;
+							default:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							}
+						}
+						if (ublox.bEnable_NMEA_GGA)
+						{
+							switch (nmeadata.GPS_quality_indicator)
+							{
+							case GNSS_NO_FIX:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case AUTONOMOUS_GNSS_FIX:
+								GNSSqualityublox[deviceid] = AUTONOMOUS_GNSS_FIX;
+								break;
+							case DIFFERENTIAL_GNSS_FIX:
+								GNSSqualityublox[deviceid] = DIFFERENTIAL_GNSS_FIX;
+								break;
+							case RTK_FIXED:
+								GNSSqualityublox[deviceid] = RTK_FIXED;
+								break;
+							case RTK_FLOAT:
+								GNSSqualityublox[deviceid] = RTK_FLOAT;
+								break;
+							case GNSS_ESTIMATED_FIX:
+								GNSSqualityublox[deviceid] = GNSS_ESTIMATED_FIX;
+								break;
+							default:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							}
+						}
+
+						// Should use GSV data and only provide the number of satellites that are above GPS_min_sat_signal...
+
+						// Position accuracy depending on the GNSS quality...
+						ComputeGNSSPosition(nmeadata.Latitude, nmeadata.Longitude, nmeadata.Altitude, GNSSqualityublox[deviceid], nmeadata.nbsat, nmeadata.hdop);
+						
+						if ((GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX)||
+							(GNSSqualityublox[deviceid] == RTK_FIXED)||(GNSSqualityublox[deviceid] == RTK_FLOAT))
+						{
+							if (ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_VTG)
+							{
+								sog = nmeadata.SOG;
+								cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+							}
 							if ((!ublox.bEnable_NMEA_RMC)&&(ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_GLL))
 							{
 								// Try to extrapolate UTC as ms from the computer date since not all the time and date data are available in GGA or GLL...
@@ -229,32 +294,20 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 								tt = timegm(&t);
 								utc = tt*1000.0+nmeadata.second*1000.0;
 							}
+							if (ublox.bEnable_NMEA_RMC)
+							{
+								// Get UTC as ms.
+								memset(&t, 0, sizeof(t));
+								t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; 
+								t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
+								tt = timegm(&t);
+								utc = tt*1000.0+nmeadata.second*1000.0;
+							}
 						}
-						else
-						{
-							bGPSOKublox[deviceid] = FALSE;
-						}
-
-						// Should check better if valid...
-						if ((ublox.bEnable_NMEA_RMC&&(nmeadata.status == 'A'))||ublox.bEnable_NMEA_VTG)
-						{
-							sog = nmeadata.SOG;
-							cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
-						}
-
-						if (ublox.bEnable_NMEA_RMC&&(nmeadata.status == 'A'))
-						{
-							// Get UTC as ms.
-							memset(&t, 0, sizeof(t));
-							t.tm_year = nmeadata.year-1900; t.tm_mon = nmeadata.month-1; t.tm_mday = nmeadata.day; 
-							t.tm_hour = nmeadata.hour; t.tm_min = nmeadata.minute; t.tm_sec = 0; t.tm_isdst = 0;
-							tt = timegm(&t);
-							utc = tt*1000.0+nmeadata.second*1000.0;
-						}
-
+						
 						if (ublox.bEnable_NMEA_HDG)
 						{
-							if (robid == SAILBOAT_ROBID) psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+							if (robid == SAILBOAT_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 						}
 
 						if (ublox.bEnable_NMEA_MWV)
@@ -264,9 +317,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							vawind = nmeadata.ApparentWindSpeed;
 							// True wind must be computed from apparent wind.
 							if (bDisableRollWindCorrectionSailboat)
-								psitwind = fmod_2PI(psiawind+psi_mes); // Robot speed and roll not taken into account...
+								psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
 							else
-								psitwind = fmod_2PI(atan2(sin(psiawind),cos(phi_mes)*cos(psiawind))+psi_mes); // Robot speed not taken into account, but with roll correction...
+								psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(psi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
 						}
 
 						if (ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA)
@@ -278,18 +331,24 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 						if (ublox.bEnable_NMEA_PD6_SA)
 						{
-							psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
-							theta_mes = -nmeadata.Pitch;
-							phi_mes = nmeadata.Roll;
+							psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+							theta_ahrs = -nmeadata.Pitch+interval(-theta_ahrs_acc, theta_ahrs_acc);
+							phi_ahrs = nmeadata.Roll+interval(-phi_ahrs_acc, phi_ahrs_acc);
 						}
 
 						if (ublox.bEnable_NMEA_PD6_BS)
 						{
 							if (nmeadata.vstatus_ship == 'A')
 							{
-								vrx_mes = nmeadata.vl_ship;
-								vry_mes = -nmeadata.vt_ship;
-								vrz_mes = nmeadata.vn_ship;
+								vrx_dvl = nmeadata.vl_ship+interval(-dvl_acc, dvl_acc);
+								vry_dvl = -nmeadata.vt_ship+interval(-dvl_acc, dvl_acc);
+								vrz_dvl = nmeadata.vn_ship+interval(-dvl_acc, dvl_acc);
+							}
+							else if (nmeadata.vstatus_ship == 'V')
+							{
+								vrx_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+								vry_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+								vrz_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 							}
 						}
 
@@ -311,17 +370,138 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||
 						ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
 					{
-						// lat/lon might be temporarily bad with this... 
-						if (ubxdata.nav_status_pl.gpsFix >= 0x02)
+						// GNSS quality determination...
+						if (ublox.bEnable_UBX_NAV_SOL)
 						{
-							//printf("%f;%f\n", ubxdata.Latitude, ubxdata.Longitude);
-							latitude = ubxdata.Latitude;
-							longitude = ubxdata.Longitude;
-							altitude = ubxdata.Altitude;
-							// GPS altitude not used since not always reliable...
-							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-							bGPSOKublox[deviceid] = TRUE;
-							//if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)
+							switch (ubxdata.nav_sol_pl.gpsFix)
+							{
+							case 0x00: // No Fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 0x01: // Dead Reckoning only.
+								GNSSqualityublox[deviceid] = GNSS_ESTIMATED_FIX;
+								break;
+							case 0x02: // 2D-Fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 0x03: // 3D-Fix.
+								// Might be underestimated...
+								if ((GNSSqualityublox[deviceid] == GNSS_NO_FIX)||(GNSSqualityublox[deviceid] == GNSS_ESTIMATED_FIX)||
+									(GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX))
+									GNSSqualityublox[deviceid] = ubxdata.nav_sol_pl.flags.DiffSoln? DIFFERENTIAL_GNSS_FIX: AUTONOMOUS_GNSS_FIX;
+								break;
+							case 0x04: // GPS + dead reckoning combined.
+								// Might be underestimated...
+								if ((GNSSqualityublox[deviceid] == GNSS_NO_FIX)||(GNSSqualityublox[deviceid] == GNSS_ESTIMATED_FIX)||
+									(GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX))
+									GNSSqualityublox[deviceid] = ubxdata.nav_sol_pl.flags.DiffSoln? DIFFERENTIAL_GNSS_FIX: AUTONOMOUS_GNSS_FIX;
+								break;
+							case 0x05: // Time only fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							default:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							}
+							// Accuracy problem detected?
+							if (!ubxdata.nav_sol_pl.flags.GPSFixOK) GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+						}
+						if (ublox.bEnable_UBX_NAV_STATUS)
+						{
+							switch (ubxdata.nav_status_pl.gpsFix)
+							{
+							case 0x00: // No Fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 0x01: // Dead Reckoning only.
+								GNSSqualityublox[deviceid] = GNSS_ESTIMATED_FIX;
+								break;
+							case 0x02: // 2D-Fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 0x03: // 3D-Fix.
+								// Might be underestimated...
+								if ((GNSSqualityublox[deviceid] == GNSS_NO_FIX)||(GNSSqualityublox[deviceid] == GNSS_ESTIMATED_FIX)||
+									(GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX))
+									GNSSqualityublox[deviceid] = ubxdata.nav_status_pl.flags.diffSoln? DIFFERENTIAL_GNSS_FIX: AUTONOMOUS_GNSS_FIX;
+								break;
+							case 0x04: // GPS + dead reckoning combined.
+								// Might be underestimated...
+								if ((GNSSqualityublox[deviceid] == GNSS_NO_FIX)||(GNSSqualityublox[deviceid] == GNSS_ESTIMATED_FIX)||
+									(GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX))
+									GNSSqualityublox[deviceid] = ubxdata.nav_status_pl.flags.diffSoln? DIFFERENTIAL_GNSS_FIX: AUTONOMOUS_GNSS_FIX;
+								break;
+							case 0x05: // Time only fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							default:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							}
+							// Accuracy problem detected?
+							if (!ubxdata.nav_status_pl.flags.gpsFixOK) GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+						}
+						if (ublox.bEnable_UBX_NAV_PVT)
+						{
+							switch (ubxdata.nav_pvt_pl.fixType)
+							{
+							case 0x00: // No Fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 0x01: // Dead Reckoning only.
+								GNSSqualityublox[deviceid] = GNSS_ESTIMATED_FIX;
+								break;
+							case 0x02: // 2D-Fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							case 0x03: // 3D-Fix.
+								GNSSqualityublox[deviceid] = ubxdata.nav_pvt_pl.flags.diffSoln? DIFFERENTIAL_GNSS_FIX: AUTONOMOUS_GNSS_FIX;
+								if (ubxdata.nav_pvt_pl.flags.carrSoln == 1) GNSSqualityublox[deviceid] = RTK_FLOAT;
+								if (ubxdata.nav_pvt_pl.flags.carrSoln == 2) GNSSqualityublox[deviceid] = RTK_FIXED;
+								break;
+							case 0x04: // GPS + dead reckoning combined.
+								GNSSqualityublox[deviceid] = ubxdata.nav_pvt_pl.flags.diffSoln? DIFFERENTIAL_GNSS_FIX: AUTONOMOUS_GNSS_FIX;
+								if (ubxdata.nav_pvt_pl.flags.carrSoln == 1) GNSSqualityublox[deviceid] = RTK_FLOAT;
+								if (ubxdata.nav_pvt_pl.flags.carrSoln == 2) GNSSqualityublox[deviceid] = RTK_FIXED;
+								break;
+							case 0x05: // Time only fix.
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							default:
+								GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+								break;
+							}
+							// Accuracy problem detected?
+							if (!ubxdata.nav_pvt_pl.flags.gnssFixOK) GNSSqualityublox[deviceid] = GNSS_NO_FIX;
+						}
+
+						if ((GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX)||
+							(GNSSqualityublox[deviceid] == RTK_FIXED)||(GNSSqualityublox[deviceid] == RTK_FLOAT))
+						{
+							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_POSLLH)
+							{
+								// Position accuracy depending on the GNSS quality...
+								ComputeGNSSPosition(ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, GNSSqualityublox[deviceid], ubxdata.nav_pvt_pl.numSV, 0);
+								if ((ublox.bEnable_UBX_NAV_PVT)&&(Width(x_gps)/2 < ubxdata.nav_pvt_pl.hAcc*1000))
+								{
+									// We were too optimistic...
+									double x = 0, y = 0, z = 0;
+									GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, &x, &y, &z);
+									x_gps = interval(x-ubxdata.nav_pvt_pl.hAcc*1000, x+ubxdata.nav_pvt_pl.hAcc*1000);
+									y_gps = interval(y-ubxdata.nav_pvt_pl.hAcc*1000, y+ubxdata.nav_pvt_pl.hAcc*1000);
+									z_gps = interval(z-ubxdata.nav_pvt_pl.vAcc*1000, z+ubxdata.nav_pvt_pl.vAcc*1000);
+								}
+								else if ((ublox.bEnable_UBX_NAV_POSLLH)&&(Width(x_gps)/2 < ubxdata.nav_posllh_pl.hAcc*1000))
+								{
+									// We were too optimistic...
+									double x = 0, y = 0, z = 0;
+									GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, &x, &y, &z);
+									x_gps = interval(x-ubxdata.nav_posllh_pl.hAcc*1000, x+ubxdata.nav_posllh_pl.hAcc*1000);
+									y_gps = interval(y-ubxdata.nav_posllh_pl.hAcc*1000, y+ubxdata.nav_posllh_pl.hAcc*1000);
+									z_gps = interval(z-ubxdata.nav_posllh_pl.vAcc*1000, z+ubxdata.nav_posllh_pl.vAcc*1000);
+								}
+							}
+							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)
 							{
 								sog = ubxdata.SOG;
 								cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
@@ -336,10 +516,6 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 								utc = tt*1000.0+ubxdata.second*1000.0;
 							}
 						}
-						else
-						{
-							bGPSOKublox[deviceid] = FALSE;
-						}
 					}
 
 					LeaveCriticalSection(&StateVariablesCS);
@@ -348,7 +524,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			if (res != EXIT_SUCCESS)
 			{
 				printf("Connection to a ublox lost.\n");
-				bGPSOKublox[deviceid] = FALSE;
+				GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				Disconnectublox(&ublox);
 				mSleep(100);
@@ -360,7 +536,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 	StopChronoQuick(&chrono_svin);
 
-	bGPSOKublox[deviceid] = FALSE;
+	GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 
 	if (ublox.pfSaveFile != NULL)
 	{

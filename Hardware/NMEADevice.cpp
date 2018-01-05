@@ -18,7 +18,6 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	time_t tt = 0;
 	struct timeval tv;
 	struct tm* timeptr = NULL;
-	double dval = 0;
 	BOOL bConnected = FALSE;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
@@ -32,7 +31,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 
 	memset(&nmeadevice, 0, sizeof(NMEADEVICE));
 
-	bGPSOKNMEADevice[deviceid] = FALSE;
+	GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 
 	for (;;)
 	{
@@ -43,7 +42,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (bConnected)
 			{
 				printf("NMEADevice paused.\n");
-				bGPSOKNMEADevice[deviceid] = FALSE;
+				GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}
@@ -57,7 +56,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (bConnected)
 			{
 				printf("Restarting a NMEADevice.\n");
-				bGPSOKNMEADevice[deviceid] = FALSE;
+				GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}
@@ -104,7 +103,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			}
 			else 
 			{
-				bGPSOKNMEADevice[deviceid] = FALSE;
+				GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -119,13 +118,17 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 
 				if ((nmeadata.GPS_quality_indicator > 0)||(nmeadata.status == 'A'))
 				{
-					//printf("%f;%f\n", nmeadata.Latitude, nmeadata.Longitude);
-					latitude = nmeadata.Latitude;
-					longitude = nmeadata.Longitude;
-					altitude = nmeadata.Altitude;
-					// GPS altitude not used since not always reliable...
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, latitude, longitude, 0, &x_mes, &y_mes, &dval);
-					bGPSOKNMEADevice[deviceid] = TRUE;
+					GNSSqualityNMEADevice[deviceid] = AUTONOMOUS_GNSS_FIX;
+
+					// Old...
+
+					double x_gps_mes = 0, y_gps_mes = 0, z_gps_mes = 0;
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, nmeadata.Latitude, nmeadata.Longitude, nmeadata.Altitude, &x_gps_mes, &y_gps_mes, &z_gps_mes);
+					// Default accuracy...
+					x_gps = interval(x_gps_mes-GPS_med_acc, x_gps_mes+GPS_med_acc);
+					y_gps = interval(y_gps_mes-GPS_med_acc, y_gps_mes+GPS_med_acc);
+					z_gps = interval(z_gps_mes-5*GPS_med_acc, z_gps_mes+5*GPS_med_acc);
+
 					if ((!nmeadevice.bEnableGPRMC)&&(nmeadevice.bEnableGPGGA||nmeadevice.bEnableGPGLL))
 					{
 						// Try to extrapolate UTC as ms from the computer date since not all the time and date data are available in GGA or GLL...
@@ -144,7 +147,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				}
 				else
 				{
-					bGPSOKNMEADevice[deviceid] = FALSE;
+					GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 				}
 
 				// Should check better if valid...
@@ -166,7 +169,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 
 				if (nmeadevice.bEnableHCHDG)
 				{
-					if (robid == SAILBOAT_ROBID) psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
+					if (robid == SAILBOAT_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 				}
 
 				if (nmeadevice.bEnableIIMWV||nmeadevice.bEnableWIMWV)
@@ -176,9 +179,9 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					vawind = nmeadata.ApparentWindSpeed;
 					// True wind must be computed from apparent wind.
 					if (bDisableRollWindCorrectionSailboat)
-						psitwind = fmod_2PI(psiawind+psi_mes); // Robot speed and roll not taken into account...
+						psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
 					else
-						psitwind = fmod_2PI(atan2(sin(psiawind),cos(phi_mes)*cos(psiawind))+psi_mes); // Robot speed not taken into account, but with roll correction...
+						psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(psi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
 				}
 
 				if (nmeadevice.bEnableWIMWD||nmeadevice.bEnableWIMDA)
@@ -193,7 +196,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			else
 			{
 				printf("Connection to a NMEADevice lost.\n");
-				bGPSOKNMEADevice[deviceid] = FALSE;
+				GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectNMEADevice(&nmeadevice);
 			}		
@@ -202,7 +205,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 		if (bExit) break;
 	}
 
-	bGPSOKNMEADevice[deviceid] = FALSE;
+	GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 
 	if (nmeadevice.pfSaveFile != NULL)
 	{

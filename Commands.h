@@ -1070,10 +1070,13 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			if (CheckGPSOK())
+			if (bCheckGNSSOK())
 			{
+				double latitude = 0, longitude = 0, altitude = 0;
+
 				// We do not use GPS altitude for that as it is not reliable...
 				// Assume that latitude,longitude is only updated by GPS...
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
 				lat_env = latitude; long_env = longitude;
 			}
 			LeaveCriticalSection(&StateVariablesCS);
@@ -1094,17 +1097,16 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			if (CheckGPSOK())
+			if (bCheckGNSSOK())
 			{
 				// Should add speed...?
 				// Should add altitude with a big error...?
-				// Assume that x_mes,y_mes is only updated by GPS...
-				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
-				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
+				xhat = xhat & x_gps;
+				yhat = yhat & y_gps;
 				if (xhat.isEmpty || yhat.isEmpty)
 				{
-					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
+					xhat = x_gps;
+					yhat = y_gps;
 				}
 			}
 			LeaveCriticalSection(&StateVariablesCS);
@@ -1254,15 +1256,15 @@ inline int Commands(char* line)
 				box P = box(xhat,yhat);
 				if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 				box M = box(
-					interval(acousticmodem_x-x_max_err,acousticmodem_x+x_max_err),
-					interval(acousticmodem_y-y_max_err,acousticmodem_y+y_max_err)
+					interval(acousticmodem_x-acousticmodem_acc,acousticmodem_x+acousticmodem_acc),
+					interval(acousticmodem_y-acousticmodem_acc,acousticmodem_y+acousticmodem_acc)
 					);
-				interval R = interval(acousticmodem_r-(x_max_err+y_max_err)/2.0,acousticmodem_r+(x_max_err+y_max_err)/2.0);
+				interval R = interval(acousticmodem_r-acousticmodem_acc,acousticmodem_r+acousticmodem_acc);
 				Cdistance(R, P, M);
 				if (R.isEmpty||P.IsEmpty()||M.IsEmpty()) 
 				{
 					// Expand initial box to be able to contract next time and because we are probably lost...
-					P = box(xhat,yhat)+box(interval(-x_max_err,x_max_err),interval(-y_max_err,y_max_err));
+					P = box(xhat,yhat)+box(interval(-acousticmodem_acc,acousticmodem_acc),interval(-acousticmodem_acc,acousticmodem_acc));
 				}
 				if (P.IsEmpty()) P = box(interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY),interval(-MAX_UNCERTAINTY,MAX_UNCERTAINTY));
 				xhat = P[1];

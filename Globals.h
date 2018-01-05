@@ -105,6 +105,24 @@ typedef enum KEYS KEYS;
 #define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 2
 
+// GNSS accuracy levels.
+#define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
+#define GNSS_ACC_LEVEL_GNSS_FIX_UNREL 1
+#define GNSS_ACC_LEVEL_GNSS_FIX_LOW 2
+#define GNSS_ACC_LEVEL_GNSS_FIX_MED 3
+#define GNSS_ACC_LEVEL_GNSS_FIX_HIGH 4
+#define GNSS_ACC_LEVEL_RTK_UNREL 5
+#define GNSS_ACC_LEVEL_RTK_FLOAT 6
+#define GNSS_ACC_LEVEL_RTK_FIXED 7
+
+// Raw GNSS quality indicator.
+#define GNSS_NO_FIX 0
+#define AUTONOMOUS_GNSS_FIX 1
+#define DIFFERENTIAL_GNSS_FIX 2
+#define RTK_FIXED 4
+#define RTK_FLOAT 5
+#define GNSS_ESTIMATED_FIX 6
+
 // Acoustic modem messages.
 enum ACOUSTIC_MODEM_MESSAGES
 {
@@ -163,11 +181,16 @@ extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
 
-// Measurements
-extern double x_mes, y_mes, z_mes, phi_mes, theta_mes, psi_mes, vrx_mes, vry_mes, vrz_mes, omegax_mes, omegay_mes, omegaz_mes, accrx_mes, accry_mes, accrz_mes;
+// Measurements.
+extern interval x_gps, y_gps, z_gps;
+extern interval phi_ahrs, theta_ahrs, psi_ahrs, omegax_ahrs, omegay_ahrs, omegaz_ahrs, accrx_ahrs, accry_ahrs, accrz_ahrs;
+extern interval vrx_dvl, vry_dvl, vrz_dvl;
+extern interval vrx_of, vry_of, vrz_of;
+extern interval z_pressure;
+// Objects to track, distance control...
 extern double dist;
 // GPS.
-extern double latitude, longitude, altitude, sog, cog, xte, utc;
+extern double sog, cog, xte, utc;
 #define MAX_NB_BYTES_RTCM_PARTS 8192
 //#define MAX_NB_RTCM_PARTS 1024
 //extern vector< deque<unsigned char*> > RTCMuserslist;
@@ -277,13 +300,27 @@ extern double sail_update_period;
 extern int controllerperiod;
 #pragma endregion
 #pragma region Observer parameters
-extern double x_max_err, y_max_err, z_max_err, phi_max_err, theta_max_err, psi_max_err, 
-vrx_max_err, vry_max_err, vrz_max_err, omegax_max_err, omegay_max_err, omegaz_max_err;
+extern double z_pressure_acc;
+extern double dvl_acc;
+extern double of_acc;
+extern double acousticmodem_acc;
+extern double phi_ahrs_acc, theta_ahrs_acc, psi_ahrs_acc,
+accrx_ahrs_acc, accry_ahrs_acc, accrz_ahrs_acc,
+omegax_ahrs_acc, omegay_ahrs_acc, omegaz_ahrs_acc;
 extern double alpha_max_err, d_max_err;
 extern interval alphavrxhat, alphaomegazhat, alphafvrxhat, alphafomegazhat, alphazhat, vzuphat, 
 alphashat, omegashat, 
 xdotnoise, ydotnoise, zdotnoise, phidotnoise, thetadotnoise, psidotnoise, 
 vrxdotnoise, vrydotnoise, vrzdotnoise, omegaxdotnoise, omegaydotnoise, omegazdotnoise;
+extern double RTK_fixed_acc, RTK_float_acc;
+extern double GPS_high_acc, GPS_high_acc_HDOP;
+extern int GPS_high_acc_nbsat;
+extern double GPS_med_acc, GPS_med_acc_HDOP;
+extern int GPS_med_acc_nbsat;
+extern double GPS_low_acc, GPS_low_acc_HDOP;
+extern int GPS_low_acc_nbsat;
+extern int GPS_min_sat_signal;
+extern double GPS_submarine_depth_limit;
 extern int rangescale, sdir;
 extern int nb_outliers;
 extern double dynamicsonarlocalization_period;
@@ -312,8 +349,7 @@ omegaz_max_rand_err, omegaz_bias_err,
 alpha_max_rand_err, alpha_bias_err, 
 d_max_rand_err, d_bias_err,
 alphavrx, alphaomegaz, alphafvrx, alphafomegaz, alphaz, vzup, 
-alphas, omegas,
-z_gps_lim;
+alphas, omegas;
 extern double outliers_ratio;
 extern int simulatorperiod;
 #pragma endregion
@@ -480,7 +516,7 @@ extern double forbidx_followme, forbidy_followme, forbidz_followme;
 #pragma endregion
 
 // Simulator variables.
-extern BOOL bGPSOKSimulator;
+extern int GNSSqualitySimulator;
 
 // CISCREA variables.
 extern BOOL bPauseCISCREA, bRestartCISCREA;
@@ -522,25 +558,25 @@ extern BOOL bPauseP33x, bRestartP33x;
 extern BOOL bPauseRazorAHRS, bRestartRazorAHRS;
 
 // MT variables.
-extern BOOL bGPSOKMT;
+extern BOOL GNSSqualityMT;
 extern BOOL bPauseMT, bRestartMT;
 
 // SBG variables.
-extern BOOL bGPSOKSBG;
+extern int GNSSqualitySBG;
 extern BOOL bPauseSBG, bRestartSBG;
 
 // NMEADevice variables.
-extern BOOL bGPSOKNMEADevice[MAX_NB_NMEADEVICE];
+extern int GNSSqualityNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bPauseNMEADevice[MAX_NB_NMEADEVICE];
 extern BOOL bRestartNMEADevice[MAX_NB_NMEADEVICE];
 
 // ublox variables.
-extern BOOL bGPSOKublox[MAX_NB_UBLOX];
+extern int GNSSqualityublox[MAX_NB_UBLOX];
 extern BOOL bPauseublox[MAX_NB_UBLOX];
 extern BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
-extern BOOL bGPSOKMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 
@@ -659,9 +695,124 @@ extern char logmissingworkertaskfilename[MAX_BUF_LEN];
 extern FILE* logfollowmetaskfile;
 extern char logfollowmetaskfilename[MAX_BUF_LEN];
 
-inline BOOL CheckGPSOK(void)
+inline int GetGNSSlevel(void)
 {
-	return (bGPSOKNMEADevice[0]||bGPSOKNMEADevice[1]||bGPSOKublox[0]||bGPSOKublox[1]||bGPSOKMAVLinkDevice[0]||bGPSOKMAVLinkDevice[1]||bGPSOKMT||bGPSOKSBG||bGPSOKSimulator);
+	int v = 0;
+
+	v = RTK_FIXED;
+	if ((GNSSqualityNMEADevice[0]==v)||(GNSSqualityNMEADevice[1]==v)||(GNSSqualityublox[0]==v)||(GNSSqualityublox[1]==v)||(GNSSqualityublox[2]==v)||
+		(GNSSqualityMAVLinkDevice[0]==v)||(GNSSqualityMAVLinkDevice[1]==v)||(GNSSqualityMT==v)||(GNSSqualitySBG==v)||(GNSSqualitySimulator==v))
+	{
+		if (abs(Width(x_gps)/2)-0.001 <= RTK_fixed_acc) return GNSS_ACC_LEVEL_RTK_FIXED;
+		else return GNSS_ACC_LEVEL_RTK_UNREL;
+	}
+	v = RTK_FLOAT;
+	if ((GNSSqualityNMEADevice[0]==v)||(GNSSqualityNMEADevice[1]==v)||(GNSSqualityublox[0]==v)||(GNSSqualityublox[1]==v)||(GNSSqualityublox[2]==v)||
+		(GNSSqualityMAVLinkDevice[0]==v)||(GNSSqualityMAVLinkDevice[1]==v)||(GNSSqualityMT==v)||(GNSSqualitySBG==v)||(GNSSqualitySimulator==v))
+	{
+		if (abs(Width(x_gps)/2)-0.001 <= RTK_float_acc) return GNSS_ACC_LEVEL_RTK_FLOAT;
+		else return GNSS_ACC_LEVEL_RTK_UNREL;
+	}
+	v = DIFFERENTIAL_GNSS_FIX;
+	if ((GNSSqualityNMEADevice[0]==v)||(GNSSqualityNMEADevice[1]==v)||(GNSSqualityublox[0]==v)||(GNSSqualityublox[1]==v)||(GNSSqualityublox[2]==v)||
+		(GNSSqualityMAVLinkDevice[0]==v)||(GNSSqualityMAVLinkDevice[1]==v)||(GNSSqualityMT==v)||(GNSSqualitySBG==v)||(GNSSqualitySimulator==v))
+	{
+		if (abs(Width(x_gps)/2)-0.001 <= GPS_high_acc) return GNSS_ACC_LEVEL_GNSS_FIX_HIGH;
+		else if (abs(Width(x_gps)/2)-0.001 <= GPS_med_acc) return GNSS_ACC_LEVEL_GNSS_FIX_MED;
+		else if (abs(Width(x_gps)/2)-0.001 <= GPS_low_acc) return GNSS_ACC_LEVEL_GNSS_FIX_LOW;
+		else return GNSS_ACC_LEVEL_GNSS_FIX_UNREL;
+	}
+	v = AUTONOMOUS_GNSS_FIX;
+	if ((GNSSqualityNMEADevice[0]==v)||(GNSSqualityNMEADevice[1]==v)||(GNSSqualityublox[0]==v)||(GNSSqualityublox[1]==v)||(GNSSqualityublox[2]==v)||
+		(GNSSqualityMAVLinkDevice[0]==v)||(GNSSqualityMAVLinkDevice[1]==v)||(GNSSqualityMT==v)||(GNSSqualitySBG==v)||(GNSSqualitySimulator==v))
+	{
+		if (abs(Width(x_gps)/2)-0.001 <= GPS_high_acc) return GNSS_ACC_LEVEL_GNSS_FIX_HIGH;
+		else if (abs(Width(x_gps)/2)-0.001 <= GPS_med_acc) return GNSS_ACC_LEVEL_GNSS_FIX_MED;
+		else if (abs(Width(x_gps)/2)-0.001 <= GPS_low_acc) return GNSS_ACC_LEVEL_GNSS_FIX_LOW;
+		else return GNSS_ACC_LEVEL_GNSS_FIX_UNREL;
+	}
+
+	return GNSS_ACC_LEVEL_GNSS_NO_FIX;
+}
+
+inline BOOL bCheckGNSSOK(void)
+{
+	return (GetGNSSlevel() > GNSS_ACC_LEVEL_GNSS_NO_FIX);
+}
+
+inline void ComputeGNSSPosition(double Latitude, double Longitude, double Altitude, int GNSSquality, int nbSat, double HDOP)
+{
+	double x = 0, y = 0, z = 0;
+
+	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, Latitude, Longitude, Altitude, &x, &y, &z);
+	switch (GNSSquality)
+	{
+	case AUTONOMOUS_GNSS_FIX:
+	case DIFFERENTIAL_GNSS_FIX:
+		if ((nbSat >= GPS_high_acc_nbsat)&&(HDOP <= GPS_high_acc_HDOP))
+		{
+			x_gps = interval(x-GPS_high_acc, x+GPS_high_acc);
+			y_gps = interval(y-GPS_high_acc, y+GPS_high_acc);
+			z_gps = interval(z-5*GPS_high_acc, z+5*GPS_high_acc);
+		}
+		else if (((nbSat >= GPS_med_acc_nbsat)&&(HDOP <= GPS_med_acc_HDOP))||(nbSat <= 0))
+		{
+			// Default accuracy...
+			x_gps = interval(x-GPS_med_acc, x+GPS_med_acc);
+			y_gps = interval(y-GPS_med_acc, y+GPS_med_acc);
+			z_gps = interval(z-5*GPS_med_acc, z+5*GPS_med_acc);
+		}
+		else if ((nbSat >= GPS_low_acc_nbsat)&&(HDOP <= GPS_low_acc_HDOP))
+		{
+			x_gps = interval(x-GPS_low_acc, x+GPS_low_acc);
+			y_gps = interval(y-GPS_low_acc, y+GPS_low_acc);
+			z_gps = interval(z-5*GPS_low_acc, z+5*GPS_low_acc);
+		}
+		else
+		{
+			x_gps = interval(x-MAX_UNCERTAINTY, x+MAX_UNCERTAINTY);
+			y_gps = interval(y-MAX_UNCERTAINTY, y+MAX_UNCERTAINTY);
+			z_gps = interval(z-5*MAX_UNCERTAINTY, z+5*MAX_UNCERTAINTY);
+		}
+		break;
+	case RTK_FLOAT:
+		if (((nbSat < GPS_med_acc_nbsat)&&(nbSat > 0))||(HDOP > GPS_med_acc_HDOP))
+		{
+			// Probably about to lose GPS soon...
+			x_gps = interval(x-GPS_low_acc, x+GPS_low_acc);
+			y_gps = interval(y-GPS_low_acc, y+GPS_low_acc);
+			z_gps = interval(z-5*GPS_low_acc, z+5*GPS_low_acc);
+		}
+		else
+		{
+			x_gps = interval(x-RTK_float_acc, x+RTK_float_acc);
+			y_gps = interval(y-RTK_float_acc, y+RTK_float_acc);
+			z_gps = interval(z-5*RTK_float_acc, z+5*RTK_float_acc);
+		}
+		break;
+	case RTK_FIXED:
+		if (((nbSat < GPS_med_acc_nbsat)&&(nbSat > 0))||(HDOP > GPS_med_acc_HDOP))
+		{
+			// Probably about to lose GPS soon...
+			x_gps = interval(x-GPS_low_acc, x+GPS_low_acc);
+			y_gps = interval(y-GPS_low_acc, y+GPS_low_acc);
+			z_gps = interval(z-5*GPS_low_acc, z+5*GPS_low_acc);
+		}
+		else
+		{
+			x_gps = interval(x-RTK_fixed_acc, x+RTK_fixed_acc);
+			y_gps = interval(y-RTK_fixed_acc, y+RTK_fixed_acc);
+			z_gps = interval(z-5*RTK_fixed_acc, z+5*RTK_fixed_acc);
+		}
+		break;
+	case GNSS_NO_FIX:
+	case GNSS_ESTIMATED_FIX:
+	default:
+		x_gps = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+		y_gps = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+		z_gps = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+		break;
+	}
 }
 
 inline int InitGlobals(void)
@@ -678,14 +829,14 @@ inline int InitGlobals(void)
 
 	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
 	{
-		bGPSOKNMEADevice[i] = FALSE;
+		GNSSqualityNMEADevice[i] = 0;
 		bPauseNMEADevice[i] = FALSE;
 		bRestartNMEADevice[i] = FALSE;
 	}
 
 	for (i = 0; i < MAX_NB_UBLOX; i++)
 	{
-		bGPSOKublox[i] = FALSE;
+		GNSSqualityublox[i] = 0;
 		bPauseublox[i] = FALSE;
 		bRestartublox[i] = FALSE;
 		RTCMuserslist.push_back(RTCMusers[i]);
@@ -693,7 +844,7 @@ inline int InitGlobals(void)
 
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
-		bGPSOKMAVLinkDevice[i] = FALSE;
+		GNSSqualityMAVLinkDevice[i] = 0;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bRestartMAVLinkDevice[i] = FALSE;
 	}
@@ -852,21 +1003,21 @@ inline int ReleaseGlobals(void)
 		RTCMuserslist.pop_back();
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
-		bGPSOKMAVLinkDevice[i] = FALSE;
+		GNSSqualityMAVLinkDevice[i] = 0;
 	}
 
 	for (i = MAX_NB_UBLOX-1; i >= 0; i--)
 	{
 		bRestartublox[i] = FALSE;
 		bPauseublox[i] = FALSE;
-		bGPSOKublox[i] = FALSE;
+		GNSSqualityublox[i] = 0;
 	}
 
 	for (i = MAX_NB_NMEADEVICE-1; i >= 0; i--)
 	{
 		bRestartNMEADevice[i] = FALSE;
 		bPauseNMEADevice[i] = FALSE;
-		bGPSOKNMEADevice[i] = FALSE;
+		GNSSqualityNMEADevice[i] = 0;
 	}
 
 	for (i = MAX_NB_BLUEVIEW-1; i >= 0; i--)

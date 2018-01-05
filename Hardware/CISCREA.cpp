@@ -111,9 +111,9 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				psi_mes = fmod_2PI(M_PI/2.0-heading*M_PI/1800.0-angle_env);
-				//psi_mes = fmod_2PI(M_PI/2.0+Yaw-angle_env);
-				z_mes = -depth/100.0;
+				psi_ahrs = fmod_2PI(M_PI/2.0-heading*M_PI/1800.0-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+				//psi_ahrs = fmod_2PI(M_PI/2.0+Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+				z_pressure = -depth/100.0+interval(-z_pressure_acc, z_pressure_acc);
 
 				// lecture des ordres et conversion -100% 100% => 0 - 250
 				value_reg[0] = cM_value(param1, (int)(100*u1));

@@ -111,9 +111,9 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				phi_mes = fmod_2PI(razorahrsdata.Roll);
-				theta_mes = fmod_2PI(-razorahrsdata.Pitch);
-				psi_mes = fmod_2PI(M_PI/2.0-razorahrsdata.Yaw-angle_env);
+				phi_ahrs = fmod_2PI(razorahrsdata.Roll)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+				theta_ahrs = fmod_2PI(-razorahrsdata.Pitch)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+				psi_ahrs = fmod_2PI(M_PI/2.0-razorahrsdata.Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}

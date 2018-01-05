@@ -8,6 +8,7 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "Observer.h"
+#include "imatrix.h"
 
 THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 {
@@ -36,8 +37,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 	fprintf(logstatefile,
 		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
-		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
-		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
+		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;accrxhat;accryhat;accrzhat;"
+		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
 		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
 		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
 		"Energy_electronics;Energy_actuators;\n"
@@ -97,35 +98,56 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		vtwindhat = wind_filter_coef*Center(vtwindhat)+(1.0-wind_filter_coef)*vtwind+interval(-vtwind_var,vtwind_var);
 
 		// Temporary...
-		phihat = interval(phi_mes-phi_max_err, phi_mes+phi_max_err);
-		thetahat = interval(theta_mes-theta_max_err, theta_mes+theta_max_err);
-		//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-		omegaxhat = interval(omegax_mes-omegax_max_err, omegax_mes+omegax_max_err);
-		omegayhat = interval(omegay_mes-omegay_max_err, omegay_mes+omegay_max_err);
-		//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+		phihat = phi_ahrs;
+		thetahat = theta_ahrs;
+		//psihat = psi_ahrs;
+		omegaxhat = omegax_ahrs;
+		omegayhat = omegay_ahrs;
+		//omegazhat = omegaz_ahrs;
+		accrxhat = accrx_ahrs;
+		accryhat = accry_ahrs;
+		accrzhat = accrz_ahrs;
 
 		if (robid & SUBMARINE_ROBID_MASK)
 		{
-			// State observer (just dead reckoning simulator...).
-			xhat = xhat+dt*(vrxhat*Cos(psihat)+vchat*Cos(psichat)+xdotnoise);
-			yhat = yhat+dt*(vrxhat*Sin(psihat)+vchat*Sin(psichat)+ydotnoise);
-			//zhat = Min(zhat+dt*(u3*alphazhat+vzuphat+zdotnoise),interval(0.0)); // z always negative.
-			//zhat = zhat & (interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err)+hwhat; // Waves influence...
-			//psihat = psihat+dt*((u1-u2)*alphaomegazhat+psidotnoise);
-			//psihat = psihat & interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = (
-				(1.0-dt*alphafvrxhat)*vrxhat
-				+dt*(u1+u2)*alphavrxhat
-				+dt*vrxdotnoise
-				); // Factorization.
-			// Should add vc,psic estimation influence in v?
+			if ((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc))
+			{
+				vrxhat = vrx_dvl;
+				vryhat = vry_dvl;
+				vrzhat = vrz_dvl;
+				zhat = z_pressure+hwhat; // Waves influence...
+				psihat = psi_ahrs;
+
+				imatrix R_Euler = RotationPhiThetaPsi(phihat, thetahat, psihat);
+				box Vr = box(vrxhat, vryhat, vrzhat);
+				box pdot = R_Euler*Vr;
+				box p = p+dt*pdot;
+				xhat = p[1];
+				yhat = p[2];
+			}
+			else
+			{
+				// State observer (just dead reckoning simulator...).
+				xhat = xhat+dt*(vrxhat*Cos(psihat)+vchat*Cos(psichat)+xdotnoise);
+				yhat = yhat+dt*(vrxhat*Sin(psihat)+vchat*Sin(psichat)+ydotnoise);
+				//zhat = Min(zhat+dt*(u3*alphazhat+vzuphat+zdotnoise),interval(0.0)); // z always negative.
+				//zhat = zhat & (z_pressure+hwhat);
+				zhat = z_pressure+hwhat; // Waves influence...
+				//psihat = psihat+dt*((u1-u2)*alphaomegazhat+psidotnoise);
+				//psihat = psihat & interval(psi_mes-psi_ahrs_acc,psi_mes+psi_ahrs_acc);
+				psihat = psi_ahrs;
+				vrxhat = (
+					(1.0-dt*alphafvrxhat)*vrxhat
+					+dt*(u1+u2)*alphavrxhat
+					+dt*vrxdotnoise
+					); // Factorization.
+				// Should add vc,psic estimation influence in v?
+			}
 
 			// SAUC'ISSE and SARDINE can measure omegaz.
 			if (robid & SAUCISSE_CLASS_ROBID_MASK)
 			{
-				omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+				omegazhat = omegaz_ahrs;
 			}
 			else if (robid == SUBMARINE_SIMULATOR_ROBID)
 			{
@@ -140,148 +162,184 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			else
 			{
 				// To handle modulo 2pi problems, we should use the following :
-				//omegazhat = sin(Center(psihat)-Center(psihat_prev))/dt+interval(-omegaz_max_err,+omegaz_max_err);
+				//omegazhat = sin(Center(psihat)-Center(psihat_prev))/dt+interval(-omegaz_ahrs_acc,+omegaz_ahrs_acc);
 
 				//GetTimeElapsedChrono(&chrono_omegaz, &dt_chrono);
 				//if (dt_chrono > 0.5)
 				//{
-				//	omegazhat = sin(Center(psihat)-Center(psihat_prev_old))/dt_chrono+interval(-omegaz_max_err,+omegaz_max_err);
+				//	omegazhat = sin(Center(psihat)-Center(psihat_prev_old))/dt_chrono+interval(-omegaz_ahrs_acc,+omegaz_ahrs_acc);
 				//	StopChronoQuick(&chrono_omegaz);
 				//	StartChrono(&chrono_omegaz);
 				//	psihat_prev_old = psihat;
 				//}
-				omegazhat = 0.8*omegazhat+0.2*(sin(Center(psihat)-Center(psihat_prev))/dt+interval(-omegaz_max_err,+omegaz_max_err));
+				omegazhat = 0.8*omegazhat+0.2*(sin(Center(psihat)-Center(psihat_prev))/dt+interval(-omegaz_ahrs_acc,+omegaz_ahrs_acc));
 
 				//printf("omegazhat = %f\n", Center(omegazhat));
+			}
+			if ((bGPSLocalization)&&(bCheckGNSSOK())&&(Center(zhat) > GPS_submarine_depth_limit))
+			{
+				// Should add speed...?
+				xhat = xhat & x_gps;
+				yhat = yhat & y_gps;
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = x_gps;
+					yhat = y_gps;
+				}
 			}
 		}
 		else if (robid == ETAS_WHEEL_ROBID)
 		{
 			xhat = xhat+dt*(alphavrxhat*(u1+u2)*Cos(psihat)+xdotnoise);
 			yhat = yhat+dt*(alphavrxhat*(u1+u2)*Sin(psihat)+ydotnoise);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
+			psihat = psi_ahrs;
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			omegazhat = omegaz_ahrs;
+			if ((bGPSLocalization)&&(bCheckGNSSOK()))
+			{
+				// Should add speed...?
+				xhat = xhat & x_gps;
+				yhat = yhat & y_gps;
+				zhat = zhat & z_gps;
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = x_gps;
+					yhat = y_gps;
+				}
+				if (zhat.isEmpty) zhat = z_gps;
+			}
 		}
 		else if (robid == BUBBLE_ROBID)
 		{
 			//// Temp...
 			//xhat = xhat+dt*(vrxhat*Cos(psihat)+vchat*Cos(psichat)+xdotnoise);
 			//yhat = yhat+dt*(vrxhat*Sin(psihat)+vchat*Sin(psichat)+ydotnoise);
-			//zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
+			//zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
+			//psihat = interval(psi_mes-psi_ahrs_acc,psi_mes+psi_ahrs_acc);
 			//vrxhat = (
 			//	(1.0-dt*alphafvrxhat)*vrxhat
 			//	+dt*(u1+u2)*alphavrxhat
 			//	+dt*vrxdotnoise
 			//	); // Factorization.
 			//// Should add vc,psic estimation influence in v?
-			//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			//omegazhat = interval(omegaz_mes-omegaz_ahrs_acc,omegaz_mes+omegaz_ahrs_acc);
 
-			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			xhat = x_gps;
+			yhat = y_gps;
+			zhat = z_gps;
+			psihat = psi_ahrs;
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			omegazhat = omegaz_ahrs;
 
 			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
 			//if (dt_chrono > 1)
 			//{
-			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vrx_max_err,+vrx_max_err);
+			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+vrxdotnoise;
 			//	StopChronoQuick(&chrono_v);
 			//	StartChrono(&chrono_v);
 			//	xhat_prev_old = xhat;
 			//	yhat_prev_old = yhat;
 			//}
-			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err));
+			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise);
 			//printf("vrxhat = %f\n", Center(vrxhat));
 		}
 		else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID))
 		{
 			xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
 			yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
+			psihat = psi_ahrs;
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			omegazhat = omegaz_ahrs;
+			if ((bGPSLocalization)&&(bCheckGNSSOK()))
+			{
+				// Should add speed...?
+				xhat = xhat & x_gps;
+				yhat = yhat & y_gps;
+				zhat = zhat & z_gps;
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = x_gps;
+					yhat = y_gps;
+				}
+				if (zhat.isEmpty) zhat = z_gps;
+			}
 		}
 		else if (robid == MOTORBOAT_ROBID)
 		{
 			//// Temp...
 			//xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
 			//yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
-			//zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			//psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			//omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			//zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
+			//psihat = interval(psi_mes-psi_ahrs_acc,psi_mes+psi_ahrs_acc);
+			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			//omegazhat = interval(omegaz_mes-omegaz_ahrs_acc,omegaz_mes+omegaz_ahrs_acc);
 
-			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			xhat = x_gps;
+			yhat = y_gps;
+			zhat = z_gps;
+			psihat = psi_ahrs;
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			omegazhat = omegaz_ahrs;
 
 			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
 			//if (dt_chrono > 1)
 			//{
-			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vrx_max_err,+vrx_max_err);
+			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+vrxdotnoise;
 			//	StopChronoQuick(&chrono_v);
 			//	StartChrono(&chrono_v);
 			//	xhat_prev_old = xhat;
 			//	yhat_prev_old = yhat;
 			//}
-			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err));
+			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise);
 			//printf("vrxhat = %f\n", Center(vrxhat));
 		}
 		else if (robid == QUADRO_ROBID)
 		{
-			xhat = xhat+dt*(vrx_mes*Cos(psihat)-vry_mes*Sin(psihat)+xdotnoise);
-			yhat = yhat+dt*(vrx_mes*Sin(psihat)+vry_mes*Cos(psihat)+ydotnoise);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			vrxhat = vrx_of;
+			vryhat = vry_of;
+			xhat = xhat+dt*(vrx_of*Cos(psihat)-vry_of*Sin(psihat)+xdotnoise);
+			yhat = yhat+dt*(vrx_of*Sin(psihat)+vry_of*Cos(psihat)+ydotnoise);
+			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
+			psihat = psi_ahrs;
+			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			vrzhat = (Center(zhat-zhat_prev))/dt+vrzdotnoise;
+			omegazhat = omegaz_ahrs;
+			if ((bGPSLocalization)&&(bCheckGNSSOK()))
+			{
+				// Should add speed...?
+				xhat = xhat & x_gps;
+				yhat = yhat & y_gps;
+				zhat = zhat & z_gps;
+				if (xhat.isEmpty || yhat.isEmpty)
+				{
+					xhat = x_gps;
+					yhat = y_gps;
+				}
+				if (zhat.isEmpty) zhat = z_gps;
+			}
 		}
 		else
 		{
-			xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-			yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-			zhat = interval(z_mes-z_max_err,z_mes+z_max_err);
-			psihat = interval(psi_mes-psi_max_err,psi_mes+psi_max_err);
-			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err);
-			omegazhat = interval(omegaz_mes-omegaz_max_err,omegaz_mes+omegaz_max_err);
+			xhat = x_gps;
+			yhat = y_gps;
+			zhat = z_gps;
+			psihat = psi_ahrs;
+			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
+			omegazhat = omegaz_ahrs;
 
 			//GetTimeElapsedChrono(&chrono_v, &dt_chrono);
 			//if (dt_chrono > 1)
 			//{
-			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+interval(-vrx_max_err,+vrx_max_err);
+			//	vrxhat = sqrt(sqr(Center(xhat-xhat_prev_old))+sqr(Center(yhat-yhat_prev_old)))/dt_chrono+vrxdotnoise;
 			//	StopChronoQuick(&chrono_v);
 			//	StartChrono(&chrono_v);
 			//	xhat_prev_old = xhat;
 			//	yhat_prev_old = yhat;
 			//}
-			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+interval(-vrx_max_err,+vrx_max_err));
+			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise);
 			//printf("vrxhat = %f\n", Center(vrxhat));
-		}
-
-		if (bGPSLocalization)
-		{
-			if (CheckGPSOK())
-			{
-				// Should add speed...?
-				// Should add altitude with a big error...?
-				// Assume that x_mes,y_mes is only updated by GPS...
-				xhat = xhat & interval(x_mes-x_max_err,x_mes+x_max_err);
-				yhat = yhat & interval(y_mes-y_max_err,y_mes+y_max_err);
-				if (xhat.isEmpty || yhat.isEmpty)
-				{
-					xhat = interval(x_mes-x_max_err,x_mes+x_max_err);
-					yhat = interval(y_mes-y_max_err,y_mes+y_max_err);
-				}
-			}
 		}
 
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
@@ -339,17 +397,17 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		fprintf(logstatefile,
 			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
 			t_epoch, lathat, longhat, althat, headinghat, cog, sog, altitude_AGL, pressure_mes, fluiddira, fluidspeeda, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
 			t, Center(xhat), Center(yhat), Center(zhat), Center(phihat), Center(thetahat), Center(psihat),
-			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat),
+			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat), Center(accrxhat), Center(accryhat), Center(accrzhat), 
 			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
-			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0),
+			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0), Width(accrxhat/2.0), Width(accryhat/2.0), Width(accrzhat/2.0),
 			wx, wy, wz, wphi, wtheta, wpsi, wd, wu, wagl, 
 			u, ul, uv, ur, up, uw, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
 			Energy_electronics, Energy_actuators);

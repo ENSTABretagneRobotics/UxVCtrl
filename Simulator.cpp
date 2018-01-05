@@ -15,7 +15,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double dt = 0, t = 0, t0 = 0, t_epoch = 0;
 	struct timeval tv;
 
-	double dval = 0, d1 = 0, d2 = 0;
+	double d1 = 0, d2 = 0;
 
 	double vc = 0, psic = 0, hw = 0;
 	double x = 0, y = 0, z = 0, psi = 0, vrx = 0, omegaz = 0;
@@ -38,15 +38,15 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	fprintf(logsimufile,
 		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
-		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;"
-		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;"
+		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;accrxhat;accryhat;accrzhat;"
+		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
 		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
 		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
 		"Energy_electronics;Energy_actuators;\n"
 	);
 	fflush(logsimufile);
 
-	bGPSOKSimulator = FALSE;
+	GNSSqualitySimulator = GNSS_NO_FIX;
 
 	t = 0;
 
@@ -97,24 +97,28 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// Compass.
-			psi_mes = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// Pressure sensor.
 			// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
 			// Les vagues perturbent ses mesures.
-			z_mes = z+z_bias_err+z_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+hw; // Waves influence...
+			z_pressure = z+z_bias_err+z_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+hw+interval(-z_pressure_acc, z_pressure_acc); // Waves influence...
 			// GPS available on surface.
-			if (z >= z_gps_lim)
+			if (z >= GPS_submarine_depth_limit)
 			{
-				x_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				y_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, 0, &latitude, &longitude, &dval);
-				bGPSOKSimulator = TRUE;
+				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+				double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
 			}
 			else
 			{
-				bGPSOKSimulator = FALSE;
+				GNSSqualitySimulator = GNSS_NO_FIX;
 			}
+			// DVL...
+			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		}
 		else if (robid == BUGGY_SIMULATOR_ROBID)
 		{
@@ -130,13 +134,17 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// Compass.
-			psi_mes = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS always available.
-			x_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			y_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_mes, y_mes, 0, &latitude, &longitude, &dval);
-			bGPSOKSimulator = TRUE;
+			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			// Odometers...
+			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		}
 
 		// Sonar.
@@ -202,17 +210,17 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		fprintf(logsimufile, 			
 			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;"
+			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
 			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d, fmod_360_rad2deg(alpha), 0.0, utc,
 			t, x, y, z, 0.0, 0.0, psi,
-			vrx, 0.0, 0.0, 0.0, 0.0, omegaz,
+			vrx, 0.0, 0.0, 0.0, 0.0, omegaz, 0.0, 0.0, 0.0,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, u1, u2, u3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 			0.0, 0.0);
@@ -225,7 +233,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	StopChrono(&chrono, &t);
 
-	bGPSOKSimulator = FALSE;
+	GNSSqualitySimulator = GNSS_NO_FIX;
 
 	fclose(logsimufile);
 

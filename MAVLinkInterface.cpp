@@ -367,7 +367,7 @@ REQ_DATA_STREAM...
 	}
 
 	memset(&gps_raw_int, 0, sizeof(mavlink_gps_raw_int_t));
-	if (CheckGPSOK())
+	if (bCheckGNSSOK())
 	{
 		gps_raw_int.fix_type = 2;
 		gps_raw_int.vel = (uint16_t)(sog*100);

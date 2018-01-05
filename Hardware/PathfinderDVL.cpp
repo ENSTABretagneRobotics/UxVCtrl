@@ -107,18 +107,24 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 				{
 					if (pathfinderdvl.bEnable_PD6_SA)
 					{
-						psi_mes = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env);
-						theta_mes = -nmeadata.Pitch;
-						phi_mes = nmeadata.Roll;
+						psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+						theta_ahrs = -nmeadata.Pitch+interval(-theta_ahrs_acc, theta_ahrs_acc);
+						phi_ahrs = nmeadata.Roll+interval(-phi_ahrs_acc, phi_ahrs_acc);
 					}
 
 					if (pathfinderdvl.bEnable_PD6_BS)
 					{
 						if (nmeadata.vstatus_ship == 'A')
 						{
-							vrx_mes = nmeadata.vl_ship;
-							vry_mes = -nmeadata.vt_ship;
-							vrz_mes = nmeadata.vn_ship;
+							vrx_dvl = nmeadata.vl_ship+interval(-dvl_acc, dvl_acc);
+							vry_dvl = -nmeadata.vt_ship+interval(-dvl_acc, dvl_acc);
+							vrz_dvl = nmeadata.vn_ship+interval(-dvl_acc, dvl_acc);
+						}
+						else if (nmeadata.vstatus_ship == 'V')
+						{
+							vrx_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+							vry_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+							vrz_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 						}
 					}
 
