@@ -56,7 +56,7 @@ Modify the Commands() function in Commands.h to add a new command. Depending on 
 
 To add a new mission/advanced processing, VisualObstacle or Ball can be used as an example. Additional shared variables and critical sections should be declared in Globals.cpp/.h, the thread should be launched in main(), images overlays to display on the GUI should be added in OpenCVGUIThread(). Most of the time, parameters for a mission are set using a new command, e.g. ballconfig for Ball-related tasks. Information on the execution can be displayed on the GUI using images overlays if needed.
 
-To add a new device support, NMEADevice can be used as an example. Most of the time, a configuration file should be added for a device, as it is done for NMEADevice and others. A parameter to enable/disable this device should also be added in UxVCtrl.txt, see LoadConfig() in Config.h.
+To add a new device support, NMEADevice can be used as an example. Most of the time, a configuration file should be added for a device, as it is done for NMEADevice and others. A parameter to enable/disable this device should also be added in UxVCtrl.txt, see LoadConfig() and SaveConfig() in Config.h.
  
 All the shared variables should be declared in Globals.cpp/.h and protected by critical sections (most of them are protected in group, e.g. StateVariables, Ball,...). Some initializations should be done in InitGlobals()/ReleaseGlobals() (e.g. critical sections, images overlays,...).
 

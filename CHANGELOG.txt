@@ -1,3 +1,6 @@
+187
+Added saveconfig and reloadconfig commands.
+
 186
 Added GetGNSSlevel() to get more info about the GNSS fix quality.
 Updated the main measurements as intervals.

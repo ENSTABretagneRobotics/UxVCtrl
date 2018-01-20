@@ -542,7 +542,7 @@ inline char* FindLatestPathfinderDVLMessage(char* str)
 	return foundstr;
 }
 */
-// We suppose that read operations return when a message has just been completely sent, and not randomly.
+/*// We suppose that read operations return when a message has just been completely sent, and not randomly.
 inline int GetLatestDataPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 {
 	char recvbuf[2*MAX_NB_BYTES_PATHFINDERDVL];
@@ -606,7 +606,7 @@ inline int GetLatestDataPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 		// Only the last recvbuflen bytes received should be taken into account in what follows.
 		BytesReceived = recvbuflen;
 	}
-/*
+
 	// The data need to be analyzed and we must check if we need to get more data from 
 	// the device to get the desired message.
 	// But normally we should not have to get more data unless we did not wait enough
@@ -650,10 +650,10 @@ inline int GetLatestDataPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 	}
 
 	pPathfinderDVL->LastAltitude = *pAltitude;
-*/
+
 	return EXIT_SUCCESS;
 }
-
+*/
 inline int GetNMEASentencePathfinderDVL(PATHFINDERDVL* pPathfinderDVL, NMEADATA* pNMEAData)
 {
 	char recvbuf[MAX_NB_BYTES_PATHFINDERDVL];

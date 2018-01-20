@@ -1,5 +1,8 @@
+ARDUCOPTER_ROBID, QUADRO_ROBID and a simulator version, to test roll and pitch control...
 
-mieux gérer les out of range de dvl, of vs quand il y a des trames sans données, voir aussi GPS...
+rajouter option rampe comme sur robot CCI...
+
+mieux gérer les out of range de dvl, optical flow vs quand il y a des trames sans données, voir aussi GPS...
 si dvl ou of activés, indiquer dans GUI si valides...->bVrOK, ou alors juste regarder la largeur des intervalles?
 sog gps vs dvl->toujours essayer d'estimer la SOG soit à partir de mesures directes soit à partir de vr et R...
 pour les bateaux, si vraiment on détecte qu'il n'y a pas de GPS, passer en dr...
@@ -35,6 +38,8 @@ commande pour régler les erreurs des capterus, et aussi en paramètres globaux?
 Nortek DVL supports RDI PD0, send Pathfinder commands, faire fichier RDIPD0Protocol.h?
 calib mag du DVL Nortek?
 prévoir commande pour mettre en veille le PathfinderDVL (avec warning s'il est en Ethernet)
+
+Test piscine avec DVL+staticsonalocalization : mettre plus grande erreur sur boussole et faire du suivi de ligne avec effet intégral pour corriger les erreurs de cap...->non en fait le DVL n'aidera pas vraiment…
 
 pour tous les capteurs rajouter : signx, signy, signz, signphi, signtheta, signpsi (changement de repère), x, y, z, phi, theta, psi (position du device dans robot), psip1, psip2 (calib mag pour corriger les perturbations en dernier recours)
 MT : Coordinate system different from legacy mode, hardcode harmonization or not...?
@@ -72,7 +77,8 @@ Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planne
 
 maybe bEnableRCMode always forces to use bEnableFullSpeedMode so they should be the same variable... 
 
-faire fonction dans Config.h qui enregistre fichier de config, voir aussi pour les fichiers de config des périphériques, changer de format de fichier...?
+voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
+https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
 bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
 Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
