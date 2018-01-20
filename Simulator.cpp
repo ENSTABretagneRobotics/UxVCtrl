@@ -18,7 +18,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double d1 = 0, d2 = 0;
 
 	double vc = 0, psic = 0, hw = 0;
-	double x = 0, y = 0, z = 0, psi = 0, vrx = 0, omegaz = 0;
+	double x = 0, y = 0, z = 0, psi = 0, vrx = 0, vry = 0, omegaz = 0;
 	double alpha = 0, d = 0;
 
 	double lat = 0, lon = 0, alt = 0, hdg = 0;
@@ -120,6 +120,31 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			// DVL...
 			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		}
+		else if (robid == TANK_SIMULATOR_ROBID)
+		{
+			psi = alphaomegaz*uw;
+			vrx = alphavrx*u;
+
+			// Simulated state evolution.
+			double xdot = vrx*cos(psi);
+			double ydot = vrx*sin(psi);
+			x = x+dt*xdot;
+			y = y+dt*ydot;
+
+			// Simulated sensors measurements.
+			// Compass.
+			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS always available.
+			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			// Odometers...
+			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		}
 		else if (robid == BUGGY_SIMULATOR_ROBID)
 		{
 			vrx = alphavrx*u;
@@ -145,6 +170,33 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
 			// Odometers...
 			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		}
+		else if (robid == QUADRO_SIMULATOR_ROBID)
+		{
+
+			// Not fully implemented...
+
+			psi = alphaomegaz*uw;
+			vrx = alphavrx*u;
+			vry = alphavrx*ul;
+
+			// Simulated state evolution.
+			double xdot = vrx*cos(psi)-vry*sin(psi);
+			double ydot = vry*cos(psi)+vrx*sin(psi);
+			x = x+dt*xdot;
+			y = y+dt*ydot;
+
+			// Simulated sensors measurements.
+			// Compass.
+			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS always available.
+			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
 		}
 
 		// Sonar.

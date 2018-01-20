@@ -295,7 +295,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			//vrxhat = 0.9*vrxhat+0.1*(sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise);
 			//printf("vrxhat = %f\n", Center(vrxhat));
 		}
-		else if (robid == QUADRO_ROBID)
+		else if (robid == ARDUCOPTER_ROBID)
 		{
 			vrxhat = vrx_of;
 			vryhat = vry_of;
@@ -350,10 +350,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		case SUBMARINE_SIMULATOR_ROBID:
 		case SAUCISSE_ROBID:
 		case SARDINE_ROBID:
-		case VENI_ROBID:
-		case VEDI_ROBID:
-		case VICI_ROBID:
-		case JACK_ROBID:
+		case CISCREA_ROBID:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
 			Energy_actuators += dt*((u1+u2+u3)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
@@ -366,11 +363,14 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			Energy_actuators += dt*(u*P_actuators_1+uw*P_actuators_2+uw*P_actuators_4)/3600.0;
 			break;
 		case BUBBLE_ROBID:
+		case TANK_SIMULATOR_ROBID:
 		case ETAS_WHEEL_ROBID:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
 			Energy_actuators += dt*((u1+u2)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
-		case QUADRO_ROBID:
+		case QUADRO_SIMULATOR_ROBID:
+		case COPTER_ROBID:
+		case ARDUCOPTER_ROBID:
 		default:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
 			Energy_actuators += dt*((u+uw+uv+ul)*P_actuators_1+P_actuators_4)/3600.0;
@@ -388,7 +388,9 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			fluiddir = fmod_360_rad2deg(M_PI/2-Center(psitwindhat));
 			fluidspeed = Center(vtwindhat);
 			break;
-		case QUADRO_ROBID:
+		case QUADRO_SIMULATOR_ROBID:
+		case COPTER_ROBID:
+		case ARDUCOPTER_ROBID:
 		default:
 			break;
 		}

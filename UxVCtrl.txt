@@ -3,7 +3,7 @@
 % Submarine Simulator
 0x00000001
 % Buggy Simulator
-%0x01000000
+%0x00100000
 % SAUCISSE
 %0x00000002
 % SARDINE
@@ -15,11 +15,11 @@
 % Sailboat
 %0x00040000
 % Buggy
-%0x02000000
+%0x00200000
 % ETAS WHEEL
+%0x00020000
+% ARDUCOPTER
 %0x04000000
-% QUADRO
-%0x20000000
 % nbvideo (max 3)
 2
 % videoimgwidth
@@ -171,6 +171,50 @@
 % vrxmax (0.4 : simu, 0.4 : SAUC'ISSE, 0.4 : SARDINE, 1.5 : CISCREA, Hovecraft : 2)
 0.4
 % omegazmax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
+0.8
+% Kp_wy
+1
+% Kd_wy
+0
+% Ki_wy
+0
+% up_max_wy
+1
+% ud_max_wy
+0.5
+% ui_max_wy
+0.1
+% u_min_wy
+-1
+% u_max_wy
+1
+% error_min_wy (in rad)
+-0.5
+% error_max_wy (in rad)
+0.5
+% omega_max_wy (in rad/s)
+0.8
+% Kp_wx
+1
+% Kd_wx
+0
+% Ki_wx
+0
+% up_max_wx
+1
+% ud_max_wx
+0.5
+% ui_max_wx
+0.1
+% u_min_wx
+-1
+% u_max_wx
+1
+% error_min_wx (in rad)
+-0.5
+% error_max_wx (in rad)
+0.5
+% omega_max_wx (in rad/s)
 0.8
 % gamma_infinite (in rad, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 1.3

@@ -240,7 +240,7 @@ int main(int argc, char* argv[])
 	if (!bDisableMiniSSC) CreateDefaultThread(MiniSSCThread, NULL, &MiniSSCThreadId);
 	if (!bDisableIM483I) CreateDefaultThread(IM483IThread, NULL, &IM483IThreadId);
 #ifdef ENABLE_LIBMODBUS_SUPPORT
-	if (robid & CISCREA_ROBID_MASK) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
+	if (robid == CISCREA_ROBID) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
@@ -325,7 +325,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_MAVLINK_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_LIBMODBUS_SUPPORT
-	if (robid & CISCREA_ROBID_MASK) WaitForThread(CISCREAThreadId);
+	if (robid == CISCREA_ROBID) WaitForThread(CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
 	if (!bDisableIM483I) WaitForThread(IM483IThreadId);
 	if (!bDisableMiniSSC) WaitForThread(MiniSSCThreadId);

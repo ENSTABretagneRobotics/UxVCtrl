@@ -75,12 +75,14 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	heartbeat.system_status = MAV_STATE_ACTIVE;
 	heartbeat.type = MAV_TYPE_GENERIC;
 	if (robid & SUBMARINE_ROBID_MASK) heartbeat.type = MAV_TYPE_SUBMARINE;
-	if (robid & MOTORBOAT_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
-	if (robid & SAILBOAT_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
+	if (robid & SURFACE_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
 	if (robid & GROUND_ROBID_MASK) heartbeat.type = MAV_TYPE_GROUND_ROVER;
 	switch (robid)
 	{
-	case QUADRO_ROBID:
+	case COPTER_ROBID:
+		heartbeat.type = MAV_TYPE_QUADROTOR;
+		break;
+	case ARDUCOPTER_ROBID:
 		heartbeat.type = MAV_TYPE_QUADROTOR;
 		break;
 	default:
@@ -354,12 +356,14 @@ REQ_DATA_STREAM...
 	heartbeat.system_status = MAV_STATE_ACTIVE;
 	heartbeat.type = MAV_TYPE_GENERIC;
 	if (robid & SUBMARINE_ROBID_MASK) heartbeat.type = MAV_TYPE_SUBMARINE;
-	if (robid & MOTORBOAT_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
-	if (robid & SAILBOAT_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
+	if (robid & SURFACE_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
 	if (robid & GROUND_ROBID_MASK) heartbeat.type = MAV_TYPE_GROUND_ROVER;
 	switch (robid)
 	{
-	case QUADRO_ROBID:
+	case COPTER_ROBID:
+		heartbeat.type = MAV_TYPE_QUADROTOR;
+		break;
+	case ARDUCOPTER_ROBID:
 		heartbeat.type = MAV_TYPE_QUADROTOR;
 		break;
 	default:

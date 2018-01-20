@@ -2,6 +2,14 @@ cd /d "%~dp0"
 
 set UDK_USER_PATH=..\..\..\..\..\..\..\..\Robotics data\Competitions or robots specific data\UxVs\Latest\UDK\USER
 
+copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\UxVCtrl.exe"
+copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\CHANGELOG.txt"
+copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\ReadMe.txt"
+copy /B /Y /Z .\mission_spec.txt "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\mission_spec.txt"
+copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\ResetWorkspace.bat"
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\samples"\
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\ARDUCOPTER_WORKSPACE\restore"\
+
 copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\BUBBLE_WORKSPACE\UxVCtrl.exe"
 copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\BUBBLE_WORKSPACE\CHANGELOG.txt"
 copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\BUBBLE_WORKSPACE\ReadMe.txt"
@@ -41,14 +49,6 @@ copy /B /Y /Z .\mission_spec.txt "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\mission_sp
 copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\ResetWorkspace.bat"
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\samples"\
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\restore"\
-
-copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\QUADRO_WORKSPACE\UxVCtrl.exe"
-copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\QUADRO_WORKSPACE\CHANGELOG.txt"
-copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\QUADRO_WORKSPACE\ReadMe.txt"
-copy /B /Y /Z .\mission_spec.txt "%UDK_USER_PATH%\QUADRO_WORKSPACE\mission_spec.txt"
-copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\QUADRO_WORKSPACE\ResetWorkspace.bat"
-robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\QUADRO_WORKSPACE\samples"\
-robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\QUADRO_WORKSPACE\restore"\
 
 copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\SAILBOAT_WORKSPACE\UxVCtrl.exe"
 copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\SAILBOAT_WORKSPACE\CHANGELOG.txt"

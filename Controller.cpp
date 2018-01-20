@@ -37,7 +37,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 #pragma region Sailboat supervisor
-	if (robid & SAILBOAT_ROBID_MASK) 
+	if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 	{
 		// Temporary...
 		EnterCriticalSection(&strtimeCS);
@@ -116,7 +116,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			wpsi = LineFollowing(phi, e, gamma_infinite, radius);
 
 #pragma region Sailboat supervisor
-			if (robid & SAILBOAT_ROBID_MASK) 
+			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 			{
 				double psiw = Center(psitwindhat);
 #ifdef ALT_SAILBOAT_CONTROLLER
@@ -267,7 +267,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*integral;
 					else uw = Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*integral;
 				}
-				else if (robid & CISCREA_ROBID_MASK) 
+				else if (robid == CISCREA_ROBID) 
 				{
 					//uw = -Kp*error
 					//	-(Kd1+Kd2*error*error*abserror)*Center(omegazhat)*(fabs(Center(omegazhat))>uw_derivative_max)
@@ -371,7 +371,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		u3 = (u3>-1)?u3:-1;
 
 #pragma region Sailboat supervisor
-		if (robid & SAILBOAT_ROBID_MASK) 
+		if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 		{
 			double latitude = 0, longitude = 0, altitude = 0;
 
@@ -453,7 +453,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	StopChronoQuick(&chrono_sail_update);
 
 	// Temporary...
-	if (robid & SAILBOAT_ROBID_MASK) fclose(lognavfile);
+	if (robid & SAILBOAT_CLASS_ROBID_MASK) fclose(lognavfile);
 #pragma endregion
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...

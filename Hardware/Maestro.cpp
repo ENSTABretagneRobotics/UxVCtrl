@@ -272,7 +272,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				mSleep(50);
 #endif // USE_MOTORBOAT_WITH_FLUX
 				break;
-			case QUADRO_ROBID:
+			case COPTER_ROBID:
+			case ARDUCOPTER_ROBID:
 			case SAUCISSE_ROBID:
 			case SARDINE_ROBID:
 				EnterCriticalSection(&StateVariablesCS);

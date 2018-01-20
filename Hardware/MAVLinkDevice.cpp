@@ -285,7 +285,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						case ETAS_WHEEL_ROBID:
 						case BUBBLE_ROBID:
 						case MOTORBOAT_ROBID:
-						case QUADRO_ROBID:
+						case COPTER_ROBID:
+						case ARDUCOPTER_ROBID:
 							if (bRearmAutopilot)
 							{
 								if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)

@@ -1,3 +1,7 @@
+188
+Added preliminary parameters related to roll and pitch control.
+Updated ROBIDs.
+
 187
 Added saveconfig and reloadconfig commands.
 

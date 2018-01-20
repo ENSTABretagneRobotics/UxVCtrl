@@ -106,6 +106,28 @@ inline int LoadConfig(void)
 	wdradius = 0.25;
 	vrxmax = 0.4;
 	omegazmax = 0.8;
+	Kp_wy = 1.0;
+	Kd_wy = 0;
+	Ki_wy = 0;
+	up_max_wy = 1;
+	ud_max_wy = 0.5;
+	ui_max_wy = 0.1;
+	u_min_wy = -1;
+	u_max_wy = 1;
+	error_min_wy = -0.5;
+	error_max_wy = 0.5;
+	omega_max_wy = 0.8;
+	Kp_wx = 1.0;
+	Kd_wx = 0;
+	Ki_wx = 0;
+	up_max_wx = 1;
+	ud_max_wx = 0.5;
+	ui_max_wx = 0.1;
+	u_min_wx = -1;
+	u_max_wx = 1;
+	error_min_wx = -0.5;
+	error_max_wx = 0.5;
+	omega_max_wx = 0.8;
 	gamma_infinite = 0.78;
 	radius = 5;
 	betatrav = 0.5;
@@ -371,6 +393,53 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &vrxmax) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &omegazmax) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &Kp_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &Kd_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &Ki_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &up_max_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &ud_max_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &ui_max_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &u_min_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &u_max_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &error_min_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &error_max_wy) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omega_max_wy) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &Kp_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &Kd_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &Ki_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &up_max_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &ud_max_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &ui_max_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &u_min_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &u_max_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &error_min_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &error_max_wx) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omega_max_wx) != 1) printf("Invalid configuration file.\n");
+
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &gamma_infinite) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -712,18 +781,18 @@ inline int LoadConfig(void)
 	case SUBMARINE_SIMULATOR_ROBID:
 	case SAUCISSE_ROBID:
 	case SARDINE_ROBID:
-	case VENI_ROBID:
-	case VEDI_ROBID:
-	case VICI_ROBID:
-	case JACK_ROBID:
+	case CISCREA_ROBID:
 	case BUBBLE_ROBID:
 	case MOTORBOAT_ROBID:
 	case VAIMOS_ROBID:
 	case SAILBOAT_ROBID:
+	case TANK_SIMULATOR_ROBID:
+	case ETAS_WHEEL_ROBID:
 	case BUGGY_SIMULATOR_ROBID:
 	case BUGGY_ROBID:
-	case ETAS_WHEEL_ROBID:
-	case QUADRO_ROBID:
+	case QUADRO_SIMULATOR_ROBID:
+	case COPTER_ROBID:
+	case ARDUCOPTER_ROBID:
 		break;
 	default:
 		printf("Invalid parameter : robid.\n");
@@ -1105,6 +1174,53 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%.10g\n", vrxmax) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", omegazmax) < 0) printf("Error writing configuration file.\n");
+	
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", Kp_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", Kd_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", Ki_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", up_max_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", ud_max_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", ui_max_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", u_min_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", u_max_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", error_min_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", error_max_wy) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", omega_max_wy) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", Kp_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", Kd_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", Ki_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", up_max_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", ud_max_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", ui_max_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", u_min_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", u_max_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", error_min_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", error_max_wx) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", omega_max_wx) < 0) printf("Error writing configuration file.\n");
+	
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", gamma_infinite) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

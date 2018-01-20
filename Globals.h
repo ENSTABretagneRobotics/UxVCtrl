@@ -45,33 +45,39 @@
 #endif // _MSC_VER
 
 // Robot id masks.
-#define SUBMARINE_ROBID_MASK 0x000000FF
-#define MOTORBOAT_ROBID_MASK 0x0000FF00
-#define SAILBOAT_ROBID_MASK 0x00FF0000
-#define GROUND_ROBID_MASK 0xFF000000
-#define SIMULATOR_ROBID_MASK 0x11111111
-#define SAUCISSE_CLASS_ROBID_MASK 0x0000000E
-#define CISCREA_ROBID_MASK 0x000000E0
-#define AERIAL_ROBID_MASK 0xE0000000
+#define SUBMARINE_ROBID_MASK          0x000000FF
+#define SURFACE_ROBID_MASK            0x0000FF00
+#define GROUND_ROBID_MASK             0x00FF0000
+#define AERIAL_ROBID_MASK             0xFF000000
+#define SAUCISSE_CLASS_ROBID_MASK     0x0000000E
+#define MOTORBOAT_CLASS_ROBID_MASK    0x00000E00
+#define SAILBOAT_CLASS_ROBID_MASK     0x0000E000
+#define COPTER_CLASS_ROBID_MASK       0x0E000000
+#define PLANE_CLASS_ROBID_MASK        0xE0000000
+#define SIMULATOR_ROBID_MASK          0x11111111
 
 // Simulators id.
-#define SUBMARINE_SIMULATOR_ROBID 0x00000001
-#define BUGGY_SIMULATOR_ROBID 0x01000000
+#define SUBMARINE_SIMULATOR_ROBID     0x00000001
+#define TANK_SIMULATOR_ROBID          0x00010000
+#define BUGGY_SIMULATOR_ROBID         0x00100000
+#define QUADRO_SIMULATOR_ROBID        0x01000000
 
 // Robots should have an even id.
-#define SAUCISSE_ROBID 0x00000002
-#define SARDINE_ROBID 0x00000004
-#define VENI_ROBID 0x00000020
-#define VEDI_ROBID 0x00000040
-#define VICI_ROBID 0x00000060
-#define JACK_ROBID 0x00000080
-#define BUBBLE_ROBID 0x00000200
-#define MOTORBOAT_ROBID 0x00000400
-#define VAIMOS_ROBID 0x00020000
-#define SAILBOAT_ROBID 0x00040000
-#define BUGGY_ROBID 0x02000000
-#define ETAS_WHEEL_ROBID 0x04000000
-#define QUADRO_ROBID 0x20000000
+#define SAUCISSE_ROBID                0x00000002
+#define SARDINE_ROBID                 0x00000004
+#define CISCREA_ROBID                 0x00000020
+#define BUBBLE_ROBID                  0x00000200
+#define MOTORBOAT_ROBID               0x00000400
+#define VAIMOS_ROBID                  0x00002000
+#define SAILBOAT_ROBID                0x00004000
+#define ETAS_WHEEL_ROBID              0x00020000
+#define BUGGY_ROBID                   0x00200000
+#define COPTER_ROBID                  0x02000000
+#define ARDUCOPTER_ROBID              0x04000000
+//#define NAE_ROBID                     0x06000000
+//#define PLANE_ROBID                   0x20000000
+//#define ARDUPLANE_ROBID               0x40000000
+//#define UAUV_ROBID                    0x60000000
 
 enum KEYS
 {
@@ -290,6 +296,10 @@ extern double wzradiushigh, wzradiuslow; // Accuracy of the depth control in m.
 extern double wdradius; // Accuracy of the distance control in m.
 extern double vrxmax; // Max submarine speed in rad/s.
 extern double omegazmax; // Max submarine rotation speed in rad/s.
+extern double Kp_wy, Kd_wy, Ki_wy, up_max_wy, ud_max_wy, ui_max_wy, 
+u_min_wy, u_max_wy, error_min_wy, error_max_wy, omega_max_wy;
+extern double Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx, 
+u_min_wx, u_max_wx, error_min_wx, error_max_wx, omega_max_wx;
 extern double gamma_infinite; // Angle to go towards the line when far, for line following in rad.
 extern double radius; // Accuracy of line/waypoint following in m.
 extern double betatrav;

@@ -415,7 +415,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
 				break;
-			case QUADRO_ROBID:
+			case ARDUCOPTER_ROBID:
 				ul += 0.1;
 				ul = (ul > 1)? 1: ul;
 				break;
@@ -438,11 +438,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
 				break;
-			case QUADRO_ROBID:
+			case QUADRO_SIMULATOR_ROBID:
+			case COPTER_ROBID:
+			case ARDUCOPTER_ROBID:
 				ul -= 0.1;
 				ul = (ul < -1)? -1: ul;
 				break;
 			case BUBBLE_ROBID:
+			case TANK_SIMULATOR_ROBID:
 			case ETAS_WHEEL_ROBID:
 				uw_max -= 0.1;
 				uw_max = (uw_max < 0)? 0: uw_max;
@@ -939,7 +942,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
-			if (robid & SAILBOAT_ROBID_MASK) 
+			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 			{
 				sprintf(szText, "%.1f/%.1f", 
 					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
@@ -1090,7 +1093,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bOrientationCircle)
 			{
 				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
-				if (robid & SAILBOAT_ROBID_MASK) 
+				if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 				{
 					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(psihat);
 					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 

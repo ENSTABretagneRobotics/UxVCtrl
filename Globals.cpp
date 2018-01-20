@@ -133,6 +133,10 @@ double wzradiushigh = 0, wzradiuslow = 0;
 double wdradius = 0;
 double vrxmax = 0;
 double omegazmax = 0;
+double Kp_wy = 0, Kd_wy = 0, Ki_wy = 0, up_max_wy = 0, ud_max_wy = 0, ui_max_wy = 0, 
+u_min_wy = 0, u_max_wy = 0, error_min_wy = 0, error_max_wy = 0, omega_max_wy = 0;
+double Kp_wx = 0, Kd_wx = 0, Ki_wx = 0, up_max_wx = 0, ud_max_wx = 0, ui_max_wx = 0, 
+u_min_wx = 0, u_max_wx = 0, error_min_wx = 0, error_max_wx = 0, omega_max_wx = 0;
 double gamma_infinite = 0;
 double radius = 0;
 double betatrav = 0;
