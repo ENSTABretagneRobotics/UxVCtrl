@@ -345,7 +345,7 @@ extern double P_electronics_1, P_electronics_2, P_electronics_3, P_electronics_4
 extern double P_actuators_1, P_actuators_2, P_actuators_3, P_actuators_4;
 #pragma endregion
 #pragma region Simulator initial state
-extern double x_0, y_0, z_0, psi_0, vrx_0, omegaz_0;
+extern double x_0, y_0, z_0, phi_0, theta_0, psi_0, vrx_0, vry_0, vrz_0, omegax_0, omegay_0, omegaz_0;
 extern double alpha_0, d_0;
 #pragma endregion
 #pragma region Simulator physical parameters

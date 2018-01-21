@@ -209,7 +209,7 @@ inline int LoadConfig(void)
 	P_actuators_1 = 0; P_actuators_2 = 0; P_actuators_3 = 0; P_actuators_4 = 0;
 #pragma endregion
 #pragma region Simulator initial state
-	x_0 = 0; y_0 = 0; z_0 = 0; psi_0 = 0; vrx_0 = 0; omegaz_0 = 0;
+	x_0 = 0; y_0 = 0; z_0 = 0; phi_0 = 0; theta_0 = 0; psi_0 = 0; vrx_0 = 0; vry_0 = 0; vrz_0 = 0; omegax_0 = 0; omegay_0 = 0; omegaz_0 = 0;
 	alpha_0 = 0; d_0 = 0;
 #pragma endregion
 #pragma region Simulator physical parameters
@@ -694,9 +694,21 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &z_0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &phi_0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &theta_0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &psi_0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &vrx_0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vry_0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vrz_0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegax_0) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &omegay_0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &omegaz_0) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1455,9 +1467,21 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", z_0) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", phi_0) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", theta_0) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", psi_0) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", vrx_0) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", vry_0) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", vrz_0) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", omegax_0) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", omegay_0) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", omegaz_0) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

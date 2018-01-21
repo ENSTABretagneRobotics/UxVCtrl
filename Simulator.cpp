@@ -18,7 +18,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double d1 = 0, d2 = 0;
 
 	double vc = 0, psic = 0, hw = 0;
-	double x = 0, y = 0, z = 0, psi = 0, vrx = 0, vry = 0, omegaz = 0;
+	double x = 0, y = 0, z = 0, phi = 0, theta = 0, psi = 0, vrx = 0, vry = 0, vrz = 0, omegax = 0, omegay = 0, omegaz = 0;
 	double alpha = 0, d = 0;
 
 	double lat = 0, lon = 0, alt = 0, hdg = 0;
@@ -50,7 +50,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	t = 0;
 
-	x = x_0; y = y_0; z = z_0; psi = psi_0; vrx = vrx_0; omegaz = omegaz_0;
+	x = x_0; y = y_0; z = z_0; phi = phi_0; theta = theta_0; psi = psi_0; vrx = vrx_0; vry = vry_0; vrz = vrz_0; omegax = omegax_0; omegay = omegay_0; omegaz = omegaz_0;
 	alpha_mes = alpha_0; d = d_0;
 
 	StartChrono(&chrono);
@@ -179,15 +179,20 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			psi = alphaomegaz*uw;
 			vrx = alphavrx*u;
 			vry = alphavrx*ul;
+			vrz = u3*alphaz;
 
 			// Simulated state evolution.
 			double xdot = vrx*cos(psi)-vry*sin(psi);
 			double ydot = vry*cos(psi)+vrx*sin(psi);
+			double zdot = vrz;
 			x = x+dt*xdot;
 			y = y+dt*ydot;
+			z = z+dt*zdot;
 
 			// Simulated sensors measurements.
-			// Compass.
+			// AHRS.
+			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS always available.
 			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;

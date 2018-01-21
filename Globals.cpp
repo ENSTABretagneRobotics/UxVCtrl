@@ -182,7 +182,7 @@ double P_electronics_1 = 0, P_electronics_2 = 0, P_electronics_3 = 0, P_electron
 double P_actuators_1 = 0, P_actuators_2 = 0, P_actuators_3 = 0, P_actuators_4 = 0;
 #pragma endregion
 #pragma region Simulator initial state
-double x_0 = 0, y_0 = 0, z_0 = 0, psi_0 = 0, vrx_0 = 0, omegaz_0 = 0;
+double x_0 = 0, y_0 = 0, z_0 = 0, phi_0 = 0, theta_0 = 0, psi_0 = 0, vrx_0 = 0, vry_0 = 0, vrz_0 = 0, omegax_0 = 0, omegay_0 = 0, omegaz_0 = 0;
 double alpha_0 = 0, d_0 = 0;
 #pragma endregion
 #pragma region Simulator physical parameters

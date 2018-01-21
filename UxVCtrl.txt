@@ -443,16 +443,28 @@
 0
 % P_actuators_4 (in W)
 0.4
-% Simulated submarine initial state
+% Simulator initial state
 % x_0 (in m)
 0
 % y_0 (in m)
 0
 % z_0 (in m)
 0
+% phi_0 (in rad)
+0
+% theta_0 (in rad)
+0
 % psi_0 (in rad)
 0
 % vrx_0 (in m/s)
+0
+% vry_0 (in m/s)
+0
+% vrz_0 (in m/s)
+0
+% omegax_0 (in rad/s)
+0
+% omegay_0 (in rad/s)
 0
 % omegaz_0 (in rad/s)
 0
@@ -460,7 +472,7 @@
 0
 % d_0 (in m)
 0
-% Simulated submarine/buggy physical parameters
+% Simulator physical parameters
 % x_max_rand_err (in m)
 3.0
 % x_bias_err (in m)

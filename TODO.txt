@@ -1,3 +1,4 @@
+update env to enable 3D
 
 mieux gérer les out of range de dvl, optical flow vs quand il y a des trames sans données, voir aussi GPS...
 si dvl ou of activés, indiquer dans GUI si valides...->bVrOK, ou alors juste regarder la largeur des intervalles?
@@ -14,11 +15,8 @@ option pour désactiver la mise à jour des variables GPS pour mavlink, sbg, mt
 récupérer accel de mavlink, mt, sbg, razor, vérifier quand elles sont valides...?
 
 accéléros : peu précis, sensible aux chocs et vibrations rejeter que si incohérent avec au moins 2 autres capteurs/algos (e.g. pression, effets propulseurs, DVL, GPS pour vertical, effets propulseurs, sonar, DVL, GPS pour horizontal)
-
 calculer vz à partir de pression pour pouvoir comparer avec effets propulseurs, DVL et accéléros
-
 moving average à faire sur 2 ou 4 mesures pour gérer les cas où il y a des deltas de 0 1 fois sur 2, comme parfois avec le GPS...
-
 et selon à quel point les mesures sont incohérentes, on agrandi leur intervalle ou on les rejette complétement...
 
 Disp DVL fix in use en petit comme GPS, à mettre aussi en petit, prévoir commande comme GPS pour choisir d'utiliser ou non les données DVL...
