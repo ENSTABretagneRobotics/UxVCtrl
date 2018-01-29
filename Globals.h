@@ -648,6 +648,8 @@ extern BOOL bLineFollowingControl;
 extern BOOL bWaypointControl;
 extern BOOL bDistanceControl;
 extern BOOL bBrakeControl;
+extern BOOL bRollControl;
+extern BOOL bPitchControl;
 extern BOOL bHeadingControl;
 extern BOOL bDepthControl;
 extern BOOL bAltitudeAGLControl;

@@ -134,7 +134,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					if (((target_followme == MAVLINKDEVICE0_TARGET)&&(deviceid == 0))||((target_followme == MAVLINKDEVICE1_TARGET)&&(deviceid == 1)))
 					{
 						// GNSSqualityMAVLinkDevice[deviceid] should not be set in that case...
-						if (mavlinkdata.gps_raw_int.fix_type >= 2)
+						if (mavlinkdata.gps_raw_int.fix_type >= GPS_FIX_TYPE_2D_FIX) // To check...
 						{
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
 						}
@@ -149,25 +149,29 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 #pragma region SENSORS
 					switch (mavlinkdata.gps_raw_int.fix_type)
 					{
-					case 2: // 2D Fix. To check...
-					case 3: // 3D Fix.
+					case GPS_FIX_TYPE_2D_FIX: // To check...
+					case GPS_FIX_TYPE_3D_FIX:
 						GNSSqualityMAVLinkDevice[deviceid] = AUTONOMOUS_GNSS_FIX;
 						StopChronoQuick(&chrono_GPSOK);
 						StartChrono(&chrono_GPSOK);
 						break;
-					case 4: // DGPS.
+					case GPS_FIX_TYPE_DGPS:
 						GNSSqualityMAVLinkDevice[deviceid] = DIFFERENTIAL_GNSS_FIX;
 						StopChronoQuick(&chrono_GPSOK);
 						StartChrono(&chrono_GPSOK);
 						break;
-					case 5: // RTK.
-						// Might be underestimated...
+					case GPS_FIX_TYPE_RTK_FLOAT:
 						GNSSqualityMAVLinkDevice[deviceid] = RTK_FLOAT;
 						StopChronoQuick(&chrono_GPSOK);
 						StartChrono(&chrono_GPSOK);
 						break;
-					case 0: // No Fix or empty field.
-					case 1: // No Fix.
+					case GPS_FIX_TYPE_RTK_FIXED:
+						GNSSqualityMAVLinkDevice[deviceid] = RTK_FIXED;
+						StopChronoQuick(&chrono_GPSOK);
+						StartChrono(&chrono_GPSOK);
+						break;
+					case GPS_FIX_TYPE_NO_GPS: // No GPS connected or empty field.
+					case GPS_FIX_TYPE_NO_FIX:
 					default:
 						// Timeout to handle temporary empty fields...
 						if (GetTimeElapsedChronoQuick(&chrono_GPSOK) > mavlinkdevice.timeout)
@@ -177,7 +181,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						break;
 					}
 
-					if (mavlinkdata.gps_raw_int.fix_type >= 2)
+					if (mavlinkdata.gps_raw_int.fix_type >= GPS_FIX_TYPE_2D_FIX) // To check...
 					{
 						double cog_deg = 0;
 						ComputeGNSSPosition(mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0,

@@ -27,7 +27,7 @@ inline void DisableAllHorizontalControls(void)
 	bDistanceControl = FALSE;
 	bBrakeControl = FALSE;
 	bHeadingControl = FALSE;
-	u = 0; uw = 0;
+	u = 0; uw = 0; ul = 0;
 	LeaveCriticalSection(&StateVariablesCS);
 }
 
@@ -50,7 +50,7 @@ inline void DisableAllControls(void)
 	bHeadingControl = FALSE;
 	bDepthControl = FALSE;
 	bAltitudeAGLControl = FALSE;
-	u = 0; uw = 0; uv = 0;
+	u = 0; uw = 0; ul = 0; uv = 0;
 	LeaveCriticalSection(&StateVariablesCS);
 	EnterCriticalSection(&MDMCS);
 	AcousticCommandMDM = 0; // Should change?

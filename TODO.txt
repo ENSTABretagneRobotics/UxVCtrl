@@ -1,3 +1,6 @@
+arducopter : vérifier touches a,e remises au neutre, avec space, etc.
+touches et commandes pour bRollControl, bPitchControl...
+
 update env to enable 3D
 
 mieux gérer les out of range de dvl, optical flow vs quand il y a des trames sans données, voir aussi GPS...
@@ -24,7 +27,7 @@ commande pour choisir aussi quelles équations d'état on utilise, désignées par u
 
 revoir mes noms de variables pour les mesures, devraient être des intervalles avec le nom du périphérique, et la largeur de l'intervalle doit être fixée par le capteur...?
 dans observer, c'est pas facile de choisir les bonnes equations d'état selon les capteurs dispos et l'état de leurs données (e.g. quadro avec optical flow, submarine avec DVL, précision GPS RTK...), si on fait avec la largeur des intervalles, définie dans les périphériques ça pourra aider...
-commande pour régler les erreurs des capterus, et aussi en paramètres globaux?
+commande pour régler les erreurs des capteurs, et aussi en paramètres globaux?
 
 Nortek DVL supports RDI PD0, send Pathfinder commands, faire fichier RDIPD0Protocol.h?
 calib mag du DVL Nortek?

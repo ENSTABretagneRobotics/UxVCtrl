@@ -18,8 +18,9 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double wxa_prev = 0, wya_prev = 0, wxb_prev = 0, wyb_prev = 0, wlata = 0, wlonga = 0, wlatb = 0, wlongb = 0, walt = 0; // For line following control.
 	double delta_d = 0; // For distance control.
 	double delta_angle = 0; // For heading control.
-	double wpsi_prev = 0; // For heading control.
-	double integral = 0; // For heading control.
+	double wpsi_prev = 0, ipsi = 0; // For heading control.
+	double wtheta_prev = 0, itheta = 0; // For pitch control.
+	double wphi_prev = 0, iphi = 0; // For roll control.
 	double delta_agl = 0; // For altitude Above Ground Level control.
 	double delta_z = 0; // For depth control.
 
@@ -246,7 +247,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		if (bHeadingControl)
 		{
-			if (wpsi != wpsi_prev) integral = 0;
+			if (wpsi != wpsi_prev) ipsi = 0;
 
 			delta_angle = Center(psihat)-wpsi;
 
@@ -264,32 +265,32 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 				if ((robid & SAUCISSE_CLASS_ROBID_MASK)||(robid == SUBMARINE_SIMULATOR_ROBID))
 				{
-					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*integral;
-					else uw = Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*integral;
+					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*ipsi;
+					else uw = Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*ipsi;
 				}
 				else if (robid == CISCREA_ROBID) 
 				{
 					//uw = -Kp*error
 					//	-(Kd1+Kd2*error*error*abserror)*Center(omegazhat)*(fabs(Center(omegazhat))>uw_derivative_max)
-					//	-Ki*integral;
-					uw = -Kp*error-Kd1*derivative-Ki*integral;
+					//	-Ki*ipsi;
+					uw = -Kp*error-Kd1*derivative-Ki*ipsi;
 				}
 				else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_ROBID))
 				{
-					uw = sign(u, 0)*(-Kp*error-Kd1*derivative-Ki*integral);
+					uw = sign(u, 0)*(-Kp*error-Kd1*derivative-Ki*ipsi);
 				}
 				else
 				{
 					//// We still (probably...) have to avoid the singularity at tan(M_PI/2)...
-					//uw = -Kp*atan(tan(delta_angle/2.0))-Kd1*Center(omegazhat)-Ki*integral;
-					uw = -Kp*error-Kd1*derivative-Ki*integral;
+					//uw = -Kp*atan(tan(delta_angle/2.0))-Kd1*Center(omegazhat)-Ki*ipsi;
+					uw = -Kp*error-Kd1*derivative-Ki*ipsi;
 				}
 
-				integral = integral+error*dt;
+				ipsi = ipsi+error*dt;
 
-				// Limit the integral.
-				if (Ki*integral > uw_integral_max) integral = uw_integral_max/Ki;
-				if (Ki*integral < -uw_integral_max) integral = -uw_integral_max/Ki;
+				// Limit the ipsi.
+				if (Ki*ipsi > uw_integral_max) ipsi = uw_integral_max/Ki;
+				if (Ki*ipsi < -uw_integral_max) ipsi = -uw_integral_max/Ki;
 			}
 			else
 			{
@@ -306,15 +307,43 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					uw = -sign(sin(delta_angle), 0)*uw_max;
 				}
 
-				integral = 0;
+				ipsi = 0;
 			}
 
 			wpsi_prev = wpsi;
 		}
 		else
 		{
-			integral = 0;
+			ipsi = 0;
 		}
+		
+
+		if (bPitchControl)
+		{
+			if (wtheta != wtheta_prev) itheta = 0;
+			up = PID_angle_control(wtheta, wtheta_prev, Center(thetahat), Center(omegayhat), &itheta, 1, dt,
+				Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx,
+				u_min_wx, u_max_wx, error_min_wx, error_max_wx, omega_max_wx);
+			wtheta_prev = wtheta;
+		}
+		else
+		{
+			itheta = 0;
+		}
+
+		if (bRollControl)
+		{
+			if (wphi != wphi_prev) iphi = 0;
+			ur = PID_angle_control(wphi, wphi_prev, Center(phihat), Center(omegayhat), &iphi, 1, dt,
+				Kp_wx, Kd_wy, Ki_wy, up_max_wy, ud_max_wy, ui_max_wy,
+				u_min_wy, u_max_wy, error_min_wy, error_max_wy, omega_max_wy);
+			wphi_prev = wphi;
+		}
+		else
+		{
+			iphi = 0;
+		}
+
 
 		if (bAltitudeAGLControl)
 		{
@@ -341,35 +370,70 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		ul = (ul > 1)? 1: ul;
 		ul = (ul < -1)? -1: ul;
 
-		//u1 = (u+uw)/2;
-		//u2 = (u-uw)/2;
-		// Force to slow down to be able to rotate correctly when too fast...
-		if (u_coef*u+uw_coef*abs(uw) > 1)
+		switch (robid)
 		{
-			double uw_boost = u_coef*u+uw_coef*abs(uw)-1;
-			u1 = u_coef*u+uw_coef*uw-uw_boost;
-			u2 = u_coef*u-uw_coef*uw-uw_boost;
+		case QUADRO_SIMULATOR_ROBID:
+		case COPTER_ROBID:
+			u1 = 1.0*uv+0.2*uw+0.4*up;
+			u2 = 1.0*uv-0.2*uw+0.4*ur;
+			u3 = 1.0*uv+0.2*uw-0.4*up;
+			u4 = 1.0*uv-0.2*uw-0.4*ur;
+			break;
+		default:
+			//u1 = (u+uw)/2;
+			//u2 = (u-uw)/2;
+			// Force to slow down to be able to rotate correctly when too fast...
+			if (u_coef*u+uw_coef*abs(uw) > 1)
+			{
+				double uw_boost = u_coef*u+uw_coef*abs(uw)-1;
+				u1 = u_coef*u+uw_coef*uw-uw_boost;
+				u2 = u_coef*u-uw_coef*uw-uw_boost;
+			}
+			else if (u_coef*u-uw_coef*abs(uw) < -1)
+			{
+				double uw_boost = -(u_coef*u-uw_coef*abs(uw))-1;
+				u1 = u_coef*u+uw_coef*uw+uw_boost;
+				u2 = u_coef*u-uw_coef*uw+uw_boost;
+			}
+			else
+			{
+				u1 = u_coef*u+uw_coef*uw;
+				u2 = u_coef*u-uw_coef*uw;
+			}
+			u3 = uv;
+			break;
 		}
-		else if (u_coef*u-uw_coef*abs(uw) < -1)
-		{
-			double uw_boost = -(u_coef*u-uw_coef*abs(uw))-1;
-			u1 = u_coef*u+uw_coef*uw+uw_boost;
-			u2 = u_coef*u-uw_coef*uw+uw_boost;
-		}
-		else
-		{
-			u1 = u_coef*u+uw_coef*uw;
-			u2 = u_coef*u-uw_coef*uw;
-		}
-		u3 = uv;
 
+#pragma region Saturation
 		u1 = (u1<1)?u1:1;
 		u1 = (u1>-1)?u1:-1;
 		u2 = (u2<1)?u2:1;
 		u2 = (u2>-1)?u2:-1;
 		u3 = (u3<1)?u3:1;
 		u3 = (u3>-1)?u3:-1;
-
+		u4 = (u4<1)?u4:1;
+		u4 = (u4>-1)?u4:-1;
+		u5 = (u5<1)?u5:1;
+		u5 = (u5>-1)?u5:-1;
+		u6 = (u6<1)?u6:1;
+		u6 = (u6>-1)?u6:-1;
+		u7 = (u7<1)?u7:1;
+		u7 = (u7>-1)?u7:-1;
+		u8 = (u8<1)?u8:1;
+		u8 = (u8>-1)?u8:-1;
+		u9 = (u9<1)?u9:1;
+		u9 = (u9>-1)?u9:-1;
+		u10 = (u10<1)?u10:1;
+		u10 = (u10>-1)?u10:-1;
+		u11 = (u11<1)?u11:1;
+		u11 = (u11>-1)?u11:-1;
+		u12 = (u12<1)?u12:1;
+		u12 = (u12>-1)?u12:-1;
+		u13 = (u13<1)?u13:1;
+		u13 = (u13>-1)?u13:-1;
+		u14 = (u14<1)?u14:1;
+		u14 = (u14>-1)?u14:-1;
+#pragma endregion
 #pragma region Sailboat supervisor
 		if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 		{
