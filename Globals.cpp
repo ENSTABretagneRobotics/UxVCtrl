@@ -478,6 +478,7 @@ BOOL bShowSwitchInfo = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;
 BOOL bEnableBackwardsMotorboat = FALSE;
 BOOL bRearmAutopilot = FALSE;
+BOOL bDisableMAVLinkInterfaceIN = FALSE;
 BOOL bExit = FALSE;
 BOOL bWaiting = FALSE;
 BOOL bMissionRunning = FALSE;

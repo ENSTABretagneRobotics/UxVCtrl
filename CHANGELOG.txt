@@ -1,3 +1,6 @@
+191
+Added preliminary support of MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE to MAVLinkInterface.
+
 190
 Quick fix to be able to stop lateral input with space key.
 Corrected RTK_FIXED case for MAVLinkDevice. 

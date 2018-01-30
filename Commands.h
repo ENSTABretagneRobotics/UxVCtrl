@@ -2796,6 +2796,14 @@ inline int Commands(char* line)
 		SaveConfig();
 		LeaveCriticalSection(&StateVariablesCS); // Just in case...
 	}
+	else if (strncmp(line, "enablemavlinkinterfacein", strlen("enablemavlinkinterfacein")) == 0)
+	{
+		bDisableMAVLinkInterfaceIN = FALSE;
+	}
+	else if (strncmp(line, "disablemavlinkinterfacein", strlen("disablemavlinkinterfacein")) == 0)
+	{
+		bDisableMAVLinkInterfaceIN = TRUE;
+	}
 #pragma endregion
 #pragma region SIMPLE MOVING COMMANDS
 	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
