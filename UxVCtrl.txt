@@ -283,12 +283,14 @@
 0.1
 % alphavrxhat.inf
 0.09
-%0.09 for submarines
+%0.09 for SARDINE
+%0.24 for SAUCISSE
 %2.4 for Buggy
 %0.49 for Catamaran
 % alphavrxhat.sup
 0.10
-%0.10 for submarines
+%0.10 for SARDINE
+%0.26 for SAUCISSE
 %2.6 for Buggy
 %0.50 for Catamaran
 % alphaomegazhat.inf
@@ -525,7 +527,8 @@
 -0.1
 % alphavrx
 0.1
-%0.1 for submarines
+%0.10 for SARDINE
+%0.25 for SAUCISSE
 %2.5 for Buggy
 %0.5 for Catamaran
 % alphaomegaz

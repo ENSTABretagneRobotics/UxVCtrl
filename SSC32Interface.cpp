@@ -63,13 +63,14 @@ int inithandlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 
 int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 {
+	char recvbuf[MAX_NB_BYTES_SSC32];
+	int Bytes = 0, BytesReceived = 0, maxrecvbuflen = MAX_NB_BYTES_SSC32, chan = 0, pw = 0;
+	char endchar = '\r';
+	char* tmp = NULL;
+
 	// Get data...
 	if (CheckAvailableBytesRS232Port(pSSC32InterfacePseudoRS232Port) == EXIT_SUCCESS)
 	{
-		char recvbuf[MAX_NB_BYTES_SSC32];
-		int Bytes = 0, BytesReceived = 0, maxrecvbuflen = MAX_NB_BYTES_SSC32, pw = 0, pw0 = 0, pw1 = 0, pw2 = 0, pw3 = 0, chan0 = 0, chan1 = 0, chan2 = 0, chan3 = 0;
-		char endchar = '\r';
-
 		// Prepare the buffers.
 		memset(recvbuf, 0, sizeof(recvbuf));
 
@@ -98,121 +99,33 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 		}
 
 		// Analyze data.
-
-		// if strtr() #...
-
-		if (sscanf(recvbuf, "#%dP%d#%dP%d#%dP%d#%dP%d", &chan0, &pw0, &chan1, &pw1, &chan2, &pw2, &chan3, &pw3) == 8)
+		tmp = strstr(recvbuf, "#");
+		while (tmp)
 		{
-			switch (robid)
+			if (sscanf(tmp, "#%dP%d", &chan, &pw) == 2)
 			{
-			case TANK_SIMULATOR_ROBID:
-			case ETAS_WHEEL_ROBID:
-			case BUGGY_SIMULATOR_ROBID:
-			case BUGGY_ROBID:
-				u = (pw2-1500.0)/500.0;
-				uw = (pw0-1500.0)/500.0;
-				break;
-			case QUADRO_SIMULATOR_ROBID:
-			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
-			default:
-				uw = (pw0-1500.0)/500.0;
-				u = (pw1-1500.0)/500.0;
-				uv = (pw2-1500.0)/500.0;
-				ul = (pw3-1500.0)/500.0;
-				break;
+				switch (robid)
+				{
+				case TANK_SIMULATOR_ROBID:
+				case ETAS_WHEEL_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+					if (chan == 2) u = (pw-1500.0)/500.0;
+					if (chan == 0) uw = (pw-1500.0)/500.0;
+					break;
+				case QUADRO_SIMULATOR_ROBID:
+				case COPTER_ROBID:
+				case ARDUCOPTER_ROBID:
+				default:
+					if (chan == 0) uw = (pw-1500.0)/500.0;
+					if (chan == 1) u = (pw-1500.0)/500.0;
+					if (chan == 2) uv = (pw-1500.0)/500.0;
+					if (chan == 3) ul = (pw-1500.0)/500.0;
+					break;
+				}
 			}
-		}
-		else if (sscanf(recvbuf, "#0P%d#1P%d#2P%d", &pw0, &pw1, &pw2) == 3)
-		{
-			switch (robid)
-			{
-			case TANK_SIMULATOR_ROBID:
-			case ETAS_WHEEL_ROBID:
-			case BUGGY_SIMULATOR_ROBID:
-			case BUGGY_ROBID:
-				u = (pw2-1500.0)/500.0;
-				uw = (pw0-1500.0)/500.0;
-				break;
-			case QUADRO_SIMULATOR_ROBID:
-			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
-			default:
-				uw = (pw0-1500.0)/500.0;
-				u = (pw1-1500.0)/500.0;
-				uv = (pw2-1500.0)/500.0;
-				break;
-			}
-		}
-		else if (sscanf(recvbuf, "#0P%d", &pw) == 1)
-		{
-			switch (robid)
-			{
-			case TANK_SIMULATOR_ROBID:
-			case ETAS_WHEEL_ROBID:
-			case BUGGY_SIMULATOR_ROBID:
-			case BUGGY_ROBID:
-				uw = (pw-1500.0)/500.0;
-				break;
-			case QUADRO_SIMULATOR_ROBID:
-			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
-			default:
-				uw = (pw-1500.0)/500.0;
-				break;
-			}
-		}
-		else if (sscanf(recvbuf, "#1P%d", &pw) == 1)
-		{
-			switch (robid)
-			{
-			case TANK_SIMULATOR_ROBID:
-			case ETAS_WHEEL_ROBID:
-			case BUGGY_SIMULATOR_ROBID:
-			case BUGGY_ROBID:
-				break;
-			case QUADRO_SIMULATOR_ROBID:
-			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
-			default:
-				u = (pw-1500.0)/500.0;
-				break;
-			}
-		}
-		else if (sscanf(recvbuf, "#2P%d", &pw) == 1)
-		{
-			switch (robid)
-			{
-			case TANK_SIMULATOR_ROBID:
-			case ETAS_WHEEL_ROBID:
-			case BUGGY_SIMULATOR_ROBID:
-			case BUGGY_ROBID:
-				u = (pw-1500.0)/500.0;
-				break;
-			case QUADRO_SIMULATOR_ROBID:
-			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
-			default:
-				uv = (pw-1500.0)/500.0;
-				break;
-			}
-		}
-		else if (sscanf(recvbuf, "#3P%d", &pw) == 1)
-		{
-			switch (robid)
-			{
-			case TANK_SIMULATOR_ROBID:
-			case ETAS_WHEEL_ROBID:
-			case BUGGY_SIMULATOR_ROBID:
-			case BUGGY_ROBID:
-				break;
-			case QUADRO_SIMULATOR_ROBID:
-			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
-			default:
-				ul = (pw-1500.0)/500.0;
-				break;
-			}
+			if (recvbuf-tmp >= MAX_NB_BYTES_SSC32-2) break;
+			tmp = strstr(tmp+1, "#");
 		}
 	}
 

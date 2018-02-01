@@ -1,4 +1,3 @@
-space ne stoppe pas toujours le buggy?
 bNMEAInterfaceHighPrec pour nombre de décimales dans trames (4 ou 6, voir ce que fait ublox)
 add recvuntil for rs232...?
 
