@@ -1,3 +1,9 @@
+192
+Added bDisableMAVLinkInterfaceIN parameter.
+Continuation of NMEAInterface integration. 
+Beginning of RazorAHRSInterface integration.
+Beginning of SSC32Interface integration.
+
 191
 Added preliminary support of MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE to MAVLinkInterface.
 

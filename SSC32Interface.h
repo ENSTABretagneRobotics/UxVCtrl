@@ -7,11 +7,11 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
-#ifndef NMEAINTERFACE_H
-#define NMEAINTERFACE_H
+#ifndef SSC32INTERFACE_H
+#define SSC32INTERFACE_H
 
 #include "Commands.h"
 
-THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam);
+THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam);
 
-#endif // NMEAINTERFACE_H
+#endif // SSC32INTERFACE_H

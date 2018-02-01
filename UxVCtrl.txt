@@ -56,6 +56,8 @@
 1
 % MAVLinkInterface_component_id
 0
+% bDisableMAVLinkInterfaceIN
+0
 % bNMEAInterface
 1
 % szNMEAInterfacePath (server TCP port (e.g. :5001), client IP address and TCP port (e.g. 127.0.0.1:5001) or local RS232 port)
@@ -80,6 +82,22 @@
 0
 % bEnable_NMEAInterface_PRDID
 0
+% bRazorAHRSInterface
+1
+% szRazorAHRSInterfacePath (server TCP port (e.g. :5007), client IP address and TCP port (e.g. 127.0.0.1:5007) or local RS232 port)
+:5007
+% RazorAHRSInterfaceBaudRate
+57600
+% RazorAHRSInterfaceTimeout (in ms)
+2000
+% bSSC32Interface
+1
+% szSSC32InterfacePath (server TCP port (e.g. :5004), client IP address and TCP port (e.g. 127.0.0.1:5004) or local RS232 port)
+:5004
+% SSC32InterfaceBaudRate
+9600
+% SSC32InterfaceTimeout (in ms)
+1000
 % bCommandPrompt
 1
 % bEcho

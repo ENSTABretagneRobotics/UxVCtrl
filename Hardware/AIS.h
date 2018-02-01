@@ -25,8 +25,8 @@
 //
 //#include <math.h>
 //
-//#include <iostream>
-//#include <iomanip>
+#include <iostream>
+#include <iomanip>
 
 #include <bitset>
 

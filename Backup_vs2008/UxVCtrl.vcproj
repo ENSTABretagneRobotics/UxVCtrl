@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RazorAHRSInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SeanetProcessing.cpp"
 				>
 			</File>
@@ -252,6 +256,10 @@
 			</File>
 			<File
 				RelativePath=".\SonarLocalization.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SSC32Interface.cpp"
 				>
 			</File>
 			<File
@@ -333,6 +341,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RazorAHRSInterface.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SeanetProcessing.h"
 				>
 			</File>
@@ -346,6 +358,10 @@
 			</File>
 			<File
 				RelativePath=".\SonarLocalization.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SSC32Interface.h"
 				>
 			</File>
 			<File

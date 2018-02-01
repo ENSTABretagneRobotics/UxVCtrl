@@ -261,6 +261,12 @@
     <ClCompile Include="Hardware\NortekDVL.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="RazorAHRSInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SSC32Interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -595,6 +601,12 @@
     </ClInclude>
     <ClInclude Include="Hardware\NortekDVL.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="RazorAHRSInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SSC32Interface.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

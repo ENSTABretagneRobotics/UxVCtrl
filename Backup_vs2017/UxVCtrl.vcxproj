@@ -128,10 +128,12 @@
     <ClCompile Include="OpenCVGUI.cpp" />
     <ClCompile Include="Pinger.cpp" />
     <ClCompile Include="Pipeline.cpp" />
+    <ClCompile Include="RazorAHRSInterface.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="SonarAltitudeEstimation.cpp" />
     <ClCompile Include="SonarLocalization.cpp" />
+    <ClCompile Include="SSC32Interface.cpp" />
     <ClCompile Include="SurfaceVisualObstacle.cpp" />
     <ClCompile Include="VideoRecord.cpp" />
     <ClCompile Include="VisualObstacle.cpp" />
@@ -213,10 +215,12 @@
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pinger.h" />
     <ClInclude Include="Pipeline.h" />
+    <ClInclude Include="RazorAHRSInterface.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />
     <ClInclude Include="SonarAltitudeEstimation.h" />
     <ClInclude Include="SonarLocalization.h" />
+    <ClInclude Include="SSC32Interface.h" />
     <ClInclude Include="SurfaceVisualObstacle.h" />
     <ClInclude Include="VideoRecord.h" />
     <ClInclude Include="VisualObstacle.h" />

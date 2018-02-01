@@ -7,11 +7,11 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
-#ifndef NMEAINTERFACE_H
-#define NMEAINTERFACE_H
+#ifndef RAZORAHRSINTERFACE_H
+#define RAZORAHRSINTERFACE_H
 
 #include "Commands.h"
 
-THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam);
+THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam);
 
-#endif // NMEAINTERFACE_H
+#endif // RAZORAHRSINTERFACE_H
