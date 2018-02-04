@@ -63,6 +63,7 @@ inline int LoadConfig(void)
 	sprintf(szRazorAHRSInterfacePath, ":5007");
 	RazorAHRSInterfaceBaudRate = 57600;
 	RazorAHRSInterfaceTimeout = 2000;
+	bROSMode_RazorAHRSInterface = FALSE;
 	bSSC32Interface = TRUE;
 	memset(szSSC32InterfacePath, 0, sizeof(szSSC32InterfacePath));
 	sprintf(szSSC32InterfacePath, ":5004");
@@ -320,6 +321,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &RazorAHRSInterfaceBaudRate) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &RazorAHRSInterfaceTimeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bROSMode_RazorAHRSInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bSSC32Interface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1131,6 +1134,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", RazorAHRSInterfaceBaudRate) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", RazorAHRSInterfaceTimeout) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bROSMode_RazorAHRSInterface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bSSC32Interface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

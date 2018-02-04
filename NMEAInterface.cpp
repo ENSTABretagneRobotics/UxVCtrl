@@ -65,77 +65,171 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 {
 	char tmpbuf[MAX_BUF_LEN];
 	char checksum[4];
-	int latdeg = 0;
+	NMEADATA nmeadata;
 	double latdecmin = 0;
-	char NorthOrSouth = 0;
-	int longdeg = 0;
 	double longdecmin = 0;
-	char EastOrWest = 0;
+	struct timeval tv;
+	time_t tt = 0;
+	struct tm* timeptr = NULL;
 	int sendbuflen = 0;
 	uint8 sendbuf[MAX_NB_BYTES_NMEADEVICE];
 
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 
+	memset(&nmeadata, 0, sizeof(nmeadata));
+
 	EnterCriticalSection(&StateVariablesCS);
 
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 	headinghat = (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
-	
-	//if (bCheckGNSSOK())
-	//{
-	//	switch (GetGNSSlevel())
-	//	{
-	//	case GNSS_ACC_LEVEL_GNSS_FIX_MED:
-	//	case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
-	//	case GNSS_ACC_LEVEL_RTK_UNREL:
 
-	//		break;
-	//	case GNSS_ACC_LEVEL_RTK_FLOAT:
-
-	//		break;
-	//	case GNSS_ACC_LEVEL_RTK_FIXED:
-
-	//		break;
-	//	default:
-
-	//		break;
-	//	}
-	//	//vel = (uint16_t)(sog*100);
-	//	//cog = (uint16_t)(fmod_360_pos((-angle_env-cog+M_PI/2.0)*180.0/M_PI)*100);
-	//}
-	//else
-	//{
-	//	fix_type = 0;
-	//	//vel = UINT16_MAX;
-	//	//cog = UINT16_MAX;
-	//}
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	memset(tmpbuf, 0, sizeof(tmpbuf));
-	GPSLatitudeDecDeg2DegDecMin(lathat, &latdeg, &latdecmin, &NorthOrSouth);
-	GPSLongitudeDecDeg2DegDecMin(longhat, &longdeg, &longdecmin, &EastOrWest);
-	sprintf(tmpbuf, "$GPGGA,000000,%02d%07.6f,%c,%03d%07.6f,%c,1,7,1.3,0.0,M,,,,",
-		latdeg, latdecmin, NorthOrSouth, longdeg, longdecmin, EastOrWest);
-	ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
-	sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-	sendbuflen = strlen((char*)sendbuf);
-	if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (bCheckGNSSOK())
 	{
-		LeaveCriticalSection(&StateVariablesCS);
-		return EXIT_FAILURE;
+		switch (GetGNSSlevel())
+		{
+		case GNSS_ACC_LEVEL_GNSS_FIX_LOW:
+			nmeadata.GPS_quality_indicator = 1;
+			nmeadata.status = 'A';
+			nmeadata.posMode = 'A';
+			nmeadata.nbsat = GPS_low_acc_nbsat;
+			nmeadata.hdop = GPS_low_acc_HDOP;
+			break;
+		case GNSS_ACC_LEVEL_GNSS_FIX_MED:
+			nmeadata.GPS_quality_indicator = 1;
+			nmeadata.status = 'A';
+			nmeadata.posMode = 'A';
+			nmeadata.nbsat = GPS_med_acc_nbsat;
+			nmeadata.hdop = GPS_med_acc_HDOP;
+			break;
+		case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
+			nmeadata.GPS_quality_indicator = 1;
+			nmeadata.status = 'A';
+			nmeadata.posMode = 'A';
+			nmeadata.nbsat = GPS_high_acc_nbsat;
+			nmeadata.hdop = GPS_high_acc_HDOP;
+			break;
+		case GNSS_ACC_LEVEL_RTK_UNREL:
+			nmeadata.GPS_quality_indicator = 1;
+			nmeadata.status = 'A';
+			nmeadata.posMode = 'F';
+			nmeadata.nbsat = GPS_low_acc_nbsat;
+			nmeadata.hdop = GPS_low_acc_HDOP;
+			break;
+		case GNSS_ACC_LEVEL_RTK_FLOAT:
+			nmeadata.GPS_quality_indicator = 4;
+			nmeadata.status = 'A';
+			nmeadata.posMode = 'F';
+			nmeadata.nbsat = GPS_med_acc_nbsat;
+			nmeadata.hdop = GPS_med_acc_HDOP;
+			break;
+		case GNSS_ACC_LEVEL_RTK_FIXED:
+			nmeadata.GPS_quality_indicator = 5;
+			nmeadata.status = 'A';
+			nmeadata.posMode = 'R';
+			nmeadata.nbsat = GPS_med_acc_nbsat;
+			nmeadata.hdop = GPS_med_acc_HDOP;
+			break;
+		default:
+			nmeadata.GPS_quality_indicator = 0;
+			nmeadata.status = 'V';
+			nmeadata.posMode = 'N';
+			nmeadata.nbsat = 0;
+			nmeadata.hdop = 0;
+			break;
+		}
+		//nmeadata.vel = (uint16_t)(sog*100);
+		//nmeadata.cog = (uint16_t)(fmod_360_pos((-angle_env-cog+M_PI/2.0)*180.0/M_PI)*100);
 	}
-	//memset(sendbuf, 0, sizeof(sendbuf));
-	//memset(tmpbuf, 0, sizeof(tmpbuf));
-	////heading = 355;
-	//sprintf(tmpbuf, "$HCHDG,%.1f,0.0,E,0.0,W", headinghat);
-	//ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
-	//sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-	//sendbuflen = strlen((char*)sendbuf);
-	//if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	//{
-	//	LeaveCriticalSection(&StateVariablesCS);
-	//	return EXIT_FAILURE;
-	//}
+	else
+	{
+		nmeadata.GPS_quality_indicator = 0;
+		nmeadata.status = 'V';
+		nmeadata.posMode = 'N';
+		nmeadata.nbsat = 0;
+		nmeadata.hdop = 0;
+		//nmeadata.vel = UINT16_MAX;
+		//nmeadata.cog = UINT16_MAX;
+	}
+	GPSLatitudeDecDeg2DegDecMin(lathat, &nmeadata.latdeg, &latdecmin, &nmeadata.north);
+	GPSLongitudeDecDeg2DegDecMin(longhat, &nmeadata.longdeg, &longdecmin, &nmeadata.east);
+	if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+	tt = tv.tv_sec;
+	timeptr = gmtime(&tt);
+	if (timeptr != NULL)
+	{
+		nmeadata.hour = timeptr->tm_hour;
+		nmeadata.minute = timeptr->tm_min;
+		nmeadata.second = timeptr->tm_sec+0.000001*tv.tv_usec;
+		nmeadata.day = timeptr->tm_mday;
+		nmeadata.month = timeptr->tm_mon;
+		nmeadata.year = timeptr->tm_year-2000;
+	}
+	if (bEnable_NMEAInterface_GPGGA)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPGGA,%02d%02d%05.2f,%02d%010.7f,%c,%03d%010.7f,%c,%d,%d,%.1f,%.3f,M,,,,",
+			nmeadata.hour, nmeadata.minute, nmeadata.second, 
+			nmeadata.latdeg, latdecmin, nmeadata.north, nmeadata.longdeg, longdecmin, nmeadata.east, 
+			nmeadata.GPS_quality_indicator, nmeadata.nbsat, nmeadata.hdop, althat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_GPRMC)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPRMC,%02d%02d%05.2f,%c,%02d%010.7f,%c,%03d%010.7f,%c,,,%02d%02d%02d,,,%c",
+			nmeadata.hour, nmeadata.minute, nmeadata.second, 
+			nmeadata.status, nmeadata.latdeg, latdecmin, nmeadata.north, nmeadata.longdeg, longdecmin, nmeadata.east, 
+			nmeadata.day, nmeadata.month, nmeadata.year, 
+			nmeadata.posMode);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_GPGLL)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPGLL,%02d%010.7f,%c,%03d%010.7f,%c,%02d%02d%05.2f,%c,%c",
+			nmeadata.latdeg, latdecmin, nmeadata.north, nmeadata.longdeg, longdecmin, nmeadata.east, 
+			nmeadata.hour, nmeadata.minute, nmeadata.second, 
+			nmeadata.status, nmeadata.posMode);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_HCHDG)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$HCHDG,%.1f,0.0,E,0.0,W", headinghat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
 		
 	//roll = fmod_2PI(Center(phihat));
 	//pitch = fmod_2PI(-Center(thetahat));

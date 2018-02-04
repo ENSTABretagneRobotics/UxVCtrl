@@ -347,6 +347,10 @@
 %
 %aglreg z (double ]-oo,oo[ in m, enable altitude Above Ground Level control)
 %
+%rollreg orientation (double [-180,180[ mod(360) in deg in North - East - Down coordinate system)
+%
+%pitchreg orientation (double [-180,180[ mod(360) in deg in North - East - Down coordinate system)
+%
 %headingreg orientation (double [0,360[ mod(360) in deg in North - East - Down coordinate system)
 %
 %headingrelativereg orientation (double [0,360[ mod(360) in deg in North - East - Down coordinate system)

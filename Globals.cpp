@@ -102,6 +102,7 @@ BOOL bRazorAHRSInterface = FALSE;
 char szRazorAHRSInterfacePath[MAX_BUF_LEN];
 int RazorAHRSInterfaceBaudRate = 0;
 int RazorAHRSInterfaceTimeout = 0;
+BOOL bROSMode_RazorAHRSInterface = FALSE;
 BOOL bSSC32Interface = FALSE;
 char szSSC32InterfacePath[MAX_BUF_LEN];
 int SSC32InterfaceBaudRate = 0;

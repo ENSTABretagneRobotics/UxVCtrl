@@ -1,3 +1,8 @@
+194
+Updated NMEAInterface and RazorAHRSInterface.
+Added bROSMode_RazorAHRSInterface parameter.
+Added preliminary rollreg and pitchreg commands.
+
 193
 Updated SSC32Interface.
 

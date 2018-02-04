@@ -90,6 +90,8 @@
 57600
 % RazorAHRSInterfaceTimeout (in ms)
 2000
+% bROSMode_RazorAHRSInterface
+0
 % bSSC32Interface
 1
 % szSSC32InterfacePath (server TCP port (e.g. :5004), client IP address and TCP port (e.g. 127.0.0.1:5004) or local RS232 port)

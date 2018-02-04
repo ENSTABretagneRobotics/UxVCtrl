@@ -265,6 +265,7 @@ extern BOOL bRazorAHRSInterface;
 extern char szRazorAHRSInterfacePath[MAX_BUF_LEN];
 extern int RazorAHRSInterfaceBaudRate;
 extern int RazorAHRSInterfaceTimeout;
+extern BOOL bROSMode_RazorAHRSInterface;
 extern BOOL bSSC32Interface;
 extern char szSSC32InterfacePath[MAX_BUF_LEN];
 extern int SSC32InterfaceBaudRate;

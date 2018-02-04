@@ -60,7 +60,7 @@ To add a new device support, NMEADevice can be used as an example. Most of the t
  
 All the shared variables should be declared in Globals.cpp/.h and protected by critical sections (most of them are protected in group, e.g. StateVariables, Ball,...). Some initializations should be done in InitGlobals()/ReleaseGlobals() (e.g. critical sections, images overlays,...).
 
-When enabled (see bMAVLinkInterface setting in UxVCtrl.txt), a MAVLink server is listening on TCP port 5760. You can use Mission Planner to connect to it and get partial position info (cancel the "Get Params" or "Home altitude" dialogs if they appear).
+When enabled (see bMAVLinkInterface setting in UxVCtrl.txt), a MAVLink server is listening on TCP port 5760. You can use Mission Planner to connect to it and get partial position info (cancel the "Get Params" or "Home altitude" dialogs if they appear). MAVLink messages at least partially supported : HEARTBEAT, GPS_RAW_INT, ATTITUDE, RC_CHANNELS_OVERRIDE.
 
 Hardware support : 
 - BlueView : Teledyne BlueView M450/900/2250-130 sonars.

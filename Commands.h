@@ -48,6 +48,8 @@ inline void DisableAllControls(void)
 	bDistanceControl = FALSE;
 	bBrakeControl = FALSE;
 	bHeadingControl = FALSE;
+	bPitchControl = FALSE;
+	bRollControl = FALSE;
 	bDepthControl = FALSE;
 	bAltitudeAGLControl = FALSE;
 	u = 0; uw = 0; ul = 0; uv = 0;
@@ -2836,6 +2838,20 @@ inline int Commands(char* line)
 		wagl = dval;
 		bDepthControl = FALSE;
 		bAltitudeAGLControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "rollreg %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wphi = dval*M_PI/180.0;
+		bRollControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "pitchreg %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wtheta = -dval*M_PI/180.0;
+		bPitchControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "headingreg %lf", &dval) == 1)
