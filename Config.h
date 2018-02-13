@@ -1744,6 +1744,8 @@ inline int LoadEnv(void)
 		csMap.xMin = -10; csMap.xMax = 10; csMap.yMin = -10; csMap.yMax = 10; 
 	}
 
+	lat_home = lat_env; long_home = long_env; alt_home = alt_env;
+
 	return EXIT_SUCCESS;
 }
 

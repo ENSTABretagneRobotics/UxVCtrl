@@ -1,6 +1,31 @@
+add defines to easily disable selectively SBG, BlueView, MAVLink...
+
 why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
 
-fly to here...
+add param to optionally display mavlink statustext...
+delay/wait, waypoint validation, fly to here wp not displayed on mp, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
+
+MAV_FRAME_GLOBAL frame : altitude AMSL
+MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
+
+Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
+Cap pas correctement envoyé en mavlink osd
+Envoyer aussi rssi
+qgroundcontrol reconnait pas la position gps...
+force mode marche pas, d'où mode non armable...->use chan 5?
+add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
+
+https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
+Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
+Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
+https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
+
+Footprint RTL, ArduPilot Smart RTL?
+
+bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
+Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
+RTL en repassant en option par le chemin
+rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
 
 touches et peut-être paramètres pour bRollControl, bPitchControl, commands to selectively disable them...?
 need to check nmeainterface with e.g. u-center...
@@ -79,30 +104,6 @@ voir aussi pour enregistrement des fichiers de config des périphériques, see if 
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
 Roscontrol et rosjava, communication avec MAVLink?
-
-Footprint RTL
-
-bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
-Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
-RTL en repassant en option par le chemin
-rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
-
-Fly to specific location mode guided LAT LON ALT
-
-MAV_FRAME_GLOBAL frame : altitude AMSL
-MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
-
-Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
-Cap pas correctement envoyé en mavlink osd
-Envoyer aussi rssi
-qgroundcontrol reconnait pas la position gps...
-force mode marche pas, d'où mode non armable...->use chan 5?
-add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
-
-https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
-Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
-Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
-https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
 
 rajouter touche bSonarAltitudeEstimation?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...

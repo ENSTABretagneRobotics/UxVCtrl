@@ -186,6 +186,7 @@ extern double u, uw, uv, ul, up, ur, wx, wy, wz, wphi, wtheta, wpsi, wd, wu;
 extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
+extern double lat_home, long_home, alt_home;
 
 // Measurements.
 extern interval x_gps, y_gps, z_gps;

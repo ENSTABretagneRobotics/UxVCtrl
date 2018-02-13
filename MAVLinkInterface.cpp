@@ -60,12 +60,6 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	uint8 sendbuf[MAX_NB_BYTES_MAVLINKDEVICE];
 	mavlink_message_t msg;
 	mavlink_heartbeat_t heartbeat;
-	mavlink_param_value_t param_value;
-	mavlink_home_position_t home_position;
-	char Name[17];
-	int nbparams = 1;
-
-	memset(Name, 0, sizeof(Name));
 	
 	EnterCriticalSection(&StateVariablesCS);
 
@@ -89,19 +83,6 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 		break;
 	}
 
-	memset(&param_value, 0, sizeof(mavlink_param_value_t));
-	sprintf(Name, "REAL32_PARAM");
-	memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
-	param_value.param_value = 0;
-	param_value.param_type = MAV_PARAM_TYPE_REAL32;
-	param_value.param_count = (uint16_t)nbparams;
-	param_value.param_index = 0;// (uint16_t)(-1) to ignore...?
-
-	memset(&home_position, 0, sizeof(mavlink_home_position_t));
-	home_position.latitude = (int32_t)(lat_env*10000000.0);
-	home_position.longitude = (int32_t)(long_env*10000000.0);
-	home_position.altitude = (int32_t)(alt_env*1000.0);
-
 	LeaveCriticalSection(&StateVariablesCS);
 
 	mavlink_msg_heartbeat_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &heartbeat);
@@ -115,52 +96,46 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	{
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
-	}
-		
-	mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
-		
-	mavlink_msg_home_position_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &home_position);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
+	}		
 
 	return EXIT_SUCCESS;
 }
 
 int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
+	int sendbuflen = 0;
+	uint8 sendbuf[MAX_NB_BYTES_MAVLINKDEVICE];
+	char recvbuf[2*MAX_NB_BYTES_MAVLINKDEVICE];
+	char savebuf[MAX_NB_BYTES_MAVLINKDEVICE];
+	int i = 0, BytesReceived = 0, Bytes = 0, recvbuflen = 0;
+	CHRONO chrono;
+	mavlink_message_t msg;
+	mavlink_heartbeat_t heartbeat;
+	mavlink_statustext_t statustext;
+	mavlink_status_t status;
+	mavlink_rc_channels_override_t rc_channels_override;
+	mavlink_set_position_target_global_int_t set_position_target;
+	mavlink_set_mode_t set_mode;
+	mavlink_command_long_t command;
+	mavlink_home_position_t home_position;
+	mavlink_gps_raw_int_t gps_raw_int;
+	mavlink_attitude_t attitude;
+	mavlink_param_value_t param_value;
+	char Name[17];
+	int nbparams = 1;
+	double d0 = 0, d1 = 0, d2 = 0;
+	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
+	double speed = 0, Rate = 0, Alt = 0, Deg = 0, angle = 0, Delay = 0, Lat = 0, Lon = 0;
+	int Dir = 0, rel = 0, Current = 0;
+	char strtime_snap[MAX_BUF_LEN];
+	char snapfilename[MAX_BUF_LEN];
+	char picsnapfilename[MAX_BUF_LEN];
+	char kmlsnapfilename[MAX_BUF_LEN];
+	FILE* kmlsnapfile = NULL;
+
 	// Get data from GCS...
 	if ((!bDisableMAVLinkInterfaceIN)&&(CheckAvailableBytesRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS))
-	{
-		char recvbuf[2*MAX_NB_BYTES_MAVLINKDEVICE];
-		char savebuf[MAX_NB_BYTES_MAVLINKDEVICE];
-		int BytesReceived = 0, Bytes = 0, recvbuflen = 0;
-		mavlink_message_t msg;
-		mavlink_status_t status;
-		mavlink_heartbeat_t heartbeat;
-		mavlink_rc_channels_override_t rc_channels_override;
-		int i = 0;
-		CHRONO chrono;
-	
+	{	
 		StartChrono(&chrono);
 
 		// Prepare the buffers.
@@ -227,8 +202,39 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 				case MAVLINK_MSG_ID_HEARTBEAT:
 					mavlink_msg_heartbeat_decode(&msg, &heartbeat);
 					break;
+				case MAVLINK_MSG_ID_STATUSTEXT:
+					mavlink_msg_statustext_decode(&msg, &statustext);
+					printf(statustext.text);
+					printf("\n");
+					break;
+				case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
+				case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "REAL32_PARAM");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = 0;
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = 0;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					break;
 				case MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE:
 					mavlink_msg_rc_channels_override_decode(&msg, &rc_channels_override);
+					EnterCriticalSection(&StateVariablesCS);
 					switch (robid)
 					{
 					case TANK_SIMULATOR_ROBID:
@@ -248,7 +254,259 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						ul = (rc_channels_override.chan4_raw-1500.0)/500.0;
 						break;
 					}
+					LeaveCriticalSection(&StateVariablesCS);
 					break;
+				case MAVLINK_MSG_ID_SET_POSITION_TARGET_GLOBAL_INT:
+					mavlink_msg_set_position_target_global_int_decode(&msg, &set_position_target);
+					EnterCriticalSection(&StateVariablesCS);
+					if (fabs(u) < 0.01) u = 0.5;
+					if (set_position_target.coordinate_frame == MAV_FRAME_GLOBAL_INT)
+					{
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt, &wx, &wy, &wz);
+						bLineFollowingControl = FALSE;
+						bWaypointControl = TRUE;
+						bHeadingControl = TRUE;
+						bDepthControl = TRUE;
+						bAltitudeAGLControl = FALSE;
+					}
+					else if (set_position_target.coordinate_frame == MAV_FRAME_GLOBAL_RELATIVE_ALT_INT)
+					{
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt+alt_home, &wx, &wy, &wz);
+						bLineFollowingControl = FALSE;
+						bWaypointControl = TRUE;
+						bHeadingControl = TRUE;
+						bDepthControl = TRUE;
+						bAltitudeAGLControl = FALSE;
+					}
+					else if (set_position_target.coordinate_frame == MAV_FRAME_GLOBAL_TERRAIN_ALT_INT)
+					{
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt, &wx, &wy, &wagl);
+						bLineFollowingControl = FALSE;
+						bWaypointControl = TRUE;
+						bHeadingControl = TRUE;
+						bDepthControl = FALSE;
+						bAltitudeAGLControl = TRUE;
+					}
+					LeaveCriticalSection(&StateVariablesCS);
+					break;
+				case MAVLINK_MSG_ID_SET_MODE:
+					mavlink_msg_set_mode_decode(&msg, &set_mode);
+					if ((set_mode.base_mode == 1)&&(set_mode.custom_mode == 6))
+					{
+						// RTL.
+						EnterCriticalSection(&StateVariablesCS);
+						if (fabs(u) < 0.01) u = 0.5;
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, lat_home, long_home, alt_home, &wx, &wy, &wz);
+						bLineFollowingControl = FALSE;
+						bWaypointControl = TRUE;
+						bHeadingControl = TRUE;
+						bDepthControl = TRUE;
+						bAltitudeAGLControl = FALSE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if ((set_mode.base_mode == 1)&&(set_mode.custom_mode ==17))
+					{
+						// Brake.
+						EnterCriticalSection(&StateVariablesCS);
+						//bDistanceControl = FALSE;
+						//bBrakeControl = TRUE;
+						//u = 0;
+
+						DisableAllHorizontalControls();
+
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					break;
+				case MAVLINK_MSG_ID_COMMAND_LONG:
+					mavlink_msg_command_long_decode(&msg, &command);
+					switch (command.command)
+					{
+					case MAV_CMD_MISSION_START:
+						mavlink_msg_command_long_decode(&msg, &command);
+						EnterCriticalSection(&StateVariablesCS);
+						if (bMissionRunning)
+						{
+							AbortMission();
+
+							//if (bMissionPaused)
+							//{
+							//	bMissionPaused = FALSE;
+							//	ResumeMission();
+							//	bDispPauseSymbol = FALSE;
+							//}
+							//else
+							//{
+							//	bMissionPaused = TRUE;
+							//	PauseMission();
+							//	bDispPauseSymbol = TRUE;
+							//	StartChrono(&chrono_pausing);
+							//}
+
+						}
+						else
+						{
+							CallMission("mission.txt");
+						}
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					case MAV_CMD_DO_DIGICAM_CONTROL:
+						mavlink_msg_command_long_decode(&msg, &command);
+						EnterCriticalSection(&StateVariablesCS);
+						memset(strtime_snap, 0, sizeof(strtime_snap));
+						EnterCriticalSection(&strtimeCS);
+						strcpy(strtime_snap, strtime_fns());
+						LeaveCriticalSection(&strtimeCS);
+						for (i = 0; i < nbvideo; i++)
+						{
+							sprintf(snapfilename, "snap%d_%.64s.png", i, strtime_snap);
+							sprintf(picsnapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);
+							EnterCriticalSection(&imgsCS[i]);
+							if (!cvSaveImage(picsnapfilename, imgs[i], 0))
+							{
+								printf("Error saving a snapshot file.\n");
+							}
+							LeaveCriticalSection(&imgsCS[i]);
+							EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
+							sprintf(kmlsnapfilename, PIC_FOLDER"snap%d_%.64s.kml", i, strtime_snap);
+							kmlsnapfile = fopen(kmlsnapfilename, "w");
+							if (kmlsnapfile == NULL)
+							{
+								printf("Error saving a snapshot file.\n");
+								continue;
+							}
+							fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+							fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+							fprintf(kmlsnapfile, "<Document>\n<name>snap%d_%.64s</name>\n", i, strtime_snap);
+							fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>snap%d_%.64s</name>\n", i, strtime_snap);
+							fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", d1, d0, d2);
+							fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
+							fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
+							fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
+							fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
+							fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
+							fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
+							fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", snapfilename);
+							fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
+							fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", d1, d0, d2);
+							fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
+							fprintf(kmlsnapfile, "</Document>\n</kml>\n");
+							fclose(kmlsnapfile);
+						}
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					case MAV_CMD_DO_CHANGE_SPEED:
+						mavlink_msg_command_long_decode(&msg, &command);
+						speed = command.param2;
+						EnterCriticalSection(&StateVariablesCS);
+						u = (speed/vrxmax)/100.0;
+						bDistanceControl = FALSE;
+						bBrakeControl = FALSE;
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					//case MAV_CMD_CONDITION_DELAY:
+					//	mavlink_msg_command_long_decode(&msg, &command);
+					//	break;
+					case MAV_CMD_CONDITION_CHANGE_ALT:
+						mavlink_msg_command_long_decode(&msg, &command);
+						Rate = command.param1; // In cm/s.
+						Alt = command.param7;
+						EnterCriticalSection(&StateVariablesCS);
+						wz = Alt;
+						bDepthControl = TRUE;
+						bAltitudeAGLControl = FALSE;
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					case MAV_CMD_CONDITION_YAW:
+						mavlink_msg_command_long_decode(&msg, &command);
+						Deg = command.param1;
+						Dir = (int)command.param3; // If param4=1 (relative) only: [-1 = CCW, +1 = CW].
+						rel = (int)command.param4; // 1=relative, 0=absolute.
+						EnterCriticalSection(&StateVariablesCS);
+						if (rel)
+						{
+							angle = Dir==-1?-Deg:+Deg;
+							wpsi = Center(psihat)+M_PI/2.0-angle*M_PI/180.0-angle_env;
+							bLineFollowingControl = FALSE;
+							bWaypointControl = FALSE;
+							bHeadingControl = TRUE;
+						}
+						else
+						{
+							angle = Deg;
+							wpsi = M_PI/2.0-angle*M_PI/180.0-angle_env;
+							bLineFollowingControl = FALSE;
+							bWaypointControl = FALSE;
+							bHeadingControl = TRUE;
+						}
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					case MAV_CMD_NAV_WAYPOINT:
+						mavlink_msg_command_long_decode(&msg, &command);
+						Delay = command.param1; // Hold time at mission waypoint in decimal seconds - MAX 65535 seconds.
+						Lat = command.param5; // Target latitude. If zero, the Copter will hold at the current latitude.
+						Lon = command.param6; // Target longitude. If zero, the Copter will hold at the current longitude.
+						Alt = command.param7; // Target altitude. If zero, the Copter will hold at the current altitude.
+						EnterCriticalSection(&StateVariablesCS);
+						if ((Lat != 0)&&(Lon != 0)&&(Alt != 0))
+						{
+							if (fabs(u) < 0.01) u = 0.5;
+							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, Lat, Lon, Alt, &wx, &wy, &wz);
+							bLineFollowingControl = FALSE;
+							bWaypointControl = TRUE;
+							bHeadingControl = TRUE;
+							bDepthControl = TRUE;
+							bAltitudeAGLControl = FALSE;
+						}
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					case MAV_CMD_DO_SET_HOME:
+						mavlink_msg_command_long_decode(&msg, &command);
+						Current = (int)command.param1; // Set home location: 1=Set home as current location. 2=Use location specified in message parameters.
+						Lat = command.param5;
+						Lon = command.param6;
+						Alt = command.param7;
+						EnterCriticalSection(&StateVariablesCS);
+						if (Current == 1)
+						{
+							EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lat_home, &long_home, &alt_home);
+						}
+						else if (Current == 2)
+						{
+							lat_home = Lat;
+							long_home = Lon;
+							alt_home = Alt;
+						}
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					case MAV_CMD_GET_HOME_POSITION:
+						mavlink_msg_command_long_decode(&msg, &command);
+						EnterCriticalSection(&StateVariablesCS);
+						memset(&home_position, 0, sizeof(mavlink_home_position_t));
+						home_position.latitude = (int32_t)(lat_home*10000000.0);
+						home_position.longitude = (int32_t)(long_home*10000000.0);
+						home_position.altitude = (int32_t)(alt_home*1000.0);
+						LeaveCriticalSection(&StateVariablesCS);
+						mavlink_msg_home_position_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &home_position);
+						memset(sendbuf, 0, sizeof(sendbuf));
+						sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+						if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+						{
+							return EXIT_FAILURE;
+						}
+						if (tlogfile)
+						{
+							fwrite_tlog(msg, tlogfile);
+							fflush(tlogfile);
+						}
+						break;
+					default:
+						//printf("Unhandled command: SYS: %d, COMP: %d, CMD: %d\n", command.target_system, command.target_component, command.command);
+						break;
+					}
+					break;
+/*
+REQ_DATA_STREAM...
+*/
 				default:
 					//printf("Unhandled packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
 					break;
@@ -256,32 +514,6 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 			}
 		}
 	}
-
-/*
-MAV_CMD_DO_SET_HOME
-MAV_CMD_MISSION_START
-MAV_CMD_DO_SET_MODE
-MAV_CMD_NAV_WAYPOINT
-MAV_CMD_CONDITION_DELAY
-MAV_CMD_CONDITION_CHANGE_ALT
-MAV_CMD_CONDITION_YAW
-MAV_CMD_DO_CHANGE_SPEED
-MAV_CMD_DO_DIGICAM_CONTROL
-
-MAV_GET_PARMS_LIST and answer 0 or 1 params...
-
-REQ_DATA_STREAM...
-
-*/
-
-	int sendbuflen = 0;
-	uint8 sendbuf[MAX_NB_BYTES_MAVLINKDEVICE];
-
-	mavlink_message_t msg;
-	mavlink_heartbeat_t heartbeat;
-	mavlink_gps_raw_int_t gps_raw_int;
-	mavlink_attitude_t attitude;
-	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 
 	EnterCriticalSection(&StateVariablesCS);
 
