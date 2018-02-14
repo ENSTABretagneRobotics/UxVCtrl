@@ -341,6 +341,12 @@
 %
 %saveconfig
 %
+%enablemavlinkinterfacein
+%
+%disablemavlinkinterfacein
+%
+%togglesimulateddvl
+%
 % SIMPLE MOVING COMMANDS
 %
 %depthreg z (double ]-oo,oo[ in m (negative underwater), enable depth control)

@@ -96,8 +96,10 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			//omegaz = omegaz+dt*omegazdot;
 
 			// Simulated sensors measurements.
-			// Compass.
+			// AHRS.
 			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// Pressure sensor.
 			// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
 			// Les vagues perturbent ses mesures.
@@ -117,8 +119,22 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			{
 				GNSSqualitySimulator = GNSS_NO_FIX;
 			}
-			// DVL...
-			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			// DVL.
+			if (bEnableSimulatedDVL)
+			{
+				double vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double vry_mes = vry+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double vrz_mes = vrz+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				vrx_dvl = interval(vrx_mes-dvl_acc, vrx_mes+dvl_acc);
+				vry_dvl = interval(vry_mes-dvl_acc, vry_mes+dvl_acc);
+				vrz_dvl = interval(vrz_mes-dvl_acc, vrz_mes+dvl_acc);
+			}
+			else
+			{
+				vrx_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+				vry_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+				vrz_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+			}
 		}
 		else if (robid == TANK_SIMULATOR_ROBID)
 		{
@@ -158,8 +174,10 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			psi = psi+dt*psidot;
 
 			// Simulated sensors measurements.
-			// Compass.
+			// AHRS.
 			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS always available.
 			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
 			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);

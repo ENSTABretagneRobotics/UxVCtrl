@@ -1,3 +1,6 @@
+197
+Added a simulated DVL to simulator.
+
 196
 Updated MAVLinkInterface.
 

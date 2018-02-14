@@ -538,6 +538,7 @@ extern double forbidx_followme, forbidy_followme, forbidz_followme;
 
 // Simulator variables.
 extern int GNSSqualitySimulator;
+extern BOOL bEnableSimulatedDVL;
 
 // CISCREA variables.
 extern BOOL bPauseCISCREA, bRestartCISCREA;

@@ -375,6 +375,7 @@ double forbidx_followme = 0, forbidy_followme = 0, forbidz_followme = 0;
 
 // Simulator variables.
 int GNSSqualitySimulator = 0;
+BOOL bEnableSimulatedDVL = FALSE;
 
 // CISCREA variables.
 BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;

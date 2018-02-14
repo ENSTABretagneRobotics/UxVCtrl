@@ -736,6 +736,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bEnableFullSpeedMode) printf("Full speed mode enabled.\n");
 			else printf("Full speed mode disabled.\n");
 			break;
+		case '#':
+			bEnableSimulatedDVL = !bEnableSimulatedDVL;
+			if (bEnableSimulatedDVL) printf("Simulated DVL enabled.\n");
+			else printf("Simulated DVL disabled.\n");
+			break;
 		case 'X':
 			bEnableOpenCVGUIs[videoid] = FALSE;
 			break;

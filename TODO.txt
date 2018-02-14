@@ -1,4 +1,7 @@
+
 add defines to easily disable selectively SBG, BlueView, MAVLink...
+Prise en compte de 2 GPS pour contracter le cap (ou 3 pour les 3 angles)
+Contraction cap avec gyros avec intégration sur une durée glissante
 
 why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
 
@@ -31,7 +34,7 @@ touches et peut-être paramètres pour bRollControl, bPitchControl, commands to se
 need to check nmeainterface with e.g. u-center...
 arducopter : vérifier touches a,e remises au neutre, avec space, etc.
 
-update env to enable 3D
+update env to enable 3D, specify also altitude of sea floor...
 
 mieux gérer les out of range de dvl, optical flow vs quand il y a des trames sans données, voir aussi GPS...
 si dvl ou of activés, indiquer dans GUI si valides...->bVrOK, ou alors juste regarder la largeur des intervalles?
@@ -40,11 +43,11 @@ pour les bateaux, si vraiment on détecte qu'il n'y a pas de GPS, passer en dr...
 altitude pressure vs gps pour un sous-marin dans un lac, robot terrestre, drone...
 gpszlocalization?
 
-touche extended menu pour simulated dvl
+touche extended menu pour simulated dvl->juste une commande et touche # pour l'instant...
 
 replace x_bias_err, x_max_rand_err with x_gps_bias_err, x_gps_max_rand_err...
 mt, sbg : fixtype, numsat, hdop...
-option pour désactiver la mise à jour des variables GPS pour mavlink, sbg, mt
+Pour chaque GPS, option bdisableuse, qui empêche mise à jour x_gps, bGPSOK, etc. mais il faut quand même qu'il reçoive les corrections rtcm...
 récupérer accel de mavlink, mt, sbg, razor, vérifier quand elles sont valides...?
 
 accéléros : peu précis, sensible aux chocs et vibrations rejeter que si incohérent avec au moins 2 autres capteurs/algos (e.g. pression, effets propulseurs, DVL, GPS pour vertical, effets propulseurs, sonar, DVL, GPS pour horizontal)
@@ -462,6 +465,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+n'afficher qu'en debug les warning bad nmea checksum, à cause des UBX-RXM-RAWX
 
 peut-être prendre en compte le ublox 2 dans bCheckGNSSOK et ne pas mettre à jour sa variable GNSSqualityublox, comme c'est le cas pour mavlinkdevice en followme...
 

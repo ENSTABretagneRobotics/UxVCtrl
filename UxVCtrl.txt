@@ -256,9 +256,9 @@
 % z_pressure_acc (in m)
 0.1
 % dvl_acc (in m/s)
-0.1
+0.005
 % of_acc (in m/s)
-0.1
+0.005
 % acousticmodem_acc (in m)
 5
 % phi_ahrs_acc (in rad)
@@ -512,9 +512,9 @@
 % psi_bias_err (in rad)
 0.01
 % vrx_max_rand_err (in m/s)
-0.05
+0.0025
 % vrx_bias_err (in m/s)
-0.02
+0.001
 % omegaz_max_rand_err (in rad/s)
 0.05
 % omegaz_bias_err (in rad/s)

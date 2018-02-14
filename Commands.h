@@ -2806,6 +2806,12 @@ inline int Commands(char* line)
 	{
 		bDisableMAVLinkInterfaceIN = TRUE;
 	}
+	else if (strncmp(line, "togglesimulateddvl", strlen("togglesimulateddvl")) == 0)
+	{
+		bEnableSimulatedDVL = !bEnableSimulatedDVL;
+		if (bEnableSimulatedDVL) printf("Simulated DVL enabled.\n");
+		else printf("Simulated DVL disabled.\n");
+	}
 #pragma endregion
 #pragma region SIMPLE MOVING COMMANDS
 	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
