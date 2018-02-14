@@ -2806,11 +2806,13 @@ inline int Commands(char* line)
 	{
 		bDisableMAVLinkInterfaceIN = TRUE;
 	}
-	else if (strncmp(line, "togglesimulateddvl", strlen("togglesimulateddvl")) == 0)
+	else if (strncmp(line, "enablesimulateddvl", strlen("enablesimulateddvl")) == 0)
 	{
-		bEnableSimulatedDVL = !bEnableSimulatedDVL;
-		if (bEnableSimulatedDVL) printf("Simulated DVL enabled.\n");
-		else printf("Simulated DVL disabled.\n");
+		bEnableSimulatedDVL = TRUE;
+	}
+	else if (strncmp(line, "disablesimulateddvl", strlen("disablesimulateddvl")) == 0)
+	{
+		bEnableSimulatedDVL = FALSE;
 	}
 #pragma endregion
 #pragma region SIMPLE MOVING COMMANDS

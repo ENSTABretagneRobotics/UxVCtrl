@@ -1,0 +1,41 @@
+setmissionaction INIT
+disableautogpslocalization
+gpslocalization 1
+wpfollowingconfig 1
+linefollowingconfig 2 0.78
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+setmissionaction SUBMERGE
+stop
+headingreg 0
+depthreg -1.25
+wait 20
+setmissionaction GO
+thrust 0.5
+gotoxytwgs 48.19937100 -3.01491800 600
+setmissionaction l0
+linefollowingtwgs 48.19937100 -3.01491800 48.19938000 -3.01504600 600
+setmissionaction l1
+linefollowingtwgs 48.19938000 -3.01504600 48.19929300 -3.01506000 600
+setmissionaction l2
+linefollowingtwgs 48.19929300 -3.01506000 48.19928400 -3.01493000 600
+setmissionaction l3
+linefollowingtwgs 48.19928400 -3.01493000 48.19918800 -3.01494200 600
+setmissionaction l4
+linefollowingtwgs 48.19918800 -3.01494200 48.19919700 -3.01507400 600
+setmissionaction l5
+linefollowingtwgs 48.19919700 -3.01507400 48.19910000 -3.01509300 600
+setmissionaction l6
+linefollowingtwgs 48.19910000 -3.01509300 48.19909100 -3.01495500 600
+setmissionaction SURFACE
+stop
+depthreg 5
+wait 60
+enableautogpslocalization
+wait 1
+stopvideorecording 1
+wait 1
+stopvideorecording 0
+wait 1
