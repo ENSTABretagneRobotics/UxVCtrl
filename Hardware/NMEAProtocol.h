@@ -93,7 +93,7 @@ struct NMEADATA
 	double salinity; 
 	double depth; // In m.
 	double speedofsound; // In m/s.
-	double vx_dvl, vy_dvl, vz_dvl, verr_dvl, vt_ship, vl_ship, vn_ship, v_east, v_north, v_up; // In mm/s.
+	double vx_dvl, vy_dvl, vz_dvl, verr_dvl, vt_ship, vl_ship, vn_ship, v_east, v_north, v_up; // Already converted from mm/s to m/s...
 	char vstatus_dvl, vstatus_ship, vstatus_earth; // 'A' = good, 'V' = bad.
 	double d_east, d_north, d_up, rangetobottom; // In m.
 	double timesincelastgood; // In s.
@@ -960,6 +960,11 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 			//printf("Error parsing NMEA sentence : Invalid data. \n");
 			//return EXIT_FAILURE;
 		}
+		// Conversion from mm/s to m/s.
+		pNMEAData->vx_dvl = 0.001*pNMEAData->vx_dvl;
+		pNMEAData->vy_dvl = 0.001*pNMEAData->vy_dvl;
+		pNMEAData->vz_dvl = 0.001*pNMEAData->vz_dvl;
+		pNMEAData->verr_dvl = 0.001*pNMEAData->verr_dvl;
 	}
 
 	// PD6 RDI DVL (BOTTOM-TRACK, SHIP-REFERENCED VELOCITY DATA).
@@ -972,6 +977,10 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 			//printf("Error parsing NMEA sentence : Invalid data. \n");
 			//return EXIT_FAILURE;
 		}
+		// Conversion from mm/s to m/s.
+		pNMEAData->vt_ship = 0.001*pNMEAData->vt_ship;
+		pNMEAData->vl_ship = 0.001*pNMEAData->vl_ship;
+		pNMEAData->vn_ship = 0.001*pNMEAData->vn_ship;
 	}
 
 	// PD6 RDI DVL (BOTTOM-TRACK, EARTH-REFERENCED VELOCITY DATA).
@@ -984,7 +993,10 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 			//printf("Error parsing NMEA sentence : Invalid data. \n");
 			//return EXIT_FAILURE;
 		}
-
+		// Conversion from mm/s to m/s.
+		pNMEAData->v_east = 0.001*pNMEAData->v_east;
+		pNMEAData->v_north = 0.001*pNMEAData->v_north;
+		pNMEAData->v_up = 0.001*pNMEAData->v_up;
 		// Conversions...
 		pNMEAData->COG = atan2(pNMEAData->v_east, pNMEAData->v_north);
 		if (pNMEAData->COG != 0) pNMEAData->SOG = sqrt(sqr(pNMEAData->v_north)+sqr(pNMEAData->v_east));

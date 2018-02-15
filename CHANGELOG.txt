@@ -1,3 +1,7 @@
+199
+Corrected conversion bug in PathfinderDVL.
+Removed unexpected pause symbol in OpenCVGUI.
+
 198
 Updated commands to enable simulated DVL.
 

@@ -6,7 +6,7 @@ Contraction cap avec gyros avec intégration sur une durée glissante
 why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
 
 add param to optionally display mavlink statustext...
-delay/wait, waypoint validation, fly to here wp not displayed on mp, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
+delay/wait, waypoint validation, fly to here wp not displayed on mp, how to display altitude, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
 
 MAV_FRAME_GLOBAL frame : altitude AMSL
 MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).

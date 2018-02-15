@@ -1494,12 +1494,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PlaySymbolPoints[2] = cvPoint(videoimgwidth-18, 8);
 					cvFillConvexPoly(dispimgs[videoid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
-				if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
-				{
-					StopChronoQuick(&chrono_pausing);
-					bDispPauseSymbol = !bDispPauseSymbol;
-					StartChrono(&chrono_pausing);
-				}
+				//if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
+				//{
+				//	StopChronoQuick(&chrono_pausing);
+				//	bDispPauseSymbol = !bDispPauseSymbol;
+				//	StartChrono(&chrono_pausing);
+				//}
 				if (bDispPauseSymbol) 
 				{
 					nbPauseSymbolPoints = 4;
