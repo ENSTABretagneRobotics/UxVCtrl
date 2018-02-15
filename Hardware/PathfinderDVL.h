@@ -1012,6 +1012,17 @@ inline int ConnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, char* szCfgFilePa
 
 inline int DisconnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 {
+	mSleep(100);
+	if (pPathfinderDVL->bSendBreak)
+	{
+		if (SendBreakPathfinderDVL(pPathfinderDVL, pPathfinderDVL->BreakMode, pPathfinderDVL->BreakDuration) != EXIT_SUCCESS)
+		{
+			printf("Unable to interrupt a PathfinderDVL : break failed.\n");
+			CloseRS232Port(&pPathfinderDVL->RS232Port);
+			return EXIT_FAILURE;
+		}
+		mSleep(500);
+	}
 	if (CloseRS232Port(&pPathfinderDVL->RS232Port) != EXIT_SUCCESS)
 	{
 		printf("PathfinderDVL disconnection failed.\n");
