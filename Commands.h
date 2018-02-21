@@ -1816,6 +1816,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartCISCREA = TRUE;
 		bPauseCISCREA = ival1;
 	}
+	else if (sscanf(line, "lirmia3config %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "LIRMIA3.txt", strlen("LIRMIA3.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "LIRMIA3.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartLIRMIA3 = TRUE;
+		bPauseLIRMIA3 = ival1;
+	}
 	else if (sscanf(line, "pathfinderconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "PathfinderDVL0.txt", strlen("PathfinderDVL0.txt")) != 0)
@@ -2000,6 +2022,28 @@ inline int Commands(char* line)
 		mSleep(500);
 		if (!ival1) bRestartRPLIDAR = TRUE;
 		bPauseRPLIDAR = ival1;
+	}
+	else if (sscanf(line, "ms580314baconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "MS580314BA0.txt", strlen("MS580314BA0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "MS580314BA0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartMS580314BA = TRUE;
+		bPauseMS580314BA = ival1;
 	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{

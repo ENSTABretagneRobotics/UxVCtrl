@@ -267,6 +267,12 @@
     <ClCompile Include="SSC32Interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\LIRMIA3.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MS580314BA.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -608,6 +614,12 @@
     <ClInclude Include="SSC32Interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\LIRMIA3.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MS580314BA.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
@@ -624,6 +636,12 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="NortekDVL0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="LIRMIA3.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MS580314BA0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

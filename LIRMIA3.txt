@@ -1,0 +1,92 @@
+% Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
+%127.0.0.1:4004
+COM6
+% BaudRate
+57600
+% Timeout (in ms)
+1000
+% bSaveRawData
+1
+% channel 0
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 1
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 2
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 3
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 4
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% rightthrusterchan
+2
+% leftthrusterchan
+3
+% frontthrusterchan
+0
+% rearthrusterchan
+1

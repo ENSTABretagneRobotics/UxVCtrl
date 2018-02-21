@@ -8,11 +8,11 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "Config.h"
-#include "P33x.h"
+#include "MS580314BA.h"
 
-THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
+THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 {
-	P33X p33x;
+	MS580314BA ms580314ba;
 	struct timeval tv;
 	double pressure = 0;
 	BOOL bConnected = FALSE;
@@ -23,7 +23,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
-	memset(&p33x, 0, sizeof(P33X));
+	memset(&ms580314ba, 0, sizeof(MS580314BA));
 
 	for (;;)
 	{
@@ -32,50 +32,50 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 
 		mSleep(100);
 
-		if (bPauseP33x)
+		if (bPauseMS580314BA)
 		{
 			if (bConnected)
 			{
-				printf("P33x Paused.\n");
+				printf("MS580314BA Paused.\n");
 				bConnected = FALSE;
-				DisconnectP33x(&p33x);
+				DisconnectMS580314BA(&ms580314ba);
 			}
 			if (bExit) break;
 			mSleep(100);
 			continue;
 		}
 
-		if (bRestartP33x)
+		if (bRestartMS580314BA)
 		{
 			if (bConnected)
 			{
-				printf("Restarting a P33x.\n");
+				printf("Restarting a MS580314BA.\n");
 				bConnected = FALSE;
-				DisconnectP33x(&p33x);
+				DisconnectMS580314BA(&ms580314ba);
 			}
-			bRestartP33x = FALSE;
+			bRestartMS580314BA = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectP33x(&p33x, "P33x0.txt") == EXIT_SUCCESS) 
+			if (ConnectMS580314BA(&ms580314ba, "MS580314BA0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
 
-				if (p33x.pfSaveFile != NULL)
+				if (ms580314ba.pfSaveFile != NULL)
 				{
-					fclose(p33x.pfSaveFile); 
-					p33x.pfSaveFile = NULL;
+					fclose(ms580314ba.pfSaveFile); 
+					ms580314ba.pfSaveFile = NULL;
 				}
-				if ((p33x.bSaveRawData)&&(p33x.pfSaveFile == NULL)) 
+				if ((ms580314ba.bSaveRawData)&&(ms580314ba.pfSaveFile == NULL)) 
 				{
-					if (strlen(p33x.szCfgFilePath) > 0)
+					if (strlen(ms580314ba.szCfgFilePath) > 0)
 					{
-						sprintf(szTemp, "%.127s", p33x.szCfgFilePath);
+						sprintf(szTemp, "%.127s", ms580314ba.szCfgFilePath);
 					}
 					else
 					{
-						sprintf(szTemp, "p33x");
+						sprintf(szTemp, "ms580314ba");
 					}
 					// Remove the extension.
 					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
@@ -84,14 +84,14 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 					EnterCriticalSection(&strtimeCS);
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.csv", szTemp, strtime_fns());
 					LeaveCriticalSection(&strtimeCS);
-					p33x.pfSaveFile = fopen(szSaveFilePath, "w");
-					if (p33x.pfSaveFile == NULL) 
+					ms580314ba.pfSaveFile = fopen(szSaveFilePath, "w");
+					if (ms580314ba.pfSaveFile == NULL) 
 					{
-						printf("Unable to create P33x data file.\n");
+						printf("Unable to create MS580314BA data file.\n");
 						break;
 					}
-					fprintf(p33x.pfSaveFile, "tv_sec;tv_usec;pressure;\n"); 
-					fflush(p33x.pfSaveFile);
+					fprintf(ms580314ba.pfSaveFile, "tv_sec;tv_usec;pressure;\n"); 
+					fflush(ms580314ba.pfSaveFile);
 				}
 			}
 			else 
@@ -102,43 +102,43 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 		}
 		else
 		{
-			if (GetPressureP33x(&p33x, &pressure) == EXIT_SUCCESS)
+			if (GetPressureMS580314BA(&ms580314ba, &pressure) == EXIT_SUCCESS)
 			{
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
 				EnterCriticalSection(&StateVariablesCS);
 				pressure_mes = pressure;
-				z_pressure = Pressure2Height(pressure, p33x.PressureRef, p33x.WaterDensity)+interval(-z_pressure_acc, z_pressure_acc);
+				z_pressure = Pressure2Height(pressure, ms580314ba.PressureRef, ms580314ba.WaterDensity)+interval(-z_pressure_acc, z_pressure_acc);
 				LeaveCriticalSection(&StateVariablesCS);
 
-				if (p33x.bSaveRawData)
+				if (ms580314ba.bSaveRawData)
 				{
-					fprintf(p33x.pfSaveFile, "%d;%d;%f;\n", (int)tv.tv_sec, (int)tv.tv_usec, pressure);
-					fflush(p33x.pfSaveFile);
+					fprintf(ms580314ba.pfSaveFile, "%d;%d;%f;\n", (int)tv.tv_sec, (int)tv.tv_usec, pressure);
+					fflush(ms580314ba.pfSaveFile);
 				}
 			}
 			else
 			{
-				printf("Connection to a P33x lost.\n");
+				printf("Connection to a MS580314BA lost.\n");
 				bConnected = FALSE;
-				DisconnectP33x(&p33x);
+				DisconnectMS580314BA(&ms580314ba);
 			}		
 		}
 
-		//printf("P33xThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		//printf("MS580314BAThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
 
 		if (bExit) break;
 	}
 
 	StopChronoQuick(&chrono_period);
 
-	if (p33x.pfSaveFile != NULL)
+	if (ms580314ba.pfSaveFile != NULL)
 	{
-		fclose(p33x.pfSaveFile); 
-		p33x.pfSaveFile = NULL;
+		fclose(ms580314ba.pfSaveFile); 
+		ms580314ba.pfSaveFile = NULL;
 	}
 
-	if (bConnected) DisconnectP33x(&p33x);
+	if (bConnected) DisconnectMS580314BA(&ms580314ba);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

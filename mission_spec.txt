@@ -152,6 +152,8 @@
 %
 %ciscreaconfig CISCREA.txt bPause
 %
+%lirmia3config LIRMIA3.txt bPause
+%
 %pathfinderdvlconfig PathfinderDVL.txt bPause
 %
 %nortekdvlconfig NortekDVL.txt bPause
@@ -167,6 +169,8 @@
 %hokuyoconfig Hokuyo.txt bPause
 %
 %rplidarconfig RPLIDAR.txt bPause
+%
+%ms580314baconfig MS580314BA.txt bPause
 %
 %p33xconfig P33x.txt bPause
 %

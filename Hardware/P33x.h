@@ -47,8 +47,6 @@ typedef struct P33X P33X;
 /*
 Initialize a P33x.
 
-HANDLE hDev : (IN) Identifier of the device serial port.
-
 Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */
 inline int InitP33x(P33X* pP33x)
@@ -129,7 +127,6 @@ inline int InitP33x(P33X* pP33x)
 /*
 Read the value at a specific channel of a P33x.
 
-HANDLE hDev : (IN) Identifier of the device serial port.
 uint8 Channel : (IN) Channel to read.
 float* pValue : (INOUT) Valid pointer receiving the value.
 

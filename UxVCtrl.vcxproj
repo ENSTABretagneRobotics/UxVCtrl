@@ -111,10 +111,12 @@
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hardware\BlueView.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
+    <ClCompile Include="Hardware\LIRMIA3.cpp" />
     <ClCompile Include="Hardware\Maestro.cpp" />
     <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
+    <ClCompile Include="Hardware\MS580314BA.cpp" />
     <ClCompile Include="Hardware\NortekDVL.cpp" />
     <ClCompile Include="Hardware\PathfinderDVL.cpp" />
     <ClCompile Include="Hardware\RPLIDAR.cpp" />
@@ -194,11 +196,13 @@
     <ClInclude Include="Hardware\AIS.h" />
     <ClInclude Include="Hardware\BlueView.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
+    <ClInclude Include="Hardware\LIRMIA3.h" />
     <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MAVLinkProtocol.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
+    <ClInclude Include="Hardware\MS580314BA.h" />
     <ClInclude Include="Hardware\NMEAProtocol.h" />
     <ClInclude Include="Hardware\NortekDVL.h" />
     <ClInclude Include="Hardware\PathfinderDVL.h" />
@@ -297,8 +301,10 @@
     <Text Include="BlueView0.txt" />
     <Text Include="BlueView1.txt" />
     <Text Include="keys.txt" />
+    <Text Include="LIRMIA3.txt" />
     <Text Include="MAVLinkDevice0.txt" />
     <Text Include="MAVLinkDevice1.txt" />
+    <Text Include="MS580314BA0.txt" />
     <Text Include="NMEADevice1.txt" />
     <Text Include="NortekDVL0.txt" />
     <Text Include="PathfinderDVL0.txt" />

@@ -120,6 +120,7 @@ BOOL bDisableSeanet = FALSE;
 BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 BOOL bDisableHokuyo = FALSE;
 BOOL bDisableRPLIDAR = FALSE;
+BOOL bDisableMS580314BA = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
@@ -380,6 +381,9 @@ BOOL bEnableSimulatedDVL = FALSE;
 // CISCREA variables.
 BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;
 
+// LIRMIA3 variables.
+BOOL bPauseLIRMIA3 = FALSE, bRestartLIRMIA3 = FALSE;
+
 #pragma region DEVICES
 // PathfinderDVL variables.
 BOOL bPausePathfinderDVL = FALSE, bRestartPathfinderDVL = FALSE;
@@ -409,6 +413,9 @@ BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;
 
 // RPLIDAR variables.
 BOOL bPauseRPLIDAR = FALSE, bRestartRPLIDAR = FALSE;
+
+// MS580314BA variables.
+BOOL bPauseMS580314BA = FALSE, bRestartMS580314BA = FALSE;
 
 // P33x variables.
 BOOL bPauseP33x = FALSE, bRestartP33x = FALSE;

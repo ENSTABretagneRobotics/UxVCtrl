@@ -35,6 +35,7 @@
 #endif // ENABLE_BLUEVIEW_SUPPORT
 #include "Hokuyo.h"
 #include "RPLIDAR.h"
+#include "MS580314BA.h"
 #include "P33x.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRS.h"
@@ -63,6 +64,7 @@
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 #include "CISCREA.h"
 #endif // ENABLE_LIBMODBUS_SUPPORT
+#include "LIRMIA3.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "MAVLinkInterface.h"
@@ -111,6 +113,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_BLUEVIEW_SUPPORT
 	THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER RPLIDARThreadId;
+	THREAD_IDENTIFIER MS580314BAThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER RazorAHRSThreadId;
@@ -139,6 +142,7 @@ int main(int argc, char* argv[])
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	THREAD_IDENTIFIER CISCREAThreadId;
 #endif // ENABLE_LIBMODBUS_SUPPORT
+	THREAD_IDENTIFIER LIRMIA3ThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER MAVLinkInterfaceThreadId;
@@ -211,6 +215,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_BLUEVIEW_SUPPORT
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableRPLIDAR) CreateDefaultThread(RPLIDARThread, NULL, &RPLIDARThreadId);
+	if (!bDisableMS580314BA) CreateDefaultThread(MS580314BAThread, NULL, &MS580314BAThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
@@ -248,6 +253,7 @@ int main(int argc, char* argv[])
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid == CISCREA_ROBID) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
+	if (robid == LIRMIA3_ROBID) CreateDefaultThread(LIRMIA3Thread, NULL, &LIRMIA3ThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 	if (bMAVLinkInterface) CreateDefaultThread(MAVLinkInterfaceThread, NULL, &MAVLinkInterfaceThreadId);
@@ -345,6 +351,7 @@ int main(int argc, char* argv[])
 	if (bMAVLinkInterface) mSleep(100);
 #endif // ENABLE_MAVLINK_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+	if (robid == LIRMIA3_ROBID) WaitForThread(LIRMIA3ThreadId);
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid == CISCREA_ROBID) WaitForThread(CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -382,6 +389,7 @@ int main(int argc, char* argv[])
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
+	if (!bDisableMS580314BA) WaitForThread(MS580314BAThreadId);
 	if (!bDisableRPLIDAR) WaitForThread(RPLIDARThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);
 #ifdef ENABLE_BLUEVIEW_SUPPORT

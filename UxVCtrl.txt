@@ -122,6 +122,8 @@
 1
 % bDisableRPLIDAR
 1
+% bDisableMS580314BA
+1
 % bDisableP33x
 1
 % bDisableRazorAHRS

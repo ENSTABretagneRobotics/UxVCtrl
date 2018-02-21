@@ -411,6 +411,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LIRMIA3.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Maestro0.txt"
 				>
 			</File>
@@ -436,6 +440,10 @@
 			</File>
 			<File
 				RelativePath=".\mission.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\MS580314BA0.txt"
 				>
 			</File>
 			<File
@@ -915,6 +923,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hardware\LIRMIA3.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\LIRMIA3.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Hardware\Maestro.cpp"
 				>
 			</File>
@@ -1004,6 +1020,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\MiniSSC.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\MS580314BA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\MS580314BA.h"
 				>
 			</File>
 			<File

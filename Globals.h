@@ -66,6 +66,7 @@
 #define SAUCISSE_ROBID                0x00000002
 #define SARDINE_ROBID                 0x00000004
 #define CISCREA_ROBID                 0x00000020
+#define LIRMIA3_ROBID                 0x00000080
 #define BUBBLE_ROBID                  0x00000200
 #define MOTORBOAT_ROBID               0x00000400
 #define VAIMOS_ROBID                  0x00002000
@@ -74,10 +75,10 @@
 #define BUGGY_ROBID                   0x00200000
 #define COPTER_ROBID                  0x02000000
 #define ARDUCOPTER_ROBID              0x04000000
-//#define NAE_ROBID                     0x06000000
+//#define NAE_ROBID                     0x08000000
 //#define PLANE_ROBID                   0x20000000
 //#define ARDUPLANE_ROBID               0x40000000
-//#define UAUV_ROBID                    0x60000000
+//#define UAUV_ROBID                    0x80000000
 
 enum KEYS
 {
@@ -283,6 +284,7 @@ extern BOOL bDisableSeanet;
 extern BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 extern BOOL bDisableHokuyo;
 extern BOOL bDisableRPLIDAR;
+extern BOOL bDisableMS580314BA;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
@@ -543,6 +545,9 @@ extern BOOL bEnableSimulatedDVL;
 // CISCREA variables.
 extern BOOL bPauseCISCREA, bRestartCISCREA;
 
+// LIRMIA3 variables.
+extern BOOL bPauseLIRMIA3, bRestartLIRMIA3;
+
 #pragma region DEVICES
 // PathfinderDVL variables.
 extern BOOL bPausePathfinderDVL, bRestartPathfinderDVL;
@@ -572,6 +577,9 @@ extern BOOL bPauseHokuyo, bRestartHokuyo;
 
 // RPLIDAR variables.
 extern BOOL bPauseRPLIDAR, bRestartRPLIDAR;
+
+// MS580314BA variables.
+extern BOOL bPauseMS580314BA, bRestartMS580314BA;
 
 // P33x variables.
 extern BOOL bPauseP33x, bRestartP33x;
