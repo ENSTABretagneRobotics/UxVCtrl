@@ -83,9 +83,9 @@ COM6
 % bProportionalPW (0 or 1)
 1
 % rightthrusterchan
-2
-% leftthrusterchan
 3
+% leftthrusterchan
+2
 % frontthrusterchan
 0
 % rearthrusterchan

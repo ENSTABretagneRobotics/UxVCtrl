@@ -1,3 +1,8 @@
+202
+Added U and H keys for pitch and roll control.
+Added omega and accr in RazorAHRS.cpp if bROSMode.
+Continuation of LIRMIA3 integration.
+
 201
 Beginning of LIRMIA3 integration.
 

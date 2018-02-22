@@ -498,6 +498,30 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				bAltitudeAGLControl = FALSE;
 			}
 			break;
+		case 'U':
+			if (!bPitchControl)
+			{
+				bPitchControl = TRUE;
+			}
+			else
+			{
+				bPitchControl = FALSE;
+			}
+			if (bPitchControl) printf("Pitch control enabled.\n");
+			else printf("Pitch control disabled.\n");
+			break;
+		case 'H':
+			if (!bRollControl)
+			{
+				bRollControl = TRUE;
+			}
+			else
+			{
+				bRollControl = FALSE;
+			}
+			if (bRollControl) printf("Roll control enabled.\n");
+			else printf("Roll control disabled.\n");
+			break;
 		case 'b':
 			light += 0.1;
 			light = (light > 1)? 1: light;

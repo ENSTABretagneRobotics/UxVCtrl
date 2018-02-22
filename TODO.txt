@@ -1,3 +1,4 @@
+
 bug ublox voit pas $gnrmc à cause des corrections rtk, du coup on doit activer gga?
 
 fly to alt veut pas nombre à virgule ni alt nulle...
@@ -33,7 +34,7 @@ Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas 
 RTL en repassant en option par le chemin
 rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
 
-touches et peut-être paramètres pour bRollControl, bPitchControl, commands to selectively disable them...?
+peut-être paramètres pour bRollControl, bPitchControl, commands to selectively disable them...?
 need to check nmeainterface with e.g. u-center...
 arducopter : vérifier touches a,e remises au neutre, avec space, etc.
 
@@ -212,6 +213,7 @@ add specific columns for raw GPS data in log file?->maybe not necessary since al
 Log update values in accrx, accry, accrz hat/err...
 
 sonar, localisation, wf
+Prendre en compte le fait qu'on va voir le fond avec le sonar, surtout dans le cas de piscines à fond variable comme à l'IPN
 voir comment j'ai rajouté state equations 2.5D dans UxVDataViewer
 option dessin des pings bruts, corrigés en angle, corrigés en angle et pos...
 simu qui produit scanlines (en reconstituant une scanline à partir de la distance qu'il retourne, on risque d'en avoir besoin si on veut attribuer des scores), wf complète puis passe par SeanetProcessing?

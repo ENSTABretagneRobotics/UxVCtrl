@@ -322,8 +322,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		{
 			if (wtheta != wtheta_prev) itheta = 0;
 			up = PID_angle_control(wtheta, wtheta_prev, Center(thetahat), Center(omegayhat), &itheta, 1, dt,
-				Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx,
-				u_min_wx, u_max_wx, error_min_wx, error_max_wx, omega_max_wx);
+				Kp_wy, Kd_wy, Ki_wy, up_max_wy, ud_max_wy, ui_max_wy,
+				u_min_wy, u_max_wy, error_min_wy, error_max_wy, omega_max_wy);
 			wtheta_prev = wtheta;
 		}
 		else
@@ -335,8 +335,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		{
 			if (wphi != wphi_prev) iphi = 0;
 			ur = PID_angle_control(wphi, wphi_prev, Center(phihat), Center(omegayhat), &iphi, 1, dt,
-				Kp_wx, Kd_wy, Ki_wy, up_max_wy, ud_max_wy, ui_max_wy,
-				u_min_wy, u_max_wy, error_min_wy, error_max_wy, omega_max_wy);
+				Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx,
+				u_min_wx, u_max_wx, error_min_wx, error_max_wx, omega_max_wx);
 			wphi_prev = wphi;
 		}
 		else
@@ -365,6 +365,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		u = (u < -u_max)? -u_max: u;
 		uw = (uw > uw_max)? uw_max: uw;
 		uw = (uw < -uw_max)? -uw_max: uw;
+		up = (up > u_max_wy)? u_max_wy: up;
+		up = (up < u_min_wy)? u_min_wy: up;
+		ur = (ur > u_max_wx)? u_max_wx: ur;
+		ur = (ur < u_min_wx)? u_min_wx: ur;
 		uv = (uv > uv_max)? uv_max: uv;
 		uv = (uv < -uv_max)? -uv_max: uv;
 		ul = (ul > 1)? 1: ul;
@@ -378,6 +382,27 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			u2 = 1.0*uv-0.2*uw+0.4*ur;
 			u3 = 1.0*uv+0.2*uw-0.4*up;
 			u4 = 1.0*uv-0.2*uw-0.4*ur;
+			break;
+		case LIRMIA3_ROBID:
+			if (u_coef*u+uw_coef*abs(uw) > 1)
+			{
+				double uw_boost = u_coef*u+uw_coef*abs(uw)-1;
+				u1 = u_coef*u+uw_coef*uw-uw_boost;
+				u2 = u_coef*u-uw_coef*uw-uw_boost;
+			}
+			else if (u_coef*u-uw_coef*abs(uw) < -1)
+			{
+				double uw_boost = -(u_coef*u-uw_coef*abs(uw))-1;
+				u1 = u_coef*u+uw_coef*uw+uw_boost;
+				u2 = u_coef*u-uw_coef*uw+uw_boost;
+			}
+			else
+			{
+				u1 = u_coef*u+uw_coef*uw;
+				u2 = u_coef*u-uw_coef*uw;
+			}
+			u3 = uv+up;
+			u4 = uv-up;
 			break;
 		default:
 			//u1 = (u+uw)/2;

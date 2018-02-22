@@ -115,6 +115,18 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 				theta_ahrs = fmod_2PI(-razorahrsdata.Pitch)+interval(-theta_ahrs_acc, theta_ahrs_acc);
 				psi_ahrs = fmod_2PI(M_PI/2.0-razorahrsdata.Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 
+				if ((razorahrs.bROSMode)&&
+					!((razorahrsdata.gyrx == 0)&&(razorahrsdata.gyry == 0)&&(razorahrsdata.gyrz == 0)&&
+					(razorahrsdata.accx == 0)&&(razorahrsdata.accy == 0)&&(razorahrsdata.accz == 0)))
+				{
+					omegax_ahrs = razorahrsdata.gyrx;
+					omegay_ahrs = -razorahrsdata.gyry;
+					omegaz_ahrs = -razorahrsdata.gyrz;
+					accrx_ahrs = razorahrsdata.accx*9.8/256.0;
+					accry_ahrs = -razorahrsdata.accy*9.8/256.0;
+					accrz_ahrs = -razorahrsdata.accz*9.8/256.0;
+				}
+
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
