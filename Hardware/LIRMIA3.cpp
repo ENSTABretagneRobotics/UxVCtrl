@@ -124,6 +124,13 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 		if (bExit) break;
 	}
 
+	// Ensure the thrusters are stopped...
+	if (bConnected)
+	{
+		SetThrustersLIRMIA3(&lirmia3, 0, 0, 0, 0);
+		mSleep(50);
+	}
+
 	StopChronoQuick(&chrono_period);
 
 	if (lirmia3.pfSaveFile != NULL)

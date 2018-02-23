@@ -1848,13 +1848,12 @@ inline int DisplayKeys(void)
 {
 	printf("On OpenCVGUI : \n");
 	printf("%c%c%c%c(horizontal control),fv(vertical control or thrust limit),%c%c(lateral),%c(brake),space(stop),g(generalstop),t%c%cUH(heading, depth, alt_agl, pitch, roll control),"
-		"o(toggle OSD),c(toggle North and control),L(toggle LLA),A(toggle alt AGL),V(toggle SOG),R(toggle YPR),"
+		"o(toggle OSD),c(toggle North and control),"
 		"m(toggle map),M(toggle Map),*(rotate map),i(toggle image),$(toggle sonar),;(other overlays),X(disableopencvgui),+-(coordspace zoom),"
-		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),"
+		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),V(enable/disableautodvllocalization),"
 		"Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snapshot),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
-		"bn(light),uj(tilt),"
-		"0(RC mode),F(ZQSD full mode),.(rearm),"
+		"bn(light),uj(tilt),0(RC mode),F(ZQSD full mode),.(rearm),"
 		"ENTER(extended menu), ESC(exit)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
 		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDEAGLCONTROL_KEY]);

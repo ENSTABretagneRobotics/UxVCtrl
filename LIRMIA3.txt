@@ -14,7 +14,7 @@ COM6
 1500
 % MaxPW (in us)
 2000
-% InitPW (in us, 0 to disable channel)
+% InitPW (in us)
 1500
 % ThresholdPW (in us)
 10
@@ -29,7 +29,7 @@ COM6
 1500
 % MaxPW (in us)
 2000
-% InitPW (in us, 0 to disable channel)
+% InitPW (in us)
 1500
 % ThresholdPW (in us)
 10
@@ -44,7 +44,7 @@ COM6
 1500
 % MaxPW (in us)
 2000
-% InitPW (in us, 0 to disable channel)
+% InitPW (in us)
 1500
 % ThresholdPW (in us)
 10
@@ -59,7 +59,7 @@ COM6
 1500
 % MaxPW (in us)
 2000
-% InitPW (in us, 0 to disable channel)
+% InitPW (in us)
 1500
 % ThresholdPW (in us)
 10
@@ -74,7 +74,7 @@ COM6
 1500
 % MaxPW (in us)
 2000
-% InitPW (in us, 0 to disable channel)
+% InitPW (in us)
 1500
 % ThresholdPW (in us)
 10

@@ -72,6 +72,12 @@ int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 	yaw = fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0)*180.0/M_PI;
 	pitch = fmod_2PI(-Center(thetahat))*180.0/M_PI;
 	roll = fmod_2PI(Center(phihat))*180.0/M_PI;
+	accx = Center(accrxhat)*256.0/9.8;
+	accy = -Center(accryhat)*256.0/9.8;
+	accz = -Center(accrzhat)*256.0/9.8;
+	gyrx = Center(omegaxhat);
+	gyry = -Center(omegayhat);
+	gyrz = -Center(omegazhat);
 
 	if (bROSMode_RazorAHRSInterface)
 	{

@@ -676,6 +676,7 @@ extern BOOL bAltitudeAGLControl;
 extern BOOL bStaticSonarLocalization;
 extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;
+extern BOOL bDVLLocalization;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 extern int labels[MAX_NB_LABELS];

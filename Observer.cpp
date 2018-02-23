@@ -59,6 +59,9 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	// GPS localization enabled by default, use enable/disableautogpslocalization commands to enable/disable...
 	bGPSLocalization = TRUE;
 
+	// DVL localization enabled by default, use enable/disableautodvllocalization commands to enable/disable...
+	bDVLLocalization = TRUE;
+
 	t = 0;
 
 	StartChrono(&chrono);
@@ -107,8 +110,9 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		if (robid & SUBMARINE_ROBID_MASK)
 		{
-			if ((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc))
+			if ((bDVLLocalization)&&((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc)))
 			{
+				// State observer using DVL and AHRS data...
 				vrxhat = vrx_dvl;
 				vryhat = vry_dvl;
 				vrzhat = vrz_dvl;

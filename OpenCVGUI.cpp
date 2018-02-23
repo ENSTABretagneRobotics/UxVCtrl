@@ -38,6 +38,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bExtendedMenu = FALSE;
 	BOOL bColorsExtendedMenu = FALSE;
 	BOOL bCISCREAOSDExtendedMenu = FALSE;
+	BOOL bOtherOSDOptionsExtendedMenu = FALSE;
 	CvPoint PlaySymbolPoints[3];
 	int nbPlaySymbolPoints = sizeof(PlaySymbolPoints);
 	CvPoint PauseSymbolPoints[4];
@@ -540,10 +541,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'o': bOSD = !bOSD; break;
 		case 'c': bOrientationCircle = !bOrientationCircle; break;
-		case 'L': bDispLLA = !bDispLLA; break;
-		case 'A': bDispAltitudeAGL = !bDispAltitudeAGL; break;
-		case 'V': bDispSOG = !bDispSOG; break;
-		case 'R': bDispYPR = !bDispYPR; break;
 		case 'm':
 			bFullMap = FALSE;
 			bMap = !bMap;
@@ -627,6 +624,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'J':
 			// enableautogpslocalization/disableautogpslocalization
 			bGPSLocalization = !bGPSLocalization;
+			break;
+		case 'V':
+			// enableautodvllocalization/disableautodvllocalization
+			bDVLLocalization = !bDVLLocalization;
 			break;
 		case 'Z':
 			// (re)setstateestimation
@@ -771,19 +772,23 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #pragma region EXTENDED MENU
 		case '1':
 			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 128));
+			else if (bOtherOSDOptionsExtendedMenu) bDispLLA = !bDispLLA;
 			else if (bExtendedMenu) bColorsExtendedMenu = TRUE;
 			break;
 		case '2':
 			if (bColorsExtendedMenu) CvCycleColors(&colorsonarlidarid, &colorsonarlidar, CV_RGB(0, 0, 255));
 			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bOtherOSDOptionsExtendedMenu) bDispAltitudeAGL = !bDispAltitudeAGL;
 			else if (bExtendedMenu) bCISCREAOSDExtendedMenu = TRUE;
 			break;
 		case '3':
 			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
+			else if (bOtherOSDOptionsExtendedMenu) bDispSOG = !bDispSOG;
 			else if (bExtendedMenu) bShowSwitchInfo = !bShowSwitchInfo;
 			break;
 		case '4': 
 			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; } 
+			else if (bOtherOSDOptionsExtendedMenu) bDispYPR = !bDispYPR;
 			else if (bExtendedMenu)
 			{
 				bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat;
@@ -808,6 +813,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				printf("Keys updated.\n");
 				DisplayKeys();
 			}
+			break;
+		case '7': 
+			if (bExtendedMenu) bOtherOSDOptionsExtendedMenu = TRUE;
 			break;
 		case '8': if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; } break;
 		case 13: // ENTER
@@ -873,6 +881,28 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				strcpy(szText, "[ENTER] EXIT");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 			}
+			else if (bOtherOSDOptionsExtendedMenu)
+			{
+				offset = 0;
+				offset += 16;
+				strcpy(szText, "EXTENDED MENU\\OTHER OSD OPTIONS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[1] DISPLAY LLA (%d)", (int)bDispLLA);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[2] DISPLAY ALTITUDE AGL (%d)", (int)bDispAltitudeAGL);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[3] DISPLAY SOG (%d)", (int)bDispSOG);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[4] DISPLAY YPR (%d)", (int)bDispYPR);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[ENTER] EXIT");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+			}
 			else
 			{
 				offset = 0;
@@ -886,16 +916,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				strcpy(szText, "[2] CISCREA OSD (46825)");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				strcpy(szText, "[3] SHOW SWITCH INFO");
+				sprintf(szText, "[3] SHOW SWITCH INFO (%d)", (int)bShowSwitchInfo);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				strcpy(szText, "[4] SAILBOAT ROLL WIND CORRECTION");
+				sprintf(szText, "[4] SAILBOAT ROLL WIND CORRECTION (%d)", (int)!bDisableRollWindCorrectionSailboat);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				strcpy(szText, "[5] MOTORBOAT BACKWARDS");
+				sprintf(szText, "[5] MOTORBOAT BACKWARDS (%d)", (int)bEnableBackwardsMotorboat);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[6] LOAD KEYS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[7] OTHER OSD OPTIONS");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
@@ -1001,6 +1034,20 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "SNR DYN LOC");
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			}
+			if (bDVLLocalization)
+			{
+				offset += 16;
+				if ((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc))
+				{
+					sprintf(szText, "DVL LOC");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				}
+				else
+				{
+					sprintf(szText, "DVL LOC N/A");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+				}
 			}
 			offset += 16;
 			switch (GetGNSSlevel())

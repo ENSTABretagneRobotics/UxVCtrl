@@ -1,3 +1,9 @@
+203
+Added enable/disableautodvllocalization commands.
+Updated extended menu in OpenCVGUI.
+Ensured motors are stopped before exit depending on robid.
+Added acc and gyr in RazorAHRSinterface.
+
 202
 Added U and H keys for pitch and roll control.
 Added omega and accr in RazorAHRS.cpp if bROSMode.

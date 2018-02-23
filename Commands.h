@@ -1145,6 +1145,14 @@ inline int Commands(char* line)
 	{
 		bGPSLocalization = FALSE;
 	}
+	else if (strncmp(line, "enableautodvllocalization", strlen("enableautodvllocalization")) == 0)
+	{
+		bDVLLocalization = TRUE;
+	}
+	else if (strncmp(line, "disableautodvllocalization", strlen("disableautodvllocalization")) == 0)
+	{
+		bDVLLocalization = FALSE;
+	}
 	else if (sscanf(line, "setstateestimationwgs %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)
 	{

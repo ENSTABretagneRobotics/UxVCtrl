@@ -198,6 +198,32 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 		if (bExit) break;
 	}
 
+	switch (robid)
+	{
+	case BUGGY_ROBID:
+		SetRudderThrustersFluxMiniSSC(&minissc, 0, 0, 0, 0, 0);
+		mSleep(50);
+		break;
+	case SAILBOAT_ROBID:
+	case VAIMOS_ROBID:
+		break;
+	case MOTORBOAT_ROBID:
+#ifdef USE_MOTORBOAT_WITH_FLUX
+		SetRudderThrustersFluxMiniSSC(&minissc, 0, 0, 0, 0, 0);
+		mSleep(50);
+#else
+		SetRudderThrusterMiniSSC(&minissc, 0, 0);
+		mSleep(50);
+#endif // USE_MOTORBOAT_WITH_FLUX
+		break;
+	case BUBBLE_ROBID:
+	case ETAS_WHEEL_ROBID:
+	default:
+		SetThrustersMiniSSC(&minissc, 0, 0);
+		mSleep(50);
+		break;
+	}
+
 	StopChronoQuick(&chrono_period);
 
 	if (minissc.pfSaveFile != NULL)

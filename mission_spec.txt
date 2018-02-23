@@ -80,6 +80,10 @@
 %
 %disableautogpslocalization
 %
+%enableautodvllocalization
+%
+%disableautodvllocalization
+%
 %setstateestimationwgs lat lat_err_m long long_err_m alt alt_err_m orientation orientation_err speed speed_err rotation_speed rotation_speed_err (lat, long, alt : double ]-oo,oo[ current GPS position estimation in decimal deg and m to indicate to the default dead reckoning localization algorithm the current submarine state, lat_err_m, long_err_m, alt_err_m : double [0,oo[ error in m, orientation : double [0,360[ mod(360) current angle to the North in deg, orientation_err : double [0,360[ error in deg, speed : double ]-oo,oo[ current speed in m/s, speed_err : double [0,oo[ error in m/s, rotation_speed : double ]-oo,oo[ current rotation speed to the North in deg/s, rotation_speed_err : double [0,oo[ error in deg/s. Usually used in the beginning of a mission to indicate the starting point. This replaces any previously estimated position)
 %
 %setstateestimation x xerr y yerr z zerr psi psierr vrx vrxerr omegaz omegazerr (x, xerr, y, yerr, z, zerr, psi, psierr, vrx, vrxerr : double ]-oo,oo[ current state estimation and errors to indicate to the default dead reckoning localization algorithm the current submarine state in the environment coordinate system. Usually used in the beginning of a mission to indicate the starting point. This replaces any previously estimated position)

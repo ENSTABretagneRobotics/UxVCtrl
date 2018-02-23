@@ -239,10 +239,10 @@ inline int ConnectLIRMIA3(LIRMIA3* pLIRMIA3, char* szCfgFilePath)
 			pLIRMIA3->CoefPWs[channel] = 1;
 			pLIRMIA3->bProportionalPWs[channel] = 1;
 		}
-		pLIRMIA3->rightthrusterchan = 1;
-		pLIRMIA3->leftthrusterchan = 0;
-		pLIRMIA3->frontthrusterchan = 2;
-		pLIRMIA3->rearthrusterchan = 3;
+		pLIRMIA3->rightthrusterchan = 3;
+		pLIRMIA3->leftthrusterchan = 2;
+		pLIRMIA3->frontthrusterchan = 0;
+		pLIRMIA3->rearthrusterchan = 1;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");

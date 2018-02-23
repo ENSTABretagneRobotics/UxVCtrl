@@ -316,6 +316,39 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 		if (bExit) break;
 	}
 
+	switch (robid)
+	{
+	case BUGGY_ROBID:
+		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);
+		mSleep(50);
+		break;
+	case SAILBOAT_ROBID:
+	case VAIMOS_ROBID:
+		break;
+	case MOTORBOAT_ROBID:
+#ifdef USE_MOTORBOAT_WITH_FLUX
+		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);
+		mSleep(50);
+#else
+		SetRudderThrusterMaestro(&maestro, 0, 0);
+		mSleep(50);
+#endif // USE_MOTORBOAT_WITH_FLUX
+		break;
+	case COPTER_ROBID:
+	case ARDUCOPTER_ROBID:
+	case SAUCISSE_ROBID:
+	case SARDINE_ROBID:
+		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);
+		mSleep(50);
+		break;
+	case BUBBLE_ROBID:
+	case ETAS_WHEEL_ROBID:
+	default:
+		SetThrustersMaestro(&maestro, 0, 0);
+		mSleep(50);
+		break;
+	}
+
 	StopChronoQuick(&chrono_period);
 
 	if (maestro.pfSaveFile != NULL)
