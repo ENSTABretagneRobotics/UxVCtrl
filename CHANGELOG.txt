@@ -1,3 +1,6 @@
+205
+Continuation of LIRMIA3 integration.
+
 204
 Corrections in MS580314BA.
 Minor updates in OpenCVGUI.

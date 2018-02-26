@@ -2,7 +2,7 @@
 %127.0.0.1:4004
 COM6
 % BaudRate
-57600
+115200
 % Timeout (in ms)
 1000
 % bSaveRawData
@@ -11,11 +11,11 @@ COM6
 % MinPW (in us)
 1000
 % MidPW (in us)
-1500
+1450
 % MaxPW (in us)
 2000
 % InitPW (in us)
-1500
+1450
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -26,11 +26,11 @@ COM6
 % MinPW (in us)
 1000
 % MidPW (in us)
-1500
+1475
 % MaxPW (in us)
 2000
 % InitPW (in us)
-1500
+1475
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -41,11 +41,11 @@ COM6
 % MinPW (in us)
 1000
 % MidPW (in us)
-1500
+1450
 % MaxPW (in us)
 2000
 % InitPW (in us)
-1500
+1450
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -56,26 +56,11 @@ COM6
 % MinPW (in us)
 1000
 % MidPW (in us)
-1500
+1475
 % MaxPW (in us)
 2000
 % InitPW (in us)
-1500
-% ThresholdPW (in us)
-10
-% CoefPW (-1 or 1)
-1
-% bProportionalPW (0 or 1)
-1
-% channel 4
-% MinPW (in us)
-1000
-% MidPW (in us)
-1500
-% MaxPW (in us)
-2000
-% InitPW (in us)
-1500
+1475
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)

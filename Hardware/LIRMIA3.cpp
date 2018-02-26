@@ -59,7 +59,7 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 
 		if (!bConnected)
 		{
-			if (ConnectLIRMIA3(&lirmia3, "LIRMIA30.txt") == EXIT_SUCCESS) 
+			if (ConnectLIRMIA3(&lirmia3, "LIRMIA3.txt") == EXIT_SUCCESS) 
 			{
 				mSleep(50);
 				bConnected = TRUE; 
