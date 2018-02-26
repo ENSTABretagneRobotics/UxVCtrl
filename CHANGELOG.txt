@@ -1,3 +1,7 @@
+204
+Corrections in MS580314BA.
+Minor updates in OpenCVGUI.
+
 203
 Added enable/disableautodvllocalization commands.
 Updated extended menu in OpenCVGUI.

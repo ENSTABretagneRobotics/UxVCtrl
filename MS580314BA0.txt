@@ -8,6 +8,6 @@ COM4
 % bSaveRawData
 1
 % PressureRef (pressure at the surface in bar, used as reference)
-1
+0.782
 % WaterDensity (in kg/m3)
 1000

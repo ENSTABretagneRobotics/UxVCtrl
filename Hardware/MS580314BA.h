@@ -25,6 +25,7 @@ struct MS580314BA
 {
 	RS232PORT RS232Port;
 	double Ca[10];
+	//double PressureIni;
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	double LastPressure;
 	char szCfgFilePath[256];
@@ -262,6 +263,7 @@ inline int GetPressureMS580314BA(MS580314BA* pMS580314BA, double* pPressure)
 	TEMPE = TEM/100.0;
 
 	//if (tim<1) { zini = (Pres*100)/9810; }
+	//if (pMS580314BA->PressureIni == 0) { pMS580314BA->PressureIni = Pres; }
 
 	if ((D1 == 0)||(D2 == 0))
 	{
@@ -271,10 +273,13 @@ inline int GetPressureMS580314BA(MS580314BA* pMS580314BA, double* pPressure)
 	else
 	{
 		//depth = (Pres*100)/9810-(pMS580314BA->PressureRef*100)/9810;
-		*pPressure = Pres;
+		//*pPressure = (Pres-pMS580314BA->PressureIni)*(100.0/9810.0)*pMS580314BA->WaterDensity*STANDARD_GRAVITY/1e5;
+		*pPressure = Pres/1000.0;
 	}
 
 	// ...
+
+	//printf("*pPressure=%f,\n",*pPressure);
 
 	//*pPressure = pMS580314BA->PressureRef-depth*(pMS580314BA->WaterDensity*STANDARD_GRAVITY)/1e5;
 
@@ -350,16 +355,16 @@ inline int ConnectMS580314BA(MS580314BA* pMS580314BA, char* szCfgFilePath)
 		return EXIT_FAILURE;
 	}
 
-	if (InitMS580314BA(pMS580314BA) != EXIT_SUCCESS)
+	if (CalibrateMS580314BA(pMS580314BA) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MS580314BA : Initialization failure.\n");
+		printf("Unable to connect to MS580314BA : Calibration failure.\n");
 		CloseRS232Port(&pMS580314BA->RS232Port);
 		return EXIT_FAILURE;
 	}
 
-	if (CalibrateMS580314BA(pMS580314BA) != EXIT_SUCCESS)
+	if (InitMS580314BA(pMS580314BA) != EXIT_SUCCESS)
 	{
-		printf("Unable to connect to MS580314BA : Calibration failure.\n");
+		printf("Unable to connect to MS580314BA : Initialization failure.\n");
 		CloseRS232Port(&pMS580314BA->RS232Port);
 		return EXIT_FAILURE;
 	}

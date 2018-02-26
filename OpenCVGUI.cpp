@@ -970,36 +970,36 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			// In deg in NED coordinate system.
-			if (bHeadingControl) sprintf(szText, "%.1f/%.1f", 
+			if (bHeadingControl) sprintf(szText, "%.2f/%.2f", 
 				(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 				(fmod_2PI(-angle_env-wpsi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
-			else sprintf(szText, "%.1f/--", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+			else sprintf(szText, "%.2f/--", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			if (robid & SUBMARINE_ROBID_MASK) 
 			{
-				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz);
-				else sprintf(szText, "%.1f/--", Center(zhat));
+				if (bDepthControl) sprintf(szText, "%.2f/%.2f", Center(zhat), wz);
+				else sprintf(szText, "%.2f/--", Center(zhat));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispAltitudeAGL)
 				{
-					if (bAltitudeAGLControl) sprintf(szText, "AGL=%.1f/%.1f", altitude_AGL, wagl);
-					else sprintf(szText, "AGL=%.1f/--", altitude_AGL);
+					if (bAltitudeAGLControl) sprintf(szText, "AGL=%.2f/%.2f", altitude_AGL, wagl);
+					else sprintf(szText, "AGL=%.2f/--", altitude_AGL);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
 			if (robid & AERIAL_ROBID_MASK) 
 			{
-				if (bDepthControl) sprintf(szText, "%.1f/%.1f", Center(zhat), wz);
-				else sprintf(szText, "%.1f/--", Center(zhat));
+				if (bDepthControl) sprintf(szText, "%.2f/%.2f", Center(zhat), wz);
+				else sprintf(szText, "%.2f/--", Center(zhat));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispAltitudeAGL)
 				{
-					if (bAltitudeAGLControl) sprintf(szText, "A_F=%.1f/%.1f", altitude_AGL, wagl);
-					else sprintf(szText, "A_F=%.1f/--", altitude_AGL);
+					if (bAltitudeAGLControl) sprintf(szText, "A_F=%.2f/%.2f", altitude_AGL, wagl);
+					else sprintf(szText, "A_F=%.2f/--", altitude_AGL);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
@@ -1022,11 +1022,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			else
 			{
-				sprintf(szText, "POS:%.1f,%.1f", Center(xhat), Center(yhat));
+				sprintf(szText, "POS:%.2f,%.2f", Center(xhat), Center(yhat));
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
-			sprintf(szText, "ERR:%.1f,%.1f", Width(xhat)/2.0, Width(yhat)/2.0);
+			sprintf(szText, "ERR:%.2f,%.2f", Width(xhat)/2.0, Width(yhat)/2.0);
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			if (bDynamicSonarLocalization)
@@ -1087,10 +1087,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			if (bDispSOG)
 			{
-				sprintf(szText, "SOG:%.1f", sog);
+				sprintf(szText, "SOG:%.2f", sog);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-				sprintf(szText, "COG:%.1f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+				sprintf(szText, "COG:%.2f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
@@ -1118,12 +1118,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					sprintf(szText, "WPT:%.1f,%.1f", wx, wy);
+					sprintf(szText, "WPT:%.2f,%.2f", wx, wy);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				d0 = sqrt(pow(wx-Center(xhat),2)+pow(wy-Center(yhat),2));
-				sprintf(szText, "DIS:%.1f", d0);
+				sprintf(szText, "DIS:%.2f", d0);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispSOG)
@@ -1146,15 +1146,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					sprintf(szText, "WPT:%.1f,%.1f", wxb, wyb);
+					sprintf(szText, "WPT:%.2f,%.2f", wxb, wyb);
 					offset += 16;
 					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				}
-				sprintf(szText, "XTE:%.1f", xte);
+				sprintf(szText, "XTE:%.2f", xte);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				d0 = sqrt(pow(wxb-Center(xhat),2)+pow(wyb-Center(yhat),2));
-				sprintf(szText, "DIS:%.1f", d0);
+				sprintf(szText, "DIS:%.2f", d0);
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispSOG)
