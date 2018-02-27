@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\liblabjackusb\labjackusb.h" />
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\ue9.h" />
+    <ClInclude Include="..\Extensions\Img\CvCLEyeSDKHook.h" />
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
     <ClInclude Include="..\Extensions\Misc\Misc.h" />
     <ClInclude Include="Ball.h" />

@@ -3,6 +3,7 @@
 @md "%TMP%\UxVCtrl"
 
 @set /P DISABLE_KINECT2="Disable Kinect2 (0, 1 (recommended)) : "
+@set /P DISABLE_CLEYE="Disable CLEye (0, 1 (recommended)) : "
 @set /P DISABLE_BLUEVIEW="Disable BlueView (0, 1 (recommended)) : "
 @set /P DISABLE_MAVLINK="Disable MAVLink (0, 1) : "
 @set /P DISABLE_LABJACK="Disable LabJack (0, 1) : "
@@ -25,6 +26,25 @@
 
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";Kinect20.lib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+)
+
+@if "%DISABLE_CLEYE%"=="1" (
+
+@echo Disabling CLEye
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_CVCLEYESDKHOOK" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(CLEYESDK_DIR)\Include" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(CLEYESDK_DIR)\Lib\" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";CLEyeMulticam.lib" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@echo Please note that CLEye is incompatible with Kinect2
 )
 
 @if "%DISABLE_BLUEVIEW%"=="1" (

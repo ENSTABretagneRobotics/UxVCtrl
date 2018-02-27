@@ -1,3 +1,7 @@
+206
+Added CLEye support.
+Continuation of LIRMIA3 integration.
+
 205
 Continuation of LIRMIA3 integration.
 

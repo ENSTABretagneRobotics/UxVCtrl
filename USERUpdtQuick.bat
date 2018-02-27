@@ -42,6 +42,14 @@ copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\ETAS_WHEEL_WORKSPACE\ResetWo
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\ETAS_WHEEL_WORKSPACE\samples"\
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\ETAS_WHEEL_WORKSPACE\restore"\
 
+copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\UxVCtrl.exe"
+copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\CHANGELOG.txt"
+copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\ReadMe.txt"
+copy /B /Y /Z .\mission_spec.txt "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\mission_spec.txt"
+copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\ResetWorkspace.bat"
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\samples"\
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\LIRMIA3_WORKSPACE\restore"\
+
 copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\UxVCtrl.exe"
 copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\CHANGELOG.txt"
 copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\MOTORBOAT_WORKSPACE\ReadMe.txt"

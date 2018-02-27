@@ -620,6 +620,9 @@
     <ClInclude Include="Hardware\MS580314BA.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvCLEyeSDKHook.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
