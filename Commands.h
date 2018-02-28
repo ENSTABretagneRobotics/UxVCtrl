@@ -2965,10 +2965,34 @@ inline int Commands(char* line)
 		u = 0;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (sscanf(line, "controlconfig %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &dval5) == 5)
+	else if (sscanf(line, "controlconfig %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		u_max = dval1; uw_max = dval2; uv_max = dval3; u_coef = dval4; uw_coef = dval5;
+		u_max = dval1; uw_max = dval2; u_coef = dval3; uw_coef = dval4;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "zcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_z = dval1; Kd_z = dval2; Ki_z = dval3; up_max_z = dval4; ud_max_z = dval5; ui_max_z = dval6;
+		u_min_z = dval7; u_max_z = dval8; error_min_z = dval9; error_max_z = dval10; dz_max_z = dval11;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "wycontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_wy = dval1; Kd_wy = dval2; Ki_wy = dval3; up_max_wy = dval4; ud_max_wy = dval5; ui_max_wy = dval6;
+		u_min_wy = dval7; u_max_wy = dval8; error_min_wy = dval9; error_max_wy = dval10; omega_max_wy = dval11;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "wxcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_wx = dval1; Kd_wx = dval2; Ki_wx = dval3; up_max_wx = dval4; ud_max_wx = dval5; ui_max_wx = dval6;
+		u_min_wx = dval7; u_max_wx = dval8; error_min_wx = dval9; error_max_wx = dval10; omega_max_wx = dval11;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "stop", strlen("stop")) == 0)

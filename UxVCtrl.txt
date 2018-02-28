@@ -165,8 +165,6 @@ WMV2
 1
 % uw_max (in [0;1], (0.5 : boost, 1 : normal) for SAUC'ISSE, (0.35 (difficult to control...) : boost, 0.25 : normal) for CISCREA)
 0.5
-% uv_max (in [0;1])
-0.75
 % u_coef (1 : boost, 0.5 : normal)
 1
 % uw_coef (1 : boost, 0.5 : normal)
@@ -186,16 +184,34 @@ WMV2
 % cosdelta_angle_threshold (0 : simu, 0 : SAUC'ISSE, 0 : SARDINE, 0 : CISCREA)
 0
 %0.78
-% wzradiushigh (accuracy of the depth control in m)
-0.05
-% wzradiuslow (accuracy of the depth control in m)
-0.05
 % wdradius (accuracy of the distance control in m)
 0.25
 % vrxmax (0.4 : simu, 0.4 : SAUC'ISSE, 0.4 : SARDINE, 1.5 : CISCREA, Hovecraft : 2)
 0.4
 % omegazmax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
 0.8
+% Kp_z
+0
+% Kd_z
+0
+% Ki_z
+0
+% up_max_z
+0.75
+% ud_max_z
+0
+% ui_max_z
+0.25
+% u_min_z
+-0.75
+% u_max_z
+0.75
+% error_min_z (in m)
+-0.05
+% error_max_z (in m)
+0.05
+% dz_max_z (in m/s)
+0.25
 % Kp_wy
 1
 % Kd_wy

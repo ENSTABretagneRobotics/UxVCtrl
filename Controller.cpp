@@ -21,8 +21,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double wpsi_prev = 0, ipsi = 0; // For heading control.
 	double wtheta_prev = 0, itheta = 0; // For pitch control.
 	double wphi_prev = 0, iphi = 0; // For roll control.
-	double delta_agl = 0; // For altitude Above Ground Level control.
-	double delta_z = 0; // For depth control.
+	//double delta_agl = 0; // For altitude Above Ground Level control.
+	//double delta_z = 0; // For depth control.
+	double wagl_prev = 0, iagl = 0; // For altitude Above Ground Level control.
+	double wz_prev = 0, iz = 0; // For depth control.
 
 #pragma region Sailboat supervisor
 	STATE prevstate = INVALID_STATE;
@@ -345,21 +347,49 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		}
 
 
+		//if (bAltitudeAGLControl)
+		//{
+		//	delta_agl = altitude_AGL-wagl;
+		//	if (delta_agl > error_max_z) uv = u_min_z;
+		//	else if (delta_agl < error_min_z) uv = u_max_z; 
+		//	else uv = 0;
+		//}
+
+		//if (bDepthControl)
+		//{
+		//	delta_z = Center(zhat)-wz;
+		//	if (delta_z > error_max_z) uv = u_min_z;
+		//	else if (delta_z < error_min_z) uv = u_max_z; 
+		//	else uv = 0;
+		//}
+
+		
 		if (bAltitudeAGLControl)
 		{
-			delta_agl = altitude_AGL-wagl;
-			if (delta_agl > wzradiushigh) uv = -uv_max;
-			else if (delta_agl < -wzradiuslow) uv = uv_max; 
-			else uv = 0;
+			if (wagl != wagl_prev) iagl = 0;
+			uv = PID_control(wagl, wagl_prev, altitude_AGL, Center(vrzhat), &iagl, 1, dt,
+				Kp_z, Kd_z, Ki_z, up_max_z, ud_max_z, ui_max_z,
+				u_min_z, u_max_z, error_min_z, error_max_z, dz_max_z);
+			wagl_prev = wagl;
+		}
+		else
+		{
+			iagl = 0;
 		}
 
 		if (bDepthControl)
 		{
-			delta_z = Center(zhat)-wz;
-			if (delta_z > wzradiushigh) uv = -uv_max;
-			else if (delta_z < -wzradiuslow) uv = uv_max; 
-			else uv = 0;
+			if (wz != wz_prev) iz = 0;
+			uv = PID_control(wz, wz_prev, Center(zhat), Center(vrzhat), &iz, 1, dt,
+				Kp_z, Kd_z, Ki_z, up_max_z, ud_max_z, ui_max_z,
+				u_min_z, u_max_z, error_min_z, error_max_z, dz_max_z);
+			wz_prev = wz;
 		}
+		else
+		{
+			iz = 0;
+		}
+		
 
 		u = (u > u_max)? u_max: u;
 		u = (u < -u_max)? -u_max: u;
@@ -369,8 +399,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		up = (up < u_min_wy)? u_min_wy: up;
 		ur = (ur > u_max_wx)? u_max_wx: ur;
 		ur = (ur < u_min_wx)? u_min_wx: ur;
-		uv = (uv > uv_max)? uv_max: uv;
-		uv = (uv < -uv_max)? -uv_max: uv;
+		uv = (uv > u_max_z)? u_max_z: uv;
+		uv = (uv < u_min_z)? u_min_z: uv;
 		ul = (ul > 1)? 1: ul;
 		ul = (ul < -1)? -1: ul;
 

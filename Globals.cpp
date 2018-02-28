@@ -137,15 +137,16 @@ BOOL bDisableMiniSSC = FALSE;
 BOOL bDisableIM483I = FALSE;
 #pragma endregion
 #pragma region Controller parameters
-double u_max = 0, uw_max = 0, uv_max = 0, u_coef = 0, uw_coef = 0;
+double u_max = 0, uw_max = 0, u_coef = 0, uw_coef = 0;
 double Kp = 0, Ki = 0, Kd1 = 0, Kd2 = 0;
 double uw_derivative_max = 0;
 double uw_integral_max = 0;
 double cosdelta_angle_threshold = 0;
-double wzradiushigh = 0, wzradiuslow = 0;
 double wdradius = 0;
 double vrxmax = 0;
 double omegazmax = 0;
+double Kp_z = 0, Kd_z = 0, Ki_z = 0, up_max_z = 0, ud_max_z = 0, ui_max_z = 0, 
+u_min_z = 0, u_max_z = 0, error_min_z = 0, error_max_z = 0, dz_max_z = 0;
 double Kp_wy = 0, Kd_wy = 0, Ki_wy = 0, up_max_wy = 0, ud_max_wy = 0, ui_max_wy = 0, 
 u_min_wy = 0, u_max_wy = 0, error_min_wy = 0, error_max_wy = 0, omega_max_wy = 0;
 double Kp_wx = 0, Kd_wx = 0, Ki_wx = 0, up_max_wx = 0, ud_max_wx = 0, ui_max_wx = 0, 

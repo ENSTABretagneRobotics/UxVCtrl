@@ -372,8 +372,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					uv += 0.1*uv_max;
-					uv = (uv > uv_max)? uv_max: uv;
+					uv += 0.1*u_max_z;
+					uv = (uv > u_max_z)? u_max_z: uv;
 				}
 				break;
 			}
@@ -400,8 +400,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					uv -= 0.1*uv_max;
-					uv = (uv < -uv_max)? -uv_max: uv;
+					uv += 0.1*u_min_z;
+					uv = (uv < u_min_z)? u_min_z: uv;
 				}
 				break;
 			}

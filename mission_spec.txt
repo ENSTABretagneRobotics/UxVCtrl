@@ -381,7 +381,13 @@
 %
 %brake (try to stop the robot taking into account horizontal thrusters speed)
 %
-%controlconfig u_max uw_max uv_max u_coef uw_coef (double [0,1])
+%controlconfig u_max uw_max u_coef uw_coef (double [0,1])
+%
+%zcontrolconfig Kp_z Kd_z Ki_z up_max_z ud_max_z ui_max_z u_min_z u_max_z error_min_z error_max_z dz_max_z
+%
+%wycontrolconfig Kp_wy Kd_wy Ki_z up_max_wy ud_max_wy ui_max_wy u_min_wy u_max_wy error_min_wy error_max_wy omega_max_wy
+%
+%wxcontrolconfig Kp_wx Kd_wx Ki_z up_max_wx ud_max_wx ui_max_wx u_min_wx u_max_wx error_min_wx error_max_wx omega_max_wx
 %
 %stop (stop only horizontal thrusters)
 %

@@ -309,15 +309,16 @@ extern BOOL bDisableMiniSSC;
 extern BOOL bDisableIM483I;
 #pragma endregion
 #pragma region Controller parameters
-extern double u_max, uw_max, uv_max, u_coef, uw_coef;
+extern double u_max, uw_max, u_coef, uw_coef;
 extern double Kp, Ki, Kd1, Kd2; // For heading PID.
 extern double uw_derivative_max;
 extern double uw_integral_max; // Max influence of the integral part of the heading PID.
 extern double cosdelta_angle_threshold; // For heading PID.
-extern double wzradiushigh, wzradiuslow; // Accuracy of the depth control in m.
 extern double wdradius; // Accuracy of the distance control in m.
 extern double vrxmax; // Max submarine speed in rad/s.
 extern double omegazmax; // Max submarine rotation speed in rad/s.
+extern double Kp_z, Kd_z, Ki_z, up_max_z, ud_max_z, ui_max_z, 
+u_min_z, u_max_z, error_min_z, error_max_z, dz_max_z;
 extern double Kp_wy, Kd_wy, Ki_wy, up_max_wy, ud_max_wy, ui_max_wy, 
 u_min_wy, u_max_wy, error_min_wy, error_max_wy, omega_max_wy;
 extern double Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx, 
