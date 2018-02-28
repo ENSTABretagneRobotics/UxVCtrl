@@ -77,7 +77,8 @@ double Energy_electronics = 0, Energy_actuators = 0;
 
 #pragma region General parameters
 int robid = 0, nbvideo = 0, 
-videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0; 
+videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0;
+char szVideoRecordCodec[5];
 BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bMAVLinkInterface = FALSE;

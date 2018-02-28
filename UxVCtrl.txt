@@ -32,6 +32,8 @@
 70
 % VerticalBeam (in ]0..360] deg)
 50
+% szVideoRecordCodec (WMV2, MJPG, DIVX, XVID, etc., see OpenCV FOURCC codecs)
+WMV2
 % bEnableOpenCVGUIs[0]
 1
 % bEnableOpenCVGUIs[1]

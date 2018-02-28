@@ -250,6 +250,7 @@ extern double Energy_electronics, Energy_actuators;
 #pragma region General parameters
 extern int robid, nbvideo, 
 videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
+extern char szVideoRecordCodec[5];
 extern BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 extern BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
 extern BOOL bMAVLinkInterface;

@@ -39,6 +39,9 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 	int videoid = (intptr_t)pParam;
 	TIMER timer;
 	BOOL bVideoRecording = FALSE;
+	char videorecordextension[16];
+
+	memset(videorecordextension, 0, sizeof(videorecordextension));
 
 	for (;;)
 	{
@@ -50,6 +53,12 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 			if (!bVideoRecording) 
 			{
+				memset(videorecordextension, 0, sizeof(videorecordextension));
+				if (strncmp(szVideoRecordCodec, "WMV2", strlen("WMV2")) == 0) strcpy(videorecordextension, "wmv"); 
+				else if (strncmp(szVideoRecordCodec, "DIVX", strlen("DIVX")) == 0) strcpy(videorecordextension, "avi"); 
+				else if (strncmp(szVideoRecordCodec, "XVID", strlen("XVID")) == 0) strcpy(videorecordextension, "avi"); 
+				else if (strncmp(szVideoRecordCodec, "MJPG", strlen("MJPG")) == 0) strcpy(videorecordextension, "avi"); 
+				else strcpy(videorecordextension, "avi");
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 #ifdef USE_ALTERNATE_RECORDING
 				EnterCriticalSection(&strtimeCS);
@@ -61,10 +70,11 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					//CV_FOURCC('I', 'Y', 'U', 'V'), 
 #else
 				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.wmv", videoid, strtime_fns());
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtime_fns(), videorecordextension);
 				LeaveCriticalSection(&strtimeCS);
 				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
-					CV_FOURCC('W','M','V','2'), 
+					//CV_FOURCC_PROMPT,
+					CV_FOURCC(szVideoRecordCodec[0],szVideoRecordCodec[1],szVideoRecordCodec[2],szVideoRecordCodec[3]), 
 #endif // USE_ALTERNATE_RECORDING
 					1000.0/(double)captureperiod, 
 					cvSize(videoimgwidth,videoimgheight), 
@@ -84,10 +94,11 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					//CV_FOURCC('I', 'Y', 'U', 'V'), 
 #else
 				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.wmv", videoid, strtime_fns());
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtime_fns(), videorecordextension);
 				LeaveCriticalSection(&strtimeCS);
 				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
-					CV_FOURCC('W','M','V','2'), 
+					//CV_FOURCC_PROMPT,
+					CV_FOURCC(szVideoRecordCodec[0],szVideoRecordCodec[1],szVideoRecordCodec[2],szVideoRecordCodec[3]), 
 #endif // USE_ALTERNATE_RECORDING
 					1000.0/(double)captureperiod, 
 					cvSize(videoimgwidth,videoimgheight), 

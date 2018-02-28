@@ -1,3 +1,6 @@
+207
+Added szVideoRecordCodec parameter.
+
 206
 Added CLEye support.
 Continuation of LIRMIA3 integration.

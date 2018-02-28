@@ -1,5 +1,4 @@
-Param compression wmv
-kinectsdkhook : gérer plusieurs kinect
+add new parameters for z control...
 
 On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en theta et position...
 
@@ -234,6 +233,8 @@ LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment fa
 Exp image sonar pour mieux détecter murs?
 
 GUI, video
+param caméras gain, exposure, etc.
+kinectsdkhook : gérer plusieurs kinect
 Stabilisation profondeur peut-être pas pratique, affichage bleu détection pas clair...
 rajouter estimation de vitesse dans SOG (sum(delta_xi)/(i*dt)) pour pouvoir avoir l'ETR, afficher aussi en option le temps passé sur le waypoint courant
 afficher followme fence
@@ -245,7 +246,7 @@ pour image sonar ça fait un peu n'importe quoi...
 Si je passe presque tout en cv cpp, peut-être que ça va résoudre les problèmes de fenêtres sous Linux...
 Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
 tester touches en nomachine, ssh -X...
-MAVLinkInterface : solve message Failed to update home location, get Params gêne parfois sur dernier Mission Planner...
+MAVLinkInterface : solve message Failed to update home location
 Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
 modify waypoints/heading commands so that they do a line following in the case of a sailboat?
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?

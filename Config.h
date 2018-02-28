@@ -31,6 +31,7 @@ inline int LoadConfig(void)
 	captureperiod = 100;
 	HorizontalBeam = 70;
 	VerticalBeam = 50;
+	memset(szVideoRecordCodec, 0, sizeof(szVideoRecordCodec));
 	bEnableOpenCVGUIs[0] = TRUE;
 	bEnableOpenCVGUIs[1] = FALSE;
 	bEnableOpenCVGUIs[2] = FALSE;
@@ -264,6 +265,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &HorizontalBeam) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &VerticalBeam) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%[^\r\n]4s", szVideoRecordCodec) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnableOpenCVGUIs[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1080,6 +1083,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", HorizontalBeam) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", VerticalBeam) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.4s\n", szVideoRecordCodec) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnableOpenCVGUIs[0]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

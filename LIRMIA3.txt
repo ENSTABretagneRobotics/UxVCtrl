@@ -9,11 +9,11 @@ COM6
 1
 % channel 0
 % MinPW (in us)
-1000
+950
 % MidPW (in us)
 1450
 % MaxPW (in us)
-2000
+1950
 % InitPW (in us)
 1450
 % ThresholdPW (in us)
@@ -24,11 +24,11 @@ COM6
 1
 % channel 1
 % MinPW (in us)
-1000
+975
 % MidPW (in us)
 1475
 % MaxPW (in us)
-2000
+1975
 % InitPW (in us)
 1475
 % ThresholdPW (in us)
@@ -39,11 +39,11 @@ COM6
 1
 % channel 2
 % MinPW (in us)
-1000
+950
 % MidPW (in us)
 1450
 % MaxPW (in us)
-2000
+1950
 % InitPW (in us)
 1450
 % ThresholdPW (in us)
@@ -54,11 +54,11 @@ COM6
 1
 % channel 3
 % MinPW (in us)
-1000
+975
 % MidPW (in us)
 1475
 % MaxPW (in us)
-2000
+1975
 % InitPW (in us)
 1475
 % ThresholdPW (in us)
