@@ -8,6 +8,7 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "Simulator.h"
+#include "imatrix.h"
 
 THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 {
@@ -192,20 +193,77 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		else if (robid == QUADRO_SIMULATOR_ROBID)
 		{
 
-			// Not fully implemented...
+			double m = 10, b = 2, delt = 1, l = 1;
 
-			psi = alphaomegaz*uw;
-			vrx = alphavrx*u;
-			vry = alphavrx*ul;
-			vrz = u3*alphaz;
+			box sqrtuquadro = box(4);
+			sqrtuquadro[1] = sqrt(u1); sqrtuquadro[2] = sqrt(u2); sqrtuquadro[3] = sqrt(u3); sqrtuquadro[4] = sqrt(u4);
+			box w = 5*sqrtuquadro;
 
-			// Simulated state evolution.
-			double xdot = vrx*cos(psi)-vry*sin(psi);
-			double ydot = vry*cos(psi)+vrx*sin(psi);
-			double zdot = vrz;
-			x = x+dt*xdot;
-			y = y+dt*ydot;
-			z = z+dt*zdot;
+			imatrix R_Euler = RotationPhiThetaPsi(phi, theta, psi);
+			box Vr = box(vrx, vry, vrz);
+			box pdot = R_Euler*Vr;
+			box p = box(x, y, z);
+			p = p+dt*pdot;
+			x = Center(p[1]);
+			y = Center(p[2]);
+			z = Center(p[3]);
+
+			rmatrix M = Zeros(3, 3);
+			M.SetVal(1, 1, 1); M.SetVal(1, 2, tan(theta)*sin(phi)); M.SetVal(1, 3, tan(theta)*cos(phi));
+			M.SetVal(2, 1, 0); M.SetVal(2, 2, cos(phi)); M.SetVal(2, 3, -sin(phi));
+			M.SetVal(3, 1, 0); M.SetVal(3, 2, sin(phi)/cos(theta)); M.SetVal(3, 3, cos(phi)/cos(theta));
+
+			box Wr = box(omegax, omegay, omegaz);
+			box anglesdot = imatrix(M)*Wr;
+			box angles = box(phi, theta, psi);
+			angles = angles+dt*anglesdot;
+			phi = Center(angles[1]);
+			theta = Center(angles[2]);
+			psi = Center(angles[3]);
+			
+			rmatrix B = Zeros(4, 4);
+			B.SetVal(1, 1, b); B.SetVal(1, 2, b); B.SetVal(1, 3, b); B.SetVal(1, 4, b);
+			B.SetVal(2, 1, -b*l); B.SetVal(2, 2, 0); B.SetVal(2, 3, b*l); B.SetVal(2, 4, 0);
+			B.SetVal(3, 1, 0); B.SetVal(3, 2, -b*l); B.SetVal(3, 3, 0); B.SetVal(3, 4, b*l);
+			B.SetVal(4, 1, -delt); B.SetVal(4, 2, delt); B.SetVal(4, 3, -delt); B.SetVal(4, 4, delt);
+
+			box wabsw = box(4);
+			wabsw[1] = w[1]*Abs(w[1]); wabsw[2] = w[2]*Abs(w[2]); wabsw[3] = w[3]*Abs(w[3]); wabsw[4] = w[4]*Abs(w[4]);
+
+			box tau = imatrix(B)*wabsw;
+
+			box Vrdot = Transpose(R_Euler)*box(0, 0, STANDARD_GRAVITY)+box(0, 0, -tau[1]/m)-box(Wr[2]*Vr[3]-Wr[3]*Vr[2], Wr[3]*Vr[1]-Wr[1]*Vr[3], Wr[1]*Vr[2]-Wr[2]*Vr[1]);
+			Vr = Vr+dt*Vrdot;
+			vrx = Center(Vr[1]);
+			vry = Center(Vr[2]);
+			vrz = Center(Vr[3]);
+
+			rmatrix I = Zeros(3, 3);
+			I.SetVal(1, 1, 10); I.SetVal(1, 2, 0); I.SetVal(1, 3, 0);
+			I.SetVal(2, 1, 0); I.SetVal(2, 2, 10); I.SetVal(2, 3, 0);
+			I.SetVal(3, 1, 0); I.SetVal(3, 2, 0); I.SetVal(3, 3, 20);
+
+			box IWr = imatrix(I)*Wr;
+			box Wrdot = imatrix(Inv(I))*(box(tau[2], tau[3], tau[4])-box(Wr[2]*IWr[3]-Wr[3]*IWr[2], Wr[3]*IWr[1]-Wr[1]*IWr[3], Wr[1]*IWr[2]-Wr[2]*IWr[1]));
+			Wr = Wr+dt*Wrdot;
+			omegax = Center(Wr[1]);
+			omegay = Center(Wr[2]);
+			omegaz = Center(Wr[3]);
+			
+			//// Not fully implemented...
+
+			//psi = alphaomegaz*uw;
+			//vrx = alphavrx*u;
+			//vry = alphavrx*ul;
+			//vrz = u3*alphaz;
+
+			//// Simulated state evolution.
+			//double xdot = vrx*cos(psi)-vry*sin(psi);
+			//double ydot = vry*cos(psi)+vrx*sin(psi);
+			//double zdot = vrz;
+			//x = x+dt*xdot;
+			//y = y+dt*ydot;
+			//z = z+dt*zdot;
 
 			// Simulated sensors measurements.
 			// AHRS.

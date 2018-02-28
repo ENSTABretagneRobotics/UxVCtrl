@@ -1,3 +1,5 @@
+brake si lateralthrust?
+compat : auto exclude from build and add option for xp and option to auto lauch build in release
 
 On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en theta et position...
 

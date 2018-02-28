@@ -52,7 +52,7 @@ inline void DisableAllControls(void)
 	bRollControl = FALSE;
 	bDepthControl = FALSE;
 	bAltitudeAGLControl = FALSE;
-	u = 0; uw = 0; ul = 0; uv = 0;
+	u = 0; uw = 0; ul = 0; up = 0; ur = 0; uv = 0;
 	LeaveCriticalSection(&StateVariablesCS);
 	EnterCriticalSection(&MDMCS);
 	AcousticCommandMDM = 0; // Should change?
@@ -2932,6 +2932,46 @@ inline int Commands(char* line)
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else if (strncmp(line, "enabledepthreg", strlen("enabledepthreg")) == 0)
+	{
+		bDepthControl = TRUE;
+	}
+	else if (strncmp(line, "disabledepthreg", strlen("disabledepthreg")) == 0)
+	{
+		bDepthControl = FALSE;
+	}
+	else if (strncmp(line, "enableaglreg", strlen("enableaglreg")) == 0)
+	{
+		bAltitudeAGLControl = TRUE;
+	}
+	else if (strncmp(line, "disableaglreg", strlen("disableaglreg")) == 0)
+	{
+		bAltitudeAGLControl = FALSE;
+	}
+	else if (strncmp(line, "enablerollreg", strlen("enablerollreg")) == 0)
+	{
+		bRollControl = TRUE;
+	}
+	else if (strncmp(line, "disablerollreg", strlen("disablerollreg")) == 0)
+	{
+		bRollControl = FALSE;
+	}
+	else if (strncmp(line, "enablepitchreg", strlen("enablepitchreg")) == 0)
+	{
+		bPitchControl = TRUE;
+	}
+	else if (strncmp(line, "disablepitchreg", strlen("disablepitchreg")) == 0)
+	{
+		bPitchControl = FALSE;
+	}
+	else if (strncmp(line, "enableheadingreg", strlen("enableheadingreg")) == 0)
+	{
+		bHeadingControl = TRUE;
+	}
+	else if (strncmp(line, "disableheadingreg", strlen("disableheadingreg")) == 0)
+	{
+		bHeadingControl = FALSE;
+	}
 	else if (sscanf(line, "thrust %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -2947,6 +2987,24 @@ inline int Commands(char* line)
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
 		bHeadingControl = FALSE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "lateralthrust %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		ul = dval;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "pitchthrust %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		up = dval;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "rollthrust %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		ur = dval;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "verticalthrust %lf", &dval) == 1)

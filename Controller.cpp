@@ -395,14 +395,14 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		u = (u < -u_max)? -u_max: u;
 		uw = (uw > uw_max)? uw_max: uw;
 		uw = (uw < -uw_max)? -uw_max: uw;
+		ul = (ul > 1)? 1: ul;
+		ul = (ul < -1)? -1: ul;
 		up = (up > u_max_wy)? u_max_wy: up;
 		up = (up < u_min_wy)? u_min_wy: up;
 		ur = (ur > u_max_wx)? u_max_wx: ur;
 		ur = (ur < u_min_wx)? u_min_wx: ur;
 		uv = (uv > u_max_z)? u_max_z: uv;
 		uv = (uv < u_min_z)? u_min_z: uv;
-		ul = (ul > 1)? 1: ul;
-		ul = (ul < -1)? -1: ul;
 
 		switch (robid)
 		{

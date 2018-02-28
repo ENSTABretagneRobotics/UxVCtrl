@@ -371,13 +371,37 @@
 %
 %headingrelativereg orientation (double [0,360[ mod(360) in deg in North - East - Down coordinate system)
 %
+%enabledepthreg
+%
+%disabledepthreg
+%
+%enableaglhreg
+%
+%disableaglreg
+%
+%enablerollreg
+%
+%disablerollreg
+%
+%enablepitchreg
+%
+%disablepitchreg
+%
+%enableheadingreg
+%
+%disableheadingreg
+%
 %thrust u (double [-1,1])
 %
 %turn u (double [-1,1])
 %
-%verticalthrust u (double [-1,1])
-%
 %lateralthrust u (double [-1,1])
+%
+%pitchthrust u (double [-1,1])
+%
+%rollthrust u (double [-1,1])
+%
+%verticalthrust u (double [-1,1])
 %
 %brake (try to stop the robot taking into account horizontal thrusters speed)
 %
