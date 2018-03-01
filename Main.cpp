@@ -36,6 +36,7 @@
 #include "Hokuyo.h"
 #include "RPLIDAR.h"
 #include "MS580314BA.h"
+#include "MS583730BA.h"
 #include "P33x.h"
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRS.h"
@@ -114,6 +115,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER RPLIDARThreadId;
 	THREAD_IDENTIFIER MS580314BAThreadId;
+	THREAD_IDENTIFIER MS583730BAThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER RazorAHRSThreadId;
@@ -216,6 +218,7 @@ int main(int argc, char* argv[])
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableRPLIDAR) CreateDefaultThread(RPLIDARThread, NULL, &RPLIDARThreadId);
 	if (!bDisableMS580314BA) CreateDefaultThread(MS580314BAThread, NULL, &MS580314BAThreadId);
+	if (!bDisableMS583730BA) CreateDefaultThread(MS583730BAThread, NULL, &MS583730BAThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 #endif // ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
@@ -389,6 +392,7 @@ int main(int argc, char* argv[])
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
+	if (!bDisableMS583730BA) WaitForThread(MS583730BAThreadId);
 	if (!bDisableMS580314BA) WaitForThread(MS580314BAThreadId);
 	if (!bDisableRPLIDAR) WaitForThread(RPLIDARThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);

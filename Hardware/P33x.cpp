@@ -25,6 +25,8 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 
 	memset(&p33x, 0, sizeof(P33X));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
 		StopChronoQuick(&chrono_period);

@@ -1,5 +1,5 @@
 % Angle of the x axis of the environment coordinate system to the North, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference (in deg in North - East - Down coordinate system)
-200
+190
 % Latitude, longitude, altitude of the environment coordinate system w.r.t. East - North - Up coordinate system (in decimal deg and m)
 19.499828
 -99.137749
@@ -25,10 +25,10 @@
 20
 % Coordinate system used to display the map
 % xMin (in m)
--50
+-35
 % xMax (in m)
-50
+35
 % yMin (in m)
--50
+-35
 % yMax (in m)
-50
+35

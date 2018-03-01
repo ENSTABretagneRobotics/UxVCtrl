@@ -9,41 +9,41 @@ COM2
 1
 % channel 0
 % MinPW (in us)
-950
+1000
 % MidPW (in us)
 1450
 % MaxPW (in us)
-1950
+1900
 % InitPW (in us)
 1450
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
-1
+-1
 % bProportionalPW (0 or 1)
 1
 % channel 1
 % MinPW (in us)
-975
+1025
 % MidPW (in us)
 1475
 % MaxPW (in us)
-1975
+1925
 % InitPW (in us)
 1475
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
-1
+-1
 % bProportionalPW (0 or 1)
 1
 % channel 2
 % MinPW (in us)
-950
+1000
 % MidPW (in us)
 1450
 % MaxPW (in us)
-1950
+1900
 % InitPW (in us)
 1450
 % ThresholdPW (in us)
@@ -54,11 +54,11 @@ COM2
 1
 % channel 3
 % MinPW (in us)
-975
+1025
 % MidPW (in us)
 1475
 % MaxPW (in us)
-1975
+1925
 % InitPW (in us)
 1475
 % ThresholdPW (in us)

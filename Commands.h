@@ -2053,6 +2053,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartMS580314BA = TRUE;
 		bPauseMS580314BA = ival1;
 	}
+	else if (sscanf(line, "ms583730baconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "MS583730BA0.txt", strlen("MS583730BA0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "MS583730BA0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartMS583730BA = TRUE;
+		bPauseMS583730BA = ival1;
+	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "P33x0.txt", strlen("P33x0.txt")) != 0)

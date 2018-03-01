@@ -273,6 +273,9 @@
     <ClCompile Include="Hardware\MS580314BA.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\MS583730BA.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -623,6 +626,9 @@
     <ClInclude Include="..\Extensions\Img\CvCLEyeSDKHook.h">
       <Filter>Extensions\Img</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\MS583730BA.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
@@ -645,6 +651,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="MS580314BA0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MS583730BA0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

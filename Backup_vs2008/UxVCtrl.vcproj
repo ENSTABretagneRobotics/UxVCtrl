@@ -447,6 +447,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MS583730BA0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\MT0.txt"
 				>
 			</File>
@@ -1028,6 +1032,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\MS580314BA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\MS583730BA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\MS583730BA.h"
 				>
 			</File>
 			<File

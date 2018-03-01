@@ -176,6 +176,8 @@
 %
 %ms580314baconfig MS580314BA.txt bPause
 %
+%ms583730baconfig MS583730BA.txt bPause
+%
 %p33xconfig P33x.txt bPause
 %
 %razorahrsconfig RazorAHRS.txt bPause

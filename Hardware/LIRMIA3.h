@@ -105,7 +105,7 @@ inline int InitLIRMIA3(LIRMIA3* pLIRMIA3)
 	return EXIT_SUCCESS;
 }
 
-inline int WriteDataLIRMIA3(LIRMIA3* pLIRMIA3, int M1, int M2, int M3, int M4)
+inline int WriteDataLIRMIA3(LIRMIA3* pLIRMIA3, unsigned char M1, unsigned char M2, unsigned char M3, unsigned char M4)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_LIRMIA3];
 	int sendbuflen = 0;
@@ -115,10 +115,10 @@ inline int WriteDataLIRMIA3(LIRMIA3* pLIRMIA3, int M1, int M2, int M3, int M4)
 	sendbuf[0] = (unsigned char)0x54; // Read or Write multiple bytes for devices without internal address or where address does not require resetting.
 	sendbuf[1] = (unsigned char)0x04; // I2C address
 	sendbuf[2] = (unsigned char)0x04; // Number of bytes to write
-	sendbuf[3] = (unsigned char)M1;
-	sendbuf[4] = (unsigned char)M2;
-	sendbuf[5] = (unsigned char)M3;
-	sendbuf[6] = (unsigned char)M4;
+	sendbuf[3] = M1;
+	sendbuf[4] = M2;
+	sendbuf[5] = M3;
+	sendbuf[6] = M4;
 	sendbuflen = 7;
 	
 	if (WriteAllRS232Port(&pLIRMIA3->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
@@ -141,6 +141,7 @@ inline int SetAllPWMsLIRMIA3(LIRMIA3* pLIRMIA3, int* pws)
 {
 	int channel = 0;
 	int pws_tmp[NB_CHANNELS_PWM_LIRMIA3];
+	int M1 = 0, M2 = 0, M3 = 0, M4 = 0;
 
 	memcpy(pws_tmp, pws, sizeof(pws_tmp));
 
@@ -170,15 +171,29 @@ inline int SetAllPWMsLIRMIA3(LIRMIA3* pLIRMIA3, int* pws)
 		//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pLIRMIA3->LastPWs[channel], abs(pws_tmp[channel]-pLIRMIA3->LastPWs[channel]), pLIRMIA3->ThresholdPWs[channel]);
 	}
 
-	if (WriteDataLIRMIA3(pLIRMIA3, (pws_tmp[0]-1000)*255/1000, (pws_tmp[1]-1000)*255/1000, (pws_tmp[2]-1000)*255/1000, (pws_tmp[3]-1000)*255/1000) != EXIT_SUCCESS)
+	//M1 = (pws_tmp[0]-pLIRMIA3->MinPWs[0])*255/(pLIRMIA3->MaxPWs[0]-pLIRMIA3->MinPWs[0]); 
+	//M2 = (pws_tmp[1]-pLIRMIA3->MinPWs[1])*255/(pLIRMIA3->MaxPWs[1]-pLIRMIA3->MinPWs[1]); 
+	//M3 = (pws_tmp[2]-pLIRMIA3->MinPWs[2])*255/(pLIRMIA3->MaxPWs[2]-pLIRMIA3->MinPWs[2]); 
+	//M4 = (pws_tmp[3]-pLIRMIA3->MinPWs[3])*255/(pLIRMIA3->MaxPWs[3]-pLIRMIA3->MinPWs[3]);
+	M1 = (pws_tmp[0]-1000)*255/1000; 
+	M2 = (pws_tmp[1]-1000)*255/1000; 
+	M3 = (pws_tmp[2]-1000)*255/1000; 
+	M4 = (pws_tmp[3]-1000)*255/1000;
+
+	M1 = max(min(M1, 255), 0);
+	M2 = max(min(M2, 255), 0);
+	M3 = max(min(M3, 255), 0);
+	M4 = max(min(M4, 255), 0);
+
+	if (WriteDataLIRMIA3(pLIRMIA3, (unsigned char)M1, (unsigned char)M2, (unsigned char)M3, (unsigned char)M4) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
 
 	for (channel = 0; channel < NB_CHANNELS_PWM_LIRMIA3; channel++)
 	{
-		// The requested PWM should have been only applied if it was slightly different from the current value.
-		if (abs(pws_tmp[channel]-pLIRMIA3->LastPWs[channel]) < pLIRMIA3->ThresholdPWs[channel]) continue;
+		//// The requested PWM should have been only applied if it was slightly different from the current value.
+		//if (abs(pws_tmp[channel]-pLIRMIA3->LastPWs[channel]) < pLIRMIA3->ThresholdPWs[channel]) continue;
 
 		// Update last known value.
 		pLIRMIA3->LastPWs[channel] = pws_tmp[channel];

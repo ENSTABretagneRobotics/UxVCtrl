@@ -294,6 +294,7 @@ extern BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 extern BOOL bDisableHokuyo;
 extern BOOL bDisableRPLIDAR;
 extern BOOL bDisableMS580314BA;
+extern BOOL bDisableMS583730BA;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
@@ -590,6 +591,9 @@ extern BOOL bPauseRPLIDAR, bRestartRPLIDAR;
 
 // MS580314BA variables.
 extern BOOL bPauseMS580314BA, bRestartMS580314BA;
+
+// MS583730BA variables.
+extern BOOL bPauseMS583730BA, bRestartMS583730BA;
 
 // P33x variables.
 extern BOOL bPauseP33x, bRestartP33x;

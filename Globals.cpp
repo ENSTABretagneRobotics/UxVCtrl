@@ -122,6 +122,7 @@ BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 BOOL bDisableHokuyo = FALSE;
 BOOL bDisableRPLIDAR = FALSE;
 BOOL bDisableMS580314BA = FALSE;
+BOOL bDisableMS583730BA = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
@@ -418,6 +419,9 @@ BOOL bPauseRPLIDAR = FALSE, bRestartRPLIDAR = FALSE;
 
 // MS580314BA variables.
 BOOL bPauseMS580314BA = FALSE, bRestartMS580314BA = FALSE;
+
+// MS583730BA variables.
+BOOL bPauseMS583730BA = FALSE, bRestartMS583730BA = FALSE;
 
 // P33x variables.
 BOOL bPauseP33x = FALSE, bRestartP33x = FALSE;

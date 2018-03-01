@@ -14,7 +14,8 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 {
 	MS580314BA ms580314ba;
 	struct timeval tv;
-	double pressure = 0;
+	double pressure = 0, pressure_prev = 0, filteredpressure = 0;
+	CHRONO chrono_filter;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -24,6 +25,10 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	memset(&ms580314ba, 0, sizeof(MS580314BA));
+
+	StartChrono(&chrono_filter);
+
+	StartChrono(&chrono_period);
 
 	for (;;)
 	{
@@ -61,6 +66,9 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 			if (ConnectMS580314BA(&ms580314ba, "MS580314BA0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+
+				StopChronoQuick(&chrono_filter);
+				StartChrono(&chrono_filter);
 
 				if (ms580314ba.pfSaveFile != NULL)
 				{
@@ -108,7 +116,28 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 				pressure_mes = pressure;
-				z_pressure = Pressure2Height(pressure, ms580314ba.PressureRef, ms580314ba.WaterDensity)+interval(-z_pressure_acc, z_pressure_acc);
+				if ((GetTimeElapsedChronoQuick(&chrono_filter) > 2)&&(GetTimeElapsedChronoQuick(&chrono_filter) <= 3))
+				{
+					pressure_prev = pressure; // Initialization of pressure_prev...
+				}
+				if (GetTimeElapsedChronoQuick(&chrono_filter) > 3)
+				{
+					if (fabs(pressure-pressure_prev) < 0.05)
+					{
+						filteredpressure = pressure;
+						pressure_prev = filteredpressure;
+					}
+					else
+					{
+						// Ignore outlier...
+						filteredpressure = pressure_prev;
+					}
+				}
+				else
+				{
+					filteredpressure = pressure;
+				}
+				z_pressure = Pressure2Height(filteredpressure, ms580314ba.PressureRef, ms580314ba.WaterDensity)+interval(-z_pressure_acc, z_pressure_acc);
 				LeaveCriticalSection(&StateVariablesCS);
 
 				if (ms580314ba.bSaveRawData)
@@ -131,6 +160,8 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 	}
 
 	StopChronoQuick(&chrono_period);
+
+	StopChronoQuick(&chrono_filter);
 
 	if (ms580314ba.pfSaveFile != NULL)
 	{

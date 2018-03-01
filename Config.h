@@ -84,6 +84,7 @@ inline int LoadConfig(void)
 	bDisableHokuyo = TRUE;
 	bDisableRPLIDAR = TRUE;
 	bDisableMS580314BA = TRUE;
+	bDisableMS583730BA = TRUE;
 	bDisableP33x = TRUE;
 	bDisableRazorAHRS = TRUE;
 	bDisableMT = TRUE;
@@ -369,6 +370,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bDisableRPLIDAR) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMS580314BA) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableMS583730BA) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableP33x) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1199,6 +1202,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bDisableRPLIDAR) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableMS580314BA) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableMS583730BA) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableP33x) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

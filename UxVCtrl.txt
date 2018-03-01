@@ -126,6 +126,8 @@ WMV2
 1
 % bDisableMS580314BA
 1
+% bDisableMS583730BA
+1
 % bDisableP33x
 1
 % bDisableRazorAHRS
