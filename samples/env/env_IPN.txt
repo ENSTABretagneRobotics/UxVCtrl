@@ -16,19 +16,19 @@
 0  20  0  0
 % Bounding box for a structured environment
 % box_env[1].inf (in m)
-0
+0.5
 % box_env[1].sup (in m)
-30
+29.5
 % box_env[2].inf (in m)
-0
+0.5
 % box_env[2].sup (in m)
-20
+19.5
 % Coordinate system used to display the map
 % xMin (in m)
--35
+-30
 % xMax (in m)
-35
+30
 % yMin (in m)
--35
+-30
 % yMax (in m)
-35
+30
