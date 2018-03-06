@@ -18,10 +18,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	double deccsec = 0;
 	BOOL bOSD = TRUE;
 	BOOL bOrientationCircle = TRUE;
-	BOOL bDispLLA = FALSE;
-	BOOL bDispAltitudeAGL = FALSE;
-	BOOL bDispSOG = TRUE;
+	BOOL bDispLLA = TRUE;
 	BOOL bDispYPR = TRUE;
+	BOOL bDispAltitudeAGL = FALSE;
+	BOOL bDispDVL = TRUE;
+	BOOL bDispGPS = TRUE;
+	BOOL bDispSOG = FALSE;
 	BOOL bMap = TRUE;
 	BOOL bFullMap = FALSE;
 	BOOL bRotatingMap = FALSE;
@@ -79,6 +81,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		bEnableFullSpeedMode = FALSE;
 		break;
 	}
+
+	if (bDisablePathfinderDVL&&bDisableNortekDVL) bDispDVL = FALSE; else bDispDVL = TRUE;
 
 	memset(szText, 0, sizeof(szText));
 	memset(windowname, 0, sizeof(windowname));
@@ -416,11 +420,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
 				break;
+			case QUADRO_SIMULATOR_ROBID:
+			case COPTER_ROBID:
+			case BLUEROV_ROBID:
 			case ARDUCOPTER_ROBID:
 				ul += 0.1;
 				ul = (ul > 1)? 1: ul;
 				break;
 			case BUBBLE_ROBID:
+			case TANK_SIMULATOR_ROBID:
 			case ETAS_WHEEL_ROBID:
 				uw_max += 0.1;
 				uw_max = (uw_max > 1)? 1: uw_max;
@@ -441,6 +449,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			case QUADRO_SIMULATOR_ROBID:
 			case COPTER_ROBID:
+			case BLUEROV_ROBID:
 			case ARDUCOPTER_ROBID:
 				ul -= 0.1;
 				ul = (ul < -1)? -1: ul;
@@ -508,8 +517,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				bPitchControl = FALSE;
 			}
-			if (bPitchControl) printf("Pitch control enabled.\n");
-			else printf("Pitch control disabled.\n");
+			//if (bPitchControl) printf("Pitch control enabled.\n");
+			//else printf("Pitch control disabled.\n");
 			break;
 		case 'H':
 			if (!bRollControl)
@@ -520,8 +529,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				bRollControl = FALSE;
 			}
-			if (bRollControl) printf("Roll control enabled.\n");
-			else printf("Roll control disabled.\n");
+			//if (bRollControl) printf("Roll control enabled.\n");
+			//else printf("Roll control disabled.\n");
 			break;
 		case 'b':
 			light += 0.1;
@@ -823,6 +832,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				if (bColorsExtendedMenu) bColorsExtendedMenu = FALSE;
 				else if (bCISCREAOSDExtendedMenu) bCISCREAOSDExtendedMenu = FALSE;
+				else if (bOtherOSDOptionsExtendedMenu) bOtherOSDOptionsExtendedMenu = FALSE;
 				else bExtendedMenu = FALSE;
 			}
 			else bExtendedMenu = TRUE;
@@ -963,19 +973,53 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1);
 				break;
+			case LIRMIA3_ROBID:
+				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u4*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
+				break;
 			default:
 				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
 			}
 			offset += 16;
 			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-			// In deg in NED coordinate system.
-			if (bHeadingControl) sprintf(szText, "%.2f/%.2f", 
-				(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-				(fmod_2PI(-angle_env-wpsi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
-			else sprintf(szText, "%.2f/--", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
-			offset += 16;
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			if (bDispLLA)
+			{
+				// In deg in NED coordinate system.
+				if (bHeadingControl) sprintf(szText, "%.2f/%.2f", fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0), fmod_360_pos_rad2deg(-angle_env-wpsi+M_PI/2.0));
+				else sprintf(szText, "%.2f/--", fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0));
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				if (bDispYPR)
+				{
+					if (bPitchControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(-Center(thetahat)), fmod_360_rad2deg(-wtheta));
+					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(-Center(thetahat)));
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					if (bRollControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(phihat)), fmod_360_rad2deg(wphi));
+					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(phihat)));
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				}
+			}
+			else
+			{
+				// In deg in the reference coordinate system.
+				if (bHeadingControl) sprintf(szText, "%.2f/%.2f", fmod_360_pos_rad2deg(Center(psihat)), fmod_360_pos_rad2deg(wpsi));
+				else sprintf(szText, "%.2f/--", fmod_360_pos_rad2deg(Center(psihat)));
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				if (bDispYPR)
+				{
+					if (bPitchControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(thetahat)), fmod_360_rad2deg(wtheta));
+					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(thetahat)));
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					if (bRollControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(phihat)), fmod_360_rad2deg(wphi));
+					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(phihat)));
+					offset += 16;
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				}
+			}
 			if (robid & SUBMARINE_ROBID_MASK) 
 			{
 				if (bDepthControl) sprintf(szText, "%.2f/%.2f", Center(zhat), wz);
@@ -1035,71 +1079,70 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
-			if (bDVLLocalization)
+			if (bDispDVL)
 			{
-				offset += 16;
-				if ((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc))
+				if (bDVLLocalization)
 				{
-					sprintf(szText, "DVL LOC");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				}
-				else
-				{
-					sprintf(szText, "DVL LOC N/A");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+					offset += 16;
+					if ((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc))
+					{
+						sprintf(szText, "DVL LOC");
+						cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					}
+					else
+					{
+						sprintf(szText, "DVL LOC N/A");
+						cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+					}
 				}
 			}
-			offset += 16;
-			switch (GetGNSSlevel())
+			if (bDispGPS)
 			{
-			case GNSS_ACC_LEVEL_RTK_FIXED:
-				if (bGPSLocalization) strcpy(szText, "RTK FIX (IN USE)"); else strcpy(szText, "RTK FIX");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				break;
-			case GNSS_ACC_LEVEL_RTK_FLOAT:
-				if (bGPSLocalization) strcpy(szText, "RTK FLT (IN USE)"); else strcpy(szText, "RTK FLT");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				break;
-			case GNSS_ACC_LEVEL_RTK_UNREL:
-				if (bGPSLocalization) strcpy(szText, "RTK ? (IN USE)"); else strcpy(szText, "RTK ?");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
-				break;
-			case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
-				if (bGPSLocalization) strcpy(szText, "GPS HIGH (IN USE)"); else strcpy(szText, "GPS HIGH");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				break;
-			case GNSS_ACC_LEVEL_GNSS_FIX_MED:
-				if (bGPSLocalization) strcpy(szText, "GPS MED (IN USE)"); else strcpy(szText, "GPS MED");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				break;
-			case GNSS_ACC_LEVEL_GNSS_FIX_LOW:
-				if (bGPSLocalization) strcpy(szText, "GPS LOW (IN USE)"); else strcpy(szText, "GPS LOW");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				break;
-			case GNSS_ACC_LEVEL_GNSS_FIX_UNREL:
-				if (bGPSLocalization) strcpy(szText, "GPS ? (IN USE)"); else strcpy(szText, "GPS ?");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
-				break;
-			default:
-				strcpy(szText, "NO FIX");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
-				break;
+				offset += 16;
+				switch (GetGNSSlevel())
+				{
+				case GNSS_ACC_LEVEL_RTK_FIXED:
+					if (bGPSLocalization) strcpy(szText, "RTK FIX (IN USE)"); else strcpy(szText, "RTK FIX");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					break;
+				case GNSS_ACC_LEVEL_RTK_FLOAT:
+					if (bGPSLocalization) strcpy(szText, "RTK FLT (IN USE)"); else strcpy(szText, "RTK FLT");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					break;
+				case GNSS_ACC_LEVEL_RTK_UNREL:
+					if (bGPSLocalization) strcpy(szText, "RTK ? (IN USE)"); else strcpy(szText, "RTK ?");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+					break;
+				case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
+					if (bGPSLocalization) strcpy(szText, "GPS HIGH (IN USE)"); else strcpy(szText, "GPS HIGH");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					break;
+				case GNSS_ACC_LEVEL_GNSS_FIX_MED:
+					if (bGPSLocalization) strcpy(szText, "GPS MED (IN USE)"); else strcpy(szText, "GPS MED");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					break;
+				case GNSS_ACC_LEVEL_GNSS_FIX_LOW:
+					if (bGPSLocalization) strcpy(szText, "GPS LOW (IN USE)"); else strcpy(szText, "GPS LOW");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					break;
+				case GNSS_ACC_LEVEL_GNSS_FIX_UNREL:
+					if (bGPSLocalization) strcpy(szText, "GPS ? (IN USE)"); else strcpy(szText, "GPS ?");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+					break;
+				default:
+					strcpy(szText, "NO FIX");
+					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+					break;
+				}
 			}
 			if (bDispSOG)
 			{
 				sprintf(szText, "SOG:%.2f", sog);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				sprintf(szText, "COG:%.2f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
-			}
-			if (bDispYPR)
-			{
-				// In deg in ENU coordinate system.
-				sprintf(szText, "YPR:%d,%d,%d", (int)fmod_360_rad2deg(Center(psihat)), (int)fmod_360_rad2deg(Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
-				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 			}
 			if (bShowBatteryInfo)
 			{

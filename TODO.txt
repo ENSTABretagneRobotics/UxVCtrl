@@ -1,7 +1,11 @@
 brake si lateralthrust?
 compat : auto exclude from build and add option for xp and option to auto lauch build in release
 
-On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en theta et position...
+nmeainterface : send altitude, heading, pitch, roll compatible with seanet
+
+ardusub support for bluerov2, e.g. through mavlink serial port or TCP redir?
+
+On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en historique theta, corrigé en historique theta et position...
 
 bug ublox voit pas $gnrmc à cause des corrections rtk, du coup on doit activer gga?
 
@@ -414,14 +418,12 @@ prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en op
 
 changer observer (et éventuellement simulator) pour que omegazdot=alphaomegaz*(u1-u2)-alphafomegaz*omegaz (au lieu de psidot=alphaomegaz*(u1-u2)...)
 si on a une IMU, on l'utilise pour omegazhat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid)
-utiliser les accéléros quand on a rien d'autre? refaire des tests...
 prendre en compte dans la localisation la position GPS de la bouée avec longueur du câble et profondeur du sous-marin?
 
 openal, pingertracking->script python séparé
 
 replay
 voir UxVDataViewer
-replay with mission planner?
 faire option lecture de fichier sonar qui lit les temps et attend de dt=t1-t0 avec t0 et t1 lus dans le fichier, voir comment c'est fait pour vidéo
 rajouter fonction replay uxvctrl, comment gérer mieux les histoires de conversions de temps?
 il faudrait sans doute faire des cas particuliers car les données sont parfois dans des fichiers séparés (caméra, sonar) et pour le sonar le temps de reconfiguration est variable donc c'est pas facile de manuellement choisir le moment où un fichier particulier doit être relu
@@ -444,7 +446,6 @@ reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations p
 
 CISCREA
 après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
-pouvoir afficher period pour tous les threads
 reorganisation CISCREA comme autres hardware pour pouvoir prendre en compte paramètres du fichier de config, voir noms/numérotation des moteurs, clockwise
 regarder paramètres internes caméra reg 11=0LRUDS01 (LRUDS : boutons OSD) (light adjustement...), programme indépendant commandes bas niveau pour les propulseurs ciscrea, rampe, faire un pwm logiciel pour les faibles vitesses...
 
@@ -452,6 +453,8 @@ attention aux valeurs au départ d'initialisation, attention au setstateestimatio
 surveiller divisions par 0..., vérifier cohérence paramètres par défaut
 surveiller le abort et abortmission... n'arrive pas toujours à arrêter toutes les régulations?
 
+Duplicate stdout to output log file
+Test again cancel on command thread to exit...
 deadlocks à cause de killthread? il faudrait plutôt utiliser quelque chose comme WaitForUserInput() au lieu de fgets... Est-ce que ça marcherait pas mieux avec les cancel? Mais il se peut qu'il y ait des malloc dans la fonction Commands()... On peut peut-être désactiver le mode cancelable autour de l'appel à la fonction Commands()... En fait sous Windows c'est différent, les cancellation points sont quasiment que les fonctions en XXXEx...
 voir aussi rapport entre pthread_cleanup_push()/pthread_cleanup_pop() et QueueUserAPC()...
 
@@ -462,7 +465,6 @@ Paramètres position xyzpsithetaphi des capteurs sur le robot et leurs erreurs su
 image : passer au log pour que les zoom, rotations... deviennent comme des translations...?
 gestion vagues et z, courants et v, wind...
 uxvguiwinforms pour zoom et ancienne gui, rajouter entree de lat0,long0, err, affichage lat long, remoteopencv gui (envoi des images et réception des touches, faire en sorte que la partie server marche sous Android (ne doit pas appeler opencgui, pas de timers...)), rmtcommand/TelnetInterface (client serait juste telnet)
-rajouter un device qui communiquerait avec une MOOSDB
 connectionqualitychecker: programme server/client qui évalue la qualité de la connexion wifi et déclenche une alarme sonore en cas de problème
 procédure équilibrage auto en mesurant vitesse de montée : en fait il faudrait une bonne estimation de rho_water, V_robot et alpha...
 peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer en cas d'erreur, le faire quitter dès qu'il y a une erreur et avoir un autre programme qui surveille sa présence et le relance s'il est arrêté. Il faut que le programme soit ensuite capable de reprendre là où il en était

@@ -244,6 +244,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						u = (rc_channels_override.chan3_raw-1500.0)/500.0;
 						uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
 						break;
+					case BLUEROV_ROBID:
 					case QUADRO_SIMULATOR_ROBID:
 					case COPTER_ROBID:
 					case ARDUCOPTER_ROBID:

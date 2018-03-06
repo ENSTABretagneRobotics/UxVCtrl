@@ -273,7 +273,6 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 #endif // USE_MOTORBOAT_WITH_FLUX
 				break;
 			case COPTER_ROBID:
-			case ARDUCOPTER_ROBID:
 			case SAUCISSE_ROBID:
 			case SARDINE_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
@@ -335,7 +334,6 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 #endif // USE_MOTORBOAT_WITH_FLUX
 		break;
 	case COPTER_ROBID:
-	case ARDUCOPTER_ROBID:
 	case SAUCISSE_ROBID:
 	case SARDINE_ROBID:
 		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);

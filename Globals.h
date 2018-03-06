@@ -74,6 +74,7 @@
 #define SAUCISSE_ROBID                0x00000002
 #define SARDINE_ROBID                 0x00000004
 #define CISCREA_ROBID                 0x00000020
+#define BLUEROV_ROBID                 0x00000040
 #define LIRMIA3_ROBID                 0x00000080
 #define BUBBLE_ROBID                  0x00000200
 #define MOTORBOAT_ROBID               0x00000400

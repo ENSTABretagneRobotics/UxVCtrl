@@ -15,6 +15,10 @@ COM12
 0.0
 % bDefaultVrToZero
 0
+% bDisableSendHeartbeat
+1
+% chrono_heartbeat_period
+1
 % bResetToDefault
 0
 % bDisableArmingCheck

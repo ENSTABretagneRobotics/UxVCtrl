@@ -30,7 +30,7 @@ COM9
 1
 % scanright (0 or 1)
 0
-% invert (0 or 1)
+% invert (0 if the sonar is head down, 1 if head up, inverted logic w.r.t. Seanet Pro or Micron Sonar software corresponding option)
 0
 % stareLLim (0 or 1)
 0

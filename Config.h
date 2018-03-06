@@ -860,6 +860,7 @@ inline int LoadConfig(void)
 	case SAUCISSE_ROBID:
 	case SARDINE_ROBID:
 	case CISCREA_ROBID:
+	case BLUEROV_ROBID:
 	case LIRMIA3_ROBID:
 	case BUBBLE_ROBID:
 	case MOTORBOAT_ROBID:

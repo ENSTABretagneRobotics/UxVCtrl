@@ -87,6 +87,8 @@ struct MAVLINKDEVICE
 	int quality_threshold;
 	double flow_comp_m_threshold;
 	BOOL bDefaultVrToZero;
+	BOOL bDisableSendHeartbeat;
+	double chrono_heartbeat_period;
 	BOOL bResetToDefault;
 	BOOL bDisableArmingCheck;
 	BOOL bOverridePWMAtStartup;
@@ -359,6 +361,30 @@ inline int ArmMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, BOOL bArm)
 	return EXIT_SUCCESS;
 }
 
+inline int SendHeartbeatMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice)
+{
+	unsigned char sendbuf[256];
+	int sendbuflen = 0;
+	mavlink_message_t msg;
+	mavlink_heartbeat_t heartbeat;
+
+	memset(&heartbeat, 0, sizeof(heartbeat));
+	heartbeat.autopilot = MAV_AUTOPILOT_INVALID;
+	heartbeat.base_mode = MAV_MODE_FLAG_SAFETY_ARMED;
+	heartbeat.system_status = MAV_STATE_ACTIVE;
+	heartbeat.type = MAV_TYPE_GCS;
+	mavlink_msg_heartbeat_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &heartbeat);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 // pw in us.
 inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedchannels, int* pws)
 {
@@ -437,6 +463,19 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	// Input 3 : Throttle.
 	// Input 4 : Yaw/rudder.
 	// Input 8 : AUX 4 (mode switch).
+
+	// ArduSub : 
+	// Input 1 : Pitch.
+	// Input 2 : Roll.
+	// Input 3 : Throttle.
+	// Input 4 : Yaw.
+	// Input 5 : Forward.
+	// Input 6 : Lateral.
+	// Input 7 : Reserved.
+	// Input 8 : Camera Tilt.
+	// Input 9 : Lights 1 Level.
+	// Input 10 : Lights 2 Level.
+	// Input 11 : Video Switch.
 
 	// Override PWM inputs. If PWM is 0, no override...
 	memset(&rc_override, 0, sizeof(rc_override));
@@ -518,6 +557,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		pMAVLinkDevice->quality_threshold = 1;
 		pMAVLinkDevice->flow_comp_m_threshold = 0.0;
 		pMAVLinkDevice->bDefaultVrToZero = 0;
+		pMAVLinkDevice->bDisableSendHeartbeat = 0;
+		pMAVLinkDevice->chrono_heartbeat_period = 1;
 		pMAVLinkDevice->bResetToDefault = 0;
 		pMAVLinkDevice->bDisableArmingCheck = 0;
 		pMAVLinkDevice->bOverridePWMAtStartup = 0;
@@ -559,6 +600,10 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (sscanf(line, "%lf", &pMAVLinkDevice->flow_comp_m_threshold) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->bDefaultVrToZero) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->bDisableSendHeartbeat) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMAVLinkDevice->chrono_heartbeat_period) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->bResetToDefault) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -689,6 +734,16 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 
 	mSleep(50);
 
+	if (!pMAVLinkDevice->bDisableSendHeartbeat)
+	{
+		if (SendHeartbeatMAVLinkDevice(pMAVLinkDevice) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a MAVLinkDevice : Heartbeat failure.\n");
+			CloseRS232Port(&pMAVLinkDevice->RS232Port);
+			return EXIT_FAILURE;
+		}
+		mSleep(50);
+	}
 	if (pMAVLinkDevice->bResetToDefault)
 	{
 		memset(&param_set, 0, sizeof(param_set));
