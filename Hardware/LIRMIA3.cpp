@@ -113,8 +113,6 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 				printf("Connection to a LIRMIA3 lost.\n");
 				bConnected = FALSE;
 				DisconnectLIRMIA3(&lirmia3);
-				mSleep(50);
-				break;
 			}
 			mSleep(50);
 		}

@@ -1,3 +1,6 @@
+212
+Corrected bug in LIRMIA3 that caused the program to exit whenever any communication error occurs.
+
 211
 Updated ReadMe.txt.
 Updated OpenCVGUI.

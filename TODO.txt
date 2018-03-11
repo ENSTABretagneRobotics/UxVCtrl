@@ -1,11 +1,22 @@
-brake si lateralthrust?
+Mavlink add option to not automatically remove failsafe
+Mavlinkdevice should send more than 8 rc override (attention à overridechan, à ignorer pour bluerov?)?
+Video support bluerov?
+Rajouter gestion udp mavlinkdevice ou même serial port
+mavlink pressure sensor?
+
+Faire guide d'utilisation et modification UxVCtrl, update sonarstaticlocstructured, sonartest
+Script to ease install of typical prereq, download all files
+Corriger comments sur alphas dans uxvctrl.txt pour saucisse et séparer cas miniking et micron
 compat : auto exclude from build and add option for xp and option to auto lauch build in release
+
+brake si lateralthrust?
 
 nmeainterface : send altitude, heading, pitch, roll compatible with seanet
 
-ardusub support for bluerov2, e.g. through mavlink serial port or TCP redir?
-
 On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en historique theta, corrigé en historique theta et position...
+Drawsonarscreenshot_seanetpro
+Indiquer pings utilisés pour localisation
+param zone morte sonar?
 
 bug ublox voit pas $gnrmc à cause des corrections rtk, du coup on doit activer gga?
 
