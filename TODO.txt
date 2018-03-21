@@ -1,17 +1,14 @@
-Mavlink add option to not automatically remove failsafe
-Mavlinkdevice should send more than 8 rc override (attention à overridechan, à ignorer pour bluerov?)?
+Mavlinkdevice should send more than 8 rc override (attention à overridechan, à ignorer pour bluerov?)? or through http://mavlink.org/messages/common#MANUAL_CONTROL...? Otherwise it seems that MAVLink 2.3 supports mor than 8 channels in RC override...
 Video support bluerov?
-Rajouter gestion udp mavlinkdevice ou même serial port
+Rajouter gestion udp mavlinkdevice ou même RS232Port.cpp
 mavlink pressure sensor?
 
 Faire guide d'utilisation et modification UxVCtrl, update sonarstaticlocstructured, sonartest
-Script to ease install of typical prereq, download all files
+Script to ease install of typical prereq, download all files, cmake...
 Corriger comments sur alphas dans uxvctrl.txt pour saucisse et séparer cas miniking et micron
 compat : auto exclude from build and add option for xp and option to auto lauch build in release
 
 brake si lateralthrust?
-
-nmeainterface : send altitude, heading, pitch, roll compatible with seanet
 
 On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en historique theta, corrigé en historique theta et position...
 Drawsonarscreenshot_seanetpro
@@ -54,7 +51,7 @@ RTL en repassant en option par le chemin
 rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
 
 peut-être paramètres pour bRollControl, bPitchControl, commands to selectively disable them...?
-need to check nmeainterface with e.g. u-center...
+need to check nmeainterface with e.g. u-center, send altitude, heading, pitch, roll compatible with seanet...
 arducopter : vérifier touches a,e remises au neutre, avec space, etc.
 
 update env to enable 3D, specify also altitude of sea floor...
@@ -119,8 +116,6 @@ minrange param, zone morte pour tous les sonar et echosondeurs...?
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
 
 Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planner...
-
-maybe bEnableRCMode always forces to use bEnableFullSpeedMode so they should be the same variable... 
 
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros

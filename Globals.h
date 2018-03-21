@@ -676,6 +676,7 @@ extern BOOL bShowSwitchInfo;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
 extern BOOL bRearmAutopilot;
+extern BOOL bForceDisarmAutopilot;
 extern BOOL bExit;
 extern BOOL bWaiting;
 extern BOOL bMissionRunning;

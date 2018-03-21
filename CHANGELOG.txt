@@ -1,3 +1,7 @@
+213
+Combined bEnableRCMode and bEnableFullSpeedMode to bEnableAltRCMode.
+Added disarm key.
+
 212
 Corrected bug in LIRMIA3 that caused the program to exit whenever any communication error occurs.
 

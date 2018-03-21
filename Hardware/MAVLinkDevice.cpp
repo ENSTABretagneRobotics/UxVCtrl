@@ -328,6 +328,20 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								mSleep(25);
 								bRearmAutopilot = FALSE;
 							}
+							if (bForceDisarmAutopilot)
+							{
+								if (ArmMAVLinkDevice(&mavlinkdevice, FALSE) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+								mSleep(25);
+								bForceDisarmAutopilot = FALSE;
+							}
 
 							memset(selectedchannels, 0, sizeof(selectedchannels));
 							memset(pws, 0, sizeof(pws));
@@ -389,6 +403,20 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								}
 								mSleep(25);
 								bRearmAutopilot = FALSE;
+							}
+							if (bForceDisarmAutopilot)
+							{
+								if (ArmMAVLinkDevice(&mavlinkdevice, FALSE) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+								mSleep(25);
+								bForceDisarmAutopilot = FALSE;
 							}
 
 							memset(selectedchannels, 0, sizeof(selectedchannels));

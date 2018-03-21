@@ -286,57 +286,60 @@ inline int ArmMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, BOOL bArm)
 	mavlink_command_long_t arm_command;
 	mavlink_set_mode_t set_mode;
 
-	if (pMAVLinkDevice->bDisableArmingCheck)
+	if (bArm)
 	{
-		// Disable all arm checks...
-		memset(&param_set, 0, sizeof(param_set));
-		sprintf(param_set.param_id, "ARMING_CHECK"); // http://ardupilot.org/plane/docs/parameters.html#arming-check-arm-checks-to-peform-bitmask
-		param_set.param_value = 0;
-		param_set.param_type = MAV_PARAM_TYPE_UINT32;
-		param_set.target_system = (uint8_t)pMAVLinkDevice->target_system;
-		param_set.target_component = (uint8_t)pMAVLinkDevice->target_component;
-		mavlink_msg_param_set_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &param_set);
+		if (pMAVLinkDevice->bDisableArmingCheck)
+		{
+			// Disable all arm checks...
+			memset(&param_set, 0, sizeof(param_set));
+			sprintf(param_set.param_id, "ARMING_CHECK"); // http://ardupilot.org/plane/docs/parameters.html#arming-check-arm-checks-to-peform-bitmask
+			param_set.param_value = 0;
+			param_set.param_type = MAV_PARAM_TYPE_UINT32;
+			param_set.target_system = (uint8_t)pMAVLinkDevice->target_system;
+			param_set.target_component = (uint8_t)pMAVLinkDevice->target_component;
+			mavlink_msg_param_set_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &param_set);
+
+			memset(sendbuf, 0, sizeof(sendbuf));
+			sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);
+			if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+			{
+				return EXIT_FAILURE;
+			}
+			mSleep(50);
+		}
+
+		// Try to force mode using deprecated command...
+		memset(&set_mode, 0, sizeof(set_mode));
+		set_mode.base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED;
+		set_mode.custom_mode = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+		set_mode.target_system = (uint8_t)pMAVLinkDevice->target_system;
+		mavlink_msg_set_mode_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &set_mode);
 
 		memset(sendbuf, 0, sizeof(sendbuf));
-		sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+		sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);
+		if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		mSleep(50);
+
+		// Try to force mode...
+		memset(&mode_command, 0, sizeof(mode_command));
+		mode_command.command = MAV_CMD_DO_SET_MODE;
+		mode_command.confirmation = 0;
+		mode_command.param1 = MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED;
+		mode_command.target_system = (uint8_t)pMAVLinkDevice->target_system;
+		mode_command.target_component = (uint8_t)pMAVLinkDevice->target_component;
+		mavlink_msg_command_long_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &mode_command);
+
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);
 		if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
 		}
 		mSleep(50);
 	}
-
-	// Try to force mode using deprecated command...
-	memset(&set_mode, 0, sizeof(set_mode));
-	set_mode.base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED;
-	set_mode.custom_mode = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
-	set_mode.target_system = (uint8_t)pMAVLinkDevice->target_system;
-	mavlink_msg_set_mode_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &set_mode);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
-
-	// Try to force mode...
-	memset(&mode_command, 0, sizeof(mode_command));
-	mode_command.command = MAV_CMD_DO_SET_MODE;
-	mode_command.confirmation = 0;
-	mode_command.param1 = MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED;
-	mode_command.target_system = (uint8_t)pMAVLinkDevice->target_system;
-	mode_command.target_component = (uint8_t)pMAVLinkDevice->target_component;
-	mavlink_msg_command_long_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &mode_command);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
-	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(50);
 
 	// Arm/disarm...
 	// Firmware ArduCopter 3.1.5 does not seem to support arm/disarm command, use the transmitter method 

@@ -34,8 +34,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispRecordSymbol = FALSE;
 	BOOL bDispPlaySymbol = FALSE;
 	BOOL bDispPauseSymbol = FALSE;
-	BOOL bEnableRCMode = FALSE;
-	BOOL bEnableFullSpeedMode = FALSE;
+	BOOL bEnableAltRCMode = FALSE;
 	BOOL bZQSDPressed = FALSE;
 	BOOL bExtendedMenu = FALSE;
 	BOOL bColorsExtendedMenu = FALSE;
@@ -67,18 +66,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	{
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:
-		bEnableRCMode = TRUE;
-		bEnableFullSpeedMode = TRUE;
+		bEnableAltRCMode = TRUE;
 		break;
 	case MOTORBOAT_ROBID:
 	case BUGGY_SIMULATOR_ROBID:
 	case BUGGY_ROBID:
-		bEnableRCMode = TRUE;
-		bEnableFullSpeedMode = TRUE;
+		bEnableAltRCMode = TRUE;
 		break;
 	default:
-		bEnableRCMode = FALSE;
-		bEnableFullSpeedMode = FALSE;
+		bEnableAltRCMode = FALSE;
 		break;
 	}
 
@@ -273,11 +269,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
-				if (bEnableFullSpeedMode) u = u_max;
+				if (bEnableAltRCMode) u = u_max;
 				break;
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
-				if (bEnableFullSpeedMode) u = u_max;
+				if (bEnableAltRCMode) u = u_max;
 				if (!bHeadingControl) uw = 0;
 				break;
 			default:
@@ -297,11 +293,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
-				if (bEnableFullSpeedMode) u = -u_max;
+				if (bEnableAltRCMode) u = -u_max;
 				break;
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
-				if (bEnableFullSpeedMode) u = -u_max;
+				if (bEnableAltRCMode) u = -u_max;
 				if (!bHeadingControl) uw = 0;
 				break;
 			default:
@@ -324,7 +320,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 				case BUBBLE_ROBID:
 				case ETAS_WHEEL_ROBID:
-					if (bEnableFullSpeedMode) uw = uw_max;
+					if (bEnableAltRCMode) uw = uw_max;
 					break;
 				default:
 					break;
@@ -346,7 +342,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 				case BUBBLE_ROBID:
 				case ETAS_WHEEL_ROBID:
-					if (bEnableFullSpeedMode) uw = -uw_max;
+					if (bEnableAltRCMode) uw = -uw_max;
 					break;
 				default:
 					break;
@@ -761,14 +757,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			printf("Rearm.\n");
 			break;
 		case '0':
-			bEnableRCMode = !bEnableRCMode;
-			if (bEnableRCMode) printf("RC mode enabled.\n");
-			else printf("RC mode disabled.\n");
+			bForceDisarmAutopilot = TRUE;
+			printf("Disarm.\n");
 			break;
 		case 'F':
-			bEnableFullSpeedMode = !bEnableFullSpeedMode;
-			if (bEnableFullSpeedMode) printf("Full speed mode enabled.\n");
-			else printf("Full speed mode disabled.\n");
+			bEnableAltRCMode = !bEnableAltRCMode;
+			if (bEnableAltRCMode) printf("Alternate RC mode enabled.\n");
+			else printf("Alternate RC mode disabled.\n");
 			break;
 		case '#':
 			bEnableSimulatedDVL = !bEnableSimulatedDVL;
@@ -845,7 +840,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bZQSDPressed)
 			{
 				bZQSDPressed = FALSE;
-				if (bEnableRCMode)
+				if (bEnableAltRCMode)
 				{
 					switch (robid)
 					{

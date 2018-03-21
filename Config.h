@@ -1901,7 +1901,7 @@ inline int DisplayKeys(void)
 		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),V(enable/disableautodvllocalization),"
 		"Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snapshot),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
-		"bn(light),uj(tilt),0(RC mode),F(ZQSD full mode),.(rearm),"
+		"bn(light),uj(tilt),F(alt RC mode),.(rearm),0(disarm),"
 		"ENTER(extended menu), ESC(exit)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
 		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDEAGLCONTROL_KEY]);

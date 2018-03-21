@@ -22,7 +22,7 @@ COM12
 % bResetToDefault
 0
 % bDisableArmingCheck
-1
+0
 % bOverridePWMAtStartup
 1
 % bForceStabilizeModeAtStartup
