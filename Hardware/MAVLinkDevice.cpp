@@ -280,6 +280,24 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						case 12:
 							if (mavlinkdata.rc_channels.chan12_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan12_raw > 1750)? TRUE: FALSE;
 							break;
+						case 13:
+							if (mavlinkdata.rc_channels.chan13_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan13_raw > 1750)? TRUE: FALSE;
+							break;
+						case 14:
+							if (mavlinkdata.rc_channels.chan14_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan14_raw > 1750)? TRUE: FALSE;
+							break;
+						case 15:
+							if (mavlinkdata.rc_channels.chan15_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan15_raw > 1750)? TRUE: FALSE;
+							break;
+						case 16:
+							if (mavlinkdata.rc_channels.chan16_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan16_raw > 1750)? TRUE: FALSE;
+							break;
+						case 17:
+							if (mavlinkdata.rc_channels.chan17_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan17_raw > 1750)? TRUE: FALSE;
+							break;
+						case 18:
+							if (mavlinkdata.rc_channels.chan18_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan18_raw > 1750)? TRUE: FALSE;
+							break;
 						default:
 							break;
 						}
@@ -354,7 +372,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 							pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 							pws[5] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							// 6 is reserved...
 							pws[7] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(tilt*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							pws[8] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*light-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+							pws[9] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*light-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 							LeaveCriticalSection(&StateVariablesCS);
 
 							pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
@@ -363,7 +384,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 							pws[4] = max(min(pws[4], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 							pws[5] = max(min(pws[5], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+							// 6 is reserved...
 							pws[7] = max(min(pws[7], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+							pws[8] = max(min(pws[8], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+							pws[9] = max(min(pws[9], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 
 							selectedchannels[0] = 1;
 							selectedchannels[1] = 1;
@@ -371,7 +395,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							selectedchannels[3] = 1;
 							selectedchannels[4] = 1;
 							selectedchannels[5] = 1;
+							// 6 is reserved...
 							selectedchannels[7] = 1;
+							selectedchannels[8] = 1;
+							selectedchannels[9] = 1;
 
 							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
 							{
@@ -469,6 +496,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"%d;%d;%.4f;%.4f;%d;%.3f;"
 						"%d;%f;%f;%f;%f;%f;%d;%d;%d;%f;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;"
+						"%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%.4f;%.4f;%.4f;"
 						"\n", 
@@ -479,6 +507,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						(int)mavlinkdata.optical_flow.flow_x, (int)mavlinkdata.optical_flow.flow_y, (double)mavlinkdata.optical_flow.flow_comp_m_x, (double)mavlinkdata.optical_flow.flow_comp_m_y, (int)mavlinkdata.optical_flow.quality, (double)mavlinkdata.optical_flow.ground_distance,
 						(int)mavlinkdata.optical_flow_rad.integration_time_us, (double)mavlinkdata.optical_flow_rad.integrated_x, (double)mavlinkdata.optical_flow_rad.integrated_y, (double)mavlinkdata.optical_flow_rad.integrated_xgyro, (double)mavlinkdata.optical_flow_rad.integrated_ygyro, (double)mavlinkdata.optical_flow_rad.integrated_zgyro, (int)mavlinkdata.optical_flow_rad.temperature, (int)mavlinkdata.optical_flow_rad.quality, (int)mavlinkdata.optical_flow_rad.time_delta_distance_us, (double)mavlinkdata.optical_flow_rad.distance,
 						(int)mavlinkdata.rc_channels_raw.chan1_raw, (int)mavlinkdata.rc_channels_raw.chan2_raw, (int)mavlinkdata.rc_channels_raw.chan3_raw, (int)mavlinkdata.rc_channels_raw.chan4_raw, (int)mavlinkdata.rc_channels_raw.chan5_raw, (int)mavlinkdata.rc_channels_raw.chan6_raw, (int)mavlinkdata.rc_channels_raw.chan7_raw, (int)mavlinkdata.rc_channels_raw.chan8_raw, 
+						(int)mavlinkdata.rc_channels.chan1_raw, (int)mavlinkdata.rc_channels.chan2_raw, (int)mavlinkdata.rc_channels.chan3_raw, (int)mavlinkdata.rc_channels.chan4_raw, (int)mavlinkdata.rc_channels.chan5_raw, (int)mavlinkdata.rc_channels.chan6_raw, (int)mavlinkdata.rc_channels.chan7_raw, (int)mavlinkdata.rc_channels.chan8_raw, (int)mavlinkdata.rc_channels.chan9_raw, (int)mavlinkdata.rc_channels.chan10_raw, (int)mavlinkdata.rc_channels.chan11_raw, (int)mavlinkdata.rc_channels.chan12_raw, (int)mavlinkdata.rc_channels.chan13_raw, (int)mavlinkdata.rc_channels.chan14_raw, (int)mavlinkdata.rc_channels.chan15_raw, (int)mavlinkdata.rc_channels.chan16_raw, (int)mavlinkdata.rc_channels.chan17_raw, (int)mavlinkdata.rc_channels.chan18_raw, 
 						(int)mavlinkdata.servo_output_raw.servo1_raw, (int)mavlinkdata.servo_output_raw.servo2_raw, (int)mavlinkdata.servo_output_raw.servo3_raw, (int)mavlinkdata.servo_output_raw.servo4_raw, (int)mavlinkdata.servo_output_raw.servo5_raw, (int)mavlinkdata.servo_output_raw.servo6_raw, (int)mavlinkdata.servo_output_raw.servo7_raw, (int)mavlinkdata.servo_output_raw.servo8_raw, 
 						(double)mavlinkdata.vfr_hud.airspeed, (double)mavlinkdata.vfr_hud.alt, (double)mavlinkdata.vfr_hud.climb
 						);

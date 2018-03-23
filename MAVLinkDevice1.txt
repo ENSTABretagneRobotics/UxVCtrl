@@ -29,6 +29,8 @@
 0
 % bArmAtStartup
 0
+% mavlink_comm (from 0 to 4)
+1
 % system_id
 255
 % component_id
@@ -37,8 +39,10 @@
 1
 % target_component
 1
-% overridechan (RC input channel used to disable RC override, from 1 to 12)
-9
+% bForceDefaultMAVLink1 (0 to enable default MAVLink v2 protocol, 1 to force to default MAVLink v1)
+1
+% overridechan (RC input channel used to disable RC override, from 1 to 18)
+17
 % channel 0
 % MinPW (in us)
 1000
@@ -153,6 +157,126 @@
 2000
 % InitPW (in us, 0 to disable channel)
 1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 8
+% MinPW (in us)
+800
+% MidPW (in us)
+800
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+800
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 9
+% MinPW (in us)
+800
+% MidPW (in us)
+800
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+800
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 10
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 11
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 12
+% MinPW (in us)
+1000
+% MidPW (in us)
+1000
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1000
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 13
+% MinPW (in us)
+1000
+% MidPW (in us)
+1500
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+1500
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 14
+% MinPW (in us)
+800
+% MidPW (in us)
+800
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+800
+% ThresholdPW (in us)
+10
+% CoefPW (-1 or 1)
+1
+% bProportionalPW (0 or 1)
+1
+% channel 15
+% MinPW (in us)
+800
+% MidPW (in us)
+800
+% MaxPW (in us)
+2000
+% InitPW (in us, 0 to disable channel)
+800
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)

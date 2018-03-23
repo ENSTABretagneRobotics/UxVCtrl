@@ -36,8 +36,8 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_MAVLINKDEVICE 2048
 
-// Only the 8 first channels are used for the moment...
-#define NB_CHANNELS_PWM_MAVLINKDEVICE 8
+// Only the 16 first channels are used for the moment...
+#define NB_CHANNELS_PWM_MAVLINKDEVICE 16
 
 // In us.
 #define DEFAULT_ABSOLUTE_MIN_PW_MAVLINKDEVICE 500
@@ -94,10 +94,12 @@ struct MAVLINKDEVICE
 	BOOL bOverridePWMAtStartup;
 	BOOL bForceStabilizeModeAtStartup;
 	BOOL bArmAtStartup;
+	int mavlink_comm;
 	int system_id;
 	int component_id;
 	int target_system;
 	int target_component;
+	BOOL bForceDefaultMAVLink1;
 	int overridechan;
 	int MinPWs[NB_CHANNELS_PWM_MAVLINKDEVICE];
 	int MidPWs[NB_CHANNELS_PWM_MAVLINKDEVICE];
@@ -221,8 +223,19 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 
 	for (i = 0; i < BytesReceived; ++i)
 	{
-		if (mavlink_parse_char(MAVLINK_COMM_0, recvbuf[i], &msg, &status))
+		if (mavlink_parse_char((uint8_t)pMAVLinkDevice->mavlink_comm, recvbuf[i], &msg, &status))
 		{
+
+			// https://mavlink.io/en/mavlink_2.html
+			// It is advisable to switch to MAVLink v2 when the communication partner sends MAVLink v2.
+			mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)pMAVLinkDevice->mavlink_comm);
+			// Check if we received version 2 and request a switch.
+			if (!(chan_state->flags & MAVLINK_STATUS_FLAG_IN_MAVLINK1))
+			{
+				// This will only switch to proto version 2.
+				chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+			}
+
 			// Packet received
 			//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
 			switch (msg.msgid)
@@ -490,6 +503,14 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	rc_override.chan6_raw = (uint16_t)pws_tmp[5];
 	rc_override.chan7_raw = (uint16_t)pws_tmp[6];
 	rc_override.chan8_raw = (uint16_t)pws_tmp[7];
+	rc_override.chan9_raw = (uint16_t)pws_tmp[8];
+	rc_override.chan10_raw = (uint16_t)pws_tmp[9];
+	rc_override.chan11_raw = (uint16_t)pws_tmp[10];
+	rc_override.chan12_raw = (uint16_t)pws_tmp[11];
+	rc_override.chan13_raw = (uint16_t)pws_tmp[12];
+	rc_override.chan14_raw = (uint16_t)pws_tmp[13];
+	rc_override.chan15_raw = (uint16_t)pws_tmp[14];
+	rc_override.chan16_raw = (uint16_t)pws_tmp[15];
 	rc_override.target_system = (uint8_t)pMAVLinkDevice->target_system;
 	rc_override.target_component = (uint8_t)pMAVLinkDevice->target_component;
 	mavlink_msg_rc_channels_override_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &rc_override);
@@ -567,11 +588,13 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		pMAVLinkDevice->bOverridePWMAtStartup = 0;
 		pMAVLinkDevice->bForceStabilizeModeAtStartup = 0;
 		pMAVLinkDevice->bArmAtStartup = 0;
+		pMAVLinkDevice->mavlink_comm = 0;
 		pMAVLinkDevice->system_id = 255;
 		pMAVLinkDevice->component_id = 0;
 		pMAVLinkDevice->target_system = 1;
 		pMAVLinkDevice->target_component = 0;
-		pMAVLinkDevice->overridechan = 9;
+		pMAVLinkDevice->bForceDefaultMAVLink1 = 1;
+		pMAVLinkDevice->overridechan = 17;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
 		{
 			pMAVLinkDevice->MinPWs[channel] = 1000;
@@ -618,6 +641,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->bArmAtStartup) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->mavlink_comm) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->system_id) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->component_id) != 1) printf("Invalid configuration file.\n");
@@ -625,6 +650,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (sscanf(line, "%d", &pMAVLinkDevice->target_system) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->target_component) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->bForceDefaultMAVLink1) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->overridechan) != 1) printf("Invalid configuration file.\n");
 
@@ -679,10 +706,10 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		printf("Invalid parameter : target_component.\n");
 		pMAVLinkDevice->target_component = 0;
 	}
-	if ((pMAVLinkDevice->overridechan < 1)||(pMAVLinkDevice->overridechan > 12))
+	if ((pMAVLinkDevice->overridechan < 1)||(pMAVLinkDevice->overridechan > 18))
 	{
 		printf("Invalid parameter : overridechan.\n");
-		pMAVLinkDevice->overridechan = 9;
+		pMAVLinkDevice->overridechan = 17;
 	}
 
 	for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
@@ -737,6 +764,13 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 
 	mSleep(50);
 
+	if (pMAVLinkDevice->bForceDefaultMAVLink1)
+	{
+		// https://mavlink.io/en/mavlink_2.html
+		// The v2 library will send packets in MAVLink v2 framing by default. In order to default to v1, run this code snippet on boot :
+		mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)pMAVLinkDevice->mavlink_comm);
+		chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
+	}
 	if (!pMAVLinkDevice->bDisableSendHeartbeat)
 	{
 		if (SendHeartbeatMAVLinkDevice(pMAVLinkDevice) != EXIT_SUCCESS)
@@ -1003,6 +1037,14 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		rc_override.chan6_raw = (uint16_t)pMAVLinkDevice->InitPWs[5];
 		rc_override.chan7_raw = (uint16_t)pMAVLinkDevice->InitPWs[6];
 		rc_override.chan8_raw = (uint16_t)pMAVLinkDevice->InitPWs[7];
+		rc_override.chan9_raw = (uint16_t)pMAVLinkDevice->InitPWs[8];
+		rc_override.chan10_raw = (uint16_t)pMAVLinkDevice->InitPWs[9];
+		rc_override.chan11_raw = (uint16_t)pMAVLinkDevice->InitPWs[10];
+		rc_override.chan12_raw = (uint16_t)pMAVLinkDevice->InitPWs[11];
+		rc_override.chan13_raw = (uint16_t)pMAVLinkDevice->InitPWs[12];
+		rc_override.chan14_raw = (uint16_t)pMAVLinkDevice->InitPWs[13];
+		rc_override.chan15_raw = (uint16_t)pMAVLinkDevice->InitPWs[14];
+		rc_override.chan16_raw = (uint16_t)pMAVLinkDevice->InitPWs[15];
 		rc_override.target_system = (uint8_t)pMAVLinkDevice->target_system;
 		rc_override.target_component = (uint8_t)pMAVLinkDevice->target_component;
 		mavlink_msg_rc_channels_override_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &rc_override);
