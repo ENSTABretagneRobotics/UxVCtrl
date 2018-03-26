@@ -63,13 +63,16 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	
 	EnterCriticalSection(&StateVariablesCS);
 
-	if (MAVLinkInterfaceForceDefaultMAVLink1)
+	// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
+	if (bForceDefaultMAVLink1MAVLinkInterface)
 	{
 		// https://mavlink.io/en/mavlink_2.html
 		// The v2 library will send packets in MAVLink v2 framing by default. In order to default to v1, run this code snippet on boot :
 		mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)MAVLinkInterface_mavlink_comm);
 		chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
 	}
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 
 	memset(&heartbeat, 0, sizeof(mavlink_heartbeat_t));
 	heartbeat.autopilot = MAV_AUTOPILOT_INVALID;
@@ -204,15 +207,21 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 			if (mavlink_parse_char((uint8_t)MAVLinkInterface_mavlink_comm, recvbuf[i], &msg, &status))
 			{
 
-				// https://mavlink.io/en/mavlink_2.html
-				// It is advisable to switch to MAVLink v2 when the communication partner sends MAVLink v2.
-				mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)MAVLinkInterface_mavlink_comm);
-				// Check if we received version 2 and request a switch.
-				if (!(chan_state->flags & MAVLINK_STATUS_FLAG_IN_MAVLINK1))
+	// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
+				if (bForceDefaultMAVLink1MAVLinkInterface)
 				{
-					// This will only switch to proto version 2.
-					chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+					// https://mavlink.io/en/mavlink_2.html
+					// It is advisable to switch to MAVLink v2 when the communication partner sends MAVLink v2.
+					// Check if we received version 2 and request a switch.
+					if (!(status.flags & MAVLINK_STATUS_FLAG_IN_MAVLINK1))
+					{
+						mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)MAVLinkInterface_mavlink_comm);
+						// This will only switch to proto version 2.
+						chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+					}
 				}
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 
 				// Packet received
 				//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);

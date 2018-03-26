@@ -226,15 +226,21 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 		if (mavlink_parse_char((uint8_t)pMAVLinkDevice->mavlink_comm, recvbuf[i], &msg, &status))
 		{
 
-			// https://mavlink.io/en/mavlink_2.html
-			// It is advisable to switch to MAVLink v2 when the communication partner sends MAVLink v2.
-			mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)pMAVLinkDevice->mavlink_comm);
-			// Check if we received version 2 and request a switch.
-			if (!(chan_state->flags & MAVLINK_STATUS_FLAG_IN_MAVLINK1))
+			// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
+			if (pMAVLinkDevice->bForceDefaultMAVLink1)
 			{
-				// This will only switch to proto version 2.
-				chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+				// https://mavlink.io/en/mavlink_2.html
+				// It is advisable to switch to MAVLink v2 when the communication partner sends MAVLink v2.
+				// Check if we received version 2 and request a switch.
+				if (!(status.flags & MAVLINK_STATUS_FLAG_IN_MAVLINK1))
+				{
+					mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)pMAVLinkDevice->mavlink_comm);
+					// This will only switch to proto version 2.
+					chan_state->flags &= ~(MAVLINK_STATUS_FLAG_OUT_MAVLINK1);
+				}
 			}
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 
 			// Packet received
 			//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
@@ -503,6 +509,8 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	rc_override.chan6_raw = (uint16_t)pws_tmp[5];
 	rc_override.chan7_raw = (uint16_t)pws_tmp[6];
 	rc_override.chan8_raw = (uint16_t)pws_tmp[7];
+	// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 	rc_override.chan9_raw = (uint16_t)pws_tmp[8];
 	rc_override.chan10_raw = (uint16_t)pws_tmp[9];
 	rc_override.chan11_raw = (uint16_t)pws_tmp[10];
@@ -511,6 +519,7 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	rc_override.chan14_raw = (uint16_t)pws_tmp[13];
 	rc_override.chan15_raw = (uint16_t)pws_tmp[14];
 	rc_override.chan16_raw = (uint16_t)pws_tmp[15];
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 	rc_override.target_system = (uint8_t)pMAVLinkDevice->target_system;
 	rc_override.target_component = (uint8_t)pMAVLinkDevice->target_component;
 	mavlink_msg_rc_channels_override_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &rc_override);
@@ -764,6 +773,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 
 	mSleep(50);
 
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 	if (pMAVLinkDevice->bForceDefaultMAVLink1)
 	{
 		// https://mavlink.io/en/mavlink_2.html
@@ -771,6 +781,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		mavlink_status_t* chan_state = mavlink_get_channel_status((uint8_t)pMAVLinkDevice->mavlink_comm);
 		chan_state->flags |= MAVLINK_STATUS_FLAG_OUT_MAVLINK1;
 	}
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 	if (!pMAVLinkDevice->bDisableSendHeartbeat)
 	{
 		if (SendHeartbeatMAVLinkDevice(pMAVLinkDevice) != EXIT_SUCCESS)
@@ -1037,6 +1048,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		rc_override.chan6_raw = (uint16_t)pMAVLinkDevice->InitPWs[5];
 		rc_override.chan7_raw = (uint16_t)pMAVLinkDevice->InitPWs[6];
 		rc_override.chan8_raw = (uint16_t)pMAVLinkDevice->InitPWs[7];
+	// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 		rc_override.chan9_raw = (uint16_t)pMAVLinkDevice->InitPWs[8];
 		rc_override.chan10_raw = (uint16_t)pMAVLinkDevice->InitPWs[9];
 		rc_override.chan11_raw = (uint16_t)pMAVLinkDevice->InitPWs[10];
@@ -1045,6 +1058,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		rc_override.chan14_raw = (uint16_t)pMAVLinkDevice->InitPWs[13];
 		rc_override.chan15_raw = (uint16_t)pMAVLinkDevice->InitPWs[14];
 		rc_override.chan16_raw = (uint16_t)pMAVLinkDevice->InitPWs[15];
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 		rc_override.target_system = (uint8_t)pMAVLinkDevice->target_system;
 		rc_override.target_component = (uint8_t)pMAVLinkDevice->target_component;
 		mavlink_msg_rc_channels_override_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &rc_override);

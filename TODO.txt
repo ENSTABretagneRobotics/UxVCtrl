@@ -1,10 +1,10 @@
-need to update http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip, SBG, BlueView...
+indicate in next release that should update mavlink!
 
-MAVLinkInterface_mavlink_comm, MAVLinkInterfaceForceDefaultMAVLink1 to add as parameters...?
-
-Mavlinkdevice add param  PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
 http://mavlink.org/messages/common#MANUAL_CONTROL...?
 Rajouter gestion udp mavlinkdevice ou même RS232Port.cpp
+Mavlinkdevice add param  PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
+
+Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
 
 Faire guide d'utilisation et modification UxVCtrl, update sonarstaticlocstructured, sonartest
 Script to ease install of typical prereq, download all files, cmake...

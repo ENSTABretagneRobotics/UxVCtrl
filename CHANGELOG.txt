@@ -1,3 +1,8 @@
+215
+Attempt to correct bug in autoswitch to MAVLink v2.
+Added parameters MAVLinkInterface_mavlink_comm and bForceDefaultMAVLink1MAVLinkInterface.
+Added N key to set camera tilt to neutral position.
+
 214
 Upgraded to MAVLink v2.
 

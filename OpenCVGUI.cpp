@@ -544,6 +544,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			tilt -= 0.1;
 			tilt = (tilt < -1)? -1: tilt;
 			break;
+		case 'N': tilt = 0; break;
 		case 'o': bOSD = !bOSD; break;
 		case 'c': bOrientationCircle = !bOrientationCircle; break;
 		case 'm':

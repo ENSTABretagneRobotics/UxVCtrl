@@ -261,7 +261,7 @@ extern int MAVLinkInterfaceTimeout;
 extern int MAVLinkInterface_mavlink_comm;
 extern int MAVLinkInterface_system_id;
 extern int MAVLinkInterface_component_id;
-extern BOOL MAVLinkInterfaceForceDefaultMAVLink1;
+extern BOOL bForceDefaultMAVLink1MAVLinkInterface;
 extern BOOL bDisableMAVLinkInterfaceIN;
 extern BOOL bNMEAInterface;
 extern char szNMEAInterfacePath[MAX_BUF_LEN];

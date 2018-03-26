@@ -54,10 +54,14 @@ WMV2
 115200
 % MAVLinkInterfaceTimeout (in ms)
 1500
+% MAVLinkInterface_mavlink_comm (from 0 to 4)
+4
 % MAVLinkInterface_system_id
 1
 % MAVLinkInterface_component_id
 0
+% bForceDefaultMAVLink1MAVLinkInterface (0 to enable default MAVLink v2 protocol, 1 to force to default MAVLink v1)
+1
 % bDisableMAVLinkInterfaceIN
 0
 % bNMEAInterface

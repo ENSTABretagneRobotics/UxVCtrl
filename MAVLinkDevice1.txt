@@ -195,13 +195,13 @@
 1
 % channel 10
 % MinPW (in us)
-1000
+800
 % MidPW (in us)
-1500
+800
 % MaxPW (in us)
 2000
 % InitPW (in us, 0 to disable channel)
-1500
+800
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -210,13 +210,13 @@
 1
 % channel 11
 % MinPW (in us)
-1000
+800
 % MidPW (in us)
-1500
+800
 % MaxPW (in us)
 2000
 % InitPW (in us, 0 to disable channel)
-1500
+800
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -225,13 +225,13 @@
 1
 % channel 12
 % MinPW (in us)
-1000
+800
 % MidPW (in us)
-1000
+800
 % MaxPW (in us)
 2000
 % InitPW (in us, 0 to disable channel)
-1000
+800
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -240,13 +240,13 @@
 1
 % channel 13
 % MinPW (in us)
-1000
+800
 % MidPW (in us)
-1500
+800
 % MaxPW (in us)
 2000
 % InitPW (in us, 0 to disable channel)
-1500
+800
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
