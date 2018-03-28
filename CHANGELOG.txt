@@ -1,3 +1,7 @@
+216
+Added drconfig, lights and cameratilt commands.
+Added partial support of MANUAL_CONTROL MAVLink message.
+
 215
 Attempt to correct bug in autoswitch to MAVLink v2.
 Added parameters MAVLinkInterface_mavlink_comm and bForceDefaultMAVLink1MAVLinkInterface.

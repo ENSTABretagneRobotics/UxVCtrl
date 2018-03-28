@@ -15,6 +15,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	MAVLINKDEVICE mavlinkdevice;
 	struct timeval tv;
 	MAVLINKDATA mavlinkdata;
+	int x_axis = 0, y_axis = 0, z_axis = 0, r_axis = 0;
+	unsigned int buttons = 0;
 	CHRONO chrono_GPSOK;
 	CHRONO chrono_heartbeat;
 	BOOL bConnected = FALSE;
@@ -361,53 +363,96 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								bForceDisarmAutopilot = FALSE;
 							}
 
-							memset(selectedchannels, 0, sizeof(selectedchannels));
-							memset(pws, 0, sizeof(pws));
-
-							EnterCriticalSection(&StateVariablesCS);
-							// Convert u (in [-1;1]) into pulse width (in us).
-							pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(up*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ur*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[5] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							// 6 is reserved...
-							pws[7] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(tilt*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[8] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*light-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[9] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*light-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							LeaveCriticalSection(&StateVariablesCS);
-
-							pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[4] = max(min(pws[4], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[5] = max(min(pws[5], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							// 6 is reserved...
-							pws[7] = max(min(pws[7], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[8] = max(min(pws[8], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[9] = max(min(pws[9], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-
-							selectedchannels[0] = 1;
-							selectedchannels[1] = 1;
-							selectedchannels[2] = 1;
-							selectedchannels[3] = 1;
-							selectedchannels[4] = 1;
-							selectedchannels[5] = 1;
-							// 6 is reserved...
-							selectedchannels[7] = 1;
-							selectedchannels[8] = 1;
-							selectedchannels[9] = 1;
-
-							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+							if (mavlinkdevice.ManualControlMode != 1)
 							{
-								printf("Connection to a MAVLinkDevice lost.\n");
-								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-								bConnected = FALSE;
-								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
-								break;
+								memset(selectedchannels, 0, sizeof(selectedchannels));
+								memset(pws, 0, sizeof(pws));
+
+								EnterCriticalSection(&StateVariablesCS);
+								// Convert u (in [-1;1]) into pulse width (in us).
+								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(up*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ur*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[5] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								// 6 is reserved...
+								pws[7] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(cameratilt*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[8] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*lights-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[9] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*lights-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								LeaveCriticalSection(&StateVariablesCS);
+
+								pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[4] = max(min(pws[4], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[5] = max(min(pws[5], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								// 6 is reserved...
+								pws[7] = max(min(pws[7], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[8] = max(min(pws[8], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[9] = max(min(pws[9], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+
+								selectedchannels[0] = 1;
+								selectedchannels[1] = 1;
+								selectedchannels[2] = 1;
+								selectedchannels[3] = 1;
+								selectedchannels[4] = 1;
+								selectedchannels[5] = 1;
+								// 6 is reserved...
+								selectedchannels[7] = 1;
+								selectedchannels[8] = 1;
+								selectedchannels[9] = 1;
+
+								if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+							}
+							if (mavlinkdevice.ManualControlMode == 1)
+							{
+								EnterCriticalSection(&StateVariablesCS);
+								x_axis = (int)(1000*u); y_axis = (int)(1000*ul); z_axis = (int)(1000*uv); r_axis = (int)(1000*uw);
+								buttons = joystick_buttons;
+								joystick_buttons = 0;
+								LeaveCriticalSection(&StateVariablesCS);
+
+								x_axis = max(min(x_axis, 1000), -1000);
+								y_axis = max(min(x_axis, 1000), -1000);
+								z_axis = max(min(x_axis, 1000), -1000);
+								r_axis = max(min(x_axis, 1000), -1000);
+
+								if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+							}
+							if (mavlinkdevice.ManualControlMode == 2)
+							{
+								EnterCriticalSection(&StateVariablesCS);
+								buttons = joystick_buttons;
+								joystick_buttons = 0;
+								LeaveCriticalSection(&StateVariablesCS);
+
+								if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
 							}
 							mSleep(25);
 							break;
@@ -446,35 +491,78 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								bForceDisarmAutopilot = FALSE;
 							}
 
-							memset(selectedchannels, 0, sizeof(selectedchannels));
-							memset(pws, 0, sizeof(pws));
-
-							EnterCriticalSection(&StateVariablesCS);
-							// Convert u (in [-1;1]) into pulse width (in us).
-							pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-							LeaveCriticalSection(&StateVariablesCS);
-
-							pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-							pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-
-							selectedchannels[0] = 1;
-							selectedchannels[1] = 1;
-							selectedchannels[2] = 1;
-							selectedchannels[3] = 1;
-
-							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+							if (mavlinkdevice.ManualControlMode != 1)
 							{
-								printf("Connection to a MAVLinkDevice lost.\n");
-								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-								bConnected = FALSE;
-								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
-								break;
+								memset(selectedchannels, 0, sizeof(selectedchannels));
+								memset(pws, 0, sizeof(pws));
+
+								EnterCriticalSection(&StateVariablesCS);
+								// Convert u (in [-1;1]) into pulse width (in us).
+								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								LeaveCriticalSection(&StateVariablesCS);
+
+								pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+
+								selectedchannels[0] = 1;
+								selectedchannels[1] = 1;
+								selectedchannels[2] = 1;
+								selectedchannels[3] = 1;
+
+								if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+							}
+							if (mavlinkdevice.ManualControlMode == 1)
+							{
+								EnterCriticalSection(&StateVariablesCS);
+								x_axis = (int)(1000*u); y_axis = (int)(1000*ul); z_axis = (int)(1000*uv); r_axis = (int)(1000*uw);
+								buttons = joystick_buttons;
+								joystick_buttons = 0;
+								LeaveCriticalSection(&StateVariablesCS);
+
+								x_axis = max(min(x_axis, 1000), -1000);
+								y_axis = max(min(x_axis, 1000), -1000);
+								z_axis = max(min(x_axis, 1000), -1000);
+								r_axis = max(min(x_axis, 1000), -1000);
+
+								if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
+							}
+							if (mavlinkdevice.ManualControlMode == 2)
+							{
+								EnterCriticalSection(&StateVariablesCS);
+								buttons = joystick_buttons;
+								joystick_buttons = 0;
+								LeaveCriticalSection(&StateVariablesCS);
+
+								if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
+								{
+									printf("Connection to a MAVLinkDevice lost.\n");
+									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+									bConnected = FALSE;
+									DisconnectMAVLinkDevice(&mavlinkdevice);
+									mSleep(50);
+									break;
+								}
 							}
 							mSleep(25);
 							break;

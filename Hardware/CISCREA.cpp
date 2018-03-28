@@ -122,8 +122,8 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 				value_reg[3] = cM_value(param4, (int)(100*u2));
 				value_reg[4] = cM_value(param5, -(int)(100*u3));
 
-				light_ciscrea = (int)(light*100);
-				tilt_ciscrea = (int)(tilt*100);
+				light_ciscrea = (int)(lights*100);
+				tilt_ciscrea = (int)(cameratilt*100);
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}

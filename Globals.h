@@ -242,7 +242,9 @@ extern double opi_x, opi_y;
 // u1 : right, u2 : left, u3 : bottom.
 extern double u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14;
 
-extern double light, tilt;
+extern double lights, cameratilt;
+
+extern unsigned int joystick_buttons;
 
 extern double rudderminangle, ruddermaxangle;
 

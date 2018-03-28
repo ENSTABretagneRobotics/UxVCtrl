@@ -325,7 +325,7 @@ WMV2
 0.7
 %0.7 for submarines
 %0.7 for Buggy
-% alphaomegazhat.sup 
+% alphaomegazhat.sup
 0.8
 %0.8 for submarines
 %0.8 for Buggy

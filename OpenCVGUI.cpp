@@ -529,22 +529,24 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			//else printf("Roll control disabled.\n");
 			break;
 		case 'b':
-			light += 0.1;
-			light = (light > 1)? 1: light;
+			lights += 0.1;
+			lights = (lights > 1)? 1: lights;
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<13);
 			break;
 		case 'n':
-			light -= 0.1;
-			light = (light < 0)? 0: light;
+			lights -= 0.1;
+			lights = (lights < 0)? 0: lights;
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<14);
 			break;
 		case 'u':
-			tilt += 0.1;
-			tilt = (tilt > 1)? 1: tilt;
+			cameratilt += 0.1;
+			cameratilt = (cameratilt > 1)? 1: cameratilt;
 			break;
 		case 'j':
-			tilt -= 0.1;
-			tilt = (tilt < -1)? -1: tilt;
+			cameratilt -= 0.1;
+			cameratilt = (cameratilt < -1)? -1: cameratilt;
 			break;
-		case 'N': tilt = 0; break;
+		case 'N': cameratilt = 0; break;
 		case 'o': bOSD = !bOSD; break;
 		case 'c': bOrientationCircle = !bOrientationCircle; break;
 		case 'm':

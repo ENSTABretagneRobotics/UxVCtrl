@@ -100,6 +100,7 @@ struct MAVLINKDEVICE
 	int target_system;
 	int target_component;
 	BOOL bForceDefaultMAVLink1;
+	int ManualControlMode;
 	int overridechan;
 	int MinPWs[NB_CHANNELS_PWM_MAVLINKDEVICE];
 	int MidPWs[NB_CHANNELS_PWM_MAVLINKDEVICE];
@@ -407,6 +408,31 @@ inline int SendHeartbeatMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice)
 	return EXIT_SUCCESS;
 }
 
+inline int ManualControlMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int x, int y, int z, int r, unsigned int buttons)
+{
+	unsigned char sendbuf[256];
+	int sendbuflen = 0;
+	mavlink_message_t msg;
+	mavlink_manual_control_t manual_control;
+
+	manual_control.x = (int16_t)x;
+	manual_control.y = (int16_t)y;
+	manual_control.z = (int16_t)z;
+	manual_control.r = (int16_t)r;
+	manual_control.buttons = (uint16_t)buttons;
+	manual_control.target = (uint8_t)pMAVLinkDevice->target_system;
+	mavlink_msg_manual_control_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &manual_control);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 // pw in us.
 inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedchannels, int* pws)
 {
@@ -603,6 +629,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		pMAVLinkDevice->target_system = 1;
 		pMAVLinkDevice->target_component = 0;
 		pMAVLinkDevice->bForceDefaultMAVLink1 = 1;
+		pMAVLinkDevice->ManualControlMode = 0;
 		pMAVLinkDevice->overridechan = 17;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
 		{
@@ -661,6 +688,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (sscanf(line, "%d", &pMAVLinkDevice->target_component) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->bForceDefaultMAVLink1) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->ManualControlMode) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->overridechan) != 1) printf("Invalid configuration file.\n");
 

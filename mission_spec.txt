@@ -88,6 +88,8 @@
 %
 %setstateestimation x xerr y yerr z zerr psi psierr vrx vrxerr omegaz omegazerr (x, xerr, y, yerr, z, zerr, psi, psierr, vrx, vrxerr : double ]-oo,oo[ current state estimation and errors to indicate to the default dead reckoning localization algorithm the current submarine state in the environment coordinate system. Usually used in the beginning of a mission to indicate the starting point. This replaces any previously estimated position)
 %
+%drconfig alphavrxhat.inf alphavrxhat.sup alphaomegazhat.inf alphaomegazhat.sup alphafvrxhat.inf alphafvrxhat.sup alphafomegazhat.inf alphafomegazhat.sup alphazhat.inf alphazhat.sup vzuphat.inf vzuphat.sup
+%
 %staticsonarlocalization t [nbretries, retryperiod?] (double [0,oo[ timeout in s, the function blocks until the timeout is reached[, nbretries : int [0,oo[ number of retries if the algorithm reports that the data might be unreliable, make the robot go backward and turn a little bit before a retry], this command can be used when the submarine is stopped to get a better estimation of the current position using sonar. If the algorithm reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
 %
 %enabledynamicsonarlocalization
@@ -307,6 +309,10 @@
 %startvideorecording videoid (int)
 %
 %stopvideorecording videoid (int)
+%
+%cameratilt u (double [-1,1])
+%
+%lights u (double [0,1])
 %
 %call mission.txt (only used from command-line)
 %

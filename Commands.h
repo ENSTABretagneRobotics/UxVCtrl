@@ -1178,6 +1178,24 @@ inline int Commands(char* line)
 		omegazhat = interval(dval11-dval12,dval11+dval12);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else if (sscanf(line, "drconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		alphavrxhat.inf = dval1;
+		alphavrxhat.sup = dval2;
+		alphaomegazhat.inf = dval3;
+		alphaomegazhat.sup = dval4;
+		alphafvrxhat.inf = dval5;
+		alphafvrxhat.sup = dval6;
+		alphafomegazhat.inf = dval7;
+		alphafomegazhat.sup = dval8;
+		alphazhat.inf = dval9;
+		alphazhat.sup = dval10;
+		vzuphat.inf = dval11;
+		vzuphat.sup = dval12;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "staticsonarlocalization %lf", &delay) == 1)
 	{
 		delay = fabs(delay);
@@ -2774,6 +2792,26 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+	}
+	else if (sscanf(line, "cameratilt %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		cameratilt = dval;
+		cameratilt = (cameratilt > 1)? 1: cameratilt;
+		cameratilt = (cameratilt < -1)? -1: cameratilt;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "lights %lf", &dval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID)
+		{
+			if (dval > lights) joystick_buttons |= (1<<13); else joystick_buttons |= (1<<14);
+		}
+		lights = dval;
+		lights = (lights > 1)? 1: lights;
+		lights = (lights < 0)? 0: lights;
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "call %[^\r\n]255s", str) == 1)
 	{

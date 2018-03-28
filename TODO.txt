@@ -1,8 +1,7 @@
 indicate in next release that should update mavlink!
 
-http://mavlink.org/messages/common#MANUAL_CONTROL...?
 Rajouter gestion udp mavlinkdevice ou même RS232Port.cpp
-Mavlinkdevice add param  PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
+Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
 
 Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
 

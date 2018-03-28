@@ -69,7 +69,9 @@ double opi_x = 0, opi_y = 0;
 // u1 : right, u2 : left, u3 : bottom.
 double u1 = 0, u2 = 0, u3 = 0, u4 = 0, u5 = 0, u6 = 0, u7 = 0, u8 = 0, u9 = 0, u10 = 0, u11 = 0, u12 = 0, u13 = 0, u14 = 0;
 
-double light = 0, tilt = 0;
+double lights = 0, cameratilt = 0;
+
+unsigned int joystick_buttons = 0;
 
 double rudderminangle = 0, ruddermaxangle = 0;
 
