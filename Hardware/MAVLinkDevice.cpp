@@ -417,15 +417,16 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							if (mavlinkdevice.ManualControlMode == 1)
 							{
 								EnterCriticalSection(&StateVariablesCS);
-								x_axis = (int)(1000*u); y_axis = (int)(1000*ul); z_axis = (int)(1000*uv); r_axis = (int)(1000*uw);
+								// https://github.com/bluerobotics/ardusub/issues/24
+								x_axis = (int)(1000*u); y_axis = (int)(-1000*ul); z_axis = (int)(500*uv+500); r_axis = (int)(-1000*uw);
 								buttons = joystick_buttons;
 								joystick_buttons = 0;
 								LeaveCriticalSection(&StateVariablesCS);
 
 								x_axis = max(min(x_axis, 1000), -1000);
-								y_axis = max(min(x_axis, 1000), -1000);
-								z_axis = max(min(x_axis, 1000), -1000);
-								r_axis = max(min(x_axis, 1000), -1000);
+								y_axis = max(min(y_axis, 1000), -1000);
+								z_axis = max(min(z_axis, 1000), 0);
+								r_axis = max(min(r_axis, 1000), -1000);
 
 								if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
 								{
@@ -533,9 +534,9 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								LeaveCriticalSection(&StateVariablesCS);
 
 								x_axis = max(min(x_axis, 1000), -1000);
-								y_axis = max(min(x_axis, 1000), -1000);
-								z_axis = max(min(x_axis, 1000), -1000);
-								r_axis = max(min(x_axis, 1000), -1000);
+								y_axis = max(min(y_axis, 1000), -1000);
+								z_axis = max(min(z_axis, 1000), -1000);
+								r_axis = max(min(r_axis, 1000), -1000);
 
 								if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
 								{

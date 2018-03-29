@@ -2793,12 +2793,60 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (strncmp(line, "cameratiltup", strlen("cameratiltup")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<10);
+		cameratilt += 0.1;
+		cameratilt = (cameratilt > 1)? 1: cameratilt;
+		cameratilt = (cameratilt < -1)? -1: cameratilt;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (strncmp(line, "cameratiltdown", strlen("cameratiltdown")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<9);
+		cameratilt -= 0.1;
+		cameratilt = (cameratilt > 1)? 1: cameratilt;
+		cameratilt = (cameratilt < -1)? -1: cameratilt;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (strncmp(line, "cameratiltcenter", strlen("cameratiltcenter")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<7);
+		cameratilt = 0;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "cameratilt %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID)
+		{
+			// Might not work well...
+			if (dval == 0) joystick_buttons |= (1<<7); else	if (dval > cameratilt) joystick_buttons |= (1<<10); else if (dval < cameratilt) joystick_buttons |= (1<<9);
+		}
 		cameratilt = dval;
 		cameratilt = (cameratilt > 1)? 1: cameratilt;
 		cameratilt = (cameratilt < -1)? -1: cameratilt;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (strncmp(line, "lightsbrighter", strlen("lightsbrighter")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<14);
+		lights += 0.1;
+		lights = (lights > 1)? 1: lights;
+		lights = (lights < 0)? 0: lights;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (strncmp(line, "lightsdimmer", strlen("lightsdimmer")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<13);
+		lights -= 0.1;
+		lights = (lights > 1)? 1: lights;
+		lights = (lights < 0)? 0: lights;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "lights %lf", &dval) == 1)
@@ -2806,7 +2854,8 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		if (robid == BLUEROV_ROBID)
 		{
-			if (dval > lights) joystick_buttons |= (1<<13); else joystick_buttons |= (1<<14);
+			// Might not work well...
+			if (dval > lights) joystick_buttons |= (1<<14); else if (dval < lights) joystick_buttons |= (1<<13);
 		}
 		lights = dval;
 		lights = (lights > 1)? 1: lights;

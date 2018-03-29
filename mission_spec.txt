@@ -310,7 +310,17 @@
 %
 %stopvideorecording videoid (int)
 %
+%cameratiltup
+%
+%cameratiltdown
+%
+%cameratiltcenter
+%
 %cameratilt u (double [-1,1])
+%
+%lightsbrighter
+%
+%lightsdimmer
 %
 %lights u (double [0,1])
 %

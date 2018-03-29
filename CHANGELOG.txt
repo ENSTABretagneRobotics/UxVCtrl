@@ -1,3 +1,7 @@
+217
+Added cameratiltup, cameratiltdown, cameratiltcenter, lightsbrigther, lightsdimmer commands.
+Corrections in MANUAL_CONTROL MAVLink message.
+
 216
 Added drconfig, lights and cameratilt commands.
 Added partial support of MANUAL_CONTROL MAVLink message.

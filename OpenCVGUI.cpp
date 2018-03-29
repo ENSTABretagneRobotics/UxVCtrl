@@ -531,22 +531,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'b':
 			lights += 0.1;
 			lights = (lights > 1)? 1: lights;
-			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<13);
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<14);
 			break;
 		case 'n':
 			lights -= 0.1;
 			lights = (lights < 0)? 0: lights;
-			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<14);
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<13);
 			break;
 		case 'u':
 			cameratilt += 0.1;
 			cameratilt = (cameratilt > 1)? 1: cameratilt;
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<10);
 			break;
 		case 'j':
 			cameratilt -= 0.1;
 			cameratilt = (cameratilt < -1)? -1: cameratilt;
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<9);
 			break;
-		case 'N': cameratilt = 0; break;
+		case 'N': 
+			cameratilt = 0; 
+			if (robid == BLUEROV_ROBID) joystick_buttons |= (1<<7);
+			break;
 		case 'o': bOSD = !bOSD; break;
 		case 'c': bOrientationCircle = !bOrientationCircle; break;
 		case 'm':

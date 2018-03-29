@@ -1,0 +1,50 @@
+generalstop
+headingreg 0
+depthreg -0.5
+wait 10
+% forward
+wait 0.1
+lightsbrighter
+wait 0.1
+lightsbrighter
+wait 0.1
+lightsbrighter
+wait 0.1
+thrust 0.4
+wait 8
+% stop
+thrust -0.4
+wait 2
+stop
+wait 0.1
+lightsdimmer
+wait 0.1
+lightsdimmer
+wait 0.1
+lightsdimmer
+wait 0.1
+% rotate
+headingreg 180
+wait 10
+% forward
+wait 0.1
+lightsbrighter
+wait 0.1
+lightsbrighter
+wait 0.1
+lightsbrighter
+wait 0.1
+thrust 0.4
+wait 8
+% stop
+thrust -0.4
+wait 2
+stop
+wait 0.1
+lightsdimmer
+wait 0.1
+lightsdimmer
+wait 0.1
+lightsdimmer
+wait 0.1
+generalstop

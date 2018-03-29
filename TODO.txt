@@ -1,6 +1,9 @@
 indicate in next release that should update mavlink!
 
+wzcontrolconfig manque!
+
 Rajouter gestion udp mavlinkdevice ou même RS232Port.cpp
+Affichage tension batterie depuis mavlink, avec Energy_actuators...?
 Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
 
 Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
@@ -122,7 +125,7 @@ Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planne
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
-Roscontrol et rosjava, communication avec MAVLink?
+Roscontrol et rosjava android apps (no longer maintained?), communication avec MAVLink?
 
 rajouter touche bSonarAltitudeEstimation?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
