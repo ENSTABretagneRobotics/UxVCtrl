@@ -2,7 +2,7 @@
 
 RS232Port.c
 
-RS232 port handling via local COM port or TCP/IP converter.
+RS232 port handling via local COM port or IP converter.
 
 Fabrice Le Bars
 
