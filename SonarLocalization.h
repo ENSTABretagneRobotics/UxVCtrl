@@ -15,4 +15,4 @@
 
 THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam);
 
-#endif // SONARLOCALIZATION_H
+#endif // !SONARLOCALIZATION_H

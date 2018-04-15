@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_NMEADEVICETHREAD
 #include "OSThread.h"
-#endif // DISABLE_NMEADEVICETHREAD
+#endif // !DISABLE_NMEADEVICETHREAD
 
 #include "NMEAProtocol.h"
 
@@ -33,15 +33,15 @@
 // Maximum number of characters of a NMEA sentence (excluding the line terminators CR and LF).
 #ifndef MAX_NB_BYTES_NMEA_SENTENCE
 #define MAX_NB_BYTES_NMEA_SENTENCE 80
-#endif // MAX_NB_BYTES_NMEA_SENTENCE
+#endif // !MAX_NB_BYTES_NMEA_SENTENCE
 
 #ifndef MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
 #define MAX_NB_BYTES_NMEA_SENTENCE_BEGIN 7
-#endif // MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
+#endif // !MAX_NB_BYTES_NMEA_SENTENCE_BEGIN
 
 #ifndef MAX_NB_BYTES_NMEA_CHECKSUM
 #define MAX_NB_BYTES_NMEA_CHECKSUM 4
-#endif // MAX_NB_BYTES_NMEA_CHECKSUM
+#endif // !MAX_NB_BYTES_NMEA_CHECKSUM
 
 struct NMEADEVICE
 {
@@ -724,6 +724,6 @@ inline int DisconnectNMEADevice(NMEADEVICE* pNMEADevice)
 
 #ifndef DISABLE_NMEADEVICETHREAD
 THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam);
-#endif // DISABLE_NMEADEVICETHREAD
+#endif // !DISABLE_NMEADEVICETHREAD
 
-#endif // NMEADEVICE_H
+#endif // !NMEADEVICE_H

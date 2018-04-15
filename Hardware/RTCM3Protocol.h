@@ -12,4 +12,4 @@
 
 #include "OSMisc.h"
 
-#endif // RTCM3PROTOCOL_H
+#endif // !RTCM3PROTOCOL_H

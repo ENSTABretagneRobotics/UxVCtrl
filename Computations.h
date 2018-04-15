@@ -1417,4 +1417,4 @@ inline int GetAllObstaclesDist5(unsigned char* scanline, unsigned char threshold
 	return EXIT_SUCCESS;
 }
 #pragma endregion
-#endif // COMPUTATIONS_H
+#endif // !COMPUTATIONS_H

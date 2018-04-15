@@ -71,4 +71,4 @@ inline void DrawSeanetScreenshot(double theta, double StepAngleSize, int NBins, 
 
 THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam);
 
-#endif // SEANETPROCESSING_H
+#endif // !SEANETPROCESSING_H

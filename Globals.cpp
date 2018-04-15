@@ -537,7 +537,7 @@ char keys[NB_CONFIGURABLE_KEYS];
 CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 #else
 cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 FILE* missionfile = NULL;

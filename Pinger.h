@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE PingerThread(void* pParam);
 
-#endif // PINGER_H
+#endif // !PINGER_H

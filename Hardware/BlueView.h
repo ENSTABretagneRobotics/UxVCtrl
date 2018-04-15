@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_BLUEVIEWTHREAD
 #include "OSThread.h"
-#endif // DISABLE_BLUEVIEWTHREAD
+#endif // !DISABLE_BLUEVIEWTHREAD
 
 #include <bvt_sdk.h>
 
@@ -431,6 +431,6 @@ inline int DisconnectBlueView(BLUEVIEW* pBlueView)
 
 #ifndef DISABLE_BLUEVIEWTHREAD
 THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam);
-#endif // DISABLE_BLUEVIEWTHREAD
+#endif // !DISABLE_BLUEVIEWTHREAD
 
-#endif // BLUEVIEW_H
+#endif // !BLUEVIEW_H

@@ -18,12 +18,12 @@
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 //#pragma pack(show)
 
@@ -883,6 +883,6 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // UBXPROTOCOL_H
+#endif // !UBXPROTOCOL_H

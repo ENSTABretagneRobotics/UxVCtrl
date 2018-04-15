@@ -49,4 +49,4 @@ inline void DrawWallTracking(IplImage* img, COORDSYSTEM2IMG* pCS2Img, double x, 
 		CV_RGB(192, 128, 255), 1, 1, 0);
 }
 
-#endif // WALL_H
+#endif // !WALL_H

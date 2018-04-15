@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE VisualObstacleThread(void* pParam);
 
-#endif // VISUALOBSTACLE_H
+#endif // !VISUALOBSTACLE_H

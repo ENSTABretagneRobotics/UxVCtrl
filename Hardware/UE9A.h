@@ -14,7 +14,7 @@
 
 #ifndef DISABLE_UE9ATHREAD
 #include "OSThread.h"
-#endif // DISABLE_UE9ATHREAD
+#endif // !DISABLE_UE9ATHREAD
 
 //// In us.
 //#define DEFAULT_ABSOLUTE_MIN_PW_UE9 500
@@ -145,6 +145,6 @@ inline int DisconnectUE9A(UE9A* pUE9A)
 
 #ifndef DISABLE_UE9ATHREAD
 THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam);
-#endif // DISABLE_UE9ATHREAD
+#endif // !DISABLE_UE9ATHREAD
 
-#endif // UE9A_H
+#endif // !UE9A_H

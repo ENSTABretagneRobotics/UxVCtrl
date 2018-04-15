@@ -23,12 +23,12 @@
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 #pragma region NMEA-SPECIFIC DEFINITIONS
 // A NMEA sentence begins with a '$' and ends with a carriage return/line feed sequence and can 
@@ -1030,6 +1030,6 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // NMEAPROTOCOL_H
+#endif // !NMEAPROTOCOL_H

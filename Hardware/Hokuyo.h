@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_HOKUYOTHREAD
 #include "OSThread.h"
-#endif // DISABLE_HOKUYOTHREAD
+#endif // !DISABLE_HOKUYOTHREAD
 
 #define TIMEOUT_MESSAGE_HOKUYO 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -709,6 +709,6 @@ inline int DisconnectHokuyo(HOKUYO* pHokuyo)
 
 #ifndef DISABLE_HOKUYOTHREAD
 THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam);
-#endif // DISABLE_HOKUYOTHREAD
+#endif // !DISABLE_HOKUYOTHREAD
 
-#endif // HOKUYO_H
+#endif // !HOKUYO_H

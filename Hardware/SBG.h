@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_SBGTHREAD
 #include "OSThread.h"
-#endif // DISABLE_SBGTHREAD
+#endif // !DISABLE_SBGTHREAD
 
 #ifdef ENABLE_SBG_SUPPORT
 #include "sbgEComLib.h"
@@ -1217,6 +1217,6 @@ inline int DisconnectSBG(SBG* pSBG)
 
 #ifndef DISABLE_SBGTHREAD
 THREAD_PROC_RETURN_VALUE SBGThread(void* pParam);
-#endif // DISABLE_SBGTHREAD
+#endif // !DISABLE_SBGTHREAD
 
-#endif // SBG_H
+#endif // !SBG_H

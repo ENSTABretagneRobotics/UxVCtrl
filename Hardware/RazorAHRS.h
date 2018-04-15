@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_RAZORAHRSTHREAD
 #include "OSThread.h"
-#endif // DISABLE_RAZORAHRSTHREAD
+#endif // !DISABLE_RAZORAHRSTHREAD
 
 #define TIMEOUT_MESSAGE_RAZORAHRS 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -396,6 +396,6 @@ inline int DisconnectRazorAHRS(RAZORAHRS* pRazorAHRS)
 
 #ifndef DISABLE_RAZORAHRSTHREAD
 THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam);
-#endif // DISABLE_RAZORAHRSTHREAD
+#endif // !DISABLE_RAZORAHRSTHREAD
 
-#endif // RAZORAHRS_H
+#endif // !RAZORAHRS_H

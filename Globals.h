@@ -20,14 +20,14 @@
 #ifdef ENABLE_CVKINECT2SDKHOOK
 #ifndef INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
 #define INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
-#endif // INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
+#endif // !INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
 #include <Kinect.h>
 #include "CvKinect2SDKHook.h"
 #else
 #ifdef ENABLE_CVCLEYESDKHOOK
 #ifndef INCLUDE_HEADERS_OUTSIDE_CVCLEYESDKHOOK
 #define INCLUDE_HEADERS_OUTSIDE_CVCLEYESDKHOOK
-#endif // INCLUDE_HEADERS_OUTSIDE_CVCLEYESDKHOOK
+#endif // !INCLUDE_HEADERS_OUTSIDE_CVCLEYESDKHOOK
 #include "CLEyeMulticam.h"
 #include "CvCLEyeSDKHook.h"
 #endif // ENABLE_CVCLEYESDKHOOK
@@ -710,7 +710,7 @@ extern char keys[NB_CONFIGURABLE_KEYS];
 extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 #else
 extern cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 extern FILE* missionfile;
@@ -914,7 +914,7 @@ inline int InitGlobals(void)
 		VideoRecordRequests[i] = 0;
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 		bPauseVideo[i] = FALSE;
 		bRestartVideo[i] = FALSE;
@@ -1042,7 +1042,7 @@ inline int ReleaseGlobals(void)
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		VideoRecordRequests[i] = 0;
 		cvReleaseImage(&dispimgs[i]);
 		cvReleaseImage(&imgs[i]);
@@ -1082,4 +1082,4 @@ inline int ReleaseGlobals(void)
 	return EXIT_SUCCESS;
 }
 
-#endif // GLOBALS_H
+#endif // !GLOBALS_H

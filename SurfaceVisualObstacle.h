@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam);
 
-#endif // SURFACEVISUALOBSTACLE_H
+#endif // !SURFACEVISUALOBSTACLE_H

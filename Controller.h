@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam);
 
-#endif // CONTROLLER_H
+#endif // !CONTROLLER_H

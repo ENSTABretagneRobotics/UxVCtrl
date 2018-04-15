@@ -122,4 +122,4 @@ inline int AnalyzeFrameRTCM2(unsigned char* buf, int buflen, int* pmtype, int* p
 // Restore default alignment settings.
 #pragma pack(pop) 
 
-#endif // RTCM2PROTOCOL_H
+#endif // !RTCM2PROTOCOL_H

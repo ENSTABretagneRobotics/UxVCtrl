@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam);
 
-#endif // RAZORAHRSINTERFACE_H
+#endif // !RAZORAHRSINTERFACE_H

@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam);
 
-#endif // FOLLOWME_H
+#endif // !FOLLOWME_H

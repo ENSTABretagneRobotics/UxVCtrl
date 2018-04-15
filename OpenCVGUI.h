@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam);
 
-#endif // OPENCVGUI_H
+#endif // !OPENCVGUI_H

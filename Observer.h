@@ -15,4 +15,4 @@
 
 THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam);
 
-#endif // OBSERVER_H
+#endif // !OBSERVER_H

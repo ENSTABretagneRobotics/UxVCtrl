@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam);
 
-#endif // SSC32INTERFACE_H
+#endif // !SSC32INTERFACE_H

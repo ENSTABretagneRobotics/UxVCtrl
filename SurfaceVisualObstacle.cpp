@@ -465,7 +465,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				cv::destroyWindow("HSV Filter");
 				cv::destroyWindow("Canny");
 				cv::destroyWindow("test");
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				bCleanUp = FALSE;
 			}
 			continue;
@@ -507,7 +507,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		cvWaitKey(1);
 #else
 		cv::waitKey(1);
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 		std::cout << "Resultat: " << result << "\n";
 

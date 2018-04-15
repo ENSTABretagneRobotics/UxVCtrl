@@ -1926,4 +1926,4 @@ inline int DisplayHelp(void)
 	return EXIT_SUCCESS;
 }
 
-#endif // CONFIG_H
+#endif // !CONFIG_H

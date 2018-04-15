@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE MissingWorkerThread(void* pParam);
 
-#endif // MISSINGWORKER_H
+#endif // !MISSINGWORKER_H

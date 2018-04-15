@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam);
 
-#endif // NMEAINTERFACE_H
+#endif // !NMEAINTERFACE_H

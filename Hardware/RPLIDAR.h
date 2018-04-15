@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_RPLIDARTHREAD
 #include "OSThread.h"
-#endif // DISABLE_RPLIDARTHREAD
+#endif // !DISABLE_RPLIDARTHREAD
 
 #define TIMEOUT_MESSAGE_RPLIDAR 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -869,6 +869,6 @@ inline int DisconnectRPLIDAR(RPLIDAR* pRPLIDAR)
 
 #ifndef DISABLE_RPLIDARTHREAD
 THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam);
-#endif // DISABLE_RPLIDARTHREAD
+#endif // !DISABLE_RPLIDARTHREAD
 
-#endif // RPLIDAR_H
+#endif // !RPLIDAR_H

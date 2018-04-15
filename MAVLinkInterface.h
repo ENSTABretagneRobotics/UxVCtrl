@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam);
 
-#endif // MAVLINKINTERFACE_H
+#endif // !MAVLINKINTERFACE_H

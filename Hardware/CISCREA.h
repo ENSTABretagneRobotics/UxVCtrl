@@ -14,7 +14,7 @@
 
 #ifndef DISABLE_CISCREATHREAD
 #include "OSThread.h"
-#endif // DISABLE_CISCREATHREAD
+#endif // !DISABLE_CISCREATHREAD
 
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
@@ -788,11 +788,11 @@ inline int CheckAlarmsStatusAndGetHeadingAndDepthAndVoltageCISCREA(modbus_t* mb,
 
 #ifndef DISABLE_CISCREATHREAD
 THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam);
-#endif // DISABLE_CISCREATHREAD
+#endif // !DISABLE_CISCREATHREAD
 
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
 #pragma warning(default : 4459) 
 #endif // _MSC_VER
 
-#endif // CISCREA_H
+#endif // !CISCREA_H

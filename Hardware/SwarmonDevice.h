@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_SWARMONDEVICETHREAD
 #include "OSThread.h"
-#endif // DISABLE_SWARMONDEVICETHREAD
+#endif // !DISABLE_SWARMONDEVICETHREAD
 
 #define TIMEOUT_MESSAGE_SWARMONDEVICE 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -302,6 +302,6 @@ inline int DisconnectSwarmonDevice(SWARMONDEVICE* pSwarmonDevice)
 
 #ifndef DISABLE_SWARMONDEVICETHREAD
 THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam);
-#endif // DISABLE_SWARMONDEVICETHREAD
+#endif // !DISABLE_SWARMONDEVICETHREAD
 
-#endif // SWARMONDEVICE_H
+#endif // !SWARMONDEVICE_H

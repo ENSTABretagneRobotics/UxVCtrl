@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_P33XTHREAD
 #include "OSThread.h"
-#endif // DISABLE_P33XTHREAD
+#endif // !DISABLE_P33XTHREAD
 
 #define TIMEOUT_MESSAGE_P33X 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -313,6 +313,6 @@ inline int DisconnectP33x(P33X* pP33x)
 
 #ifndef DISABLE_P33XTHREAD
 THREAD_PROC_RETURN_VALUE P33xThread(void* pParam);
-#endif // DISABLE_P33XTHREAD
+#endif // !DISABLE_P33XTHREAD
 
-#endif // P33X_H
+#endif // !P33X_H

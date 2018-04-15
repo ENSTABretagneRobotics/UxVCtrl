@@ -3179,4 +3179,4 @@ inline int Commands(char* line)
 	return EXIT_SUCCESS;
 }
 
-#endif // COMMANDS_H
+#endif // !COMMANDS_H

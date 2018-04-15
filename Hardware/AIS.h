@@ -21,7 +21,7 @@
 //
 //#ifndef UNREFERENCED_PARAMETER
 //#define UNREFERENCED_PARAMETER(P) (void)(P)
-//#endif // UNREFERENCED_PARAMETER
+//#endif // !UNREFERENCED_PARAMETER
 //
 //#include <math.h>
 //
@@ -217,4 +217,4 @@ inline int decode_AIS(char* aisbuf, int aisbuflen, double* pAIS_Latitude, double
 	return EXIT_SUCCESS;
 }
 
-#endif // AIS_H
+#endif // !AIS_H

@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_PATHFINDERDVLTHREAD
 #include "OSThread.h"
-#endif // DISABLE_PATHFINDERDVLTHREAD
+#endif // !DISABLE_PATHFINDERDVLTHREAD
 
 #include "NMEAProtocol.h"
 
@@ -25,12 +25,12 @@
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 #define TIMEOUT_MESSAGE_PATHFINDERDVL 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -1036,7 +1036,7 @@ inline int DisconnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 
 #ifndef DISABLE_PATHFINDERDVLTHREAD
 THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam);
-#endif // DISABLE_PATHFINDERDVLTHREAD
+#endif // !DISABLE_PATHFINDERDVLTHREAD
 
 // min and max might cause incompatibilities on Linux...
 #ifndef _WIN32
@@ -1046,6 +1046,6 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam);
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // PATHFINDERDVL_H
+#endif // !PATHFINDERDVL_H

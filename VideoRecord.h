@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam);
 
-#endif // VIDEORECORD_H
+#endif // !VIDEORECORD_H

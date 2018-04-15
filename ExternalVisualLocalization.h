@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam);
 
-#endif // EXTERNALVISUALLOCALIZATION_H
+#endif // !EXTERNALVISUALLOCALIZATION_H

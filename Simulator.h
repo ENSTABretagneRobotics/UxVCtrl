@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam);
 
-#endif // SIMULATOR_H
+#endif // !SIMULATOR_H

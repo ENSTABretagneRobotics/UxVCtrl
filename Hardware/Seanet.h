@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_SEANETTHREAD
 #include "OSThread.h"
-#endif // DISABLE_SEANETTHREAD
+#endif // !DISABLE_SEANETTHREAD
 
 #define TIMEOUT_MESSAGE_SEANET 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -55,11 +55,11 @@
 
 #ifndef STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS
 #define STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS(StepAngleSize) ((int)(360.0/(StepAngleSize)))
-#endif // STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS
+#endif // !STEP_ANGLE_SIZE_IN_DEGREES2NUMBER_OF_STEPS
 
 #ifndef NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES
 #define NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES(NSteps) (360.0/(NSteps))
-#endif // NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES
+#endif // !NUMBER_OF_STEPS2STEP_ANGLE_SIZE_IN_DEGREES
 
 // Transducer Bearing is the position of the transducer for the current scanline (0..6399 in 1/16 Gradian units), 
 // ahead corresponds to 3200. 10 gradians = 9 degrees. 0.05625 = (1/16)*(9/10).
@@ -2153,6 +2153,6 @@ inline int DisconnectSeanet(SEANET* pSeanet)
 
 #ifndef DISABLE_SEANETTHREAD
 THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam);
-#endif // DISABLE_SEANETTHREAD
+#endif // !DISABLE_SEANETTHREAD
 
-#endif // SEANET_H
+#endif // !SEANET_H

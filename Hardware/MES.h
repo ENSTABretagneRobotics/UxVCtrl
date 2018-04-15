@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_MESTHREAD
 #include "OSThread.h"
-#endif // DISABLE_MESTHREAD
+#endif // !DISABLE_MESTHREAD
 
 #define TIMEOUT_MESSAGE_MES 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -301,6 +301,6 @@ inline int DisconnectMES(MES* pMES)
 
 #ifndef DISABLE_MESTHREAD
 THREAD_PROC_RETURN_VALUE MESThread(void* pParam);
-#endif // DISABLE_MESTHREAD
+#endif // !DISABLE_MESTHREAD
 
-#endif // MES_H
+#endif // !MES_H

@@ -18,7 +18,7 @@
 #undef inline
 #endif // __GNUC__
 #endif // inline
-#endif // __cplusplus
+#endif // !__cplusplus
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
 #pragma warning(disable : 4201) 
@@ -43,36 +43,36 @@
 #define inline static __inline__
 #endif // __GNUC__
 #endif // inline
-#endif // __cplusplus
+#endif // !__cplusplus
 
 // For older versions of MAVLink headers...
 #ifndef GPS_FIX_TYPE_NO_GPS
 #define GPS_FIX_TYPE_NO_GPS 0
-#endif // GPS_FIX_TYPE_NO_GPS
+#endif // !GPS_FIX_TYPE_NO_GPS
 #ifndef GPS_FIX_TYPE_NO_FIX
 #define GPS_FIX_TYPE_NO_FIX 1
-#endif // GPS_FIX_TYPE_NO_FIX
+#endif // !GPS_FIX_TYPE_NO_FIX
 #ifndef GPS_FIX_TYPE_2D_FIX
 #define GPS_FIX_TYPE_2D_FIX 2
-#endif // GPS_FIX_TYPE_2D_FIX
+#endif // !GPS_FIX_TYPE_2D_FIX
 #ifndef GPS_FIX_TYPE_3D_FIX
 #define GPS_FIX_TYPE_3D_FIX 3
-#endif // GPS_FIX_TYPE_3D_FIX
+#endif // !GPS_FIX_TYPE_3D_FIX
 #ifndef GPS_FIX_TYPE_DGPS
 #define GPS_FIX_TYPE_DGPS 4
-#endif // GPS_FIX_TYPE_DGPS
+#endif // !GPS_FIX_TYPE_DGPS
 #ifndef GPS_FIX_TYPE_RTK_FLOAT
 #define GPS_FIX_TYPE_RTK_FLOAT 5
-#endif // GPS_FIX_TYPE_RTK_FLOAT
+#endif // !GPS_FIX_TYPE_RTK_FLOAT
 #ifndef GPS_FIX_TYPE_RTK_FIXED
 #define GPS_FIX_TYPE_RTK_FIXED 6
-#endif // GPS_FIX_TYPE_RTK_FIXED
+#endif // !GPS_FIX_TYPE_RTK_FIXED
 #ifndef GPS_FIX_TYPE_STATIC
 #define GPS_FIX_TYPE_STATIC 7
-#endif // GPS_FIX_TYPE_STATIC
+#endif // !GPS_FIX_TYPE_STATIC
 #ifndef GPS_FIX_TYPE_PPP
 #define GPS_FIX_TYPE_PPP 8
-#endif // GPS_FIX_TYPE_PPP
+#endif // !GPS_FIX_TYPE_PPP
 
 #define MAX_PACKET_LEN_MAVLINK 263
 #define MIN_PACKET_LEN_MAVLINK 8
@@ -192,4 +192,4 @@ inline size_t fwrite_tlog(mavlink_message_t msg, FILE* file)
 	return fwrite(sendbuf, 1, sendbuflen, file);
 }
 
-#endif // MAVLINKPROTOCOL_H
+#endif // !MAVLINKPROTOCOL_H

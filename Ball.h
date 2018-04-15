@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE BallThread(void* pParam);
 
-#endif // BALL_H
+#endif // !BALL_H

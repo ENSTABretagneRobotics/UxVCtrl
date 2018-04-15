@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE PipelineThread(void* pParam);
 
-#endif // PIPELINE_H
+#endif // !PIPELINE_H

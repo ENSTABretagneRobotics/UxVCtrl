@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_MDMTHREAD
 #include "OSThread.h"
-#endif // DISABLE_MDMTHREAD
+#endif // !DISABLE_MDMTHREAD
 
 #define TIMEOUT_MESSAGE_MDM 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -716,6 +716,6 @@ inline int DisconnectMDM(MDM* pMDM)
 
 #ifndef DISABLE_MDMTHREAD
 THREAD_PROC_RETURN_VALUE MDMThread(void* pParam);
-#endif // DISABLE_MDMTHREAD
+#endif // !DISABLE_MDMTHREAD
 
-#endif // MDM_H
+#endif // !MDM_H

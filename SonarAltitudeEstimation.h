@@ -14,4 +14,4 @@
 
 THREAD_PROC_RETURN_VALUE SonarAltitudeEstimationThread(void* pParam);
 
-#endif // SONARALTITUDEESTIMATION_H
+#endif // !SONARALTITUDEESTIMATION_H

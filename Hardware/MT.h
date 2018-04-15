@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_MTTHREAD
 #include "OSThread.h"
-#endif // DISABLE_MTTHREAD
+#endif // !DISABLE_MTTHREAD
 
 #define TIMEOUT_MESSAGE_MT 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -1244,6 +1244,6 @@ inline int DisconnectMT(MT* pMT)
 
 #ifndef DISABLE_MTTHREAD
 THREAD_PROC_RETURN_VALUE MTThread(void* pParam);
-#endif // DISABLE_MTTHREAD
+#endif // !DISABLE_MTTHREAD
 
-#endif // MT_H
+#endif // !MT_H

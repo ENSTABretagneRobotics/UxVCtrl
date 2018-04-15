@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_MAESTROTHREAD
 #include "OSThread.h"
-#endif // DISABLE_MAESTROTHREAD
+#endif // !DISABLE_MAESTROTHREAD
 
 // Need to be undefined at the end of the file...
 // min and max might cause incompatibilities on Linux...
@@ -23,12 +23,12 @@
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 //#define TIMEOUT_MESSAGE_MAESTRO 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -846,7 +846,7 @@ inline int DisconnectMaestro(MAESTRO* pMaestro)
 
 #ifndef DISABLE_MAESTROTHREAD
 THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam);
-#endif // DISABLE_MAESTROTHREAD
+#endif // !DISABLE_MAESTROTHREAD
 
 // min and max might cause incompatibilities on Linux...
 #ifndef _WIN32
@@ -856,6 +856,6 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam);
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // MAESTRO_H
+#endif // !MAESTRO_H

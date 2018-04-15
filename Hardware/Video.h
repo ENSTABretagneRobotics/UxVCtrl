@@ -18,7 +18,7 @@
 //#ifndef __STDC_CONSTANT_MACROS
 //#define __STDC_CONSTANT_MACROS_DEFINED
 //#define __STDC_CONSTANT_MACROS
-//#endif // __STDC_CONSTANT_MACROS
+//#endif // !__STDC_CONSTANT_MACROS
 
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
@@ -45,7 +45,7 @@ extern "C" {
 
 #ifndef DISABLE_VIDEOTHREAD
 #include "OSThread.h"
-#endif // DISABLE_VIDEOTHREAD
+#endif // !DISABLE_VIDEOTHREAD
 
 #define LOCAL_TYPE_VIDEO 0
 #define REMOTE_TYPE_VIDEO 1
@@ -59,7 +59,7 @@ struct VIDEO
 	cv::VideoCapture* pCapture;
 	cv::Mat* pframemat;
 	IplImage frameipl;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	SOCKET s;
 	char address[256];
 	char port[256];
@@ -613,7 +613,7 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 		}
 		pVideo->frameipl = (IplImage)*pVideo->pframemat;
 		pVideo->frame = &pVideo->frameipl;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		break;
 	case FILE_TYPE_VIDEO:
 #ifdef USE_FFMPEG_VIDEO
@@ -640,7 +640,7 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 		}
 		pVideo->frameipl = (IplImage)*pVideo->pframemat;
 		pVideo->frame = &pVideo->frameipl;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 		break;
 	default:
@@ -971,7 +971,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			}
 			pVideo->frameipl = (IplImage)*pVideo->pframemat;
 			pVideo->frame = &pVideo->frameipl;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		}
 		else
 		{
@@ -1085,7 +1085,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			}
 			pVideo->frameipl = (IplImage)*pVideo->pframemat;
 			pVideo->frame = &pVideo->frameipl;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 		}
 	}
@@ -1108,7 +1108,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				cvReleaseCapture(&pVideo->pCapture);
 #else
 				pVideo->pCapture->release();
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				return EXIT_FAILURE;
 			case FILE_TYPE_VIDEO:
 #ifdef USE_FFMPEG_VIDEO
@@ -1119,7 +1119,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				cvReleaseCapture(&pVideo->pCapture);
 #else
 				pVideo->pCapture->release();
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 				return EXIT_FAILURE;
 			default:
@@ -1151,7 +1151,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	//		pVideo->pCapture->release();
 	//		delete pVideo->pCapture;
 	//		delete pVideo->pframemat;
-	//#endif // USE_OPENCV_HIGHGUI_CPP_API
+	//#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	//		return EXIT_FAILURE;
 	//	case FILE_TYPE_VIDEO:
 	//#ifdef USE_FFMPEG_VIDEO
@@ -1164,7 +1164,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	//		pVideo->pCapture->release();
 	//		delete pVideo->pCapture;
 	//		delete pVideo->pframemat;
-	//#endif // USE_OPENCV_HIGHGUI_CPP_API
+	//#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	//#endif // USE_FFMPEG_VIDEO
 	//		return EXIT_FAILURE;
 	//	default:
@@ -1202,7 +1202,7 @@ inline int DisconnectVideo(VIDEO* pVideo)
 		pVideo->pCapture->release();
 		delete pVideo->pCapture;
 		delete pVideo->pframemat;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		break;
 	case FILE_TYPE_VIDEO:
 #ifdef USE_FFMPEG_VIDEO
@@ -1215,7 +1215,7 @@ inline int DisconnectVideo(VIDEO* pVideo)
 		pVideo->pCapture->release();
 		delete pVideo->pCapture;
 		delete pVideo->pframemat;
-#endif // USE_OPENCV_HIGHGUI_CPP_API
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // USE_FFMPEG_VIDEO
 		break;
 	default:
@@ -1241,6 +1241,6 @@ inline int DisconnectVideo(VIDEO* pVideo)
 
 #ifndef DISABLE_VIDEOTHREAD
 THREAD_PROC_RETURN_VALUE VideoThread(void* pParam);
-#endif // DISABLE_VIDEOTHREAD
+#endif // !DISABLE_VIDEOTHREAD
 
-#endif // VIDEO_H
+#endif // !VIDEO_H

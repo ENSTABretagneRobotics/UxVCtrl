@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_UBLOXTHREAD
 #include "OSThread.h"
-#endif // DISABLE_UBLOXTHREAD
+#endif // !DISABLE_UBLOXTHREAD
 
 #include "UBXProtocol.h"
 #include "NMEAProtocol.h"
@@ -27,12 +27,12 @@
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 //#pragma pack(show)
 
@@ -1159,7 +1159,7 @@ inline int Disconnectublox(UBLOX* publox)
 
 #ifndef DISABLE_UBLOXTHREAD
 THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam);
-#endif // DISABLE_UBLOXTHREAD
+#endif // !DISABLE_UBLOXTHREAD
 
 // Restore default alignment settings.
 #pragma pack(pop) 
@@ -1172,6 +1172,6 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam);
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // UBLOX_H
+#endif // !UBLOX_H

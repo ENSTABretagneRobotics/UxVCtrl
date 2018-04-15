@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_NORTEKDVLTHREAD
 #include "OSThread.h"
-#endif // DISABLE_NORTEKDVLTHREAD
+#endif // !DISABLE_NORTEKDVLTHREAD
 
 #include "NMEAProtocol.h"
 
@@ -25,12 +25,12 @@
 #if !defined(NOMINMAX)
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
-#endif // max
+#endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif // min
+#endif // !min
 #endif // !defined(NOMINMAX)
-#endif // _WIN32
+#endif // !_WIN32
 
 #define TIMEOUT_MESSAGE_NORTEKDVL 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -546,7 +546,7 @@ inline int DisconnectNortekDVL(NORTEKDVL* pNortekDVL)
 
 #ifndef DISABLE_NORTEKDVLTHREAD
 THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam);
-#endif // DISABLE_NORTEKDVLTHREAD
+#endif // !DISABLE_NORTEKDVLTHREAD
 
 // min and max might cause incompatibilities on Linux...
 #ifndef _WIN32
@@ -556,6 +556,6 @@ THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam);
 #ifdef min
 #undef min
 #endif // min
-#endif // _WIN32
+#endif // !_WIN32
 
-#endif // NORTEKDVL_H
+#endif // !NORTEKDVL_H

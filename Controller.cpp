@@ -144,7 +144,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 						((cos(psiw-phi)+cos(ksi) < 0)&&(fabs(e) < radius)))
 #else
 					if (cos(psiw-psi)+cos(ksi) < 0)
-#endif // ALT_SAILBOAT_CONTROLLER
+#endif // !ALT_SAILBOAT_CONTROLLER
 					{
 						if (e < 0)
 						{
@@ -201,7 +201,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					deltasmax = q1*pow((cos(psiw-wpsi)+1.0)/2.0,q2); // Sail command.
 #else
 					deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0,q2); // Sail command.
-#endif // ALT_SAILBOAT_CONTROLLER
+#endif // !ALT_SAILBOAT_CONTROLLER
 					break;
 				}
 

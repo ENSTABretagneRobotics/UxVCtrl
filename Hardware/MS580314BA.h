@@ -15,7 +15,7 @@
 
 #ifndef DISABLE_MS580314BATHREAD
 #include "OSThread.h"
-#endif // DISABLE_MS580314BATHREAD
+#endif // !DISABLE_MS580314BATHREAD
 
 #define TIMEOUT_MESSAGE_MS580314BA 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -389,6 +389,6 @@ inline int DisconnectMS580314BA(MS580314BA* pMS580314BA)
 
 #ifndef DISABLE_MS580314BATHREAD
 THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam);
-#endif // DISABLE_MS580314BATHREAD
+#endif // !DISABLE_MS580314BATHREAD
 
-#endif // MS580314BA_H
+#endif // !MS580314BA_H
