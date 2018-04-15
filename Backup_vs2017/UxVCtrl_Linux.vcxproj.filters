@@ -43,6 +43,21 @@
     <Filter Include="Input Files">
       <UniqueIdentifier>{acb9fe6c-8504-4311-81bf-51ff30a320fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="restore">
+      <UniqueIdentifier>{4590e197-810b-48d3-85cb-dec8155760e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="restore\log">
+      <UniqueIdentifier>{7a0fe602-20ca-4e97-bb30-f03a99a27772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="restore\pic">
+      <UniqueIdentifier>{1a836fdd-23a5-45e2-aada-44985bb1d748}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="restore\vid">
+      <UniqueIdentifier>{36432d4c-f0e4-44e3-a599-45954909c1cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="restore\aud">
+      <UniqueIdentifier>{0e2d2eed-d208-4dcf-814e-93bfa0ffa8e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ball.cpp">
@@ -655,6 +670,21 @@
     </Text>
     <Text Include="MS583730BA0.txt">
       <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="restore\log\ReadMe.txt">
+      <Filter>restore\log</Filter>
+    </Text>
+    <Text Include="restore\aud\ReadMe.txt">
+      <Filter>restore\aud</Filter>
+    </Text>
+    <Text Include="restore\vid\ReadMe.txt">
+      <Filter>restore\vid</Filter>
+    </Text>
+    <Text Include="restore\pic\ReadMe.txt">
+      <Filter>restore\pic</Filter>
+    </Text>
+    <Text Include="restore\ReadMe.txt">
+      <Filter>restore</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

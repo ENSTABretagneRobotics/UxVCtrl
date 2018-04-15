@@ -348,15 +348,21 @@ Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is current
 */
 inline int CheckAvailableBytesRS232Port(RS232PORT* pRS232Port)
 {
+#ifdef DISABLE_IOCTLSOCKET
 	struct timeval tv;
 
 	tv.tv_sec = 0;
 	tv.tv_usec = 0;
+#endif // DISABLE_IOCTLSOCKET
 	switch (pRS232Port->DevType)
 	{
 	case TCP_CLIENT_TYPE_RS232PORT:
 	case TCP_SERVER_TYPE_RS232PORT:
+#ifdef DISABLE_IOCTLSOCKET
 		return waitforsocket(pRS232Port->s, tv);
+#else
+		return checkavailablebytessocket(pRS232Port->s);
+#endif // DISABLE_IOCTLSOCKET
 	case LOCAL_TYPE_RS232PORT:
 		return CheckAvailableBytesComputerRS232Port(pRS232Port->hDev);
 	default:
@@ -364,6 +370,60 @@ inline int CheckAvailableBytesRS232Port(RS232PORT* pRS232Port)
 			strtime_m(), 
 			"Invalid device type. ", 
 			pRS232Port));
+		return EXIT_FAILURE;
+	}
+}
+
+/*
+Wait for data to read on a RS232 port.
+
+RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
+a RS232 port.
+int timeout : (IN) Max time to wait before returning in ms.
+int checkingperiod : (IN) Checking period in ms.
+
+Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is currently no data
+ available or EXIT_FAILURE if there is an error.
+*/
+inline int WaitForRS232Port(RS232PORT* pRS232Port, int timeout, int checkingperiod)
+{
+	struct timeval tv;
+	//CHRONO chrono;
+
+	tv.tv_sec = (long)(timeout/1000);
+	tv.tv_usec = (long)((timeout%1000)*1000);
+	switch (pRS232Port->DevType)
+	{
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
+		return waitforsocket(pRS232Port->s, tv);
+	case LOCAL_TYPE_RS232PORT:
+		//StartChrono(&chrono);
+		//do
+		//{
+		//	int ret = CheckAvailableBytesComputerRS232Port(pRS232Port->hDev);
+		//	switch (ret)
+		//	{
+		//	case EXIT_SUCCESS:
+		//		StopChronoQuick(&chrono);
+		//		return EXIT_SUCCESS;
+		//	case EXIT_TIMEOUT:
+		//		mSleep(checkingperiod);
+		//		break;
+		//	default:
+		//		StopChronoQuick(&chrono);
+		//		return ret;
+		//	}
+		//} while (GetTimeElapsedChronoQuick(&chrono) <= timeout);
+		//StopChronoQuick(&chrono);
+		//return EXIT_TIMEOUT;
+		return WaitForComputerRS232Port(pRS232Port->hDev, timeout, checkingperiod);
+	default:
+		PRINT_DEBUG_ERROR_RS232PORT(("WaitForRS232Port error (%s) : %s"
+			"(pRS232Port=%#x, timeout=%d, checkingperiod=%d)\n", 
+			strtime_m(), 
+			"Invalid device type. ", 
+			pRS232Port, timeout, checkingperiod));
 		return EXIT_FAILURE;
 	}
 }
@@ -570,4 +630,403 @@ inline int ReadAllRS232Port(RS232PORT* pRS232Port, uint8* readbuf, int readbufle
 	}
 }
 
-#endif // RS232PORT_H
+inline int ReadLatestRS232Port(RS232PORT* pRS232Port, uint8* readbuf, int readbuflen)
+{
+	int BytesReceived = 0;
+	int Bytes = 0;
+	uint8* savebuf = NULL;
+
+	savebuf = (uint8*)calloc(readbuflen, sizeof(uint8));
+
+	if (savebuf == NULL)
+	{
+		PRINT_DEBUG_ERROR_RS232PORT(("ReadLatestRS232Port error (%s) : %s"
+			"(pRS232Port=%#x, readbuf=%#x, readbuflen=%d)\n", 
+			strtime_m(), 
+			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY], 
+			pRS232Port, readbuf, readbuflen));
+		return EXIT_OUT_OF_MEMORY;
+	}
+
+	if (ReadRS232Port(pRS232Port, readbuf, readbuflen, &Bytes) == EXIT_SUCCESS)
+	{
+		if (Bytes == 0)
+		{
+			PRINT_DEBUG_WARNING_RS232PORT(("ReadLatestRS232Port warning (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, readbuflen=%d)\n", 
+				strtime_m(), 
+				szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+				pRS232Port, readbuf, readbuflen));
+			free(savebuf);
+			return EXIT_TIMEOUT;
+		}
+		else
+		{
+
+		}
+	}
+	else
+	{
+		PRINT_DEBUG_ERROR_RS232PORT(("ReadLatestRS232Port error (%s) : %s"
+			"(pRS232Port=%#x, readbuf=%#x, readbuflen=%d)\n", 
+			strtime_m(), 
+			"ReadRS232Port failed. ", 
+			pRS232Port, readbuf, readbuflen));
+		free(savebuf);
+		return EXIT_FAILURE;
+	}
+
+	BytesReceived += Bytes;
+
+	while (Bytes == readbuflen)
+	{
+		memcpy(savebuf, readbuf, Bytes);
+		if (ReadRS232Port(pRS232Port, readbuf, readbuflen, &Bytes) == EXIT_SUCCESS)
+		{
+			if (Bytes == 0)
+			{
+				PRINT_DEBUG_WARNING_RS232PORT(("ReadLatestRS232Port warning (%s) : %s"
+					"(pRS232Port=%#x, readbuf=%#x, readbuflen=%d)\n", 
+					strtime_m(), 
+					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+					pRS232Port, readbuf, readbuflen));
+				free(savebuf);
+				return EXIT_TIMEOUT;
+			}
+			else
+			{
+
+			}
+		}
+		else
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadLatestRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, readbuflen=%d)\n", 
+				strtime_m(), 
+				"ReadRS232Port failed. ", 
+				pRS232Port, readbuf, readbuflen));
+			free(savebuf);
+			return EXIT_FAILURE;
+		}
+
+		BytesReceived += Bytes;
+	}
+
+	if (BytesReceived < readbuflen)
+	{
+		int iResult = ReadAllRS232Port(pRS232Port, readbuf+BytesReceived, readbuflen-BytesReceived);
+		if (iResult != EXIT_SUCCESS)
+		{
+			free(savebuf);
+			return iResult;
+		}
+	}
+	else
+	{
+		memmove(readbuf+readbuflen-Bytes, readbuf, Bytes);
+		memcpy(readbuf, savebuf+Bytes, readbuflen-Bytes);
+	}
+
+	free(savebuf);
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Receive data from a RS232 port until a specific end string is read.
+If this string is found (and the maximum number of bytes to read has not 
+been reached), it is not necessarily the last read bytes in the buffer 
+(other bytes might have been read after).
+Fail when a timeout occurs.
+
+RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
+a RS232 port.
+uint8* readbuf : (INOUT) Valid pointer that will receive the data read 
+(should be null-terminated, but the search does not include terminating null characters).
+char* endstr : (IN) End string to wait for (should be null-terminated, but 
+the search does not include terminating null characters).
+int maxreadbuflen : (IN) Maximum number of bytes to read.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int ReadAtLeastUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char* endstr, int maxreadbuflen)
+{
+	int BytesReceived = 0;
+	int Bytes = 0;
+
+	for (;;)
+	{
+		if (BytesReceived >= maxreadbuflen)
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadAtLeastUntilRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endstr=%s, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"readbuf full. ", 
+				pRS232Port, readbuf, endstr, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		if (ReadRS232Port(pRS232Port, readbuf + BytesReceived, maxreadbuflen - BytesReceived, &Bytes) == EXIT_SUCCESS)
+		{
+			if (Bytes == 0)
+			{
+				PRINT_DEBUG_WARNING_RS232PORT(("ReadAtLeastUntilRS232Port warning (%s) : %s"
+					"(pRS232Port=%#x, readbuf=%#x, endstr=%s, maxreadbuflen=%d)\n", 
+					strtime_m(), 
+					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+					pRS232Port, readbuf, endstr, maxreadbuflen));
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+				return EXIT_TIMEOUT;
+			}
+			else
+			{
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Bytes received : %d\n", Bytes));
+
+				// Look for endstr in the bytes received.
+				if (strstr((char*)readbuf, endstr))
+				{
+					break;
+				}
+			}
+		}
+		else
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadAtLeastUntilRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endstr=%s, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"ReadRS232Port failed. ", 
+				pRS232Port, readbuf, endstr, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		BytesReceived += Bytes;
+	}
+
+	PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Receive data from a RS232 port until a specific end character is read.
+If this character is found (and the maximum number of bytes to read has not 
+been reached), it is not necessarily the last read byte in the buffer 
+(other bytes might have been read after).
+Fail when a timeout occurs.
+
+RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
+a RS232 port.
+uint8* readbuf : (INOUT) Valid pointer that will receive the data read.
+char endchar : (IN) End character to wait for.
+int maxreadbuflen : (IN) Maximum number of bytes to read.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int ReadAtLeastUntilRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char endchar, int maxreadbuflen)
+{
+	int BytesReceived = 0;
+	int Bytes = 0;
+	int bStop = 0;
+
+	for (;;)
+	{
+		if (BytesReceived >= maxreadbuflen)
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadAtLeastUntilRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endchar=%.2x, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"readbuf full. ", 
+				pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		if (ReadRS232Port(pRS232Port, readbuf + BytesReceived, maxreadbuflen - BytesReceived, &Bytes) == EXIT_SUCCESS)
+		{
+			if (Bytes == 0)
+			{
+				PRINT_DEBUG_WARNING_RS232PORT(("ReadAtLeastUntilRS232Port warning (%s) : %s"
+					"(pRS232Port=%#x, readbuf=%#x, endchar=%.2x, maxreadbuflen=%d)\n", 
+					strtime_m(), 
+					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+					pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+				return EXIT_TIMEOUT;
+			}
+			else
+			{
+				int i = 0;
+
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Bytes received : %d\n", Bytes));
+
+				// Look for endchar in the bytes just received.
+				for (i = BytesReceived; i < BytesReceived+Bytes; i++)
+				{
+					if (readbuf[i] == endchar)
+					{
+						bStop = 1;
+						break;
+					}
+				}
+
+				if (bStop)
+				{
+					break;
+				}
+			}
+		}
+		else
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadAtLeastUntilRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endchar=%.2x, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"ReadRS232Port failed. ", 
+				pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		BytesReceived += Bytes;
+	}
+
+	PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Receive data from a RS232 port until a specific end character is read.
+If this character is found (and the maximum number of bytes to read has not 
+been reached), it is the last read byte in the buffer.
+This function might take more network load than ReadAtLeastUntilRS232Port() but guarantees
+that no bytes are read after the end character (the bytes that might be between 
+the end character and the maximum number of bytes to read are left unchanged).
+Fail when a timeout occurs.
+
+RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
+a RS232 port.
+uint8* readbuf : (INOUT) Valid pointer that will receive the data read.
+char endchar : (IN) End character to wait for.
+int maxreadbuflen : (IN) Maximum number of bytes to read.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int ReadUntilRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char endchar, int maxreadbuflen)
+{
+	int BytesReceived = 0;
+	int Bytes = 0;
+
+	// Receive byte per byte.
+	while ((BytesReceived <= 0)||(readbuf[BytesReceived-1] != endchar))
+	{
+		if (BytesReceived >= maxreadbuflen)
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadUntilRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endchar=%.2x, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"readbuf full. ", 
+				pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		// Receive 1 byte.
+		if (ReadRS232Port(pRS232Port, readbuf + BytesReceived, 1, &Bytes) == EXIT_SUCCESS)
+		{
+			if (Bytes == 0)
+			{
+				PRINT_DEBUG_WARNING_RS232PORT(("ReadUntilRS232Port warning (%s) : %s"
+					"(pRS232Port=%#x, readbuf=%#x, endchar=%.2x, maxreadbuflen=%d)\n", 
+					strtime_m(), 
+					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+					pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+				return EXIT_TIMEOUT;
+			}
+			else
+			{
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Bytes received : %d\n", Bytes));
+			}
+		}
+		else
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadUntilRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endchar=%.2x, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"ReadRS232Port failed. ", 
+				pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		BytesReceived += Bytes;
+	}
+
+	PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+
+	//*pBytesReceived = BytesReceived;
+
+	return EXIT_SUCCESS;
+}
+
+inline int ReadUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char* endstr, int maxreadbuflen, int* pBytesReceived)
+{
+	int BytesReceived = 0;
+	int Bytes = 0;
+
+	// Receive byte per byte.
+	while ((BytesReceived <= 0)||(strstr((char*)readbuf, endstr) == NULL))
+	{
+		if (BytesReceived >= maxreadbuflen)
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadUntilStrRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endstr=%s, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"readbuf full. ", 
+				pRS232Port, readbuf, endstr, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		// Receive 1 byte.
+		if (ReadRS232Port(pRS232Port, readbuf + BytesReceived, 1, &Bytes) == EXIT_SUCCESS)
+		{
+			if (Bytes == 0)
+			{
+				PRINT_DEBUG_WARNING_RS232PORT(("ReadUntilStrRS232Port warning (%s) : %s"
+					"(pRS232Port=%#x, readbuf=%#x, endstr=%s, maxreadbuflen=%d)\n", 
+					strtime_m(), 
+					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
+					pRS232Port, readbuf, endstr, maxreadbuflen));
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+				return EXIT_TIMEOUT;
+			}
+			else
+			{
+				PRINT_DEBUG_MESSAGE_RS232PORT(("Bytes received : %d\n", Bytes));
+			}
+		}
+		else
+		{
+			PRINT_DEBUG_ERROR_RS232PORT(("ReadUntilStrRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, readbuf=%#x, endstr=%s, maxreadbuflen=%d)\n", 
+				strtime_m(), 
+				"ReadRS232Port failed. ", 
+				pRS232Port, readbuf, endstr, maxreadbuflen));
+			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			return EXIT_FAILURE;
+		}
+
+		BytesReceived += Bytes;
+	}
+
+	PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+
+	*pBytesReceived = BytesReceived;
+
+	return EXIT_SUCCESS;
+}
+
+#endif // !RS232PORT_H
