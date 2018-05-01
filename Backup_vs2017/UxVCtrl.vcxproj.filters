@@ -267,6 +267,9 @@
     <ClCompile Include="Hardware\MS583730BA.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\gpControl.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -614,6 +617,9 @@
     <ClInclude Include="Hardware\MS583730BA.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\gpControl.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -729,6 +735,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="MS583730BA0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="gpControl0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

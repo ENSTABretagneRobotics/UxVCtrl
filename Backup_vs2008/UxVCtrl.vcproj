@@ -399,6 +399,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\gpControl0.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Hokuyo0.txt"
 				>
 			</File>
@@ -908,6 +912,14 @@
 			</File>
 			<File
 				RelativePath=".\Hardware\CISCREA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\gpControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Hardware\gpControl.h"
 				>
 			</File>
 			<File

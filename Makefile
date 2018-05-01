@@ -21,6 +21,7 @@ CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-parameter
 #CFLAGS += -D ENABLE_VALGRIND_DEBUG 
 CFLAGS += -D OPENCV249
 #CFLAGS += -D OPENCV310
+#CFLAGS += -D USE_FFMPEG_VIDEO
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 #CFLAGS += -D USE_ALTERNATE_RECORDING
 CFLAGS += -D ENABLE_MAVLINK_SUPPORT
@@ -150,7 +151,13 @@ imatrix.o: ../interval/imatrix.cpp ../interval/imatrix.h
 
 ############################# Hardware #############################
 
+BlueView.o: ./Hardware/BlueView.cpp ./Hardware/BlueView.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 CISCREA.o: ./Hardware/CISCREA.cpp ./Hardware/CISCREA.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+gpControl.o: ./Hardware/gpControl.cpp ./Hardware/gpControl.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 Hokuyo.o: ./Hardware/Hokuyo.cpp ./Hardware/Hokuyo.h
@@ -211,9 +218,6 @@ SBG.o: ./Hardware/SBG.cpp ./Hardware/SBG.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
-	$(CXX) $(CXXFLAGS) -c $<
-
-BlueView.o: ./Hardware/BlueView.cpp ./Hardware/BlueView.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 SSC32.o: ./Hardware/SSC32.cpp ./Hardware/SSC32.h
@@ -311,7 +315,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o BlueView.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o LIRMIA3.o IM483I.o Hokuyo.o CISCREA.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

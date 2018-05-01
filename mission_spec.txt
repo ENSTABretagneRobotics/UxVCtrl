@@ -160,6 +160,8 @@
 %
 %lirmia3config LIRMIA3.txt bPause
 %
+%gpcontrolconfig gpControl.txt bPause
+%
 %pathfinderdvlconfig PathfinderDVL.txt bPause
 %
 %nortekdvlconfig NortekDVL.txt bPause

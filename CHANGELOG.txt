@@ -1,3 +1,6 @@
+221
+Beginning of GoPro integration.
+
 220
 Attempt to add UDP support to RS232Port.
 

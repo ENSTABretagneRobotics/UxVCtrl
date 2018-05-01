@@ -110,6 +110,8 @@ WMV2
 1
 % bEcho
 1
+% bDisablegpControl
+1
 % bDisablePathfinderDVL
 1
 % bDisableNortekDVL

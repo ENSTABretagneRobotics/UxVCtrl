@@ -117,6 +117,7 @@ BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 #pragma endregion
 #pragma region Devices parameters
+BOOL bDisablegpControl = FALSE;
 BOOL bDisablePathfinderDVL = FALSE;
 BOOL bDisableNortekDVL = FALSE;
 BOOL bDisableMES = FALSE;
@@ -392,6 +393,9 @@ BOOL bPauseCISCREA = FALSE, bRestartCISCREA = FALSE;
 BOOL bPauseLIRMIA3 = FALSE, bRestartLIRMIA3 = FALSE;
 
 #pragma region DEVICES
+// gpControl variables.
+BOOL bPausegpControl = FALSE, bRestartgpControl = FALSE;
+
 // PathfinderDVL variables.
 BOOL bPausePathfinderDVL = FALSE, bRestartPathfinderDVL = FALSE;
 

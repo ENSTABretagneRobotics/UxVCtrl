@@ -80,6 +80,7 @@
     <ClCompile Include="FollowMe.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Hardware\BlueView.cpp" />
+    <ClCompile Include="Hardware\gpControl.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
     <ClCompile Include="Hardware\LIRMIA3.cpp" />
     <ClCompile Include="Hardware\Maestro.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hardware\AIS.h" />
     <ClInclude Include="Hardware\BlueView.h" />
+    <ClInclude Include="Hardware\gpControl.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
     <ClInclude Include="Hardware\LIRMIA3.h" />
     <ClInclude Include="Hardware\Maestro.h" />
@@ -456,6 +458,7 @@
     <Text Include="BlueView0.txt" />
     <Text Include="BlueView1.txt" />
     <Text Include="CHANGELOG.txt" />
+    <Text Include="gpControl0.txt" />
     <Text Include="LIRMIA3.txt" />
     <Text Include="mission_spec.txt" />
     <Text Include="MS580314BA0.txt" />

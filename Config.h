@@ -76,6 +76,7 @@ inline int LoadConfig(void)
 	bEcho = TRUE;
 #pragma endregion
 #pragma region Devices parameters
+	bDisablegpControl = TRUE;
 	bDisablePathfinderDVL = TRUE;
 	bDisableNortekDVL = TRUE;
 	bDisableMES = TRUE;
@@ -356,6 +357,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
 #pragma region Devices parameters
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablegpControl) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisablePathfinderDVL) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1193,6 +1196,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bEcho) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 #pragma region Devices parameters
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisablegpControl) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisablePathfinderDVL) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

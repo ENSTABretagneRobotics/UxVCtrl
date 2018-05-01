@@ -290,6 +290,7 @@ extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 #pragma endregion
 #pragma region Devices parameters
+extern BOOL bDisablegpControl;
 extern BOOL bDisablePathfinderDVL;
 extern BOOL bDisableNortekDVL;
 extern BOOL bDisableMES;
@@ -565,6 +566,9 @@ extern BOOL bPauseCISCREA, bRestartCISCREA;
 extern BOOL bPauseLIRMIA3, bRestartLIRMIA3;
 
 #pragma region DEVICES
+// gpControl variables.
+extern BOOL bPausegpControl, bRestartgpControl;
+
 // PathfinderDVL variables.
 extern BOOL bPausePathfinderDVL, bRestartPathfinderDVL;
 

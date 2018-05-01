@@ -22,7 +22,7 @@ _ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/L
 [_ OpenAL SDK 1.1]
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
-[_ ffmpeg 32 bit (ffmpeg-msvc)]
+[_ ffmpeg 32 bit (recommended if using a SJCAM or GoPro through Wi-Fi, see http://www.ensta-bretagne.fr/lebars/utilities/ffmpeg-msvc.zip, to enable using ffmpeg_vs2017.bat script)]
 _ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP, can be disabled using Compat_vs20XX.bat script)
 _ CL-Eye driver and SDK (see https://codelaboratories.com/products/eye/driver/ , you might also want to create an environment variable CLEYESDK_DIR=C:\Users\Administrator\Documents\CL-Eye Platform SDK depending on where it is installed, can be disabled using Compat_vs20XX.bat script, not compatible with Kinect v2 support)
 _ ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt , can be disabled using Compat_vs20XX.bat script)
@@ -56,7 +56,7 @@ Modify the Commands() function in Commands.h to add a new command. Depending on 
 
 To add a new mission/advanced processing, VisualObstacle or Ball can be used as an example. Additional shared variables and critical sections should be declared in Globals.cpp/.h, the thread should be launched in main(), images overlays to display on the GUI should be added in OpenCVGUIThread(). Most of the time, parameters for a mission are set using a new command, e.g. ballconfig for Ball-related tasks. Information on the execution can be displayed on the GUI using images overlays if needed.
 
-To add a new device support, NMEADevice can be used as an example. Most of the time, a configuration file should be added for a device, as it is done for NMEADevice and others. A parameter to enable/disable this device should also be added in UxVCtrl.txt, see LoadConfig() and SaveConfig() in Config.h.
+To add a new device support, NMEADevice can be used as an example. Specific shared variables should be declared in Globals.cpp/.h and the thread should be launched in main(). Most of the time, a configuration file should be added for the device, as it is done for NMEADevice and others. A parameter to enable/disable this device should also be added in UxVCtrl.txt, see LoadConfig() and SaveConfig() in Config.h, as well as a command to be able to change dynamically its parameters, see Commands() in Commands.h and mission_spec.txt.
  
 All the shared variables should be declared in Globals.cpp/.h and protected by critical sections (most of them are protected in group, e.g. StateVariables, Ball,...). Some initializations should be done in InitGlobals()/ReleaseGlobals() (e.g. critical sections, images overlays,...).
 

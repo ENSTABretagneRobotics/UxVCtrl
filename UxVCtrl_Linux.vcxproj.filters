@@ -291,6 +291,9 @@
     <ClCompile Include="Hardware\MS583730BA.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\gpControl.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -644,6 +647,9 @@
     <ClInclude Include="Hardware\MS583730BA.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\gpControl.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
@@ -671,20 +677,8 @@
     <Text Include="MS583730BA0.txt">
       <Filter>Input Files</Filter>
     </Text>
-    <Text Include="restore\log\ReadMe.txt">
-      <Filter>restore\log</Filter>
-    </Text>
-    <Text Include="restore\aud\ReadMe.txt">
-      <Filter>restore\aud</Filter>
-    </Text>
-    <Text Include="restore\vid\ReadMe.txt">
-      <Filter>restore\vid</Filter>
-    </Text>
-    <Text Include="restore\pic\ReadMe.txt">
-      <Filter>restore\pic</Filter>
-    </Text>
-    <Text Include="restore\ReadMe.txt">
-      <Filter>restore</Filter>
+    <Text Include="gpControl0.txt">
+      <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
@@ -781,5 +775,10 @@
     <None Include="Video2.txt">
       <Filter>Input Files</Filter>
     </None>
+    <None Include="restore\aud\ReadMe.txt" />
+    <None Include="restore\log\ReadMe.txt" />
+    <None Include="restore\pic\ReadMe.txt" />
+    <None Include="restore\ReadMe.txt" />
+    <None Include="restore\vid\ReadMe.txt" />
   </ItemGroup>
 </Project>

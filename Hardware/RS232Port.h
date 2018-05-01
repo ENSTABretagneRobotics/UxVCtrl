@@ -910,7 +910,7 @@ inline int ReadAtLeastUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, c
 				"readbuf full. ", 
 				pRS232Port, readbuf, endstr, maxreadbuflen));
 			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		if (ReadRS232Port(pRS232Port, readbuf + BytesReceived, maxreadbuflen - BytesReceived, &Bytes) == EXIT_SUCCESS)
@@ -986,7 +986,7 @@ inline int ReadAtLeastUntilRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char
 				"readbuf full. ", 
 				pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
 			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		if (ReadRS232Port(pRS232Port, readbuf + BytesReceived, maxreadbuflen - BytesReceived, &Bytes) == EXIT_SUCCESS)
@@ -1075,7 +1075,7 @@ inline int ReadUntilRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char endcha
 				"readbuf full. ", 
 				pRS232Port, readbuf, (int)(unsigned char)endchar, maxreadbuflen));
 			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		// Receive 1 byte.
@@ -1133,7 +1133,7 @@ inline int ReadUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char* en
 				"readbuf full. ", 
 				pRS232Port, readbuf, endstr, maxreadbuflen));
 			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
-			return EXIT_FAILURE;
+			return EXIT_OUT_OF_MEMORY;
 		}
 
 		// Receive 1 byte.

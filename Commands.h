@@ -1864,6 +1864,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartLIRMIA3 = TRUE;
 		bPauseLIRMIA3 = ival1;
 	}
+	else if (sscanf(line, "gpcontrolconfig %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "gpControl0.txt", strlen("gpControl0.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "gpControl0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartgpControl = TRUE;
+		bPausegpControl = ival1;
+	}
 	else if (sscanf(line, "pathfinderconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "PathfinderDVL0.txt", strlen("PathfinderDVL0.txt")) != 0)

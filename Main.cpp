@@ -7,6 +7,7 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
+#include "gpControl.h"
 #include "Video.h"
 #include "VideoRecord.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -86,6 +87,7 @@ int main(int argc, char* argv[])
 {
 	int i = 0;
 	BOOL bGUIAvailable = FALSE;
+	THREAD_IDENTIFIER gpControlThreadId;
 	THREAD_IDENTIFIER VideoThreadId[MAX_NB_VIDEO];
 	THREAD_IDENTIFIER VideoRecordThreadId[MAX_NB_VIDEO];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -182,12 +184,12 @@ int main(int argc, char* argv[])
 #endif // _WIN32
 
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...
+	if (!bDisablegpControl) CreateDefaultThread(gpControlThread, NULL, &gpControlThreadId);
 	for (i = 0; i < nbvideo; i++)
 	{
 		CreateDefaultThread(VideoThread, (void*)(intptr_t)i, &VideoThreadId[i]);
 		CreateDefaultThread(VideoRecordThread, (void*)(intptr_t)i, &VideoRecordThreadId[i]);
 	}
-
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(SeanetProcessingThread, NULL, &SeanetProcessingThreadId);
 	CreateDefaultThread(SonarLocalizationThread, NULL, &SonarLocalizationThreadId);
@@ -423,12 +425,12 @@ int main(int argc, char* argv[])
 	WaitForThread(SonarLocalizationThreadId);
 	WaitForThread(SeanetProcessingThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-
 	for (i = nbvideo-1; i >= 0; i--)
 	{
 		WaitForThread(VideoRecordThreadId[i]);
 		WaitForThread(VideoThreadId[i]);
 	}
+	if (!bDisablegpControl) WaitForThread(gpControlThreadId);
 
 #ifdef _WIN32
 	// Allow the system to idle to sleep normally.
