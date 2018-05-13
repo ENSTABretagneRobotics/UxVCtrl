@@ -33,6 +33,7 @@ struct GPCONTROL
 	//int BaudRate;
 	//int timeout;
 	BOOL bSaveRawData;
+	BOOL bDisableHTTPPersistent;
 	BOOL bDisableStreamingSettings;
 	BOOL bDisableStatusCheck;
 	char streamingstarthttpreq[256];
@@ -449,21 +450,39 @@ inline int KeepAlivegpControl(GPCONTROL* pgpControl)
 
 	if (!pgpControl->bDisableStatusCheck)
 	{
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (inittcpcli(&pgpControl->tcpsock, pgpControl->RS232Port.address, "80") != EXIT_SUCCESS)
+			{
+				printf("Error communicating with a gpControl.\n");
+				return EXIT_FAILURE;
+			}
+		}
 		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->statushttpreq) != EXIT_SUCCESS)
 		{
-			printf("Error communicating with gpControl.\n");
+			printf("Error communicating with a gpControl.\n");
+			if (pgpControl->bDisableHTTPPersistent) releasetcpcli(pgpControl->tcpsock);
 			return EXIT_FAILURE;
 		}
 		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
 		{
-			printf("Error communicating with gpControl.\n");
+			printf("Error communicating with a gpControl.\n");
+			if (pgpControl->bDisableHTTPPersistent) releasetcpcli(pgpControl->tcpsock);
 			return EXIT_FAILURE;
+		}
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+			{
+				printf("Error communicating with a gpControl.\n");
+				return EXIT_FAILURE;
+			}
 		}
 		sprintf(streamingstatustmp, "\"%d\":", pgpControl->streamingstatusid);
 		ptr = strstr(body, streamingstatustmp);
 		if ((ptr == NULL)||(ptr[strlen(streamingstatustmp)] != '1'))
 		{
-			printf("Error communicating with gpControl.\n");
+			printf("Error communicating with a gpControl.\n");
 			free(title);
 			free(body);
 			return EXIT_FAILURE;
@@ -501,6 +520,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		//pgpControl->BaudRate = 9600;
 		//pgpControl->timeout = 1000;
 		pgpControl->bSaveRawData = 0; // Not a parameter at the moment...
+		pgpControl->bDisableHTTPPersistent = 0;
 		pgpControl->bDisableStreamingSettings = 0;
 		pgpControl->bDisableStatusCheck = 0;
 		memset(pgpControl->streamingstarthttpreq, 0, sizeof(pgpControl->streamingstarthttpreq));
@@ -528,6 +548,8 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			//if (sscanf(line, "%d", &pgpControl->timeout) != 1) printf("Invalid configuration file.\n");
 			//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			//if (sscanf(line, "%d", &pgpControl->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pgpControl->bDisableHTTPPersistent) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pgpControl->bDisableStreamingSettings) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -581,7 +603,6 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		CloseRS232Port(&pgpControl->RS232Port);
 		return EXIT_FAILURE;
 	}
-	mSleep(100);
 
 	if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->streamingstarthttpreq) != EXIT_SUCCESS)
 	{
@@ -600,9 +621,27 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			return EXIT_FAILURE;
 		}
 	}
+	if (pgpControl->bDisableHTTPPersistent)
+	{
+		if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to gpControl.\n");
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+	}
 
 	if (!pgpControl->bDisableStreamingSettings)
 	{
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (inittcpcli(&pgpControl->tcpsock, pgpControl->RS232Port.address, "80") != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
 		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->streamingbitratehttpreq) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to gpControl.\n");
@@ -616,6 +655,24 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			{
 				printf("Unable to connect to gpControl.\n");
 				releasetcpcli(pgpControl->tcpsock);
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (inittcpcli(&pgpControl->tcpsock, pgpControl->RS232Port.address, "80") != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
 				CloseRS232Port(&pgpControl->RS232Port);
 				return EXIT_FAILURE;
 			}
@@ -637,12 +694,30 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 				return EXIT_FAILURE;
 			}
 		}
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
 	}
 
 	mSleep(250);
 
 	if (!pgpControl->bDisableStatusCheck)
 	{
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (inittcpcli(&pgpControl->tcpsock, pgpControl->RS232Port.address, "80") != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
 		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->statushttpreq) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to gpControl.\n");
@@ -657,6 +732,15 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			CloseRS232Port(&pgpControl->RS232Port);
 			return EXIT_FAILURE;
 		}
+		if (pgpControl->bDisableHTTPPersistent)
+		{
+			if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
 		sprintf(streamingstatustmp, "\"%d\":", pgpControl->streamingstatusid);
 		ptr = strstr(body, streamingstatustmp);
 		if ((ptr == NULL)||(ptr[strlen(streamingstatustmp)] != '1'))
@@ -664,7 +748,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			printf("Unable to connect to gpControl.\n");
 			free(title);
 			free(body);
-			releasetcpcli(pgpControl->tcpsock);
+			if (!pgpControl->bDisableHTTPPersistent) releasetcpcli(pgpControl->tcpsock);
 			CloseRS232Port(&pgpControl->RS232Port);
 			return EXIT_FAILURE;
 		}
@@ -679,11 +763,14 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 
 inline int DisconnectgpControl(GPCONTROL* pgpControl)
 {
-	if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+	if (!pgpControl->bDisableHTTPPersistent)
 	{
-		printf("gpControl disconnection failed.\n");
-		CloseRS232Port(&pgpControl->RS232Port);
-		return EXIT_FAILURE;
+		if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+		{
+			printf("gpControl disconnection failed.\n");
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
 	}
 
 	if (CloseRS232Port(&pgpControl->RS232Port) != EXIT_SUCCESS)
