@@ -1,16 +1,20 @@
 % Device IP address
 udp://10.5.5.9:8554
+% bDisableStreamingSettings
+0
+% bDisableStatusCheck
+1
 % streamingstarthttpreq
-/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart
+http://10.5.5.9/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart
 % streamingbitratehttpreq
-/gp/gpControl/setting/62/2000000
+http://10.5.5.9/gp/gpControl/setting/62/2000000
 % streamingresolutionhttpreq
-/gp/gpControl/setting/64/7
-% nbretry
-2
-% retryperiod (in ms)
-1000
+http://10.5.5.9/gp/gpControl/setting/64/7
+% statushttpreq
+http://10.5.5.9/gp/gpControl/status
+% streamingstatusid
+32
 % keepalivemsg
 _GPHD_:0:0:2:0.000000
 % keepaliveperiod (in ms)
-2500
+2000

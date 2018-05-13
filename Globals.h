@@ -810,26 +810,26 @@ inline void ComputeGNSSPosition(double Latitude, double Longitude, double Altitu
 		{
 			x_gps = interval(x-GPS_high_acc, x+GPS_high_acc);
 			y_gps = interval(y-GPS_high_acc, y+GPS_high_acc);
-			z_gps = interval(z-5*GPS_high_acc, z+5*GPS_high_acc);
+			z_gps = interval(z-5.0*GPS_high_acc, z+5.0*GPS_high_acc);
 		}
 		else if (((nbSat >= GPS_med_acc_nbsat)&&(HDOP <= GPS_med_acc_HDOP))||(nbSat <= 0))
 		{
 			// Default accuracy...
 			x_gps = interval(x-GPS_med_acc, x+GPS_med_acc);
 			y_gps = interval(y-GPS_med_acc, y+GPS_med_acc);
-			z_gps = interval(z-5*GPS_med_acc, z+5*GPS_med_acc);
+			z_gps = interval(z-5.0*GPS_med_acc, z+5.0*GPS_med_acc);
 		}
 		else if ((nbSat >= GPS_low_acc_nbsat)&&(HDOP <= GPS_low_acc_HDOP))
 		{
 			x_gps = interval(x-GPS_low_acc, x+GPS_low_acc);
 			y_gps = interval(y-GPS_low_acc, y+GPS_low_acc);
-			z_gps = interval(z-5*GPS_low_acc, z+5*GPS_low_acc);
+			z_gps = interval(z-5.0*GPS_low_acc, z+5.0*GPS_low_acc);
 		}
 		else
 		{
 			x_gps = interval(x-MAX_UNCERTAINTY, x+MAX_UNCERTAINTY);
 			y_gps = interval(y-MAX_UNCERTAINTY, y+MAX_UNCERTAINTY);
-			z_gps = interval(z-5*MAX_UNCERTAINTY, z+5*MAX_UNCERTAINTY);
+			z_gps = interval(z-5.0*MAX_UNCERTAINTY, z+5.0*MAX_UNCERTAINTY);
 		}
 		break;
 	case RTK_FLOAT:
@@ -838,13 +838,13 @@ inline void ComputeGNSSPosition(double Latitude, double Longitude, double Altitu
 			// Probably about to lose GPS soon...
 			x_gps = interval(x-GPS_low_acc, x+GPS_low_acc);
 			y_gps = interval(y-GPS_low_acc, y+GPS_low_acc);
-			z_gps = interval(z-5*GPS_low_acc, z+5*GPS_low_acc);
+			z_gps = interval(z-5.0*GPS_low_acc, z+5.0*GPS_low_acc);
 		}
 		else
 		{
 			x_gps = interval(x-RTK_float_acc, x+RTK_float_acc);
 			y_gps = interval(y-RTK_float_acc, y+RTK_float_acc);
-			z_gps = interval(z-5*RTK_float_acc, z+5*RTK_float_acc);
+			z_gps = interval(z-5.0*RTK_float_acc, z+5.0*RTK_float_acc);
 		}
 		break;
 	case RTK_FIXED:
@@ -853,13 +853,13 @@ inline void ComputeGNSSPosition(double Latitude, double Longitude, double Altitu
 			// Probably about to lose GPS soon...
 			x_gps = interval(x-GPS_low_acc, x+GPS_low_acc);
 			y_gps = interval(y-GPS_low_acc, y+GPS_low_acc);
-			z_gps = interval(z-5*GPS_low_acc, z+5*GPS_low_acc);
+			z_gps = interval(z-5.0*GPS_low_acc, z+5.0*GPS_low_acc);
 		}
 		else
 		{
 			x_gps = interval(x-RTK_fixed_acc, x+RTK_fixed_acc);
 			y_gps = interval(y-RTK_fixed_acc, y+RTK_fixed_acc);
-			z_gps = interval(z-5*RTK_fixed_acc, z+5*RTK_fixed_acc);
+			z_gps = interval(z-5.0*RTK_fixed_acc, z+5.0*RTK_fixed_acc);
 		}
 		break;
 	case GNSS_NO_FIX:

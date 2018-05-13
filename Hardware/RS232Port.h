@@ -1133,6 +1133,7 @@ inline int ReadUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char* en
 				"readbuf full. ", 
 				pRS232Port, readbuf, endstr, maxreadbuflen));
 			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			*pBytesReceived = BytesReceived;
 			return EXIT_OUT_OF_MEMORY;
 		}
 
@@ -1147,6 +1148,7 @@ inline int ReadUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char* en
 					szOSUtilsErrMsgs[EXIT_TIMEOUT], 
 					pRS232Port, readbuf, endstr, maxreadbuflen));
 				PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+				*pBytesReceived = BytesReceived;
 				return EXIT_TIMEOUT;
 			}
 			else
@@ -1162,6 +1164,7 @@ inline int ReadUntilStrRS232Port(RS232PORT* pRS232Port, uint8* readbuf, char* en
 				"ReadRS232Port failed. ", 
 				pRS232Port, readbuf, endstr, maxreadbuflen));
 			PRINT_DEBUG_MESSAGE_RS232PORT(("Total bytes received : %d\n", BytesReceived));
+			*pBytesReceived = BytesReceived;
 			return EXIT_FAILURE;
 		}
 

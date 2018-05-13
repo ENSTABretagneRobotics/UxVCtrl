@@ -26,14 +26,21 @@ struct GPCONTROL
 	RS232PORT RS232Port;
 	SOCKET tcpsock;
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
-	double LastVal;
+	//double LastVal;
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
-	int BaudRate;
-	int timeout;
+	//int BaudRate;
+	//int timeout;
 	BOOL bSaveRawData;
-	int retryperiod;
+	BOOL bDisableStreamingSettings;
+	BOOL bDisableStatusCheck;
+	char streamingstarthttpreq[256];
+	char streamingbitratehttpreq[256];
+	char streamingresolutionhttpreq[256];
+	char statushttpreq[256];
+	int streamingstatusid;
+	char keepalivemsg[256];
 	int keepaliveperiod;
 };
 typedef struct GPCONTROL GPCONTROL;
@@ -70,7 +77,7 @@ inline int sendsimplehttpgetreq(SOCKET sock, char* url)
 		return EXIT_INVALID_PARAMETER;
 	}
 
-	address = (char*)calloc(count, 1);
+	address = (char*)calloc(count+1, 1);
 	if (address == NULL)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("sendhttpgetreq error (%s) : %s(sock=%d, url=%s)\n",
@@ -85,10 +92,9 @@ inline int sendsimplehttpgetreq(SOCKET sock, char* url)
 	sprintf(sendbuf,
 		"GET %s HTTP/1.1\r\n"
 		"Host: %s\r\n"
-		"Accept: text/html\r\n"
-		"\r\n"
+//		"Accept: text/html\r\n"
 		"\r\n",
-		url, address);
+		url+strlen("http://")+strlen(address), address);
 	free(address);
 	sendbuflen = (int)strlen(sendbuf);
 	ret = sendall(sock, sendbuf, sendbuflen);
@@ -105,34 +111,37 @@ inline int sendsimplehttpgetreq(SOCKET sock, char* url)
 
 /*
 
-Need free(contenttype), free(content)...
+Need free(*pszStatus), free(*pContentType), free(*pContent)...
 
 */
-inline int recvsimplehttpresp(SOCKET sock, int* pStatus, char* contenttype, int* pContentLength, char* content, int maxrecvbuflen, int* pBytesReceived)
+inline int recvsimplehttpresp(SOCKET sock, int* pStatus, char** pszStatus, char** pContentType, int* pContentLength, char** pContent, int maxrecvbuflen, int* pBytesReceived)
 {
 	int ret = EXIT_FAILURE;
 	char* recvbuf = NULL;
 	char* ptr = NULL;
-	double httpver = 0;
-	char szStatus[256];
+	char* ptr2 = NULL;
 	int count = 0;
+	double httpver = 0;
 
 	*pStatus = 0;
-	contenttype = NULL;
+	*pszStatus = NULL;
+	*pContentType = NULL;
 	*pContentLength = 0;
-	content = NULL;
+	*pContent = NULL;
 	*pBytesReceived = 0;
 
-	recvbuf = (char*)calloc(maxrecvbuflen, 1);
+	recvbuf = (char*)calloc(maxrecvbuflen+1, 1);
 	if (recvbuf == NULL)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
 		return EXIT_OUT_OF_MEMORY;
 	}
+
+	// Should enable other line endings...
 
 	ret = recvuntilstr(sock, recvbuf, "\r\n\r\n", maxrecvbuflen, pBytesReceived);
 	if (ret != EXIT_SUCCESS)
@@ -145,71 +154,70 @@ inline int recvsimplehttpresp(SOCKET sock, int* pStatus, char* contenttype, int*
 	if (ptr == NULL)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
 		free(recvbuf);
 		return EXIT_INVALID_DATA;
 	}
 
-	if (sscanf(ptr, "HTTP/%lf %d %[^\r\n]255s", &httpver, pStatus, szStatus) != 3)
+	*pszStatus = (char*)calloc(256, 1);
+	if (*pszStatus == NULL)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
-			strtime_m(),
-			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
-		free(recvbuf);
-		return EXIT_INVALID_DATA;
-	}
-
-	ptr = strstr(recvbuf, "Content-Type: ");
-	if (ptr == NULL)
-	{
-		free(recvbuf);
-		return EXIT_SUCCESS;
-	}
-	count = -(ptr-strstr(ptr, "\r\n"));
-	if (count <= 0)
-	{
-		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
-			strtime_m(),
-			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
-		free(recvbuf);
-		return EXIT_INVALID_DATA;
-	}
-	
-	contenttype = (char*)calloc(count, 1);
-	if (contenttype == NULL)
-	{
-		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
 		free(recvbuf);
 		return EXIT_OUT_OF_MEMORY;
 	}
-	
-	if (sscanf(ptr, "Content-Type: %[^\r\n]255s", contenttype) != 1)
+
+	if (sscanf(ptr, "HTTP/%lf %d %[^\r\n]255s", &httpver, pStatus, *pszStatus) != 3)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
-		free(contenttype);
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
+		free(*pszStatus);
 		free(recvbuf);
 		return EXIT_INVALID_DATA;
 	}
+
+	if (strstrbeginend(ptr, "Content-Type: ", "\r\n", &ptr2, &count) == NULL)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			strtime_m(),
+			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
+		free(*pszStatus);
+		free(recvbuf);
+		return EXIT_INVALID_DATA;
+	}
+
+	*pContentType = (char*)calloc(count+1, 1);
+	if (*pContentType == NULL)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			strtime_m(),
+			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY],
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
+		free(*pszStatus);
+		free(recvbuf);
+		return EXIT_OUT_OF_MEMORY;
+	}
+
+	memcpy(*pContentType, ptr2, count);
 
 	ptr = strstr(recvbuf, "Content-Length: ");
 	if (ptr == NULL)
 	{
-		free(contenttype);
+		free(*pContentType);
+		free(*pszStatus);
 		free(recvbuf);
 		return EXIT_SUCCESS;
 	}
@@ -217,33 +225,37 @@ inline int recvsimplehttpresp(SOCKET sock, int* pStatus, char* contenttype, int*
 	if ((sscanf(ptr, "Content-Length: %d", pContentLength) != 1)||(*pContentLength < 0))
 	{
 		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
-		free(contenttype);
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
+		free(*pContentType);
+		free(*pszStatus);
 		free(recvbuf);
 		return EXIT_INVALID_DATA;
 	}
 	
 	free(recvbuf);
 
-	content = (char*)calloc(*pContentLength, 1);
-	if (content == NULL)
+	*pContent = (char*)calloc(*pContentLength+1, 1);
+	if (*pContent == NULL)
 	{
 		PRINT_DEBUG_ERROR_OSNET(("recvsimplehttpresp error (%s) : %s"
-			"(sock=%d, *pStatus=%d, contenttype=%s, *pContentLength=%d, content=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			"(sock=%d, *pStatus=%d, *pszStatus=%s, *pContentType=%s, *pContentLength=%d, *pContent=%#x, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY],
-			(int)sock, *pStatus, contenttype, *pContentLength, content, maxrecvbuflen, *pBytesReceived));
-		free(contenttype);
+			(int)sock, *pStatus, *pszStatus, *pContentType, *pContentLength, *pContent, maxrecvbuflen, *pBytesReceived));
+		free(*pContentType);
+		free(*pszStatus);
 		return EXIT_OUT_OF_MEMORY;
 	}
 
-	ret = recvall(sock, recvbuf, *pContentLength);
+	ret = recvall(sock, *pContent, *pContentLength);
 	if (ret != EXIT_SUCCESS)
 	{
-		free(contenttype);
+		free(*pContent);
+		free(*pContentType);
+		free(*pszStatus);
 		return ret;
 	}
 
@@ -254,23 +266,112 @@ inline int recvsimplehttpresp(SOCKET sock, int* pStatus, char* contenttype, int*
 
 /*
 
-Need free(title), free(body)...?
+Need free(*pTagParams), free(*pTagData)...
 
 */
-inline int recvsimplehtml(SOCKET sock, char* title, char* body, int maxrecvbuflen, int* pBytesReceived)
+inline int gethtmltagdata(char* str, char* tag, char** pTagParams, char** pTagData)
+{
+	char* ptr = NULL;
+	char* ptr2 = NULL;
+	int count = 0;
+	char* tagbegin = NULL;
+	char* tagend = NULL;
+
+	tagbegin = (char*)calloc(strlen(tag)+2, 1);
+	if (tagbegin == NULL)
+	{
+		return EXIT_OUT_OF_MEMORY;
+	}
+
+	tagbegin[0] = '<';
+	strcat(tagbegin, tag);
+
+	if (stristrbeginend(str, tagbegin, ">", &ptr, &count) == NULL)
+	{
+		free(tagbegin);
+		return EXIT_INVALID_DATA;
+	}
+
+	*pTagParams = (char*)calloc(count+1, 1);
+	if (*pTagParams == NULL)
+	{
+		free(tagbegin);
+		return EXIT_OUT_OF_MEMORY;
+	}
+	
+	memcpy(*pTagParams, ptr, count);
+
+	tagend = (char*)calloc(strlen(tag)+4, 1);
+	if (tagend == NULL)
+	{
+		free(*pTagParams);
+		free(tagbegin);
+		return EXIT_OUT_OF_MEMORY;
+	}
+
+	tagend[0] = '<';
+	tagend[1] = '/';
+	strcat(tagend, tag);
+	strcat(tagend, ">");
+
+	ptr2 = stristr(str, tagend);
+	if (ptr2 == NULL)
+	{
+		free(tagend);
+		free(*pTagParams);
+		free(tagbegin);
+		return EXIT_INVALID_DATA;
+	}
+
+	count = ptr2-ptr;
+	if (count < 0)
+	{
+		free(tagend);
+		free(*pTagParams);
+		free(tagbegin);
+		return EXIT_INVALID_DATA;
+	}
+
+	*pTagData = (char*)calloc(count+1, 1);
+	if (*pTagData == NULL)
+	{
+		free(tagend);
+		free(*pTagParams);
+		free(tagbegin);
+		return EXIT_OUT_OF_MEMORY;
+	}
+	
+	memcpy(*pTagData, ptr2, count);
+
+	free(tagend);
+	free(tagbegin);
+
+	return EXIT_SUCCESS;
+}
+
+/*
+
+Need free(*pTitle), free(*pBody)...?
+
+*/
+inline int recvsimplehtml(SOCKET sock, char** pTitle, char** pBody, int maxrecvbuflen, int* pBytesReceived)
 {
 	int status = 0;
+	char* szstatus = NULL;
 	char* contenttype = NULL;
 	int contentlength = 0;
 	char* content = NULL;
 	int ret = 0;
+	char* titleparams = NULL;
+	char* bodyparams = NULL;
 
-	title = NULL;
-	body = NULL;
+	*pTitle = NULL;
+	*pBody = NULL;
 
-	ret = recvsimplehttpresp(sock, &status, contenttype, &contentlength, content, maxrecvbuflen, pBytesReceived);
+	ret = recvsimplehttpresp(sock, &status, &szstatus, &contenttype, &contentlength, &content, maxrecvbuflen, pBytesReceived);
 	if (ret != EXIT_SUCCESS)
 	{
+		free(szstatus);
 		free(contenttype);
 		free(content);
 		return ret;
@@ -282,45 +383,94 @@ inline int recvsimplehtml(SOCKET sock, char* title, char* body, int maxrecvbufle
 			"(sock=%d, title=%s, body=%s, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
 			strtime_m(),
 			szOSUtilsErrMsgs[EXIT_INVALID_DATA],
-			(int)sock, title, body, maxrecvbuflen, *pBytesReceived));
+			(int)sock, *pTitle, *pBody, maxrecvbuflen, *pBytesReceived));
+		free(szstatus);
 		free(contenttype);
 		free(content);
 		return EXIT_INVALID_DATA;
 	}
 
+	if (gethtmltagdata(content, "title", &titleparams, pTitle) != EXIT_SUCCESS)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("recvsimplehtml error (%s) : %s"
+			"(sock=%d, title=%s, body=%s, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			strtime_m(),
+			szOSUtilsErrMsgs[EXIT_FAILURE],
+			(int)sock, *pTitle, *pBody, maxrecvbuflen, *pBytesReceived));
+		free(szstatus);
+		free(contenttype);
+		free(content);
+		return EXIT_FAILURE;
+	}
 
-	//
+	if (gethtmltagdata(content, "body", &bodyparams, pBody) != EXIT_SUCCESS)
+	{
+		PRINT_DEBUG_ERROR_OSNET(("recvsimplehtml error (%s) : %s"
+			"(sock=%d, title=%s, body=%s, maxrecvbuflen=%d, *pBytesReceived=%d)\n",
+			strtime_m(),
+			szOSUtilsErrMsgs[EXIT_FAILURE],
+			(int)sock, *pTitle, *pBody, maxrecvbuflen, *pBytesReceived));
+		free(titleparams);
+		free(szstatus);
+		free(contenttype);
+		free(content);
+		return EXIT_FAILURE;
+	}
 
+	free(bodyparams);
+	free(titleparams);
 
+	free(szstatus);
 	free(contenttype);
 	free(content);
 	
 	return EXIT_SUCCESS;
 }
 
-
-/*
-Initialize a gpControl.
-
-Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
-*/
-inline int InitgpControl(GPCONTROL* pgpControl)
-{
-	
-
-	if (sendsimplehttpgetreq(pgpControl->tcpsock, "") != EXIT_SUCCESS)
-	{ 
-		printf("Error writing data to a gpControl. \n");
-		return EXIT_FAILURE;
-	}
-
-
-
-	return EXIT_SUCCESS;
-}
-
 inline int KeepAlivegpControl(GPCONTROL* pgpControl)
 {
+	char* ptr = NULL;
+	char* title = NULL;
+	char* body = NULL;
+	int BytesReceived = 0;
+	char streamingstatustmp[256];
+	struct sockaddr_in sa;
+	int salen = sizeof(sa);
+	
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons((unsigned short)atoi(pgpControl->RS232Port.port));
+	sa.sin_addr.s_addr = inet_addr(pgpControl->RS232Port.address);
+	
+	// Keep-alive...
+	sendto(pgpControl->RS232Port.s, "_GPHD_:0:0:2:0.000000", sizeof("_GPHD_:0:0:2:0.000000"), 0, (struct sockaddr*)&sa, salen);
+	
+
+	if (!pgpControl->bDisableStatusCheck)
+	{
+		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->statushttpreq) != EXIT_SUCCESS)
+		{
+			printf("Error communicating with gpControl.\n");
+			return EXIT_FAILURE;
+		}
+		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+		{
+			printf("Error communicating with gpControl.\n");
+			return EXIT_FAILURE;
+		}
+		sprintf(streamingstatustmp, "\"%d\":", pgpControl->streamingstatusid);
+		ptr = strstr(body, streamingstatustmp);
+		if ((ptr == NULL)||(ptr[strlen(streamingstatustmp)] != '1'))
+		{
+			printf("Error communicating with gpControl.\n");
+			free(title);
+			free(body);
+			return EXIT_FAILURE;
+		}
+		free(title);
+		free(body);
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -330,6 +480,11 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 {
 	FILE* file = NULL;
 	char line[256];
+	char* ptr = NULL;
+	char* title = NULL;
+	char* body = NULL;
+	int BytesReceived = 0;
+	char streamingstatustmp[256];
 
 	memset(pgpControl->szCfgFilePath, 0, sizeof(pgpControl->szCfgFilePath));
 	sprintf(pgpControl->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -342,12 +497,24 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 
 		// Default values.
 		memset(pgpControl->szDevPath, 0, sizeof(pgpControl->szDevPath));
-		sprintf(pgpControl->szDevPath, "COM1");
-		pgpControl->BaudRate = 9600;
-		pgpControl->timeout = 1000;
-		pgpControl->bSaveRawData = 1;
-		pgpControl->retryperiod = 1;
-		pgpControl->keepaliveperiod = 1000;
+		sprintf(pgpControl->szDevPath, "udp://10.5.5.9:8554");
+		//pgpControl->BaudRate = 9600;
+		//pgpControl->timeout = 1000;
+		pgpControl->bSaveRawData = 0; // Not a parameter at the moment...
+		pgpControl->bDisableStreamingSettings = 0;
+		pgpControl->bDisableStatusCheck = 0;
+		memset(pgpControl->streamingstarthttpreq, 0, sizeof(pgpControl->streamingstarthttpreq));
+		sprintf(pgpControl->streamingstarthttpreq, "http://10.5.5.9/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart");
+		memset(pgpControl->streamingbitratehttpreq, 0, sizeof(pgpControl->streamingbitratehttpreq));
+		sprintf(pgpControl->streamingbitratehttpreq, "http://10.5.5.9/gp/gpControl/setting/62/2000000");
+		memset(pgpControl->streamingresolutionhttpreq, 0, sizeof(pgpControl->streamingresolutionhttpreq));
+		sprintf(pgpControl->streamingresolutionhttpreq, "http://10.5.5.9/gp/gpControl/setting/64/7");
+		memset(pgpControl->statushttpreq, 0, sizeof(pgpControl->statushttpreq));
+		sprintf(pgpControl->statushttpreq, "http://10.5.5.9/gp/gpControl/status");
+		pgpControl->streamingstatusid = 32;
+		memset(pgpControl->keepalivemsg, 0, sizeof(pgpControl->keepalivemsg));
+		sprintf(pgpControl->keepalivemsg, "_GPHD_:0:0:2:0.000000");
+		pgpControl->keepaliveperiod = 2000;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -355,14 +522,28 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		{
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%255s", pgpControl->szDevPath) != 1) printf("Invalid configuration file.\n");
+			//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			//if (sscanf(line, "%d", &pgpControl->BaudRate) != 1) printf("Invalid configuration file.\n");
+			//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			//if (sscanf(line, "%d", &pgpControl->timeout) != 1) printf("Invalid configuration file.\n");
+			//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			//if (sscanf(line, "%d", &pgpControl->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pgpControl->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pgpControl->bDisableStreamingSettings) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pgpControl->timeout) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pgpControl->bDisableStatusCheck) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pgpControl->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pgpControl->streamingstarthttpreq) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pgpControl->retryperiod) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pgpControl->streamingbitratehttpreq) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pgpControl->streamingresolutionhttpreq) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pgpControl->statushttpreq) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pgpControl->streamingstatusid) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pgpControl->keepalivemsg) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pgpControl->keepaliveperiod) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
@@ -376,35 +557,120 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 	// Used to save raw data, should be handled specifically...
 	//pgpControl->pfSaveFile = NULL;
 
-	pgpControl->LastVal = 0;
+	//pgpControl->LastVal = 0;
 
+	// UDP connection.
 	if (OpenRS232Port(&pgpControl->RS232Port, pgpControl->szDevPath) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a gpControl.\n");
 		return EXIT_FAILURE;
 	}
 
-	if (SetOptionsRS232Port(&pgpControl->RS232Port, pgpControl->BaudRate, NOPARITY, FALSE, 8, 
-		ONESTOPBIT, (UINT)pgpControl->timeout) != EXIT_SUCCESS)
-	{
-		printf("Unable to connect to a gpControl.\n");
-		CloseRS232Port(&pgpControl->RS232Port);
-		return EXIT_FAILURE;
-	}
+	//if (SetOptionsRS232Port(&pgpControl->RS232Port, pgpControl->BaudRate, NOPARITY, FALSE, 8, 
+	//	ONESTOPBIT, (UINT)pgpControl->timeout) != EXIT_SUCCESS)
+	//{
+	//	printf("Unable to connect to a gpControl.\n");
+	//	CloseRS232Port(&pgpControl->RS232Port);
+	//	return EXIT_FAILURE;
+	//}
 
-	if (InitgpControl(pgpControl) != EXIT_SUCCESS)
+	// Web connection.
+	if (inittcpcli(&pgpControl->tcpsock, pgpControl->RS232Port.address, "80") != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to gpControl.\n");
 		CloseRS232Port(&pgpControl->RS232Port);
 		return EXIT_FAILURE;
 	}
+	mSleep(100);
 
+	if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->streamingstarthttpreq) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to gpControl.\n");
+		releasetcpcli(pgpControl->tcpsock);
+		CloseRS232Port(&pgpControl->RS232Port);
+		return EXIT_FAILURE;
+	}
+	if (!pgpControl->bDisableStatusCheck)
+	{
+		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to gpControl.\n");
+			releasetcpcli(pgpControl->tcpsock);
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+	}
 
+	if (!pgpControl->bDisableStreamingSettings)
+	{
+		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->streamingbitratehttpreq) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to gpControl.\n");
+			releasetcpcli(pgpControl->tcpsock);
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+		if (!pgpControl->bDisableStatusCheck)
+		{
+			if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				releasetcpcli(pgpControl->tcpsock);
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
+		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->streamingresolutionhttpreq) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to gpControl.\n");
+			releasetcpcli(pgpControl->tcpsock);
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+		if (!pgpControl->bDisableStatusCheck)
+		{
+			if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+			{
+				printf("Unable to connect to gpControl.\n");
+				releasetcpcli(pgpControl->tcpsock);
+				CloseRS232Port(&pgpControl->RS232Port);
+				return EXIT_FAILURE;
+			}
+		}
+	}
 
+	mSleep(250);
 
-
-
-
+	if (!pgpControl->bDisableStatusCheck)
+	{
+		if (sendsimplehttpgetreq(pgpControl->tcpsock, pgpControl->statushttpreq) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to gpControl.\n");
+			releasetcpcli(pgpControl->tcpsock);
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to gpControl.\n");
+			releasetcpcli(pgpControl->tcpsock);
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+		sprintf(streamingstatustmp, "\"%d\":", pgpControl->streamingstatusid);
+		ptr = strstr(body, streamingstatustmp);
+		if ((ptr == NULL)||(ptr[strlen(streamingstatustmp)] != '1'))
+		{
+			printf("Unable to connect to gpControl.\n");
+			free(title);
+			free(body);
+			releasetcpcli(pgpControl->tcpsock);
+			CloseRS232Port(&pgpControl->RS232Port);
+			return EXIT_FAILURE;
+		}
+		free(title);
+		free(body);
+	}
 
 	printf("gpControl connected.\n");
 
@@ -413,6 +679,13 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 
 inline int DisconnectgpControl(GPCONTROL* pgpControl)
 {
+	if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
+	{
+		printf("gpControl disconnection failed.\n");
+		CloseRS232Port(&pgpControl->RS232Port);
+		return EXIT_FAILURE;
+	}
+
 	if (CloseRS232Port(&pgpControl->RS232Port) != EXIT_SUCCESS)
 	{
 		printf("gpControl disconnection failed.\n");

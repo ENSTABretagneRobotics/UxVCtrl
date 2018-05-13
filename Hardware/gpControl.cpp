@@ -13,8 +13,8 @@
 THREAD_PROC_RETURN_VALUE gpControlThread(void* pParam)
 {
 	GPCONTROL gpcontrol;
-	struct timeval tv;
-	double val = 0;
+	//struct timeval tv;
+	//double val = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -106,18 +106,18 @@ THREAD_PROC_RETURN_VALUE gpControlThread(void* pParam)
 		{
 			if (KeepAlivegpControl(&gpcontrol) == EXIT_SUCCESS)
 			{
-				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+				//if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
-				EnterCriticalSection(&StateVariablesCS);
+				//EnterCriticalSection(&StateVariablesCS);
 
 
-				LeaveCriticalSection(&StateVariablesCS);
+				//LeaveCriticalSection(&StateVariablesCS);
 
-				if (gpcontrol.bSaveRawData)
-				{
-					fprintf(gpcontrol.pfSaveFile, "%d;%d;%f;\n", (int)tv.tv_sec, (int)tv.tv_usec, val);
-					fflush(gpcontrol.pfSaveFile);
-				}
+				//if (gpcontrol.bSaveRawData)
+				//{
+				//	fprintf(gpcontrol.pfSaveFile, "%d;%d;%f;\n", (int)tv.tv_sec, (int)tv.tv_usec, val);
+				//	fflush(gpcontrol.pfSaveFile);
+				//}
 			}
 			else
 			{
