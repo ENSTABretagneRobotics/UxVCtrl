@@ -233,14 +233,14 @@ inline int GetPressureMS580314BA(MS580314BA* pMS580314BA, double* pPressure)
 	if (TEM <= 2000)
 	{
 		T2 = 3*(dt*dt);
-		T2 = T2/8589934592;
+		T2 = T2/8589934592.0;
 		OFF2 = 3*(TEM-2000)*(TEM-2000)/2;
 		SENS2 = 5*(TEM-2000)*(TEM-2000)/8;
 	}
 	else
 	{
 		T2 = 7*(dt*dt);
-		T2 = T2/137438953472;
+		T2 = T2/137438953472.0;
 		OFF2 = 1*(TEM-2000)*(TEM-2000)/16;
 		SENS2 = 0;
 	}

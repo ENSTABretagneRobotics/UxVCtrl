@@ -1,7 +1,20 @@
+tester avec un nouveau mingw
+
+réintégrer la gestion de waypoints.csv et curwp.txt...
+
+cmake static surtout pour linux...
+
+param friendly name
+Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
+
+terme intégral line following
+
+faire UxVSim à partir de VSim
+
 udp : réfléchir à la logique des recvfrom, sendto que doit utiliser mavproxy (start mavproxy.exe --master=tcp:127.0.0.1:5760 --out=udp:127.0.0.1:14550) et mission planner pour comprendre pourquoi mavproxy binde sur un port random...->c'est peut-être moi qui doit faire bind sur 14550 et un recvfrom dessus pour récupérer le port utilisé par mavproxy...
 rajouter commentaires qui indiquent qu'on peut faire udp://...
-udp cli OK, but waitforcliforudpsrv() to check...
-Should create a socket correctly bound in waitforcliudpsrv(), ne gère pas encore le multi-clients, 1er datagramme perdu...
+1er datagramme perdu pour server...
+ne gère pas encore le multi-clients, faire une version tcp et une autre udp de handlecliThreadProc, mais est-ce que c'est vraiment possible de faire un multicliudpsrv suffisamment générique...?
 bien envoyer ack quand je reçois des commandes mavlink?
 
 move recvhttpcontent, recvhtml, sendhttpreq, etc. in OSNet?
@@ -309,6 +322,7 @@ détection quand il y a quelque chose de visible à la caméra pour détecter quand 
 Dashboard : rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
 Appli gps qui affiche sog à partir des logs?
 Faire programme pour aider à la mag calib
+fournir simple couche d'adaptation pour pouvoir traiter webcam sans opencv
 
 acousticmodemlocalization
 transmettre aussi t pour améliorer précision de localisation
@@ -501,6 +515,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+sln cfg par défaut x86->pas possible sans .suo (user-specific)?
 
 n'utiliser que des recvfrom et sendto dans le cas UDP et garder en mémoire le dernier sockaddr reçu dans la structure RS232PORT...->mais il faut être sûr qu'il y a un recvfrom en 1er...
 

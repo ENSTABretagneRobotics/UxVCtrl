@@ -34,6 +34,7 @@ inline void DisableAllHorizontalControls(void)
 inline void DisableAllControls(void)
 {
 	EnterCriticalSection(&StateVariablesCS);
+#ifndef DISABLE_OPENCV_SUPPORT
 	bWallTrackingControl = FALSE;
 	bWallAvoidanceControl = FALSE;
 	bPipelineTrackingControl = FALSE;
@@ -42,6 +43,7 @@ inline void DisableAllControls(void)
 	bSurfaceVisualObstacleAvoidanceControl = FALSE;
 	bPingerTrackingControl = FALSE;
 	bMissingWorkerTrackingControl = FALSE;
+#endif // !DISABLE_OPENCV_SUPPORT
 	bFollowMeTrackingControl = FALSE;
 	bLineFollowingControl = FALSE;
 	bWaypointControl = FALSE;
@@ -485,15 +487,20 @@ inline int Commands(char* line)
 	BOOL bContinueElseIf1 = FALSE, bContinueElseIf2 = FALSE, bContinueElseIf3 = FALSE, bContinueElseIf4 = FALSE, bContinueElseIf5 = FALSE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 	double dval = 0, dval1 = 0, dval2 = 0, dval3 = 0, dval4 = 0, dval5 = 0, 
 		dval6 = 0, dval7 = 0, dval8 = 0, dval9 = 0, dval10 = 0, dval11 = 0, dval12 = 0; 
-	int ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0, ival6 = 0, 
+	int ival = 0, ival1 = 0, ival2 = 0, ival3 = 0;
+#ifndef DISABLE_OPENCV_SUPPORT
+	int ival4 = 0, ival5 = 0, ival6 = 0,
 		ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
 		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0;
 	char cval = 0;
+#endif // !DISABLE_OPENCV_SUPPORT
 	char str[MAX_BUF_LEN];
 	char str2[MAX_BUF_LEN];
 	unsigned char* buf = NULL;
 	size_t bytes = 0;
+#ifndef DISABLE_OPENCV_SUPPORT
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
+#endif // !DISABLE_OPENCV_SUPPORT
 	double delay = 0, delay_station = 0;
 	CHRONO chrono, chrono_station;
 
@@ -505,6 +512,7 @@ inline int Commands(char* line)
 	// e.g. stop vs stopwalltracking (when strncmp() is used).
 
 #pragma region MISSIONS
+#ifndef DISABLE_OPENCV_SUPPORT
 	if (sscanf(line, "wallconfig %lf %lf %lf %lf %lf %lf %lf %d %d %d", 
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &ival1, &ival2, &ival3) == 10)
 	{
@@ -1026,7 +1034,9 @@ inline int Commands(char* line)
 		//bAltitudeAGLControl = FALSE;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
-	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
+	else 
+#endif // !DISABLE_OPENCV_SUPPORT
+	if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
 	{
 		EnterCriticalSection(&FollowMeCS);
 		dmin_followme = dval1; dmax_followme = dval2; uidle_followme = dval3; umin_followme = dval4; umax_followme = dval5; spaceperiod_followme = dval6; forbidlat_followme = dval7; forbidlong_followme = dval8; forbidalt_followme = dval9; forbidradius_followme = dval10; target_followme = ival1; mode_followme = ival2; bDepth_followme = ival3;
@@ -1061,8 +1071,8 @@ inline int Commands(char* line)
 	else bContinueElseIf1 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#pragma GCC diagnostic ignored "-Wparentheses"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -1071,8 +1081,6 @@ inline int Commands(char* line)
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
-#else
-#pragma GCC diagnostic warning "-Wparentheses"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 	{
@@ -1235,6 +1243,7 @@ inline int Commands(char* line)
 	{
 		bSonarAltitudeEstimation = FALSE;
 	}
+#ifndef DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "externalvisuallocalizationconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
@@ -1286,6 +1295,7 @@ inline int Commands(char* line)
 		bExternalVisualLocalization = FALSE;
 		LeaveCriticalSection(&ExternalVisualLocalizationCS);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "acousticmodemlocalization %lf", &delay) == 1)
 	{
 		delay = fabs(delay);
@@ -1807,8 +1817,8 @@ inline int Commands(char* line)
 	else bContinueElseIf2 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#pragma GCC diagnostic ignored "-Wparentheses"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -1817,8 +1827,6 @@ inline int Commands(char* line)
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
-#else
-#pragma GCC diagnostic warning "-Wparentheses"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 	{
@@ -2428,6 +2436,7 @@ inline int Commands(char* line)
 		if (!ival1) bRestartIM483I = TRUE;
 		bPauseIM483I = ival1;
 	}
+#ifndef DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "videoconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
 		if ((ival >= 0)&&(ival < nbvideo))
@@ -2459,6 +2468,7 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "showswitchinfo %d", &ival) == 1)
 	{
 		bShowSwitchInfo = ival? TRUE: FALSE;
@@ -2468,8 +2478,8 @@ inline int Commands(char* line)
 	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#pragma GCC diagnostic ignored "-Wparentheses"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2478,8 +2488,6 @@ inline int Commands(char* line)
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
-#else
-#pragma GCC diagnostic warning "-Wparentheses"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 	{
@@ -2738,8 +2746,8 @@ inline int Commands(char* line)
 	else bContinueElseIf4 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#pragma GCC diagnostic ignored "-Wparentheses"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2748,8 +2756,6 @@ inline int Commands(char* line)
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
-#else
-#pragma GCC diagnostic warning "-Wparentheses"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 	{
@@ -3002,8 +3008,8 @@ inline int Commands(char* line)
 	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#pragma GCC diagnostic ignored "-Wparentheses"
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -3012,8 +3018,6 @@ inline int Commands(char* line)
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
-#else
-#pragma GCC diagnostic warning "-Wparentheses"
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
 	{

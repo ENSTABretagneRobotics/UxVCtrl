@@ -364,6 +364,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				break;
 #pragma endregion 
 #pragma region OPI
+#ifndef DISABLE_OPENCV_SUPPORT
 			case SENDOPI_MSG :
 				LeaveCriticalSection(&MDMCS);
 				memset(buf, 0, sizeof(buf));
@@ -470,6 +471,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 					}
 				}
 				break;
+#endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion 
 #pragma region SHH
 			case SENDSHH_MSG :

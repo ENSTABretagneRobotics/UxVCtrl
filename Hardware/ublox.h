@@ -22,17 +22,15 @@
 //#include "RTCM3Protocol.h"
 
 // Need to be undefined at the end of the file...
-// min and max might cause incompatibilities on Linux...
-#ifndef _WIN32
-#if !defined(NOMINMAX)
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // !min
-#endif // !defined(NOMINMAX)
-#endif // !_WIN32
+#endif // !_MSC_VER
 
 //#pragma pack(show)
 
@@ -1164,14 +1162,14 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam);
 // Restore default alignment settings.
 #pragma pack(pop) 
 
-// min and max might cause incompatibilities on Linux...
-#ifndef _WIN32
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
-#endif // !_WIN32
+#endif // !_MSC_VER
 
 #endif // !UBLOX_H

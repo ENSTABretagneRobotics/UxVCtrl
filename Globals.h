@@ -16,6 +16,7 @@
 #include "OSMisc.h"
 #include "RS232Port.h"
 #include "CoordSystem2Img.h"
+#ifndef DISABLE_OPENCV_SUPPORT
 #include "CvUtils.h"
 #ifdef ENABLE_CVKINECT2SDKHOOK
 #ifndef INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
@@ -32,6 +33,7 @@
 #include "CvCLEyeSDKHook.h"
 #endif // ENABLE_CVCLEYESDKHOOK
 #endif // ENABLE_CVKINECT2SDKHOOK
+#endif // !DISABLE_OPENCV_SUPPORT
 
 #ifdef _WIN32
 #ifdef _MSC_VER
@@ -46,6 +48,7 @@
 #endif // _WIN32
 
 #include "rmatrix.h"
+#include <deque>
 
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
@@ -409,6 +412,7 @@ extern BOOL bSonarAltitudeEstimation;
 extern CRITICAL_SECTION SonarAltitudeEstimationCS;
 extern double dmin_sonaraltitudeestimation, ratio_sonaraltitudeestimation; 
 
+#ifndef DISABLE_OPENCV_SUPPORT
 // ExternalVisualLocalization variables.
 extern BOOL bExternalVisualLocalization;
 extern CRITICAL_SECTION ExternalVisualLocalizationCS;
@@ -426,8 +430,10 @@ extern double psi_externalvisuallocalization;
 extern double lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization;
 extern double heading_externalvisuallocalization;
 extern BOOL bExternalVisualLocalizationFound;
+#endif // !DISABLE_OPENCV_SUPPORT
 
 #pragma region MISSIONS
+#ifndef DISABLE_OPENCV_SUPPORT
 // Wall variables.
 extern BOOL bWallDetection;
 extern BOOL bWallTrackingControl;
@@ -542,6 +548,7 @@ extern int procid_missingworker;
 extern int videoid_missingworker; 
 extern double u_missingworker;
 extern BOOL bMissingWorkerFound;
+#endif // !DISABLE_OPENCV_SUPPORT
 
 // Follow me variables.
 extern BOOL bFollowMeTrackingControl;
@@ -585,7 +592,9 @@ extern BOOL bPauseMDM, bRestartMDM;
 
 // Seanet variables.
 extern CRITICAL_SECTION SeanetOverlayImgCS;
+#ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* SeanetOverlayImg;
+#endif // !DISABLE_OPENCV_SUPPORT
 extern BOOL bPauseSeanet, bRestartSeanet;
 
 // BlueView variables.
@@ -651,15 +660,19 @@ extern BOOL bPauseMiniSSC, bRestartMiniSSC;
 // IM483I variables.
 extern BOOL bPauseIM483I, bRestartIM483I;
 
+#ifndef DISABLE_OPENCV_SUPPORT
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 extern IplImage* imgs[MAX_NB_VIDEO];
 extern BOOL bPauseVideo[MAX_NB_VIDEO];
 extern BOOL bRestartVideo[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion
 
 // Other.
+#ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* dispimgs[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 extern int VideoRecordRequests[MAX_NB_VIDEO];
 extern CRITICAL_SECTION dispimgsCS[MAX_NB_VIDEO];
 extern CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
@@ -674,7 +687,9 @@ extern double vbattery1;
 extern double vswitch;
 extern double vswitchcoef;
 extern double vswitchthreshold;
+#ifndef DISABLE_OPENCV_SUPPORT
 extern CvScalar colorsonarlidar;
+#endif // !DISABLE_OPENCV_SUPPORT
 extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
 extern BOOL bStdOutDetailedInfo;
@@ -710,11 +725,13 @@ extern int procstackids[MAX_NB_PROCEDURES];
 extern int procstack;
 extern char keys[NB_CONFIGURABLE_KEYS];
 
+#ifndef DISABLE_OPENCV_SUPPORT
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 #else
 extern cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+#endif // !DISABLE_OPENCV_SUPPORT
 extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 extern FILE* missionfile;
@@ -906,6 +923,7 @@ inline int InitGlobals(void)
 		bRestartMAVLinkDevice[i] = FALSE;
 	}
 
+#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < nbvideo; i++)
 	{
 		InitCriticalSection(&imgsCS[i]);
@@ -951,8 +969,10 @@ inline int InitGlobals(void)
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
 	colorsonarlidar = CV_RGB(0, 0, 255);
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	InitCriticalSection(&SonarAltitudeEstimationCS);
+#ifndef DISABLE_OPENCV_SUPPORT
 	InitCriticalSection(&ExternalVisualLocalizationCS);
 	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	InitCriticalSection(&WallCS);
@@ -969,6 +989,7 @@ inline int InitGlobals(void)
 	InitCriticalSection(&PingerOverlayImgCS);
 	InitCriticalSection(&MissingWorkerCS);
 	InitCriticalSection(&MissingWorkerOverlayImgCS);
+#endif // !DISABLE_OPENCV_SUPPORT
 	InitCriticalSection(&FollowMeCS);
 	InitCriticalSection(&MDMCS);
 	InitCriticalSection(&SeanetOverlayImgCS);
@@ -1003,6 +1024,7 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&SeanetOverlayImgCS);
 	DeleteCriticalSection(&MDMCS);
 	DeleteCriticalSection(&FollowMeCS);
+#ifndef DISABLE_OPENCV_SUPPORT
 	DeleteCriticalSection(&MissingWorkerOverlayImgCS);
 	DeleteCriticalSection(&MissingWorkerCS);
 	DeleteCriticalSection(&PingerOverlayImgCS);
@@ -1019,8 +1041,10 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&WallCS);
 	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	DeleteCriticalSection(&ExternalVisualLocalizationCS);
+#endif // !DISABLE_OPENCV_SUPPORT
 	DeleteCriticalSection(&SonarAltitudeEstimationCS);
 
+#ifndef DISABLE_OPENCV_SUPPORT
 	cvReleaseImage(&SeanetOverlayImg);
 
 	cvReleaseImage(&MissingWorkerOverlayImg);
@@ -1054,6 +1078,7 @@ inline int ReleaseGlobals(void)
 		DeleteCriticalSection(&dispimgsCS[i]);
 		DeleteCriticalSection(&imgsCS[i]);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)
 	{

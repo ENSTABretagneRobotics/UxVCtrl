@@ -26,7 +26,10 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 {
 	CHRONO chrono_period;
 	int nbnew = 0;
-	int i = 0, j = 0;
+	int i = 0;
+#ifndef DISABLE_OPENCV_SUPPORT
+	int j = 0;
+#endif // !DISABLE_OPENCV_SUPPORT
 	struct timeval tv;
 	double angle = 0;
 	unsigned char scanline[MAX_NB_BYTES_SEANET];
@@ -35,9 +38,11 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
+#ifndef DISABLE_OPENCV_SUPPORT
 	// Missing error checking...
 	IplImage* overlayimage = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	tvstsort = (struct timeval*)calloc(MAX_NUMBER_OF_STEPS_SEANET, sizeof(struct timeval));
 	anglestsort = (double*)calloc(MAX_NUMBER_OF_STEPS_SEANET, sizeof(double));
@@ -65,7 +70,9 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 		mSleep(50);
 
+#ifndef DISABLE_OPENCV_SUPPORT
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#endif // !DISABLE_OPENCV_SUPPORT
 
 		if (!bDisableSeanet)
 		{
@@ -149,6 +156,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 
 
+#ifndef DISABLE_OPENCV_SUPPORT
 				//if (!bSwitchView) 
 				{
 					DrawSeanetScreenshot(Center(psihat), StepAngleSize, NBins, (unsigned char)AdLow, (unsigned char)AdSpan, Hdctrl.bits.adc8on, overlayimage);
@@ -170,6 +178,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 				//DrawScanlineMiniature(scanline, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
 				//DrawScanlineDiffMiniature(scanline, NBins, AdLow, AdSpan, Hdctrl.bits.adc8on);
+#endif // !DISABLE_OPENCV_SUPPORT
 
 
 				LeaveCriticalSection(&StateVariablesCS);
@@ -181,6 +190,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 		{
 			EnterCriticalSection(&StateVariablesCS);
 
+#ifndef DISABLE_OPENCV_SUPPORT
 			cvCircle(overlayimage, cvPoint(overlayimage->width/2, overlayimage->height/2), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
 			for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 			{
@@ -191,13 +201,16 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 				}
 			}
+#endif // !DISABLE_OPENCV_SUPPORT
 
 			LeaveCriticalSection(&StateVariablesCS);
 		}
 
+#ifndef DISABLE_OPENCV_SUPPORT
 		EnterCriticalSection(&SeanetOverlayImgCS);
 		cvCopy(overlayimage, SeanetOverlayImg, 0);
 		LeaveCriticalSection(&SeanetOverlayImgCS);
+#endif // !DISABLE_OPENCV_SUPPORT
 
 		//printf("SeanetProcessingThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
 
@@ -211,7 +224,9 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 	free(anglestsort);
 	free(tvstsort);
 
+#ifndef DISABLE_OPENCV_SUPPORT
 	cvReleaseImage(&overlayimage);
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

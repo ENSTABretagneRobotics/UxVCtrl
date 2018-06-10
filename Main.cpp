@@ -8,22 +8,30 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "gpControl.h"
+#ifndef DISABLE_OPENCV_SUPPORT
 #include "Video.h"
 #include "VideoRecord.h"
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "SeanetProcessing.h"
 #include "SonarLocalization.h"
 #include "SonarAltitudeEstimation.h"
+#ifndef DISABLE_OPENCV_SUPPORT
 #include "ExternalVisualLocalization.h"
 #include "Wall.h"
 #include "Pipeline.h"
+#endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 #include "Ball.h"
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 #include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
 #include "Pinger.h"
 #include "MissingWorker.h"
+#endif // !DISABLE_OPENCV_SUPPORT
 #include "FollowMe.h"
 #include "Simulator.h"
 #include "PathfinderDVL.h"
@@ -76,8 +84,10 @@
 #include "SSC32Interface.h"
 #include "Observer.h"
 #include "Controller.h"
-#include "OpenCVGUI.h"
 #include "Commands.h"
+#ifndef DISABLE_OPENCV_SUPPORT
+#include "OpenCVGUI.h"
+#endif // !DISABLE_OPENCV_SUPPORT
 
 #if !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
 #include <valgrind/memcheck.h>
@@ -88,22 +98,30 @@ int main(int argc, char* argv[])
 	int i = 0;
 	BOOL bGUIAvailable = FALSE;
 	THREAD_IDENTIFIER gpControlThreadId;
+#ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER VideoThreadId[MAX_NB_VIDEO];
 	THREAD_IDENTIFIER VideoRecordThreadId[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER SeanetProcessingThreadId;
 	THREAD_IDENTIFIER SonarLocalizationThreadId;
 	THREAD_IDENTIFIER SonarAltitudeEstimationThreadId;
+#ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER ExternalVisualLocalizationThreadId;
 	THREAD_IDENTIFIER WallThreadId;
 	THREAD_IDENTIFIER PipelineThreadId;
+#endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER BallThreadId;
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
 	THREAD_IDENTIFIER MissingWorkerThreadId;
+#endif // !DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER FollowMeThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
 	THREAD_IDENTIFIER PathfinderDVLThreadId;
@@ -159,7 +177,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MissionThreadId;
 	THREAD_IDENTIFIER MissionLogThreadId;
 	THREAD_IDENTIFIER CommandsThreadId;
+#ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER OpenCVGUIThreadId[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	INIT_DEBUG;
 
@@ -185,25 +205,33 @@ int main(int argc, char* argv[])
 
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...
 	if (!bDisablegpControl) CreateDefaultThread(gpControlThread, NULL, &gpControlThreadId);
+#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < nbvideo; i++)
 	{
 		CreateDefaultThread(VideoThread, (void*)(intptr_t)i, &VideoThreadId[i]);
 		CreateDefaultThread(VideoRecordThread, (void*)(intptr_t)i, &VideoRecordThreadId[i]);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(SeanetProcessingThread, NULL, &SeanetProcessingThreadId);
 	CreateDefaultThread(SonarLocalizationThread, NULL, &SonarLocalizationThreadId);
 	CreateDefaultThread(SonarAltitudeEstimationThread, NULL, &SonarAltitudeEstimationThreadId);
+#ifndef DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
 	CreateDefaultThread(WallThread, NULL, &WallThreadId);
 	CreateDefaultThread(PipelineThread, NULL, &PipelineThreadId);
+#endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(BallThread, NULL, &BallThreadId);
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
+#endif // !DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
 	if (!bDisablePathfinderDVL) CreateDefaultThread(PathfinderDVLThread, NULL, &PathfinderDVLThreadId);
@@ -277,10 +305,12 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(MissionThread, NULL, &MissionThreadId);
 	CreateDefaultThread(MissionLogThread, NULL, &MissionLogThreadId);
 	if (bCommandPrompt) CreateDefaultThread(CommandsThread, NULL, &CommandsThreadId);
+#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < nbvideo; i++)
 	{
 		CreateDefaultThread(OpenCVGUIThread, (void*)(intptr_t)i, &OpenCVGUIThreadId[i]);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	// Launch a mission file if specified as argument.
 	if (argc == 2) CallMission(argv[1]);
@@ -304,10 +334,12 @@ int main(int argc, char* argv[])
 		}
 	}
 
+#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = nbvideo-1; i >= 0; i--)
 	{
 		WaitForThread(OpenCVGUIThreadId[i]);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 	if (bCommandPrompt) 
 	{
 		//if (bExit)
@@ -411,25 +443,33 @@ int main(int argc, char* argv[])
 	if (!bDisablePathfinderDVL) WaitForThread(PathfinderDVLThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) WaitForThread(SimulatorThreadId);
 	WaitForThread(FollowMeThreadId);
+#ifndef DISABLE_OPENCV_SUPPORT
 	WaitForThread(MissingWorkerThreadId);
 	WaitForThread(PingerThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 	WaitForThread(VisualObstacleThreadId);
+#endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	WaitForThread(BallThreadId);
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	WaitForThread(PipelineThreadId);
 	WaitForThread(WallThreadId);
 	WaitForThread(ExternalVisualLocalizationThreadId);
+#endif // !DISABLE_OPENCV_SUPPORT
 	WaitForThread(SonarAltitudeEstimationThreadId);
 	WaitForThread(SonarLocalizationThreadId);
 	WaitForThread(SeanetProcessingThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = nbvideo-1; i >= 0; i--)
 	{
 		WaitForThread(VideoRecordThreadId[i]);
 		WaitForThread(VideoThreadId[i]);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 	if (!bDisablegpControl) WaitForThread(gpControlThreadId);
 
 #ifdef _WIN32

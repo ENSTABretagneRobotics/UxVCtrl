@@ -236,6 +236,7 @@ BOOL bSonarAltitudeEstimation = FALSE;
 CRITICAL_SECTION SonarAltitudeEstimationCS;
 double dmin_sonaraltitudeestimation = 0, ratio_sonaraltitudeestimation = 0; 
 
+#ifndef DISABLE_OPENCV_SUPPORT
 // ExternalVisualLocalization variables.
 BOOL bExternalVisualLocalization = FALSE;
 CRITICAL_SECTION ExternalVisualLocalizationCS;
@@ -253,8 +254,10 @@ double psi_externalvisuallocalization = 0;
 double lat_externalvisuallocalization = 0, long_externalvisuallocalization = 0, alt_externalvisuallocalization = 0;
 double heading_externalvisuallocalization = 0;
 BOOL bExternalVisualLocalizationFound = FALSE;
+#endif // !DISABLE_OPENCV_SUPPORT
 
 #pragma region MISSIONS
+#ifndef DISABLE_OPENCV_SUPPORT
 // Wall variables.
 BOOL bWallDetection = FALSE;
 BOOL bWallTrackingControl = FALSE;
@@ -369,6 +372,7 @@ int procid_missingworker = 0;
 int videoid_missingworker = 0; 
 double u_missingworker = 0;
 BOOL bMissingWorkerFound = FALSE;
+#endif // !DISABLE_OPENCV_SUPPORT
 
 // Follow me variables.
 BOOL bFollowMeTrackingControl = FALSE;
@@ -412,7 +416,9 @@ BOOL bPauseMDM = FALSE, bRestartMDM = FALSE;
 
 // Seanet variables.
 CRITICAL_SECTION SeanetOverlayImgCS;
+#ifndef DISABLE_OPENCV_SUPPORT
 IplImage* SeanetOverlayImg = NULL;
+#endif // !DISABLE_OPENCV_SUPPORT
 BOOL bPauseSeanet = FALSE, bRestartSeanet = FALSE;
 
 // BlueView variables.
@@ -478,15 +484,19 @@ BOOL bPauseMiniSSC = FALSE, bRestartMiniSSC = FALSE;
 // IM483I variables.
 BOOL bPauseIM483I = FALSE, bRestartIM483I = FALSE;
 
+#ifndef DISABLE_OPENCV_SUPPORT
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 IplImage* imgs[MAX_NB_VIDEO];
 BOOL bPauseVideo[MAX_NB_VIDEO];
 BOOL bRestartVideo[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion
 
 // Other.
+#ifndef DISABLE_OPENCV_SUPPORT
 IplImage* dispimgs[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 int VideoRecordRequests[MAX_NB_VIDEO];
 CRITICAL_SECTION dispimgsCS[MAX_NB_VIDEO];
 CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
@@ -501,7 +511,9 @@ double vbattery1 = 0;
 double vswitch = 0; 
 double vswitchcoef = 0; 
 double vswitchthreshold = 0; 
+#ifndef DISABLE_OPENCV_SUPPORT
 CvScalar colorsonarlidar;
+#endif // !DISABLE_OPENCV_SUPPORT
 char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;
 BOOL bStdOutDetailedInfo = FALSE;
@@ -537,11 +549,13 @@ int procstackids[MAX_NB_PROCEDURES];
 int procstack = 0;
 char keys[NB_CONFIGURABLE_KEYS];
 
+#ifndef DISABLE_OPENCV_SUPPORT
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
 #else
 cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+#endif // !DISABLE_OPENCV_SUPPORT
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 FILE* missionfile = NULL;
