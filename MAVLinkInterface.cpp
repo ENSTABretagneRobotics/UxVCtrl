@@ -232,8 +232,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					break;
 				case MAVLINK_MSG_ID_STATUSTEXT:
 					mavlink_msg_statustext_decode(&msg, &statustext);
-					printf(statustext.text);
-					printf("\n");
+					printf("%.50s\n", statustext.text);
 					break;
 				case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 				case MAVLINK_MSG_ID_PARAM_REQUEST_READ:

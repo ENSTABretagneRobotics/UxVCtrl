@@ -79,9 +79,11 @@
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "MAVLinkInterface.h"
 #endif // ENABLE_MAVLINK_SUPPORT
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "NMEAInterface.h"
 #include "RazorAHRSInterface.h"
 #include "SSC32Interface.h"
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "Observer.h"
 #include "Controller.h"
 #include "Commands.h"
@@ -169,9 +171,11 @@ int main(int argc, char* argv[])
 #ifdef ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER MAVLinkInterfaceThreadId;
 #endif // ENABLE_MAVLINK_SUPPORT
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER NMEAInterfaceThreadId;
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
 	THREAD_IDENTIFIER SSC32InterfaceThreadId;
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER ObserverThreadId;
 	THREAD_IDENTIFIER ControllerThreadId;
 	THREAD_IDENTIFIER MissionThreadId;
@@ -292,12 +296,14 @@ int main(int argc, char* argv[])
 	if (bMAVLinkInterface) CreateDefaultThread(MAVLinkInterfaceThread, NULL, &MAVLinkInterfaceThreadId);
 	if (bMAVLinkInterface) DetachThread(MAVLinkInterfaceThreadId); // Not easy to stop it correctly...
 #endif // ENABLE_MAVLINK_SUPPORT
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (bNMEAInterface) CreateDefaultThread(NMEAInterfaceThread, NULL, &NMEAInterfaceThreadId);
 	if (bNMEAInterface) DetachThread(NMEAInterfaceThreadId); // Not easy to stop it correctly...
 	if (bRazorAHRSInterface) CreateDefaultThread(RazorAHRSInterfaceThread, NULL, &RazorAHRSInterfaceThreadId);
 	if (bRazorAHRSInterface) DetachThread(RazorAHRSInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSSC32Interface) CreateDefaultThread(SSC32InterfaceThread, NULL, &SSC32InterfaceThreadId);
 	if (bSSC32Interface) DetachThread(SSC32InterfaceThreadId); // Not easy to stop it correctly...
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
 
@@ -373,6 +379,7 @@ int main(int argc, char* argv[])
 	// Stop sensors, actuators, algorithms thread loops...
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	// Not easy to stop it correctly...
 	//if (bSSC32Interface) WaitForThread(SSC32InterfaceThreadId);
 	if (bSSC32Interface) mSleep(100);
@@ -382,6 +389,7 @@ int main(int argc, char* argv[])
 	// Not easy to stop it correctly...
 	//if (bNMEAInterface) WaitForThread(NMEAInterfaceThreadId);
 	if (bNMEAInterface) mSleep(100);
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 	// Not easy to stop it correctly...
 	//if (bMAVLinkInterface) WaitForThread(MAVLinkInterfaceThreadId);

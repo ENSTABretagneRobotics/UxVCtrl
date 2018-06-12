@@ -1,8 +1,7 @@
-tester avec un nouveau mingw
+cmake static surtout pour linux...
+tester avec un nouveau mingw et linux, check inline and timegm, update test_devices
 
 réintégrer la gestion de waypoints.csv et curwp.txt...
-
-cmake static surtout pour linux...
 
 param friendly name
 Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?

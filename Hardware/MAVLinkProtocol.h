@@ -127,7 +127,7 @@ inline void UNIX2GPSTOW(uint64_t unix, unsigned int* pGMS, unsigned int* pGWk)
 	gpsepoch.tm_mday = d;
 	gpsepoch.tm_isdst = 0;
 
-	//*pGWk?
+	// *pGWk?
 }
 */
 // Convert GPS time of week in ms and week number to UNIX time in us.
