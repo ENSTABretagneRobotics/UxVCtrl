@@ -2761,6 +2761,31 @@ inline int Commands(char* line)
 	{
 		bStdOutDetailedInfo = ival? TRUE: FALSE;
 	}
+	else if (strncmp(line, "robid", strlen("robid")) == 0)
+	{
+		switch (robid)
+		{
+		case SUBMARINE_SIMULATOR_ROBID: printf("Submarine Simulator.\n"); break;
+		case SAUCISSE_ROBID: printf("SAUCISSE.\n"); break;
+		case SARDINE_ROBID: printf("SARDINE.\n"); break;
+		case CISCREA_ROBID: printf("CISCREA.\n"); break;
+		case BLUEROV_ROBID: printf("BlueROV.\n"); break;
+		case LIRMIA3_ROBID: printf("LIRMIA3.\n"); break;
+		case BUBBLE_ROBID: printf("BUBBLE.\n"); break;
+		case MOTORBOAT_ROBID: printf("Motorboat.\n"); break;
+		case VAIMOS_ROBID: printf("VAIMOS.\n"); break;
+		case SAILBOAT_ROBID: printf("Sailboat.\n"); break;
+		case SAILBOAT2_ROBID: printf("Sailboat 2.\n"); break;
+		case TANK_SIMULATOR_ROBID: printf("Tank Simulator.\n"); break;
+		case ETAS_WHEEL_ROBID: printf("ETAS WHEEL.\n"); break;
+		case BUGGY_SIMULATOR_ROBID: printf("Buggy Simulator.\n"); break;
+		case BUGGY_ROBID: printf("Buggy.\n"); break;
+		case QUADRO_SIMULATOR_ROBID: printf("Quadro Simulator.\n"); break;
+		case COPTER_ROBID: printf("Copter.\n"); break;
+		case ARDUCOPTER_ROBID: printf("ArduCopter.\n"); break;
+		default: printf("Invalid robid.\n"); break;
+		}
+	}
 	else if (sscanf(line, "showbatteryinfo %d", &ival) == 1)
 	{
 		bShowBatteryInfo = ival? TRUE: FALSE;

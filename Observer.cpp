@@ -384,6 +384,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			break;
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
+		case SAILBOAT2_ROBID:
 		case MOTORBOAT_ROBID:
 		case BUGGY_SIMULATOR_ROBID:
 		case BUGGY_ROBID:
@@ -409,6 +410,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		{
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
+		case SAILBOAT2_ROBID:
 		case MOTORBOAT_ROBID:
 		case BUBBLE_ROBID:
 			fluiddira = fmod_360_rad2deg(M_PI/2-psiawind);

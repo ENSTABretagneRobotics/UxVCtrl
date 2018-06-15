@@ -74,6 +74,14 @@ copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\SAILBOAT_WORKSPACE\ResetWork
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\SAILBOAT_WORKSPACE\samples"\
 robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\SAILBOAT_WORKSPACE\restore"\
 
+copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\UxVCtrl.exe"
+copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\CHANGELOG.txt"
+copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\ReadMe.txt"
+copy /B /Y /Z .\mission_spec.txt "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\mission_spec.txt"
+copy /B /Y /Z .\ResetWorkspace.bat "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\ResetWorkspace.bat"
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R samples "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\samples"\
+robocopy /E /ZB /PURGE /IS /IT /IOFF /ITEM /ETA /R:1 /W:2 /A-:R restore "%UDK_USER_PATH%\SAILBOAT2_WORKSPACE\restore"\
+
 copy /B /Y /Z .\Release\UxVCtrl.exe "%UDK_USER_PATH%\SARDINE_WORKSPACE\UxVCtrl.exe"
 copy /B /Y /Z .\CHANGELOG.txt "%UDK_USER_PATH%\SARDINE_WORKSPACE\CHANGELOG.txt"
 copy /B /Y /Z .\ReadMe.txt "%UDK_USER_PATH%\SARDINE_WORKSPACE\ReadMe.txt"

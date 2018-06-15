@@ -309,7 +309,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						
 						if (ublox.bEnable_NMEA_HDG)
 						{
-							if (robid == SAILBOAT_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+							if (robid == SAILBOAT2_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 						}
 
 						if (ublox.bEnable_NMEA_MWV)

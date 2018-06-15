@@ -265,6 +265,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
 				break;
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
@@ -289,6 +290,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
 				break;
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
@@ -412,6 +414,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case MOTORBOAT_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
@@ -439,6 +442,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case MOTORBOAT_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				if (!bHeadingControl) uw = 0;
@@ -854,6 +858,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 					case VAIMOS_ROBID:
 					case SAILBOAT_ROBID:
+					case SAILBOAT2_ROBID:
 						if (!bHeadingControl) uw = 0;
 						break;
 					case MOTORBOAT_ROBID:
@@ -967,6 +972,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
 				switch (state)
 				{
 				case DIRECT_TRAJECTORY: s = 'D'; break;

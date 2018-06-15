@@ -210,6 +210,63 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
+			case SAILBOAT2_ROBID:
+				EnterCriticalSection(&StateVariablesCS);
+				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
+				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				thrust = u;
+				LeaveCriticalSection(&StateVariablesCS);
+				if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+				{
+					printf("Connection to a Maestro lost.\n");
+					bConnected = FALSE;
+					DisconnectMaestro(&maestro);
+					mSleep(50);
+					break;
+				}
+				mSleep(30);
+				if (counter%counter_modulo == 0)
+				{
+					if (GetValueMaestro(&maestro, maestro.bat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					EnterCriticalSection(&StateVariablesCS);
+					vbattery1 = maestro.bat1analoginputvaluecoef*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
+					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < maestro.bat1analoginputvaluethreshold)) printf("BAT1 ALARM\n");
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+				else if (counter%counter_modulo == 5)
+				{
+					if (GetValueMaestro(&maestro, maestro.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					EnterCriticalSection(&StateVariablesCS);
+					vswitchcoef = maestro.switchanaloginputvaluecoef;
+					vswitchthreshold = maestro.switchanaloginputvaluethreshold;
+					vswitch = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+				else mSleep(20);
+				EnterCriticalSection(&StateVariablesCS);
+				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
+				if (bShowSwitchInfo) printf("vswitch:%.1fV (%s)\n", vswitch, (vswitch*vswitchcoef > vswitchthreshold? "auto": "manual"));
+				LeaveCriticalSection(&StateVariablesCS);
+				counter++;
+				if (counter >= counter_modulo) counter = 0;
+				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
@@ -322,6 +379,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 		mSleep(50);
 		break;
 	case SAILBOAT_ROBID:
+	case SAILBOAT2_ROBID:
 	case VAIMOS_ROBID:
 		break;
 	case MOTORBOAT_ROBID:

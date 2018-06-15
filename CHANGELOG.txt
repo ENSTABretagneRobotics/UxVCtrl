@@ -1,3 +1,7 @@
+227
+Added preliminary Sailboat 2 support.
+Added robid command to print the current robid.
+
 226
 Updated showdetailedinfo.
 Added the output of servo_output_raw in MAVLinkInterface.

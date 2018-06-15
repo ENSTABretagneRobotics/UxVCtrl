@@ -106,6 +106,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			{
 			case BUGGY_ROBID:
 			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
 				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
@@ -205,6 +206,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 		mSleep(50);
 		break;
 	case SAILBOAT_ROBID:
+	case SAILBOAT2_ROBID:
 	case VAIMOS_ROBID:
 		break;
 	case MOTORBOAT_ROBID:

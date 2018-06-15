@@ -83,6 +83,7 @@
 #define MOTORBOAT_ROBID               0x00000400
 #define VAIMOS_ROBID                  0x00002000
 #define SAILBOAT_ROBID                0x00004000
+#define SAILBOAT2_ROBID               0x00008000
 #define ETAS_WHEEL_ROBID              0x00020000
 #define BUGGY_ROBID                   0x00200000
 #define COPTER_ROBID                  0x02000000
