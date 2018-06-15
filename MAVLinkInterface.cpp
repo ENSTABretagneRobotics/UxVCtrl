@@ -131,6 +131,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_home_position_t home_position;
 	mavlink_gps_raw_int_t gps_raw_int;
 	mavlink_attitude_t attitude;
+	mavlink_servo_output_raw_t servo_output_raw;
 	mavlink_param_value_t param_value;
 	char Name[17];
 	int nbparams = 1;
@@ -611,6 +612,16 @@ REQ_DATA_STREAM...
 	attitude.pitch = (float)fmod_2PI(-Center(thetahat));
 	attitude.yaw = (float)fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
 
+	memset(&servo_output_raw, 0, sizeof(mavlink_servo_output_raw_t));
+	servo_output_raw.servo1_raw = (uint16_t)(1500+u1*500);
+	servo_output_raw.servo2_raw = (uint16_t)(1500+u2*500);
+	servo_output_raw.servo3_raw = (uint16_t)(1500+u3*500);
+	servo_output_raw.servo4_raw = (uint16_t)(1500+u4*500);
+	servo_output_raw.servo5_raw = (uint16_t)(1500+u5*500);
+	servo_output_raw.servo6_raw = (uint16_t)(1500+u6*500);
+	servo_output_raw.servo7_raw = (uint16_t)(1500+u7*500);
+	servo_output_raw.servo8_raw = (uint16_t)(1500+u8*500);
+
 	LeaveCriticalSection(&StateVariablesCS);
 
 	mavlink_msg_heartbeat_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &heartbeat);
@@ -640,6 +651,19 @@ REQ_DATA_STREAM...
 	}
 
 	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+
+	mavlink_msg_servo_output_raw_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &servo_output_raw);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
 	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)

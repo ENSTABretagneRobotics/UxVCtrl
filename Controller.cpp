@@ -560,6 +560,31 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		}
 #pragma endregion
 
+#pragma region bStdOutDetailedInfo
+		if (!(robid & SAILBOAT_CLASS_ROBID_MASK))
+		{
+			if ((bStdOutDetailedInfo)&&(counter%10 == 0))
+			{
+				int days = 0, hours = 0, minutes = 0, seconds = 0;
+				double deccsec = 0, latitude = 0, longitude = 0, altitude = 0;
+
+				DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
+
+				printf("-------------------------------------------------------------------\n");
+				printf("Time is %.4f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
+				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
+				printf("Heading is %.1f deg in the reference coordinate system.\n", Center(psihat)*180.0/M_PI);
+				printf("Yaw is %d deg, pitch is %d deg, roll is %d deg in the NED coordinate system.\n",
+					(int)fmod_360_rad2deg(-Center(psihat)-angle_env), (int)fmod_360_rad2deg(-Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
+				printf("Position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", Center(xhat), Center(yhat), latitude, longitude);
+				printf("Waypoint position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", wxb, wyb, wlatb, wlongb);
+				printf("Distance to the waypoint is %.2f m, distance to the line is %.2f m.\n", norm_bm, e);
+				printf("%+04d%% %+04d%% %+04d%%\n", (int)floor(u*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(uv*100.0+0.05));
+			}
+		}
+#pragma endregion
+
 		LeaveCriticalSection(&StateVariablesCS);
 
 		if (bExit) break;

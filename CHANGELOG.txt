@@ -1,5 +1,10 @@
+226
+Updated showdetailedinfo.
+Added the output of servo_output_raw in MAVLinkInterface.
+Added the output of HEHDT, HEROT, PRDID in NMEAInterface.
+
 225
-Updated CMake support and other minor updates.
+Updated preliminary CMake support and other minor updates.
 
 224
 Updated Compat_vs2017.bat to be able to build without OpenCV.

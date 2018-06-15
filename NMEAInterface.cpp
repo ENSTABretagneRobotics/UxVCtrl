@@ -74,14 +74,16 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	int sendbuflen = 0;
 	uint8 sendbuf[MAX_NB_BYTES_NMEADEVICE];
 
-	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
+	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, pitchhat = 0, rollhat = 0;
 
 	memset(&nmeadata, 0, sizeof(nmeadata));
 
 	EnterCriticalSection(&StateVariablesCS);
 
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
-	headinghat = (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+	headinghat = fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
+	pitchhat = fmod_360_rad2deg(-Center(thetahat));
+	rollhat = fmod_360_rad2deg(Center(phihat));
 
 	if (bCheckGNSSOK())
 	{
@@ -230,10 +232,48 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			return EXIT_FAILURE;
 		}
 	}
-		
-	//roll = fmod_2PI(Center(phihat));
-	//pitch = fmod_2PI(-Center(thetahat));
-	//yaw = fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
+	if (bEnable_NMEAInterface_HEHDT)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$HEHDT,%.1f,T", headinghat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_HEROT)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$HEROT,%.1f,A", -60.0*Center(omegazhat)*180.0/M_PI);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_PRDID)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$PRDID,%.1f,%.1f,%.1f", pitchhat, rollhat, headinghat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
 
 	LeaveCriticalSection(&StateVariablesCS);
 	
