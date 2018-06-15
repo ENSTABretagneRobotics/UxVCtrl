@@ -740,6 +740,7 @@
     <Text Include="gpControl0.txt">
       <Filter>Input Files</Filter>
     </Text>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />

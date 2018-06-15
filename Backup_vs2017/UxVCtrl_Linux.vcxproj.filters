@@ -680,6 +680,7 @@
     <Text Include="gpControl0.txt">
       <Filter>Input Files</Filter>
     </Text>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -775,10 +776,20 @@
     <None Include="Video2.txt">
       <Filter>Input Files</Filter>
     </None>
-    <None Include="restore\aud\ReadMe.txt" />
-    <None Include="restore\log\ReadMe.txt" />
-    <None Include="restore\pic\ReadMe.txt" />
-    <None Include="restore\ReadMe.txt" />
-    <None Include="restore\vid\ReadMe.txt" />
+    <None Include="restore\pic\ReadMe.txt">
+      <Filter>restore\pic</Filter>
+    </None>
+    <None Include="restore\aud\ReadMe.txt">
+      <Filter>restore\aud</Filter>
+    </None>
+    <None Include="restore\ReadMe.txt">
+      <Filter>restore</Filter>
+    </None>
+    <None Include="restore\vid\ReadMe.txt">
+      <Filter>restore\vid</Filter>
+    </None>
+    <None Include="restore\log\ReadMe.txt">
+      <Filter>restore\log</Filter>
+    </None>
   </ItemGroup>
 </Project>

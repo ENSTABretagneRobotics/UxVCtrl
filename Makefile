@@ -103,9 +103,6 @@ U3Core.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Core.c ../Extensions/Devi
 U3Cfg.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Cfg.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Cfg.h U3Core.o
 	$(CC) $(CFLAGS) -c $<
 
-U3Mgr.o: ../Extensions/Devices/LabjackUtils/U3Utils/U3Mgr.c ../Extensions/Devices/LabjackUtils/U3Utils/U3Mgr.h U3Cfg.o OSCriticalSection.o
-	$(CC) $(CFLAGS) -c $<
-
 ue9.o: ../Extensions/Devices/LabjackUtils/UE9Utils/ue9.c ../Extensions/Devices/LabjackUtils/UE9Utils/ue9.h labjackusb.o
 	$(CC) $(CFLAGS) -c $<
 
@@ -113,9 +110,6 @@ UE9Core.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Core.c ../Extensions/D
 	$(CC) $(CFLAGS) -c $<
 
 UE9Cfg.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.h UE9Core.o
-	$(CC) $(CFLAGS) -c $<
-
-UE9Mgr.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Mgr.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Mgr.h UE9Cfg.o OSCriticalSection.o
 	$(CC) $(CFLAGS) -c $<
 
 CvCore.o: ../Extensions/Img/CvCore.c ../Extensions/Img/CvCore.h OSTime.o
@@ -316,7 +310,7 @@ VisualObstacle.o: VisualObstacle.cpp
 Wall.o: Wall.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Mgr.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
