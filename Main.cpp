@@ -56,8 +56,8 @@
 #include "SBG.h"
 #endif // ENABLE_SBG_SUPPORT
 #include "NMEADevice.h"
-#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "ublox.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "MAVLinkDevice.h"
 #endif // ENABLE_MAVLINK_SUPPORT
@@ -79,8 +79,8 @@
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "MAVLinkInterface.h"
 #endif // ENABLE_MAVLINK_SUPPORT
-#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "NMEAInterface.h"
+#ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRSInterface.h"
 #include "SSC32Interface.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT

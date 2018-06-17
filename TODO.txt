@@ -1,3 +1,12 @@
+bug *sizeof(double) memset(wpslat, 0, MAX_NB_WP), dans code VAIMOS, fileconversions, etc...
+
+Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
+
+cmake option static visual studio?
+
+réglages maestro zodiac?
+pouvoir gérer plus de 5 PWM maestro
+
 nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1...
 
 waypointslist file.csv bStationIfEndOrEmpty comme ça attend qu'opencpn envoie nouveaux wps, et ça réécrit le fichier waypoints.csv, dont on pourrait remplacer le format avec celui de mission planner
@@ -14,7 +23,7 @@ tester avec un nouveau mingw et linux, check inline and timegm in a small progra
 param friendly name
 Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
 
-terme intégral line following
+terme intégral line following, ne plus faire l'approximation repère local pour les commandes xxxwgs
 
 faire UxVSim à partir de VSim
 
@@ -220,7 +229,7 @@ le changement de alphafvxy n'a peut-être pas été fait dans le bon sens pour SARD
 problèmes taille de long différente, éviter les long, beaucoup de long dans labjack, mais peut-être qu'il faut les laisser, voir pour mieux définir les uint32, uLong...
 printf size_t->%zu?
 chiffres significatifs...
-Warnings misleading indent, see Ubuntu 16.10/VS2017 and static/dynamic code analysis...?
+Warnings misleading indent, see Ubuntu 18.04/VS2017 and static/dynamic code analysis...?
 retester avec -Wunkown-pragmas, -Wwarn-cstrict
 vc_linux warnings de conversion à corriger par des casts explicites?
 tester longtemps en release sur les robots (avec tous les devices possibles) avec et sans debugger, avec et sans appverif et valgrind...
@@ -522,6 +531,11 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Ubuntu static
+gcc -o foo main.o -static -lbaz -lbar
+g++ -static-libgcc -static-libstdc++
+https://www.arangodb.com/2018/04/static-binaries-c-plus-plus-application/
 
 sln cfg par défaut x86->pas possible sans .suo (user-specific)?
 

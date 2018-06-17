@@ -204,6 +204,9 @@ extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
 extern double lat_home, long_home, alt_home;
 
+extern double wpstmplat[MAX_NB_WP];
+extern double wpstmplong[MAX_NB_WP];
+extern int nbwpstmp;
 extern double wpslat[MAX_NB_WP];
 extern double wpslong[MAX_NB_WP];
 extern int nbWPs, CurWP;
@@ -1017,10 +1020,13 @@ inline int InitGlobals(void)
 	memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
 	memset(procstackids, 0, sizeof(procstackids));
 
-	bDeleteRoute = FALSE;
+	bDeleteRoute = TRUE;
+	nbwpstmp = 0;
+	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
 	nbWPs = 0;
-	memset(wpslat, 0, MAX_NB_WP);
-	memset(wpslong, 0, MAX_NB_WP);
+	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 
 	return EXIT_SUCCESS;
 }
@@ -1029,10 +1035,13 @@ inline int ReleaseGlobals(void)
 {
 	int i = 0;
 
-	bDeleteRoute = FALSE;
+	bDeleteRoute = TRUE;
+	nbwpstmp = 0;
+	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
 	nbWPs = 0;
-	memset(wpslat, 0, MAX_NB_WP);
-	memset(wpslong, 0, MAX_NB_WP);
+	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 
 	DeleteCriticalSection(&strtimeCS);
 	DeleteCriticalSection(&OpenCVCS);

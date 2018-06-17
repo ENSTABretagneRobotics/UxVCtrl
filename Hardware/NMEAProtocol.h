@@ -887,7 +887,8 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		memset(pNMEAData->szwpname, 0, sizeof(pNMEAData->szwpname));
 		if (sscanf(sentence+offset, "WPL,%c%c%lf,%c,%c%c%c%lf,%c,%63s", 
 			&pNMEAData->szwplatdeg[0], &pNMEAData->szwplatdeg[1], &pNMEAData->wplatmin, &pNMEAData->wpnorth, 
-			&pNMEAData->szwplongdeg[0], &pNMEAData->szwplongdeg[1], &pNMEAData->szwplongdeg[2], &pNMEAData->wplongmin, &pNMEAData->wpeast, pNMEAData->szwpname) != 10)
+			&pNMEAData->szwplongdeg[0], &pNMEAData->szwplongdeg[1], &pNMEAData->szwplongdeg[2], &pNMEAData->wplongmin, &pNMEAData->wpeast, 
+			pNMEAData->szwpname) != 10)
 		{
 			//printf("Error parsing NMEA sentence : Invalid data. \n");
 			//return EXIT_FAILURE;
@@ -909,7 +910,10 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	if (strstr(mnemonic, "RTE"))
 	{
 		offset = 1+(int)strlen(talkerid);
-		memset(pNMEAData->szwpname, 0, sizeof(pNMEAData->szwpname));
+		memset(pNMEAData->szrtewp1name, 0, sizeof(pNMEAData->szrtewp1name));
+		memset(pNMEAData->szrtewp2name, 0, sizeof(pNMEAData->szrtewp2name));
+		memset(pNMEAData->szrtewp3name, 0, sizeof(pNMEAData->szrtewp3name));
+		memset(pNMEAData->szrtewp4name, 0, sizeof(pNMEAData->szrtewp4name));
 		if (
 			(sscanf(sentence+offset, "RTE,%d,%d,%c,%63s,%63s,%63s,%63s", 
 			&pNMEAData->totalrtemsg, &pNMEAData->rtemsgnb, &pNMEAData->rtemsgmode, pNMEAData->szrtewp1name, pNMEAData->szrtewp2name, pNMEAData->szrtewp3name, pNMEAData->szrtewp3name) != 7)
@@ -929,8 +933,6 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		}
 		// Do other else if (sscanf() != x) if more/less complete sentence...
 		
-
-
 	}
 
 	// AIS data.

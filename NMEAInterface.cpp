@@ -179,8 +179,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			{
 				bDeleteRoute = FALSE;
 				nbWPs = 0;
-				memset(wpslat, 0, MAX_NB_WP);
-				memset(wpslong, 0, MAX_NB_WP);
+				memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+				memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 			}
 			if (nbWPs >= MAX_NB_WP)
 			{
@@ -203,6 +203,59 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		{
 			bDeleteRoute = TRUE;
 		}
+
+
+
+
+/*
+
+
+		if ((nmeadata.wpLatitude != 0)&&(nmeadata.wpLongitude != 0))
+		{
+			if (bDeleteRoute)
+			{
+				bDeleteRoute = FALSE;
+				nbwpstmp = 0;
+				memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
+				memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+			}
+			if (nbwpstmp >= MAX_NB_WP)
+			{
+				printf("Too many waypoints.\n");
+			}
+			else
+			{
+				// Avoid duplicates...
+				if ((nbwpstmp == 0)||
+					((nbwpstmp > 0)&&((wpstmplat[nbwpstmp-1] != nmeadata.wpLatitude)||(wpstmplong[nbwpstmp-1] != nmeadata.wpLongitude))))
+				{
+					wpstmplat[nbwpstmp] = nmeadata.wpLatitude;
+					wpstmplong[nbwpstmp] = nmeadata.wpLongitude;
+					nbwpstmp++;
+				}
+			}
+		}
+
+		if (nmeadata.rtemsgmode == 'c')
+		{
+			FILE* f = fopen(LOG_FOLDER"Waypoints.csv", w);
+
+
+
+
+
+
+
+
+			bDeleteRoute = TRUE;
+		}
+
+
+
+*/
+
+
+
 	}
 	
 	memset(&nmeadata, 0, sizeof(nmeadata));

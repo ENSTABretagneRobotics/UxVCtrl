@@ -67,8 +67,8 @@ inline int LoadWaypointsEx(char* szFilePath, double wpslat[], double wpslong[], 
 	char line[MAX_BUF_LEN];
 	int i = 0;
 
-	memset(wpslat, 0, MAX_NB_WP);
-	memset(wpslong, 0, MAX_NB_WP);
+	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 	*pNbWPs = 0;
 
 	file = fopen(szFilePath, "r");
@@ -1265,6 +1265,7 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wdangling-else"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2050,6 +2051,7 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wdangling-else"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2711,6 +2713,7 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wdangling-else"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2979,6 +2982,7 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wdangling-else"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -3266,6 +3270,7 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wdangling-else"
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
