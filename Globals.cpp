@@ -27,6 +27,10 @@ deque<double> wx_vector, wy_vector, wz_vector;
 double wagl = 0;
 double lat_home = 0, long_home = 0, alt_home = 0;
 
+double wpslat[MAX_NB_WP];
+double wpslong[MAX_NB_WP];
+int nbWPs = 0, CurWP = 0;
+
 // Measurements.
 interval x_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), y_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), z_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval phi_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), theta_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psi_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
@@ -104,6 +108,7 @@ BOOL bEnable_NMEAInterface_HCHDG = FALSE;
 BOOL bEnable_NMEAInterface_HEHDT = FALSE;
 BOOL bEnable_NMEAInterface_HEROT = FALSE;
 BOOL bEnable_NMEAInterface_PRDID = FALSE;
+BOOL bDisableNMEAInterfaceIN = FALSE;
 BOOL bRazorAHRSInterface = FALSE;
 char szRazorAHRSInterfacePath[MAX_BUF_LEN];
 int RazorAHRSInterfaceBaudRate = 0;
@@ -540,6 +545,7 @@ BOOL bStaticSonarLocalization = FALSE;
 BOOL bDynamicSonarLocalization = FALSE;
 BOOL bGPSLocalization = FALSE;
 BOOL bDVLLocalization = FALSE;
+BOOL bDeleteRoute = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
 int labels[MAX_NB_LABELS];

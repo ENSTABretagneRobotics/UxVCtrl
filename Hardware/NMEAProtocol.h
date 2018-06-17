@@ -80,6 +80,18 @@ struct NMEADATA
 	double sog, kph, cog, mag_cog; // Respectively in knots, km/h, deg in NED coordinate system.
 	double heading, deviation, variation; // Respectively in deg in NED coordinate system.
 	char dev_east, var_east;
+	int wplatdeg, wplongdeg;
+	double wplatmin, wplongmin;
+	char szwplatdeg[3];
+	char szwplongdeg[4];
+	char wpnorth, wpeast;
+	char szwpname[64];
+	int totalrtemsg, rtemsgnb;
+	char rtemsgmode;
+	char szrtewp1name[64];
+	char szrtewp2name[64];
+	char szrtewp3name[64];
+	char szrtewp4name[64];
 	// AIS.
 	int nbsentences;
 	int sentence_number;
@@ -111,6 +123,8 @@ struct NMEADATA
 	double WindSpeed; // In m/s.
 	double ApparentWindDir; // In rad.
 	double ApparentWindSpeed; // In m/s.
+	double wpLatitude; // In decimal degrees.
+	double wpLongitude; // In decimal degrees.
 	double AIS_Latitude; // In decimal degrees.
 	double AIS_Longitude; // In decimal degrees.
 	double AIS_SOG; // In m/s.
@@ -866,12 +880,65 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		pNMEAData->WindSpeed = pNMEAData->windspeed; 
 	}
 
+	// Waypoint location data.
+	if (strstr(mnemonic, "WPL"))
+	{
+		offset = 1+(int)strlen(talkerid);
+		memset(pNMEAData->szwpname, 0, sizeof(pNMEAData->szwpname));
+		if (sscanf(sentence+offset, "WPL,%c%c%lf,%c,%c%c%c%lf,%c,%63s", 
+			&pNMEAData->szwplatdeg[0], &pNMEAData->szwplatdeg[1], &pNMEAData->wplatmin, &pNMEAData->wpnorth, 
+			&pNMEAData->szwplongdeg[0], &pNMEAData->szwplongdeg[1], &pNMEAData->szwplongdeg[2], &pNMEAData->wplongmin, &pNMEAData->wpeast, pNMEAData->szwpname) != 10)
+		{
+			//printf("Error parsing NMEA sentence : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+		// Do other else if (sscanf() != x) if more/less complete sentence...
+		
+		if ((strlen(pNMEAData->szwplatdeg) > 0)&&(strlen(pNMEAData->szwplongdeg) > 0))
+		{
+			pNMEAData->wplatdeg = atoi(pNMEAData->szwplatdeg);
+			pNMEAData->wplongdeg = atoi(pNMEAData->szwplongdeg);
+
+			// Convert GPS latitude and longitude in decimal.
+			pNMEAData->wpLatitude = (pNMEAData->wpnorth == 'N')?(pNMEAData->wplatdeg+pNMEAData->wplatmin/60.0):-(pNMEAData->wplatdeg+pNMEAData->wplatmin/60.0);
+			pNMEAData->wpLongitude = (pNMEAData->wpeast == 'E')?(pNMEAData->wplongdeg+pNMEAData->wplongmin/60.0):-(pNMEAData->wplongdeg+pNMEAData->wplongmin/60.0);
+		}
+	}
+
+	// Routes data.
+	if (strstr(mnemonic, "RTE"))
+	{
+		offset = 1+(int)strlen(talkerid);
+		memset(pNMEAData->szwpname, 0, sizeof(pNMEAData->szwpname));
+		if (
+			(sscanf(sentence+offset, "RTE,%d,%d,%c,%63s,%63s,%63s,%63s", 
+			&pNMEAData->totalrtemsg, &pNMEAData->rtemsgnb, &pNMEAData->rtemsgmode, pNMEAData->szrtewp1name, pNMEAData->szrtewp2name, pNMEAData->szrtewp3name, pNMEAData->szrtewp3name) != 7)
+			&&
+			(sscanf(sentence+offset, "RTE,%d,%d,%c,%63s,%63s,%63s", 
+			&pNMEAData->totalrtemsg, &pNMEAData->rtemsgnb, &pNMEAData->rtemsgmode, pNMEAData->szrtewp1name, pNMEAData->szrtewp2name, pNMEAData->szrtewp3name) != 6)
+			&&
+			(sscanf(sentence+offset, "RTE,%d,%d,%c,%63s,%63s", 
+			&pNMEAData->totalrtemsg, &pNMEAData->rtemsgnb, &pNMEAData->rtemsgmode, pNMEAData->szrtewp1name, pNMEAData->szrtewp2name) != 5)
+			&&
+			(sscanf(sentence+offset, "RTE,%d,%d,%c,%63s", 
+			&pNMEAData->totalrtemsg, &pNMEAData->rtemsgnb, &pNMEAData->rtemsgmode, pNMEAData->szrtewp1name) != 4)
+			)
+		{
+			//printf("Error parsing NMEA sentence : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+		// Do other else if (sscanf() != x) if more/less complete sentence...
+		
+
+
+	}
+
 	// AIS data.
 	if (strstr(mnemonic, "VDM"))
 	{
 		offset = 1+(int)strlen(talkerid);
 		memset(aisbuf, 0, sizeof(aisbuf));
-		if (sscanf(sentence+offset, "VDM,%d,%d,,%c,%128s", 
+		if (sscanf(sentence+offset, "VDM,%d,%d,,%c,%127s", 
 			&pNMEAData->nbsentences, &pNMEAData->sentence_number, &pNMEAData->AIS_channel, aisbuf) != 4)
 		{
 			//printf("Error parsing NMEA sentence : Invalid data. \n");

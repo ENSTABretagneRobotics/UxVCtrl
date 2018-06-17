@@ -565,7 +565,7 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 	if (pNMEADevice->bEnableAIVDM)
 	{
 		memset(aisbuf, 0, sizeof(aisbuf));
-		if (sscanf(ptr_AIVDM, "!AIVDM,%d,%d,,%c,%128s", 
+		if (sscanf(ptr_AIVDM, "!AIVDM,%d,%d,,%c,%127s", 
 			&pNMEAData->nbsentences, &pNMEAData->sentence_number, &pNMEAData->AIS_channel, aisbuf) != 4)
 		{
 			//printf("Error reading data from a NMEADevice : Invalid data. \n");

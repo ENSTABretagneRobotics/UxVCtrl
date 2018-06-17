@@ -94,6 +94,8 @@ WMV2
 0
 % bEnable_NMEAInterface_PRDID
 0
+% bDisableNMEAInterfaceIN
+0
 % bRazorAHRSInterface
 1
 % szRazorAHRSInterfacePath (server TCP port (e.g. :5007), client IP address and TCP port (e.g. 127.0.0.1:5007) or local RS232 port)

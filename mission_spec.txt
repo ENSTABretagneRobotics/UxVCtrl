@@ -154,6 +154,8 @@
 %
 %waitlinetwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
 %
+%waypointslist unusedparam
+%
 % DEVICES COMMANDS
 %
 %ciscreaconfig CISCREA.txt bPause

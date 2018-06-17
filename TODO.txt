@@ -1,9 +1,13 @@
-Waypointslist file.csv bStation, inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
-opencpn input wps
+nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1...
+
+waypointslist file.csv bStationIfEndOrEmpty comme ça attend qu'opencpn envoie nouveaux wps, et ça réécrit le fichier waypoints.csv, dont on pourrait remplacer le format avec celui de mission planner
+inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
+longitude180handling?
 
 ball detection : ajouter en option des prétraitements?
 
 cmake test auto prereq download on live ubuntu
+Générer .deb static avec cmake?
 cmake static surtout pour linux...
 tester avec un nouveau mingw et linux, check inline and timegm in a small program, update test_devices
 

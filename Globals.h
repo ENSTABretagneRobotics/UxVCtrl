@@ -125,6 +125,8 @@ typedef enum KEYS KEYS;
 #define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 2
 
+#define MAX_NB_WP 256
+
 // GNSS accuracy levels.
 #define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
 #define GNSS_ACC_LEVEL_GNSS_FIX_UNREL 1
@@ -201,6 +203,10 @@ extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
 extern double lat_home, long_home, alt_home;
+
+extern double wpslat[MAX_NB_WP];
+extern double wpslong[MAX_NB_WP];
+extern int nbWPs, CurWP;
 
 // Measurements.
 extern interval x_gps, y_gps, z_gps;
@@ -281,6 +287,7 @@ extern BOOL bEnable_NMEAInterface_HCHDG;
 extern BOOL bEnable_NMEAInterface_HEHDT;
 extern BOOL bEnable_NMEAInterface_HEROT;
 extern BOOL bEnable_NMEAInterface_PRDID;
+extern BOOL bDisableNMEAInterfaceIN;
 extern BOOL bRazorAHRSInterface;
 extern char szRazorAHRSInterfacePath[MAX_BUF_LEN];
 extern int RazorAHRSInterfaceBaudRate;
@@ -717,6 +724,7 @@ extern BOOL bStaticSonarLocalization;
 extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;
 extern BOOL bDVLLocalization;
+extern BOOL bDeleteRoute;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 extern int labels[MAX_NB_LABELS];
@@ -1009,12 +1017,22 @@ inline int InitGlobals(void)
 	memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
 	memset(procstackids, 0, sizeof(procstackids));
 
+	bDeleteRoute = FALSE;
+	nbWPs = 0;
+	memset(wpslat, 0, MAX_NB_WP);
+	memset(wpslong, 0, MAX_NB_WP);
+
 	return EXIT_SUCCESS;
 }
 
 inline int ReleaseGlobals(void)
 {
 	int i = 0;
+
+	bDeleteRoute = FALSE;
+	nbWPs = 0;
+	memset(wpslat, 0, MAX_NB_WP);
+	memset(wpslong, 0, MAX_NB_WP);
 
 	DeleteCriticalSection(&strtimeCS);
 	DeleteCriticalSection(&OpenCVCS);

@@ -1,3 +1,8 @@
+228
+Added bDisableNMEAInterfaceIN parameter.
+Added preliminary waypointslist command.
+Updated preliminary CMake support.
+
 227
 Added preliminary Sailboat 2 support.
 Added robid command to print the current robid.

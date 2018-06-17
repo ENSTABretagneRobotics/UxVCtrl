@@ -61,6 +61,198 @@ inline void DisableAllControls(void)
 	LeaveCriticalSection(&MDMCS);
 }
 
+inline int LoadWaypointsEx(char* szFilePath, double wpslat[], double wpslong[], int* pNbWPs)
+{
+	FILE* file = NULL;
+	char line[MAX_BUF_LEN];
+	int i = 0;
+
+	memset(wpslat, 0, MAX_NB_WP);
+	memset(wpslong, 0, MAX_NB_WP);
+	*pNbWPs = 0;
+
+	file = fopen(szFilePath, "r");
+	if (file == NULL)
+	{
+		printf("Waypoints file not found.\n");
+		return EXIT_FAILURE;
+	}
+
+	i = 0;
+	memset(line, 0, sizeof(line));
+	while (fgets3(file, line, sizeof(line)) != NULL) 
+	{
+		if (i >= MAX_NB_WP) 
+		{
+			printf("Too many waypoints.\n");
+			*pNbWPs = i;
+			fclose(file);
+			return EXIT_FAILURE;
+		}
+		if ((sscanf(line, "%lf;%lf", &wpslat[i], &wpslong[i]) == 2)||
+			(sscanf(line, "%lf %lf", &wpslat[i], &wpslong[i]) == 2)) 
+		{
+			i++;
+		}
+		else
+		{
+			printf("Skipping an invalid line in the waypoints file.\n");
+		}
+		memset(line, 0, sizeof(line));
+	}
+	*pNbWPs = i;
+	if (*pNbWPs <= 0)
+	{
+		printf("Invalid waypoints file.\n");
+		*pNbWPs = 0;
+		fclose(file);
+		return EXIT_FAILURE;
+	}
+	if (fclose(file) != EXIT_SUCCESS) 
+	{
+		printf("Error closing waypoints file.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int CheckWaypointsEx(char* szFilePath, double wpslat[], double wpslong[], int nbWPs)
+{
+	FILE* file = NULL;
+	char line[MAX_BUF_LEN];
+	double wpslattmp = 0;
+	double wpslongtmp = 0;
+	int i = 0;
+
+	file = fopen(szFilePath, "r");
+	if (file == NULL)
+	{
+		printf("Waypoints file not found.\n");
+		return EXIT_FAILURE;
+	}
+
+	i = 0;
+	memset(line, 0, sizeof(line));
+	while (fgets3(file, line, sizeof(line)) != NULL) 
+	{
+		if (i >= MAX_NB_WP) 
+		{
+			printf("Too many waypoints.\n");
+			fclose(file);
+			return EXIT_FAILURE;
+		}
+		wpslattmp = 0; wpslongtmp = 0;
+		if (sscanf(line, "%lf;%lf", &wpslattmp, &wpslongtmp) == 2) 
+		{
+			if ((i >= nbWPs)||(fabs(wpslattmp-wpslat[i]) > DBL_EPSILON)||(fabs(wpslongtmp-wpslong[i]) > DBL_EPSILON))
+			{
+				printf("Waypoints file has changed.\n");
+				if (fclose(file) != EXIT_SUCCESS) 
+				{
+					printf("Error closing waypoints file.\n");
+					return EXIT_FAILURE;
+				}
+				return EXIT_CHANGED;
+			}
+			i++;
+		}
+		else
+		{
+			printf("Skipping an invalid line in the waypoints file.\n");
+		}
+		memset(line, 0, sizeof(line));
+	}
+	if (i <= 0)
+	{
+		printf("Invalid waypoints file.\n");
+		fclose(file);
+		return EXIT_FAILURE;
+	}
+	if (i != nbWPs)
+	{
+		printf("Waypoints file has changed.\n");
+		if (fclose(file) != EXIT_SUCCESS) 
+		{
+			printf("Error closing waypoints file.\n");
+			return EXIT_FAILURE;
+		}
+		return EXIT_CHANGED;
+	}
+	if (fclose(file) != EXIT_SUCCESS) 
+	{
+		printf("Error closing waypoints file.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int GetCurrentWaypointEx(char* szFilePath, int* pCurWP)
+{
+
+	// Should use an interprocess semaphore...
+
+	FILE* file = NULL;
+
+	*pCurWP = 0;
+
+	file = fopen(szFilePath, "r");
+	if (file == NULL)
+	{
+		printf("Current waypoint file not found.\n");
+		return EXIT_FAILURE;
+	}
+	if (fscanf(file, "%d", pCurWP) != 1) 
+	{
+		// Wait and retry in case the file was being modified.
+		mSleep(75);
+		rewind(file);
+		if (fscanf(file, "%d", pCurWP) != 1) 
+		{
+			printf("Error reading current waypoint file.\n");
+			*pCurWP = 0;
+			fclose(file);
+			return EXIT_FAILURE;
+		}
+	}
+	if (fclose(file) != EXIT_SUCCESS) 
+	{
+		printf("Error closing current waypoint file.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int SetCurrentWaypointEx(char* szFilePath, int CurWP)
+{
+
+	// Should use an interprocess semaphore...
+
+	FILE* file = NULL;
+
+	file = fopen(szFilePath, "w");
+	if (file == NULL)
+	{
+		printf("Unable to create current waypoint file.\n");
+		return EXIT_FAILURE;
+	}
+	if (fprintf(file, "%d", CurWP) <= 0)
+	{
+		printf("Error writing current waypoint file.\n");
+		fclose(file);
+		return EXIT_FAILURE;
+	}
+	if (fclose(file) != EXIT_SUCCESS) 
+	{
+		printf("Error closing current waypoint file.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 inline void CallMission(char* str)
 {
 	EnterCriticalSection(&MissionFilesCS);
@@ -1811,6 +2003,45 @@ inline int Commands(char* line)
 		}
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "waypointslist %d", &ival) == 1)
+	{
+		for (CurWP = 1; CurWP < nbWPs; CurWP++)
+		{
+
+			EnterCriticalSection(&StateVariablesCS);
+			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+			bLineFollowingControl = TRUE;
+			bWaypointControl = FALSE;
+			bHeadingControl = TRUE;
+			LeaveCriticalSection(&StateVariablesCS);
+			delay = fabs(delay);
+			bWaiting = TRUE;
+			StartChrono(&chrono);
+			for (;;)
+			{
+				EnterCriticalSection(&StateVariablesCS);
+				// Check if the destination waypoint of the line was reached.
+				if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					break;
+				}
+				else
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+				if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+				if (!bWaiting) break;
+				if (bExit) break;
+				// Wait at least delay/10 and at most around 100 ms for each loop.
+				mSleep((long)min(delay*100.0, 100.0));
+			}
+			StopChronoQuick(&chrono);
+			bWaiting = FALSE;
+
+		}
 	}
 #pragma endregion
 #pragma region DEVICES COMMANDS

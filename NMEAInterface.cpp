@@ -7,7 +7,7 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
-#include "NMEADevice.h"
+#include "ublox.h"
 #include "NMEAInterface.h"
 
 #define LOCAL_TYPE_NMEAINTERFACE 0
@@ -63,6 +63,13 @@ int inithandlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 
 int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 {
+	char recvbuf[MAX_NB_BYTES_UBLOX];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	char* ptr = NULL;
+	int sentencelen = 0;
+	char talkerid[MAX_NB_BYTES_TALKER_ID_NMEA+1]; // +1 for the null terminator character for strings.
+	char mnemonic[MAX_NB_BYTES_MNEMONIC_NMEA+1]; // +1 for the null terminator character for strings.
+	CHRONO chrono;
 	char tmpbuf[MAX_BUF_LEN];
 	char checksum[4];
 	NMEADATA nmeadata;
@@ -72,10 +79,132 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	time_t tt = 0;
 	struct tm* timeptr = NULL;
 	int sendbuflen = 0;
-	uint8 sendbuf[MAX_NB_BYTES_NMEADEVICE];
-
+	uint8 sendbuf[MAX_NB_BYTES_UBLOX];
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, pitchhat = 0, rollhat = 0;
+	
+	if ((!bDisableNMEAInterfaceIN)&&(CheckAvailableBytesRS232Port(pNMEAInterfacePseudoRS232Port) == EXIT_SUCCESS))
+	{
+		memset(&nmeadata, 0, sizeof(nmeadata));
+		
+		StartChrono(&chrono);
 
+		// Prepare the buffers.
+		memset(recvbuf, 0, sizeof(recvbuf));
+		recvbuflen = MAX_NB_BYTES_UBLOX-1; // The last character must be a 0 to be a valid string for sscanf.
+		BytesReceived = 0;
+
+		// Suppose that there are not so many data to discard.
+		// First try to get directly the desired message...
+
+		nbBytesToRequest = MIN_NB_BYTES_SENTENCE_NMEA;
+		if (ReadAllRS232Port(pNMEAInterfacePseudoRS232Port, (uint8*)recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a NMEAInterface. \n");
+			return EXIT_FAILURE;
+		}
+		//if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+		//{
+		//	fwrite(recvbuf, nbBytesToRequest, 1, publox->pfSaveFile);
+		//	fflush(publox->pfSaveFile);
+		//}
+		BytesReceived += nbBytesToRequest;
+
+		for (;;)
+		{
+			memset(talkerid, 0, sizeof(talkerid));
+			memset(mnemonic, 0, sizeof(mnemonic));
+			res = FindSentenceNMEA(recvbuf, BytesReceived, talkerid, mnemonic, &sentencelen, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+			if (res == EXIT_SUCCESS) break;
+			if (res == EXIT_FAILURE)
+			{
+				nbBytesToRequest = min(MIN_NB_BYTES_SENTENCE_NMEA, nbBytesDiscarded);
+			}
+			memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+			BytesReceived -= nbBytesDiscarded;
+			if (BytesReceived+nbBytesToRequest > recvbuflen)
+			{
+				printf("Error reading data from a NMEAInterface : Invalid data. \n");
+				return EXIT_INVALID_DATA;
+			}
+			if (ReadAllRS232Port(pNMEAInterfacePseudoRS232Port, (uint8*)recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+			{
+				printf("Error reading data from a NMEAInterface. \n");
+				return EXIT_FAILURE;
+			}
+			//if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+			//{
+			//	fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
+			//	fflush(publox->pfSaveFile);
+			//}
+			BytesReceived += nbBytesToRequest;
+			if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
+			{
+				printf("Error reading data from a NMEAInterface : Sentence timeout. \n");
+				return EXIT_TIMEOUT;
+			}
+		}
+
+		if (BytesReceived-nbBytesDiscarded-sentencelen > 0)
+		{
+			printf("Warning getting data from a NMEAInterface : Unexpected data after a sentence. \n");
+		}
+
+		//// Get data bytes.
+
+		//memset(databuf, 0, databuflen);
+
+		//// Check the number of data bytes before copy.
+		//if (databuflen < *psentencelen)
+		//{
+		//	printf("Error getting data from a ublox : Too small data buffer. \n");
+		//	return EXIT_FAILURE;
+		//}
+
+		//// Copy the data bytes of the message.
+		//if (*psentencelen > 0)
+		//{
+		//	memcpy(databuf, ptr, *psentencelen);
+		//}
+
+		if (ProcessSentenceNMEA(ptr, sentencelen, talkerid, mnemonic, &nmeadata) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		
+		// Analyze data.
+
+		if ((nmeadata.wpLatitude != 0)&&(nmeadata.wpLongitude != 0))
+		{
+			if (bDeleteRoute)
+			{
+				bDeleteRoute = FALSE;
+				nbWPs = 0;
+				memset(wpslat, 0, MAX_NB_WP);
+				memset(wpslong, 0, MAX_NB_WP);
+			}
+			if (nbWPs >= MAX_NB_WP)
+			{
+				printf("Too many waypoints.\n");
+			}
+			else
+			{
+				// Avoid duplicates...
+				if ((nbWPs == 0)||
+					((nbWPs > 0)&&((wpslat[nbWPs-1] != nmeadata.wpLatitude)||(wpslong[nbWPs-1] != nmeadata.wpLongitude))))
+				{
+					wpslat[nbWPs] = nmeadata.wpLatitude;
+					wpslong[nbWPs] = nmeadata.wpLongitude;
+					nbWPs++;
+				}
+			}
+		}
+
+		if (nmeadata.rtemsgmode == 'c')
+		{
+			bDeleteRoute = TRUE;
+		}
+	}
+	
 	memset(&nmeadata, 0, sizeof(nmeadata));
 
 	EnterCriticalSection(&StateVariablesCS);
