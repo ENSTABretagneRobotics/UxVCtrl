@@ -1265,7 +1265,9 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#if (__GNUC__ >= 7)
 #pragma GCC diagnostic ignored "-Wdangling-else"
+#endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2051,7 +2053,9 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#if (__GNUC__ >= 7)
 #pragma GCC diagnostic ignored "-Wdangling-else"
+#endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2713,7 +2717,9 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#if (__GNUC__ >= 7)
 #pragma GCC diagnostic ignored "-Wdangling-else"
+#endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -2982,7 +2988,9 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#if (__GNUC__ >= 7)
 #pragma GCC diagnostic ignored "-Wdangling-else"
+#endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
@@ -3270,7 +3278,9 @@ inline int Commands(char* line)
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic ignored "-Wparentheses"
+#if (__GNUC__ >= 7)
 #pragma GCC diagnostic ignored "-Wdangling-else"
+#endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__

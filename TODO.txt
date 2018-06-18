@@ -1,11 +1,13 @@
+Tester gopro libavcodec rpiz
+
 bug *sizeof(double) memset(wpslat, 0, MAX_NB_WP), dans code VAIMOS, fileconversions, etc...
 
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 
-cmake option static visual studio?
+cmake option static, xp toolset visual studio?
+cmake-gui hangs at the end of sudo apt install, but not cmake...
 
-réglages maestro zodiac?
-pouvoir gérer plus de 5 PWM maestro
+Pololu jrk zodiac?
 
 nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1...
 
@@ -15,9 +17,6 @@ longitude180handling?
 
 ball detection : ajouter en option des prétraitements?
 
-cmake test auto prereq download on live ubuntu
-Générer .deb static avec cmake?
-cmake static surtout pour linux...
 tester avec un nouveau mingw et linux, check inline and timegm in a small program, update test_devices
 
 param friendly name
@@ -46,7 +45,7 @@ IridiumComm...
 Need to check ReadLatestRS232Port() and others as well as checkdata (see MAVLinkInterface), waitfordata (see IridiumComm)...
 Make a select.h for MSVC for compatibility (en essayant de déterminer le type de fd qui est passé (en appelant une fonction de socket et voir si elle échoue...), si c'est une socket essayer d'appeler la bonne fonction, qu'on aurait renommée plus tôt, voir pour faire la même chose pour les fichiers pour les open et read...)...
 
-Composante latérale bluerov et ciscrea
+Composante latérale bluerov et ciscrea, brake si lateralthrust?
 wzcontrolconfig manque! mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
 
 Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
@@ -55,12 +54,8 @@ Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui f
 
 Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
 
-Faire guide d'utilisation et modification UxVCtrl, update sonarstaticlocstructured, sonartest
-Script to ease install of typical prereq, download all files, cmake...
+update sonarstaticlocstructured, sonartest
 Corriger comments sur alphas dans uxvctrl.txt pour saucisse et séparer cas miniking et micron
-compat : auto exclude from build and add option for xp and option to auto lauch build in release
-
-brake si lateralthrust?
 
 On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en historique theta, corrigé en historique theta et position...
 Drawsonarscreenshot_seanetpro
@@ -69,7 +64,6 @@ param zone morte sonar?
 
 fly to alt veut pas nombre à virgule ni alt nulle...
 
-add defines to easily disable selectively SBG, BlueView, MAVLink...
 Prise en compte de 2 GPS pour contracter le cap (ou 3 pour les 3 angles)
 Contraction cap avec gyros avec intégration sur une durée glissante
 

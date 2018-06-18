@@ -380,6 +380,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						break;
 					case MAV_CMD_DO_DIGICAM_CONTROL:
 						mavlink_msg_command_long_decode(&msg, &command);
+#ifndef DISABLE_OPENCV_SUPPORT
 						EnterCriticalSection(&StateVariablesCS);
 						memset(strtime_snap, 0, sizeof(strtime_snap));
 						EnterCriticalSection(&strtimeCS);
@@ -422,6 +423,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 							fclose(kmlsnapfile);
 						}
 						LeaveCriticalSection(&StateVariablesCS);
+#endif // !DISABLE_OPENCV_SUPPORT
 						break;
 					case MAV_CMD_DO_CHANGE_SPEED:
 						mavlink_msg_command_long_decode(&msg, &command);

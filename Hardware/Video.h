@@ -111,6 +111,14 @@ typedef struct VIDEO VIDEO;
 #pragma warning(disable : 4996) 
 #endif // _MSC_VER
 
+#ifdef __GNUC__
+// Disable some GCC warnings.
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic push
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // __GNUC__
+
 inline int ffmpegopen(VIDEO* pVideo)
 {
 	int i = 0;
@@ -273,6 +281,13 @@ inline int ffmpegclose(VIDEO* pVideo)
 
 	return EXIT_SUCCESS;
 }
+
+#ifdef __GNUC__
+// Restore the GCC warnings previously disabled.
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic pop
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // __GNUC__
 
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
