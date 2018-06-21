@@ -179,8 +179,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			{
 				bDeleteRoute = FALSE;
 				nbWPs = 0;
-				memset(wpslat, 0, MAX_NB_WP*sizeof(double));
-				memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+				memset(wpslat, 0, sizeof(wpslat));
+				memset(wpslong, 0, sizeof(wpslong));
 			}
 			if (nbWPs >= MAX_NB_WP)
 			{
@@ -216,8 +216,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			{
 				bDeleteRoute = FALSE;
 				nbwpstmp = 0;
-				memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
-				memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+				memset(wpstmplat, 0, sizeof(wpstmplat));
+				memset(wpstmplong, 0, sizeof(wpstmplong));
 			}
 			if (nbwpstmp >= MAX_NB_WP)
 			{

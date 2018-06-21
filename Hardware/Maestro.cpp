@@ -216,7 +216,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+				if (SetRudderThrustersMaestro(&maestro, rudder, thrust, thrust) != EXIT_SUCCESS)
 				{
 					printf("Connection to a Maestro lost.\n");
 					bConnected = FALSE;
@@ -318,13 +318,29 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					if (u < 0) thrust = 0;
 				}
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+
+				// Temporary method to handle a Pololu Jrk motor controller for Boatbot...
+				if (maestro.DeviceNumber == 11)
 				{
-					printf("Connection to a Maestro lost.\n");
-					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
-					mSleep(50);
-					break;
+					if (SetRudderJrkMaestro(&maestro, rudder) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
+				}
+				else
+				{
+					if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Maestro lost.\n");
+						bConnected = FALSE;
+						DisconnectMaestro(&maestro);
+						mSleep(50);
+						break;
+					}
 				}
 				mSleep(50);
 #endif // USE_MOTORBOAT_WITH_FLUX

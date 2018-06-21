@@ -1022,11 +1022,11 @@ inline int InitGlobals(void)
 
 	bDeleteRoute = TRUE;
 	nbwpstmp = 0;
-	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
-	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmplat, 0, sizeof(wpstmplat));
+	memset(wpstmplong, 0, sizeof(wpstmplong));
 	nbWPs = 0;
-	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
-	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslat, 0, sizeof(wpslat));
+	memset(wpslong, 0, sizeof(wpslong));
 
 	return EXIT_SUCCESS;
 }
@@ -1037,11 +1037,11 @@ inline int ReleaseGlobals(void)
 
 	bDeleteRoute = TRUE;
 	nbwpstmp = 0;
-	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
-	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmplat, 0, sizeof(wpstmplat));
+	memset(wpstmplong, 0, sizeof(wpstmplong));
 	nbWPs = 0;
-	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
-	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslat, 0, sizeof(wpslat));
+	memset(wpslong, 0, sizeof(wpslong));
 
 	DeleteCriticalSection(&strtimeCS);
 	DeleteCriticalSection(&OpenCVCS);

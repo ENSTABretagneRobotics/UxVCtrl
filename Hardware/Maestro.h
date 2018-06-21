@@ -378,6 +378,73 @@ inline int SetAllPWMsMaestro(MAESTRO* pMaestro, int* selectedchannels, int* pws)
 	return EXIT_SUCCESS;
 }
 
+// Pololu Jrk motor controller quick adaptation (default device number is 11)...
+inline int SetPWMJrkMaestro(MAESTRO* pMaestro, int pw)
+{
+	unsigned char sendbuf[MAX_NB_BYTES_MAESTRO];
+	int target = 0;
+	int sendbuflen = 0;
+	int channel = 0; // Only 1 motor on Jrk...
+
+	if (pMaestro->bProportionalPWs[channel])
+	{
+		pw = (int)(pMaestro->CoefPWs[channel]*(pw-DEFAULT_MID_PW_MAESTRO));
+		if (pw >= 0)
+			pw = pMaestro->MidPWs[channel]+pw*(pMaestro->MaxPWs[channel]-pMaestro->MidPWs[channel])
+			/(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+		else
+			pw = pMaestro->MidPWs[channel]+pw*(pMaestro->MinPWs[channel]-pMaestro->MidPWs[channel])
+			/(DEFAULT_MIN_PW_MAESTRO-DEFAULT_MID_PW_MAESTRO);
+	}
+	else
+	{
+		pw = DEFAULT_MID_PW_MAESTRO+(int)(pMaestro->CoefPWs[channel]*(pw-DEFAULT_MID_PW_MAESTRO));
+	}
+
+	pw = max(min(pw, pMaestro->MaxPWs[channel]), pMaestro->MinPWs[channel]);
+	//pw = max(min(pw, DEFAULT_ABSOLUTE_MAX_PW_MAESTRO), DEFAULT_ABSOLUTE_MIN_PW_MAESTRO);
+
+	// The requested PWM is only applied if it is slightly different from the current value.
+	if (abs(pw-pMaestro->LastPWs[channel]) < pMaestro->ThresholdPWs[channel]) return EXIT_SUCCESS;
+
+	// bEnableSetMultipleTargets is used here to choose between Pololu protocol and compact protocol modes...
+	if (pMaestro->bEnableSetMultipleTargets)
+	{
+		// Prepare data to send to device.
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuf[0] = (unsigned char)BAUD_RATE_INDICATION_BYTE_MAESTRO;
+		sendbuf[1] = (unsigned char)pMaestro->DeviceNumber;
+		target = (pw-DEFAULT_MIN_PW_MAESTRO)*4095/(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO);
+		sendbuf[2] = (unsigned char)(0x40 + (target & 0x1F)); // Command byte holds the lower 5 bits of target.
+		sendbuf[3] = (unsigned char)((target >> 5) & 0x7F); // Data byte holds the upper 7 bits of target.
+		sendbuflen = 4;
+	}
+	else
+	{
+		// Prepare data to send to device.
+		memset(sendbuf, 0, sizeof(sendbuf));
+		target = (pw-DEFAULT_MIN_PW_MAESTRO)*4095/(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO);
+		sendbuf[0] = (unsigned char)(0xC0 + (target & 0x1F)); // Command byte holds the lower 5 bits of target.
+		sendbuf[1] = (unsigned char)((target >> 5) & 0x7F); // Data byte holds the upper 7 bits of target.
+		sendbuflen = 2;
+	}
+
+	if (WriteAllRS232Port(&pMaestro->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pMaestro->bSaveRawData)&&(pMaestro->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pMaestro->pfSaveFile);
+		fflush(pMaestro->pfSaveFile);
+	}
+
+	// Update last known value.
+	pMaestro->LastPWs[channel] = pw;
+
+	return EXIT_SUCCESS;
+}
+
 inline int SetRudderMaestro(MAESTRO* pMaestro, double angle)
 {
 	int pw = 0;
@@ -456,6 +523,32 @@ inline int SetRudderThrusterMaestro(MAESTRO* pMaestro, double angle, double urt)
 	return SetAllPWMsMaestro(pMaestro, selectedchannels, pws);
 }
 
+inline int SetRudderThrustersMaestro(MAESTRO* pMaestro, double angle, double urt, double ult)
+{
+	int selectedchannels[NB_CHANNELS_PWM_MAESTRO];
+	int pws[NB_CHANNELS_PWM_MAESTRO];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert angle (in rad) into Maestro pulse width (in us).
+	pws[pMaestro->rudderchan] = DEFAULT_MID_PW_MAESTRO+(int)(angle*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)
+		/(pMaestro->MaxAngle-pMaestro->MinAngle));
+	// Convert u (in [-1;1]) into Maestro pulse width (in us).
+	pws[pMaestro->rightthrusterchan] = DEFAULT_MID_PW_MAESTRO+(int)(urt*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)/2.0);
+	pws[pMaestro->leftthrusterchan] = DEFAULT_MID_PW_MAESTRO+(int)(ult*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)/2.0);
+
+	pws[pMaestro->rudderchan] = max(min(pws[pMaestro->rudderchan], DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+	pws[pMaestro->rightthrusterchan] = max(min(pws[pMaestro->rightthrusterchan], DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+	pws[pMaestro->leftthrusterchan] = max(min(pws[pMaestro->leftthrusterchan], DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+
+	selectedchannels[pMaestro->rudderchan] = 1;
+	selectedchannels[pMaestro->rightthrusterchan] = 1;
+	selectedchannels[pMaestro->leftthrusterchan] = 1;
+
+	return SetAllPWMsMaestro(pMaestro, selectedchannels, pws);
+}
+
 inline int SetRudderThrustersFluxMaestro(MAESTRO* pMaestro, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_MAESTRO];
@@ -486,6 +579,33 @@ inline int SetRudderThrustersFluxMaestro(MAESTRO* pMaestro, double angle, double
 	selectedchannels[pMaestro->leftfluxchan] = 1;
 
 	return SetAllPWMsMaestro(pMaestro, selectedchannels, pws);
+}
+
+// Pololu Jrk motor controller quick adaptation (default device number is 11)...
+inline int SetMotorJrkMaestro(MAESTRO* pMaestro, double umotor)
+{
+	int pw = 0;
+
+	// Convert u (in [-1;1]) into Maestro pulse width (in us).
+	pw = DEFAULT_MID_PW_MAESTRO+(int)(umotor*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)/2.0);
+
+	pw = max(min(pw, DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+
+	return SetPWMJrkMaestro(pMaestro, pw);
+}
+
+// Pololu Jrk motor controller quick adaptation (default device number is 11)...
+inline int SetRudderJrkMaestro(MAESTRO* pMaestro, double angle)
+{
+	int pw = 0;
+
+	// Convert angle (in rad) into Maestro pulse width (in us).
+	pw = DEFAULT_MID_PW_MAESTRO+(int)(angle*(DEFAULT_MAX_PW_MAESTRO-DEFAULT_MIN_PW_MAESTRO)
+		/(pMaestro->MaxAngle-pMaestro->MinAngle));
+
+	pw = max(min(pw, DEFAULT_MAX_PW_MAESTRO), DEFAULT_MIN_PW_MAESTRO);
+
+	return SetPWMJrkMaestro(pMaestro, pw);
 }
 
 inline int CheckMaestro(MAESTRO* pMaestro)

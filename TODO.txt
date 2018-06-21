@@ -1,3 +1,7 @@
+Add Boatbot robid
+
+Jrk getvariable
+
 Tester gopro libavcodec rpiz
 
 bug *sizeof(double) memset(wpslat, 0, MAX_NB_WP), dans code VAIMOS, fileconversions, etc...
@@ -5,9 +9,6 @@ bug *sizeof(double) memset(wpslat, 0, MAX_NB_WP), dans code VAIMOS, fileconversi
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 
 cmake option static, xp toolset visual studio?
-cmake-gui hangs at the end of sudo apt install, but not cmake...
-
-Pololu jrk zodiac?
 
 nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1...
 
@@ -525,6 +526,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+cmake-gui hangs sometimes at the end of sudo apt install...
 
 Ubuntu static
 gcc -o foo main.o -static -lbaz -lbar
