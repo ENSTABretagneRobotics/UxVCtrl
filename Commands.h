@@ -2007,7 +2007,7 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "waypointslist %d", &ival) == 1)
+	else if (sscanf(line, "waypointslist %lf", &delay) == 1)
 	{
 		for (CurWP = 1; CurWP < nbWPs; CurWP++)
 		{

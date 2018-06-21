@@ -1,3 +1,6 @@
+232
+Quick fix for waypointslist command.
+
 231
 Added temporary support of Pololu Jrk motor controller in Maestro for Motorboat robid.
 Updated preliminary CMake support.
