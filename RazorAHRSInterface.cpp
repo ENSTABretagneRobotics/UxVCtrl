@@ -79,6 +79,8 @@ int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 	gyry = -Center(omegayhat);
 	gyrz = -Center(omegazhat);
 
+	LeaveCriticalSection(&StateVariablesCS);
+
 	if (bROSMode_RazorAHRSInterface)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
@@ -86,7 +88,6 @@ int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
@@ -97,12 +98,9 @@ int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
-
-	LeaveCriticalSection(&StateVariablesCS);
 
 	mSleep(50);
 

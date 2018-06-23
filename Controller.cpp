@@ -26,12 +26,19 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double wagl_prev = 0, iagl = 0; // For altitude Above Ground Level control.
 	double wz_prev = 0, iz = 0; // For depth control.
 
+	int days = 0, hours = 0, minutes = 0, seconds = 0;
+	double deccsec = 0;
+	double latitude = 0, longitude = 0, altitude = 0;
+
+#pragma region lognav
+	char lognavfilename[MAX_BUF_LEN];
+	FILE* lognavfile = NULL;
+#pragma endregion
+
 #pragma region Sailboat supervisor
 	STATE prevstate = INVALID_STATE;
 	int bForceCheckStrategy = 0, bForceSailUpdate = 0;
 	CHRONO chrono_sail_update, chrono_check_strategy;
-	char lognavfilename[MAX_BUF_LEN];
-	FILE* lognavfile = NULL;
 	double deltasmax = 0;
 	double q1 = betaarr;
 	double q2 = (log(betaarr)-log(betatrav))/log(2.0);
@@ -39,10 +46,9 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
-#pragma region Sailboat supervisor
-	if (robid & SAILBOAT_CLASS_ROBID_MASK) 
+#pragma region lognav
+	if (!bDisablelognav)
 	{
-		// Temporary...
 		EnterCriticalSection(&strtimeCS);
 		sprintf(lognavfilename, LOG_FOLDER"lognav_%.64s.csv", strtime_fns());
 		LeaveCriticalSection(&strtimeCS);
@@ -54,16 +60,18 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			return 0;
 		}
 
-		fprintf(lognavfile, 
-			"counter;t (in s);lat0 (in decimal degrees);long0 (in decimal degrees);roll (in rad);pitch (in rad);yaw (in rad);" 
-			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);psi (in rad);psiw (in rad);" 
-			"latitude (in decimal degrees);longitude (in decimal degrees);x (in m);y (in m);ax (in m);ay (in m);bx (in m);by (in m);CurWP;" 
-			"wpslat[CurWP] (in decimal degrees);wpslong[CurWP] (in decimal degrees);e (in m);norm_ma (in m);norm_bm (in m);state;" 
+		fprintf(lognavfile,
+			"counter;t (in s);lat0 (in decimal degrees);long0 (in decimal degrees);roll (in rad);pitch (in rad);yaw (in rad);"
+			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);psi (in rad);psiw (in rad);"
+			"latitude (in decimal degrees);longitude (in decimal degrees);x (in m);y (in m);ax (in m);ay (in m);bx (in m);by (in m);CurWP;"
+			"wpslat[CurWP] (in decimal degrees);wpslong[CurWP] (in decimal degrees);e (in m);norm_ma (in m);norm_bm (in m);state;"
 			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbattery1 (in V);vswitch (in V);\n"
-			); 
+		);
 		fflush(lognavfile);
 	}
+#pragma endregion
 
+#pragma region Sailboat supervisor
 	bForceCheckStrategy = 1;
 	bForceSailUpdate = 1;
 
@@ -86,6 +94,9 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		EnterCriticalSection(&StateVariablesCS);
 
 		// Optimization : should compute the x=Center(xhat),... only once at each loop?
+
+		DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
+		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
 
 		// The order here gives some kind of priority...
 
@@ -458,7 +469,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			u3 = uv;
 			break;
 		}
-
 #pragma region Saturation
 		u1 = (u1<1)?u1:1;
 		u1 = (u1>-1)?u1:-1;
@@ -489,20 +499,13 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		u14 = (u14<1)?u14:1;
 		u14 = (u14>-1)?u14:-1;
 #pragma endregion
-#pragma region Sailboat supervisor
-		if (robid & SAILBOAT_CLASS_ROBID_MASK) 
+
+#pragma region bStdOutDetailedInfo
+		if ((bStdOutDetailedInfo)&&(counter%10 == 0))
 		{
-			double latitude = 0, longitude = 0, altitude = 0;
-
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
-
-			if ((bStdOutDetailedInfo)&&(counter%10 == 0))
+			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 			{
-				int days = 0, hours = 0, minutes = 0, seconds = 0;
-				double deccsec = 0;
-
-				DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
-
+#pragma region Sailboat supervisor
 				printf("-------------------------------------------------------------------\n");
 				printf("Time is %.4f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
 				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
@@ -538,39 +541,14 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					printf("State is %d (invalid state).\n", (int)state);
 					break;
 				}
-				printf("Rudder angle is %.1f deg.\n", -uw*ruddermaxangle*180.0/M_PI);
+				printf("Rudder angle is %.1f deg.\n", -uw*((ruddermaxangle-rudderminangle)/2.0)*180.0/M_PI);
 				printf("Sail maximum angle is %.1f deg.\n", u*q1*180.0/M_PI);
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
-			}
-
-			// Temporary...
-			fprintf(lognavfile, "%d;%f;%.8f;%.8f;%.3f;%.3f;%.3f;"
-				"%.3f;%.1f;%.3f;%.1f;%.3f;%.3f;%.3f;"
-				"%.8f;%.8f;%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%d;"
-				"%.8f;%.8f;%.3f;%.3f;%.3f;%d;"
-				"%.3f;%.3f;%.3f;%.3f;%.3f;\n", 
-				counter, t, lat_env, long_env, fmod_2PI(Center(phihat)), fmod_2PI(Center(thetahat)), fmod_2PI(Center(psihat)+angle_env-M_PI/2.0), 
-				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
-				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat), 
-				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0, 
-				wlatb, wlongb, e, norm_ma, norm_bm, (int)state, 
-				-uw*ruddermaxangle, u*q1, wpsi, vbattery1, vswitch);
-			fflush(lognavfile);
-		}
 #pragma endregion
-
-#pragma region bStdOutDetailedInfo
-		if (!(robid & SAILBOAT_CLASS_ROBID_MASK))
-		{
-			if ((bStdOutDetailedInfo)&&(counter%10 == 0))
+			}
+			else
 			{
-				int days = 0, hours = 0, minutes = 0, seconds = 0;
-				double deccsec = 0, latitude = 0, longitude = 0, altitude = 0;
-
-				DecSec2DaysHoursMinSec(t, &days, &hours, &minutes, &seconds, &deccsec);
-				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
-
 				printf("-------------------------------------------------------------------\n");
 				printf("Time is %.4f s i.e. %d days %02d:%02d:%02d %07.4f (loop %d).\n", t, days, hours, minutes, seconds, deccsec, counter);
 				printf("GPS position of the reference coordinate system is (%.7f,%.7f).\n", lat_env, long_env);
@@ -585,6 +563,24 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		}
 #pragma endregion
 
+#pragma region lognav
+		if (!bDisablelognav)
+		{
+			fprintf(lognavfile, "%d;%f;%.8f;%.8f;%.3f;%.3f;%.3f;"
+				"%.3f;%.1f;%.3f;%.1f;%.3f;%.3f;%.3f;"
+				"%.8f;%.8f;%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%d;"
+				"%.8f;%.8f;%.3f;%.3f;%.3f;%d;"
+				"%.3f;%.3f;%.3f;%.3f;%.3f;\n",
+				counter, t, lat_env, long_env, fmod_2PI(Center(phihat)), fmod_2PI(Center(thetahat)), fmod_2PI(Center(psihat)+angle_env-M_PI/2.0),
+				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
+				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat),
+				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0,
+				wlatb, wlongb, e, norm_ma, norm_bm, (int)state,
+				-uw*((ruddermaxangle-rudderminangle)/2.0), u*q1, wpsi, vbattery1, vswitch);
+			fflush(lognavfile);
+		}
+#pragma endregion
+
 		LeaveCriticalSection(&StateVariablesCS);
 
 		if (bExit) break;
@@ -595,9 +591,13 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 	StopChronoQuick(&chrono_check_strategy);
 	StopChronoQuick(&chrono_sail_update);
+#pragma endregion
 
-	// Temporary...
-	if (robid & SAILBOAT_CLASS_ROBID_MASK) fclose(lognavfile);
+#pragma region lognav
+	if (!bDisablelognav)
+	{
+		fclose(lognavfile);
+	}
 #pragma endregion
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...

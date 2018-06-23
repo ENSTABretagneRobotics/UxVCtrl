@@ -61,6 +61,7 @@ inline int LoadConfig(void)
 	bEnable_NMEAInterface_HEHDT = FALSE;
 	bEnable_NMEAInterface_HEROT = FALSE;
 	bEnable_NMEAInterface_PRDID = FALSE;
+	bEnable_NMEAInterface_IIRSA = FALSE;
 	bDisableNMEAInterfaceIN = FALSE;
 	bRazorAHRSInterface = TRUE;
 	memset(szRazorAHRSInterfacePath, 0, sizeof(szRazorAHRSInterfacePath));
@@ -73,6 +74,7 @@ inline int LoadConfig(void)
 	sprintf(szSSC32InterfacePath, ":5004");
 	SSC32InterfaceBaudRate = 9600;
 	SSC32InterfaceTimeout = 1000;
+	bDisablelognav = FALSE;
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
 #pragma endregion
@@ -335,6 +337,8 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_PRDID) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEnable_NMEAInterface_IIRSA) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableNMEAInterfaceIN) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bRazorAHRSInterface) != 1) printf("Invalid configuration file.\n");
@@ -354,6 +358,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &SSC32InterfaceBaudRate) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &SSC32InterfaceTimeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablelognav) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1177,6 +1183,8 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_PRDID) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_IIRSA) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableNMEAInterfaceIN) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bRazorAHRSInterface) < 0) printf("Error writing configuration file.\n");
@@ -1196,6 +1204,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", SSC32InterfaceBaudRate) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", SSC32InterfaceTimeout) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisablelognav) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bCommandPrompt) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

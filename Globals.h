@@ -125,7 +125,7 @@ typedef enum KEYS KEYS;
 #define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 2
 
-#define MAX_NB_WP 256
+#define MAX_NB_WP 1024
 
 // GNSS accuracy levels.
 #define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
@@ -290,6 +290,7 @@ extern BOOL bEnable_NMEAInterface_HCHDG;
 extern BOOL bEnable_NMEAInterface_HEHDT;
 extern BOOL bEnable_NMEAInterface_HEROT;
 extern BOOL bEnable_NMEAInterface_PRDID;
+extern BOOL bEnable_NMEAInterface_IIRSA;
 extern BOOL bDisableNMEAInterfaceIN;
 extern BOOL bRazorAHRSInterface;
 extern char szRazorAHRSInterfacePath[MAX_BUF_LEN];
@@ -300,6 +301,7 @@ extern BOOL bSSC32Interface;
 extern char szSSC32InterfacePath[MAX_BUF_LEN];
 extern int SSC32InterfaceBaudRate;
 extern int SSC32InterfaceTimeout;
+extern BOOL bDisablelognav;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 #pragma endregion
@@ -1022,11 +1024,14 @@ inline int InitGlobals(void)
 
 	bDeleteRoute = TRUE;
 	nbwpstmp = 0;
-	memset(wpstmplat, 0, sizeof(wpstmplat));
-	memset(wpstmplong, 0, sizeof(wpstmplong));
+	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
 	nbWPs = 0;
-	memset(wpslat, 0, sizeof(wpslat));
-	memset(wpslong, 0, sizeof(wpslong));
+	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+
+	rudderminangle = -0.7;
+	ruddermaxangle = 0.7;
 
 	return EXIT_SUCCESS;
 }
@@ -1037,11 +1042,11 @@ inline int ReleaseGlobals(void)
 
 	bDeleteRoute = TRUE;
 	nbwpstmp = 0;
-	memset(wpstmplat, 0, sizeof(wpstmplat));
-	memset(wpstmplong, 0, sizeof(wpstmplong));
+	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
 	nbWPs = 0;
-	memset(wpslat, 0, sizeof(wpslat));
-	memset(wpslong, 0, sizeof(wpslong));
+	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 
 	DeleteCriticalSection(&strtimeCS);
 	DeleteCriticalSection(&OpenCVCS);

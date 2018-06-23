@@ -111,6 +111,7 @@ BOOL bEnable_NMEAInterface_HCHDG = FALSE;
 BOOL bEnable_NMEAInterface_HEHDT = FALSE;
 BOOL bEnable_NMEAInterface_HEROT = FALSE;
 BOOL bEnable_NMEAInterface_PRDID = FALSE;
+BOOL bEnable_NMEAInterface_IIRSA = FALSE;
 BOOL bDisableNMEAInterfaceIN = FALSE;
 BOOL bRazorAHRSInterface = FALSE;
 char szRazorAHRSInterfacePath[MAX_BUF_LEN];
@@ -121,6 +122,7 @@ BOOL bSSC32Interface = FALSE;
 char szSSC32InterfacePath[MAX_BUF_LEN];
 int SSC32InterfaceBaudRate = 0;
 int SSC32InterfaceTimeout = 0;
+BOOL bDisablelognav = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 #pragma endregion

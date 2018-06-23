@@ -87,13 +87,15 @@ WMV2
 % bEnable_NMEAInterface_GPVTG
 0
 % bEnable_NMEAInterface_HCHDG
-0
+1
 % bEnable_NMEAInterface_HEHDT
 0
 % bEnable_NMEAInterface_HEROT
 0
 % bEnable_NMEAInterface_PRDID
 0
+% bEnable_NMEAInterface_IIRSA
+1
 % bDisableNMEAInterfaceIN
 0
 % bRazorAHRSInterface
@@ -114,6 +116,8 @@ WMV2
 9600
 % SSC32InterfaceTimeout (in ms)
 1000
+% bDisablelognav
+0
 % bCommandPrompt
 1
 % bEcho

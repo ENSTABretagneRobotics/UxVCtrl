@@ -80,7 +80,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	struct tm* timeptr = NULL;
 	int sendbuflen = 0;
 	uint8 sendbuf[MAX_NB_BYTES_UBLOX];
-	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, pitchhat = 0, rollhat = 0;
+	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, pitchhat = 0, rollhat = 0, rateofturn = 0, singlerudder = 0;
 	
 	if ((!bDisableNMEAInterfaceIN)&&(CheckAvailableBytesRS232Port(pNMEAInterfacePseudoRS232Port) == EXIT_SUCCESS))
 	{
@@ -96,7 +96,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		// Suppose that there are not so many data to discard.
 		// First try to get directly the desired message...
 
-		nbBytesToRequest = MIN_NB_BYTES_SENTENCE_NMEA;
+		nbBytesToRequest = 1;//MIN_NB_BYTES_SENTENCE_NMEA;
 		if (ReadAllRS232Port(pNMEAInterfacePseudoRS232Port, (uint8*)recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
 		{
 			printf("Error reading data from a NMEAInterface. \n");
@@ -117,7 +117,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			if (res == EXIT_SUCCESS) break;
 			if (res == EXIT_FAILURE)
 			{
-				nbBytesToRequest = min(MIN_NB_BYTES_SENTENCE_NMEA, nbBytesDiscarded);
+				nbBytesToRequest = 1;//min(MIN_NB_BYTES_SENTENCE_NMEA, nbBytesDiscarded);
 			}
 			memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
 			BytesReceived -= nbBytesDiscarded;
@@ -126,16 +126,27 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 				printf("Error reading data from a NMEAInterface : Invalid data. \n");
 				return EXIT_INVALID_DATA;
 			}
-			if (ReadAllRS232Port(pNMEAInterfacePseudoRS232Port, (uint8*)recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+			if (CheckAvailableBytesRS232Port(pNMEAInterfacePseudoRS232Port) == EXIT_SUCCESS)
 			{
-				printf("Error reading data from a NMEAInterface. \n");
-				return EXIT_FAILURE;
+				if (ReadAllRS232Port(pNMEAInterfacePseudoRS232Port, (uint8*)recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+				{
+					printf("Error reading data from a NMEAInterface. \n");
+					return EXIT_FAILURE;
+				}
+				//if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+				//{
+				//	fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
+				//	fflush(publox->pfSaveFile);
+				//}
 			}
-			//if ((publox->bSaveRawData)&&(publox->pfSaveFile))
-			//{
-			//	fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, publox->pfSaveFile);
-			//	fflush(publox->pfSaveFile);
-			//}
+			else
+			{
+				nbBytesToRequest = 0;
+
+				mSleep(500);
+
+				return EXIT_SUCCESS;
+			}
 			BytesReceived += nbBytesToRequest;
 			if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_UBLOX)
 			{
@@ -173,14 +184,16 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		
 		// Analyze data.
 
+		EnterCriticalSection(&StateVariablesCS);
+
 		if ((nmeadata.wpLatitude != 0)&&(nmeadata.wpLongitude != 0))
 		{
 			if (bDeleteRoute)
 			{
 				bDeleteRoute = FALSE;
 				nbWPs = 0;
-				memset(wpslat, 0, sizeof(wpslat));
-				memset(wpslong, 0, sizeof(wpslong));
+				memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+				memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 			}
 			if (nbWPs >= MAX_NB_WP)
 			{
@@ -216,8 +229,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			{
 				bDeleteRoute = FALSE;
 				nbwpstmp = 0;
-				memset(wpstmplat, 0, sizeof(wpstmplat));
-				memset(wpstmplong, 0, sizeof(wpstmplong));
+				memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
+				memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
 			}
 			if (nbwpstmp >= MAX_NB_WP)
 			{
@@ -254,18 +267,19 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 
 */
 
-
-
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 	
 	memset(&nmeadata, 0, sizeof(nmeadata));
-
+		
 	EnterCriticalSection(&StateVariablesCS);
 
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 	headinghat = fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
 	pitchhat = fmod_360_rad2deg(-Center(thetahat));
 	rollhat = fmod_360_rad2deg(Center(phihat));
+	rateofturn = -60.0*Center(omegazhat)*180.0/M_PI;
+	singlerudder = -uw*((ruddermaxangle-rudderminangle)/2.0)*180.0/M_PI;
 
 	if (bCheckGNSSOK())
 	{
@@ -321,8 +335,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			nmeadata.hdop = 0;
 			break;
 		}
-		//nmeadata.vel = (uint16_t)(sog*100);
-		//nmeadata.cog = (uint16_t)(fmod_360_pos((-angle_env-cog+M_PI/2.0)*180.0/M_PI)*100);
+		nmeadata.sog = sog*1.94;
+		nmeadata.cog = fmod_360_pos_rad2deg(-angle_env-cog+M_PI/2.0);
 	}
 	else
 	{
@@ -331,8 +345,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		nmeadata.posMode = 'N';
 		nmeadata.nbsat = 0;
 		nmeadata.hdop = 0;
-		//nmeadata.vel = UINT16_MAX;
-		//nmeadata.cog = UINT16_MAX;
+		nmeadata.sog = 0;
+		nmeadata.cog = 0;
 	}
 	GPSLatitudeDecDeg2DegDecMin(lathat, &nmeadata.latdeg, &latdecmin, &nmeadata.north);
 	GPSLongitudeDecDeg2DegDecMin(longhat, &nmeadata.longdeg, &longdecmin, &nmeadata.east);
@@ -345,9 +359,12 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		nmeadata.minute = timeptr->tm_min;
 		nmeadata.second = timeptr->tm_sec+0.000001*tv.tv_usec;
 		nmeadata.day = timeptr->tm_mday;
-		nmeadata.month = timeptr->tm_mon;
-		nmeadata.year = timeptr->tm_year-2000;
+		nmeadata.month = timeptr->tm_mon+1;
+		nmeadata.year = timeptr->tm_year+1900-2000;
 	}
+
+	LeaveCriticalSection(&StateVariablesCS);
+
 	if (bEnable_NMEAInterface_GPGGA)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
@@ -361,7 +378,6 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
@@ -369,9 +385,10 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$GPRMC,%02d%02d%05.2f,%c,%02d%010.7f,%c,%03d%010.7f,%c,,,%02d%02d%02d,,,%c",
+		sprintf(tmpbuf, "$GPRMC,%02d%02d%05.2f,%c,%02d%010.7f,%c,%03d%010.7f,%c,%06.2f,%06.2f,%02d%02d%02d,,,%c",
 			nmeadata.hour, nmeadata.minute, nmeadata.second, 
 			nmeadata.status, nmeadata.latdeg, latdecmin, nmeadata.north, nmeadata.longdeg, longdecmin, nmeadata.east, 
+			nmeadata.sog, nmeadata.cog, 
 			nmeadata.day, nmeadata.month, nmeadata.year, 
 			nmeadata.posMode);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
@@ -379,7 +396,6 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
@@ -396,7 +412,19 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_GPVTG)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPVTG,%06.2f,T,,,%06.2f,N,,,%c", nmeadata.cog, nmeadata.sog, nmeadata.posMode);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
 			return EXIT_FAILURE;
 		}
 	}
@@ -404,13 +432,12 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$HCHDG,%.1f,0.0,E,0.0,W", headinghat);
+		sprintf(tmpbuf, "$HCHDG,%.2f,0.0,E,0.0,W", headinghat);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
@@ -418,13 +445,12 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$HEHDT,%.1f,T", headinghat);
+		sprintf(tmpbuf, "$HEHDT,%.2f,T", headinghat);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
@@ -432,13 +458,12 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$HEROT,%.1f,A", -60.0*Center(omegazhat)*180.0/M_PI);
+		sprintf(tmpbuf, "$HEROT,%.2f,A", rateofturn);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
@@ -446,18 +471,28 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$PRDID,%.1f,%.1f,%.1f", pitchhat, rollhat, headinghat);
+		sprintf(tmpbuf, "$PRDID,%.2f,%.2f,%.2f", pitchhat, rollhat, headinghat);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
-			LeaveCriticalSection(&StateVariablesCS);
 			return EXIT_FAILURE;
 		}
 	}
-
-	LeaveCriticalSection(&StateVariablesCS);
+	if (bEnable_NMEAInterface_IIRSA)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$IIRSA,%.2f,A,,,", singlerudder);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
 	
 	mSleep(500);
 

@@ -13,13 +13,15 @@ PROGS = UxVCtrl
 CC = gcc
 CXX = g++
 
-#CFLAGS += -g -Wall -Wno-unknown-pragmas -Wextra -Winline
-CFLAGS += -O3 -Wall -Wno-unknown-pragmas -Wno-unused-parameter
+#CFLAGS += -g
+CFLAGS += -O3
+CFLAGS += -Wall -Wno-unknown-pragmas -Wno-unused-parameter -Wextra
+#CFLAGS += -Winline
 
 #CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY 
 #CFLAGS += -D _DEBUG_MESSAGES 
 #CFLAGS += -D ENABLE_VALGRIND_DEBUG 
-CFLAGS += -D OPENCV249
+CFLAGS += -D OPENCV2413
 #CFLAGS += -D OPENCV320
 #CFLAGS += -D USE_FFMPEG_VIDEO
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
@@ -47,6 +49,7 @@ CFLAGS += -I/usr/local/include/sbgECom/src -I/usr/local/include/sbgECom/common
 
 CXXFLAGS += $(CFLAGS) -fpermissive
 
+#LDFLAGS += -static-libgcc -static-libstdc++ -static
 LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
 #LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
 LDFLAGS += -lmodbus

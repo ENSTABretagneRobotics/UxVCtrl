@@ -1,10 +1,9 @@
+check critical sections in interfaces...
+parsing PRDID, IIRSA NMEA...
+Jrk getvariable...
 Add Boatbot robid
 
-Jrk getvariable
-
 Tester gopro libavcodec rpiz
-
-bug *sizeof(double) memset(wpslat, 0, MAX_NB_WP), dans code VAIMOS, fileconversions, etc...
 
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 

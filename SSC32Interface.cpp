@@ -99,6 +99,9 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 		}
 
 		// Analyze data.
+
+		EnterCriticalSection(&StateVariablesCS);
+
 		tmp = strstr(recvbuf, "#");
 		while (tmp)
 		{
@@ -127,6 +130,8 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 			if (recvbuf-tmp >= MAX_NB_BYTES_SSC32-2) break;
 			tmp = strstr(tmp+1, "#");
 		}
+
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 
 	mSleep(50);
