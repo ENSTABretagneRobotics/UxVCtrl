@@ -205,6 +205,14 @@ int main(int argc, char* argv[])
 	// Prevent display/system sleep...
 	SetThreadExecutionState(ES_CONTINUOUS|ES_DISPLAY_REQUIRED);
 	//SetThreadExecutionState(ES_CONTINUOUS|ES_SYSTEM_REQUIRED);
+#else
+#ifndef DISABLE_IGNORE_SIGPIPE
+	// See https://stackoverflow.com/questions/17332646/server-dies-on-send-if-client-was-closed-with-ctrlc...
+	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+	{
+		PRINT_DEBUG_WARNING(("signal failed. \n"));
+	}
+#endif // DISABLE_IGNORE_SIGPIPE
 #endif // _WIN32
 
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...

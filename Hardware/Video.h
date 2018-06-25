@@ -134,69 +134,166 @@ inline int ffmpegopen(VIDEO* pVideo)
 	pVideo->buffer = NULL;
 	pVideo->sws_ctx = NULL;
 
-	// Register all formats and codecs
+	// Register all formats and codecs.
 	av_register_all();
 
-	// Open video file
-	if (avformat_open_input(&pVideo->pFormatCtx, pVideo->szDevPath, NULL, NULL)!=0)
-		return EXIT_FAILURE; // Couldn't open file
+	// Open video file.
+	if (avformat_open_input(&pVideo->pFormatCtx, pVideo->szDevPath, NULL, NULL) != 0)
+	{
+		fprintf(stderr, "Couldn't open file!\n");
+		pVideo->pFormatCtx = NULL;
+		return EXIT_FAILURE; 
+	}
 
-	  // Retrieve stream information
-	if (avformat_find_stream_info(pVideo->pFormatCtx, NULL)<0)
-		return EXIT_FAILURE; // Couldn't find stream information
+	// Retrieve stream information.
+	if (avformat_find_stream_info(pVideo->pFormatCtx, NULL) < 0)
+	{
+		fprintf(stderr, "Couldn't find stream information!\n");
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		return EXIT_FAILURE;
+	}
 
-	  // Dump information about file onto standard error
+	// Dump information about file onto standard error.
 	av_dump_format(pVideo->pFormatCtx, 0, pVideo->szDevPath, 0);
 
-	// Find the first video stream
+	// Find the first video stream.
 	pVideo->videoStream = -1;
 	for (i = 0; i<(int)pVideo->pFormatCtx->nb_streams; i++)
 		if (pVideo->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO) {
 			pVideo->videoStream = i;
 			break;
 		}
-	if (pVideo->videoStream==-1)
-		return EXIT_FAILURE; // Didn't find a video stream
+	if (pVideo->videoStream == -1)
+	{
+		fprintf(stderr, "Didn't find a video stream!\n");
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		return EXIT_FAILURE;
+	}
 
-	  // Get a pointer to the codec context for the video stream
+	// Get a pointer to the codec context for the video stream.
 	pVideo->pCodecCtxOrig = pVideo->pFormatCtx->streams[pVideo->videoStream]->codec;
-	// Find the decoder for the video stream
+	// Find the decoder for the video stream.
 	pVideo->pCodec = avcodec_find_decoder(pVideo->pCodecCtxOrig->codec_id);
-	if (pVideo->pCodec==NULL) {
+	if (pVideo->pCodec == NULL) 
+	{
 		fprintf(stderr, "Unsupported codec!\n");
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
 		return EXIT_FAILURE; // Codec not found
 	}
-	// Copy context
+	// Copy context.
 	pVideo->pCodecCtx = avcodec_alloc_context3(pVideo->pCodec);
-	if (avcodec_copy_context(pVideo->pCodecCtx, pVideo->pCodecCtxOrig) != 0) {
-		fprintf(stderr, "Couldn't copy codec context");
+	if (pVideo->pCodecCtx == NULL) 
+	{
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
+		return EXIT_FAILURE; // Error copying codec context
+	}
+	if (avcodec_copy_context(pVideo->pCodecCtx, pVideo->pCodecCtxOrig) != 0) 
+	{
+		fprintf(stderr, "Couldn't copy codec context!\n");
+		avcodec_free_context(&pVideo->pCodecCtx);
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
 		return EXIT_FAILURE; // Error copying codec context
 	}
 
-	// Open codec
+	// Open codec.
 	if (avcodec_open2(pVideo->pCodecCtx, pVideo->pCodec, NULL)<0)
+	{
+		avcodec_free_context(&pVideo->pCodecCtx);
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
 		return EXIT_FAILURE; // Could not open codec
+	}
 
-	  // Allocate video frame
+	// Allocate video frame.
 	pVideo->pFrame = av_frame_alloc();
-
-	// Allocate an AVFrame structure
-	pVideo->pFrameRGB = av_frame_alloc();
-	if (pVideo->pFrameRGB==NULL)
+	if (pVideo->pFrame == NULL)
+	{
+		avcodec_close(pVideo->pCodecCtx);
+		avcodec_free_context(&pVideo->pCodecCtx);
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
+		pVideo->pFrame = NULL;
 		return EXIT_FAILURE;
+	}
 
-	// Determine required buffer size and allocate buffer
+	// Allocate an AVFrame structure.
+	pVideo->pFrameRGB = av_frame_alloc();
+	if (pVideo->pFrameRGB == NULL)
+	{
+		av_frame_free(&pVideo->pFrame);
+		avcodec_free_context(&pVideo->pCodecCtx);
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
+		pVideo->pFrame = NULL;
+		pVideo->pFrameRGB = NULL;
+		return EXIT_FAILURE;
+	}
+
+	// Determine required buffer size and allocate buffer.
 	pVideo->numBytes = avpicture_get_size(AV_PIX_FMT_RGB24, pVideo->pCodecCtx->width,
 		pVideo->pCodecCtx->height);
 	pVideo->buffer = (uint8_t *)av_malloc(pVideo->numBytes*sizeof(uint8_t));
+	if (pVideo->buffer == NULL)
+	{
+		av_frame_free(&pVideo->pFrameRGB);
+		av_frame_free(&pVideo->pFrame);
+		avcodec_free_context(&pVideo->pCodecCtx);
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
+		pVideo->pFrame = NULL;
+		pVideo->pFrameRGB = NULL;
+		pVideo->numBytes = 0;
+		pVideo->buffer = NULL;
+		return EXIT_FAILURE;
+	}
 
 	// Assign appropriate parts of buffer to image planes in pFrameRGB
 	// Note that pFrameRGB is an AVFrame, but AVFrame is a superset
-	// of AVPicture
+	// of AVPicture.
 	avpicture_fill((AVPicture *)pVideo->pFrameRGB, pVideo->buffer, AV_PIX_FMT_RGB24,
 		pVideo->pCodecCtx->width, pVideo->pCodecCtx->height);
 
-	// initialize SWS context for software scaling
+	// Initialize SWS context for software scaling.
 	pVideo->sws_ctx = sws_getContext(pVideo->pCodecCtx->width,
 		pVideo->pCodecCtx->height,
 		pVideo->pCodecCtx->pix_fmt,
@@ -212,6 +309,22 @@ inline int ffmpegopen(VIDEO* pVideo)
 	if ((pVideo->pCodecCtx->width != pVideo->videoimgwidth)||(pVideo->pCodecCtx->height != pVideo->videoimgheight))
 	{
 		printf("Unable to set desired video resolution.\n");
+		av_free(pVideo->buffer);
+		av_frame_free(&pVideo->pFrameRGB);
+		av_frame_free(&pVideo->pFrame);
+		avcodec_free_context(&pVideo->pCodecCtx);
+		//avcodec_close(pVideo->pCodecCtxOrig);
+		avformat_close_input(&pVideo->pFormatCtx);
+		pVideo->pFormatCtx = NULL;
+		pVideo->videoStream = 0;
+		pVideo->pCodecCtxOrig = NULL;
+		pVideo->pCodec = NULL;
+		pVideo->pCodecCtx = NULL;
+		pVideo->pFrame = NULL;
+		pVideo->pFrameRGB = NULL;
+		pVideo->numBytes = 0;
+		pVideo->buffer = NULL;
+		pVideo->sws_ctx = NULL;
 		return EXIT_FAILURE;
 	}
 
@@ -254,25 +367,25 @@ inline int ffmpegread(VIDEO* pVideo)
 
 inline int ffmpegclose(VIDEO* pVideo)
 {
-	// Free the RGB image
+	// Free the RGB image.
 	av_free(pVideo->buffer);
 	av_frame_free(&pVideo->pFrameRGB);
 
-	// Free the YUV frame
+	// Free the YUV frame.
 	av_frame_free(&pVideo->pFrame);
 
-	// Close the codecs
-	avcodec_close(pVideo->pCodecCtx);
-	avcodec_close(pVideo->pCodecCtxOrig);
+	// Free the codecs.
+	avcodec_free_context(&pVideo->pCodecCtx);
+	//avcodec_close(pVideo->pCodecCtxOrig);
 
-	// Close the video file
+	// Close the video file.
 	avformat_close_input(&pVideo->pFormatCtx);
 
 	pVideo->pFormatCtx = NULL;
 	pVideo->videoStream = 0;
 	pVideo->pCodecCtxOrig = NULL;
-	pVideo->pCodecCtx = NULL;
 	pVideo->pCodec = NULL;
+	pVideo->pCodecCtx = NULL;
 	pVideo->pFrame = NULL;
 	pVideo->pFrameRGB = NULL;
 	pVideo->numBytes = 0;
