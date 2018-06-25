@@ -568,7 +568,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case '*': bRotatingMap = !bRotatingMap; break;
 		case 'i': bShowVideoOpenCVGUIs[videoid] = !bShowVideoOpenCVGUIs[videoid]; break;
-		case '$': bShowSonar = !bShowSonar; break;
+		case '$': 
+
+			// Should cycle between different display modes...
+
+			bShowSonar = !bShowSonar; 
+			break;
 		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
 		case '+':
 			if ((fabs(csMap.xMin) > 0.1)&&(fabs(csMap.xMax) > 0.1)&&(fabs(csMap.yMin) > 0.1)&&(fabs(csMap.yMax) > 0.1))

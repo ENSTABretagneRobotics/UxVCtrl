@@ -693,7 +693,8 @@ inline int Commands(char* line)
 #ifndef DISABLE_OPENCV_SUPPORT
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
-	double delay = 0, delay_station = 0;
+	BOOL bStation = FALSE;
+	double delay = 0, delay_station = 0, delay_wait_new = 0;
 	CHRONO chrono, chrono_station;
 
 	memset(str, 0, sizeof(str));
@@ -2007,44 +2008,120 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "waypointslist %lf", &delay) == 1)
+	else if (sscanf(line, "waypointslist %d %lf %lf %lf", &bStation, &delay_wait_new, &delay_station, &delay) == 4)
 	{
-		for (CurWP = 1; CurWP < nbWPs; CurWP++)
+		EnterCriticalSection(&StateVariablesCS);
+		bWaypointsChanged = FALSE;
+		CurWP = 0;
+		if (nbWPs == 0)
 		{
-
-			EnterCriticalSection(&StateVariablesCS);
-			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+			// Special situation...
+			wxa = Center(xhat); wya = Center(yhat);
+			wxb = Center(xhat)+1; wyb = Center(yhat);
+		}
+		else
+		{
+			//if (nbWPs > 1)
+			//{
+			//	CurWP++;
+			//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+			//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+			//}
+			//else
+			//{
+			// Special situation : should follow the line between its current position and the waypoint specified.
+			wxa = Center(xhat); wya = Center(yhat);
 			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
-			bLineFollowingControl = TRUE;
-			bWaypointControl = FALSE;
-			bHeadingControl = TRUE;
-			LeaveCriticalSection(&StateVariablesCS);
-			delay = fabs(delay);
-			bWaiting = TRUE;
-			StartChrono(&chrono);
-			for (;;)
+			//}
+		}
+		bLineFollowingControl = TRUE;
+		bWaypointControl = FALSE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
-				EnterCriticalSection(&StateVariablesCS);
-				// Check if the destination waypoint of the line was reached.
-				if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+				if (CurWP >= nbWPs-1)
 				{
+					if (!bStation)
+					{
+						LeaveCriticalSection(&StateVariablesCS);
+						break;
+					}
 					LeaveCriticalSection(&StateVariablesCS);
-					break;
+					// Wait a little bit after reaching the waypoint.
+					bLineFollowingControl = FALSE;
+					bWaypointControl = FALSE;
+					bHeadingControl = FALSE;
+					StartChrono(&chrono_station);
+					for (;;)
+					{
+						if (GetTimeElapsedChronoQuick(&chrono_station) > delay_station) break;
+						if (!bWaiting) break;
+						if (bExit) break;
+						// Wait at least delay/10 and at most around 100 ms for each loop.
+						mSleep((long)min(delay_station*100.0, 100.0));
+					}
+					StopChronoQuick(&chrono_station);
+					EnterCriticalSection(&StateVariablesCS);
+					// Special situation : should follow the line between its current position and the waypoint specified.
+					// Therefore, the robot should remain near the waypoint specified.
+					wxa = Center(xhat); wya = Center(yhat);
+					bLineFollowingControl = TRUE;
+					bWaypointControl = FALSE;
+					bHeadingControl = TRUE;
 				}
 				else
 				{
-					LeaveCriticalSection(&StateVariablesCS);
+					CurWP++;
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
 				}
-				if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
-				if (!bWaiting) break;
-				if (bExit) break;
-				// Wait at least delay/10 and at most around 100 ms for each loop.
-				mSleep((long)min(delay*100.0, 100.0));
 			}
-			StopChronoQuick(&chrono);
-			bWaiting = FALSE;
-
+			// Check if the waypoints changed.
+			if (bWaypointsChanged)
+			{
+				bWaypointsChanged = FALSE;
+				// Wait a little bit because the list is probably being changed...
+				LeaveCriticalSection(&StateVariablesCS);
+				mSleep((long)(delay_wait_new*1000.0));
+				EnterCriticalSection(&StateVariablesCS);
+				CurWP = 0;
+				if (nbWPs > 0)
+				{
+					//if (nbWPs > 1)
+					//{
+					//	CurWP++;
+					//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+					//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+					//}
+					//else
+					//{
+					// Special situation : should follow the line between its current position and the waypoint specified.
+					wxa = Center(xhat); wya = Center(yhat);
+					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+					//}
+				}
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
 		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
 	}
 #pragma endregion
 #pragma region DEVICES COMMANDS

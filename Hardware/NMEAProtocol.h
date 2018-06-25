@@ -280,7 +280,7 @@ inline int AnalyzeSentenceNMEA(char* buf, int buflen, char* talkerid, char* mnem
 	if (buf[*psentencelen-MAX_NB_BYTES_CHECKSUM_NMEA-nb_bytes_end] == '*')
 	{
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
-		if ((buf[*psentencelen-2-nb_bytes_end] != checksum[1])||(buf[*psentencelen-1-nb_bytes_end] != checksum[2]))
+		if ((toupper(buf[*psentencelen-2-nb_bytes_end]) != checksum[1])||(toupper(buf[*psentencelen-1-nb_bytes_end]) != checksum[2]))
 		{ 
 			PRINT_DEBUG_WARNING(("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]));
 			*pnbBytesToDiscard = *psentencelen;

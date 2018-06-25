@@ -551,6 +551,7 @@ BOOL bDynamicSonarLocalization = FALSE;
 BOOL bGPSLocalization = FALSE;
 BOOL bDVLLocalization = FALSE;
 BOOL bDeleteRoute = FALSE;
+BOOL bWaypointsChanged = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
 int labels[MAX_NB_LABELS];

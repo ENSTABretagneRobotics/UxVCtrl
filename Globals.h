@@ -730,6 +730,7 @@ extern BOOL bDynamicSonarLocalization;
 extern BOOL bGPSLocalization;
 extern BOOL bDVLLocalization;
 extern BOOL bDeleteRoute;
+extern BOOL bWaypointsChanged;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 extern int labels[MAX_NB_LABELS];
@@ -1026,7 +1027,9 @@ inline int InitGlobals(void)
 	nbwpstmp = 0;
 	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+	bWaypointsChanged = TRUE;
 	nbWPs = 0;
+	CurWP = 0;
 	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 
@@ -1044,7 +1047,9 @@ inline int ReleaseGlobals(void)
 	nbwpstmp = 0;
 	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+	bWaypointsChanged = TRUE;
 	nbWPs = 0;
+	CurWP = 0;
 	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 

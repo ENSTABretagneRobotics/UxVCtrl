@@ -191,7 +191,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			if (bDeleteRoute)
 			{
 				bDeleteRoute = FALSE;
+				bWaypointsChanged = TRUE;
 				nbWPs = 0;
+				CurWP = 0;
 				memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 				memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 			}

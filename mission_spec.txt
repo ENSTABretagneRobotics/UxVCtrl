@@ -154,7 +154,7 @@
 %
 %waitlinetwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
 %
-%waypointslist delay
+%waypointslist bStation delay_wait_new t_station t (t_station : double [0,oo[ time to wait when the last waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached or the last waypoint is reached with bStation set to 0)
 %
 % DEVICES COMMANDS
 %

@@ -1,7 +1,10 @@
+Add Boatbot robid
+wzcontrolconfig manque! mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
+nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1, écrire dans waypoints.csv pour pouvoir être changé via Iridium/3G...
+abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
 parsing PRDID, IIRSA NMEA...
 Jrk getvariable...
-Add Boatbot robid
 
 Tester gopro libavcodec rpiz
 
@@ -9,22 +12,20 @@ Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 
 cmake option static, xp toolset visual studio?
 
-nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1...
-
 waypointslist file.csv bStationIfEndOrEmpty comme ça attend qu'opencpn envoie nouveaux wps, et ça réécrit le fichier waypoints.csv, dont on pourrait remplacer le format avec celui de mission planner
 inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
 longitude180handling?
 
 ball detection : ajouter en option des prétraitements?
 
-tester avec un nouveau mingw et linux, check inline and timegm in a small program, update test_devices
+tester avec un nouveau mingw et linux, check inline and timegm in a small program
 
 param friendly name
 Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
 
 terme intégral line following, ne plus faire l'approximation repère local pour les commandes xxxwgs
 
-faire UxVSim à partir de VSim
+UxVSim...
 
 udp : réfléchir à la logique des recvfrom, sendto que doit utiliser mavproxy (start mavproxy.exe --master=tcp:127.0.0.1:5760 --out=udp:127.0.0.1:14550) et mission planner pour comprendre pourquoi mavproxy binde sur un port random...->c'est peut-être moi qui doit faire bind sur 14550 et un recvfrom dessus pour récupérer le port utilisé par mavproxy...
 rajouter commentaires qui indiquent qu'on peut faire udp://...
@@ -41,12 +42,10 @@ crash si changement de streaming window gopro via gstreamer...
 
 compat CV7 : in if (ublox.bEnable_NMEA_MWV) take into account apparent wind speed and robot speed (SOG, COG...) and roll...
 
-IridiumComm...
 Need to check ReadLatestRS232Port() and others as well as checkdata (see MAVLinkInterface), waitfordata (see IridiumComm)...
 Make a select.h for MSVC for compatibility (en essayant de déterminer le type de fd qui est passé (en appelant une fonction de socket et voir si elle échoue...), si c'est une socket essayer d'appeler la bonne fonction, qu'on aurait renommée plus tôt, voir pour faire la même chose pour les fichiers pour les open et read...)...
 
 Composante latérale bluerov et ciscrea, brake si lateralthrust?
-wzcontrolconfig manque! mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
 
 Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
 Affichage tension batterie depuis mavlink, avec Energy_actuators...?
