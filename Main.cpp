@@ -196,6 +196,8 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
+	InitNet();
+
 	LoadConfig();
 	LoadEnv();
 	LoadKeys();

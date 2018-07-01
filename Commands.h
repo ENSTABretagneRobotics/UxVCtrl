@@ -693,7 +693,7 @@ inline int Commands(char* line)
 #ifndef DISABLE_OPENCV_SUPPORT
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
-	BOOL bStation = FALSE;
+	BOOL bGenerateLineToFirst = FALSE, bStation = FALSE;
 	double delay = 0, delay_station = 0, delay_wait_new = 0;
 	CHRONO chrono, chrono_station;
 
@@ -2008,31 +2008,28 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "waypointslist %d %lf %lf %lf", &bStation, &delay_wait_new, &delay_station, &delay) == 4)
+	else if (sscanf(line, "waypointslist %d %d %lf %lf %lf", &bGenerateLineToFirst, &bStation, &delay_wait_new, &delay_station, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		bWaypointsChanged = FALSE;
 		CurWP = 0;
-		if (nbWPs == 0)
+		if (nbWPs <= 0)
 		{
 			// Special situation...
 			wxa = Center(xhat); wya = Center(yhat);
-			wxb = Center(xhat)+1; wyb = Center(yhat);
+			wxb = Center(xhat)+0.01; wyb = Center(yhat);
 		}
-		else
+		else if ((nbWPs == 1)||(bGenerateLineToFirst))
 		{
-			//if (nbWPs > 1)
-			//{
-			//	CurWP++;
-			//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
-			//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
-			//}
-			//else
-			//{
 			// Special situation : should follow the line between its current position and the waypoint specified.
 			wxa = Center(xhat); wya = Center(yhat);
 			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
-			//}
+		}
+		else
+		{
+			CurWP++;
+			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
 		}
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
@@ -2095,18 +2092,18 @@ inline int Commands(char* line)
 				CurWP = 0;
 				if (nbWPs > 0)
 				{
-					//if (nbWPs > 1)
-					//{
-					//	CurWP++;
-					//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
-					//	GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
-					//}
-					//else
-					//{
-					// Special situation : should follow the line between its current position and the waypoint specified.
-					wxa = Center(xhat); wya = Center(yhat);
-					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
-					//}
+					if ((nbWPs == 1)||(bGenerateLineToFirst))
+					{
+						// Special situation : should follow the line between its current position and the waypoint specified.
+						wxa = Center(xhat); wya = Center(yhat);
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+					}
+					else
+					{
+						CurWP++;
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
+						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+					}
 				}
 				LeaveCriticalSection(&StateVariablesCS);
 			}

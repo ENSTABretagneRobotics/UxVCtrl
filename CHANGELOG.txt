@@ -1,3 +1,6 @@
+236
+Updated waypointslist command.
+
 235
 Updated ffmpeg support.
 Added DISABLE_IGNORE_SIGPIPE.

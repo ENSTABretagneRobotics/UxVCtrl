@@ -1,3 +1,10 @@
+
+pouvoir envoyer les params de calib mag à la razor comme fait ROS, matrice de rotation, bras de levier...
+
+renommer maestro en pololu, rajouter get jrk, param PololuType (0 : Maestro, 1 : Jrk), mettre 16 PWM dans fichier de config, rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal, rajouter commande showpwm
+
+show WPT(CurWP) on OpenCVGUI when waypointslist is in use?
+
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
 Add Boatbot robid
 wzcontrolconfig manque! mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
@@ -7,9 +14,7 @@ check critical sections in interfaces...
 parsing PRDID, IIRSA NMEA...
 Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
-UxVSim : mettre en option voilier ou motorboat, émuler SBG, mettre des options bDisableDevice...
-
-Tester gopro libavcodec rpiz
+UxVSim : mettre en option voilier ou motorboat (et faire motorboat qui a du vy), émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
 
 rajouter gestion de message manual control mavlinkinterface
 
@@ -525,6 +530,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Passer de 80 à 70 pour gamma_infinite par défaut pour pas revenir en arr si erreur de 20 deg sur cap…?
+
+Pas forcément remettre à 0 integral si changement consigne? Pas sûr…
 
 Linux : program killed when client disconnects from server->dans send mettre MSG_NOSIGNAL, mais pour write il n'y a pas de paramètre donc dans le open mettre signal(SIGPIPE, SIG_IGN) (or sigignore(SIGPIPE)) et/ou le mettre dans le main...
 https://stackoverflow.com/questions/17332646/server-dies-on-send-if-client-was-closed-with-ctrlc
