@@ -1,3 +1,7 @@
+237
+Added bSendCalibration parameter to RazorAHRS.
+Added NMEAInterfacePeriod and NMEAInterfaceSendPeriod (not implemented) parameters.
+
 236
 Updated waypointslist command.
 

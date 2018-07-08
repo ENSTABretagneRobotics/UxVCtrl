@@ -1,14 +1,14 @@
+contrôle des 2 voiles
 
-pouvoir envoyer les params de calib mag à la razor comme fait ROS, matrice de rotation, bras de levier...
+check bSendCalibration with real Razor
+
+AHRS matrice de rotation, bras de levier...
 
 renommer maestro en pololu, rajouter get jrk, param PololuType (0 : Maestro, 1 : Jrk), mettre 16 PWM dans fichier de config, rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal, rajouter commande showpwm
 
-show WPT(CurWP) on OpenCVGUI when waypointslist is in use?
-
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
-Add Boatbot robid
+Add Boatbot robid and remove lirmia workspace
 wzcontrolconfig manque! mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
-nb waypoints impairs, juste 1, reset CurWP, index qui démarrre à 0 ou 1, écrire dans waypoints.csv pour pouvoir être changé via Iridium/3G...
 abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
 parsing PRDID, IIRSA NMEA...
@@ -22,8 +22,12 @@ Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 
 cmake option static, xp toolset visual studio?
 
-waypointslist file.csv bStationIfEndOrEmpty comme ça attend qu'opencpn envoie nouveaux wps, et ça réécrit le fichier waypoints.csv, dont on pourrait remplacer le format avec celui de mission planner
+bug com with opencpn when it sends also other nmea messages, because of period of 500 ms for nmea interface, the period should be lower and 500 ms should be used only to choose when to send data, add parameters for the send period of each individual nmea message...
+Mélange des waypoints s'il y a 2 clients nmeainterface…
+waypointslist waypoints.csv comme ça attend qu'une autre app modifie via Iridium/3G le fichier waypoints.csv, dont on pourrait remplacer le format avec celui de mission planner
 inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
+nb waypoints impairs, juste 1, reset CurWP, index qui démarre à 0 ou 1...
+show WPT(CurWP) on OpenCVGUI when waypointslist is in use?
 longitude180handling?
 
 ball detection : ajouter en option des prétraitements?

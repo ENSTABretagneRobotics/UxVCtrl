@@ -42,6 +42,13 @@ struct RAZORAHRS
 	int timeout;
 	BOOL bSaveRawData;
 	BOOL bROSMode;
+	BOOL bSendCalibration;
+	double accel_x_min, accel_x_max, accel_y_min, accel_y_max, accel_z_min, accel_z_max;
+	double magn_x_min, magn_x_max, magn_y_min, magn_y_max, magn_z_min, magn_z_max;
+	BOOL calibration_magn_use_extended;
+	double ccx, ccy, ccz;
+	double ctxX, ctxY, ctxZ, ctyX, ctyY, ctyZ, ctzX, ctzY, ctzZ;
+	double gyro_average_offset_x, gyro_average_offset_y, gyro_average_offset_z;
 	double rollorientation;
 	double rollp1;
 	double rollp2;
@@ -264,6 +271,7 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 	char line[256];
 	char* outputmodebuf = "#ox";
 	char* streammodebuf = "#o1";
+	char calibbuf[2048];
 
 	memset(pRazorAHRS->szCfgFilePath, 0, sizeof(pRazorAHRS->szCfgFilePath));
 	sprintf(pRazorAHRS->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -281,6 +289,19 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		pRazorAHRS->timeout = 2000;
 		pRazorAHRS->bSaveRawData = 1;
 		pRazorAHRS->bROSMode = 1;
+		pRazorAHRS->bSendCalibration = 0;
+		pRazorAHRS->accel_x_min = 0; pRazorAHRS->accel_x_max = 0;
+		pRazorAHRS->accel_y_min = 0; pRazorAHRS->accel_y_max = 0;
+		pRazorAHRS->accel_z_min = 0; pRazorAHRS->accel_z_max = 0;
+		pRazorAHRS->magn_x_min = 0; pRazorAHRS->magn_x_max = 0;
+		pRazorAHRS->magn_y_min = 0; pRazorAHRS->magn_y_max = 0;
+		pRazorAHRS->magn_z_min = 0; pRazorAHRS->magn_z_max = 0;
+		pRazorAHRS->calibration_magn_use_extended = 0;
+		pRazorAHRS->ccx = 0; pRazorAHRS->ccy = 0; pRazorAHRS->ccz = 0;
+		pRazorAHRS->ctxX = 0; pRazorAHRS->ctxY = 0; pRazorAHRS->ctxZ = 0;
+		pRazorAHRS->ctyX = 0; pRazorAHRS->ctyY = 0; pRazorAHRS->ctyZ = 0;
+		pRazorAHRS->ctzX = 0; pRazorAHRS->ctzY = 0; pRazorAHRS->ctzZ = 0;
+		pRazorAHRS->gyro_average_offset_x = 0; pRazorAHRS->gyro_average_offset_y = 0; pRazorAHRS->gyro_average_offset_z = 0;
 		pRazorAHRS->rollorientation = 0;
 		pRazorAHRS->rollp1 = 0;
 		pRazorAHRS->rollp2 = 0;
@@ -305,6 +326,71 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pRazorAHRS->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRazorAHRS->bROSMode) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRazorAHRS->bSendCalibration) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->accel_x_min) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->accel_x_max) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->accel_y_min) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->accel_y_max) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->accel_z_min) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->accel_z_max) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->magn_x_min) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->magn_x_max) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->magn_y_min) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->magn_y_max) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->magn_z_min) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->magn_z_max) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRazorAHRS->calibration_magn_use_extended) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ccx) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ccy) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ccz) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctxX) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctxY) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctxZ) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctyX) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctyY) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctyZ) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctzX) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctzY) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->ctzZ) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->gyro_average_offset_x) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->gyro_average_offset_y) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pRazorAHRS->gyro_average_offset_z) != 1) printf("Invalid configuration file.\n");
+
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pRazorAHRS->rollorientation) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -348,6 +434,50 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		printf("Unable to connect to a RazorAHRS.\n");
 		CloseRS232Port(&pRazorAHRS->RS232Port);
 		return EXIT_FAILURE;
+	}
+
+	if (pRazorAHRS->bSendCalibration)
+	{
+		memset(calibbuf, 0, sizeof(calibbuf));
+		if (pRazorAHRS->calibration_magn_use_extended)
+		{
+			sprintf(calibbuf,
+				"#caxm%.2f#caxM%.2f#caym%.2f#cayM%.2f#cazm%.2f#cazM%.2f"
+				"#cmxm%.2f#cmxM%.2f#cmym%.2f#cmyM%.2f#cmzm%.2f#cmzM%.2f"
+				"#ccx%.4f#ccy%.4f#ccz%.4f"
+				"#ctxX%.4f#ctxY%.4f#ctxZ%.4f"
+				"#ctyX%.4f#ctyY%.4f#ctyZ%.4f"
+				"#ctzX%.4f#ctzY%.4f#ctzZ%.4f"
+				"#cgx%.4f#cgy%.4f#cgz%.4f",
+				pRazorAHRS->accel_x_min, pRazorAHRS->accel_x_max, pRazorAHRS->accel_y_min, pRazorAHRS->accel_y_max, pRazorAHRS->accel_z_min, pRazorAHRS->accel_z_max,
+				pRazorAHRS->magn_x_min, pRazorAHRS->magn_x_max, pRazorAHRS->magn_y_min, pRazorAHRS->magn_y_max, pRazorAHRS->magn_z_min, pRazorAHRS->magn_z_max,
+				pRazorAHRS->ccx, pRazorAHRS->ccy, pRazorAHRS->ccz,
+				pRazorAHRS->ctxX, pRazorAHRS->ctxY, pRazorAHRS->ctxZ,
+				pRazorAHRS->ctyX, pRazorAHRS->ctyY, pRazorAHRS->ctyZ,
+				pRazorAHRS->ctzX, pRazorAHRS->ctzY, pRazorAHRS->ctzZ,
+				pRazorAHRS->gyro_average_offset_x, pRazorAHRS->gyro_average_offset_y, pRazorAHRS->gyro_average_offset_z);
+		}
+		else
+		{
+			sprintf(calibbuf,
+				"#caxm%.2f#caxM%.2f#caym%.2f#cayM%.2f#cazm%.2f#cazM%.2f"
+				"#cmxm%.2f#cmxM%.2f#cmym%.2f#cmyM%.2f#cmzm%.2f#cmzM%.2f"
+				"#cgx%.4f#cgy%.4f#cgz%.4f",
+				pRazorAHRS->accel_x_min, pRazorAHRS->accel_x_max, pRazorAHRS->accel_y_min, pRazorAHRS->accel_y_max, pRazorAHRS->accel_z_min, pRazorAHRS->accel_z_max,
+				pRazorAHRS->magn_x_min, pRazorAHRS->magn_x_max, pRazorAHRS->magn_y_min, pRazorAHRS->magn_y_max, pRazorAHRS->magn_z_min, pRazorAHRS->magn_z_max,
+				pRazorAHRS->gyro_average_offset_x, pRazorAHRS->gyro_average_offset_y, pRazorAHRS->gyro_average_offset_z);
+		}
+		if (WriteAllRS232Port(&pRazorAHRS->RS232Port, (uint8*)calibbuf, (int)strlen(calibbuf)) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a RazorAHRS : Failed to send calibration data.\n");
+			CloseRS232Port(&pRazorAHRS->RS232Port);
+			return EXIT_FAILURE;
+		}
+		if ((pRazorAHRS->bSaveRawData)&&(pRazorAHRS->pfSaveFile))
+		{
+			fwrite(calibbuf, strlen(calibbuf), 1, pRazorAHRS->pfSaveFile);
+			fflush(pRazorAHRS->pfSaveFile);
+		}
 	}
 
 	if (pRazorAHRS->bROSMode)

@@ -9,6 +9,64 @@ COM5
 1
 % bROSMode
 1
+% bSendCalibration
+0
+% accel_x_min
+-250
+% accel_x_max
+250
+% accel_y_min
+-250
+% accel_y_max
+250
+% accel_z_min
+-250
+% accel_z_max
+250
+% magn_x_min
+-600
+% magn_x_max
+600
+% magn_y_min
+-600
+% magn_y_max
+600
+% magn_z_min
+-600
+% magn_z_max
+600
+% calibration_magn_use_extended
+0
+% ccx
+0
+% ccy
+0
+% ccz
+0
+% ctxX
+0
+% ctxY
+0
+% ctxZ
+0
+% ctyX
+0
+% ctyY
+0
+% ctyZ
+0
+% ctzX
+0
+% ctzY
+0
+% ctzZ
+0
+% gyro_average_offset_x
+0
+% gyro_average_offset_y
+0
+% gyro_average_offset_z
+0
 % rollorientation (in rad)
 0.0
 % rollp1

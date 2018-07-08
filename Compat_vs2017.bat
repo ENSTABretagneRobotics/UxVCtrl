@@ -11,7 +11,7 @@
 @set /P DISABLE_SBG="Disable SBG (0, 1) : "
 @set /P DISABLE_OPENCV="Disable OpenCV (0, 1) : "
 @set /P ENABLE_FFMPEG="Enable avcodec/ffmpeg (0 (recommended), 1) : "
-@set /P ENABLE_XP="Enable XP Platform Toolset (0 (recommended), 1) : "
+@set /P ENABLE_XP="Enable XP Platform Toolset (0, 1) : "
 @echo.
 
 @if "%DISABLE_KINECT2%"=="1" (

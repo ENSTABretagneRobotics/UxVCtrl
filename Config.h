@@ -53,6 +53,7 @@ inline int LoadConfig(void)
 	sprintf(szNMEAInterfacePath, ":5001");
 	NMEAInterfaceBaudRate = 4800;
 	NMEAInterfaceTimeout = 1500;
+	NMEAInterfacePeriod = 500;
 	bEnable_NMEAInterface_GPGGA = FALSE;
 	bEnable_NMEAInterface_GPRMC = TRUE;
 	bEnable_NMEAInterface_GPGLL = FALSE;
@@ -62,6 +63,7 @@ inline int LoadConfig(void)
 	bEnable_NMEAInterface_HEROT = FALSE;
 	bEnable_NMEAInterface_PRDID = FALSE;
 	bEnable_NMEAInterface_IIRSA = FALSE;
+	NMEAInterfaceSendPeriod = 500;
 	bDisableNMEAInterfaceIN = FALSE;
 	bRazorAHRSInterface = TRUE;
 	memset(szRazorAHRSInterfacePath, 0, sizeof(szRazorAHRSInterfacePath));
@@ -321,6 +323,8 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &NMEAInterfaceTimeout) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &NMEAInterfacePeriod) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_GPGGA) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_GPRMC) != 1) printf("Invalid configuration file.\n");
@@ -338,6 +342,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_PRDID) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_IIRSA) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &NMEAInterfaceSendPeriod) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableNMEAInterfaceIN) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1167,6 +1173,8 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", NMEAInterfaceTimeout) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", NMEAInterfacePeriod) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_GPGGA) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_GPRMC) < 0) printf("Error writing configuration file.\n");
@@ -1184,6 +1192,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_PRDID) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_IIRSA) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", NMEAInterfaceSendPeriod) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableNMEAInterfaceIN) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

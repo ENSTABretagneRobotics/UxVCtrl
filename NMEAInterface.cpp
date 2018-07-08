@@ -496,7 +496,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		}
 	}
 	
-	mSleep(500);
+	mSleep(NMEAInterfacePeriod);
 
 	return EXIT_SUCCESS;
 }
