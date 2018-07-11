@@ -18,7 +18,7 @@ RS232PORT SSC32InterfacePseudoRS232Port;
 
 int connectssc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 {
-	if (OpenRS232Port(pSSC32InterfacePseudoRS232Port, szSSC32InterfacePath) == EXIT_SUCCESS) 
+	if (OpenRS232Port(pSSC32InterfacePseudoRS232Port, szSSC32InterfacePath) != EXIT_SUCCESS) 
 	{
 		printf("Unable to connect to a SSC32Interface.\n");
 		return EXIT_FAILURE;
@@ -39,7 +39,7 @@ int connectssc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 
 int disconnectssc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 {
-	if (CloseRS232Port(pSSC32InterfacePseudoRS232Port) == EXIT_SUCCESS) 
+	if (CloseRS232Port(pSSC32InterfacePseudoRS232Port) != EXIT_SUCCESS) 
 	{
 		printf("SSC32Interface disconnection failed.\n");
 		return EXIT_FAILURE;

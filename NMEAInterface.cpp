@@ -18,7 +18,7 @@ RS232PORT NMEAInterfacePseudoRS232Port;
 
 int connectnmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 {
-	if (OpenRS232Port(pNMEAInterfacePseudoRS232Port, szNMEAInterfacePath) == EXIT_SUCCESS) 
+	if (OpenRS232Port(pNMEAInterfacePseudoRS232Port, szNMEAInterfacePath) != EXIT_SUCCESS) 
 	{
 		printf("Unable to connect to a NMEAInterface.\n");
 		return EXIT_FAILURE;
@@ -39,7 +39,7 @@ int connectnmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 
 int disconnectnmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 {
-	if (CloseRS232Port(pNMEAInterfacePseudoRS232Port) == EXIT_SUCCESS) 
+	if (CloseRS232Port(pNMEAInterfacePseudoRS232Port) != EXIT_SUCCESS) 
 	{
 		printf("NMEAInterface disconnection failed.\n");
 		return EXIT_FAILURE;

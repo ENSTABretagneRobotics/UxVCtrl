@@ -18,7 +18,7 @@ RS232PORT RazorAHRSInterfacePseudoRS232Port;
 
 int connectrazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 {
-	if (OpenRS232Port(pRazorAHRSInterfacePseudoRS232Port, szRazorAHRSInterfacePath) == EXIT_SUCCESS) 
+	if (OpenRS232Port(pRazorAHRSInterfacePseudoRS232Port, szRazorAHRSInterfacePath) != EXIT_SUCCESS) 
 	{
 		printf("Unable to connect to a RazorAHRSInterface.\n");
 		return EXIT_FAILURE;
@@ -39,7 +39,7 @@ int connectrazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 
 int disconnectrazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 {
-	if (CloseRS232Port(pRazorAHRSInterfacePseudoRS232Port) == EXIT_SUCCESS) 
+	if (CloseRS232Port(pRazorAHRSInterfacePseudoRS232Port) != EXIT_SUCCESS) 
 	{
 		printf("RazorAHRSInterface disconnection failed.\n");
 		return EXIT_FAILURE;

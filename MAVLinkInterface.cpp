@@ -18,7 +18,7 @@ RS232PORT MAVLinkInterfacePseudoRS232Port;
 
 int connectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
-	if (OpenRS232Port(pMAVLinkInterfacePseudoRS232Port, szMAVLinkInterfacePath) == EXIT_SUCCESS) 
+	if (OpenRS232Port(pMAVLinkInterfacePseudoRS232Port, szMAVLinkInterfacePath) != EXIT_SUCCESS) 
 	{
 		printf("Unable to connect to a MAVLinkInterface.\n");
 		return EXIT_FAILURE;
@@ -39,7 +39,7 @@ int connectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 
 int disconnectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
-	if (CloseRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
+	if (CloseRS232Port(pMAVLinkInterfacePseudoRS232Port) != EXIT_SUCCESS) 
 	{
 		printf("MAVLinkInterface disconnection failed.\n");
 		return EXIT_FAILURE;

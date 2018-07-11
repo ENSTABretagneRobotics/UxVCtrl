@@ -1,3 +1,6 @@
+238
+Corrected RS232Port connection bug in all interfaces.
+
 237
 Added bSendCalibration parameter to RazorAHRS.
 Added NMEAInterfacePeriod and NMEAInterfaceSendPeriod (not implemented) parameters.
