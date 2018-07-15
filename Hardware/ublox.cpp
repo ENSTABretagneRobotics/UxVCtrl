@@ -173,8 +173,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				if (res == EXIT_SUCCESS) 
 				{
 					// Temp...
-					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
-						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM||
+					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||
+						ublox.bEnable_NMEA_HDG||ublox.bEnable_NMEA_HDT||ublox.bEnable_NMEA_ROT||
+						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_DID||ublox.bEnable_NMEA_VDM||
 						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
 						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD) res = GetNMEASentenceublox(&ublox, &nmeadata);
 					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||
@@ -307,9 +308,15 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							}
 						}
 						
-						if (ublox.bEnable_NMEA_HDG)
+						if (ublox.bEnable_NMEA_HDG||ublox.bEnable_NMEA_HDT)
 						{
-							if (robid == SAILBOAT2_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+							// For VAIMOS, it is the sail angle...
+							if (robid != VAIMOS_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+						}
+						
+						if (ublox.bEnable_NMEA_ROT)
+						{
+							omegaz_ahrs = fmod_2PI(M_PI/2.0-nmeadata.RateOfTurn-angle_env)+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
 						}
 
 						if (ublox.bEnable_NMEA_MWV)
@@ -331,7 +338,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							vtwind = nmeadata.WindSpeed;
 						}
 
-						if (ublox.bEnable_NMEA_PD6_SA)
+						if (ublox.bEnable_NMEA_DID||ublox.bEnable_NMEA_PD6_SA)
 						{
 							psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 							theta_ahrs = -nmeadata.Pitch+interval(-theta_ahrs_acc, theta_ahrs_acc);

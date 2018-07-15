@@ -94,10 +94,18 @@ WMV2
 0
 % bEnable_NMEAInterface_HEROT
 0
+% bEnable_NMEAInterface_WIMWV
+0
+% bEnable_NMEAInterface_WIMWD
+0
+% bEnable_NMEAInterface_WIMDA
+0
 % bEnable_NMEAInterface_PRDID
 0
 % bEnable_NMEAInterface_IIRSA
 1
+% bEnable_NMEAInterface_SDDBT
+0
 % NMEAInterfaceSendPeriod (in ms, not implemented)
 500
 % bDisableNMEAInterfaceIN

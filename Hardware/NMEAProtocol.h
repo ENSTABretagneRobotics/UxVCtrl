@@ -80,6 +80,7 @@ struct NMEADATA
 	double sog, kph, cog, mag_cog; // Respectively in knots, km/h, deg in NED coordinate system.
 	double heading, deviation, variation; // Respectively in deg in NED coordinate system.
 	char dev_east, var_east;
+	double rateofturn; // In deg/min in NED coordinate system.
 	int wplatdeg, wplongdeg;
 	double wplatmin, wplongmin;
 	char szwplatdeg[3];
@@ -119,6 +120,7 @@ struct NMEADATA
 	double Roll; // In rad in NED coordinate system.
 	double Pitch; // In rad in NED coordinate system.
 	double Heading; // In rad in NED coordinate system.
+	double RateOfTurn; // In rad/s in NED coordinate system.
 	double WindDir; // In rad in NED coordinate system.
 	double WindSpeed; // In m/s.
 	double ApparentWindDir; // In rad.
@@ -817,6 +819,34 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		// Convert heading to angle in rad.
 		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
 	}
+	
+	// Heading data.
+	if (strstr(mnemonic, "HDT"))
+	{
+		offset = 1+(int)strlen(talkerid);
+		if (sscanf(sentence+offset, "HDT,%lf,T", &pNMEAData->heading) != 1)
+		{
+			//printf("Error parsing NMEA sentence : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+
+		// Convert heading to angle in rad.
+		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
+	}
+	
+	// Rate Of Turn.
+	if (strstr(mnemonic, "ROT"))
+	{
+		offset = 1+(int)strlen(talkerid);
+		if (sscanf(sentence+offset, "ROT,%lf,A", &pNMEAData->rateofturn) != 1)
+		{
+			//printf("Error parsing NMEA sentence : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+
+		// Convert to rad/s.
+		pNMEAData->RateOfTurn = pNMEAData->rateofturn*M_PI/(180.0*60.0);
+	}
 
 	// Wind speed and angle, in relation to the vessel's bow/centerline.
 	if (strstr(mnemonic, "MWV"))
@@ -878,6 +908,22 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		pNMEAData->WindDir = pNMEAData->winddir*M_PI/180.0;
 
 		pNMEAData->WindSpeed = pNMEAData->windspeed; 
+	}
+
+	// PRDID.
+	if (strstr(mnemonic, "DID"))
+	{
+		offset = 1+(int)strlen(talkerid);
+		if (sscanf(sentence+offset, "DID,%lf,%lf,%lf", &pNMEAData->pitch, &pNMEAData->roll, &pNMEAData->heading) != 3)
+		{
+			//printf("Error parsing NMEA sentence : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+
+		// Convert to angle in rad.
+		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
+		pNMEAData->Pitch = pNMEAData->pitch*M_PI/180.0;
+		pNMEAData->Roll = pNMEAData->roll*M_PI/180.0;
 	}
 
 	// Waypoint location data.
@@ -994,7 +1040,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 			//return EXIT_FAILURE;
 		}
 
-		// Convert heading to angle in rad.
+		// Convert to angle in rad.
 		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
 		pNMEAData->Pitch = pNMEAData->pitch*M_PI/180.0;
 		pNMEAData->Roll = pNMEAData->roll*M_PI/180.0;

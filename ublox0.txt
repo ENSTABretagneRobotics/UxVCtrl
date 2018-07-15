@@ -35,11 +35,17 @@ COM14
 0
 % bEnable_NMEA_HDG
 0
+% bEnable_NMEA_HDT
+0
+% bEnable_NMEA_ROT
+0
 % bEnable_NMEA_MWV
 0
 % bEnable_NMEA_MWD
 0
 % bEnable_NMEA_MDA
+0
+% bEnable_NMEA_DID
 0
 % bEnable_NMEA_VDM
 0
