@@ -1,3 +1,6 @@
+240
+Updated ReadMe.txt.
+
 239
 Added bEnable_NMEAInterface_WIMWV, bEnable_NMEAInterface_WIMWD, bEnable_NMEAInterface_WIMDA, bEnable_NMEAInterface_SDDBT parameters.
 Added bEnable_NMEA_HDT, bEnable_NMEA_ROT, bEnable_NMEA_DID parameters to ublox.

@@ -358,28 +358,33 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 	if (bCommandPrompt) 
 	{
-		//if (bExit)
-		//{
-		//	//// This should make fgets() return and let CommandsThread realize that 
-		//	//// the program is stopping...
-		//	//if (ungetc('\n', stdin) != '\n')
-		//	//{
-		//	//	// Wait a little bit and make another attempt...
-		//	//	mSleep(3000);
-		//	//	if (ungetc('\n', stdin) != '\n')
-		//	//	{
-		//	//		// Dirty way to kill the thread...
-		//	//		KillOrCancelThreadMode(TRUE);
-		//	//		mSleep(1000);
-		//	//		KillThread(CommandsThreadId);
-		//	//	}
-		//	//}
-		//	mSleep(3000);
-		//	KillOrCancelThreadMode(TRUE);
-		//	mSleep(1000);
-		//  // Cause deadlocks sometimes in release?
-		//	KillThread(CommandsThreadId);
-		//}
+		if (bExit)
+		{
+			//// This should make fgets() return and let CommandsThread realize that 
+			//// the program is stopping...
+			//if (ungetc('\n', stdin) != '\n')
+			//{
+			//	// Wait a little bit and make another attempt...
+			//	mSleep(3000);
+			//	if (ungetc('\n', stdin) != '\n')
+			//	{
+			//		// Dirty way to kill the thread...
+			//		KillOrCancelThreadMode(TRUE);
+			//		mSleep(1000);
+			//		KillThread(CommandsThreadId);
+			//	}
+			//}
+			//mSleep(3000);
+			//KillOrCancelThreadMode(TRUE);
+			//// Cause deadlocks sometimes in release...?
+			//KillThread(CommandsThreadId);
+			//mSleep(1000);
+//#ifdef ENABLE_CANCEL_THREAD
+//			KillOrCancelThreadMode(FALSE);
+//			CancelThread(CommandsThreadId);
+//			mSleep(1000);
+//#endif // ENABLE_CANCEL_THREAD
+		}
 		WaitForThread(CommandsThreadId);
 	}
 	WaitForThread(MissionLogThreadId);
