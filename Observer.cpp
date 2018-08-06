@@ -288,7 +288,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				if (zhat.isEmpty) zhat = z_gps;
 			}
 		}
-		else if (robid == MOTORBOAT_ROBID)
+		else if ((robid == MOTORBOAT_SIMULATOR_ROBID)||(robid == MOTORBOAT_ROBID))
 		{
 			//// Temp...
 			//xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
@@ -382,9 +382,11 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
 			Energy_actuators += dt*((u1+u2+u3)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
+		case SAILBOAT_SIMULATOR_ROBID:
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
 		case SAILBOAT2_ROBID:
+		case MOTORBOAT_SIMULATOR_ROBID:
 		case MOTORBOAT_ROBID:
 		case BUGGY_SIMULATOR_ROBID:
 		case BUGGY_ROBID:

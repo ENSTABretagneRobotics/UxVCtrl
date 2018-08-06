@@ -3089,7 +3089,9 @@ inline int Commands(char* line)
 		case BLUEROV_ROBID: printf("BlueROV.\n"); break;
 		case LIRMIA3_ROBID: printf("LIRMIA3.\n"); break;
 		case BUBBLE_ROBID: printf("BUBBLE.\n"); break;
+		case MOTORBOAT_SIMULATOR_ROBID: printf("Motorboat Simulator.\n"); break;
 		case MOTORBOAT_ROBID: printf("Motorboat.\n"); break;
+		case SAILBOAT_SIMULATOR_ROBID: printf("Sailboat Simulator.\n"); break;
 		case VAIMOS_ROBID: printf("VAIMOS.\n"); break;
 		case SAILBOAT_ROBID: printf("Sailboat.\n"); break;
 		case SAILBOAT2_ROBID: printf("Sailboat 2.\n"); break;

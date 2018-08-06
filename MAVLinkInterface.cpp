@@ -265,6 +265,13 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					EnterCriticalSection(&StateVariablesCS);
 					switch (robid)
 					{
+					case BUBBLE_ROBID:
+					case MOTORBOAT_SIMULATOR_ROBID:
+					case MOTORBOAT_ROBID:
+					case SAILBOAT_SIMULATOR_ROBID:
+					case VAIMOS_ROBID:
+					case SAILBOAT_ROBID:
+					case SAILBOAT2_ROBID:
 					case TANK_SIMULATOR_ROBID:
 					case ETAS_WHEEL_ROBID:
 					case BUGGY_SIMULATOR_ROBID:

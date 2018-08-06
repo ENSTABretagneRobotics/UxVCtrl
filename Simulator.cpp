@@ -21,6 +21,13 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double vc = 0, psic = 0, hw = 0;
 	double x = 0, y = 0, z = 0, phi = 0, theta = 0, psi = 0, vrx = 0, vry = 0, vrz = 0, omegax = 0, omegay = 0, omegaz = 0;
 	double alpha = 0, d = 0;
+	
+	// Motorboat simulator...
+	double alphafvry = 0.1;
+
+	// Sailboat simulator...
+	double deltas = 0, phidot = 0;
+	double V = 6;
 
 	double lat = 0, lon = 0, alt = 0, hdg = 0;
 
@@ -136,6 +143,82 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				vry_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 				vrz_dvl = interval(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 			}
+		}
+		else if (robid == MOTORBOAT_SIMULATOR_ROBID)
+		{
+			// Simulated state evolution.
+			double xdot = vrx*cos(psi)*cos(alphaomegaz*uw)+vc*cos(psic);
+			double ydot = vrx*sin(psi)*cos(alphaomegaz*uw)+vc*sin(psic);
+			double psidot = vrx*sin(alphaomegaz*uw)/alphaz;
+			double vrxdot = u*alphavrx-vrx*alphafvrx;
+			double vrydot = -vry*alphafvry;
+			x = x+dt*xdot;
+			y = y+dt*ydot;
+			psi = psi+dt*psidot;
+			vrx = vrx+dt*vrxdot;
+			vry = vry+dt*vrydot;
+
+			// Simulated sensors measurements.
+			// AHRS.
+			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS always available.
+			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+		}
+		else if (robid == SAILBOAT_SIMULATOR_ROBID)
+		{
+			// The model is described in "L. Jaulin Modélisation et commande d'un bateau à voile, CIFA2004, Douz (Tunisie)".
+
+			double alphaomegax = 40.0;
+			double m = 280.0;
+			double Jx = 15.0;
+			double Jz = 50.0;
+			double l = 0.5;
+			double h = 2.1;
+			double rr = 1.5;
+			double rs = 0.5;
+			double leq = 0.2;
+			double deltasminreal = 0.30;
+			double deltasmaxreal = 1.20;
+			double alphaw = 100.0;
+			double beta = 0.01;
+			
+			double deltar = alphaomegaz*uw;
+			double deltasmaxsimu = deltasminreal+u*(deltasmaxreal-deltasminreal);
+
+			double gamma = cos(theta-psi)+cos(deltasmaxsimu);
+			if (gamma<0) deltas = M_PI-theta+psi; // Voile en drapeau.
+			else if (sin(theta-psi)>0) deltas = deltasmaxsimu; else deltas = -deltasmaxsimu;
+			double fg = alphaz*vrx*sin(deltar);
+			double fv = alphavrx*V*sin(theta+deltas-psi);
+			x += (vrx*cos(theta)+beta*V*cos(psi)+vc*cos(psic))*dt;
+			y += (vrx*sin(theta)+beta*V*sin(psi)+vc*sin(psic))*dt;
+			theta += omegaz*dt;
+			omegaz += (1/Jz)*((l-rs*cos(deltas))*fv-rr*cos(deltar)*fg-alphafomegaz*omegaz+alphaw*hw)*dt;
+			vrx += (1/m)*(sin(deltas)*fv-sin(deltar)*fg-alphafvrx*vrx*vrx)*dt;
+			phidot += (-alphaomegax*phidot/Jx+fv*h*cos(deltas)*cos(phi)/Jx-m*9.81*leq*sin(phi)/Jx)*dt;
+			phi += phidot*dt;
+
+			// Simulated sensors measurements.
+			// AHRS.
+			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS always available.
+			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
 		}
 		else if (robid == TANK_SIMULATOR_ROBID)
 		{

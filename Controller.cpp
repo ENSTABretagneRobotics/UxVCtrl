@@ -288,7 +288,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					//	-Ki*ipsi;
 					uw = -Kp*error-Kd1*derivative-Ki*ipsi;
 				}
-				else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_ROBID))
+				else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_SIMULATOR_ROBID)||(robid == MOTORBOAT_ROBID))
 				{
 					uw = sign(u, 0)*(-Kp*error-Kd1*derivative-Ki*ipsi);
 				}
@@ -311,7 +311,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 				// Depending on the type of robot, we need to invert if the robot is going backwards...
 
-				if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_ROBID))
+				if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID)||(robid == MOTORBOAT_SIMULATOR_ROBID)||(robid == MOTORBOAT_ROBID))
 				{
 					uw = -sign(u, 0)*sign(sin(delta_angle), 0)*uw_max;
 				}

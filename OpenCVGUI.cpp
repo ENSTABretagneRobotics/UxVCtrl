@@ -68,6 +68,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	case ETAS_WHEEL_ROBID:
 		bEnableAltRCMode = TRUE;
 		break;
+	case MOTORBOAT_SIMULATOR_ROBID:
 	case MOTORBOAT_ROBID:
 	case BUGGY_SIMULATOR_ROBID:
 	case BUGGY_ROBID:
@@ -263,10 +264,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = (u > u_max)? u_max: u;
 			switch (robid)
 			{
+			case SAILBOAT_SIMULATOR_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
 				break;
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
@@ -288,10 +291,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			u = (u < -u_max)? -u_max: u;
 			switch (robid)
 			{
+			case SAILBOAT_SIMULATOR_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
 				break;
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
@@ -355,6 +360,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'f':
 			switch (robid)
 			{
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
@@ -383,6 +389,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'v':
 			switch (robid)
 			{
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
@@ -411,7 +418,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'a':
 			switch (robid)
 			{
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
+			case SAILBOAT_SIMULATOR_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
@@ -439,7 +448,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'e':
 			switch (robid)
 			{
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
+			case SAILBOAT_SIMULATOR_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
@@ -861,11 +872,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					switch (robid)
 					{
+					case SAILBOAT_SIMULATOR_ROBID:
 					case VAIMOS_ROBID:
 					case SAILBOAT_ROBID:
 					case SAILBOAT2_ROBID:
 						if (!bHeadingControl) uw = 0;
 						break;
+					case MOTORBOAT_SIMULATOR_ROBID:
 					case MOTORBOAT_ROBID:
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
@@ -970,11 +983,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case ETAS_WHEEL_ROBID:
 				sprintf(szText, "%d%% %d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw_max*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
+			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05));
 				break;
+			case SAILBOAT_SIMULATOR_ROBID:
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
@@ -1338,6 +1353,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 					case BUBBLE_ROBID:
 					case ETAS_WHEEL_ROBID:
+					case MOTORBOAT_SIMULATOR_ROBID:
 					case MOTORBOAT_ROBID:
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
@@ -1402,6 +1418,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 					case BUBBLE_ROBID:
 					case ETAS_WHEEL_ROBID:
+					case MOTORBOAT_SIMULATOR_ROBID:
 					case MOTORBOAT_ROBID:
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
@@ -1502,6 +1519,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 					case BUBBLE_ROBID:
 					case ETAS_WHEEL_ROBID:
+					case MOTORBOAT_SIMULATOR_ROBID:
 					case MOTORBOAT_ROBID:
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
@@ -1576,6 +1594,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						}
 					case BUBBLE_ROBID:
 					case ETAS_WHEEL_ROBID:
+					case MOTORBOAT_SIMULATOR_ROBID:
 					case MOTORBOAT_ROBID:
 					default:
 						cvLine(dispimgs[videoid], 
