@@ -1,3 +1,6 @@
+242
+Improved compatibility with OpenCV 3.4.2.
+
 241
 Beginning of built-in sailboat simulator integration.
 

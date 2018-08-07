@@ -138,21 +138,6 @@
     <ClCompile Include="..\OSUtils\OSTimer.c">
       <Filter>OSUtils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Extensions\Img\CvCore.c">
-      <Filter>Extensions\Img</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Img\CvDisp.c">
-      <Filter>Extensions\Img</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Img\CvDraw.c">
-      <Filter>Extensions\Img</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Img\CvFiles.c">
-      <Filter>Extensions\Img</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Extensions\Img\CvProc.c">
-      <Filter>Extensions\Img</Filter>
-    </ClCompile>
     <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.c">
       <Filter>Extensions\UE9Utils</Filter>
     </ClCompile>
@@ -384,24 +369,6 @@
       <Filter>Extensions\Img</Filter>
     </ClInclude>
     <ClInclude Include="..\Extensions\Img\CoordSystemChg.h">
-      <Filter>Extensions\Img</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Img\CvCore.h">
-      <Filter>Extensions\Img</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Img\CvDisp.h">
-      <Filter>Extensions\Img</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Img\CvDraw.h">
-      <Filter>Extensions\Img</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Img\CvFiles.h">
-      <Filter>Extensions\Img</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Img\CvProc.h">
-      <Filter>Extensions\Img</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Extensions\Img\CvUtils.h">
       <Filter>Extensions\Img</Filter>
     </ClInclude>
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.h">
@@ -649,6 +616,27 @@
     </ClInclude>
     <ClInclude Include="Hardware\gpControl.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvInc.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvCore.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvDisp.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvDraw.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvFiles.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvProc.h">
+      <Filter>Extensions\Img</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Extensions\Img\CvUtils.h">
+      <Filter>Extensions\Img</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

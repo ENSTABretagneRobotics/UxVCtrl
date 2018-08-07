@@ -152,11 +152,6 @@
     <ClCompile Include="..\OSUtils\OSThread.c" />
     <ClCompile Include="..\OSUtils\OSTime.c" />
     <ClCompile Include="..\OSUtils\OSTimer.c" />
-    <ClCompile Include="..\Extensions\Img\CvCore.c" />
-    <ClCompile Include="..\Extensions\Img\CvDisp.c" />
-    <ClCompile Include="..\Extensions\Img\CvDraw.c" />
-    <ClCompile Include="..\Extensions\Img\CvFiles.c" />
-    <ClCompile Include="..\Extensions\Img\CvProc.c" />
     <ClCompile Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
@@ -186,7 +181,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Extensions\Img\CvCLEyeSDKHook.h" />
+    <ClInclude Include="..\Extensions\Img\CvCore.h" />
+    <ClInclude Include="..\Extensions\Img\CvDisp.h" />
+    <ClInclude Include="..\Extensions\Img\CvDraw.h" />
+    <ClInclude Include="..\Extensions\Img\CvFiles.h" />
+    <ClInclude Include="..\Extensions\Img\CvInc.h" />
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
+    <ClInclude Include="..\Extensions\Img\CvProc.h" />
+    <ClInclude Include="..\Extensions\Img\CvUtils.h" />
     <ClInclude Include="..\Extensions\Misc\Misc.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Commands.h" />
@@ -249,12 +251,6 @@
     <ClInclude Include="..\Extensions\Img\CoordSystem.h" />
     <ClInclude Include="..\Extensions\Img\CoordSystem2Img.h" />
     <ClInclude Include="..\Extensions\Img\CoordSystemChg.h" />
-    <ClInclude Include="..\Extensions\Img\CvCore.h" />
-    <ClInclude Include="..\Extensions\Img\CvDisp.h" />
-    <ClInclude Include="..\Extensions\Img\CvDraw.h" />
-    <ClInclude Include="..\Extensions\Img\CvFiles.h" />
-    <ClInclude Include="..\Extensions\Img\CvProc.h" />
-    <ClInclude Include="..\Extensions\Img\CvUtils.h" />
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Cfg.h" />
     <ClInclude Include="..\Extensions\Devices\LabjackUtils\UE9Utils\UE9Core.h" />
     <ClInclude Include="..\interval\box.h" />

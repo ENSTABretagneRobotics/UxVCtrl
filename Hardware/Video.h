@@ -12,7 +12,7 @@
 
 #include "OSMisc.h"
 #include "OSNet.h"
-#include "CvUtils.h"
+#include "CvInc.h"
 
 #ifdef USE_FFMPEG_VIDEO
 //#ifndef __STDC_CONSTANT_MACROS

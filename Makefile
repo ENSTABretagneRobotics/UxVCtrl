@@ -115,21 +115,6 @@ UE9Core.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Core.c ../Extensions/D
 UE9Cfg.o: ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.c ../Extensions/Devices/LabjackUtils/UE9Utils/UE9Cfg.h UE9Core.o
 	$(CC) $(CFLAGS) -c $<
 
-CvCore.o: ../Extensions/Img/CvCore.c ../Extensions/Img/CvCore.h OSTime.o
-	$(CC) $(CFLAGS) -c $<
-
-CvFiles.o: ../Extensions/Img/CvFiles.c ../Extensions/Img/CvFiles.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
-
-CvProc.o: ../Extensions/Img/CvProc.c ../Extensions/Img/CvProc.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
-
-CvDraw.o: ../Extensions/Img/CvDraw.c ../Extensions/Img/CvDraw.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
-
-CvDisp.o: ../Extensions/Img/CvDisp.c ../Extensions/Img/CvDisp.h CvCore.o
-	$(CC) $(CFLAGS) -c $<
-
 ############################# interval #############################
 
 iboolean.o: ../interval/iboolean.cpp ../interval/iboolean.h
@@ -230,90 +215,90 @@ ublox.o: ./Hardware/ublox.cpp ./Hardware/ublox.h ./Hardware/UBXProtocol.h ./Hard
 UE9A.o: ./Hardware/UE9A.cpp ./Hardware/UE9A.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Video.o: ./Hardware/Video.cpp ./Hardware/Video.h
+Video.o: ./Hardware/Video.cpp ./Hardware/Video.h ../Extensions/Img/CvUtils.h ../Extensions/Img/CvCore.h ../Extensions/Img/CvInc.h ../Extensions/Img/CvProc.h ../Extensions/Img/CvDisp.h ../Extensions/Img/CvDraw.h ../Extensions/Img/CvFiles.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 ############################# PROGS #############################
 
-Ball.o: Ball.cpp
+Ball.o: Ball.cpp Ball.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Commands.o: Commands.cpp
+Commands.o: Commands.cpp Commands.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Computations.o: Computations.cpp
+Computations.o: Computations.cpp Computations.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Config.o: Config.cpp
+Config.o: Config.cpp Config.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Controller.o: Controller.cpp
+Controller.o: Controller.cpp Controller.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-ExternalVisualLocalization.o: ExternalVisualLocalization.cpp
+ExternalVisualLocalization.o: ExternalVisualLocalization.cpp ExternalVisualLocalization.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-FollowMe.o: FollowMe.cpp
+FollowMe.o: FollowMe.cpp FollowMe.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Globals.o: Globals.cpp
+Globals.o: Globals.cpp Globals.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 Main.o: Main.cpp
 	$(CXX) $(CXXFLAGS) -c $<
 
-MAVLinkInterface.o: MAVLinkInterface.cpp
+MAVLinkInterface.o: MAVLinkInterface.cpp MAVLinkInterface.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-MissingWorker.o: MissingWorker.cpp
+MissingWorker.o: MissingWorker.cpp MissingWorker.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-NMEAInterface.o: NMEAInterface.cpp
+NMEAInterface.o: NMEAInterface.cpp NMEAInterface.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Observer.o: Observer.cpp
+Observer.o: Observer.cpp Observer.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-OpenCVGUI.o: OpenCVGUI.cpp
+OpenCVGUI.o: OpenCVGUI.cpp OpenCVGUI.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Pinger.o: Pinger.cpp
+Pinger.o: Pinger.cpp Pinger.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Pipeline.o: Pipeline.cpp
+Pipeline.o: Pipeline.cpp Pipeline.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-RazorAHRSInterface.o: RazorAHRSInterface.cpp
+RazorAHRSInterface.o: RazorAHRSInterface.cpp RazorAHRSInterface.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-SeanetProcessing.o: SeanetProcessing.cpp
+SeanetProcessing.o: SeanetProcessing.cpp SeanetProcessing.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Simulator.o: Simulator.cpp
+Simulator.o: Simulator.cpp Simulator.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-SonarAltitudeEstimation.o: SonarAltitudeEstimation.cpp
+SonarAltitudeEstimation.o: SonarAltitudeEstimation.cpp SonarAltitudeEstimation.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-SonarLocalization.o: SonarLocalization.cpp
+SonarLocalization.o: SonarLocalization.cpp SonarLocalization.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-SSC32Interface.o: SSC32Interface.cpp
+SSC32Interface.o: SSC32Interface.cpp SSC32Interface.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-SurfaceVisualObstacle.o: SurfaceVisualObstacle.cpp
+SurfaceVisualObstacle.o: SurfaceVisualObstacle.cpp SurfaceVisualObstacle.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-VideoRecord.o: VideoRecord.cpp
+VideoRecord.o: VideoRecord.cpp VideoRecord.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-VisualObstacle.o: VisualObstacle.cpp
+VisualObstacle.o: VisualObstacle.cpp VisualObstacle.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-Wall.o: Wall.cpp
+Wall.o: Wall.cpp Wall.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o CvDisp.o CvDraw.o CvProc.o CvFiles.o CvCore.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o Maestro.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

@@ -1,8 +1,13 @@
+Effacer messages ffmpeg et limiter perturbations?
+error while decoding MB
+cabac decode of qscale diff failed
+Top block unavailable for requested intra4x4 mode
+->peut-être que le thread n'arrive pas à tourner assez vite, afficher le framerate dans OpenCVGUI?
 
-linefollowingrelative pour obstacle, params taux de détection sur durée ou équivalents?->not implemented?
+cv342 : rajouter plus de USE_OPENCV_HIGHGUI_CPP_API et ou rajouter une autre option USE_ONLY_OPENCV_CPP_API ou utiliser __cplusplus pour ne plus utiliser que les API C++, tout changer en cv::Mat vu que tout est basé sur les IplImage, désactiver temporarirement les include de fonctions C pour voir quel code utilise encore du C...
 
-Simu voilier : mettre equations motorboat et voilier, PololuInterface
-add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
+params taux de détection sur durée ou équivalents?->not implemented?
+linefollowingrelativerobot relatif au cap et à la positionactuelle pour obstacle, goxyrelative, est-ce qu'il a déjà été utilisé dans une mission...?
 
 récupérer tension batterie via 4G?
 Affichage de tension de 2 bat dans OpenCVGUI pour SAILBOAT2 (ou alterner entre les 2, faire un chrono_alternate qui peut servir pour d'autres infos qui alternent)
@@ -16,6 +21,7 @@ to be able to get apparent and true wind data from the sensors without trying to
 pouvoir tester tous ces modes avec le simulateur
 Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et la vitesse du vent peut s'estimer grossièrement à partir de la vitesse du bateau, sauf que dépend aussi du courant…
 Prendre aussi en compte tangage, utiliser matrice d'euler
+rajouter commande setwindestimation/wgs avec unités des marins
 command wind filter coefs
 
 renommer maestro en pololu, rajouter get jrk, param PololuType (0 : Maestro, 1 : Jrk), mettre 16 PWM dans fichier de config, rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal, rajouter commande showpwm, support de 3 Pololu
@@ -28,6 +34,8 @@ abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
 Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
+Simu voilier : mettre equations motorboat et voilier, PololuInterface
+add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
 UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
 
@@ -227,9 +235,6 @@ waitlinetwgs
 
 dans les linefollowing, bLineFollowingControl n'est pas changé quand on a fini?
 les variantes sans t ont peut-être peu d'utilité...?
-
-linefollowingrelativerobot relatif au cap
-rajouter commande setwindestimation/wgs avec unités des marins
 
 fmod_2PI avec des intervalles...?
 préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endianess() in Razor firmware, Arduino.h...)
