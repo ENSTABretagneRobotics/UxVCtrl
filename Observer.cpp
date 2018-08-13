@@ -373,6 +373,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 		headinghat = (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
+		// Should be different if V and I are measured...
+
 		switch (robid)
 		{
 		case SUBMARINE_SIMULATOR_ROBID:
@@ -386,12 +388,15 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
 		case SAILBOAT2_ROBID:
+			Energy_electronics += dt*(P_electronics_4)/3600.0;
+			Energy_actuators += dt*(P_actuators_4)/3600.0;
+			break;
 		case MOTORBOAT_SIMULATOR_ROBID:
 		case MOTORBOAT_ROBID:
 		case BUGGY_SIMULATOR_ROBID:
 		case BUGGY_ROBID:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*(u*P_actuators_1+uw*P_actuators_2+uw*P_actuators_4)/3600.0;
+			Energy_actuators += dt*(u*P_actuators_1+uw*P_actuators_2+P_actuators_4)/3600.0;
 			break;
 		case BUBBLE_ROBID:
 		case TANK_SIMULATOR_ROBID:

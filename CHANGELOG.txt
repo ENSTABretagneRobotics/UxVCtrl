@@ -1,3 +1,6 @@
+243
+Updated CMakeLists.txt and other minor updates.
+
 242
 Improved compatibility with OpenCV 3.4.2.
 

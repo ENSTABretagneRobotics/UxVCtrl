@@ -1,4 +1,5 @@
 cd /d "%~dp0"
+recycle -f *.tmp
 recycle -f log
 recycle -f pic
 recycle -f vid
