@@ -25,13 +25,13 @@ setmissionaction L_Start
 linefollowingtwgs 41.693069 -8.822041 41.691251 -8.821241 31557600.000000
 label 0
 setmissionaction L0
-ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0 3.0 0 0 220 0.05 0 0 0 0 0 0
+ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0.5 2 0 3.0 0 0 220 0.05 0 0 0 0 0 0
 startballtracking
 linefollowingconfig 5 1.3
 linefollowingtwgs 41.691251 -8.821241 41.690133 -8.822578 31557600.000000
 stopballtracking
 setmissionaction L1
-ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0 3.0 0 0 220 0.05 0 0 0 0 1 0
+ballconfig 0 0 0 0 0 0 20 235 75 240 75 210 0.03 0.07 0.5 2 0 3.0 0 0 220 0.05 0 0 0 0 1 0
 startballtracking
 linefollowingconfig 5 1.3
 linefollowingtwgs 41.690133 -8.822578 41.691251 -8.821241 31557600.000000

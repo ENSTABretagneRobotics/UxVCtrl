@@ -7,7 +7,9 @@ COM6
 1000
 % bSaveRawData
 1
-% DeviceNumber (default is 12)
+% PololuType (0 : Maestro, 1 : Jrk)
+0
+% DeviceNumber (default is 12 for Maestro, 11 for Jrk)
 12
 % channel 0
 % MinPW (in us)
@@ -96,7 +98,7 @@ COM6
 % leftfluxchan
 3
 % winddiranaloginputchan (disabled if -1)
-11
+-1
 % winddiranaloginputvalueoffset
 20.0
 % winddiranaloginputvaluethreshold
@@ -111,24 +113,40 @@ COM6
 0.0
 % windspeedanaloginputvaluecoef
 1.0
-% bat1analoginputchan (disabled if -1)
-7
-% bat1analoginputvalueoffset
-0.0
-% bat1analoginputvaluethreshold
-12.8
-% bat1analoginputvaluecoef
-10.10101
-% bat2analoginputchan (disabled if -1)
+% vbat1analoginputchan (disabled if -1)
 -1
-% bat2analoginputvalueoffset
+% vbat1analoginputvalueoffset
 0.0
-% bat2analoginputvaluethreshold
+% vbat1analoginputvaluethreshold
+0
+% vbat1analoginputvaluecoef
+10.10101
+% ibat1analoginputchan (disabled if -1)
+-1
+% ibat1analoginputvalueoffset
 0.0
-% bat2analoginputvaluecoef
-1.0
+% ibat1analoginputvaluethreshold
+0
+% ibat1analoginputvaluecoef
+18.0
+% vbat2analoginputchan (disabled if -1)
+-1
+% vbat2analoginputvalueoffset
+0.0
+% vbat2analoginputvaluethreshold
+0
+% vbat2analoginputvaluecoef
+10.10101
+% ibat2analoginputchan (disabled if -1)
+-1
+% ibat2analoginputvalueoffset
+0.0
+% ibat2analoginputvaluethreshold
+0
+% ibat2analoginputvaluecoef
+18.0
 % switchanaloginputchan (disabled if -1)
-9
+-1
 % switchanaloginputvalueoffset
 0.0
 % switchanaloginputvaluethreshold

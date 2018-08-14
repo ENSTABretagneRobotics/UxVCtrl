@@ -242,6 +242,7 @@ inline int LoadConfig(void)
 #pragma region Power consumption
 	P_electronics_1 = 0; P_electronics_2 = 0; P_electronics_3 = 0; P_electronics_4 = 0;
 	P_actuators_1 = 0; P_actuators_2 = 0; P_actuators_3 = 0; P_actuators_4 = 0;
+	bat_filter_coef = 0.9;
 #pragma endregion
 #pragma region Simulator initial state
 	x_0 = 0; y_0 = 0; z_0 = 0; phi_0 = 0; theta_0 = 0; psi_0 = 0; vrx_0 = 0; vry_0 = 0; vrz_0 = 0; omegax_0 = 0; omegay_0 = 0; omegaz_0 = 0;
@@ -787,6 +788,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &P_actuators_3) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &P_actuators_4) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &bat_filter_coef) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
 #pragma region Simulated submarine initial state
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1092,6 +1095,11 @@ inline int LoadConfig(void)
 	{
 		printf("Invalid parameter : psic_var.\n");
 		psic_var = 1.0*M_PI/8.0;
+	}
+	if ((bat_filter_coef < 0)||(bat_filter_coef > 1))
+	{
+		printf("Invalid parameter : bat_filter_coef.\n");
+		bat_filter_coef = 0.9;
 	}
 	if (outliers_ratio < 0)
 	{
@@ -1627,6 +1635,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%.10g\n", P_actuators_3) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", P_actuators_4) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", bat_filter_coef) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 #pragma region Simulated submarine initial state
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

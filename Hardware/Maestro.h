@@ -35,7 +35,10 @@
 // Only the 5 first channels are used for the moment...
 #define NB_CHANNELS_PWM_MAESTRO 5
 
-#define NB_CHANNELS_MAESTRO 32
+#define NB_CHANNELS_MAESTRO 24
+
+// 11 in decimal...
+#define DEFAULT_DEVICE_NUMBER_JRK 0x0B
 
 // 12 in decimal...
 #define DEFAULT_DEVICE_NUMBER_MAESTRO 0x0C
@@ -79,6 +82,7 @@ struct MAESTRO
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	int PololuType;
 	int DeviceNumber;
 	int MinPWs[NB_CHANNELS_PWM_MAESTRO];
 	int MidPWs[NB_CHANNELS_PWM_MAESTRO];
@@ -100,14 +104,22 @@ struct MAESTRO
 	double windspeedanaloginputvalueoffset;
 	double windspeedanaloginputvaluethreshold;
 	double windspeedanaloginputvaluecoef;
-	int bat1analoginputchan;
-	double bat1analoginputvalueoffset;
-	double bat1analoginputvaluethreshold;
-	double bat1analoginputvaluecoef;
-	int bat2analoginputchan;
-	double bat2analoginputvalueoffset;
-	double bat2analoginputvaluethreshold;
-	double bat2analoginputvaluecoef;
+	int vbat1analoginputchan;
+	double vbat1analoginputvalueoffset;
+	double vbat1analoginputvaluethreshold;
+	double vbat1analoginputvaluecoef;
+	int ibat1analoginputchan;
+	double ibat1analoginputvalueoffset;
+	double ibat1analoginputvaluethreshold;
+	double ibat1analoginputvaluecoef;
+	int vbat2analoginputchan;
+	double vbat2analoginputvalueoffset;
+	double vbat2analoginputvaluethreshold;
+	double vbat2analoginputvaluecoef;
+	int ibat2analoginputchan;
+	double ibat2analoginputvalueoffset;
+	double ibat2analoginputvaluethreshold;
+	double ibat2analoginputvaluecoef;
 	int switchanaloginputchan;
 	double switchanaloginputvalueoffset;
 	double switchanaloginputvaluethreshold;
@@ -119,7 +131,7 @@ struct MAESTRO
 };
 typedef struct MAESTRO MAESTRO;
 
-// If analog input, voltage = value*5.0/1024.0. If digital input, bit = (value == 1023)? 1: 0;.
+// If analog input, voltage = value*5.0/1023.0. If digital input, bit = (value == 1023)? 1: 0;.
 inline int GetValueMaestro(MAESTRO* pMaestro, int channel, int* pValue)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_MAESTRO];
@@ -683,6 +695,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		pMaestro->BaudRate = 115200;
 		pMaestro->timeout = 1000;
 		pMaestro->bSaveRawData = 1;
+		pMaestro->PololuType = 0;
 		pMaestro->DeviceNumber = DEFAULT_DEVICE_NUMBER_MAESTRO;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MAESTRO; channel++)
 		{
@@ -699,7 +712,7 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		pMaestro->leftthrusterchan = 0;
 		pMaestro->rightfluxchan = 4;
 		pMaestro->leftfluxchan = 3;
-		pMaestro->winddiranaloginputchan = 11;
+		pMaestro->winddiranaloginputchan = -1;
 		pMaestro->winddiranaloginputvalueoffset = 0;
 		pMaestro->winddiranaloginputvaluethreshold = 0;
 		pMaestro->winddiranaloginputvaluecoef = 1;
@@ -707,15 +720,23 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 		pMaestro->windspeedanaloginputvalueoffset = 0;
 		pMaestro->windspeedanaloginputvaluethreshold = 0;
 		pMaestro->windspeedanaloginputvaluecoef = 1;
-		pMaestro->bat1analoginputchan = 7;
-		pMaestro->bat1analoginputvalueoffset = 0;
-		pMaestro->bat1analoginputvaluethreshold = 0;
-		pMaestro->bat1analoginputvaluecoef = 1;
-		pMaestro->bat2analoginputchan = -1;
-		pMaestro->bat2analoginputvalueoffset = 0;
-		pMaestro->bat2analoginputvaluethreshold = 0;
-		pMaestro->bat2analoginputvaluecoef = 1;
-		pMaestro->switchanaloginputchan = 9;
+		pMaestro->vbat1analoginputchan = -1;
+		pMaestro->vbat1analoginputvalueoffset = 0;
+		pMaestro->vbat1analoginputvaluethreshold = 0;
+		pMaestro->vbat1analoginputvaluecoef = 1;
+		pMaestro->ibat1analoginputchan = -1;
+		pMaestro->ibat1analoginputvalueoffset = 0;
+		pMaestro->ibat1analoginputvaluethreshold = 0;
+		pMaestro->ibat1analoginputvaluecoef = 1;
+		pMaestro->vbat2analoginputchan = -1;
+		pMaestro->vbat2analoginputvalueoffset = 0;
+		pMaestro->vbat2analoginputvaluethreshold = 0;
+		pMaestro->vbat2analoginputvaluecoef = 1;
+		pMaestro->ibat2analoginputchan = -1;
+		pMaestro->ibat2analoginputvalueoffset = 0;
+		pMaestro->ibat2analoginputvaluethreshold = 0;
+		pMaestro->ibat2analoginputvaluecoef = 1;
+		pMaestro->switchanaloginputchan = -1;
 		pMaestro->switchanaloginputvalueoffset = 0;
 		pMaestro->switchanaloginputvaluethreshold = 0;
 		pMaestro->switchanaloginputvaluecoef = 1;
@@ -736,6 +757,8 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pMaestro->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMaestro->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->PololuType) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMaestro->DeviceNumber) != 1) printf("Invalid configuration file.\n");
 
@@ -787,22 +810,40 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &pMaestro->windspeedanaloginputvaluecoef) != 1) printf("Invalid configuration file.\n");
 			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->bat1analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->vbat1analoginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->bat1analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->vbat1analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->bat1analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->vbat1analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->bat1analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->vbat1analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
 			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pMaestro->bat2analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->ibat1analoginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->bat2analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->ibat1analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->bat2analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->ibat1analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pMaestro->bat2analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->ibat1analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+			
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->vbat2analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->vbat2analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->vbat2analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->vbat2analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+			
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMaestro->ibat2analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->ibat2analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->ibat2analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pMaestro->ibat2analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
 			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMaestro->switchanaloginputchan) != 1) printf("Invalid configuration file.\n");
@@ -891,27 +932,37 @@ inline int ConnectMaestro(MAESTRO* pMaestro, char* szCfgFilePath)
 	if ((pMaestro->winddiranaloginputchan < -1)||(pMaestro->winddiranaloginputchan >= NB_CHANNELS_MAESTRO))
 	{
 		printf("Invalid parameter : winddiranaloginputchan.\n");
-		pMaestro->winddiranaloginputchan = 11;
+		pMaestro->winddiranaloginputchan = -1;
 	}
 	if ((pMaestro->windspeedanaloginputchan < -1)||(pMaestro->windspeedanaloginputchan >= NB_CHANNELS_MAESTRO))
 	{
 		printf("Invalid parameter : windspeedanaloginputchan.\n");
 		pMaestro->windspeedanaloginputchan = -1;
 	}
-	if ((pMaestro->bat1analoginputchan < -1)||(pMaestro->bat1analoginputchan >= NB_CHANNELS_MAESTRO))
+	if ((pMaestro->vbat1analoginputchan < -1)||(pMaestro->vbat1analoginputchan >= NB_CHANNELS_MAESTRO))
 	{
-		printf("Invalid parameter : bat1analoginputchan.\n");
-		pMaestro->bat1analoginputchan = 7;
+		printf("Invalid parameter : vbat1analoginputchan.\n");
+		pMaestro->vbat1analoginputchan = -1;
 	}
-	if ((pMaestro->bat2analoginputchan < -1)||(pMaestro->bat2analoginputchan >= NB_CHANNELS_MAESTRO))
+	if ((pMaestro->ibat1analoginputchan < -1)||(pMaestro->ibat1analoginputchan >= NB_CHANNELS_MAESTRO))
 	{
-		printf("Invalid parameter : bat2analoginputchan.\n");
-		pMaestro->bat2analoginputchan = -1;
+		printf("Invalid parameter : ibat1analoginputchan.\n");
+		pMaestro->ibat1analoginputchan = -1;
+	}
+	if ((pMaestro->vbat2analoginputchan < -1)||(pMaestro->vbat2analoginputchan >= NB_CHANNELS_MAESTRO))
+	{
+		printf("Invalid parameter : vbat2analoginputchan.\n");
+		pMaestro->vbat2analoginputchan = -1;
+	}
+	if ((pMaestro->ibat2analoginputchan < -1)||(pMaestro->ibat2analoginputchan >= NB_CHANNELS_MAESTRO))
+	{
+		printf("Invalid parameter : ibat2analoginputchan.\n");
+		pMaestro->ibat2analoginputchan = -1;
 	}
 	if ((pMaestro->switchanaloginputchan < -1)||(pMaestro->switchanaloginputchan >= NB_CHANNELS_MAESTRO))
 	{
 		printf("Invalid parameter : switchanaloginputchan.\n");
-		pMaestro->switchanaloginputchan = 9;
+		pMaestro->switchanaloginputchan = -1;
 	}
 
 	if ((pMaestro->MaxAngle-pMaestro->MidAngle <= 0.001)||(pMaestro->MidAngle-pMaestro->MinAngle <= 0.001))

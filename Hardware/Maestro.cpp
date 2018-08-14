@@ -17,9 +17,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	double thrust1 = 0, thrust2 = 0, thrust3 = 0;
 	int ivalue = 0;
 	double winddir = 0;
-	double vbattery1_filter_coef = 0;
-	double vbattery1_filtered = 0;
-	int counter = 0, counter_modulo = 11;
+	int counter = 0, counter_modulo = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -70,8 +68,18 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				mSleep(50);
 				bConnected = TRUE; 
 
-				vbattery1_filter_coef = 0.9;
-				vbattery1_filtered = maestro.bat1analoginputvaluethreshold;
+				EnterCriticalSection(&StateVariablesCS);
+
+				if (maestro.vbat1analoginputchan != -1) vbat1_filtered = maestro.vbat1analoginputvaluethreshold; else vbat1_filtered = 0;
+				if (maestro.vbat1analoginputchan != -1) vbat1_threshold = maestro.vbat1analoginputvaluethreshold; else vbat1_threshold = 0;
+				if (maestro.ibat1analoginputchan != -1) ibat1_filtered = maestro.ibat1analoginputvaluethreshold; else ibat1_filtered = 0;
+				if (maestro.vbat2analoginputchan != -1) vbat2_filtered = maestro.vbat2analoginputvaluethreshold; else vbat2_filtered = 0;
+				if (maestro.vbat2analoginputchan != -1) vbat2_threshold = maestro.vbat2analoginputvaluethreshold; else vbat2_threshold = 0;
+				if (maestro.ibat2analoginputchan != -1) ibat2_filtered = maestro.ibat2analoginputvaluethreshold; else ibat2_filtered = 0;
+				vswitchcoef = maestro.switchanaloginputvaluecoef;
+				vswitchthreshold = maestro.switchanaloginputvaluethreshold;
+
+				LeaveCriticalSection(&StateVariablesCS);
 
 				if (maestro.pfSaveFile != NULL)
 				{
@@ -130,6 +138,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				mSleep(50);
 				break;
 			case SAILBOAT_ROBID:
+				counter_modulo = 11;
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
@@ -170,7 +179,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				else mSleep(20);
 				if (counter%counter_modulo == 0)
 				{
-					if (GetValueMaestro(&maestro, maestro.bat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValueMaestro(&maestro, maestro.vbat1analoginputchan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
@@ -180,9 +189,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vbattery1 = maestro.bat1analoginputvaluecoef*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
-					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
-					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < maestro.bat1analoginputvaluethreshold)) printf("BAT1 ALARM\n");
+					vbat1 = maestro.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+maestro.vbat1analoginputvalueoffset; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if (counter%counter_modulo == 5)
@@ -197,20 +205,15 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vswitchcoef = maestro.switchanaloginputvaluecoef;
-					vswitchthreshold = maestro.switchanaloginputvaluethreshold;
-					vswitch = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
+					vswitch = ivalue*5.0/1023.0; // Manual or auto mode depends on this value...	
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
-				EnterCriticalSection(&StateVariablesCS);
-				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
-				if (bShowSwitchInfo) printf("vswitch:%.1fV (%s)\n", vswitch, (vswitch*vswitchcoef > vswitchthreshold? "auto": "manual"));
-				LeaveCriticalSection(&StateVariablesCS);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
 			case SAILBOAT2_ROBID:
+				counter_modulo = 16;
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
 				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
@@ -224,10 +227,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					mSleep(50);
 					break;
 				}
-				mSleep(30);
-				if (counter%counter_modulo == 0)
+				mSleep(10);
+				if (maestro.winddiranaloginputchan != -1) // Special value to indicate to disable the wind sensor...
 				{
-					if (GetValueMaestro(&maestro, maestro.bat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValueMaestro(&maestro, maestro.winddiranaloginputchan, &ivalue) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Maestro lost.\n");
 						bConnected = FALSE;
@@ -237,33 +240,118 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vbattery1 = maestro.bat1analoginputvaluecoef*ivalue*5.0/1024.0; // *10.10101 for V, *18.00 for I, see sensor documentation...	
-					vbattery1_filtered = vbattery1_filter_coef*vbattery1_filtered+(1.0-vbattery1_filter_coef)*vbattery1;
-					if ((!bDisableBatteryAlarm)&&(vbattery1_filtered < maestro.bat1analoginputvaluethreshold)) printf("BAT1 ALARM\n");
-					LeaveCriticalSection(&StateVariablesCS);
-				}
-				else if (counter%counter_modulo == 5)
-				{
-					if (GetValueMaestro(&maestro, maestro.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
-					{
-						printf("Connection to a Maestro lost.\n");
-						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
-						mSleep(50);
-						break;
-					}
-					mSleep(10);
-					EnterCriticalSection(&StateVariablesCS);
-					vswitchcoef = maestro.switchanaloginputvaluecoef;
-					vswitchthreshold = maestro.switchanaloginputvaluethreshold;
-					vswitch = ivalue*5.0/1024.0; // Manual or auto mode depends on this value...	
+					winddir = fmod_360(ivalue*maestro.winddiranaloginputvaluecoef+maestro.winddiranaloginputvalueoffset+180.0)+180.0;
+					//printf("%f\n", winddir);
+					// Apparent wind (in robot coordinate system).
+					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
+					// True wind must be computed from apparent wind.
+					if (bDisableRollWindCorrectionSailboat)
+						psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
+					else
+						psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(psi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
-				EnterCriticalSection(&StateVariablesCS);
-				if (bShowBatteryInfo) printf("BAT1:%.1f/%.1fV\n", vbattery1, vbattery1_filtered);
-				if (bShowSwitchInfo) printf("vswitch:%.1fV (%s)\n", vswitch, (vswitch*vswitchcoef > vswitchthreshold? "auto": "manual"));
-				LeaveCriticalSection(&StateVariablesCS);
+				if (counter%counter_modulo == 0)
+				{
+					if (maestro.vbat1analoginputchan != -1)
+					{
+						if (GetValueMaestro(&maestro, maestro.vbat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+						{
+							printf("Connection to a Maestro lost.\n");
+							bConnected = FALSE;
+							DisconnectMaestro(&maestro);
+							mSleep(50);
+							break;
+						}
+						mSleep(10);
+						EnterCriticalSection(&StateVariablesCS);
+						vbat1 = maestro.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+maestro.vbat1analoginputvalueoffset;
+						vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else mSleep(20);
+				}
+				else if (counter%counter_modulo == 3)
+				{
+					if (maestro.ibat1analoginputchan != -1)
+					{
+						if (GetValueMaestro(&maestro, maestro.ibat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+						{
+							printf("Connection to a Maestro lost.\n");
+							bConnected = FALSE;
+							DisconnectMaestro(&maestro);
+							mSleep(50);
+							break;
+						}
+						mSleep(10);
+						EnterCriticalSection(&StateVariablesCS);
+						ibat1 = maestro.ibat1analoginputvaluecoef*ivalue*5.0/1023.0+maestro.ibat1analoginputvalueoffset;
+						ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else mSleep(20);
+				}
+				else if (counter%counter_modulo == 6)
+				{
+					if (maestro.vbat2analoginputchan != -1)
+					{
+						if (GetValueMaestro(&maestro, maestro.vbat2analoginputchan, &ivalue) != EXIT_SUCCESS)
+						{
+							printf("Connection to a Maestro lost.\n");
+							bConnected = FALSE;
+							DisconnectMaestro(&maestro);
+							mSleep(50);
+							break;
+						}
+						mSleep(10);
+						EnterCriticalSection(&StateVariablesCS);
+						vbat2 = maestro.vbat2analoginputvaluecoef*ivalue*5.0/1023.0+maestro.vbat2analoginputvalueoffset;
+						vbat2_filtered = bat_filter_coef*vbat2_filtered+(1.0-bat_filter_coef)*vbat2;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else mSleep(20);
+				}
+				else if (counter%counter_modulo == 9)
+				{
+					if (maestro.ibat2analoginputchan != -1)
+					{
+						if (GetValueMaestro(&maestro, maestro.ibat2analoginputchan, &ivalue) != EXIT_SUCCESS)
+						{
+							printf("Connection to a Maestro lost.\n");
+							bConnected = FALSE;
+							DisconnectMaestro(&maestro);
+							mSleep(50);
+							break;
+						}
+						mSleep(10);
+						EnterCriticalSection(&StateVariablesCS);
+						ibat2 = maestro.ibat2analoginputvaluecoef*ivalue*5.0/1023.0+maestro.ibat2analoginputvalueoffset;
+						ibat2_filtered = bat_filter_coef*ibat2_filtered+(1.0-bat_filter_coef)*ibat2;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else mSleep(20);
+				}
+				else if (counter%counter_modulo == 12)
+				{
+					if (maestro.switchanaloginputchan != -1)
+					{
+						if (GetValueMaestro(&maestro, maestro.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
+						{
+							printf("Connection to a Maestro lost.\n");
+							bConnected = FALSE;
+							DisconnectMaestro(&maestro);
+							mSleep(50);
+							break;
+						}
+						mSleep(10);
+						EnterCriticalSection(&StateVariablesCS);
+						vswitch = ivalue*5.0/1023.0; // Manual or auto mode depends on this value...	
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else mSleep(20);
+				}
+				else mSleep(20);
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
@@ -320,7 +408,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				LeaveCriticalSection(&StateVariablesCS);
 
 				// Temporary method to handle a Pololu Jrk motor controller for Boatbot...
-				if (maestro.DeviceNumber == 11)
+				if (maestro.PololuType == 1)
 				{
 					if (SetRudderJrkMaestro(&maestro, rudder) != EXIT_SUCCESS)
 					{

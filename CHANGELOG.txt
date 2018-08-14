@@ -1,3 +1,14 @@
+244
+Added objMinDetectionRatio and objDetectionRatioDuration parameters (not implemented) in commands related to detections.
+Added bat_filter_coef parameter.
+Added PololuType parameter to Maestro.
+Added alternating display of VBAT1 and VBAT2 in OpenCVGUI.
+Added the display of alarms in the middle of OpenCVGUI.
+vbat2 added to lognav.
+Replaced enable/disablebatteryalarm commands by enable/disableallalarms.
+Updated showbatteryinfo and showswitchinfo commands.
+Added wzcontrolconfig and sailboatconfig commands.
+
 243
 Updated CMakeLists.txt and other minor updates.
 

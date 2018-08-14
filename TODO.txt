@@ -1,6 +1,5 @@
 
 params taux de détection sur durée ou équivalents?->not implemented
-
 linefollowingrelativerobot relatif au cap et à la position actuelle pour obstacle, goxyrelative, est-ce qu'il a déjà été utilisé dans une mission...?
 
 tester avec appverif avec OpenCV disabled
@@ -18,6 +17,7 @@ récupérer tension batterie via 4G? Tension/courant dans log principal?->vbat1 et
 Attention à surcharge de maestro...->disabled if -1, sleep équilibrés, countermodulo...
 Maestrosleeptime=10+10*(vbat1chan!=-1?1:0)+10*(ibat1chan!=-1?1:0)+10*(vbat2chan!=-1?1:0)+10*(ibat2chan!=-1?1:0)
 faire un getmultiplevaluemaestro pour optimiser, mais pas sûr que ça marche?->pas urgent car pour l'instant on peut alterner les lectures, mais peut être intéressant si besoin de haute fréquence de lecture...
+delete Maestro0_mini.txt
 
 contrôle des 2 voiles...
 
@@ -33,12 +33,13 @@ renommer maestro en pololu, mettre 16 PWM dans fichier de config, Jrk getvariabl
 
 AHRS matrice de rotation, bras de levier...
 
-commande pour changer ksi et autres param propres aux voiliers
-wzcontrolconfig manque! mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
+execute procid not implemented for some detection functions...
+
 abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
 missing BOATBOT robid...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
+wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
 Simu voilier : mettre equations motorboat et voilier, PololuInterface
 add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
 UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params

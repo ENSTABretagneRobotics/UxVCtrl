@@ -24,6 +24,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispDVL = TRUE;
 	BOOL bDispGPS = TRUE;
 	BOOL bDispSOG = FALSE;
+	BOOL bDispEPU = FALSE;
 	BOOL bMap = TRUE;
 	BOOL bFullMap = FALSE;
 	BOOL bRotatingMap = FALSE;
@@ -61,6 +62,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	CHRONO chrono_recording;
 	CHRONO chrono_playing;
 	CHRONO chrono_pausing;
+	CHRONO chrono_alarms;
+	CHRONO chrono_epu;
 
 	switch (robid)
 	{
@@ -87,6 +90,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	StartChrono(&chrono_recording);
 	StartChrono(&chrono_playing);
 	StartChrono(&chrono_pausing);
+	StartChrono(&chrono_alarms);
+	StartChrono(&chrono_epu);
 
 	// Sometimes needed on Linux to get windows-related functions working properly in multiple threads, sometimes not...
 	//EnterCriticalSection(&OpenCVCS);
@@ -773,13 +778,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			AbortMission();
 			break;
 		case 'h': DisplayHelp(); break;
-		case 'I': bStdOutDetailedInfo = !bStdOutDetailedInfo; break;
 		case '!':
-			bDisableBatteryAlarm = !bDisableBatteryAlarm;
-			if (bDisableBatteryAlarm) printf("Battery alarm disabled.\n");
-			else printf("Battery alarm enabled.\n");
+			bDisableAllAlarms = !bDisableAllAlarms;
+			if (bDisableAllAlarms) printf("Alarms disabled.\n");
+			else printf("Alarms enabled.\n");
 			break;
-		case '?': bShowBatteryInfo = !bShowBatteryInfo; break;
+		case '?': bDispEPU = !bDispEPU; break;
 		case '.':
 			bRearmAutopilot = TRUE;
 			printf("Rearm.\n");
@@ -816,7 +820,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case '3':
 			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
 			else if (bOtherOSDOptionsExtendedMenu) bDispSOG = !bDispSOG;
-			else if (bExtendedMenu) bShowSwitchInfo = !bShowSwitchInfo;
+			else if (bExtendedMenu) bStdOutDetailedInfo = !bStdOutDetailedInfo;
 			break;
 		case '4': 
 			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; } 
@@ -952,7 +956,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				strcpy(szText, "[2] CISCREA OSD (46825)");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				sprintf(szText, "[3] SHOW SWITCH INFO (%d)", (int)bShowSwitchInfo);
+				sprintf(szText, "[3] SHOW DETAILED INFO (%d)", (int)bStdOutDetailedInfo);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[4] SAILBOAT ROLL WIND CORRECTION (%d)", (int)!bDisableRollWindCorrectionSailboat);
@@ -1000,7 +1004,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case PORT_TACK_TRAJECTORY: s = 'P'; break;
 				default: s = 'I'; break;
 				}
-				sprintf(szText, "%c %c %d%% %d%% BAT1:%.1fV", (vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbattery1);
+				sprintf(szText, "%c %c %d%% %d%% VBAT1:%.1fV",
+					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbat1);
 				break;
 			case LIRMIA3_ROBID:
 				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u4*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
@@ -1173,9 +1178,34 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 			}
-			if (bShowBatteryInfo)
+			if (bDispEPU)
 			{
-				sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", Energy_electronics, Energy_actuators);
+				if (GetTimeElapsedChronoQuick(&chrono_epu) < 2.0)
+				{
+					sprintf(szText, "VBAT1:%.1fV, VBAT2:%.1fV", vbat1, vbat2);
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_epu) < 4.0)
+				{
+					sprintf(szText, "VFBAT1:%.1fV, VFBAT2:%.1fV", vbat1_filtered, vbat2_filtered);
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_epu) < 6.0)
+				{
+					sprintf(szText, "IBAT1:%.1fA, IBAT2:%.1fA", ibat1, ibat2);
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_epu) < 8.0)
+				{
+					sprintf(szText, "IFBAT1:%.1fA, IFBAT2:%.1fA", ibat1_filtered, ibat2_filtered);
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_epu) < 10.0)
+				{
+					sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", Energy_electronics, Energy_actuators);
+				}
+				else
+				{
+					StopChronoQuick(&chrono_epu);
+					sprintf(szText, "VBAT1:%.1fV, VBAT2:%.1fV", vbat1, vbat2);
+					StartChrono(&chrono_epu);
+				}
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
@@ -1663,6 +1693,39 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					cvFillConvexPoly(dispimgs[videoid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
 			}
+			if (!bDisableAllAlarms)
+			{
+				if (GetTimeElapsedChronoQuick(&chrono_alarms) < 1.0)
+				{
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 2.0)
+				{
+					if ((vbat1_threshold > 0.01)&&(vbat1_filtered < vbat1_threshold))
+					{
+						strcpy(szText, "BAT1 ALARM");
+						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-2*16), &font, CV_RGB(255, 0, 0));
+					}
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 3.0)
+				{
+					if ((vbat2_threshold > 0.01)&&(vbat2_filtered < vbat2_threshold))
+					{
+						strcpy(szText, "BAT2 ALARM");
+						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-2*16), &font, CV_RGB(255, 0, 0));
+					}
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 4.0)
+				{
+				}
+				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 5.0)
+				{
+				}
+				else
+				{
+					StopChronoQuick(&chrono_alarms);
+					StartChrono(&chrono_alarms);
+				}
+			}
 		}
 #pragma endregion
 		LeaveCriticalSection(&dispimgsCS[videoid]);
@@ -1712,6 +1775,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		memset(windowname, 0, sizeof(windowname));
 	}
 
+	StopChronoQuick(&chrono_epu);
+	StopChronoQuick(&chrono_alarms);
 	StopChronoQuick(&chrono_pausing);
 	StopChronoQuick(&chrono_playing);
 	StopChronoQuick(&chrono_recording);

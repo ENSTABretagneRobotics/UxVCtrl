@@ -292,11 +292,11 @@ WMV2
 1.22
 % r (accuracy of line/waypoint following in m, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
-% betatrav (angle de la voile en vent de travers (in rad))
+% betatrav (sail angle when the wind comes from the side (in rad))
 0.5
-% betaarr (angle de la voile en vent arrière (in rad))
+% betaarr (sail angle when the wind comes from the rear (in rad))
 1.5
-% ksi (angle de près (in rad))
+% ksi (close-hauled angle (in rad))
 0.87
 % check_strategy_period (in s)
 60
@@ -517,6 +517,8 @@ WMV2
 0
 % P_actuators_4 (in W)
 0.4
+% bat_filter_coef
+0.9
 % Simulator initial state
 % x_0 (in m)
 0

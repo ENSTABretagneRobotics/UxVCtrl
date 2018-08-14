@@ -79,6 +79,16 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 			if (mb != NULL)
 			{
 				bConnected = TRUE; 
+
+				EnterCriticalSection(&StateVariablesCS);
+
+				// Add param battery alarm voltage...?
+
+				// Li-ion battery...
+				vbat1_filtered = 9.6;
+				vbat1_threshold = 9.6;
+
+				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else 
 			{
@@ -96,11 +106,10 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 			if (!bError)
 			{
-				// Add param battery alarm voltage...?
 
-				if ((!bDisableBatteryAlarm)&&(voltage/1000.0 < 9.6)) printf("Li-ion battery alarm.\n");
+				//if ((!bDisableAllAlarms)&&(voltage/1000.0 < vbat1_threshold)) printf("Li-ion battery alarm.\n");
 
-				if (bShowBatteryInfo) printf("Battery : %f V.\n", voltage/1000.0);
+				//if (bShowBatteryInfo) printf("Battery : %f V.\n", voltage/1000.0);
 
 				// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 				//error = 15.4*sin((heading+1439.4)*3.14/1800.0)+1.04;
@@ -124,6 +133,9 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 				light_ciscrea = (int)(lights*100);
 				tilt_ciscrea = (int)(cameratilt*100);
+
+				vbat1 = voltage/1000.0;
+				vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
 
 				LeaveCriticalSection(&StateVariablesCS);
 			}
