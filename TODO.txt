@@ -1,6 +1,7 @@
 
 params taux de détection sur durée ou équivalents?->not implemented
-linefollowingrelativerobot relatif au cap et à la position actuelle pour obstacle, goxyrelative, est-ce qu'il a déjà été utilisé dans une mission...?
+
+linefollowingtrelativerobot pour obstacle...->mettre à jour mission...
 
 tester avec appverif avec OpenCV disabled
 
@@ -28,6 +29,8 @@ Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et 
 Prendre aussi en compte tangage, utiliser matrice d'euler
 rajouter commande setwindestimation/wgs avec unités des marins
 command wind filter coefs
+setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
+prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 renommer maestro en pololu, mettre 16 PWM dans fichier de config, Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT), rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal (BOATBOT avec sondeur...), rajouter commande showpwm, support de 3 Pololu
 
@@ -233,14 +236,6 @@ selon les accx_err, ça aura ou non une influence sur les équations d'état
 Gérer le -g dans acc...
 changer les bruits d'état en bruits discrétisés...?
 fusion de certains fichiers avec UxVDataViewer, notamment forward et backward..., intégrer sonarstaticlocstructured et lecture vidéo dans UxVDataViewer, afficher date, heure, min, sec?
-
-waitxyt x y t
-waitxytrelative x y t
-waitxytwgs
-waitlinet
-waitlinetrelative
-waitlinetrelativerobot
-waitlinetwgs
 
 dans les linefollowing, bLineFollowingControl n'est pas changé quand on a fini?
 les variantes sans t ont peut-être peu d'utilité...?
@@ -503,10 +498,8 @@ faire un tracking et voir s'ils se confirment
 voilier
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
 si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstragey et forcesailupdate...
-setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
 kalman pour retrouver vent vrai?
 lorsqu'on vire de bord, la girouette va se retrouver à un moment à un angle de 0 et ce sera forcément la direction du vrai vent, par contre pas filtrer passe-bas à cause du retard, filtrer en regardant quand on passe de 5 valeurs positives à 5 valeurs négatives
-prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 changer observer (et éventuellement simulator) pour que omegazdot=alphaomegaz*(u1-u2)-alphafomegaz*omegaz (au lieu de psidot=alphaomegaz*(u1-u2)...)
 si on a une IMU, on l'utilise pour omegazhat, si on a un GPS, on l'utilise pour la vitesse... (activer ça selon les robid)
@@ -564,6 +557,15 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+waitxyt x y t
+waitxytrelative x y t
+waitxytwgs
+
+waitlinet
+waitlinetrelative
+waitlinetrelativerobot
+waitlinetwgs
 
 Le programme ne s'arrête pas si n'arrive pas à se connecter à udp://10.5.5.9, mais c'est sans doute à cause d'opencv
 

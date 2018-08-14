@@ -1,5 +1,5 @@
 %
-% Warning : the linefollowingtrelative part is not really correct since every linefollowingtrelative command is relative to the previous position...
+% Warning : the linefollowingtrelative part might not be correct since every linefollowingtrelative command is relative to the previous position...
 %
 setmissionaction INIT
 wpfollowingconfig 0.25

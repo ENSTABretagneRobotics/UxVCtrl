@@ -1,3 +1,6 @@
+%
+% Warning : the linefollowingtrelative part might not be correct since every linefollowingtrelative command is relative to the previous position...
+%
 setmissionaction swarm_ar_goto
 setstateestimation 0 15 0 15 0 10000 0 10000 0 0.1 0 0.1
 wait 3

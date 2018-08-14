@@ -1,3 +1,6 @@
+245
+Added linefollowingrelativerobot, linefollowingtrelativerobot, waitxyt, waitxytrelative, waitxytwgs, waitlinet, waitlinetrelativerobot commands.
+
 244
 Added objMinDetectionRatio and objDetectionRatioDuration parameters (not implemented) in commands related to detections.
 Added bat_filter_coef parameter.
