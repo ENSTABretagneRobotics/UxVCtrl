@@ -270,6 +270,7 @@ double x_externalvisuallocalization = 0, y_externalvisuallocalization = 0, z_ext
 double psi_externalvisuallocalization = 0;
 double lat_externalvisuallocalization = 0, long_externalvisuallocalization = 0, alt_externalvisuallocalization = 0;
 double heading_externalvisuallocalization = 0;
+double detectratio_externalvisuallocalization = 0;
 BOOL bExternalVisualLocalizationFound = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 
@@ -302,6 +303,7 @@ int bBrake_pipeline = 0;
 int procid_pipeline = 0;
 int videoid_pipeline = 0; 
 double u_pipeline = 0;
+double detectratio_pipeline = 0;
 BOOL bPipelineFound = FALSE;
 
 // Ball variables.
@@ -327,6 +329,7 @@ double x_ball = 0, y_ball = 0, z_ball = 0;
 double psi_ball = 0;
 double lat_ball = 0, long_ball = 0, alt_ball = 0;
 double heading_ball = 0;
+double detectratio_ball = 0;
 BOOL bBallFound = FALSE;
 int lightStatus_ball = 0;
 
@@ -342,6 +345,7 @@ int bBrake_visualobstacle = 0;
 int procid_visualobstacle = 0;
 int videoid_visualobstacle = 0; 
 double u_visualobstacle = 0;
+double detectratio_visualobstacle = 0;
 
 // Surface visual obstacle variables.
 BOOL bSurfaceVisualObstacleDetection = FALSE;
@@ -356,6 +360,7 @@ int bBrake_surfacevisualobstacle = 0;
 int procid_surfacevisualobstacle = 0;
 int videoid_surfacevisualobstacle = 0; 
 double u_surfacevisualobstacle = 0;
+double detectratio_surfacevisualobstacle = 0;
 
 // Pinger variables.
 BOOL bPingerDetection = FALSE;
@@ -372,6 +377,7 @@ int bBrakeSurfaceEnd_pinger = 0;
 int procid_pinger = 0;
 int videoid_pinger = 0; 
 double u_pinger = 0;
+double detectratio_pinger = 0;
 BOOL bPingerFound = FALSE;
 
 // Missing worker variables.
@@ -388,6 +394,7 @@ int bBrake_missingworker = 0;
 int procid_missingworker = 0;
 int videoid_missingworker = 0; 
 double u_missingworker = 0;
+double detectratio_missingworker = 0;
 BOOL bMissingWorkerFound = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 

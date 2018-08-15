@@ -451,6 +451,7 @@ extern double x_externalvisuallocalization, y_externalvisuallocalization, z_exte
 extern double psi_externalvisuallocalization;
 extern double lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization;
 extern double heading_externalvisuallocalization;
+extern double detectratio_externalvisuallocalization;
 extern BOOL bExternalVisualLocalizationFound;
 #endif // !DISABLE_OPENCV_SUPPORT
 
@@ -483,6 +484,7 @@ extern int bBrake_pipeline;
 extern int procid_pipeline;
 extern int videoid_pipeline; 
 extern double u_pipeline;
+extern double detectratio_pipeline;
 extern BOOL bPipelineFound;
 
 // Ball variables.
@@ -508,6 +510,7 @@ extern double x_ball, y_ball, z_ball;
 extern double psi_ball; // Not used...
 extern double lat_ball, long_ball, alt_ball;
 extern double heading_ball; // Not used...
+extern double detectratio_ball;
 extern BOOL bBallFound;
 extern int lightStatus_ball;
 
@@ -523,6 +526,7 @@ extern int bBrake_visualobstacle;
 extern int procid_visualobstacle;
 extern int videoid_visualobstacle;
 extern double u_visualobstacle;
+extern double detectratio_visualobstacle;
 
 // Surface visual obstacle variables.
 extern BOOL bSurfaceVisualObstacleDetection;
@@ -537,6 +541,7 @@ extern int bBrake_surfacevisualobstacle;
 extern int procid_surfacevisualobstacle;
 extern int videoid_surfacevisualobstacle;
 extern double u_surfacevisualobstacle;
+extern double detectratio_surfacevisualobstacle;
 
 // Pinger variables.
 extern BOOL bPingerDetection;
@@ -553,6 +558,7 @@ extern int bBrakeSurfaceEnd_pinger;
 extern int procid_pinger;
 extern int videoid_pinger; 
 extern double u_pinger;
+extern double detectratio_pinger;
 extern BOOL bPingerFound;
 
 // Missing worker variables.
@@ -569,6 +575,7 @@ extern int bBrake_missingworker;
 extern int procid_missingworker;
 extern int videoid_missingworker; 
 extern double u_missingworker;
+extern double detectratio_missingworker;
 extern BOOL bMissingWorkerFound;
 #endif // !DISABLE_OPENCV_SUPPORT
 

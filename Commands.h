@@ -60,7 +60,7 @@ inline void DisableAllControls(void)
 	AcousticCommandMDM = 0; // Should change?
 	LeaveCriticalSection(&MDMCS);
 }
-
+#pragma region Waypoints.csv file
 inline int LoadWaypointsEx(char* szFilePath, double wpslat[], double wpslong[], int* pNbWPs)
 {
 	FILE* file = NULL;
@@ -252,7 +252,7 @@ inline int SetCurrentWaypointEx(char* szFilePath, int CurWP)
 
 	return EXIT_SUCCESS;
 }
-
+#pragma endregion
 inline void CallMission(char* str)
 {
 	EnterCriticalSection(&MissionFilesCS);
@@ -793,7 +793,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PipelineCS);
 		rmin_pipeline = ival1; rmax_pipeline = ival2; gmin_pipeline = ival3; gmax_pipeline = ival4; bmin_pipeline = ival5; bmax_pipeline = ival6; 
 		hmin_pipeline = ival7; hmax_pipeline = ival8; smin_pipeline = ival9; smax_pipeline = ival10; lmin_pipeline = ival11; lmax_pipeline = ival12; 
-		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; objMinDetectionRatio_pipeline = dval3; objDetectionRatioDuration_pipeline = dval4; d0_pipeline = dval5; 
+		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; objMinDetectionRatio_pipeline = dval3; objDetectionRatioDuration_pipeline = (dval4 <= 0)? captureperiod: dval4; d0_pipeline = dval5; 
 		kh_pipeline = dval6; kv_pipeline = dval7; 
 		bBrake_pipeline = ival13; procid_pipeline = ival14; 
 		if ((ival15 >= 0)&&(ival15 < nbvideo))
@@ -812,6 +812,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PipelineCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_pipeline = u;
+		detectratio_pipeline = 0;
 		bPipelineDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&PipelineCS);
@@ -832,6 +833,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PipelineCS);
 		bPipelineDetection = FALSE;
 		if (bBrake_pipeline) bBrakeControl = FALSE;
+		detectratio_pipeline = 0;
 		LeaveCriticalSection(&PipelineCS);
 	}
 	else if (strncmp(line, "startpipelinetracking", strlen("startpipelinetracking")) == 0)
@@ -839,6 +841,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PipelineCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_pipeline = u;
+		detectratio_pipeline = 0;
 		bPipelineTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&PipelineCS);
@@ -852,6 +855,7 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
 		//bAltitudeAGLControl = FALSE;
+		detectratio_pipeline = 0;
 		LeaveCriticalSection(&PipelineCS);
 	}
 	else if (sscanf(line, "ballconfig "
@@ -874,7 +878,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&BallCS);
 		rmin_ball = ival1; rmax_ball = ival2; gmin_ball = ival3; gmax_ball = ival4; bmin_ball = ival5; bmax_ball = ival6; 
 		hmin_ball = ival7; hmax_ball = ival8; smin_ball = ival9; smax_ball = ival10; lmin_ball = ival11; lmax_ball = ival12; 
-		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionRatio_ball = dval3; objDetectionRatioDuration_ball = dval4; d0_ball = dval5; 
+		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionRatio_ball = dval3; objDetectionRatioDuration_ball = (dval4 <= 0)? captureperiod: dval4; d0_ball = dval5; 
 		kh_ball = dval6; kv_ball = dval7; 
 		lightMin_ball = ival13; lightPixRatio_ball = dval8; bAcoustic_ball = ival14;
 		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; procid_ball = ival18; 
@@ -895,6 +899,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		u_ball = u;
 		psi_ball = Center(psihat);
+		detectratio_ball = 0;
 		bBallDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&BallCS);
@@ -915,6 +920,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&BallCS);
 		bBallDetection = FALSE;
 		if (bBrake_ball) bBrakeControl = FALSE;
+		detectratio_ball = 0;
 		LeaveCriticalSection(&BallCS);
 	}
 	else if (strncmp(line, "startballtracking", strlen("startballtracking")) == 0)
@@ -923,6 +929,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		u_ball = u;
 		psi_ball = Center(psihat);
+		detectratio_ball = 0;
 		bBallTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&BallCS);
@@ -939,6 +946,7 @@ inline int Commands(char* line)
 			bDepthControl = FALSE;
 			bAltitudeAGLControl = FALSE;
 		}
+		detectratio_ball = 0;
 		LeaveCriticalSection(&BallCS);
 	}
 	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %lf %lf %d %d %d", 
@@ -946,7 +954,7 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&VisualObstacleCS);
 		rmin_visualobstacle = ival1; rmax_visualobstacle = ival2; gmin_visualobstacle = ival3; gmax_visualobstacle = ival4; bmin_visualobstacle = ival5; bmax_visualobstacle = ival6; 
-		obsPixRatio_visualobstacle = dval1; obsMinDetectionRatio_visualobstacle = dval2; obsDetectionRatioDuration_visualobstacle = dval3; 
+		obsPixRatio_visualobstacle = dval1; obsMinDetectionRatio_visualobstacle = dval2; obsDetectionRatioDuration_visualobstacle = (dval3 <= 0)? captureperiod: dval3; 
 		bBrake_visualobstacle = ival7; procid_visualobstacle = ival8; 
 		if ((ival9 >= 0)&&(ival9 < nbvideo))
 		{
@@ -963,6 +971,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&VisualObstacleCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_visualobstacle = u;
+		detectratio_visualobstacle = 0;
 		bVisualObstacleDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&VisualObstacleCS);
@@ -983,6 +992,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&VisualObstacleCS);
 		bVisualObstacleDetection = FALSE;
 		if (bBrake_visualobstacle) bBrakeControl = FALSE;
+		detectratio_visualobstacle = 0;
 		LeaveCriticalSection(&VisualObstacleCS);
 	}
 	else if (strncmp(line, "startvisualobstacleavoidance", strlen("startvisualobstacleavoidance")) == 0)
@@ -990,6 +1000,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&VisualObstacleCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_visualobstacle = u;
+		detectratio_visualobstacle = 0;
 		bVisualObstacleAvoidanceControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&VisualObstacleCS);
@@ -1001,6 +1012,7 @@ inline int Commands(char* line)
 		bDistanceControl = FALSE;
 		if (bBrake_visualobstacle) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
+		detectratio_visualobstacle = 0;
 		LeaveCriticalSection(&VisualObstacleCS);
 	}
 	else if (sscanf(line, "surfacevisualobstacleconfig %c %d %lf %lf %d %d %d", 
@@ -1009,7 +1021,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		weather_surfacevisualobstacle = cval;
 		boatsize_surfacevisualobstacle = ival1; 
-		obsMinDetectionRatio_surfacevisualobstacle = dval1; obsDetectionRatioDuration_surfacevisualobstacle = dval2; 
+		obsMinDetectionRatio_surfacevisualobstacle = dval1; obsDetectionRatioDuration_surfacevisualobstacle = (dval2 <= 0)? captureperiod: dval2; 
 		bBrake_surfacevisualobstacle = ival2;  procid_surfacevisualobstacle = ival3;
 		if ((ival4 >= 0)&&(ival4 < nbvideo))
 		{
@@ -1026,6 +1038,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_surfacevisualobstacle = u;
+		detectratio_surfacevisualobstacle = 0;
 		bSurfaceVisualObstacleDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
@@ -1046,6 +1059,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		bSurfaceVisualObstacleDetection = FALSE;
 		if (bBrake_surfacevisualobstacle) bBrakeControl = FALSE;
+		detectratio_surfacevisualobstacle = 0;
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 	}
 	else if (strncmp(line, "startsurfacevisualobstacleavoidance", strlen("startsurfacevisualobstacleavoidance")) == 0)
@@ -1053,6 +1067,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_surfacevisualobstacle = u;
+		detectratio_surfacevisualobstacle = 0;
 		bSurfaceVisualObstacleAvoidanceControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
@@ -1064,6 +1079,7 @@ inline int Commands(char* line)
 		bDistanceControl = FALSE;
 		if (bBrake_surfacevisualobstacle) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
+		detectratio_surfacevisualobstacle = 0;
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 	}
 	else if (sscanf(line, "pingerconfig "
@@ -1086,7 +1102,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PingerCS);
 		rmin_pinger = ival1; rmax_pinger = ival2; gmin_pinger = ival3; gmax_pinger = ival4; bmin_pinger = ival5; bmax_pinger = ival6; 
 		hmin_pinger = ival7; hmax_pinger = ival8; smin_pinger = ival9; smax_pinger = ival10; lmin_pinger = ival11; lmax_pinger = ival12; 
-		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionRatio_pinger = dval3; objDetectionRatioDuration_pinger = dval4; 
+		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionRatio_pinger = dval3; objDetectionRatioDuration_pinger = (dval4 <= 0)? captureperiod: dval4; 
 		pulsefreq_pinger = dval5; pulselen_pinger = dval6; pulsepersec_pinger = dval7; hyddist_pinger = dval8; hydorient_pinger = dval9; preferreddir_pinger = dval10; 
 		bUseFile_pinger = ival13; 
 		bBrakeSurfaceEnd_pinger = ival14; procid_pinger = ival15; 
@@ -1106,6 +1122,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PingerCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_pinger = u;
+		detectratio_pinger = 0;
 		bPingerDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&PingerCS);
@@ -1126,6 +1143,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PingerCS);
 		bPingerDetection = FALSE;
 		if (bBrakeSurfaceEnd_pinger) bBrakeControl = FALSE;
+		detectratio_pinger = 0;
 		LeaveCriticalSection(&PingerCS);
 	}
 	else if (strncmp(line, "startpingertracking", strlen("startpingertracking")) == 0)
@@ -1133,6 +1151,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PingerCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_pinger = u;
+		detectratio_pinger = 0;
 		bPingerTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&PingerCS);
@@ -1146,6 +1165,7 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
 		//bAltitudeAGLControl = FALSE;
+		detectratio_pinger = 0;
 		LeaveCriticalSection(&PingerCS);
 	}
 	else if (sscanf(line, "missingworkerconfig "
@@ -1166,7 +1186,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&MissingWorkerCS);
 		rmin_missingworker = ival1; rmax_missingworker = ival2; gmin_missingworker = ival3; gmax_missingworker = ival4; bmin_missingworker = ival5; bmax_missingworker = ival6; 
 		hmin_missingworker = ival7; hmax_missingworker = ival8; smin_missingworker = ival9; smax_missingworker = ival10; lmin_missingworker = ival11; lmax_missingworker = ival12; 
-		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; objMinDetectionRatio_missingworker = dval3; objDetectionRatioDuration_missingworker = dval4; d0_missingworker = dval5; 
+		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; objMinDetectionRatio_missingworker = dval3; objDetectionRatioDuration_missingworker = (dval4 <= 0)? captureperiod: dval4; d0_missingworker = dval5; 
 		kh_missingworker = dval6; kv_missingworker = dval7; 
 		bBrake_missingworker = ival13; procid_missingworker = ival14; 
 		if ((ival15 >= 0)&&(ival15 < nbvideo))
@@ -1185,6 +1205,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&MissingWorkerCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_missingworker = u;
+		detectratio_missingworker = 0;
 		bMissingWorkerDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&MissingWorkerCS);
@@ -1205,6 +1226,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&MissingWorkerCS);
 		bMissingWorkerDetection = FALSE;
 		if (bBrake_missingworker) bBrakeControl = FALSE;
+		detectratio_missingworker = 0;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
 	else if (strncmp(line, "startmissingworkertracking", strlen("startmissingworkertracking")) == 0)
@@ -1212,6 +1234,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&MissingWorkerCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_missingworker = u;
+		detectratio_missingworker = 0;
 		bMissingWorkerTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&MissingWorkerCS);
@@ -1225,6 +1248,7 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
 		//bAltitudeAGLControl = FALSE;
+		detectratio_missingworker = 0;
 		LeaveCriticalSection(&MissingWorkerCS);
 	}
 	else 
@@ -1460,7 +1484,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 		rmin_externalvisuallocalization = ival1; rmax_externalvisuallocalization = ival2; gmin_externalvisuallocalization = ival3; gmax_externalvisuallocalization = ival4; bmin_externalvisuallocalization = ival5; bmax_externalvisuallocalization = ival6; 
 		hmin_externalvisuallocalization = ival7; hmax_externalvisuallocalization = ival8; smin_externalvisuallocalization = ival9; smax_externalvisuallocalization = ival10; lmin_externalvisuallocalization = ival11; lmax_externalvisuallocalization = ival12; 
-		objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionRatio_externalvisuallocalization = dval3; objDetectionRatioDuration_externalvisuallocalization = dval4;
+		objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionRatio_externalvisuallocalization = dval3; objDetectionRatioDuration_externalvisuallocalization = (dval4 <= 0)? captureperiod: dval4;
 		T_externalvisuallocalization = rmatrix(4,4);
 		T_externalvisuallocalization.SetVal(1,1,T11); T_externalvisuallocalization.SetVal(2,1,T21); T_externalvisuallocalization.SetVal(3,1,T31); T_externalvisuallocalization.SetVal(4,1,T41); 
 		T_externalvisuallocalization.SetVal(1,2,T12); T_externalvisuallocalization.SetVal(2,2,T22); T_externalvisuallocalization.SetVal(3,2,T32); T_externalvisuallocalization.SetVal(4,2,T42); 
@@ -1482,6 +1506,7 @@ inline int Commands(char* line)
 	else if (strncmp(line, "enableexternalvisuallocalization", strlen("enableexternalvisuallocalization")) == 0)
 	{
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
+		detectratio_externalvisuallocalization = 0;
 		bExternalVisualLocalization = TRUE;
 		LeaveCriticalSection(&ExternalVisualLocalizationCS);
 	}
@@ -1489,6 +1514,7 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 		bExternalVisualLocalization = FALSE;
+		detectratio_externalvisuallocalization = 0;
 		LeaveCriticalSection(&ExternalVisualLocalizationCS);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT

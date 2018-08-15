@@ -9,6 +9,16 @@
 
 #include "Ball.h"
 
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
@@ -91,6 +101,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	int i = 0, j = 0, index = 0;
 
 	CvFont font;
+	char szText[256];
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
@@ -148,8 +159,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		// Correction of bad lines on the borders of the video...
 		CorrectImageBordersRawBGR(data, videoimgwidth, videoimgheight, 2, 0, 0, 0);
 
-		// Simulated object for tests...
-
+#pragma region Simulated objects for tests
 		//for (i = 0; i < image->height; i++)
 		//{
 		//	for (j = 0; j < image->width; j++)
@@ -182,9 +192,10 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		//CvPoint* pts[1] = {points[0]};
 		//int npts[] = {4};
 
-		//cvFillPoly(image, pts, npts, 1, CV_RGB(255,255,0));
-
-		//
+		//if (((int)(10*GetTimeElapsedChronoQuick(&chrono)))%50 < 10) 
+		//	if (((int)(10*GetTimeElapsedChronoQuick(&chrono)))%10 < 5) 
+		//		cvFillPoly(image, pts, npts, 1, CV_RGB(255,0,0));
+#pragma endregion
 
 		for (i = 0; i < image->height; i++)
 		{
@@ -253,15 +264,16 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			}
 		}
 #pragma endregion
+		sprintf(szText, "DR=%.2f", detectratio_ball);
+		cvPutText(overlayimage, szText, cvPoint(videoimgwidth-10*8,videoimgheight-40), &font, CV_RGB(255,0,128));
 		if (nbSelectedPixels == 0) 
 		{
-			//bTemporaryObjectDetected = FALSE;
-			//if (bTemporaryObjectDetected != bTemporaryObjectDetected_prev)
+			detectratio_ball = (0.001*(double)captureperiod/objDetectionRatioDuration_ball)*0.0+(1.0-(0.001*(double)captureperiod/objDetectionRatioDuration_ball))*detectratio_ball;
+			//if (GetTimeElapsedChronoQuick(&chrono_mindetectionduration) > objDetectionRatioDuration_ball)
 			//{
-			//	bTemporaryObjectDetected_prev = bTemporaryObjectDetected;
-			//	StopChronoQuick(&chrono_mindetectionduration);
-			//	StartChrono(&chrono_mindetectionduration);
+			//	detectratio_ball = min(0.0, detectratio_ball-(0.001*(double)captureperiod/objDetectionRatioDuration_ball));
 			//}
+			//bTemporaryObjectDetected = FALSE;
 			LeaveCriticalSection(&BallCS);
 			EnterCriticalSection(&BallOverlayImgCS);
 			cvCopy(overlayimage, BallOverlayImg, 0);
@@ -447,25 +459,51 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			}					
 #endif // THIRD_METHOD
 #pragma endregion
-		//	bTemporaryObjectDetected = TRUE;
-		//}
-		//else
-		//{
-		//	bTemporaryObjectDetected = FALSE;
-		//}
+			detectratio_ball = (0.001*(double)captureperiod/objDetectionRatioDuration_ball)*1.0+(1.0-(0.001*(double)captureperiod/objDetectionRatioDuration_ball))*detectratio_ball;
+			//if (fabs(detectratio_ball) < 0.001)
+			//{
+			//	StopChronoQuick(&chrono_mindetectionduration);
+			//	StartChrono(&chrono_mindetectionduration);
+			//}
+			//detectratio_ball = max(1.0, detectratio_ball+(0.001*(double)captureperiod/objDetectionRatioDuration_ball));
+			//bTemporaryObjectDetected = TRUE;
+		}
+		else
+		{
+			detectratio_ball = (0.001*(double)captureperiod/objDetectionRatioDuration_ball)*0.0+(1.0-(0.001*(double)captureperiod/objDetectionRatioDuration_ball))*detectratio_ball;
+			//if (GetTimeElapsedChronoQuick(&chrono_mindetectionduration) > objDetectionRatioDuration_ball)
+			//{
+			//	detectratio_ball = min(0.0, detectratio_ball-(0.001*(double)captureperiod/objDetectionRatioDuration_ball));
+			//}
+			//bTemporaryObjectDetected = FALSE;
+		}
 
-		//if (bTemporaryObjectDetected != bTemporaryObjectDetected_prev)
-		//{
-		//	bTemporaryObjectDetected_prev = bTemporaryObjectDetected;
-		//	StopChronoQuick(&chrono_mindetectionduration);
-		//	StartChrono(&chrono_mindetectionduration);
-		//}
+		/*
+		{
+			nbdetect++;
+			detectratio_ball = nbdetect/(nbdetect+nbnondetect);
+			if (nbdetect+nbnondetect > objDetectionRatioDuration_ball/(0.001*(double)captureperiod)+1)
+			{
+				nbdetect--;
+				nbnondetect--;
+			}
+		}
+		else
+		{
+			nbnondetect++;
+			detectratio_ball = nbdetect/(nbdetect+nbnondetect);
+			if (nbdetect+nbnondetect > objDetectionRatioDuration_ball/(0.001*(double)captureperiod)+1)
+			{
+				nbdetect--;
+				nbnondetect--;
+			}
+		}		
+		*/
 
-		//if (bTemporaryObjectDetected&&(GetTimeElapsedChronoQuick(&chrono_mindetectionduration) > objMinDetectionDuration_ball))
-		//{
+		if (detectratio_ball >= objMinDetectionRatio_ball)
+		{
 			bBallFound = TRUE;
 #pragma region Actions
-			char szText[256];
 			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
 			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 

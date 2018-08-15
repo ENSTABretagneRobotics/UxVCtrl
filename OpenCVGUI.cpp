@@ -1703,7 +1703,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat1_threshold > 0.01)&&(vbat1_filtered < vbat1_threshold))
 					{
 						strcpy(szText, "BAT1 ALARM");
-						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-2*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 3.0)
@@ -1711,7 +1711,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat2_threshold > 0.01)&&(vbat2_filtered < vbat2_threshold))
 					{
 						strcpy(szText, "BAT2 ALARM");
-						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-2*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 4.0)

@@ -1,3 +1,6 @@
+246
+Updated ball detection and corrected related samples.
+
 245
 Added linefollowingrelativerobot, linefollowingtrelativerobot, waitxyt, waitxytrelative, waitxytwgs, waitlinet, waitlinetrelativerobot commands.
 
