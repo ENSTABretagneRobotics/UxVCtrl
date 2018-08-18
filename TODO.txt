@@ -1,6 +1,20 @@
+armbaserotationchan
+armrotation1chan
+armrotation2chan
+armrotation3chan
+armrotation4chan
+camtilt/panchan
+gripperclose/rotationchan
+trunk1,2,3,4
+extra1,2,3,4
+mettre 24 PWM dans fichier de config (suffit sans doute de changer MAX_NB_PWM...), rajouter commande showmaestropwm sous forme d'entier en ms
+
+Touches opencv gui->uNj(camera tilt), voir pour rajouter bras...
+
+Pouvoir lancer balltracking sans que ça fasse d'action?
+
 
 linefollowingtrelativerobot, HSL values pour obstacle...->mettre à jour mission...
-
 tester avec appverif avec OpenCV disabled
 
 params taux de détection sur durée ou équivalents, execute procid not implemented for some detection functions...
@@ -31,7 +45,7 @@ command wind filter coefs
 setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
 prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
-renommer maestro en pololu, mettre 16 PWM dans fichier de config, Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT), rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal (BOATBOT avec sondeur...), rajouter commande showpwm, support de 3 Pololu
+Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT), rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal (BOATBOT avec sondeur...)
 
 AHRS matrice de rotation, bras de levier...
 
@@ -256,7 +270,7 @@ printf size_t->%zu?
 chiffres significatifs...
 Warnings misleading indent, see Ubuntu 18.04/VS2017 and static/dynamic code analysis...?
 retester avec -Wunkown-pragmas, -Wwarn-cstrict
-vc_linux warnings de conversion à corriger par des casts explicites?
+vc_linux warnings de conversion à corriger par des casts explicites?, ne pas oublier d'activer l'option Copy Remotely pour tous les input files...
 tester longtemps en release sur les robots (avec tous les devices possibles) avec et sans debugger, avec et sans appverif et valgrind...
 SpeedBit Video Accelerator\Accelerator.dll seems to generate small bugs everytime a network function is called...
 crash simu mission guerlédan en tapant la commande exit, peut-être lié à MAVLinkInterface, qui était connectée?->aussi quand pas connecté...->peut-être lié au videorecording...->crash même quand mission interrompue par touche x...->crash même quand MAVLinkInterface désactivée...->pas revu...

@@ -154,7 +154,7 @@ BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bDisableSwarmonDevice = FALSE;
 BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
-BOOL bDisableMaestro = FALSE;
+BOOL bDisablePololu[MAX_NB_POLOLU];
 BOOL bDisableMiniSSC = FALSE;
 BOOL bDisableIM483I = FALSE;
 #pragma endregion
@@ -499,8 +499,9 @@ BOOL bPauseUE9A = FALSE, bRestartUE9A = FALSE;
 // SSC32 variables.
 BOOL bPauseSSC32 = FALSE, bRestartSSC32 = FALSE;
 
-// Maestro variables.
-BOOL bPauseMaestro = FALSE, bRestartMaestro = FALSE;
+// Pololu variables.
+BOOL bPausePololu[MAX_NB_POLOLU];
+BOOL bRestartPololu[MAX_NB_POLOLU];
 
 // MiniSSC variables.
 BOOL bPauseMiniSSC = FALSE, bRestartMiniSSC = FALSE;

@@ -25,8 +25,6 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	//UNREFERENCED_PARAMETER(pParam);
-
 	sprintf(szCfgFilePath, "NMEADevice%d.txt", deviceid);
 
 	memset(&nmeadevice, 0, sizeof(NMEADEVICE));

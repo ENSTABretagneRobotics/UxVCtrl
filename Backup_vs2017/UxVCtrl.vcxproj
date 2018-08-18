@@ -113,7 +113,6 @@
     <ClCompile Include="Hardware\gpControl.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
     <ClCompile Include="Hardware\LIRMIA3.cpp" />
-    <ClCompile Include="Hardware\Maestro.cpp" />
     <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
@@ -121,6 +120,7 @@
     <ClCompile Include="Hardware\MS583730BA.cpp" />
     <ClCompile Include="Hardware\NortekDVL.cpp" />
     <ClCompile Include="Hardware\PathfinderDVL.cpp" />
+    <ClCompile Include="Hardware\Pololu.cpp" />
     <ClCompile Include="Hardware\RPLIDAR.cpp" />
     <ClCompile Include="Hardware\SBG.cpp" />
     <ClCompile Include="Hardware\ublox.cpp" />
@@ -203,7 +203,6 @@
     <ClInclude Include="Hardware\gpControl.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
     <ClInclude Include="Hardware\LIRMIA3.h" />
-    <ClInclude Include="Hardware\Maestro.h" />
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MAVLinkProtocol.h" />
     <ClInclude Include="Hardware\MiniSSC.h" />
@@ -213,6 +212,7 @@
     <ClInclude Include="Hardware\NMEAProtocol.h" />
     <ClInclude Include="Hardware\NortekDVL.h" />
     <ClInclude Include="Hardware\PathfinderDVL.h" />
+    <ClInclude Include="Hardware\Pololu.h" />
     <ClInclude Include="Hardware\RPLIDAR.h" />
     <ClInclude Include="Hardware\RTCM2Protocol.h" />
     <ClInclude Include="Hardware\RTCM3Protocol.h" />
@@ -312,6 +312,9 @@
     <Text Include="NMEADevice1.txt" />
     <Text Include="NortekDVL0.txt" />
     <Text Include="PathfinderDVL0.txt" />
+    <Text Include="Pololu0.txt" />
+    <Text Include="Pololu1.txt" />
+    <Text Include="Pololu2.txt" />
     <Text Include="RPLIDAR0.txt" />
     <Text Include="SBG0.txt" />
     <Text Include="ublox0.txt" />
@@ -321,7 +324,6 @@
     <Text Include="CISCREA.txt" />
     <Text Include="env.txt" />
     <Text Include="Hokuyo0.txt" />
-    <Text Include="Maestro0.txt" />
     <Text Include="MDM0.txt" />
     <Text Include="MES0.txt" />
     <Text Include="MiniSSC0.txt" />

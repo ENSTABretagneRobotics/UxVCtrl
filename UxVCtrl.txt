@@ -186,7 +186,11 @@ WMV2
 1
 % bDisableSSC32
 1
-% bDisableMaestro
+% bDisablePololu[0]
+1
+% bDisablePololu[1]
+1
+% bDisablePololu[2]
 1
 % bDisableMiniSSC
 1

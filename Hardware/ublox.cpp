@@ -29,8 +29,6 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	//UNREFERENCED_PARAMETER(pParam);
-
 	sprintf(szCfgFilePath, "ublox%d.txt", deviceid);
 
 	memset(&ublox, 0, sizeof(UBLOX));

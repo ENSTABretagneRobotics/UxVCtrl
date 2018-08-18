@@ -27,8 +27,6 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	//UNREFERENCED_PARAMETER(pParam);
-
 	sprintf(szCfgFilePath, "MAVLinkDevice%d.txt", deviceid);
 
 	memset(&mavlinkdevice, 0, sizeof(MAVLINKDEVICE));

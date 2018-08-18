@@ -18,6 +18,7 @@ _ Microsoft .NET Framework 4.7 (see http://go.microsoft.com/fwlink/?LinkId=82530
 _ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.exe.zip , can be disabled using Compat_vs20XX.bat script)]
 [_ MT SDK 2.7/3.3/4.2.1/4.3 (recommended if using a Xsens MTi device)]
 [_ Maestro Control Center (recommended if using a Pololu Maestro device)]
+[_ Jrk Configuration Utility (recommended if using a Pololu Jrk device)]
 [_ MAVProxy (see e.g. http://firmware.ardupilot.org/Tools/MAVProxy/MAVProxySetup-1.6.2.exe , recommended if using a BlueROV2)]
 [_ OpenAL SDK 1.1]
 [_ freealut 1.1.0]
@@ -68,7 +69,7 @@ Hardware support :
 - CISCREA : CISCREA JACK ROV ENSTA Bretagne version.
 - Hokuyo : Hokuyo URG-04LX-UG01 laser telemeter.
 - LIRMIA3 : Thrusters I2C drivers through Arduino on LIRMIA 3 AUV from UMI LAFMIA CINVESTAV Mexico.
-- Maestro : Pololu Mini Maestro 6, 18, 24 servo controllers, Pololu Jrk (preliminary support).
+- Pololu : Pololu Mini Maestro 6, 18, 24 servo controllers, Pololu Jrk (preliminary support).
 - MAVLinkDevice : HKPilot32 (Pixhawk), ArduPilot/ArduFlyer/HKPilot Mega (APM 2.5) with ArduCopter, ArduRover, ArduSub, or PX4FLOW.
 - MDM : Tritech Micron Data Modem (or other kinds of simple RS232 modems).
 - MES : Tritech Micron Echosounder.
@@ -80,7 +81,7 @@ Hardware support :
 - RazorAHRS : SparkFun 9DOF Razor IMU (flash firmware from https://github.com/lebarsfa/razor-9dof-ahrs if needed).
 - RPLIDAR : RPLIDAR A2 laser telemeter.
 - SBG : SBG Systems Ellipse-N AHRS.
-- Seanet : Tritech Micron Sonar, Tritech Miniking Sonar.
+- Seanet : Tritech Micron Sonar, Tritech MiniKing Sonar.
 - SSC-32 : Lynxmotion SSC-32, SSC-32u servo controllers.
 - ublox : ublox GPS, Furuno WS200 weather station, AIS Receiver dAISy, or other NMEA-compatible devices with supported NMEA sentences.
 - UE9A : LabJack UE9.

@@ -8,11 +8,11 @@
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
 #include "Config.h"
-#include "Maestro.h"
+#include "Pololu.h"
 
-THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
+THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 {
-	MAESTRO maestro;
+	POLOLU pololu;
 	double rudder = 0, thrust = 0, flux = 0;
 	double thrust1 = 0, thrust2 = 0, thrust3 = 0;
 	int ivalue = 0;
@@ -20,13 +20,15 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	int counter = 0, counter_modulo = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int deviceid = (intptr_t)pParam;
+	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	UNREFERENCED_PARAMETER(pParam);
+	sprintf(szCfgFilePath, "Pololu%d.txt", deviceid);
 
-	memset(&maestro, 0, sizeof(MAESTRO));
+	memset(&pololu, 0, sizeof(POLOLU));
 
 	StartChrono(&chrono_period);
 
@@ -37,64 +39,64 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 
 		//mSleep(50);
 
-		if (bPauseMaestro) 
+		if (bPausePololu[deviceid]) 
 		{
 			if (bConnected)
 			{
-				printf("Maestro paused.\n");
+				printf("Pololu paused.\n");
 				bConnected = FALSE;
-				DisconnectMaestro(&maestro);
+				DisconnectPololu(&pololu);
 			}
 			if (bExit) break;
 			mSleep(100);
 			continue;
 		}
 
-		if (bRestartMaestro) 
+		if (bRestartPololu[deviceid]) 
 		{
 			if (bConnected)
 			{
-				printf("Restarting a Maestro.\n");
+				printf("Restarting a Pololu.\n");
 				bConnected = FALSE;
-				DisconnectMaestro(&maestro);
+				DisconnectPololu(&pololu);
 			}
-			bRestartMaestro = FALSE;
+			bRestartPololu[deviceid] = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectMaestro(&maestro, "Maestro0.txt") == EXIT_SUCCESS) 
+			if (ConnectPololu(&pololu, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				mSleep(50);
 				bConnected = TRUE; 
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				if (maestro.vbat1analoginputchan != -1) vbat1_filtered = maestro.vbat1analoginputvaluethreshold; else vbat1_filtered = 0;
-				if (maestro.vbat1analoginputchan != -1) vbat1_threshold = maestro.vbat1analoginputvaluethreshold; else vbat1_threshold = 0;
-				if (maestro.ibat1analoginputchan != -1) ibat1_filtered = maestro.ibat1analoginputvaluethreshold; else ibat1_filtered = 0;
-				if (maestro.vbat2analoginputchan != -1) vbat2_filtered = maestro.vbat2analoginputvaluethreshold; else vbat2_filtered = 0;
-				if (maestro.vbat2analoginputchan != -1) vbat2_threshold = maestro.vbat2analoginputvaluethreshold; else vbat2_threshold = 0;
-				if (maestro.ibat2analoginputchan != -1) ibat2_filtered = maestro.ibat2analoginputvaluethreshold; else ibat2_filtered = 0;
-				vswitchcoef = maestro.switchanaloginputvaluecoef;
-				vswitchthreshold = maestro.switchanaloginputvaluethreshold;
+				if (pololu.vbat1analoginputchan != -1) vbat1_filtered = pololu.vbat1analoginputvaluethreshold; else vbat1_filtered = 0;
+				if (pololu.vbat1analoginputchan != -1) vbat1_threshold = pololu.vbat1analoginputvaluethreshold; else vbat1_threshold = 0;
+				if (pololu.ibat1analoginputchan != -1) ibat1_filtered = pololu.ibat1analoginputvaluethreshold; else ibat1_filtered = 0;
+				if (pololu.vbat2analoginputchan != -1) vbat2_filtered = pololu.vbat2analoginputvaluethreshold; else vbat2_filtered = 0;
+				if (pololu.vbat2analoginputchan != -1) vbat2_threshold = pololu.vbat2analoginputvaluethreshold; else vbat2_threshold = 0;
+				if (pololu.ibat2analoginputchan != -1) ibat2_filtered = pololu.ibat2analoginputvaluethreshold; else ibat2_filtered = 0;
+				vswitchcoef = pololu.switchanaloginputvaluecoef;
+				vswitchthreshold = pololu.switchanaloginputvaluethreshold;
 
 				LeaveCriticalSection(&StateVariablesCS);
 
-				if (maestro.pfSaveFile != NULL)
+				if (pololu.pfSaveFile != NULL)
 				{
-					fclose(maestro.pfSaveFile); 
-					maestro.pfSaveFile = NULL;
+					fclose(pololu.pfSaveFile); 
+					pololu.pfSaveFile = NULL;
 				}
-				if ((maestro.bSaveRawData)&&(maestro.pfSaveFile == NULL)) 
+				if ((pololu.bSaveRawData)&&(pololu.pfSaveFile == NULL)) 
 				{
-					if (strlen(maestro.szCfgFilePath) > 0)
+					if (strlen(pololu.szCfgFilePath) > 0)
 					{
-						sprintf(szTemp, "%.127s", maestro.szCfgFilePath);
+						sprintf(szTemp, "%.127s", pololu.szCfgFilePath);
 					}
 					else
 					{
-						sprintf(szTemp, "maestro");
+						sprintf(szTemp, "pololu");
 					}
 					// Remove the extension.
 					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
@@ -103,10 +105,10 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					EnterCriticalSection(&strtimeCS);
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtime_fns());
 					LeaveCriticalSection(&strtimeCS);
-					maestro.pfSaveFile = fopen(szSaveFilePath, "wb");
-					if (maestro.pfSaveFile == NULL) 
+					pololu.pfSaveFile = fopen(szSaveFilePath, "wb");
+					if (pololu.pfSaveFile == NULL) 
 					{
-						printf("Unable to create Maestro data file.\n");
+						printf("Unable to create Pololu data file.\n");
 						break;
 					}
 				}
@@ -123,15 +125,15 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			{
 			case BUGGY_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
-				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersFluxMaestro(&maestro, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
+				if (SetRudderThrustersFluxPololu(&pololu, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
@@ -140,32 +142,32 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			case SAILBOAT_ROBID:
 				counter_modulo = 11;
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
-				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+				if (SetRudderThrusterPololu(&pololu, rudder, thrust) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
 				mSleep(10);
-				if (maestro.winddiranaloginputchan != -1) // Special value to indicate to disable the wind sensor...
+				if (pololu.winddiranaloginputchan != -1) // Special value to indicate to disable the wind sensor...
 				{
-					if (GetValueMaestro(&maestro, maestro.winddiranaloginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValuePololu(&pololu, pololu.winddiranaloginputchan, &ivalue) != EXIT_SUCCESS)
 					{
-						printf("Connection to a Maestro lost.\n");
+						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
+						DisconnectPololu(&pololu);
 						mSleep(50);
 						break;
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					winddir = fmod_360(ivalue*maestro.winddiranaloginputvaluecoef+maestro.winddiranaloginputvalueoffset+180.0)+180.0;
+					winddir = fmod_360(ivalue*pololu.winddiranaloginputvaluecoef+pololu.winddiranaloginputvalueoffset+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
@@ -179,27 +181,27 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				else mSleep(20);
 				if (counter%counter_modulo == 0)
 				{
-					if (GetValueMaestro(&maestro, maestro.vbat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValuePololu(&pololu, pololu.vbat1analoginputchan, &ivalue) != EXIT_SUCCESS)
 					{
-						printf("Connection to a Maestro lost.\n");
+						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
+						DisconnectPololu(&pololu);
 						mSleep(50);
 						break;
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vbat1 = maestro.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+maestro.vbat1analoginputvalueoffset; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					vbat1 = pololu.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+pololu.vbat1analoginputvalueoffset; // *10.10101 for V, *18.00 for I, see sensor documentation...	
 					vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if (counter%counter_modulo == 5)
 				{
-					if (GetValueMaestro(&maestro, maestro.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValuePololu(&pololu, pololu.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
 					{
-						printf("Connection to a Maestro lost.\n");
+						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
+						DisconnectPololu(&pololu);
 						mSleep(50);
 						break;
 					}
@@ -215,32 +217,32 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			case SAILBOAT2_ROBID:
 				counter_modulo = 16;
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
-				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersMaestro(&maestro, rudder, thrust, thrust) != EXIT_SUCCESS)
+				if (SetRudderThrustersPololu(&pololu, rudder, thrust, thrust) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
 				mSleep(10);
-				if (maestro.winddiranaloginputchan != -1) // Special value to indicate to disable the wind sensor...
+				if (pololu.winddiranaloginputchan != -1) // Special value to indicate to disable the wind sensor...
 				{
-					if (GetValueMaestro(&maestro, maestro.winddiranaloginputchan, &ivalue) != EXIT_SUCCESS)
+					if (GetValuePololu(&pololu, pololu.winddiranaloginputchan, &ivalue) != EXIT_SUCCESS)
 					{
-						printf("Connection to a Maestro lost.\n");
+						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
+						DisconnectPololu(&pololu);
 						mSleep(50);
 						break;
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					winddir = fmod_360(ivalue*maestro.winddiranaloginputvaluecoef+maestro.winddiranaloginputvalueoffset+180.0)+180.0;
+					winddir = fmod_360(ivalue*pololu.winddiranaloginputvaluecoef+pololu.winddiranaloginputvalueoffset+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
@@ -254,19 +256,19 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				else mSleep(20);
 				if (counter%counter_modulo == 0)
 				{
-					if (maestro.vbat1analoginputchan != -1)
+					if (pololu.vbat1analoginputchan != -1)
 					{
-						if (GetValueMaestro(&maestro, maestro.vbat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+						if (GetValuePololu(&pololu, pololu.vbat1analoginputchan, &ivalue) != EXIT_SUCCESS)
 						{
-							printf("Connection to a Maestro lost.\n");
+							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
-							DisconnectMaestro(&maestro);
+							DisconnectPololu(&pololu);
 							mSleep(50);
 							break;
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						vbat1 = maestro.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+maestro.vbat1analoginputvalueoffset;
+						vbat1 = pololu.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+pololu.vbat1analoginputvalueoffset;
 						vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -274,19 +276,19 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				else if (counter%counter_modulo == 3)
 				{
-					if (maestro.ibat1analoginputchan != -1)
+					if (pololu.ibat1analoginputchan != -1)
 					{
-						if (GetValueMaestro(&maestro, maestro.ibat1analoginputchan, &ivalue) != EXIT_SUCCESS)
+						if (GetValuePololu(&pololu, pololu.ibat1analoginputchan, &ivalue) != EXIT_SUCCESS)
 						{
-							printf("Connection to a Maestro lost.\n");
+							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
-							DisconnectMaestro(&maestro);
+							DisconnectPololu(&pololu);
 							mSleep(50);
 							break;
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						ibat1 = maestro.ibat1analoginputvaluecoef*ivalue*5.0/1023.0+maestro.ibat1analoginputvalueoffset;
+						ibat1 = pololu.ibat1analoginputvaluecoef*ivalue*5.0/1023.0+pololu.ibat1analoginputvalueoffset;
 						ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -294,19 +296,19 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				else if (counter%counter_modulo == 6)
 				{
-					if (maestro.vbat2analoginputchan != -1)
+					if (pololu.vbat2analoginputchan != -1)
 					{
-						if (GetValueMaestro(&maestro, maestro.vbat2analoginputchan, &ivalue) != EXIT_SUCCESS)
+						if (GetValuePololu(&pololu, pololu.vbat2analoginputchan, &ivalue) != EXIT_SUCCESS)
 						{
-							printf("Connection to a Maestro lost.\n");
+							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
-							DisconnectMaestro(&maestro);
+							DisconnectPololu(&pololu);
 							mSleep(50);
 							break;
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						vbat2 = maestro.vbat2analoginputvaluecoef*ivalue*5.0/1023.0+maestro.vbat2analoginputvalueoffset;
+						vbat2 = pololu.vbat2analoginputvaluecoef*ivalue*5.0/1023.0+pololu.vbat2analoginputvalueoffset;
 						vbat2_filtered = bat_filter_coef*vbat2_filtered+(1.0-bat_filter_coef)*vbat2;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -314,19 +316,19 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				else if (counter%counter_modulo == 9)
 				{
-					if (maestro.ibat2analoginputchan != -1)
+					if (pololu.ibat2analoginputchan != -1)
 					{
-						if (GetValueMaestro(&maestro, maestro.ibat2analoginputchan, &ivalue) != EXIT_SUCCESS)
+						if (GetValuePololu(&pololu, pololu.ibat2analoginputchan, &ivalue) != EXIT_SUCCESS)
 						{
-							printf("Connection to a Maestro lost.\n");
+							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
-							DisconnectMaestro(&maestro);
+							DisconnectPololu(&pololu);
 							mSleep(50);
 							break;
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						ibat2 = maestro.ibat2analoginputvaluecoef*ivalue*5.0/1023.0+maestro.ibat2analoginputvalueoffset;
+						ibat2 = pololu.ibat2analoginputvaluecoef*ivalue*5.0/1023.0+pololu.ibat2analoginputvalueoffset;
 						ibat2_filtered = bat_filter_coef*ibat2_filtered+(1.0-bat_filter_coef)*ibat2;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -334,13 +336,13 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				}
 				else if (counter%counter_modulo == 12)
 				{
-					if (maestro.switchanaloginputchan != -1)
+					if (pololu.switchanaloginputchan != -1)
 					{
-						if (GetValueMaestro(&maestro, maestro.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
+						if (GetValuePololu(&pololu, pololu.switchanaloginputchan, &ivalue) != EXIT_SUCCESS)
 						{
-							printf("Connection to a Maestro lost.\n");
+							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
-							DisconnectMaestro(&maestro);
+							DisconnectPololu(&pololu);
 							mSleep(50);
 							break;
 						}
@@ -357,14 +359,14 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
-				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderMaestro(&maestro, rudder) != EXIT_SUCCESS)
+				if (SetRudderPololu(&pololu, rudder) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
@@ -373,8 +375,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
-				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
 				thrust = fabs(u);
 				if (bEnableBackwardsMotorboat)
 				{
@@ -386,11 +388,11 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 					flux = 1;
 				}
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersFluxMaestro(&maestro, rudder, thrust, thrust, flux, flux) != EXIT_SUCCESS)
+				if (SetRudderThrustersFluxPololu(&pololu, rudder, thrust, thrust, flux, flux) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
@@ -398,8 +400,8 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 #else
 				UNREFERENCED_PARAMETER(flux);
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = maestro.MinAngle; ruddermaxangle = maestro.MaxAngle;
-				rudder = ((maestro.MaxAngle+maestro.MinAngle)/2.0)-uw*((maestro.MaxAngle-maestro.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
 				thrust = u;
 				if (!bEnableBackwardsMotorboat)
 				{
@@ -408,24 +410,24 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				LeaveCriticalSection(&StateVariablesCS);
 
 				// Temporary method to handle a Pololu Jrk motor controller for Boatbot...
-				if (maestro.PololuType == 1)
+				if (pololu.PololuType == 1)
 				{
-					if (SetRudderJrkMaestro(&maestro, rudder) != EXIT_SUCCESS)
+					if (SetRudderJrkPololu(&pololu, rudder) != EXIT_SUCCESS)
 					{
-						printf("Connection to a Maestro lost.\n");
+						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
+						DisconnectPololu(&pololu);
 						mSleep(50);
 						break;
 					}
 				}
 				else
 				{
-					if (SetRudderThrusterMaestro(&maestro, rudder, thrust) != EXIT_SUCCESS)
+					if (SetRudderThrusterPololu(&pololu, rudder, thrust) != EXIT_SUCCESS)
 					{
-						printf("Connection to a Maestro lost.\n");
+						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
-						DisconnectMaestro(&maestro);
+						DisconnectPololu(&pololu);
 						mSleep(50);
 						break;
 					}
@@ -441,11 +443,11 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				thrust2 = u2;
 				thrust3 = u3;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetRudderThrustersFluxMaestro(&maestro, 0, thrust1, thrust2, thrust3, 0) != EXIT_SUCCESS)
+				if (SetRudderThrustersFluxPololu(&pololu, 0, thrust1, thrust2, thrust3, 0) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
@@ -458,11 +460,11 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 				thrust1 = u1;
 				thrust2 = u2;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetThrustersMaestro(&maestro, thrust1, thrust2) != EXIT_SUCCESS)
+				if (SetThrustersPololu(&pololu, thrust1, thrust2) != EXIT_SUCCESS)
 				{
-					printf("Connection to a Maestro lost.\n");
+					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
-					DisconnectMaestro(&maestro);
+					DisconnectPololu(&pololu);
 					mSleep(50);
 					break;
 				}
@@ -471,7 +473,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 			}
 		}
 
-		//printf("MaestroThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		//printf("PololuThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
 
 		if (bExit) break;
 	}
@@ -479,7 +481,7 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 	switch (robid)
 	{
 	case BUGGY_ROBID:
-		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);
+		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
 		mSleep(50);
 		break;
 	case SAILBOAT_ROBID:
@@ -488,36 +490,36 @@ THREAD_PROC_RETURN_VALUE MaestroThread(void* pParam)
 		break;
 	case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
-		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);
+		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
 		mSleep(50);
 #else
-		SetRudderThrusterMaestro(&maestro, 0, 0);
+		SetRudderThrusterPololu(&pololu, 0, 0);
 		mSleep(50);
 #endif // USE_MOTORBOAT_WITH_FLUX
 		break;
 	case COPTER_ROBID:
 	case SAUCISSE_ROBID:
 	case SARDINE_ROBID:
-		SetRudderThrustersFluxMaestro(&maestro, 0, 0, 0, 0, 0);
+		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
 		mSleep(50);
 		break;
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:
 	default:
-		SetThrustersMaestro(&maestro, 0, 0);
+		SetThrustersPololu(&pololu, 0, 0);
 		mSleep(50);
 		break;
 	}
 
 	StopChronoQuick(&chrono_period);
 
-	if (maestro.pfSaveFile != NULL)
+	if (pololu.pfSaveFile != NULL)
 	{
-		fclose(maestro.pfSaveFile); 
-		maestro.pfSaveFile = NULL;
+		fclose(pololu.pfSaveFile); 
+		pololu.pfSaveFile = NULL;
 	}
 
-	if (bConnected) DisconnectMaestro(&maestro);
+	if (bConnected) DisconnectPololu(&pololu);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

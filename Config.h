@@ -111,7 +111,9 @@ inline int LoadConfig(void)
 	bDisableSwarmonDevice = TRUE;
 	bDisableUE9A = TRUE;
 	bDisableSSC32 = TRUE;
-	bDisableMaestro = TRUE;
+	bDisablePololu[0] = TRUE;
+	bDisablePololu[1] = TRUE;
+	bDisablePololu[2] = TRUE;
 	bDisableMiniSSC = TRUE;
 	bDisableIM483I = TRUE;
 #pragma endregion
@@ -438,7 +440,11 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableSSC32) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bDisableMaestro) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablePololu[0]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablePololu[1]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablePololu[2]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMiniSSC) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1305,7 +1311,11 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableSSC32) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%d\n", bDisableMaestro) < 0) printf("Error writing configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisablePololu[0]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisablePololu[1]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisablePololu[2]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableMiniSSC) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1973,7 +1983,7 @@ inline int DisplayKeys(void)
 		"m(toggle map),M(toggle Map),*(rotate map),i(toggle image),$(toggle sonar),;(other overlays),X(disableopencvgui),+-(coordspace zoom),"
 		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),V(enable/disableautodvllocalization),"
 		"Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
-		"P(snapshot),r(record),p(mission),x(abort),h(help),I(extra info),!?(battery),"
+		"P(snapshot),r(record),p(mission),x(abort),h(help),!(alarms),?(battery),"
 		"bn(lights),uNj(camera tilt),F(alt RC mode),.(rearm),0(disarm),"
 		"ENTER(extended menu), ESC(exit)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 

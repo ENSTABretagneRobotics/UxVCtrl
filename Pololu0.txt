@@ -7,9 +7,9 @@ COM6
 1000
 % bSaveRawData
 1
-% PololuType (0 : Maestro, 1 : Jrk)
+% PololuType (0 : Pololu, 1 : Jrk)
 0
-% DeviceNumber (default is 12 for Maestro, 11 for Jrk)
+% DeviceNumber (default is 12 for Pololu, 11 for Jrk)
 12
 % channel 0
 % MinPW (in us)

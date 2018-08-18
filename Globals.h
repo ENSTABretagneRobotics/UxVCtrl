@@ -126,6 +126,7 @@ typedef enum KEYS KEYS;
 #define MAX_NB_NMEADEVICE 2
 #define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 2
+#define MAX_NB_POLOLU 3
 
 #define MAX_NB_WP 1024
 
@@ -335,7 +336,7 @@ extern BOOL bDisableMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bDisableSwarmonDevice;
 extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
-extern BOOL bDisableMaestro;
+extern BOOL bDisablePololu[MAX_NB_POLOLU];
 extern BOOL bDisableMiniSSC;
 extern BOOL bDisableIM483I;
 #pragma endregion
@@ -680,8 +681,9 @@ extern BOOL bPauseUE9A, bRestartUE9A;
 // SSC32 variables.
 extern BOOL bPauseSSC32, bRestartSSC32;
 
-// Maestro variables.
-extern BOOL bPauseMaestro, bRestartMaestro;
+// Pololu variables.
+extern BOOL bPausePololu[MAX_NB_POLOLU];
+extern BOOL bRestartPololu[MAX_NB_POLOLU];
 
 // MiniSSC variables.
 extern BOOL bPauseMiniSSC, bRestartMiniSSC;
@@ -961,6 +963,12 @@ inline int InitGlobals(void)
 		bRestartMAVLinkDevice[i] = FALSE;
 	}
 
+	for (i = 0; i < MAX_NB_POLOLU; i++)
+	{
+		bPausePololu[i] = FALSE;
+		bRestartPololu[i] = FALSE;
+	}
+
 #ifndef DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < nbvideo; i++)
 	{
@@ -1141,9 +1149,14 @@ inline int ReleaseGlobals(void)
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
 
+	for (i = MAX_NB_POLOLU-1; i >= 0; i--)
+	{
+		bRestartPololu[i] = FALSE;
+		bPausePololu[i] = FALSE;
+	}
+
 	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)
 	{
-		RTCMuserslist.pop_back();
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
 		GNSSqualityMAVLinkDevice[i] = 0;
@@ -1151,6 +1164,7 @@ inline int ReleaseGlobals(void)
 
 	for (i = MAX_NB_UBLOX-1; i >= 0; i--)
 	{
+		RTCMuserslist.pop_back();
 		bRestartublox[i] = FALSE;
 		bPauseublox[i] = FALSE;
 		GNSSqualityublox[i] = 0;

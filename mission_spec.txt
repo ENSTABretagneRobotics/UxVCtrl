@@ -214,7 +214,7 @@
 %
 %ssc32config SSC32.txt bPause
 %
-%maestroconfig Maestro.txt bPause
+%pololuconfig deviceid Pololu.txt bPause
 %
 %minisscconfig MiniSSC.txt bPause
 %

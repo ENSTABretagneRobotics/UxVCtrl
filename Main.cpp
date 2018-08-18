@@ -67,7 +67,7 @@
 #endif // ENABLE_LABJACK_SUPPORT
 #include "SSC32.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-#include "Maestro.h"
+#include "Pololu.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "MiniSSC.h"
 #include "IM483I.h"
@@ -95,7 +95,7 @@
 #include <valgrind/memcheck.h>
 #endif // !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
 	int i = 0;
 	BOOL bGUIAvailable = FALSE;
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_LABJACK_SUPPORT
 	THREAD_IDENTIFIER SSC32ThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-	THREAD_IDENTIFIER MaestroThreadId;
+	THREAD_IDENTIFIER PololuThreadId[MAX_NB_POLOLU];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MiniSSCThreadId;
 	THREAD_IDENTIFIER IM483IThreadId;
@@ -293,7 +293,10 @@ int main(int argc, char* argv[])
 #endif // ENABLE_LABJACK_SUPPORT
 	if (!bDisableSSC32) CreateDefaultThread(SSC32Thread, NULL, &SSC32ThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-	if (!bDisableMaestro) CreateDefaultThread(MaestroThread, NULL, &MaestroThreadId);
+	for (i = 0; i < MAX_NB_POLOLU; i++)
+	{
+		if (!bDisablePololu[i]) CreateDefaultThread(PololuThread, (void*)(intptr_t)i, &PololuThreadId[i]);
+	}
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMiniSSC) CreateDefaultThread(MiniSSCThread, NULL, &MiniSSCThreadId);
 	if (!bDisableIM483I) CreateDefaultThread(IM483IThread, NULL, &IM483IThreadId);
@@ -334,16 +337,16 @@ int main(int argc, char* argv[])
 		"Usage : \n"
 		"\t%s mission.txt\n"
 		"\t\tor\n"
-		"\t%s\n", 
+		"\t%s\n",
 		argv[0], argv[0]);
-	if ((argc < 2)&&(!bCommandPrompt)) 
+	if ((argc < 2)&&(!bCommandPrompt))
 	{
 		bGUIAvailable = FALSE;
 		for (i = 0; i < nbvideo; i++)
 		{
 			bGUIAvailable = bGUIAvailable||bEnableOpenCVGUIs[i];
 		}
-		if (!bGUIAvailable) 
+		if (!bGUIAvailable)
 		{
 			printf("No mission file specified as argument, command prompt disabled, no video GUI : will stop.\n");
 			bExit = TRUE;
@@ -356,7 +359,7 @@ int main(int argc, char* argv[])
 		WaitForThread(OpenCVGUIThreadId[i]);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
-	if (bCommandPrompt) 
+	if (bCommandPrompt)
 	{
 		if (bExit)
 		{
@@ -418,7 +421,10 @@ int main(int argc, char* argv[])
 	if (!bDisableIM483I) WaitForThread(IM483IThreadId);
 	if (!bDisableMiniSSC) WaitForThread(MiniSSCThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-	if (!bDisableMaestro) WaitForThread(MaestroThreadId);
+	for (i = MAX_NB_POLOLU-1; i >= 0; i--)
+	{
+		if (!bDisablePololu[i]) WaitForThread(PololuThreadId[i]);
+	}
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableSSC32) WaitForThread(SSC32ThreadId);
 #ifdef ENABLE_LABJACK_SUPPORT

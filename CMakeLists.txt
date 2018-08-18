@@ -80,7 +80,7 @@ if(WIN32)
 	endif()
 endif()
 
-add_executable(UxVCtrl Observer.cpp NMEAInterface.cpp Main.cpp Globals.cpp Controller.cpp Config.cpp Computations.cpp Commands.cpp Hardware/ublox.cpp Hardware/RS232Port.cpp Hardware/RazorAHRS.cpp Hardware/NMEADevice.cpp Hardware/Maestro.cpp Hardware/gpControl.cpp ../interval/imatrix.cpp ../interval/rmatrix.cpp ../interval/box.cpp ../interval/interval.cpp ../interval/iboolean.cpp ../OSUtils/OSTimer.c ../OSUtils/OSTime.c ../OSUtils/OSThread.c ../OSUtils/OSSem.c ../OSUtils/OSNet.c ../OSUtils/OSMisc.c ../OSUtils/OSEv.c ../OSUtils/OSCriticalSection.c ../OSUtils/OSCore.c ../OSUtils/OSComputerRS232Port.c)
+add_executable(UxVCtrl Observer.cpp NMEAInterface.cpp Main.cpp Globals.cpp Controller.cpp Config.cpp Computations.cpp Commands.cpp Hardware/ublox.cpp Hardware/RS232Port.cpp Hardware/RazorAHRS.cpp Hardware/Pololu.cpp Hardware/NMEADevice.cpp Hardware/gpControl.cpp ../interval/imatrix.cpp ../interval/rmatrix.cpp ../interval/box.cpp ../interval/interval.cpp ../interval/iboolean.cpp ../OSUtils/OSTimer.c ../OSUtils/OSTime.c ../OSUtils/OSThread.c ../OSUtils/OSSem.c ../OSUtils/OSNet.c ../OSUtils/OSMisc.c ../OSUtils/OSEv.c ../OSUtils/OSCriticalSection.c ../OSUtils/OSCore.c ../OSUtils/OSComputerRS232Port.c)
 
 if(WIN32)
 	option(ENABLE_CVKINECT2SDKHOOK "ENABLE_CVKINECT2SDKHOOK" OFF)

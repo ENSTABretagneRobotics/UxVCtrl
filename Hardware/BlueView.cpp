@@ -15,20 +15,24 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 	BLUEVIEW blueview;
 	int res = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
 
-	//UNREFERENCED_PARAMETER(pParam);
-
 	sprintf(szCfgFilePath, "BlueView%d.txt", deviceid);
 
 	memset(&blueview, 0, sizeof(BLUEVIEW));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
 		//mSleep(100);
 
 		if (bPauseBlueView[deviceid])
@@ -115,8 +119,12 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 			}		
 		}
 
+		//printf("BlueViewThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (strlen(blueview.szSaveFile) > 0)
 	{
