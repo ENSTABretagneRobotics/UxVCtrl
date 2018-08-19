@@ -1,21 +1,11 @@
-armbaserotationchan
-armrotation1chan
-armrotation2chan
-armrotation3chan
-armrotation4chan
-camtilt/panchan
-gripperclose/rotationchan
-trunk1,2,3,4
-extra1,2,3,4
-mettre 24 PWM dans fichier de config (suffit sans doute de changer MAX_NB_PWM...), rajouter commande showmaestropwm sous forme d'entier en ms
-
-Touches opencv gui->uNj(camera tilt), voir pour rajouter bras...
-
-Pouvoir lancer balltracking sans que ça fasse d'action?
-
-
+coefs energy...
 linefollowingtrelativerobot, HSL values pour obstacle...->mettre à jour mission...
+Pouvoir lancer balltracking sans que ça fasse d'action?
 tester avec appverif avec OpenCV disabled
+
+Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT)
+
+PololuInterfaceType, coefs simu...
 
 params taux de détection sur durée ou équivalents, execute procid not implemented for some detection functions...
 
@@ -44,8 +34,6 @@ rajouter commande setwindestimation/wgs avec unités des marins
 command wind filter coefs
 setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
 prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
-
-Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT), rajouter param biasrudderangle pour gérer le cas où on veut rajouter un biais par rapport au neutre normal (BOATBOT avec sondeur...)
 
 AHRS matrice de rotation, bras de levier...
 
@@ -433,13 +421,12 @@ sauvegarder e,phi,delta_psi dans wall?
 
 Actuators
 rajouter option rampe comme sur robot CCI...
-contrôle du bras, servos pan and tilt au min...
+Touches opencv gui->uNj(camera tilt), voir pour rajouter bras...
 Maestro, MAVLinkDevice : rajouter plus de channel PWM (24, 14), peut-être rajouter paramètre bEnable pour chacun si pas déjà plus ou moins fait, s'inspirer aussi de l'interface de Maestro Control Center...
 Maestro : avoir plus de flexibilité sur quel channel fait quoi...
-revoir mon organisation des pwm pour qu'ils puissent apparaitre sur n'importe quel chan > 5 en m'inspirant de la gestion des analogin de maestro...
+revoir mon organisation des pwm et analogin...
 Arm : mode not armable->set mode stabilize pour s'en sortir?
 MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM? rajouter touches spéciales pour changer mode (manual, stabilize, etc.), touches pour désactiver l'override...
-param midangle : changer les formules de conversion entre uw et rudder pour que ça puisse ne pas être symétrique...
 reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer des données...
 revoir l'organisation des actionneurs (IM483I, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
 Pin number (not used) dans config.txt, regarder fio ain de ue9...
@@ -568,6 +555,21 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+uw    idealangle                        realangle             pw
+      -0.75                             phyminangle=-0.5      1000
+      -0.125                            phymidangle=0         1500
+      0.5                               phymaxangle=0.5       2000
+-1    phyminangle-phymidangle=-0.5      minangle=-0.3         1200
+0     0                                 midangle=0.1          1600
+1     phymaxangle-phymidangle=0.5       maxangle=0.5          2000
+                                        -0.1                  1400
+
+phymaxangle=max(fabs(minangle),fabs(maxangle))=0.5
+phyminangle=-phymaxangle=-0.5
+phymidangle=0
+
+pouvoir rajouter un biais par rapport au neutre normal (BOATBOT avec sondeur...), mais peut-être déjà possible de le faire en fait avec les MidPW...
 
 waitxyt x y t
 waitxytrelative x y t

@@ -32,10 +32,9 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_POLOLU 512
 
-// Only the 5 first channels are used for the moment...
-#define NB_CHANNELS_PWM_POLOLU 5
-
 #define NB_CHANNELS_POLOLU 24
+
+#define NB_CHANNELS_PWM_POLOLU NB_CHANNELS_POLOLU
 
 // 11 in decimal...
 #define DEFAULT_DEVICE_NUMBER_JRK 0x0B
@@ -96,6 +95,19 @@ struct POLOLU
 	int leftthrusterchan;
 	int rightfluxchan;
 	int leftfluxchan;
+	int campanchan;
+	int camtiltchan;
+	int gripperclosechan;
+	int gripperrotationchan;
+	int armbaserotationchan;
+	int armrotation1chan;
+	int armrotation2chan;
+	int armrotation3chan;
+	int armrotation4chan;
+	int extra1chan;
+	int extra2chan;
+	int extra3chan;
+	int extra4chan;
 	int winddiranaloginputchan;
 	double winddiranaloginputvalueoffset;
 	double winddiranaloginputvaluethreshold;
@@ -131,7 +143,7 @@ struct POLOLU
 };
 typedef struct POLOLU POLOLU;
 
-// If analog input, voltage = value*5.0/1023.0. If digital input, bit = (value == 1023)? 1: 0;.
+// If analog input, voltage = value*5.0/1023.0 V. If digital input, bit = (value == 1023)? 1: 0. If digital output, bit = (value < 6000)? 0: 1. If servo, pw = value/4 us.
 inline int GetValuePololu(POLOLU* pPololu, int channel, int* pValue)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
@@ -457,19 +469,35 @@ inline int SetPWMJrkPololu(POLOLU* pPololu, int pw)
 	return EXIT_SUCCESS;
 }
 
+// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
 inline int SetRudderPololu(POLOLU* pPololu, double angle)
 {
 	int pw = 0;
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	// Convert angle (in rad) into Pololu pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pPololu->MidAngle+angle*(pPololu->MaxAngle-pPololu->MidAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)): pPololu->MidAngle+angle*(pPololu->MidAngle-pPololu->MinAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle));
+	//angletmp = angle >= 0? pPololu->MidAngle+urudder*(pPololu->MaxAngle-pPololu->MidAngle): pPololu->MidAngle+urudder*(pPololu->MidAngle-pPololu->MinAngle);
+	if (angletmp >= 0)
+		pw = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MID_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+	else
+		pw = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MID_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+#else
 	pw = DEFAULT_MID_PW_POLOLU+(int)(angle*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
 		/(pPololu->MaxAngle-pPololu->MinAngle));
+#endif // !DISABLE_POLOLU_MIDANGLE
 
 	pw = max(min(pw, DEFAULT_MAX_PW_POLOLU), DEFAULT_MIN_PW_POLOLU);
 
 	return SetPWMPololu(pPololu, pPololu->rudderchan, pw);
 }
 
+// u should be in [-1;1].
 inline int SetThrustersPololu(POLOLU* pPololu, double urt, double ult)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
@@ -491,38 +519,33 @@ inline int SetThrustersPololu(POLOLU* pPololu, double urt, double ult)
 	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
 }
 
-inline int SetFluxPololu(POLOLU* pPololu, double urf, double ulf)
-{
-	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
-	int pws[NB_CHANNELS_PWM_POLOLU];
-
-	memset(selectedchannels, 0, sizeof(selectedchannels));
-	memset(pws, 0, sizeof(pws));
-
-	// Convert u (in [-1;1]) into Pololu pulse width (in us).
-	pws[pPololu->rightfluxchan] = DEFAULT_MID_PW_POLOLU+(int)(urf*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
-	pws[pPololu->leftfluxchan] = DEFAULT_MID_PW_POLOLU+(int)(ulf*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
-
-	pws[pPololu->rightfluxchan] = max(min(pws[pPololu->rightfluxchan], DEFAULT_MAX_PW_POLOLU), DEFAULT_MIN_PW_POLOLU);
-	pws[pPololu->leftfluxchan] = max(min(pws[pPololu->leftfluxchan], DEFAULT_MAX_PW_POLOLU), DEFAULT_MIN_PW_POLOLU);
-
-	selectedchannels[pPololu->rightfluxchan] = 1;
-	selectedchannels[pPololu->leftfluxchan] = 1;
-
-	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
-}
-
+// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrusterPololu(POLOLU* pPololu, double angle, double urt)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
 	int pws[NB_CHANNELS_PWM_POLOLU];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into Pololu pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pPololu->MidAngle+angle*(pPololu->MaxAngle-pPololu->MidAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)): pPololu->MidAngle+angle*(pPololu->MidAngle-pPololu->MinAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle));
+	//angletmp = angle >= 0? pPololu->MidAngle+urudder*(pPololu->MaxAngle-pPololu->MidAngle): pPololu->MidAngle+urudder*(pPololu->MidAngle-pPololu->MinAngle);
+	if (angletmp >= 0)
+		pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MID_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+	else
+		pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MID_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+#else
 	pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angle*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
 		/(pPololu->MaxAngle-pPololu->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into Pololu pulse width (in us).
 	pws[pPololu->rightthrusterchan] = DEFAULT_MID_PW_POLOLU+(int)(urt*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
 
@@ -535,17 +558,33 @@ inline int SetRudderThrusterPololu(POLOLU* pPololu, double angle, double urt)
 	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
 }
 
+// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrustersPololu(POLOLU* pPololu, double angle, double urt, double ult)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
 	int pws[NB_CHANNELS_PWM_POLOLU];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into Pololu pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pPololu->MidAngle+angle*(pPololu->MaxAngle-pPololu->MidAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)): pPololu->MidAngle+angle*(pPololu->MidAngle-pPololu->MinAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle));
+	//angletmp = angle >= 0? pPololu->MidAngle+urudder*(pPololu->MaxAngle-pPololu->MidAngle): pPololu->MidAngle+urudder*(pPololu->MidAngle-pPololu->MinAngle);
+	if (angletmp >= 0)
+		pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MID_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+	else
+		pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MID_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+#else
 	pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angle*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
 		/(pPololu->MaxAngle-pPololu->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into Pololu pulse width (in us).
 	pws[pPololu->rightthrusterchan] = DEFAULT_MID_PW_POLOLU+(int)(urt*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
 	pws[pPololu->leftthrusterchan] = DEFAULT_MID_PW_POLOLU+(int)(ult*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
@@ -561,17 +600,33 @@ inline int SetRudderThrustersPololu(POLOLU* pPololu, double angle, double urt, d
 	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
 }
 
+// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrustersFluxPololu(POLOLU* pPololu, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
 	int pws[NB_CHANNELS_PWM_POLOLU];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into Pololu pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pPololu->MidAngle+angle*(pPololu->MaxAngle-pPololu->MidAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)): pPololu->MidAngle+angle*(pPololu->MidAngle-pPololu->MinAngle)/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle));
+	//angletmp = angle >= 0? pPololu->MidAngle+urudder*(pPololu->MaxAngle-pPololu->MidAngle): pPololu->MidAngle+urudder*(pPololu->MidAngle-pPololu->MinAngle);
+	if (angletmp >= 0)
+		pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MID_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+	else
+		pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MID_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle), fabs(pPololu->MaxAngle)));
+#else
 	pws[pPololu->rudderchan] = DEFAULT_MID_PW_POLOLU+(int)(angle*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
 		/(pPololu->MaxAngle-pPololu->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into Pololu pulse width (in us).
 	pws[pPololu->rightthrusterchan] = DEFAULT_MID_PW_POLOLU+(int)(urt*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
 	pws[pPololu->leftthrusterchan] = DEFAULT_MID_PW_POLOLU+(int)(ult*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0);
@@ -594,6 +649,7 @@ inline int SetRudderThrustersFluxPololu(POLOLU* pPololu, double angle, double ur
 }
 
 // Pololu Jrk motor controller quick adaptation (default device number is 11)...
+// u should be in [-1;1].
 inline int SetMotorJrkPololu(POLOLU* pPololu, double umotor)
 {
 	int pw = 0;
@@ -607,13 +663,28 @@ inline int SetMotorJrkPololu(POLOLU* pPololu, double umotor)
 }
 
 // Pololu Jrk motor controller quick adaptation (default device number is 11)...
+// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
 inline int SetRudderJrkPololu(POLOLU* pPololu, double angle)
 {
 	int pw = 0;
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	// Convert angle (in rad) into Pololu pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pPololu->MidAngle+angle*(pPololu->MaxAngle-pPololu->MidAngle)/max(fabs(pPololu->MinAngle),fabs(pPololu->MaxAngle)): pPololu->MidAngle+angle*(pPololu->MidAngle-pPololu->MinAngle)/max(fabs(pPololu->MinAngle),fabs(pPololu->MaxAngle));
+	//angletmp = angle >= 0? pPololu->MidAngle+urudder*(pPololu->MaxAngle-pPololu->MidAngle): pPololu->MidAngle+urudder*(pPololu->MidAngle-pPololu->MinAngle);
+	if (angletmp >= 0)
+		pw = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MID_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle),fabs(pPololu->MaxAngle)));
+	else
+		pw = DEFAULT_MID_PW_POLOLU+(int)(angletmp*(DEFAULT_MID_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
+			/max(fabs(pPololu->MinAngle),fabs(pPololu->MaxAngle)));
+#else
 	pw = DEFAULT_MID_PW_POLOLU+(int)(angle*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)
 		/(pPololu->MaxAngle-pPololu->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	pw = max(min(pw, DEFAULT_MAX_PW_POLOLU), DEFAULT_MIN_PW_POLOLU);
 
@@ -654,17 +725,6 @@ inline int CheckPololu(POLOLU* pPololu)
 	}
 	mSleep(2000);
 	if (SetThrustersPololu(pPololu, 0.0, 0.0) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(2000);
-
-	if (SetFluxPololu(pPololu, -0.25, -0.25) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(2000);
-	if (SetFluxPololu(pPololu, 0.25, 0.25) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -712,6 +772,19 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 		pPololu->leftthrusterchan = 0;
 		pPololu->rightfluxchan = 4;
 		pPololu->leftfluxchan = 3;
+		pPololu->campanchan = 7;
+		pPololu->camtiltchan = 8;
+		pPololu->gripperclosechan = 9;
+		pPololu->gripperrotationchan = 10;
+		pPololu->armbaserotationchan = 11;
+		pPololu->armrotation1chan = 12;
+		pPololu->armrotation2chan = 13;
+		pPololu->armrotation3chan = 14;
+		pPololu->armrotation4chan = 15;
+		pPololu->extra1chan = 16;
+		pPololu->extra2chan = 17;
+		pPololu->extra3chan = 18;
+		pPololu->extra4chan = 19;
 		pPololu->winddiranaloginputchan = -1;
 		pPololu->winddiranaloginputvalueoffset = 0;
 		pPololu->winddiranaloginputvaluethreshold = 0;
@@ -790,6 +863,32 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pPololu->rightfluxchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->leftfluxchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->campanchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->camtiltchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->gripperclosechan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->gripperrotationchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->armbaserotationchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->armrotation1chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->armrotation2chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->armrotation3chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->armrotation4chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->extra1chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->extra2chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->extra3chan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->extra4chan) != 1) printf("Invalid configuration file.\n");
 			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->winddiranaloginputchan) != 1) printf("Invalid configuration file.\n");
@@ -928,6 +1027,71 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 	{
 		printf("Invalid parameter : leftfluxchan.\n");
 		pPololu->leftfluxchan = 3;
+	}
+	if ((pPololu->campanchan < 0)||(pPololu->campanchan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : campanchan.\n");
+		pPololu->campanchan = 7;
+	}
+	if ((pPololu->camtiltchan < 0)||(pPololu->camtiltchan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : camtiltchan.\n");
+		pPololu->camtiltchan = 8;
+	}
+	if ((pPololu->gripperclosechan < 0)||(pPololu->gripperclosechan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : gripperclosechan.\n");
+		pPololu->gripperclosechan = 9;
+	}
+	if ((pPololu->gripperrotationchan < 0)||(pPololu->gripperrotationchan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : gripperrotationchan.\n");
+		pPololu->gripperrotationchan = 10;
+	}
+	if ((pPololu->armbaserotationchan < 0)||(pPololu->armbaserotationchan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : armbaserotationchan.\n");
+		pPololu->armbaserotationchan = 11;
+	}
+	if ((pPololu->armrotation1chan < 0)||(pPololu->armrotation1chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : armrotation1chan.\n");
+		pPololu->armrotation1chan = 12;
+	}
+	if ((pPololu->armrotation2chan < 0)||(pPololu->armrotation2chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : armrotation2chan.\n");
+		pPololu->armrotation2chan = 13;
+	}
+	if ((pPololu->armrotation3chan < 0)||(pPololu->armrotation3chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : armrotation3chan.\n");
+		pPololu->armrotation3chan = 14;
+	}
+	if ((pPololu->armrotation4chan < 0)||(pPololu->armrotation4chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : armrotation4chan.\n");
+		pPololu->armrotation4chan = 15;
+	}
+	if ((pPololu->extra1chan < 0)||(pPololu->extra1chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : extra1chan.\n");
+		pPololu->extra1chan = 16;
+	}
+	if ((pPololu->extra2chan < 0)||(pPololu->extra2chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : extra2chan.\n");
+		pPololu->extra2chan = 17;
+	}
+	if ((pPololu->extra3chan < 0)||(pPololu->extra3chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : extra3chan.\n");
+		pPololu->extra3chan = 18;
+	}
+	if ((pPololu->extra4chan < 0)||(pPololu->extra4chan >= NB_CHANNELS_PWM_POLOLU))
+	{
+		printf("Invalid parameter : extra4chan.\n");
+		pPololu->extra4chan = 19;
 	}
 	if ((pPololu->winddiranaloginputchan < -1)||(pPololu->winddiranaloginputchan >= NB_CHANNELS_POLOLU))
 	{

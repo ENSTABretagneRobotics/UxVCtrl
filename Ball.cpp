@@ -9,6 +9,7 @@
 
 #include "Ball.h"
 
+// Need to be undefined at the end of the file...
 // min and max might cause incompatibilities with GCC...
 #ifndef _MSC_VER
 #ifndef max
@@ -807,3 +808,13 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 	return 0;
 }
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER

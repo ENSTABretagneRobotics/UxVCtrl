@@ -1,3 +1,8 @@
+248
+Updated bias support for rudders.
+Added showmaestrogetposition command.
+Updated Pololu and SSC32 to support up to 24 and 32 PWMs respectively.
+
 247
 Renamed Maestro to Pololu.
 

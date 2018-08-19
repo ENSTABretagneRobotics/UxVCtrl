@@ -32,8 +32,7 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_SSC32 512
 
-// Only the 5 first channels are used for the moment...
-#define NB_CHANNELS_PWM_SSC32 5
+#define NB_CHANNELS_PWM_SSC32 32
 
 // In us.
 #define DEFAULT_ABSOLUTE_MIN_PW_SSC32 500
@@ -388,19 +387,35 @@ inline int SetAllPWMsSSC32(SSC32* pSSC32, int* selectedchannels, int* pws)
 	return EXIT_SUCCESS;
 }
 
+// angle should be in [-max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle))].
 inline int SetRudderSSC32(SSC32* pSSC32, double angle)
 {
 	int pw = 0;
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	// Convert angle (in rad) into SSC32 pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pSSC32->MidAngle+angle*(pSSC32->MaxAngle-pSSC32->MidAngle)/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)): pSSC32->MidAngle+angle*(pSSC32->MidAngle-pSSC32->MinAngle)/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle));
+	//angletmp = angle >= 0? pSSC32->MidAngle+urudder*(pSSC32->MaxAngle-pSSC32->MidAngle): pSSC32->MidAngle+urudder*(pSSC32->MidAngle-pSSC32->MinAngle);
+	if (angletmp >= 0)
+		pw = DEFAULT_MID_PW_SSC32+(int)(angletmp*(DEFAULT_MAX_PW_SSC32-DEFAULT_MID_PW_SSC32)
+			/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)));
+	else
+		pw = DEFAULT_MID_PW_SSC32+(int)(angletmp*(DEFAULT_MID_PW_SSC32-DEFAULT_MIN_PW_SSC32)
+			/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)));
+#else
 	pw = DEFAULT_MID_PW_SSC32+(int)(angle*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)
 		/(pSSC32->MaxAngle-pSSC32->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	pw = max(min(pw, DEFAULT_MAX_PW_SSC32), DEFAULT_MIN_PW_SSC32);
 
 	return SetPWMSSC32(pSSC32, pSSC32->rudderchan, pw);
 }
 
+// u should be in [-1;1].
 inline int SetThrustersSSC32(SSC32* pSSC32, double urt, double ult)
 {
 	int selectedchannels[NB_CHANNELS_PWM_SSC32];
@@ -422,38 +437,33 @@ inline int SetThrustersSSC32(SSC32* pSSC32, double urt, double ult)
 	return SetAllPWMsSSC32(pSSC32, selectedchannels, pws);
 }
 
-inline int SetFluxSSC32(SSC32* pSSC32, double urf, double ulf)
-{
-	int selectedchannels[NB_CHANNELS_PWM_SSC32];
-	int pws[NB_CHANNELS_PWM_SSC32];
-
-	memset(selectedchannels, 0, sizeof(selectedchannels));
-	memset(pws, 0, sizeof(pws));
-
-	// Convert u (in [-1;1]) into SSC32 pulse width (in us).
-	pws[pSSC32->rightfluxchan] = DEFAULT_MID_PW_SSC32+(int)(urf*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)/2.0);
-	pws[pSSC32->leftfluxchan] = DEFAULT_MID_PW_SSC32+(int)(ulf*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)/2.0);
-
-	pws[pSSC32->rightfluxchan] = max(min(pws[pSSC32->rightfluxchan], DEFAULT_MAX_PW_SSC32), DEFAULT_MIN_PW_SSC32);
-	pws[pSSC32->leftfluxchan] = max(min(pws[pSSC32->leftfluxchan], DEFAULT_MAX_PW_SSC32), DEFAULT_MIN_PW_SSC32);
-
-	selectedchannels[pSSC32->rightfluxchan] = 1;
-	selectedchannels[pSSC32->leftfluxchan] = 1;
-
-	return SetAllPWMsSSC32(pSSC32, selectedchannels, pws);
-}
-
+// angle should be in [-max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrusterSSC32(SSC32* pSSC32, double angle, double urt)
 {
 	int selectedchannels[NB_CHANNELS_PWM_SSC32];
 	int pws[NB_CHANNELS_PWM_SSC32];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into SSC32 pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pSSC32->MidAngle+angle*(pSSC32->MaxAngle-pSSC32->MidAngle)/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)): pSSC32->MidAngle+angle*(pSSC32->MidAngle-pSSC32->MinAngle)/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle));
+	//angletmp = angle >= 0? pSSC32->MidAngle+urudder*(pSSC32->MaxAngle-pSSC32->MidAngle): pSSC32->MidAngle+urudder*(pSSC32->MidAngle-pSSC32->MinAngle);
+	if (angletmp >= 0)
+		pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angletmp*(DEFAULT_MAX_PW_SSC32-DEFAULT_MID_PW_SSC32)
+			/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)));
+	else
+		pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angletmp*(DEFAULT_MID_PW_SSC32-DEFAULT_MIN_PW_SSC32)
+			/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)));
+#else
 	pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angle*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)
 		/(pSSC32->MaxAngle-pSSC32->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into SSC32 pulse width (in us).
 	pws[pSSC32->rightthrusterchan] = DEFAULT_MID_PW_SSC32+(int)(urt*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)/2.0);
 
@@ -466,17 +476,33 @@ inline int SetRudderThrusterSSC32(SSC32* pSSC32, double angle, double urt)
 	return SetAllPWMsSSC32(pSSC32, selectedchannels, pws);
 }
 
+// angle should be in [-max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrustersFluxSSC32(SSC32* pSSC32, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_SSC32];
 	int pws[NB_CHANNELS_PWM_SSC32];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into SSC32 pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pSSC32->MidAngle+angle*(pSSC32->MaxAngle-pSSC32->MidAngle)/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)): pSSC32->MidAngle+angle*(pSSC32->MidAngle-pSSC32->MinAngle)/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle));
+	//angletmp = angle >= 0? pSSC32->MidAngle+urudder*(pSSC32->MaxAngle-pSSC32->MidAngle): pSSC32->MidAngle+urudder*(pSSC32->MidAngle-pSSC32->MinAngle);
+	if (angletmp >= 0)
+		pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angletmp*(DEFAULT_MAX_PW_SSC32-DEFAULT_MID_PW_SSC32)
+			/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)));
+	else
+		pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angletmp*(DEFAULT_MID_PW_SSC32-DEFAULT_MIN_PW_SSC32)
+			/max(fabs(pSSC32->MinAngle),fabs(pSSC32->MaxAngle)));
+#else
 	pws[pSSC32->rudderchan] = DEFAULT_MID_PW_SSC32+(int)(angle*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)
 		/(pSSC32->MaxAngle-pSSC32->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into SSC32 pulse width (in us).
 	pws[pSSC32->rightthrusterchan] = DEFAULT_MID_PW_SSC32+(int)(urt*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)/2.0);
 	pws[pSSC32->leftthrusterchan] = DEFAULT_MID_PW_SSC32+(int)(ult*(DEFAULT_MAX_PW_SSC32-DEFAULT_MIN_PW_SSC32)/2.0);
@@ -532,17 +558,6 @@ inline int CheckSSC32(SSC32* pSSC32)
 	}
 	mSleep(2000);
 	if (SetThrustersSSC32(pSSC32, 0.0, 0.0) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(2000);
-
-	if (SetFluxSSC32(pSSC32, -0.25, -0.25) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(2000);
-	if (SetFluxSSC32(pSSC32, 0.25, 0.25) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}

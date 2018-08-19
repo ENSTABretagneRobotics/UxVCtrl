@@ -80,7 +80,7 @@ double lights = 0, cameratilt = 0;
 
 unsigned int joystick_buttons = 0;
 
-double rudderminangle = 0, ruddermaxangle = 0;
+double rudderminangle = 0, ruddermidangle = 0, ruddermaxangle = 0;
 
 double Energy_electronics = 0, Energy_actuators = 0;
 
@@ -500,6 +500,7 @@ BOOL bPauseUE9A = FALSE, bRestartUE9A = FALSE;
 BOOL bPauseSSC32 = FALSE, bRestartSSC32 = FALSE;
 
 // Pololu variables.
+int ShowMaestroGetPositionPololu[MAX_NB_POLOLU];
 BOOL bPausePololu[MAX_NB_POLOLU];
 BOOL bRestartPololu[MAX_NB_POLOLU];
 

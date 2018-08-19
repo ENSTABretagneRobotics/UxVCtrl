@@ -130,6 +130,8 @@ typedef enum KEYS KEYS;
 
 #define MAX_NB_WP 1024
 
+#define MAX_CFGFILE_SIZE 16384
+
 // GNSS accuracy levels.
 #define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
 #define GNSS_ACC_LEVEL_GNSS_FIX_UNREL 1
@@ -262,7 +264,7 @@ extern double lights, cameratilt;
 
 extern unsigned int joystick_buttons;
 
-extern double rudderminangle, ruddermaxangle;
+extern double rudderminangle, ruddermidangle, ruddermaxangle;
 
 extern double Energy_electronics, Energy_actuators;
 
@@ -682,6 +684,7 @@ extern BOOL bPauseUE9A, bRestartUE9A;
 extern BOOL bPauseSSC32, bRestartSSC32;
 
 // Pololu variables.
+extern int ShowMaestroGetPositionPololu[MAX_NB_POLOLU];
 extern BOOL bPausePololu[MAX_NB_POLOLU];
 extern BOOL bRestartPololu[MAX_NB_POLOLU];
 
@@ -965,6 +968,7 @@ inline int InitGlobals(void)
 
 	for (i = 0; i < MAX_NB_POLOLU; i++)
 	{
+		ShowMaestroGetPositionPololu[i] = -1;
 		bPausePololu[i] = FALSE;
 		bRestartPololu[i] = FALSE;
 	}
@@ -1065,6 +1069,7 @@ inline int InitGlobals(void)
 	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 
 	rudderminangle = -0.7;
+	ruddermidangle = 0.0;
 	ruddermaxangle = 0.7;
 
 	return EXIT_SUCCESS;
@@ -1153,6 +1158,7 @@ inline int ReleaseGlobals(void)
 	{
 		bRestartPololu[i] = FALSE;
 		bPausePololu[i] = FALSE;
+		ShowMaestroGetPositionPololu[i] = -1;
 	}
 
 	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)

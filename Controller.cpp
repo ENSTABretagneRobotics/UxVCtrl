@@ -541,7 +541,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					printf("State is %d (invalid state).\n", (int)state);
 					break;
 				}
-				printf("Rudder angle is %.1f deg.\n", -uw*((ruddermaxangle-rudderminangle)/2.0)*180.0/M_PI);
+				printf("Rudder angle is %.1f deg.\n", (uw >= 0)? fmod_360_rad2deg(ruddermidangle+uw*(rudderminangle-ruddermidangle)): fmod_360_rad2deg(ruddermidangle+uw*(ruddermidangle-ruddermaxangle)));
 				printf("Sail maximum angle is %.1f deg.\n", u*q1*180.0/M_PI);
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
@@ -586,7 +586,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat),
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0,
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state,
-				-uw*((ruddermaxangle-rudderminangle)/2.0), u*q1, wpsi, vbat1, vbat2, vswitch);
+				(uw >= 0)? (ruddermidangle+uw*(rudderminangle-ruddermidangle)): (ruddermidangle+uw*(ruddermidangle-ruddermaxangle)), u*q1, wpsi, vbat1, vbat2, vswitch);
 			fflush(lognavfile);
 		}
 #pragma endregion

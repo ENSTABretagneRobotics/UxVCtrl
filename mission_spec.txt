@@ -222,6 +222,8 @@
 %
 %videoconfig videoid Video.txt bPause
 %
+%showmaestrogetposition deviceid channel
+%
 % ACOUSTIC COMMANDS
 %
 %%rngacousticmodem nbretries retryperiod (send rng and wait for the result)

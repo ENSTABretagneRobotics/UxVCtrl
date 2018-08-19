@@ -280,19 +280,35 @@ inline int SetAllPWMsMiniSSC(MINISSC* pMiniSSC, int* selectedchannels, int* pws)
 	return EXIT_SUCCESS;
 }
 
+// angle should be in [-max(fabs(minissc.MinAngle),fabs(minissc.MaxAngle));max(fabs(minissc.MinAngle),fabs(minissc.MaxAngle))].
 inline int SetRudderMiniSSC(MINISSC* pMiniSSC, double angle)
 {
 	int pw = 0;
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	// Convert angle (in rad) into MiniSSC pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pMiniSSC->MidAngle+angle*(pMiniSSC->MaxAngle-pMiniSSC->MidAngle)/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)): pMiniSSC->MidAngle+angle*(pMiniSSC->MidAngle-pMiniSSC->MinAngle)/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle));
+	//angletmp = angle >= 0? pMiniSSC->MidAngle+urudder*(pMiniSSC->MaxAngle-pMiniSSC->MidAngle): pMiniSSC->MidAngle+urudder*(pMiniSSC->MidAngle-pMiniSSC->MinAngle);
+	if (angletmp >= 0)
+		pw = DEFAULT_MID_PW_MINISSC+(int)(angletmp*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MID_PW_MINISSC)
+			/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)));
+	else
+		pw = DEFAULT_MID_PW_MINISSC+(int)(angletmp*(DEFAULT_MID_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
+			/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)));
+#else
 	pw = DEFAULT_MID_PW_MINISSC+(int)(angle*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
 		/(pMiniSSC->MaxAngle-pMiniSSC->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	pw = max(min(pw, DEFAULT_MAX_PW_MINISSC), DEFAULT_MIN_PW_MINISSC);
 
 	return SetPWMMiniSSC(pMiniSSC, pMiniSSC->rudderchan, pw);
 }
 
+// u should be in [-1;1].
 inline int SetThrustersMiniSSC(MINISSC* pMiniSSC, double urt, double ult)
 {
 	int selectedchannels[NB_CHANNELS_PWM_MINISSC];
@@ -314,38 +330,33 @@ inline int SetThrustersMiniSSC(MINISSC* pMiniSSC, double urt, double ult)
 	return SetAllPWMsMiniSSC(pMiniSSC, selectedchannels, pws);
 }
 
-inline int SetFluxMiniSSC(MINISSC* pMiniSSC, double urf, double ulf)
-{
-	int selectedchannels[NB_CHANNELS_PWM_MINISSC];
-	int pws[NB_CHANNELS_PWM_MINISSC];
-
-	memset(selectedchannels, 0, sizeof(selectedchannels));
-	memset(pws, 0, sizeof(pws));
-
-	// Convert u (in [-1;1]) into MiniSSC pulse width (in us).
-	pws[pMiniSSC->rightfluxchan] = DEFAULT_MID_PW_MINISSC+(int)(urf*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)/2.0);
-	pws[pMiniSSC->leftfluxchan] = DEFAULT_MID_PW_MINISSC+(int)(ulf*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)/2.0);
-
-	pws[pMiniSSC->rightfluxchan] = max(min(pws[pMiniSSC->rightfluxchan], DEFAULT_MAX_PW_MINISSC), DEFAULT_MIN_PW_MINISSC);
-	pws[pMiniSSC->leftfluxchan] = max(min(pws[pMiniSSC->leftfluxchan], DEFAULT_MAX_PW_MINISSC), DEFAULT_MIN_PW_MINISSC);
-
-	selectedchannels[pMiniSSC->rightfluxchan] = 1;
-	selectedchannels[pMiniSSC->leftfluxchan] = 1;
-
-	return SetAllPWMsMiniSSC(pMiniSSC, selectedchannels, pws);
-}
-
+// angle should be in [-max(fabs(minissc.MinAngle),fabs(minissc.MaxAngle));max(fabs(minissc.MinAngle),fabs(minissc.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrusterMiniSSC(MINISSC* pMiniSSC, double angle, double urt)
 {
 	int selectedchannels[NB_CHANNELS_PWM_MINISSC];
 	int pws[NB_CHANNELS_PWM_MINISSC];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into MiniSSC pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pMiniSSC->MidAngle+angle*(pMiniSSC->MaxAngle-pMiniSSC->MidAngle)/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)): pMiniSSC->MidAngle+angle*(pMiniSSC->MidAngle-pMiniSSC->MinAngle)/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle));
+	//angletmp = angle >= 0? pMiniSSC->MidAngle+urudder*(pMiniSSC->MaxAngle-pMiniSSC->MidAngle): pMiniSSC->MidAngle+urudder*(pMiniSSC->MidAngle-pMiniSSC->MinAngle);
+	if (angletmp >= 0)
+		pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angletmp*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MID_PW_MINISSC)
+			/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)));
+	else
+		pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angletmp*(DEFAULT_MID_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
+			/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)));
+#else
 	pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angle*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
 		/(pMiniSSC->MaxAngle-pMiniSSC->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into MiniSSC pulse width (in us).
 	pws[pMiniSSC->rightthrusterchan] = DEFAULT_MID_PW_MINISSC+(int)(urt*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)/2.0);
 
@@ -358,17 +369,33 @@ inline int SetRudderThrusterMiniSSC(MINISSC* pMiniSSC, double angle, double urt)
 	return SetAllPWMsMiniSSC(pMiniSSC, selectedchannels, pws);
 }
 
+// angle should be in [-max(fabs(minissc.MinAngle),fabs(minissc.MaxAngle));max(fabs(minissc.MinAngle),fabs(minissc.MaxAngle))].
+// u should be in [-1;1].
 inline int SetRudderThrustersFluxMiniSSC(MINISSC* pMiniSSC, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_MINISSC];
 	int pws[NB_CHANNELS_PWM_MINISSC];
+#ifndef DISABLE_RUDDER_MIDANGLE
+	double angletmp = 0;
+#endif // DISABLE_RUDDER_MIDANGLE
 
 	memset(selectedchannels, 0, sizeof(selectedchannels));
 	memset(pws, 0, sizeof(pws));
 
 	// Convert angle (in rad) into MiniSSC pulse width (in us).
+#ifndef DISABLE_RUDDER_MIDANGLE
+	angletmp = angle >= 0? pMiniSSC->MidAngle+angle*(pMiniSSC->MaxAngle-pMiniSSC->MidAngle)/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)): pMiniSSC->MidAngle+angle*(pMiniSSC->MidAngle-pMiniSSC->MinAngle)/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle));
+	//angletmp = angle >= 0? pMiniSSC->MidAngle+urudder*(pMiniSSC->MaxAngle-pMiniSSC->MidAngle): pMiniSSC->MidAngle+urudder*(pMiniSSC->MidAngle-pMiniSSC->MinAngle);
+	if (angletmp >= 0)
+		pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angletmp*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MID_PW_MINISSC)
+			/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)));
+	else
+		pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angletmp*(DEFAULT_MID_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
+			/max(fabs(pMiniSSC->MinAngle),fabs(pMiniSSC->MaxAngle)));
+#else
 	pws[pMiniSSC->rudderchan] = DEFAULT_MID_PW_MINISSC+(int)(angle*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)
 		/(pMiniSSC->MaxAngle-pMiniSSC->MinAngle));
+#endif // DISABLE_RUDDER_MIDANGLE
 	// Convert u (in [-1;1]) into MiniSSC pulse width (in us).
 	pws[pMiniSSC->rightthrusterchan] = DEFAULT_MID_PW_MINISSC+(int)(urt*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)/2.0);
 	pws[pMiniSSC->leftthrusterchan] = DEFAULT_MID_PW_MINISSC+(int)(ult*(DEFAULT_MAX_PW_MINISSC-DEFAULT_MIN_PW_MINISSC)/2.0);
@@ -424,17 +451,6 @@ inline int CheckMiniSSC(MINISSC* pMiniSSC)
 	}
 	mSleep(2000);
 	if (SetThrustersMiniSSC(pMiniSSC, 0.0, 0.0) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(2000);
-
-	if (SetFluxMiniSSC(pMiniSSC, -0.25, -0.25) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	mSleep(2000);
-	if (SetFluxMiniSSC(pMiniSSC, 0.25, 0.25) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}

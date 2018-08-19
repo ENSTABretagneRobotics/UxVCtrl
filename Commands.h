@@ -2361,10 +2361,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "CISCREA0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "CISCREA0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2383,10 +2383,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "LIRMIA3.txt", strlen("LIRMIA3.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "LIRMIA3.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "LIRMIA3.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2405,10 +2405,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "gpControl0.txt", strlen("gpControl0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "gpControl0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "gpControl0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2427,10 +2427,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "PathfinderDVL0.txt", strlen("PathfinderDVL0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "PathfinderDVL0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "PathfinderDVL0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2449,10 +2449,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "NortekDVL0.txt", strlen("NortekDVL0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "NortekDVL0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "NortekDVL0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2471,10 +2471,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "MES0.txt", strlen("MES0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "MES0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "MES0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2493,10 +2493,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "MDM0.txt", strlen("MDM0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "MDM0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "MDM0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2515,10 +2515,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "Seanet0.txt", strlen("Seanet0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "Seanet0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "Seanet0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2541,10 +2541,10 @@ inline int Commands(char* line)
 			sprintf(str2, "BlueView%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 				if (buf)
 				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 					{
 						printf("Unable to copy file.\n");
 					}
@@ -2568,10 +2568,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "Hokuyo0.txt", strlen("Hokuyo0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "Hokuyo0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "Hokuyo0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2590,10 +2590,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "RPLIDAR0.txt", strlen("RPLIDAR0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "RPLIDAR0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "RPLIDAR0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2612,10 +2612,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "MS580314BA0.txt", strlen("MS580314BA0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "MS580314BA0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "MS580314BA0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2634,10 +2634,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "MS583730BA0.txt", strlen("MS583730BA0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "MS583730BA0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "MS583730BA0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2656,10 +2656,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "P33x0.txt", strlen("P33x0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "P33x0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "P33x0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2678,10 +2678,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "RazorAHRS0.txt", strlen("RazorAHRS0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "RazorAHRS0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "RazorAHRS0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2700,10 +2700,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "MT0.txt", strlen("MT0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "MT0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "MT0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2722,10 +2722,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "SBG0.txt", strlen("SBG0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "SBG0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "SBG0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2748,10 +2748,10 @@ inline int Commands(char* line)
 			sprintf(str2, "NMEADevice%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 				if (buf)
 				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 					{
 						printf("Unable to copy file.\n");
 					}
@@ -2779,10 +2779,10 @@ inline int Commands(char* line)
 			sprintf(str2, "ublox%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 				if (buf)
 				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 					{
 						printf("Unable to copy file.\n");
 					}
@@ -2810,10 +2810,10 @@ inline int Commands(char* line)
 			sprintf(str2, "MAVLinkDevice%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 				if (buf)
 				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 					{
 						printf("Unable to copy file.\n");
 					}
@@ -2837,10 +2837,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "SwarmonDevice0.txt", strlen("SwarmonDevice0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "SwarmonDevice0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "SwarmonDevice0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2859,10 +2859,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "UE9A0.txt", strlen("UE9A0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "UE9A0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "UE9A0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2881,10 +2881,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "SSC320.txt", strlen("SSC320.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "SSC320.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "SSC320.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2907,10 +2907,10 @@ inline int Commands(char* line)
 			sprintf(str2, "Pololu%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 				if (buf)
 				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 					{
 						printf("Unable to copy file.\n");
 					}
@@ -2934,10 +2934,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "MiniSSC0.txt", strlen("MiniSSC0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "MiniSSC0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "MiniSSC0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2956,10 +2956,10 @@ inline int Commands(char* line)
 	{
 		if (strncmp(str, "IM483I0.txt", strlen("IM483I0.txt")) != 0)
 		{
-			buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 			if (buf)
 			{
-				if (fcopyload(str, "IM483I0.txt", buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+				if (fcopyload(str, "IM483I0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 				{
 					printf("Unable to copy file.\n");
 				}
@@ -2983,10 +2983,10 @@ inline int Commands(char* line)
 			sprintf(str2, "Video%d.txt", ival);
 			if (strncmp(str, str2, strlen(str2)) != 0)
 			{
-				buf = (unsigned char*)calloc(8192, sizeof(unsigned char)); 
+				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
 				if (buf)
 				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), 8192, &bytes) != EXIT_SUCCESS)
+					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
 					{
 						printf("Unable to copy file.\n");
 					}
@@ -3007,6 +3007,19 @@ inline int Commands(char* line)
 		}
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
+	else if (sscanf(line, "showmaestrogetposition %d %d", &ival, &ival1) == 2)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_POLOLU))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			ShowMaestroGetPositionPololu[ival] = ival1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS
 	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...

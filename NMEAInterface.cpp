@@ -286,7 +286,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	awindspeed = vawind;
 	winddir = fmod_360_pos_rad2deg(-angle_env-Center(psitwindhat)+3.0*M_PI/2.0);
 	windspeed = Center(vtwindhat);
-	singlerudder = -uw*((ruddermaxangle-rudderminangle)/2.0)*180.0/M_PI;
+	singlerudder = (uw >= 0)? fmod_360_rad2deg(ruddermidangle+uw*(rudderminangle-ruddermidangle)): fmod_360_rad2deg(ruddermidangle+uw*(ruddermidangle-ruddermaxangle));
 	dbt = altitude_AGL;
 
 	if (bCheckGNSSOK())

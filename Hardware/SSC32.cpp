@@ -10,6 +10,17 @@
 #include "Config.h"
 #include "SSC32.h"
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 {
 	SSC32 ssc32;
@@ -108,8 +119,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
+				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
+				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
 				thrust = u;
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrusterSSC32(&ssc32, rudder, thrust) != EXIT_SUCCESS)
@@ -122,8 +133,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
+				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
+				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderSSC32(&ssc32, rudder) != EXIT_SUCCESS)
 				{
@@ -136,8 +147,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
+				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
+				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
 				thrust = fabs(u);
 				if (bEnableBackwardsMotorboat)
 				{
@@ -159,8 +170,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 #else
 				UNREFERENCED_PARAMETER(flux);
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = ssc32.MinAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = ((ssc32.MaxAngle+ssc32.MinAngle)/2.0)-uw*((ssc32.MaxAngle-ssc32.MinAngle)/2.0);
+				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
+				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
 				thrust = u;
 				if (!bEnableBackwardsMotorboat)
 				{
@@ -240,3 +251,13 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 
 	return 0;
 }
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER

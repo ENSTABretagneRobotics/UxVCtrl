@@ -84,7 +84,7 @@ COM6
 1
 % bProportionalPW (0 or 1)
 1
-% For motorboat or sailboat...
+% Specific channels...
 % rudderchan
 2
 % rightthrusterchan

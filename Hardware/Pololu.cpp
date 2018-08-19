@@ -10,6 +10,17 @@
 #include "Config.h"
 #include "Pololu.h"
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 {
 	POLOLU pololu;
@@ -18,6 +29,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	int ivalue = 0;
 	double winddir = 0;
 	int counter = 0, counter_modulo = 0;
+	int showgetposition = -1;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int deviceid = (intptr_t)pParam;
@@ -125,9 +137,10 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 			{
 			case BUGGY_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
 				thrust = u;
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrustersFluxPololu(&pololu, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
 				{
@@ -138,13 +151,31 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					break;
 				}
 				mSleep(50);
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				break;
 			case SAILBOAT_ROBID:
 				counter_modulo = 11;
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
 				thrust = u;
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrusterPololu(&pololu, rudder, thrust) != EXIT_SUCCESS)
 				{
@@ -211,15 +242,33 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
 			case SAILBOAT2_ROBID:
 				counter_modulo = 16;
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
 				thrust = u;
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrustersPololu(&pololu, rudder, thrust, thrust) != EXIT_SUCCESS)
 				{
@@ -354,13 +403,31 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					else mSleep(20);
 				}
 				else mSleep(20);
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderPololu(&pololu, rudder) != EXIT_SUCCESS)
 				{
@@ -371,12 +438,29 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					break;
 				}
 				mSleep(50);
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				break;
 			case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
 				thrust = fabs(u);
 				if (bEnableBackwardsMotorboat)
 				{
@@ -387,6 +471,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					if (u < 0) thrust = 0;
 					flux = 1;
 				}
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrustersFluxPololu(&pololu, rudder, thrust, thrust, flux, flux) != EXIT_SUCCESS)
 				{
@@ -400,16 +485,18 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 #else
 				UNREFERENCED_PARAMETER(flux);
 				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = ((pololu.MaxAngle+pololu.MinAngle)/2.0)-uw*((pololu.MaxAngle-pololu.MinAngle)/2.0);
+				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
+				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
 				thrust = u;
 				if (!bEnableBackwardsMotorboat)
 				{
 					if (u < 0) thrust = 0;
 				}
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 
 				// Temporary method to handle a Pololu Jrk motor controller for Boatbot...
+
 				if (pololu.PololuType == 1)
 				{
 					if (SetRudderJrkPololu(&pololu, rudder) != EXIT_SUCCESS)
@@ -434,6 +521,23 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				}
 				mSleep(50);
 #endif // USE_MOTORBOAT_WITH_FLUX
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				break;
 			case COPTER_ROBID:
 			case SAUCISSE_ROBID:
@@ -442,6 +546,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				thrust1 = u1;
 				thrust2 = u2;
 				thrust3 = u3;
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrustersFluxPololu(&pololu, 0, thrust1, thrust2, thrust3, 0) != EXIT_SUCCESS)
 				{
@@ -452,6 +557,23 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					break;
 				}
 				mSleep(50);
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				break;
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
@@ -459,6 +581,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				EnterCriticalSection(&StateVariablesCS);
 				thrust1 = u1;
 				thrust2 = u2;
+				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetThrustersPololu(&pololu, thrust1, thrust2) != EXIT_SUCCESS)
 				{
@@ -469,6 +592,23 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					break;
 				}
 				mSleep(50);
+				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
+				{
+					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					printf("%d\n", ivalue);
+					EnterCriticalSection(&StateVariablesCS);
+					ShowMaestroGetPositionPololu[deviceid] = -1;
+					LeaveCriticalSection(&StateVariablesCS);
+					showgetposition = -1;
+				}
 				break;
 			}
 		}
@@ -525,3 +665,13 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 
 	return 0;
 }
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER

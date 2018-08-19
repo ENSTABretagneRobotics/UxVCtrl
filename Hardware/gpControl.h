@@ -464,7 +464,7 @@ inline int KeepAlivegpControl(GPCONTROL* pgpControl)
 			if (pgpControl->bDisableHTTPPersistent) releasetcpcli(pgpControl->tcpsock);
 			return EXIT_FAILURE;
 		}
-		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, MAX_NB_BYTES_GPCONTROL, &BytesReceived) != EXIT_SUCCESS)
 		{
 			printf("Error communicating with a gpControl.\n");
 			if (pgpControl->bDisableHTTPPersistent) releasetcpcli(pgpControl->tcpsock);
@@ -613,7 +613,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 	}
 	if (!pgpControl->bDisableStatusCheck)
 	{
-		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, MAX_NB_BYTES_GPCONTROL, &BytesReceived) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to a gpControl.\n");
 			releasetcpcli(pgpControl->tcpsock);
@@ -651,7 +651,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		}
 		if (!pgpControl->bDisableStatusCheck)
 		{
-			if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+			if (recvsimplehtml(pgpControl->tcpsock, &title, &body, MAX_NB_BYTES_GPCONTROL, &BytesReceived) != EXIT_SUCCESS)
 			{
 				printf("Unable to connect to a gpControl.\n");
 				releasetcpcli(pgpControl->tcpsock);
@@ -686,7 +686,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		}
 		if (!pgpControl->bDisableStatusCheck)
 		{
-			if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+			if (recvsimplehtml(pgpControl->tcpsock, &title, &body, MAX_NB_BYTES_GPCONTROL, &BytesReceived) != EXIT_SUCCESS)
 			{
 				printf("Unable to connect to a gpControl.\n");
 				releasetcpcli(pgpControl->tcpsock);
@@ -725,7 +725,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			CloseRS232Port(&pgpControl->RS232Port);
 			return EXIT_FAILURE;
 		}
-		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, 8192, &BytesReceived) != EXIT_SUCCESS)
+		if (recvsimplehtml(pgpControl->tcpsock, &title, &body, MAX_NB_BYTES_GPCONTROL, &BytesReceived) != EXIT_SUCCESS)
 		{
 			printf("Unable to connect to a gpControl.\n");
 			releasetcpcli(pgpControl->tcpsock);
