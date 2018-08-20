@@ -959,7 +959,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "[3] SHOW DETAILED INFO (%d)", (int)bStdOutDetailedInfo);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				sprintf(szText, "[4] SAILBOAT ROLL WIND CORRECTION (%d)", (int)!bDisableRollWindCorrectionSailboat);
+				sprintf(szText, "[4] SAILBOAT ROLL WIND CORR (%d)", (int)!bDisableRollWindCorrectionSailboat);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[5] MOTORBOAT BACKWARDS (%d)", (int)bEnableBackwardsMotorboat);

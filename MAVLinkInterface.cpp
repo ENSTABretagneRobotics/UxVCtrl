@@ -135,15 +135,17 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_param_value_t param_value;
 	char Name[17];
 	int nbparams = 1;
-	double d0 = 0, d1 = 0, d2 = 0;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 	double speed = 0, Rate = 0, Alt = 0, Deg = 0, angle = 0, Delay = 0, Lat = 0, Lon = 0;
 	int Dir = 0, rel = 0, Current = 0;
+#ifndef DISABLE_OPENCV_SUPPORT
+	double d0 = 0, d1 = 0, d2 = 0;
 	char strtime_snap[MAX_BUF_LEN];
 	char snapfilename[MAX_BUF_LEN];
 	char picsnapfilename[MAX_BUF_LEN];
 	char kmlsnapfilename[MAX_BUF_LEN];
 	FILE* kmlsnapfile = NULL;
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	// Get data from GCS...
 	if ((!bDisableMAVLinkInterfaceIN)&&(CheckAvailableBytesRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS))

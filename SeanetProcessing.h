@@ -28,6 +28,11 @@ extern unsigned char* wtftsort;
 extern unsigned char* wtfasort;
 
 #ifndef DISABLE_OPENCV_SUPPORT
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4459) 
+#endif // _MSC_VER
+
 inline void DrawObstacleDistError(double x, double y, double alpha, double d, double d_err, CvScalar color, IplImage* img)
 {
 	COORDSYSTEM2IMG csMap2Img;
@@ -69,6 +74,11 @@ inline void DrawSeanetScreenshot(double theta, double StepAngleSize, int NBins, 
 		}
 	}
 }
+
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4459) 
+#endif // _MSC_VER
 #endif // !DISABLE_OPENCV_SUPPORT
 
 THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam);

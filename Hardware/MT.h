@@ -305,6 +305,11 @@ struct MT
 };
 typedef struct MT MT;
 
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4459) 
+#endif // _MSC_VER
+
 inline int ConvertToDoubleMT(int OutputSettings, unsigned char* buf, int offset, double* pValue)
 {
 	usInt_MT usl;
@@ -1241,6 +1246,11 @@ inline int DisconnectMT(MT* pMT)
 
 	return EXIT_SUCCESS;
 }
+
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4459) 
+#endif // _MSC_VER
 
 #ifndef DISABLE_MTTHREAD
 THREAD_PROC_RETURN_VALUE MTThread(void* pParam);

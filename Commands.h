@@ -61,6 +61,11 @@ inline void DisableAllControls(void)
 	LeaveCriticalSection(&MDMCS);
 }
 #pragma region Waypoints.csv file
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4459) 
+#endif // _MSC_VER
+
 inline int LoadWaypointsEx(char* szFilePath, double wpslat[], double wpslong[], int* pNbWPs)
 {
 	FILE* file = NULL;
@@ -252,6 +257,11 @@ inline int SetCurrentWaypointEx(char* szFilePath, int CurWP)
 
 	return EXIT_SUCCESS;
 }
+
+#ifdef _MSC_VER
+// Restore the Visual Studio warnings previously disabled.
+#pragma warning(default : 4459) 
+#endif // _MSC_VER
 #pragma endregion
 inline void CallMission(char* str)
 {

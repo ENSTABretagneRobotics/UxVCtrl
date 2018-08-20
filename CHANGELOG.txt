@@ -1,3 +1,6 @@
+249
+Minor corrections.
+
 248
 Updated bias support for rudders.
 Added showmaestrogetposition command.
