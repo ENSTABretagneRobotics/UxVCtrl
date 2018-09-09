@@ -293,7 +293,7 @@ WMV2
 % omega_max_wx (in rad/s)
 0.8
 % gamma_infinite (in rad, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
-1.22
+1.3
 % r (accuracy of line/waypoint following in m, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
 % betatrav (sail angle when the wind comes from the side (in rad))
@@ -305,7 +305,7 @@ WMV2
 % check_strategy_period (in s)
 60
 % sail_update_period (in s)
-20
+15
 % controllerperiod (in ms)
 25
 % Observer parameters
