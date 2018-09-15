@@ -3017,7 +3017,7 @@ inline int Commands(char* line)
 		}
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
-	else if (sscanf(line, "showmaestrogetposition %d %d", &ival, &ival1) == 2)
+	else if (sscanf(line, "showgetpositionmaestro %d %d", &ival, &ival1) == 2)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_POLOLU))
 		{
@@ -3605,6 +3605,56 @@ inline int Commands(char* line)
 	{
 		bEnableSimulatedDVL = FALSE;
 	}
+	else if (sscanf(line, "controlconfig %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		u_max = dval1; uw_max = dval2; u_coef = dval3; uw_coef = dval4;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "zcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_z = dval1; Kd_z = dval2; Ki_z = dval3; up_max_z = dval4; ud_max_z = dval5; ui_max_z = dval6;
+		u_min_z = dval7; u_max_z = dval8; error_min_z = dval9; error_max_z = dval10; dz_max_z = dval11;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "wzcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10) == 10)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp = dval1; Kd1 = dval2; Kd2 = dval3; Ki = dval4; uw_derivative_max = dval5; uw_integral_max = dval6;
+		cosdelta_angle_threshold = dval7; wdradius = dval8; vrxmax = dval9; omegazmax = dval10;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "wycontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_wy = dval1; Kd_wy = dval2; Ki_wy = dval3; up_max_wy = dval4; ud_max_wy = dval5; ui_max_wy = dval6;
+		u_min_wy = dval7; u_max_wy = dval8; error_min_wy = dval9; error_max_wy = dval10; omega_max_wy = dval11;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "wxcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_wx = dval1; Kd_wx = dval2; Ki_wx = dval3; up_max_wx = dval4; ud_max_wx = dval5; ui_max_wx = dval6;
+		u_min_wx = dval7; u_max_wx = dval8; error_min_wx = dval9; error_max_wx = dval10; omega_max_wx = dval11;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "sailboatconfig %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &dval5) == 5)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		betaside = dval1; betarear = dval2; zeta = dval3; check_strategy_period = dval4; sail_update_period = dval5;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "windfilterconfig %lf", &dval1) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wind_filter_coef = dval1;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 #pragma endregion
 #pragma region SIMPLE MOVING COMMANDS
 	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
@@ -3761,50 +3811,6 @@ inline int Commands(char* line)
 		bDistanceControl = FALSE;
 		bBrakeControl = TRUE;
 		u = 0;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "controlconfig %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		u_max = dval1; uw_max = dval2; u_coef = dval3; uw_coef = dval4;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "zcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		Kp_z = dval1; Kd_z = dval2; Ki_z = dval3; up_max_z = dval4; ud_max_z = dval5; ui_max_z = dval6;
-		u_min_z = dval7; u_max_z = dval8; error_min_z = dval9; error_max_z = dval10; dz_max_z = dval11;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "wzcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10) == 10)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		Kp = dval1; Kd1 = dval2; Kd2 = dval3; Ki = dval4; uw_derivative_max = dval5; uw_integral_max = dval6;
-		cosdelta_angle_threshold = dval7; wdradius = dval8; vrxmax = dval9; omegazmax = dval10;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "wycontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		Kp_wy = dval1; Kd_wy = dval2; Ki_wy = dval3; up_max_wy = dval4; ud_max_wy = dval5; ui_max_wy = dval6;
-		u_min_wy = dval7; u_max_wy = dval8; error_min_wy = dval9; error_max_wy = dval10; omega_max_wy = dval11;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "wxcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		Kp_wx = dval1; Kd_wx = dval2; Ki_wx = dval3; up_max_wx = dval4; ud_max_wx = dval5; ui_max_wx = dval6;
-		u_min_wx = dval7; u_max_wx = dval8; error_min_wx = dval9; error_max_wx = dval10; omega_max_wx = dval11;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "sailboatconfig %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &dval5) == 5)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		betatrav = dval1; betaarr = dval2; ksi = dval3; check_strategy_period = dval4; sail_update_period = dval5;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "stop", strlen("stop")) == 0)

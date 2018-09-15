@@ -40,8 +40,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	int bForceCheckStrategy = 0, bForceSailUpdate = 0;
 	CHRONO chrono_sail_update, chrono_check_strategy;
 	double deltasmax = 0;
-	double q1 = betaarr;
-	double q2 = (log(betaarr)-log(betatrav))/log(2.0);
+	double q1 = betarear;
+	double q2 = (log(betarear)-log(betaside))/log(2.0);
 #pragma endregion
 
 	UNREFERENCED_PARAMETER(pParam);
@@ -151,10 +151,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					bForceCheckStrategy = 0;
 					prevstate = state;
 #ifndef ALT_SAILBOAT_CONTROLLER
-					if ((cos(psiw-wpsi)+cos(ksi) < 0)||
-						((cos(psiw-phi)+cos(ksi) < 0)&&(fabs(e) < radius)))
+					if ((cos(psiw-wpsi)+cos(zeta) < 0)||
+						((cos(psiw-phi)+cos(zeta) < 0)&&(fabs(e) < radius)))
 #else
-					if (cos(psiw-psi)+cos(ksi) < 0)
+					if (cos(psiw-psi)+cos(zeta) < 0)
 #endif // !ALT_SAILBOAT_CONTROLLER
 					{
 						if (e < 0)
@@ -199,11 +199,11 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				switch (state)
 				{
 				case STARBOARD_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI+ksi; // Heading command.
+					wpsi = psiw+M_PI+zeta; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				case PORT_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI-ksi; // Heading command.
+					wpsi = psiw+M_PI-zeta; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				default: // DIRECT_TRAJECTORY

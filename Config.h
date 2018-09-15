@@ -167,9 +167,9 @@ inline int LoadConfig(void)
 	omega_max_wx = 0.8;
 	gamma_infinite = 0.78;
 	radius = 5;
-	betatrav = 0.5;
-	betaarr = 1.5;
-	ksi = 0.87;
+	betaside = 0.5;
+	betarear = 1.5;
+	zeta = 0.87;
 	check_strategy_period = 60;
 	sail_update_period = 20;
 	controllerperiod = 25;
@@ -554,11 +554,11 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &radius) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &betatrav) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &betaside) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &betaarr) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &betarear) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%lf", &ksi) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &zeta) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &check_strategy_period) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1022,20 +1022,20 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : gamma_infinite.\n");
 		gamma_infinite = 0.78;
 	}
-	if ((betatrav < -M_PI)||(betatrav > M_PI))
+	if ((betaside < -M_PI)||(betaside > M_PI))
 	{
-		printf("Invalid parameter : betatrav.\n");
-		betatrav = 0.5;
+		printf("Invalid parameter : betaside.\n");
+		betaside = 0.5;
 	}
-	if ((betaarr < -M_PI)||(betaarr > M_PI))
+	if ((betarear < -M_PI)||(betarear > M_PI))
 	{
-		printf("Invalid parameter : betaarr.\n");
-		betaarr = 1.5;
+		printf("Invalid parameter : betarear.\n");
+		betarear = 1.5;
 	}
-	if ((ksi < -M_PI)||(ksi > M_PI))
+	if ((zeta < -M_PI)||(zeta > M_PI))
 	{
-		printf("Invalid parameter : ksi.\n");
-		ksi = 0.87;
+		printf("Invalid parameter : zeta.\n");
+		zeta = 0.87;
 	}
 	if (controllerperiod < 0)
 	{
@@ -1425,11 +1425,11 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", radius) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%.10g\n", betatrav) < 0) printf("Error writing configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", betaside) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%.10g\n", betaarr) < 0) printf("Error writing configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", betarear) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%.10g\n", ksi) < 0) printf("Error writing configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", zeta) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", check_strategy_period) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

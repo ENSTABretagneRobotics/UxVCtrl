@@ -175,9 +175,9 @@ double Kp_wx = 0, Kd_wx = 0, Ki_wx = 0, up_max_wx = 0, ud_max_wx = 0, ui_max_wx 
 u_min_wx = 0, u_max_wx = 0, error_min_wx = 0, error_max_wx = 0, omega_max_wx = 0;
 double gamma_infinite = 0;
 double radius = 0;
-double betatrav = 0;
-double betaarr = 0;
-double ksi = 0;
+double betaside = 0;
+double betarear = 0;
+double zeta = 0;
 double check_strategy_period = 0;
 double sail_update_period = 0;
 int controllerperiod = 0;

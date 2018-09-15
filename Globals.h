@@ -359,9 +359,9 @@ extern double Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx,
 u_min_wx, u_max_wx, error_min_wx, error_max_wx, omega_max_wx;
 extern double gamma_infinite; // Angle to go towards the line when far, for line following in rad.
 extern double radius; // Accuracy of line/waypoint following in m.
-extern double betatrav;
-extern double betaarr;
-extern double ksi;
+extern double betaside;
+extern double betarear;
+extern double zeta;
 extern double check_strategy_period;
 extern double sail_update_period;
 extern int controllerperiod;

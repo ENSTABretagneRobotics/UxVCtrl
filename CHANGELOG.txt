@@ -1,3 +1,12 @@
+250
+Disabled u < 0 for sailboats.
+Renamed showmaestrogetposition to showgetpositionmaestro.
+Renamed ksi to zeta, betatrav to betaside, betaarr to betarear.
+Corrected comment about objRealRadius.
+Added bDispERR option in OpenCVGUI.
+Moved some commands.
+Added windfilterconfig command.
+
 249
 Minor corrections.
 

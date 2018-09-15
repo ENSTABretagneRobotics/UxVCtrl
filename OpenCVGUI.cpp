@@ -25,6 +25,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bDispGPS = TRUE;
 	BOOL bDispSOG = FALSE;
 	BOOL bDispEPU = FALSE;
+	BOOL bDispERR = FALSE;
 	BOOL bMap = TRUE;
 	BOOL bFullMap = FALSE;
 	BOOL bRotatingMap = FALSE;
@@ -300,6 +301,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case VAIMOS_ROBID:
 			case SAILBOAT_ROBID:
 			case SAILBOAT2_ROBID:
+				u = (u < 0)? 0: u;
 				break;
 			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
@@ -834,6 +836,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case '5': 
 			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; } 
+			else if (bOtherOSDOptionsExtendedMenu) bDispERR = !bDispERR;
 			else if (bExtendedMenu)
 			{
 				bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat;
@@ -938,6 +941,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[4] DISPLAY YPR (%d)", (int)bDispYPR);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[5] DISPLAY ERR (%d)", (int)bDispERR);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
@@ -1104,9 +1110,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset += 16;
 				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
 			}
-			sprintf(szText, "ERR:%.2f,%.2f", Width(xhat)/2.0, Width(yhat)/2.0);
-			offset += 16;
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			if (bDispERR)
+			{
+				sprintf(szText, "ERR:%.2f,%.2f", Width(xhat)/2.0, Width(yhat)/2.0);
+				offset += 16;
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+			}
 			if (bDynamicSonarLocalization)
 			{
 				sprintf(szText, "SNR DYN LOC");

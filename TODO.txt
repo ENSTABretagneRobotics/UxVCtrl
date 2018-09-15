@@ -1,28 +1,17 @@
-Rajouter uxvsim dans le release github?
-
-Control voile fg, foc zs, ou l'inverse, avoir une option pour choisir si contrôle indépendant? Mais gestion du stop et generalstop dans scripts?
-Touche juste mise au neutre gouvernail?
-Pouvoir remettre au neutre juste que le gouvernail, ne pas laisser la possibilité de mettre u < 0 pour voilier
-
-fluiddir (in deg) values in log razor scan?
-Linefollowingconfigex r debut, r milieu, r fin...
-Attention si changement de r en cours de route, il risque d'attendre le chrono check strategy avant de changer de bord, il faut faire forcecheckstrategy si changement
+Preparer sample évitement d'obstacle en relatif
 
 Dashboard : rajouter image en fond, cap voulu en remontée au vent car depend de l'estimation de vent
-Check observer omegazhat for submarines
-objRealRadius : double [0,1] real radius of the object in m->erreur, c'est pas limité à 1?
 
 problème echosondeur sur port série de rpizw?
 1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 
+Control voile fg, foc zs, ou l'inverse, avoir une option pour choisir si contrôle indépendant? Mais gestion du stop et generalstop dans scripts?
+Check observer omegazhat for submarines
 initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écrasé à cause de u, du coup c'est plutôt un u_0, uw_0, etc. qu'il faudrait?
-Rajouter params à linefollowingconfig pour que le robot ait automatiquement une précision plus importante quand il se rapproche de la destination
-linefollowingconfig r gamma_infinite dist_end r_end gamma_infinite_end
+Rajouter params à linefollowingconfig pour que le robot ait automatiquement une précision plus importante quand il se rapproche de la destination->Attention si changement de r en cours de route, il risque d'attendre le chrono check strategy avant de changer de bord, il faut faire forcecheckstrategy si changement...
+linefollowingconfigex r gamma_infinite dist_end r_end gamma_infinite_end
+Linefollowingconfigex r debut, r milieu, r fin...
 GUI bloquée si GoPro pas connectée...->prévoir option pour lancer OpenCVGUI en 1er?
-afficher en option ERR dans OpenCVGUI
-rename showmaestrogetposition en showgetpositionmaestro
-command wind filter coefs
-renommer ksi en zeta?
 
 pour les waypoints dans file conversions et ailleurs, utiliser %.9f car de toutes façons il y a toujours peu de waypoints (contrairement aux logs qui peuvent être gros)...
 
@@ -145,6 +134,7 @@ MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position 
 Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
 Cap pas correctement envoyé en mavlink osd
 Envoyer aussi rssi
+pouvoir envoyer image de caméra via télémétrie
 qgroundcontrol reconnait pas la position gps...
 force mode marche pas, d'où mode non armable...->use chan 5?
 add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
@@ -581,6 +571,9 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+fluiddir (in deg) values in log razor scan?->c'est juste le vent initial...
+Touche juste mise au neutre gouvernail?->déjà possible avec a ou e pour certains robots...
 
 Vérifier pourquoi reconnections razor->caractères invalides de temps en temps
 
