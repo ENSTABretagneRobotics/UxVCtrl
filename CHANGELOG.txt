@@ -1,3 +1,6 @@
+252
+Corrected sailboattacktype.
+
 251
 Added sailboattacktype and sailformulatype parameters.
 Updated sailboatconfig command.

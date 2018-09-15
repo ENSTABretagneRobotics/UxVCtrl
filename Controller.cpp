@@ -42,6 +42,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double deltasmax = 0;
 	double q1 = betarear;
 	double q2 = (log(betarear)-log(betaside))/log(2.0);
+	double q = 0;
 #pragma endregion
 
 	UNREFERENCED_PARAMETER(pParam);
@@ -132,9 +133,9 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma region Sailboat supervisor
 			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 			{
+				double theta_star = wpsi;
 				double psiw = Center(psitwindhat);
 				double psi = Center(psihat);
-				double q = 0;
 				
 				q1 = betarear;
 				q2 = (log(betarear)-log(betaside))/log(2.0);
@@ -153,7 +154,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					bForceCheckStrategy = 0;
 					prevstate = state;
 #ifndef ALT_SAILBOAT_CONTROLLER
-					if ((cos(psiw-wpsi)+cos(zeta) < 0)||
+					if ((cos(psiw-theta_star)+cos(zeta) < 0)||
 						((cos(psiw-phi)+cos(zeta) < 0)&&(fabs(e) < radius)))
 #else
 					if (cos(psiw-psi)+cos(zeta) < 0)
@@ -163,13 +164,13 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 						{
 						default:
 						case 0:
-							q = sign(sin(wpsi-psi), 0);
-							break;
-						case 1:
 							q = sign(e, 0);
 							break;
-						case 2:
+						case 1:
 							q = -sign(e*cos(psi-phi), 0);
+							break;
+						case 2:
+							q = sign(sin(theta_star-psi), 0);
 							break;
 						}
 						if (q < 0)
@@ -220,7 +221,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					break;
 				case DIRECT_TRAJECTORY:
 				default:
-					//wpsi = wpsi; // Heading command.
+					wpsi = theta_star; // Heading command.
 					// Sail command.
 					switch (sailformulatype)
 					{
