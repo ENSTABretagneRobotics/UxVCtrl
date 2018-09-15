@@ -1416,6 +1416,20 @@ inline int Commands(char* line)
 		omegazhat = interval(dval11-dval12,dval11+dval12);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else if (sscanf(line, "setwindestimationwgs %lf %lf", &dval1, &dval2) == 2)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		psitwind = fmod_2PI(M_PI/2.0-dval1*M_PI/180.0+M_PI-angle_env);
+		vtwind = dval2*0.51;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "setwindestimation %lf %lf", &dval1, &dval2) == 2)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		psitwind = dval1;
+		vtwind = dval2;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "drconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)
 	{
@@ -3643,10 +3657,10 @@ inline int Commands(char* line)
 		u_min_wx = dval7; u_max_wx = dval8; error_min_wx = dval9; error_max_wx = dval10; omega_max_wx = dval11;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (sscanf(line, "sailboatconfig %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &dval5) == 5)
+	else if (sscanf(line, "sailboatconfig %lf %lf %lf %lf %lf %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &ival1, &ival2) == 7)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		betaside = dval1; betarear = dval2; zeta = dval3; check_strategy_period = dval4; sail_update_period = dval5;
+		betaside = dval1; betarear = dval2; zeta = dval3; check_strategy_period = dval4; sail_update_period = dval5; sailboattacktype = ival1; sailformulatype = ival2;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "windfilterconfig %lf", &dval1) == 1)

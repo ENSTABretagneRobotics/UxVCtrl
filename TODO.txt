@@ -40,8 +40,7 @@ to be able to get apparent and true wind data from the sensors without trying to
 pouvoir tester tous ces modes avec le simulateur
 Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et la vitesse du vent peut s'estimer grossièrement à partir de la vitesse du bateau, sauf que dépend aussi du courant…
 Prendre aussi en compte tangage, utiliser matrice d'euler
-rajouter commande setwindestimation/wgs avec unités des marins
-setwindestimation : command to set psitwind and vtwind, also add for water current and waves?
+setwindestimation/wgs : also add for water current and waves, any fluid...?
 prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 AHRS matrice de rotation, bras de levier...

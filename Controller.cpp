@@ -133,9 +133,11 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 			{
 				double psiw = Center(psitwindhat);
-#ifdef ALT_SAILBOAT_CONTROLLER
 				double psi = Center(psihat);
-#endif // ALT_SAILBOAT_CONTROLLER
+				double q = 0;
+				
+				q1 = betarear;
+				q2 = (log(betarear)-log(betaside))/log(2.0);
 
 				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
 				if (((state == STARBOARD_TACK_TRAJECTORY)&&(e > radius/2.0))||
@@ -157,7 +159,20 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					if (cos(psiw-psi)+cos(zeta) < 0)
 #endif // !ALT_SAILBOAT_CONTROLLER
 					{
-						if (e < 0)
+						switch (sailboattacktype)
+						{
+						default:
+						case 0:
+							q = sign(sin(wpsi-psi), 0);
+							break;
+						case 1:
+							q = sign(e, 0);
+							break;
+						case 2:
+							q = -sign(e*cos(psi-phi), 0);
+							break;
+						}
+						if (q < 0)
 						{
 							if ((state == PORT_TACK_TRAJECTORY)&&(e > -radius/2.0))
 							{
@@ -199,20 +214,27 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				switch (state)
 				{
 				case STARBOARD_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI+zeta; // Heading command.
-					deltasmax = 0; // Sail command.
-					break;
 				case PORT_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI-zeta; // Heading command.
+					wpsi = psiw+M_PI-q*zeta; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
-				default: // DIRECT_TRAJECTORY
+				case DIRECT_TRAJECTORY:
+				default:
 					//wpsi = wpsi; // Heading command.
-#ifndef ALT_SAILBOAT_CONTROLLER
-					deltasmax = q1*pow((cos(psiw-wpsi)+1.0)/2.0,q2); // Sail command.
-#else
-					deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0,q2); // Sail command.
-#endif // !ALT_SAILBOAT_CONTROLLER
+					// Sail command.
+					switch (sailformulatype)
+					{
+					default:
+					case 0:
+						deltasmax = q1*pow((cos(psiw-wpsi)+1.0)/2.0, q2);
+						break;
+					case 1:
+						deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0, q2);
+						break;
+					case 2:
+						deltasmax = q1*pow((cos(psiawind)+1.0)/2.0, q2);
+						break;
+					}
 					break;
 				}
 

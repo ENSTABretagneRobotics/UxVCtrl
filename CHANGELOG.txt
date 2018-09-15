@@ -1,3 +1,8 @@
+251
+Added sailboattacktype and sailformulatype parameters.
+Updated sailboatconfig command.
+Added setwindestimationwgs and setwindestimation commands.
+
 250
 Disabled u < 0 for sailboats.
 Renamed showmaestrogetposition to showgetpositionmaestro.

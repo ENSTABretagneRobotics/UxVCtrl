@@ -180,6 +180,8 @@ double betarear = 0;
 double zeta = 0;
 double check_strategy_period = 0;
 double sail_update_period = 0;
+int sailboattacktype = 0;
+int sailformulatype = 0;
 int controllerperiod = 0;
 #pragma endregion
 #pragma region Observer parameters

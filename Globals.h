@@ -364,6 +364,8 @@ extern double betarear;
 extern double zeta;
 extern double check_strategy_period;
 extern double sail_update_period;
+extern int sailboattacktype;
+extern int sailformulatype;
 extern int controllerperiod;
 #pragma endregion
 #pragma region Observer parameters

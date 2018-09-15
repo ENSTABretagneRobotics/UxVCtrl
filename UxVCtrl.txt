@@ -306,6 +306,10 @@ WMV2
 60
 % sail_update_period (in s)
 15
+% sailboattacktype (0, 1 or 2, see Controller.cpp)
+0
+% sailformulatype (0, 1 or 2, see Controller.cpp)
+0
 % controllerperiod (in ms)
 25
 % Observer parameters
