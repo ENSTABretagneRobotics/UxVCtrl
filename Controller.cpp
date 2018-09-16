@@ -164,50 +164,65 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 						{
 						default:
 						case 0:
-							q = sign(e, 0);
+							if ((fabs(e) > radius/2.0)||((state != STARBOARD_TACK_TRAJECTORY)&&(state != PORT_TACK_TRAJECTORY)))
+							{
+								q = sign(sin(psi-theta_star), 0);
+								if (q < 0)
+								{
+									state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
+								}
+								else
+								{
+									state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
+								}
+							}
 							break;
 						case 1:
-							q = -sign(e*cos(psi-phi), 0);
-							break;
-						case 2:
-							q = sign(sin(theta_star-psi), 0);
-							break;
-						}
-						if (q < 0)
-						{
-							if ((state == PORT_TACK_TRAJECTORY)&&(e > -radius/2.0))
+							if (e < 0)
 							{
-								if (bStdOutDetailedInfo) printf("Port tack trajectory.\n");
-								state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
+								if ((state == PORT_TACK_TRAJECTORY)&&(e > -radius/2.0))
+								{
+									state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
+								}
+								else
+								{
+									state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
+								}
 							}
 							else
 							{
-								if (bStdOutDetailedInfo) printf("Starboard tack trajectory.\n");
-								state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
+								if ((state == STARBOARD_TACK_TRAJECTORY)&&(e < radius/2.0))
+								{
+									state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
+								}
+								else
+								{
+									state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
+								}
 							}
-						}
-						else
-						{
-							if ((state == STARBOARD_TACK_TRAJECTORY)&&(e < radius/2.0))
-							{
-								if (bStdOutDetailedInfo) printf("Starboard tack trajectory.\n");
-								state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
-							}
-							else
-							{
-								if (bStdOutDetailedInfo) printf("Port tack trajectory.\n");
-								state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
-							}
+							break;
 						}
 					}
 					else
 					{
-						if (bStdOutDetailedInfo) printf("Direct trajectory.\n");
 						state = DIRECT_TRAJECTORY; // Suivi direct.
 					}
 					if (state != prevstate)
 					{
 						bForceSailUpdate = 1;
+						switch (state)
+						{
+						case STARBOARD_TACK_TRAJECTORY:
+							if (bStdOutDetailedInfo) printf("Starboard tack trajectory.\n");
+							break;
+						case PORT_TACK_TRAJECTORY:
+							if (bStdOutDetailedInfo) printf("Port tack trajectory.\n");
+							break;
+						case DIRECT_TRAJECTORY:
+							if (bStdOutDetailedInfo) printf("Direct trajectory.\n");
+						default:
+							break;
+						}
 					}
 					StartChrono(&chrono_check_strategy);
 				}
@@ -215,8 +230,11 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				switch (state)
 				{
 				case STARBOARD_TACK_TRAJECTORY:
+					wpsi = psiw+M_PI+zeta; // Heading command.
+					deltasmax = 0; // Sail command.
+					break;
 				case PORT_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI-q*zeta; // Heading command.
+					wpsi = psiw+M_PI-zeta; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				case DIRECT_TRAJECTORY:
