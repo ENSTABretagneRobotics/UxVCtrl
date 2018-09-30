@@ -277,9 +277,7 @@ fly to alt veut pas nombre à virgule ni alt nulle...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
-Add opencv and blueview to path from cmake?
 cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
-cmake auto download labjack...
 cmake options static (attention cv342...), xp toolset visual studio?
 tester avec un nouveau mingw et linux, check inline and timegm in a small program
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...

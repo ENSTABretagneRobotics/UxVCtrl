@@ -1,3 +1,6 @@
+256
+Updated CMakeLists.txt.
+
 255
 Changed thread-safety in OpenCVGUI, Video and VideoRecord.
 
