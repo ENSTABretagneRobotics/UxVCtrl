@@ -7,12 +7,10 @@ Potential fields to compute wtheta that fuses geofence, obstacles, theta_star
 Obstacles statiques de toutes sortes à spécifier dans fichier de config
 Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon autour?
 Programme et article potential fields de 2013
+rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
 
 Preparer sample évitement d'obstacle en relatif
 
-Dashboard : rajouter image en fond, cap voulu en remontée au vent car depend de l'estimation de vent
-
-problème echosondeur sur port série de rpizw?
 1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 
 Control voile fg, foc zs, ou l'inverse, avoir une option pour choisir si contrôle indépendant? Mais gestion du stop et generalstop dans scripts?
@@ -21,30 +19,16 @@ initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écras
 Rajouter params à linefollowingconfig pour que le robot ait automatiquement une précision plus importante quand il se rapproche de la destination->Attention si changement de r en cours de route, il risque d'attendre le chrono check strategy avant de changer de bord, il faut faire forcecheckstrategy si changement...
 linefollowingconfigex r gamma_infinite dist_end r_end gamma_infinite_end
 Linefollowingconfigex r debut, r milieu, r fin...
-GUI bloquée si GoPro pas connectée...->prévoir option pour lancer OpenCVGUI en 1er?
-
-pour les waypoints dans file conversions et ailleurs, utiliser %.9f car de toutes façons il y a toujours peu de waypoints (contrairement aux logs qui peuvent être gros)...
 
 Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT)
 
 params taux de détection sur durée ou équivalents, execute procid not implemented for some detection functions...
-Pouvoir lancer balltracking sans que ça fasse d'action...
-ball detection : ajouter en option des prétraitements?
-
-Effacer messages ffmpeg et limiter perturbations?
-error while decoding MB
-cabac decode of qscale diff failed
-Top block unavailable for requested intra4x4 mode
-->peut-être que le thread n'arrive pas à tourner assez vite, afficher le framerate dans OpenCVGUI?
-
-cv342 : rajouter plus de USE_OPENCV_HIGHGUI_CPP_API et ou rajouter une autre option USE_ONLY_OPENCV_CPP_API ou utiliser __cplusplus pour ne plus utiliser que les API C++, tout changer en cv::Mat vu que tout est basé sur les IplImage, désactiver temporairement les include de fonctions C pour voir quel code utilise encore du C...
 
 Bat1 elec, bat2 actuators, should update energy estimation when V and I measured...
 récupérer tension batterie via 4G? Tension/courant dans log principal?->vbat1 et 2 mis à la fin de lognav...
 Attention à surcharge de maestro...->disabled if -1, sleep équilibrés, countermodulo...
 Maestrosleeptime=10+10*(vbat1chan!=-1?1:0)+10*(ibat1chan!=-1?1:0)+10*(vbat2chan!=-1?1:0)+10*(ibat2chan!=-1?1:0)
 faire un getmultiplevaluemaestro pour optimiser, mais pas sûr que ça marche?->pas urgent car pour l'instant on peut alterner les lectures, mais peut être intéressant si besoin de haute fréquence de lecture...
-Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 compat CV7 : in if (ublox.bEnable_NMEA_MWV) take into account apparent wind speed and robot speed (SOG, COG...) and roll and pitch...
 to be able to get apparent and true wind data from the sensors without trying to compute true wind from apparent wind : replace bDisableRollWindCorrectionSailboat with int TrueWindComputationMode : 0 no true wind computation from apparent wind, 1 computation with all possible corrections, 2 computation with only yaw and roll correction
@@ -54,22 +38,14 @@ Prendre aussi en compte tangage, utiliser matrice d'euler
 setwindestimation/wgs : also add for water current and waves, any fluid...?
 prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
-AHRS matrice de rotation, bras de levier...
-
 abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
 PololuInterfaceType
 missing BOATBOT robid...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
 wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
-Simu voilier : mettre equations motorboat et voilier, PololuInterface
-add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
 mission.txt : prévoir e.g. 32 registres double pour pouvoir faire des conditions dessus
-UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
-Update simu pour émuler pololu?
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
-
-Arrêter proprement le programme si CTRL-C...
 
 rajouter gestion de message manual control mavlinkinterface
 
@@ -118,8 +94,6 @@ Drawsonarscreenshot_seanetpro
 Indiquer pings utilisés pour localisation
 param zone morte sonar?
 
-fly to alt veut pas nombre à virgule ni alt nulle...
-
 Prise en compte de 2 GPS pour contracter le cap (ou 3 pour les 3 angles)
 Contraction cap avec gyros avec intégration sur une durée glissante
 
@@ -149,7 +123,6 @@ Footprint RTL, ArduPilot Smart RTL?
 bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
 Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
 RTL en repassant en option par le chemin
-rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
 
 peut-être paramètres pour bRollControl, bPitchControl, commands to selectively disable them...?
 need to check nmeainterface with e.g. u-center, send altitude, heading, pitch, roll compatible with seanet...
@@ -217,15 +190,11 @@ minrange param, zone morte pour tous les sonar et echosondeurs...?
 
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
 
-Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planner...
-
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
 rajouter touche bSonarAltitudeEstimation?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
-
-Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
 
 Gyr/omegaz mais du coup je peux pas désactiver la centrale... voir pour pouvoir n'utiliser que gyros, utiliser options internes centrale? mais des fois je voudrais faire moi-même la fusion magnéto+gyros...
 ambiguités pour l'angle quand sort du champ de vision...
@@ -256,8 +225,10 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+problème echosondeur sur port série de rpizw?
 bug ublox voit pas $gnrmc à cause des corrections rtk, du coup on doit activer gga?
 lorsqu'il y a des erreurs de décodage opencv (e.g. avec rtp?), il y a des déconnexions des autres périphériques et XXXInterfaces...
+Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4...
 UxVCtrl et fileconv : vérifier les conversions entre repère NED, NWU, ENU, marine units, etc.
 check sign Euler angles computation from quaternions and matrix for SBG, old and new MTi...
 check sign of omegaz for SBG on SAUC'ISSE!
@@ -288,7 +259,6 @@ MAVLinkInterfaceThread will not be stopped and might create a memory leak...->no
 strange thread destruction loop at exit sometimes : this due to e.g. NMEAInterface when there is a client ready to connect it, the server is still creating threads for it, that immediately stop because of bExit. For some reason this delays the WaitForThread in the main...?
 manque des StopChrono() au moins dans MT, SBG
 should add commands critical section so that bWaiting = FALSE would never risk to be overwritten just after...
-Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4...
 Invalid minangle, midangle or maxangle sometimes on rpi2?
 Si le pipe est au centre de l'image mais tout en bas, le tracking marchera pas bien...
 Pour les commandes sans paramètres, si des caractères erronés sont après la commande mais avant le retour à la ligne, ça marche quand même, est-ce qu'il faut retourner erreur?->rajouter \n dans l'analyse de toutes les commandes?->ne marche pas sous Linux...
@@ -303,6 +273,8 @@ Attention à la touche NUM LOCK dans les vm Linux!
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
+fly to alt veut pas nombre à virgule ni alt nulle...
+Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
 Add opencv and blueview to path from cmake?
@@ -314,6 +286,10 @@ unit tests : vérifier que la plupart des commandes ne retournent pas une erreur,
 Compiler uxvctrl pour le pixhawk?
 
 logs
+Dashboard : rajouter image en fond, cap voulu en remontée au vent car depend de l'estimation de vent
+Dashboard : rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
+pour les waypoints dans file conversions et ailleurs, utiliser %.9f car de toutes façons il y a toujours peu de waypoints (contrairement aux logs qui peuvent être gros)...
+Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planner...
 logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
 fluiddir, fluidspeed, d_mes, alpha_mes units...
 différents types d'altitude, AMSL, venant d'un GPS imprécis, depth, AGL...
@@ -341,6 +317,13 @@ LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment fa
 Exp image sonar pour mieux détecter murs?
 
 GUI, video
+Pouvoir lancer balltracking sans que ça fasse d'action...?
+ball detection : ajouter en option des prétraitements?
+Effacer messages ffmpeg et limiter perturbations?
+error while decoding MB
+cabac decode of qscale diff failed
+Top block unavailable for requested intra4x4 mode
+->peut-être que le thread n'arrive pas à tourner assez vite, afficher le framerate dans OpenCVGUI?
 param caméras gain, exposure, etc.
 kinectsdkhook : gérer plusieurs kinect
 Stabilisation profondeur peut-être pas pratique, affichage bleu détection pas clair...
@@ -351,7 +334,7 @@ Rampe etas quand on accélère, en option...?
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
 pour image sonar ça fait un peu n'importe quoi...
-Si je passe presque tout en cv cpp, peut-être que ça va résoudre les problèmes de fenêtres sous Linux...
+cv342 : rajouter plus de USE_OPENCV_HIGHGUI_CPP_API et ou rajouter une autre option USE_ONLY_OPENCV_CPP_API ou utiliser __cplusplus pour ne plus utiliser que les API C++, tout changer en cv::Mat vu que tout est basé sur les IplImage, désactiver temporairement les include de fonctions C pour voir quel code utilise encore du C...
 Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
 tester touches en nomachine, ssh -X...
 MAVLinkInterface : solve message Failed to update home location
@@ -383,7 +366,7 @@ opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut 
 essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...->pas forcément souhaitable
 Mettre en var globale les périphériques?
 détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
-Dashboard : rajouter les mêmes types d'infos que dans UxVCtrl (GUI et showdetailedinfo) et voir aussi avec UxVDataViewer
+Arrêter proprement le programme si CTRL-C...
 Appli gps qui affiche sog à partir des logs?
 Faire programme pour aider à la mag calib
 fournir simple couche d'adaptation pour pouvoir traiter webcam sans opencv
@@ -459,6 +442,7 @@ vérifier la bonne utilisation d'InitPW...
 save mavlink tlog for MAVLinkDevice?
 
 GPS, NMEA, waypoints, AHRS, DVL
+AHRS matrice de rotation, bras de levier...
 ublox : surveiller problèmes de pragma pack, taille de packet dans SetCfg()...
 gestion des corrections RTCM probablement mal faite (retards?)...->pas trop grave si on les injecte via VSPE...
 Activer dans config ublox pseudo range, carrier phase->UBX-RXM-RAW, RAWX, penser à enregistrer config avec UBX-CFG, pour pouvoir faire post process avec rtklib
@@ -547,7 +531,11 @@ rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
 simu
+Simu voilier : mettre equations motorboat et voilier, PololuInterface
+add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
+UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
 reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations pour d'autres robots, et/ou intégrer les devices simulés et équations de robots dans UxVCtrl?->au moins les équations, il y a déjà des robid prévus pour différents simulateurs...
+Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
 
 CISCREA
 après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070
@@ -577,6 +565,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+GUI bloquée si GoPro pas connectée...->prévoir option pour lancer OpenCVGUI en 1er?->peut-être résolu avec nouvelles CS Video et GUI séparées...
 
 Roscontrol et rosjava android apps (no longer maintained?), communication avec MAVLink?
 

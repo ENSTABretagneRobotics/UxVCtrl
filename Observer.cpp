@@ -160,8 +160,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				// Should add vc,psic estimation influence in v?
 			}
 
-			// SAUC'ISSE and SARDINE can measure omegaz.
-			if (robid & SAUCISSE_CLASS_ROBID_MASK)
+			// SAUC'ISSE, SARDINE, BLUEROV, LIRMIA3 can measure omegaz.
+			if ((robid & SAUCISSE_CLASS_ROBID_MASK)||(robid == BLUEROV_ROBID)||(robid == LIRMIA3_ROBID))
 			{
 				omegazhat = omegaz_ahrs;
 			}

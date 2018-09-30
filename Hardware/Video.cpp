@@ -32,9 +32,9 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 			{
 				printf("Camera or video file paused.\n");
 				bConnected = FALSE;
-				EnterCriticalSection(&OpenCVCS);
+				EnterCriticalSection(&OpenCVVideoCS);
 				DisconnectVideo(&video);
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVVideoCS);
 			}
 			if (bExit) break;
 			mSleep(100);
@@ -47,16 +47,16 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 			{
 				printf("Restarting a camera or video file.\n");
 				bConnected = FALSE;
-				EnterCriticalSection(&OpenCVCS);
+				EnterCriticalSection(&OpenCVVideoCS);
 				DisconnectVideo(&video);
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVVideoCS);
 			}
 			bRestartVideo[videoid] = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			EnterCriticalSection(&OpenCVCS);
+			EnterCriticalSection(&OpenCVVideoCS);
 			if (ConnectVideo(&video, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
@@ -67,16 +67,16 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 				if (img == NULL)
 				{
 					printf("cvCreateImage() failed.\n");
-					LeaveCriticalSection(&OpenCVCS);
+					LeaveCriticalSection(&OpenCVVideoCS);
 					break;
 				}
 
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVVideoCS);
 				//mSleep(captureperiod);
 			}
 			else 
 			{
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVVideoCS);
 				bConnected = FALSE;
 				mSleep(1000);
 			}
@@ -100,9 +100,9 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 			{
 				printf("Connection to a camera lost or no more picture in a video file.\n");
 				bConnected = FALSE;
-				EnterCriticalSection(&OpenCVCS);
+				EnterCriticalSection(&OpenCVVideoCS);
 				DisconnectVideo(&video);
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVVideoCS);
 				mSleep(captureperiod);
 			}		
 		}
@@ -113,9 +113,9 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	if (img) cvReleaseImage(&img);
 	img = NULL;
 
-	EnterCriticalSection(&OpenCVCS);
+	EnterCriticalSection(&OpenCVVideoCS);
 	if (bConnected) DisconnectVideo(&video);
-	LeaveCriticalSection(&OpenCVCS);
+	LeaveCriticalSection(&OpenCVVideoCS);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

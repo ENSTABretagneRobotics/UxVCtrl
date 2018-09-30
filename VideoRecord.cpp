@@ -64,6 +64,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				EnterCriticalSection(&strtimeCS);
 				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
 				LeaveCriticalSection(&strtimeCS);
+				EnterCriticalSection(&OpenCVVideoRecordCS);
 				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
 					CV_FOURCC('M','J','P','G'), 
 					//CV_FOURCC('D','I','V','X'), 
@@ -72,6 +73,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				EnterCriticalSection(&strtimeCS);
 				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtime_fns(), videorecordextension);
 				LeaveCriticalSection(&strtimeCS);
+				EnterCriticalSection(&OpenCVVideoRecordCS);
 				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
 					//CV_FOURCC_PROMPT,
 					CV_FOURCC(szVideoRecordCodec[0],szVideoRecordCodec[1],szVideoRecordCodec[2],szVideoRecordCodec[3]), 
@@ -79,6 +81,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					1000.0/(double)captureperiod, 
 					cvSize(videoimgwidth,videoimgheight), 
 					1);
+				LeaveCriticalSection(&OpenCVVideoRecordCS);
 				if (!videorecordfiles[videoid])
 				{
 					printf("Error creating a video file.\n");
@@ -88,6 +91,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				EnterCriticalSection(&strtimeCS);
 				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
 				LeaveCriticalSection(&strtimeCS);
+				EnterCriticalSection(&OpenCVVideoRecordCS);
 				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
 					CV_FOURCC('M','J','P','G'), 
 					//CV_FOURCC('D','I','V','X'), 
@@ -96,6 +100,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				EnterCriticalSection(&strtimeCS);
 				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtime_fns(), videorecordextension);
 				LeaveCriticalSection(&strtimeCS);
+				EnterCriticalSection(&OpenCVVideoRecordCS);
 				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
 					//CV_FOURCC_PROMPT,
 					CV_FOURCC(szVideoRecordCodec[0],szVideoRecordCodec[1],szVideoRecordCodec[2],szVideoRecordCodec[3]), 
@@ -104,19 +109,23 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					cvSize(videoimgwidth,videoimgheight), 
 					1))
 				{
+					LeaveCriticalSection(&OpenCVVideoRecordCS);
 					printf("Error creating a video file.\n");
 				}
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 				else
 				{
+					LeaveCriticalSection(&OpenCVVideoRecordCS);
 					if (CreateTimer(&timer, VideoRecordCallbackFunction, (void*)(intptr_t)videoid, captureperiod, captureperiod) != EXIT_SUCCESS)
 					{
 						printf("Error creating a timer.\n");
+						EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 						cvReleaseVideoWriter(&videorecordfiles[videoid]);
 #else
 						videorecordfiles[videoid].release();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+						LeaveCriticalSection(&OpenCVVideoRecordCS);
 					}
 					else
 						bVideoRecording = TRUE;
@@ -131,11 +140,13 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			{
 				DeleteTimer(&timer, FALSE);
 				mSleep(captureperiod);
+				EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvReleaseVideoWriter(&videorecordfiles[videoid]);
 #else
 				videorecordfiles[videoid].release();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+				LeaveCriticalSection(&OpenCVVideoRecordCS);
 				mSleep(captureperiod);
 				bVideoRecording = FALSE;
 			}
@@ -148,11 +159,13 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 	{
 		DeleteTimer(&timer, FALSE);
 		mSleep(captureperiod);
+		EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvReleaseVideoWriter(&videorecordfiles[videoid]);
 #else
 		videorecordfiles[videoid].release();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+		LeaveCriticalSection(&OpenCVVideoRecordCS);
 		mSleep(captureperiod);
 		bVideoRecording = FALSE;
 	}

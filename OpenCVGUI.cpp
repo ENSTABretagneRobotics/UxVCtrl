@@ -95,13 +95,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	StartChrono(&chrono_epu);
 
 	// Sometimes needed on Linux to get windows-related functions working properly in multiple threads, sometimes not...
-	//EnterCriticalSection(&OpenCVCS);
+	//EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 	//cvStartWindowThread();
 #else
 	//cv::startWindowThread();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-	//LeaveCriticalSection(&OpenCVCS);
+	//LeaveCriticalSection(&OpenCVGUICS);
 
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0.0, 1, 8);
 	colortextid = 0;
@@ -115,13 +115,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		if (windowname[0] != 0)
 		{
 #ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
-			EnterCriticalSection(&OpenCVCS);
+			EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 			c = cvWaitKey(captureperiod);
 #else
 			c = cv::waitKey(captureperiod);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-			LeaveCriticalSection(&OpenCVCS);
+			LeaveCriticalSection(&OpenCVGUICS);
 #else
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 			c = cvWaitKey(captureperiod);
@@ -139,7 +139,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (windowname[0] == 0)
 			{
 				sprintf(windowname, "UxVOpenCVGUI%d", videoid);
-				EnterCriticalSection(&OpenCVCS);
+				EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
 				cvMoveWindow(windowname, videoimgwidth*videoid, 0);
@@ -147,7 +147,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cv::namedWindow(windowname, cv::WINDOW_AUTOSIZE);
 				cv::moveWindow(windowname, videoimgwidth*videoid, 0);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVGUICS);
 			}
 		}
 		else
@@ -167,7 +167,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					//AbortMission();
 					bDispPlaySymbol = FALSE;
 				}
-				EnterCriticalSection(&OpenCVCS);
+				EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvDestroyWindow(windowname);
 				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
@@ -177,7 +177,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cv::namedWindow(windowname, cv::WINDOW_AUTOSIZE);
 				cv::destroyWindow(windowname);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-				LeaveCriticalSection(&OpenCVCS);
+				LeaveCriticalSection(&OpenCVGUICS);
 				memset(windowname, 0, sizeof(windowname));
 			}
 			mSleep(100);
@@ -1740,6 +1740,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		LeaveCriticalSection(&dispimgsCS[videoid]);
 		LeaveCriticalSection(&StateVariablesCS);
 
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+		EnterCriticalSection(&OpenCVGUICS);
+#endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 		EnterCriticalSection(&dispimgsCS[videoid]);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvShowImage(windowname, dispimgs[videoid]);
@@ -1747,6 +1750,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		cv::imshow(windowname, cv::cvarrToMat(dispimgs[videoid]));
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		LeaveCriticalSection(&dispimgsCS[videoid]);
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+		LeaveCriticalSection(&OpenCVGUICS);
+#endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 
 		if (bExit) break;
 	}
@@ -1770,7 +1776,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	}
 	if (windowname[0] != 0)
 	{
-		EnterCriticalSection(&OpenCVCS);
+		EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvDestroyWindow(windowname);
 		cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
@@ -1780,7 +1786,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		cv::namedWindow(windowname, cv::WINDOW_AUTOSIZE);
 		cv::destroyWindow(windowname);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-		LeaveCriticalSection(&OpenCVCS);
+		LeaveCriticalSection(&OpenCVGUICS);
 		memset(windowname, 0, sizeof(windowname));
 	}
 

@@ -716,7 +716,9 @@ extern CRITICAL_SECTION SeanetConnectingCS;
 extern CRITICAL_SECTION SeanetDataCS;
 extern CRITICAL_SECTION StateVariablesCS;
 extern CRITICAL_SECTION MissionFilesCS;
-extern CRITICAL_SECTION OpenCVCS;
+extern CRITICAL_SECTION OpenCVGUICS;
+extern CRITICAL_SECTION OpenCVVideoCS;
+extern CRITICAL_SECTION OpenCVVideoRecordCS;
 extern CRITICAL_SECTION strtimeCS;
 extern STATE state;
 extern double vbat1;
@@ -1049,7 +1051,9 @@ inline int InitGlobals(void)
 	InitCriticalSection(&SeanetDataCS);
 	InitCriticalSection(&StateVariablesCS);
 	InitCriticalSection(&MissionFilesCS);
-	InitCriticalSection(&OpenCVCS);
+	InitCriticalSection(&OpenCVGUICS);
+	InitCriticalSection(&OpenCVVideoCS);
+	InitCriticalSection(&OpenCVVideoRecordCS);
 	InitCriticalSection(&strtimeCS);
 
 	StartChrono(&chrono_mission);
@@ -1092,7 +1096,9 @@ inline int ReleaseGlobals(void)
 	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
 
 	DeleteCriticalSection(&strtimeCS);
-	DeleteCriticalSection(&OpenCVCS);
+	DeleteCriticalSection(&OpenCVVideoRecordCS);
+	DeleteCriticalSection(&OpenCVVideoCS);
+	DeleteCriticalSection(&OpenCVGUICS);
 	DeleteCriticalSection(&MissionFilesCS);
 	DeleteCriticalSection(&StateVariablesCS);
 	DeleteCriticalSection(&SeanetDataCS);
