@@ -1,3 +1,7 @@
+254
+Updated ReadMe.txt and CMakeLists.txt.
+Changed default build options.
+
 253
 Corrected sailboattacktype.
 

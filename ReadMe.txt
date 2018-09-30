@@ -15,7 +15,7 @@ _ Microsoft .NET Framework 4.7 (see http://go.microsoft.com/fwlink/?LinkId=82530
 [_ MinGW and MSYS]
 [_ GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
 [_ Look@LAN (lalsetup250)]
-_ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.exe.zip , can be disabled using Compat_vs20XX.bat script)]
+_ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.exe.zip , can be disabled using Compat_vs20XX.bat script or cmake)]
 [_ MT SDK 2.7/3.3/4.2.1/4.3 (recommended if using a Xsens MTi device)]
 [_ Maestro Control Center (recommended if using a Pololu Maestro device)]
 [_ Jrk Configuration Utility (recommended if using a Pololu Jrk device)]
@@ -23,23 +23,23 @@ _ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/L
 [_ OpenAL SDK 1.1]
 [_ freealut 1.1.0]
 [_ fftw 3.3.2 32 bit]
-[_ ffmpeg 32 bit (recommended if using a SJCAM or GoPro through Wi-Fi, see http://www.ensta-bretagne.fr/lebars/utilities/ffmpeg-msvc.zip, to enable using ffmpeg_vs2017.bat script)]
-_ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP, can be disabled using Compat_vs20XX.bat script)
-_ CL-Eye driver and SDK (see https://codelaboratories.com/products/eye/driver/ , you might also want to create an environment variable CLEYESDK_DIR=C:\Users\Administrator\Documents\CL-Eye Platform SDK depending on where it is installed, can be disabled using Compat_vs20XX.bat script, not compatible with Kinect v2 support)
-_ ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt , can be disabled using Compat_vs20XX.bat script)
+[_ ffmpeg 32 bit (might be useful if using a SJCAM through Wi-Fi, see http://www.ensta-bretagne.fr/lebars/utilities/ffmpeg-msvc.zip, to enable using ffmpeg_vs2017.bat script or cmake)]
+_ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP, can be disabled using Compat_vs20XX.bat script or cmake)
+_ CL-Eye driver and SDK (see https://codelaboratories.com/products/eye/driver/ , you might also want to create an environment variable similar to CLEYESDK_DIR=C:\Users\Administrator\Documents\CL-Eye Platform SDK depending on where it is installed, can be disabled using Compat_vs20XX.bat script or cmake, not compatible with Kinect v2 support)
+_ ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt , can be disabled using Compat_vs20XX.bat script or cmake)
 [_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
-_ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip , can be disabled using Compat_vs20XX.bat script)
+_ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 *** DEVELOPER ***
 _ Visual Studio 2017
-_ OpenCV 2.4.13 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf , can be disabled using Compat_vs20XX.bat script )
-_ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip , can be disabled using Compat_vs20XX.bat script)
-_ SBG Systems Inertial SDK v3.5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script)
+_ OpenCV 2.4.13 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
+_ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip , can be disabled using Compat_vs20XX.bat script or cmake)
+_ SBG Systems Inertial SDK v3.5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 _ ..\OSUtils : Windows/Linux abstraction layer (threads, network, serial port, time management...) as well as other useful functions
 _ ..\Extensions : Labjack and some image functions
 _ ..\interval : interval library
 _ ..\matrix_lib : matrix library compatible with interval
 
-Restart the computer after prerequisites installation. Ensure that the folders UxVCtrl, OSUtils, Extensions, interval, matrix_lib are at the same directory level. To disable the need of any unnecessary prerequisites, run Compat_vs20XX.bat and follow its instructions. To use a specific version of the Visual Studio solution, copy the project files from the Backup_vs20XX folder to the UxVCtrl folder to replace the default. You might also need to adapt some paths in Visual Studio Project Properties (C/C++\Additional Include Directories, Linker\Additional Library Directories) and in Windows PATH if some required dependencies are not found correctly on your system. The program is also supposed to be compatible with Linux with equivalent prerequisites (see http://www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt for installation information about some of them), although not fully tested. See provided Makefile or Visual Studio 2017 VC Linux project (set Pre-Launch Command to export DISPLAY=:0.0 and Working Directory to $(RemoteProjectDir)/UxVCtrl). Alternatively, you can use cmake-gui/cmake (only 32 bit version is supported on Windows 64 bit) to configure your project files or makefiles.
+Restart the computer after prerequisites installation. Ensure that the folders UxVCtrl, OSUtils, Extensions, interval, matrix_lib are at the same directory level. To disable the need of any unnecessary prerequisites, run Compat_vs20XX.bat and follow its instructions. To use a specific version of the Visual Studio solution, copy the project files from the Backup_vs20XX folder to the UxVCtrl folder to replace the default. You might also need to adapt some paths in Visual Studio Project Properties (C/C++\Additional Include Directories, Linker\Additional Library Directories) and in Windows PATH if some required dependencies are not found correctly on your system. The program is also supposed to be compatible with Linux with equivalent prerequisites (see http://www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt for installation information about some of them), although not fully tested. See provided Makefile or Visual Studio 2017 VC Linux project (set Pre-Launch Command to export DISPLAY=:0.0 and Working Directory to $(RemoteProjectDir)/UxVCtrl). Alternatively, you can use cmake-gui/cmake (only 32 bit version is supported on Windows 64 bit, run as administrator if needed, check if the command prompt is asking for a password if cmake-gui appears to hang, build and run UxVCtrl with the generated project files) to configure your project files or makefiles. On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows.
 
 Please do not try to build the program in a directory that contains commas! Mind the line endings in the configuration files depending on the OS (use e.g. the command dos2unix *.txt to convert line endings for Linux)!
 
@@ -67,9 +67,10 @@ Hardware support :
 - BlueView : Teledyne BlueView M450/900/2250-130 sonars.
 - BlueROV2 : Hardware version of February 2018 (shipped with ArduSub 3.5.2 (07f2d5ac)).
 - CISCREA : CISCREA JACK ROV ENSTA Bretagne version.
+- gpControl : GoPro Hero 5 control link (need to configure also Video accordingly).
 - Hokuyo : Hokuyo URG-04LX-UG01 laser telemeter.
+- IM483I : Intelligent Motion Systems IM483I step motor controller.
 - LIRMIA3 : Thrusters I2C drivers through Arduino on LIRMIA 3 AUV from UMI LAFMIA CINVESTAV Mexico.
-- Pololu : Pololu Mini Maestro 6, 18, 24 servo controllers, Pololu Jrk (preliminary support).
 - MAVLinkDevice : HKPilot32 (Pixhawk), ArduPilot/ArduFlyer/HKPilot Mega (APM 2.5) with ArduCopter, ArduRover, ArduSub, or PX4FLOW.
 - MDM : Tritech Micron Data Modem (or other kinds of simple RS232 modems).
 - MES : Tritech Micron Echosounder.
@@ -78,13 +79,14 @@ Hardware support :
 - NMEADevice (superseded by ublox) : GPS, Furuno WS200 weather station, AIS Receiver dAISy.
 - P33x : Keller pressure sensor PAA-33x.
 - PathfinderDVL : TRDI Pathfinder DVL.
+- Pololu : Pololu Mini Maestro 6, 18, 24 servo controllers, Pololu Jrk (preliminary support).
 - RazorAHRS : SparkFun 9DOF Razor IMU (flash firmware from https://github.com/lebarsfa/razor-9dof-ahrs if needed).
-- RPLIDAR : RPLIDAR A2 laser telemeter.
-- SBG : SBG Systems Ellipse-N AHRS.
+- RPLIDAR : RPLIDAR A1 and A2 laser telemeters.
+- SBG : SBG Systems Ellipse AHRS.
 - Seanet : Tritech Micron Sonar, Tritech MiniKing Sonar.
 - SSC-32 : Lynxmotion SSC-32, SSC-32u servo controllers.
 - ublox : ublox GPS, Furuno WS200 weather station, AIS Receiver dAISy, or other NMEA-compatible devices with supported NMEA sentences.
 - UE9A : LabJack UE9.
-- Video : USB webcam, SJCAM M10+ through Wi-Fi, Kinect v2, CL-Eye (Kinect v2 and CL-Eye are mutually exclusive).
+- Video : USB webcam, GoPro Hero 5 through Wi-Fi (need to enable also gpControl), SJCAM M10+ through Wi-Fi, Kinect v2, CL-Eye (Kinect v2 and CL-Eye are mutually exclusive).
 
-See also https://github.com/ENSTABretagneRobotics/Android, https://github.com/ENSTABretagneRobotics/Hardware-CPP, https://github.com/ENSTABretagneRobotics/Hardware-MATLAB, https://github.com/ENSTABretagneRobotics/Hardware-Java.
+See also https://github.com/ENSTABretagneRobotics/Hardware-CPP, https://github.com/ENSTABretagneRobotics/Hardware-MATLAB, https://github.com/ENSTABretagneRobotics/Hardware-Java, https://github.com/ENSTABretagneRobotics/Android.

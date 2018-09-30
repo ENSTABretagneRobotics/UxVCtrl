@@ -217,6 +217,14 @@ int main(int argc, char* argv[])
 #endif // DISABLE_IGNORE_SIGPIPE
 #endif // _WIN32
 
+//#ifdef _WIN32
+//	// Need <direct.h>...
+//	_mkdir(LOG_FOLDER); _mkdir(PIC_FOLDER); _mkdir(VID_FOLDER); _mkdir(AUD_FOLDER);
+//#else
+//	// Need <sys/stat.h> and <sys/types.h>...
+//	mkdir(LOG_FOLDER, 0777); mkdir(PIC_FOLDER, 0777); mkdir(VID_FOLDER, 0777); mkdir(AUD_FOLDER, 0777);
+//#endif // _WIN32
+
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...
 	if (!bDisablegpControl) CreateDefaultThread(gpControlThread, NULL, &gpControlThreadId);
 #ifndef DISABLE_OPENCV_SUPPORT

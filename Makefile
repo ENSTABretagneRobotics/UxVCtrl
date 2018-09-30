@@ -2,8 +2,8 @@
 # You might need to install C/C++ development tools by typing :
 #    sudo apt-get install build-essential
 # in a terminal.
-# Additionally, you might need to install OpenCV 2.4.13, MAVLink, libmodbus 3.0.6, SBG Systems Inertial SDK v3.5.0, ProViewer SDK 3.5[, ffmpeg 32 bit, OpenAL SDK 1.1, freealut 1.1.0, fftw 3.3.2].
-# For more information on the configuration used, see www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt .
+# Additionally, you might need to install additional prerequisites, as described in ReadMe.txt.
+# For more information on the configuration used, see http://www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt .
 # Use dos2unix *.txt to ensure line endings are correct for Linux in the configuration files.
 # In case of codecs problems, try with USE_ALTERNATE_RECORDING...
 # On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows.

@@ -1,3 +1,13 @@
+MAVLink : envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?), vérifier fonctionnement de rc_override vers UxVCtrl notamment pour voilier...
+pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
+
+Geofence command
+Obstacles list added by LIDAR or other things
+Potential fields to compute wtheta that fuses geofence, obstacles, theta_star
+Obstacles statiques de toutes sortes à spécifier dans fichier de config
+Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon autour?
+Programme et article potential fields de 2013
+
 Preparer sample évitement d'obstacle en relatif
 
 Dashboard : rajouter image en fond, cap voulu en remontée au vent car depend de l'estimation de vent
@@ -19,6 +29,7 @@ Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT)
 
 params taux de détection sur durée ou équivalents, execute procid not implemented for some detection functions...
 Pouvoir lancer balltracking sans que ça fasse d'action...
+ball detection : ajouter en option des prétraitements?
 
 Effacer messages ffmpeg et limiter perturbations?
 error while decoding MB
@@ -38,7 +49,7 @@ Maestro bloquée si on ne récupère pas en continu les données envoyées par la Raz
 compat CV7 : in if (ublox.bEnable_NMEA_MWV) take into account apparent wind speed and robot speed (SOG, COG...) and roll and pitch...
 to be able to get apparent and true wind data from the sensors without trying to compute true wind from apparent wind : replace bDisableRollWindCorrectionSailboat with int TrueWindComputationMode : 0 no true wind computation from apparent wind, 1 computation with all possible corrections, 2 computation with only yaw and roll correction
 pouvoir tester tous ces modes avec le simulateur
-Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et la vitesse du vent peut s'estimer grossièrement à partir de la vitesse du bateau, sauf que dépend aussi du courant…
+Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et la vitesse du vent peut s'estimer grossièrement à partir de la vitesse du bateau, sauf que dépend aussi du courant...
 Prendre aussi en compte tangage, utiliser matrice d'euler
 setwindestimation/wgs : also add for water current and waves, any fluid...?
 prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
@@ -55,20 +66,14 @@ Simu voilier : mettre equations motorboat et voilier, PololuInterface
 add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
 mission.txt : prévoir e.g. 32 registres double pour pouvoir faire des conditions dessus
 UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
+Update simu pour émuler pololu?
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
 
 Arrêter proprement le programme si CTRL-C...
 
-unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
-
 rajouter gestion de message manual control mavlinkinterface
 
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
-
-cmake options static (attention cv342...), xp toolset visual studio?
-cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
-
-Compiler uxvctrl pour le pixhawk?
 
 bug com with opencpn when it sends also other nmea messages, because of period of 500 ms for nmea interface, the period should be lower and 500 ms should be used only to choose when to send data, add parameters for the send period of each individual nmea message...
 Mélange des waypoints s'il y a 2 clients nmeainterface...
@@ -77,10 +82,6 @@ inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
 nb waypoints impairs, juste 1, reset CurWP, index qui démarre à 0 ou 1...
 show WPT(CurWP) on OpenCVGUI when waypointslist is in use?
 longitude180handling?
-
-ball detection : ajouter en option des prétraitements?
-
-tester avec un nouveau mingw et linux, check inline and timegm in a small program
 
 param friendly name
 Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
@@ -221,8 +222,6 @@ Data viewer: pouvoir rejouer en temps réel ou accéléré, lien avec Mission Planne
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
-Roscontrol et rosjava android apps (no longer maintained?), communication avec MAVLink?
-
 rajouter touche bSonarAltitudeEstimation?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
 
@@ -296,7 +295,6 @@ Pour les commandes sans paramètres, si des caractères erronés sont après la comm
 bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
 crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...
 why I need to press twice r to stop videorecording when it was started by a script?->c'est logique, il faudrait sans doute que la variable locale bVideoRecording soit réglée en fonction de videorecordrequests, peut-être la supprimer dans OpenCVGUI et rendre l'enregistrement indépendant du fait que la GUI soit enabled ou pas, les videorecordrequests étant juste soit 0, soit 1, seul l'appui de la touche r ou les command start/stop videorecording doivent controler l'enregistrement...
-protéger par OpenCVCS les VideoWriter? Mais s'il y a une webcam qui met du temps à se connecter ça va bloquer...
 tester mission crash vidéo sur sardine pendant longtemps, sur des missions, en appuyant sur tous les boutons...
 race condition : vérifier que si 2 entercritical section différents se suivent, c'est toujours dans le même ordre quel que soit le thread...
 pb opencv 2.4.9 qt gentoo linux touches maj et avec plusieurs fenêtres opencv dans threads->à cause de Qt?
@@ -305,6 +303,15 @@ Attention à la touche NUM LOCK dans les vm Linux!
 bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il y a des free qui ne devraient être faits que si bConnected, fuite mémoire aussi...?->en fait ça va pas bugger, mais c'est un peu limite...
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
+
+build and install
+Add opencv and blueview to path from cmake?
+cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
+cmake auto download labjack...
+cmake options static (attention cv342...), xp toolset visual studio?
+tester avec un nouveau mingw et linux, check inline and timegm in a small program
+unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
+Compiler uxvctrl pour le pixhawk?
 
 logs
 logstate format : Observer, Simulator, upgradelogstate, downgradelogstate, logstate2tlog
@@ -571,6 +578,15 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+Roscontrol et rosjava android apps (no longer maintained?), communication avec MAVLink?
+
+Chemin avec espace pour source...
+Cmake n'arrivait pas à télécharger opencv windows->probablement corrigé...
+
+protéger par OpenCVCS les VideoWriter? Mais s'il y a une webcam qui met du temps à se connecter ça va bloquer...->CS séparées...
+
+UxVSim : simulateur se déplace bizarrement...->peut-être normal
+
 fluiddir (in deg) values in log razor scan?->c'est juste le vent initial...
 Touche juste mise au neutre gouvernail?->déjà possible avec a ou e pour certains robots...
 
@@ -602,9 +618,9 @@ waitlinetwgs
 
 Le programme ne s'arrête pas si n'arrive pas à se connecter à udp://10.5.5.9, mais c'est sans doute à cause d'opencv
 
-Passer de 80 à 70 pour gamma_infinite par défaut pour pas revenir en arr si erreur de 20 deg sur cap…?
+Passer de 80 à 70 pour gamma_infinite par défaut pour pas revenir en arr si erreur de 20 deg sur cap...?
 
-Pas forcément remettre à 0 integral si changement consigne? Pas sûr…
+Pas forcément remettre à 0 integral si changement consigne? Pas sûr...
 
 Linux : program killed when client disconnects from server->dans send mettre MSG_NOSIGNAL, mais pour write il n'y a pas de paramètre donc dans le open mettre signal(SIGPIPE, SIG_IGN) (or sigignore(SIGPIPE)) et/ou le mettre dans le main...
 https://stackoverflow.com/questions/17332646/server-dies-on-send-if-client-was-closed-with-ctrlc
@@ -647,7 +663,7 @@ sign(u, 0) buggy (movement direction if necessary)
 constrain, map, sq
 non-symmetrical control...->keep as it is...
 
-Commande proportionnelle à e.g. sqrt(error), sin…->à traiter comme cas particuliers…
+Commande proportionnelle à e.g. sqrt(error), sin...->à traiter comme cas particuliers...
 
 put by default GGA and RMC in ublox config files that use NMEA protocol...
 
@@ -657,7 +673,7 @@ Rajouter depth et altitude dans log file, différencier altitude AGL (above groun
 
 logstate était compatible avec le début de logsimu à l'origine...->modifier logsimu pour qu'il soit toujours un peu compatible?->tout faire comme logstate
 
-Nouveau seanet pro pour problème portée?->pas mieux, pareil avec micron software…
+Nouveau seanet pro pour problème portée?->pas mieux, pareil avec micron software...
 
 Renommer dossiers AUVs\2016-2017 en UxVs\Latest, et mettre à jour script USERUpdtQuick et UpgradeOSUtils et dans GitHub pour chaque PC?
 

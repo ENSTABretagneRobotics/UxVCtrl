@@ -345,7 +345,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_GPS1_RAW:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.gpsRawDataSize = pLogData->gpsRawData.bufferSize;
+		pSBG->LastSBGData.gpsRawDataSize = (unsigned int)pLogData->gpsRawData.bufferSize;
 		memcpy(pSBG->LastSBGData.gpsRawData, pLogData->gpsRawData.rawBuffer, pLogData->gpsRawData.bufferSize);
 		LeaveCriticalSection(&pSBG->CallbackCS);	
 		break;
