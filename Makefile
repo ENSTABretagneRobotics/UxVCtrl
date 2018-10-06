@@ -250,9 +250,6 @@ Main.o: Main.cpp
 MAVLinkInterface.o: MAVLinkInterface.cpp MAVLinkInterface.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-MissingWorker.o: MissingWorker.cpp MissingWorker.h
-	$(CXX) $(CXXFLAGS) -c $<
-
 NMEAInterface.o: NMEAInterface.cpp NMEAInterface.h
 	$(CXX) $(CXXFLAGS) -c $<
 
@@ -263,9 +260,6 @@ OpenCVGUI.o: OpenCVGUI.cpp OpenCVGUI.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 Pinger.o: Pinger.cpp Pinger.h
-	$(CXX) $(CXXFLAGS) -c $<
-
-Pipeline.o: Pipeline.cpp Pipeline.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 RazorAHRSInterface.o: RazorAHRSInterface.cpp RazorAHRSInterface.h
@@ -298,7 +292,7 @@ VisualObstacle.o: VisualObstacle.cpp VisualObstacle.h
 Wall.o: Wall.cpp Wall.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o Pipeline.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MissingWorker.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VisualObstacle.o VideoRecord.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o OpenCVGUI.o Observer.o NortekDVL.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

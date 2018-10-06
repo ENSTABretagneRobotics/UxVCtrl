@@ -90,6 +90,7 @@ videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, Ve
 char szVideoRecordCodec[5];
 BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
+int opencvguiperiod = 0;
 BOOL bMAVLinkInterface = FALSE;
 char szMAVLinkInterfacePath[MAX_BUF_LEN];
 int MAVLinkInterfaceBaudRate = 0;
@@ -261,8 +262,9 @@ BOOL bExternalVisualLocalization = FALSE;
 CRITICAL_SECTION ExternalVisualLocalizationCS;
 CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
 IplImage* ExternalVisualLocalizationOverlayImg = NULL;
-int rmin_externalvisuallocalization = 0, rmax_externalvisuallocalization = 0, gmin_externalvisuallocalization = 0, gmax_externalvisuallocalization = 0, bmin_externalvisuallocalization = 0, bmax_externalvisuallocalization = 0; 
 int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, smin_externalvisuallocalization = 0, smax_externalvisuallocalization = 0, lmin_externalvisuallocalization = 0, lmax_externalvisuallocalization = 0;
+BOOL bHExclusive_externalvisuallocalization = 0, bSExclusive_externalvisuallocalization = 0, bLExclusive_externalvisuallocalization = 0;
+int r_selpix_externalvisuallocalization = 0, g_selpix_externalvisuallocalization = 0, b_selpix_externalvisuallocalization = 0; 
 double objMinRadiusRatio_externalvisuallocalization = 0, objRealRadius_externalvisuallocalization = 0, objMinDetectionRatio_externalvisuallocalization = 0, objDetectionRatioDuration_externalvisuallocalization = 0; 
 rmatrix T_externalvisuallocalization(4,4);
 double coef1_angle_externalvisuallocalization = 0, coef2_angle_externalvisuallocalization = 0;
@@ -291,31 +293,14 @@ int bBrake_wall = 0;
 int procid_wall = 0;
 double u_wall = 0;
 
-// Pipeline variables.
-BOOL bPipelineDetection = FALSE;
-BOOL bPipelineTrackingControl = FALSE;
-CRITICAL_SECTION PipelineCS;
-CRITICAL_SECTION PipelineOverlayImgCS;
-IplImage* PipelineOverlayImg = NULL;
-int rmin_pipeline = 0, rmax_pipeline = 0, gmin_pipeline = 0, gmax_pipeline = 0, bmin_pipeline = 0, bmax_pipeline = 0; 
-int hmin_pipeline = 0, hmax_pipeline = 0, smin_pipeline = 0, smax_pipeline = 0, lmin_pipeline = 0, lmax_pipeline = 0;
-double objMinRadiusRatio_pipeline = 0, objRealRadius_pipeline = 0, objMinDetectionRatio_pipeline = 0, objDetectionRatioDuration_pipeline = 0, d0_pipeline = 0; 
-double kh_pipeline = 0, kv_pipeline = 0;
-int bBrake_pipeline = 0;
-int procid_pipeline = 0;
-int videoid_pipeline = 0; 
-double u_pipeline = 0;
-double detectratio_pipeline = 0;
-BOOL bPipelineFound = FALSE;
-
 // Ball variables.
-BOOL bBallDetection = FALSE;
 BOOL bBallTrackingControl = FALSE;
 CRITICAL_SECTION BallCS;
 CRITICAL_SECTION BallOverlayImgCS;
 IplImage* BallOverlayImg = NULL;
-int rmin_ball = 0, rmax_ball = 0, gmin_ball = 0, gmax_ball = 0, bmin_ball = 0, bmax_ball = 0; 
 int hmin_ball = 0, hmax_ball = 0, smin_ball = 0, smax_ball = 0, lmin_ball = 0, lmax_ball = 0;
+BOOL bHExclusive_ball = 0, bSExclusive_ball = 0, bLExclusive_ball = 0;
+int r_selpix_ball = 0, g_selpix_ball = 0, b_selpix_ball = 0; 
 double objMinRadiusRatio_ball = 0, objRealRadius_ball = 0, objMinDetectionRatio_ball = 0, objDetectionRatioDuration_ball = 0, d0_ball = 0; 
 double kh_ball = 0, kv_ball = 0;
 int lightMin_ball = 0;
@@ -323,7 +308,9 @@ double lightPixRatio_ball = 0;
 int bAcoustic_ball = 0;
 int bDepth_ball = 0;
 int camdir_ball = 0;
-int bBrake_ball = 0;
+int bDisableControl_ball = 0;
+int objtype_ball = 0; 
+double mindistproc_ball = 0;
 int procid_ball = 0;
 int videoid_ball = 0; 
 double u_ball = 0;
@@ -365,39 +352,14 @@ double u_surfacevisualobstacle = 0;
 double detectratio_surfacevisualobstacle = 0;
 
 // Pinger variables.
-BOOL bPingerDetection = FALSE;
 BOOL bPingerTrackingControl = FALSE;
 CRITICAL_SECTION PingerCS;
 CRITICAL_SECTION PingerOverlayImgCS;
 IplImage* PingerOverlayImg = NULL;
-int rmin_pinger = 0, rmax_pinger = 0, gmin_pinger = 0, gmax_pinger = 0, bmin_pinger = 0, bmax_pinger = 0; 
-int hmin_pinger = 0, hmax_pinger = 0, smin_pinger = 0, smax_pinger = 0, lmin_pinger = 0, lmax_pinger = 0;
-double objMinRadiusRatio_pinger = 0, objRealRadius_pinger = 0, objMinDetectionRatio_pinger = 0, objDetectionRatioDuration_pinger = 0; 
 double pulsefreq_pinger = 0, pulselen_pinger = 0, pulsepersec_pinger = 0, hyddist_pinger = 0, hydorient_pinger = 0, preferreddir_pinger = 0; 
 int bUseFile_pinger = 0;
-int bBrakeSurfaceEnd_pinger = 0;
-int procid_pinger = 0;
-int videoid_pinger = 0; 
 double u_pinger = 0;
-double detectratio_pinger = 0;
 BOOL bPingerFound = FALSE;
-
-// Missing worker variables.
-BOOL bMissingWorkerDetection = FALSE;
-BOOL bMissingWorkerTrackingControl = FALSE;
-CRITICAL_SECTION MissingWorkerCS;
-CRITICAL_SECTION MissingWorkerOverlayImgCS;
-IplImage* MissingWorkerOverlayImg = NULL;
-int rmin_missingworker = 0, rmax_missingworker = 0, gmin_missingworker = 0, gmax_missingworker = 0, bmin_missingworker = 0, bmax_missingworker = 0; 
-int hmin_missingworker = 0, hmax_missingworker = 0, smin_missingworker = 0, smax_missingworker = 0, lmin_missingworker = 0, lmax_missingworker = 0;
-double objMinRadiusRatio_missingworker = 0, objRealRadius_missingworker = 0, objMinDetectionRatio_missingworker = 0, objDetectionRatioDuration_missingworker = 0, d0_missingworker = 0; 
-double kh_missingworker = 0, kv_missingworker = 0;
-int bBrake_missingworker = 0;
-int procid_missingworker = 0;
-int videoid_missingworker = 0; 
-double u_missingworker = 0;
-double detectratio_missingworker = 0;
-BOOL bMissingWorkerFound = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 
 // Follow me variables.

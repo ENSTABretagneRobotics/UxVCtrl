@@ -132,6 +132,10 @@ typedef enum KEYS KEYS;
 
 #define MAX_CFGFILE_SIZE 16384
 
+#define OBJTYPE_BALL 0
+#define OBJTYPE_PIPELINE 1
+#define OBJTYPE_PINGER 2
+
 // GNSS accuracy levels.
 #define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
 #define GNSS_ACC_LEVEL_GNSS_FIX_UNREL 1
@@ -274,6 +278,7 @@ videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam;
 extern char szVideoRecordCodec[5];
 extern BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
 extern BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
+extern int opencvguiperiod;
 extern BOOL bMAVLinkInterface;
 extern char szMAVLinkInterfacePath[MAX_BUF_LEN];
 extern int MAVLinkInterfaceBaudRate;
@@ -445,8 +450,9 @@ extern BOOL bExternalVisualLocalization;
 extern CRITICAL_SECTION ExternalVisualLocalizationCS;
 extern CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
 extern IplImage* ExternalVisualLocalizationOverlayImg;
-extern int rmin_externalvisuallocalization, rmax_externalvisuallocalization, gmin_externalvisuallocalization, gmax_externalvisuallocalization, bmin_externalvisuallocalization, bmax_externalvisuallocalization; 
 extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smin_externalvisuallocalization, smax_externalvisuallocalization, lmin_externalvisuallocalization, lmax_externalvisuallocalization;
+extern BOOL bHExclusive_externalvisuallocalization, bSExclusive_externalvisuallocalization, bLExclusive_externalvisuallocalization;
+extern int r_selpix_externalvisuallocalization, g_selpix_externalvisuallocalization, b_selpix_externalvisuallocalization; 
 extern double objMinRadiusRatio_externalvisuallocalization, objRealRadius_externalvisuallocalization, objMinDetectionRatio_externalvisuallocalization, objDetectionRatioDuration_externalvisuallocalization; 
 extern rmatrix T_externalvisuallocalization;
 extern double coef1_angle_externalvisuallocalization, coef2_angle_externalvisuallocalization;
@@ -475,31 +481,14 @@ extern int bBrake_wall;
 extern int procid_wall;
 extern double u_wall;
 
-// Pipeline variables.
-extern BOOL bPipelineDetection;
-extern BOOL bPipelineTrackingControl;
-extern CRITICAL_SECTION PipelineCS;
-extern CRITICAL_SECTION PipelineOverlayImgCS;
-extern IplImage* PipelineOverlayImg;
-extern int rmin_pipeline, rmax_pipeline, gmin_pipeline, gmax_pipeline, bmin_pipeline, bmax_pipeline; 
-extern int hmin_pipeline, hmax_pipeline, smin_pipeline, smax_pipeline, lmin_pipeline, lmax_pipeline;
-extern double objMinRadiusRatio_pipeline, objRealRadius_pipeline, objMinDetectionRatio_pipeline, objDetectionRatioDuration_pipeline, d0_pipeline; 
-extern double kh_pipeline, kv_pipeline;
-extern int bBrake_pipeline;
-extern int procid_pipeline;
-extern int videoid_pipeline; 
-extern double u_pipeline;
-extern double detectratio_pipeline;
-extern BOOL bPipelineFound;
-
 // Ball variables.
-extern BOOL bBallDetection;
 extern BOOL bBallTrackingControl;
 extern CRITICAL_SECTION BallCS;
 extern CRITICAL_SECTION BallOverlayImgCS;
 extern IplImage* BallOverlayImg;
-extern int rmin_ball, rmax_ball, gmin_ball, gmax_ball, bmin_ball, bmax_ball; // Not used...
-extern int hmin_ball, hmax_ball, smin_ball, smax_ball, lmin_ball, lmax_ball; // Warning : ]hmin,hmax[ is exclusive...
+extern int hmin_ball, hmax_ball, smin_ball, smax_ball, lmin_ball, lmax_ball;
+extern BOOL bHExclusive_ball, bSExclusive_ball, bLExclusive_ball;
+extern int r_selpix_ball, g_selpix_ball, b_selpix_ball;
 extern double objMinRadiusRatio_ball, objRealRadius_ball, objMinDetectionRatio_ball, objDetectionRatioDuration_ball, d0_ball; 
 extern double kh_ball, kv_ball; // Not used...
 extern int lightMin_ball;
@@ -507,7 +496,9 @@ extern double lightPixRatio_ball;
 extern int bAcoustic_ball;
 extern int bDepth_ball;
 extern int camdir_ball;
-extern int bBrake_ball;
+extern int bDisableControl_ball;
+extern int objtype_ball;
+extern double mindistproc_ball;
 extern int procid_ball;
 extern int videoid_ball;
 extern double u_ball;
@@ -549,39 +540,14 @@ extern double u_surfacevisualobstacle;
 extern double detectratio_surfacevisualobstacle;
 
 // Pinger variables.
-extern BOOL bPingerDetection;
 extern BOOL bPingerTrackingControl;
 extern CRITICAL_SECTION PingerCS;
 extern CRITICAL_SECTION PingerOverlayImgCS;
 extern IplImage* PingerOverlayImg;
-extern int rmin_pinger, rmax_pinger, gmin_pinger, gmax_pinger, bmin_pinger, bmax_pinger; 
-extern int hmin_pinger, hmax_pinger, smin_pinger, smax_pinger, lmin_pinger, lmax_pinger;
-extern double objMinRadiusRatio_pinger, objRealRadius_pinger, objMinDetectionRatio_pinger, objDetectionRatioDuration_pinger; 
 extern double pulsefreq_pinger, pulselen_pinger, pulsepersec_pinger, hyddist_pinger, hydorient_pinger, preferreddir_pinger; 
 extern int bUseFile_pinger;
-extern int bBrakeSurfaceEnd_pinger;
-extern int procid_pinger;
-extern int videoid_pinger; 
 extern double u_pinger;
-extern double detectratio_pinger;
 extern BOOL bPingerFound;
-
-// Missing worker variables.
-extern BOOL bMissingWorkerDetection;
-extern BOOL bMissingWorkerTrackingControl;
-extern CRITICAL_SECTION MissingWorkerCS;
-extern CRITICAL_SECTION MissingWorkerOverlayImgCS;
-extern IplImage* MissingWorkerOverlayImg;
-extern int rmin_missingworker, rmax_missingworker, gmin_missingworker, gmax_missingworker, bmin_missingworker, bmax_missingworker; 
-extern int hmin_missingworker, hmax_missingworker, smin_missingworker, smax_missingworker, lmin_missingworker, lmax_missingworker;
-extern double objMinRadiusRatio_missingworker, objRealRadius_missingworker, objMinDetectionRatio_missingworker, objDetectionRatioDuration_missingworker, d0_missingworker; 
-extern double kh_missingworker, kv_missingworker;
-extern int bBrake_missingworker;
-extern int procid_missingworker;
-extern int videoid_missingworker; 
-extern double u_missingworker;
-extern double detectratio_missingworker;
-extern BOOL bMissingWorkerFound;
 #endif // !DISABLE_OPENCV_SUPPORT
 
 // Follow me variables.
@@ -1002,9 +968,6 @@ inline int InitGlobals(void)
 	WallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(WallOverlayImg, CV_RGB(0, 0, 0), NULL);
 
-	PipelineOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-	cvSet(PipelineOverlayImg, CV_RGB(0, 0, 0), NULL);
-
 	BallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(BallOverlayImg, CV_RGB(0, 0, 0), NULL);
 
@@ -1017,9 +980,6 @@ inline int InitGlobals(void)
 	PingerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
 
-	MissingWorkerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-	cvSet(MissingWorkerOverlayImg, CV_RGB(0, 0, 0), NULL);
-
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
 	colorsonarlidar = CV_RGB(0, 0, 255);
@@ -1031,8 +991,6 @@ inline int InitGlobals(void)
 	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	InitCriticalSection(&WallCS);
 	InitCriticalSection(&WallOverlayImgCS);
-	InitCriticalSection(&PipelineCS);
-	InitCriticalSection(&PipelineOverlayImgCS);
 	InitCriticalSection(&BallCS);
 	InitCriticalSection(&BallOverlayImgCS);
 	InitCriticalSection(&VisualObstacleCS);
@@ -1041,8 +999,6 @@ inline int InitGlobals(void)
 	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	InitCriticalSection(&PingerCS);
 	InitCriticalSection(&PingerOverlayImgCS);
-	InitCriticalSection(&MissingWorkerCS);
-	InitCriticalSection(&MissingWorkerOverlayImgCS);
 #endif // !DISABLE_OPENCV_SUPPORT
 	InitCriticalSection(&FollowMeCS);
 	InitCriticalSection(&MDMCS);
@@ -1107,8 +1063,6 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&MDMCS);
 	DeleteCriticalSection(&FollowMeCS);
 #ifndef DISABLE_OPENCV_SUPPORT
-	DeleteCriticalSection(&MissingWorkerOverlayImgCS);
-	DeleteCriticalSection(&MissingWorkerCS);
 	DeleteCriticalSection(&PingerOverlayImgCS);
 	DeleteCriticalSection(&PingerCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
@@ -1117,8 +1071,6 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&VisualObstacleCS);
 	DeleteCriticalSection(&BallOverlayImgCS);
 	DeleteCriticalSection(&BallCS);
-	DeleteCriticalSection(&PipelineOverlayImgCS);
-	DeleteCriticalSection(&PipelineCS);
 	DeleteCriticalSection(&WallOverlayImgCS);
 	DeleteCriticalSection(&WallCS);
 	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
@@ -1129,8 +1081,6 @@ inline int ReleaseGlobals(void)
 #ifndef DISABLE_OPENCV_SUPPORT
 	cvReleaseImage(&SeanetOverlayImg);
 
-	cvReleaseImage(&MissingWorkerOverlayImg);
-
 	cvReleaseImage(&PingerOverlayImg);
 
 	cvReleaseImage(&SurfaceVisualObstacleOverlayImg);
@@ -1138,8 +1088,6 @@ inline int ReleaseGlobals(void)
 	cvReleaseImage(&VisualObstacleOverlayImg);
 
 	cvReleaseImage(&BallOverlayImg);
-
-	cvReleaseImage(&PipelineOverlayImg);
 
 	cvReleaseImage(&WallOverlayImg);
 

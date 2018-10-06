@@ -38,6 +38,7 @@ inline int LoadConfig(void)
 	bShowVideoOpenCVGUIs[0] = TRUE;
 	bShowVideoOpenCVGUIs[1] = TRUE;
 	bShowVideoOpenCVGUIs[2] = TRUE;
+	opencvguiperiod = 100;
 	bMAVLinkInterface = TRUE;
 	memset(szMAVLinkInterfacePath, 0, sizeof(szMAVLinkInterfacePath));
 	sprintf(szMAVLinkInterfacePath, ":5760");
@@ -305,6 +306,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[1]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[2]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &opencvguiperiod) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bMAVLinkInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1180,6 +1183,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[1]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[2]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", opencvguiperiod) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bMAVLinkInterface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

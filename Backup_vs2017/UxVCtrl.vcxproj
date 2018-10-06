@@ -126,12 +126,10 @@
     <ClCompile Include="Hardware\ublox.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MAVLinkInterface.cpp" />
-    <ClCompile Include="MissingWorker.cpp" />
     <ClCompile Include="NMEAInterface.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
     <ClCompile Include="Pinger.cpp" />
-    <ClCompile Include="Pipeline.cpp" />
     <ClCompile Include="RazorAHRSInterface.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
@@ -220,12 +218,10 @@
     <ClInclude Include="Hardware\ublox.h" />
     <ClInclude Include="Hardware\UBXProtocol.h" />
     <ClInclude Include="MAVLinkInterface.h" />
-    <ClInclude Include="MissingWorker.h" />
     <ClInclude Include="NMEAInterface.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pinger.h" />
-    <ClInclude Include="Pipeline.h" />
     <ClInclude Include="RazorAHRSInterface.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />

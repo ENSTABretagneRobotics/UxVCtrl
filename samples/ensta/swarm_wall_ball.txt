@@ -6,7 +6,7 @@ thrust 0.3
 %wallconfig 3 2 -1 0 10 0.78 2 1 0 -1
 wallconfig 1 2 -1 0 3 0.78 1 1 0 -1
 startwalltracking
-ballconfig 0 0 0 0 0 0 20 220 75 240 75 210 0.03 0.07 0.5 0.5 1.0 0 0 220 0.05 1 0 0 0 -1 1
+ballconfig 20 220 75 240 75 210 1 0 0 255 0 0 0.03 0.07 0.5 0.5 1.0 0 0 220 0.05 1 0 0 0 0 1000 -1 1
 balldetection 600
 setmissionaction BALL_DETECTED_OR_TIMEOUT
 stopwalltracking

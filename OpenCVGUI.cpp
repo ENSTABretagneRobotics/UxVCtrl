@@ -117,20 +117,20 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 			EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
-			c = cvWaitKey(captureperiod);
+			c = cvWaitKey(opencvguiperiod);
 #else
-			c = cv::waitKey(captureperiod);
+			c = cv::waitKey(opencvguiperiod);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 			LeaveCriticalSection(&OpenCVGUICS);
 #else
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
-			c = cvWaitKey(captureperiod);
+			c = cvWaitKey(opencvguiperiod);
 #else
-			c = cv::waitKey(captureperiod);
+			c = cv::waitKey(opencvguiperiod);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 	}
-		else mSleep(captureperiod);
+		else mSleep(opencvguiperiod);
 
 		if (bExit) break;
 #pragma region IMAGES
@@ -221,13 +221,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				CopyOverlay(WallOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&WallOverlayImgCS);
 			}
-			if ((bPipelineDetection||bPipelineTrackingControl)&&(videoid == videoid_pipeline))
-			{
-				EnterCriticalSection(&PipelineOverlayImgCS);
-				CopyOverlay(PipelineOverlayImg, dispimgs[videoid]);
-				LeaveCriticalSection(&PipelineOverlayImgCS);
-			}
-			if ((bBallDetection||bBallTrackingControl)&&(videoid == videoid_ball))
+			if ((bBallTrackingControl)&&(videoid == videoid_ball))
 			{
 				EnterCriticalSection(&BallOverlayImgCS);
 				CopyOverlay(BallOverlayImg, dispimgs[videoid]);
@@ -245,17 +239,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 			}
-			if ((bPingerDetection||bPingerTrackingControl)&&(videoid == videoid_pinger))
+			if (bPingerTrackingControl)
 			{
 				EnterCriticalSection(&PingerOverlayImgCS);
 				CopyOverlay(PingerOverlayImg, dispimgs[videoid]);
 				LeaveCriticalSection(&PingerOverlayImgCS);
-			}
-			if ((bMissingWorkerDetection||bMissingWorkerTrackingControl)&&(videoid == videoid_missingworker))
-			{
-				EnterCriticalSection(&MissingWorkerOverlayImgCS);
-				CopyOverlay(MissingWorkerOverlayImg, dispimgs[videoid]);
-				LeaveCriticalSection(&MissingWorkerOverlayImgCS);
 			}
 		}
 		LeaveCriticalSection(&dispimgsCS[videoid]);

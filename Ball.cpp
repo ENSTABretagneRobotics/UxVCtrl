@@ -117,10 +117,10 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	}
 
 	fprintf(logballtaskfile, 
-		"%% Time (in s); Distance to the ball (in m); Bearing to the ball (in rad); Elevation to the ball (in rad); "
+		"%% Time (in s); Distance to the ball (in m); Bearing to the ball (in rad); Elevation to the ball (in rad); Radius (in pixels); Orientation (in rad); Orientation validity; "
 		"Light status (1 : on, 0 : off); "
-		"x ball position (in m); y ball position (in m); z ball position (in m); "
-		"Latitude of the ball (in decimal degrees); Longitude of the ball (in decimal degrees); Altitude of the ball (in m);\n"
+		"x ball position (in m); y ball position (in m); z ball position (in m); theta orientation (in rad); "
+		"Latitude of the ball (in decimal degrees); Longitude of the ball (in decimal degrees); Altitude of the ball (in m); Heading (in deg);\n"
 		); 
 	fflush(logballtaskfile);
 
@@ -132,7 +132,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		mSleep(captureperiod);
 
 		if (bExit) break;
-		if ((!bBallDetection)&&(!bBallTrackingControl)) continue;
+		if (!bBallTrackingControl) continue;
 
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
 
@@ -198,55 +198,39 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		//		cvFillPoly(image, pts, npts, 1, CV_RGB(255,0,0));
 #pragma endregion
 
+#pragma region Color selection
 		for (i = 0; i < image->height; i++)
 		{
 			for (j = 0; j < image->width; j++)
 			{
 				index = 3*(j+image->width*i);
-				double b = data[0+index];
-				double g = data[1+index];
-				double r = data[2+index];
+				double b = data[0+index], g = data[1+index], r = data[2+index];
 				double h = 0, s = 0, l = 0;
 				RGB2HSL_MSPaint(r, g, b, &h, &s, &l);
-				// Select the pixels without the right color.
-				//if (
-				//	(
-				//	(h < hmin_invalid)||(h > hmax_invalid)
-				//	)&&(
-				//	(s >= smin)&&(s <= smax)&&
-				//	(l >= lmin)&&(l <= lmax)
-				//	)
-				//	)
 				// Select the pixels with the right color.
 				if (
-					//((r >= rmin_ball)&&(r <= rmax_ball))&&
-					//((g >= gmin_ball)&&(g <= gmax_ball))&&
-					//((b >= bmin_ball)&&(b <= bmax_ball))
-					//((h >= hmin_ball)&&(h <= hmax_ball))&&
-					//((s >= smin_ball)&&(s <= smax_ball))&&
-					//((l >= lmin_ball)&&(l <= lmax_ball))
-					((h <= hmin_ball)||(h >= hmax_ball))&&
-					((s >= smin_ball)&&(s <= smax_ball))&&
-					((l >= lmin_ball)&&(l <= lmax_ball))
+					((!bHExclusive_ball)&&((h >= hmin_ball)&&(h <= hmax_ball)))||
+					(((bHExclusive_ball)&&((h < hmin_ball)||(h > hmax_ball))))
+					&&
+					((!bSExclusive_ball)&&((s >= smin_ball)&&(s <= smax_ball)))||
+					(((bSExclusive_ball)&&((s < smin_ball)||(s > smax_ball))))
+					&&
+					((!bLExclusive_ball)&&((l >= lmin_ball)&&(l <= lmax_ball)))||
+					(((bLExclusive_ball)&&((l < lmin_ball)||(l > lmax_ball))))
 					)
 				{
 					SelectedPixelsImage->imageData[index] = 1;
 					nbSelectedPixels++;
-
-
 					nbSelectedPixelsi[i]++;
 					nbSelectedPixelsj[j]++;
-
-					//if (nbSelectedPixelsi[i] > 10) i0 = i;
-
 
 					// Prepare the computation of the mean of selected pixels.
 					obji += i;
 					objj += j;
-					// Selected pixels are displayed in red.
-					overlaydata[0+index] = 0;
-					overlaydata[1+index] = 0;
-					overlaydata[2+index] = 255;
+					// Selected pixels are displayed in a specific color.
+					overlaydata[0+index] = (unsigned char)r_selpix_ball;
+					overlaydata[1+index] = (unsigned char)g_selpix_ball;
+					overlaydata[2+index] = (unsigned char)b_selpix_ball;
 				}
 				else
 				{
@@ -264,6 +248,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				}
 			}
 		}
+#pragma endregion
 #pragma endregion
 		sprintf(szText, "DR=%.2f", detectratio_ball);
 		cvPutText(overlayimage, szText, cvPoint(videoimgwidth-10*8,videoimgheight-40), &font, CV_RGB(255,0,128));
@@ -342,7 +327,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			cvRectangle(overlayimage, 
 				cvPoint((int)objj-objRadius,(int)obji-objRadius), 
 				cvPoint((int)objj+objRadius,(int)obji+objRadius), 
-				CV_RGB(0,255,0));
+				CV_RGB(0,0,255));
 
 			objDistance = objRealRadius_ball/tan(objRadius*pixelAngleSize);
 			objBearing = -(objj-image->width/2.0)*pixelAngleSize;
@@ -448,7 +433,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
-					CV_RGB(0,255,0));
+					CV_RGB(255,255,0));
 			}
 			else
 			{
@@ -561,14 +546,16 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_ball, y_ball, z_ball, &lat_ball, &long_ball, &alt_ball);
 			LeaveCriticalSection(&StateVariablesCS);
 
-			fprintf(logballtaskfile, "%f;%f;%f;%f;%d;%f;%f;%f;%f;%f;%f;\n", 
-				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, 
-				lightStatus_ball, x_ball, y_ball, z_ball, lat_ball, long_ball, alt_ball
+			fprintf(logballtaskfile, "%f;%f;%f;%f;%d;%f;%d;%d;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
+				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, objRadius, objAngle, (int)bobjAngleValid, 
+				lightStatus_ball, x_ball, y_ball, z_ball, psi_ball, 
+				lat_ball, long_ball, alt_ball, heading_ball
 				);
 			fflush(logballtaskfile);
 
-			if (bBallDetection)
+			if (pic_counter > (int)(1000/captureperiod))
 			{
+				pic_counter = 0;
 				// Save a picture showing the detection.
 				memset(strtime_pic, 0, sizeof(strtime_pic));
 				EnterCriticalSection(&strtimeCS);
@@ -613,83 +600,24 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				{
 					printf("Error saving a KML file.\n");
 				}
-
-				if (bBrake_ball)
-				{
-					// Temporary...
-					EnterCriticalSection(&StateVariablesCS);
-					u = 0;
-					bDistanceControl = FALSE;
-					bBrakeControl = TRUE;
-					LeaveCriticalSection(&StateVariablesCS);
-					mSleep(3000);
-					EnterCriticalSection(&StateVariablesCS);
-					u = 0;
-					bBrakeControl = FALSE;
-					LeaveCriticalSection(&StateVariablesCS);
-				}
-				bBallDetection = FALSE;
 			}
+			else pic_counter++;
 
-			if (bBallTrackingControl)
+			if (!bDisableControl_ball)
 			{
-				if (pic_counter > (int)(1000/captureperiod))
+				if (objtype_ball == OBJTYPE_PIPELINE)
 				{
-					pic_counter = 0;
-					// Save a picture showing the detection.
-					memset(strtime_pic, 0, sizeof(strtime_pic));
-					EnterCriticalSection(&strtimeCS);
-					strcpy(strtime_pic, strtime_fns());
-					LeaveCriticalSection(&strtimeCS);
-					sprintf(snapfilename, "pic_%.64s.jpg", strtime_pic);
-					sprintf(picsnapfilename, PIC_FOLDER"pic_%.64s.jpg", strtime_pic);
-					if (!cvSaveImage(picsnapfilename, image, 0))
-					{
-						printf("Error saving a picture file.\n");
-					}
-					sprintf(dtcfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
-					if (!cvSaveImage(dtcfilename, overlayimage, 0))
-					{
-						printf("Error saving a picture file.\n");
-					}
-					sprintf(kmlfilename, PIC_FOLDER"pic_%.64s.kml", strtime_pic);
-					kmlsnapfile = fopen(kmlfilename, "w");
-					if (kmlsnapfile != NULL)
-					{
-						EnterCriticalSection(&StateVariablesCS);
-						fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-						fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
-						fprintf(kmlsnapfile, "<Document>\n<name>pic_%.64s</name>\n", strtime_pic);
-						fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>pic_%.64s</name>\n", strtime_pic);
-						fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", long_ball, lat_ball, alt_ball);
-						fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
-						fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
-						fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
-						fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
-						fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
-						fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
-						fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", snapfilename);
-						fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
-						fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", long_ball, lat_ball, alt_ball);
-						fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
-						fprintf(kmlsnapfile, "</Document>\n</kml>\n");
-						LeaveCriticalSection(&StateVariablesCS);
-						fclose(kmlsnapfile);
-					}
-					else
-					{
-						printf("Error saving a KML file.\n");
-					}
-				}
-				else pic_counter++;
-
-				if (bBrake_ball)
-				{
-					// No need to really brake...
+					EnterCriticalSection(&StateVariablesCS);
+					u = u_ball;
+					//wpsi = Center(psihat)+objBearing;
+					wpsi = Center(psihat)-kh_ball*atan((objj-(double)videoimgwidth/2.0)/((double)videoimgwidth/2.0));
+					//bDistanceControl = FALSE;
+					//bBrakeControl = FALSE;
+					bHeadingControl = TRUE;
+					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else
 				{
-					// Tracking.
 					switch (camdir_ball)
 					{
 					case 0:
@@ -701,7 +629,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						if (bDepth_ball) wz = Center(zhat)+objDistance*sin(objElevation);
 						bDistanceControl = TRUE;
 						bHeadingControl = TRUE;
-						if (bDepth_ball) 
+						if (bDepth_ball)
 						{
 							bDepthControl = TRUE;
 							bAltitudeAGLControl = FALSE;
@@ -714,7 +642,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						wpsi = Center(psihat)+objBearing+u_ball*(M_PI/4.0)*sign(objDistance-d0_ball, wdradius);
 						if (bDepth_ball) wz = Center(zhat)+objDistance*sin(objElevation);
 						bHeadingControl = TRUE;
-						if (bDepth_ball) 
+						if (bDepth_ball)
 						{
 							bDepthControl = TRUE;
 							bAltitudeAGLControl = FALSE;
@@ -727,7 +655,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						wpsi = Center(psihat)+objBearing-u_ball*(M_PI/4.0)*sign(objDistance-d0_ball, wdradius);
 						if (bDepth_ball) wz = Center(zhat)+objDistance*sin(objElevation);
 						bHeadingControl = TRUE;
-						if (bDepth_ball) 
+						if (bDepth_ball)
 						{
 							bDepthControl = TRUE;
 							bAltitudeAGLControl = FALSE;
@@ -743,7 +671,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 						if (bDepth_ball) wz = Center(zhat)-objDistance+d0_ball;
 						bDistanceControl = TRUE;
 						bHeadingControl = TRUE;
-						if (bDepth_ball) 
+						if (bDepth_ball)
 						{
 							bDepthControl = TRUE;
 							bAltitudeAGLControl = FALSE;
@@ -758,22 +686,22 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 			if (procid_ball != -1)
 			{
-				if (bBallTrackingControl)
+				if (objDistance <= mindistproc_ball)
 				{
 					// stopballtracking to avoid multiple execute...
 					bBallTrackingControl = FALSE;
 					bDistanceControl = FALSE;
-					//if (bBrake_ball) bBrakeControl = FALSE;
+					//if (bDisableControl_ball) bBrakeControl = FALSE;
 					bHeadingControl = FALSE;
-					if (bDepth_ball) 
+					if (bDepth_ball)
 					{
 						bDepthControl = FALSE;
 						bAltitudeAGLControl = FALSE;
 					}
+					if (bEcho) printf("execute %d\n", procid_ball);
+					ExecuteProcedure(procid_ball);
+					bWaiting = FALSE; // To interrupt and force execution of the next commands...
 				}
-				if (bEcho) printf("execute %d\n", procid_ball);
-				ExecuteProcedure(procid_ball);
-				bWaiting = FALSE; // To interrupt and force execution of the next commands...
 			}
 #pragma endregion
 		}

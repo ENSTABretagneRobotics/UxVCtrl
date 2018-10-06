@@ -37,12 +37,10 @@ inline void DisableAllControls(void)
 #ifndef DISABLE_OPENCV_SUPPORT
 	bWallTrackingControl = FALSE;
 	bWallAvoidanceControl = FALSE;
-	bPipelineTrackingControl = FALSE;
 	bBallTrackingControl = FALSE;
 	bVisualObstacleAvoidanceControl = FALSE;
 	bSurfaceVisualObstacleAvoidanceControl = FALSE;
 	bPingerTrackingControl = FALSE;
-	bMissingWorkerTrackingControl = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 	bFollowMeTrackingControl = FALSE;
 	bLineFollowingControl = FALSE;
@@ -693,7 +691,7 @@ inline int Commands(char* line)
 #ifndef DISABLE_OPENCV_SUPPORT
 	int ival4 = 0, ival5 = 0, ival6 = 0,
 		ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
-		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0;
+		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0, ival20 = 0;
 	char cval = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
 	char str[MAX_BUF_LEN];
@@ -785,152 +783,39 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&WallCS);
 	}
-	else if (sscanf(line, "pipelineconfig "
-		"%d %d %d %d %d %d "
-		"%d %d %d %d %d %d "
-		"%lf %lf %lf %lf %lf "
-		"%lf %lf "
-		"%d %d "
-		"%d", 
-		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
-		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, &dval5, 
-		&dval6, &dval7, 
-		&ival13, &ival14, 
-		&ival15
-		) == 22)
-	{
-		EnterCriticalSection(&PipelineCS);
-		rmin_pipeline = ival1; rmax_pipeline = ival2; gmin_pipeline = ival3; gmax_pipeline = ival4; bmin_pipeline = ival5; bmax_pipeline = ival6; 
-		hmin_pipeline = ival7; hmax_pipeline = ival8; smin_pipeline = ival9; smax_pipeline = ival10; lmin_pipeline = ival11; lmax_pipeline = ival12; 
-		objMinRadiusRatio_pipeline = dval1; objRealRadius_pipeline = dval2; objMinDetectionRatio_pipeline = dval3; objDetectionRatioDuration_pipeline = (dval4 <= 0)? captureperiod: dval4; d0_pipeline = dval5; 
-		kh_pipeline = dval6; kv_pipeline = dval7; 
-		bBrake_pipeline = ival13; procid_pipeline = ival14; 
-		if ((ival15 >= 0)&&(ival15 < nbvideo))
-		{
-			videoid_pipeline = ival15;
-		}
-		else
-		{
-			printf("Invalid parameter.\n");
-		}
-		bPipelineFound = FALSE;
-		LeaveCriticalSection(&PipelineCS);
-	}
-	else if (sscanf(line, "pipelinedetection %lf", &delay) == 1)
-	{
-		EnterCriticalSection(&PipelineCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_pipeline = u;
-		detectratio_pipeline = 0;
-		bPipelineDetection = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&PipelineCS);
-		delay = fabs(delay);
-		bWaiting = TRUE;
-		StartChrono(&chrono);
-		for (;;)
-		{
-			if (!bPipelineDetection) break;
-			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
-			if (!bWaiting) break;
-			if (bExit) break;
-			// Wait at least delay/10 and at most around 100 ms for each loop.
-			mSleep((long)min(delay*100.0, 100.0));
-		}
-		StopChronoQuick(&chrono);
-		bWaiting = FALSE;
-		EnterCriticalSection(&PipelineCS);
-		bPipelineDetection = FALSE;
-		if (bBrake_pipeline) bBrakeControl = FALSE;
-		detectratio_pipeline = 0;
-		LeaveCriticalSection(&PipelineCS);
-	}
-	else if (strncmp(line, "startpipelinetracking", strlen("startpipelinetracking")) == 0)
-	{
-		EnterCriticalSection(&PipelineCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_pipeline = u;
-		detectratio_pipeline = 0;
-		bPipelineTrackingControl = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&PipelineCS);
-	}
-	else if (strncmp(line, "stoppipelinetracking", strlen("stoppipelinetracking")) == 0)
-	{
-		EnterCriticalSection(&PipelineCS);
-		bPipelineTrackingControl = FALSE;
-		//bDistanceControl = FALSE;
-		//if (bBrake_pipeline) bBrakeControl = FALSE;
-		bHeadingControl = FALSE;
-		//bDepthControl = FALSE;
-		//bAltitudeAGLControl = FALSE;
-		detectratio_pipeline = 0;
-		LeaveCriticalSection(&PipelineCS);
-	}
 	else if (sscanf(line, "ballconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
 		"%lf %lf %lf %lf %lf "
 		"%lf %lf "
 		"%d %lf %d "
-		"%d %d %d %d "
+		"%d %d %d %d %lf %d "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, &dval4, &dval5, 
 		&dval6, &dval7, 
 		&ival13, &dval8, &ival14, 
-		&ival15, &ival16, &ival17, &ival18, 
-		&ival19
-		) == 27)
+		&ival15, &ival16, &ival17, &ival18, &dval9, &ival19, 
+		&ival20
+		) == 29)
 	{
 		EnterCriticalSection(&BallCS);
-		rmin_ball = ival1; rmax_ball = ival2; gmin_ball = ival3; gmax_ball = ival4; bmin_ball = ival5; bmax_ball = ival6; 
-		hmin_ball = ival7; hmax_ball = ival8; smin_ball = ival9; smax_ball = ival10; lmin_ball = ival11; lmax_ball = ival12; 
+		hmin_ball = ival1; hmax_ball = ival2; smin_ball = ival3; smax_ball = ival4; lmin_ball = ival5; lmax_ball = ival6; 
+		bHExclusive_ball = ival7; bSExclusive_ball = ival8; bLExclusive_ball = ival9; r_selpix_ball = ival10; g_selpix_ball = ival11; b_selpix_ball = ival12; 
 		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionRatio_ball = dval3; objDetectionRatioDuration_ball = (dval4 <= 0)? captureperiod: dval4; d0_ball = dval5; 
 		kh_ball = dval6; kv_ball = dval7; 
 		lightMin_ball = ival13; lightPixRatio_ball = dval8; bAcoustic_ball = ival14;
-		bDepth_ball = ival15; camdir_ball = ival16; bBrake_ball = ival17; procid_ball = ival18; 
-		if ((ival19 >= 0)&&(ival19 < nbvideo))
+		bDepth_ball = ival15; camdir_ball = ival16; bDisableControl_ball = ival17; objtype_ball = ival18; mindistproc_ball = dval9; procid_ball = ival19;
+		if ((ival20 >= 0)&&(ival20 < nbvideo))
 		{
-			videoid_ball = ival19;
+			videoid_ball = ival20;
 		}
 		else
 		{
 			printf("Invalid parameter.\n");
 		}
 		bBallFound = FALSE;
-		LeaveCriticalSection(&BallCS);
-	}
-	else if (sscanf(line, "balldetection %lf", &delay) == 1)
-	{
-		EnterCriticalSection(&BallCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_ball = u;
-		psi_ball = Center(psihat);
-		detectratio_ball = 0;
-		bBallDetection = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&BallCS);
-		delay = fabs(delay);
-		bWaiting = TRUE;
-		StartChrono(&chrono);
-		for (;;)
-		{
-			if (!bBallDetection) break;
-			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
-			if (!bWaiting) break;
-			if (bExit) break;
-			// Wait at least delay/10 and at most around 100 ms for each loop.
-			mSleep((long)min(delay*100.0, 100.0));
-		}
-		StopChronoQuick(&chrono);
-		bWaiting = FALSE;
-		EnterCriticalSection(&BallCS);
-		bBallDetection = FALSE;
-		if (bBrake_ball) bBrakeControl = FALSE;
-		detectratio_ball = 0;
 		LeaveCriticalSection(&BallCS);
 	}
 	else if (strncmp(line, "startballtracking", strlen("startballtracking")) == 0)
@@ -949,7 +834,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&BallCS);
 		bBallTrackingControl = FALSE;
 		bDistanceControl = FALSE;
-		//if (bBrake_ball) bBrakeControl = FALSE;
+		//if (bDisableControl_ball) bBrakeControl = FALSE;
 		bHeadingControl = FALSE;
 		if (bDepth_ball) 
 		{
@@ -1092,68 +977,11 @@ inline int Commands(char* line)
 		detectratio_surfacevisualobstacle = 0;
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 	}
-	else if (sscanf(line, "pingerconfig "
-		"%d %d %d %d %d %d "
-		"%d %d %d %d %d %d "
-		"%lf %lf %lf %lf "
-		"%lf %lf %lf %lf %lf %lf "
-		"%d "
-		"%d %d "
-		"%d", 
-		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
-		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, 
-		&dval5, &dval6, &dval7, &dval8, &dval9, &dval10, 
-		&ival13, 
-		&ival14, &ival15, 
-		&ival16
-		) == 26)
+	else if (sscanf(line, "pingerconfig %lf %lf %lf %lf %lf %lf %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &ival) == 7)
 	{
 		EnterCriticalSection(&PingerCS);
-		rmin_pinger = ival1; rmax_pinger = ival2; gmin_pinger = ival3; gmax_pinger = ival4; bmin_pinger = ival5; bmax_pinger = ival6; 
-		hmin_pinger = ival7; hmax_pinger = ival8; smin_pinger = ival9; smax_pinger = ival10; lmin_pinger = ival11; lmax_pinger = ival12; 
-		objMinRadiusRatio_pinger = dval1; objRealRadius_pinger = dval2; objMinDetectionRatio_pinger = dval3; objDetectionRatioDuration_pinger = (dval4 <= 0)? captureperiod: dval4; 
-		pulsefreq_pinger = dval5; pulselen_pinger = dval6; pulsepersec_pinger = dval7; hyddist_pinger = dval8; hydorient_pinger = dval9; preferreddir_pinger = dval10; 
-		bUseFile_pinger = ival13; 
-		bBrakeSurfaceEnd_pinger = ival14; procid_pinger = ival15; 
-		if ((ival16 >= 0)&&(ival16 < nbvideo))
-		{
-			videoid_pinger = ival16;
-		}
-		else
-		{
-			printf("Invalid parameter.\n");
-		}
+		pulsefreq_pinger = dval1; pulselen_pinger = dval2; pulsepersec_pinger = dval3; hyddist_pinger = dval4; hydorient_pinger = dval5; preferreddir_pinger = dval6; bUseFile_pinger = ival; 
 		bPingerFound = FALSE;
-		LeaveCriticalSection(&PingerCS);
-	}
-	else if (sscanf(line, "pingerdetection %lf", &delay) == 1)
-	{
-		EnterCriticalSection(&PingerCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_pinger = u;
-		detectratio_pinger = 0;
-		bPingerDetection = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&PingerCS);
-		delay = fabs(delay);
-		bWaiting = TRUE;
-		StartChrono(&chrono);
-		for (;;)
-		{
-			if (!bPingerDetection) break;
-			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
-			if (!bWaiting) break;
-			if (bExit) break;
-			// Wait at least delay/10 and at most around 100 ms for each loop.
-			mSleep((long)min(delay*100.0, 100.0));
-		}
-		StopChronoQuick(&chrono);
-		bWaiting = FALSE;
-		EnterCriticalSection(&PingerCS);
-		bPingerDetection = FALSE;
-		if (bBrakeSurfaceEnd_pinger) bBrakeControl = FALSE;
-		detectratio_pinger = 0;
 		LeaveCriticalSection(&PingerCS);
 	}
 	else if (strncmp(line, "startpingertracking", strlen("startpingertracking")) == 0)
@@ -1161,7 +989,6 @@ inline int Commands(char* line)
 		EnterCriticalSection(&PingerCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_pinger = u;
-		detectratio_pinger = 0;
 		bPingerTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&PingerCS);
@@ -1175,91 +1002,7 @@ inline int Commands(char* line)
 		bHeadingControl = FALSE;
 		//bDepthControl = FALSE;
 		//bAltitudeAGLControl = FALSE;
-		detectratio_pinger = 0;
 		LeaveCriticalSection(&PingerCS);
-	}
-	else if (sscanf(line, "missingworkerconfig "
-		"%d %d %d %d %d %d "
-		"%d %d %d %d %d %d "
-		"%lf %lf %lf %lf %lf "
-		"%lf %lf "
-		"%d %d "
-		"%d", 
-		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
-		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, &dval5, 
-		&dval6, &dval7, 
-		&ival13, &ival14, 
-		&ival15
-		) == 22)
-	{
-		EnterCriticalSection(&MissingWorkerCS);
-		rmin_missingworker = ival1; rmax_missingworker = ival2; gmin_missingworker = ival3; gmax_missingworker = ival4; bmin_missingworker = ival5; bmax_missingworker = ival6; 
-		hmin_missingworker = ival7; hmax_missingworker = ival8; smin_missingworker = ival9; smax_missingworker = ival10; lmin_missingworker = ival11; lmax_missingworker = ival12; 
-		objMinRadiusRatio_missingworker = dval1; objRealRadius_missingworker = dval2; objMinDetectionRatio_missingworker = dval3; objDetectionRatioDuration_missingworker = (dval4 <= 0)? captureperiod: dval4; d0_missingworker = dval5; 
-		kh_missingworker = dval6; kv_missingworker = dval7; 
-		bBrake_missingworker = ival13; procid_missingworker = ival14; 
-		if ((ival15 >= 0)&&(ival15 < nbvideo))
-		{
-			videoid_missingworker = ival15;
-		}
-		else
-		{
-			printf("Invalid parameter.\n");
-		}
-		bMissingWorkerFound = FALSE;
-		LeaveCriticalSection(&MissingWorkerCS);
-	}
-	else if (sscanf(line, "missingworkerdetection %lf", &delay) == 1)
-	{
-		EnterCriticalSection(&MissingWorkerCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_missingworker = u;
-		detectratio_missingworker = 0;
-		bMissingWorkerDetection = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&MissingWorkerCS);
-		delay = fabs(delay);
-		bWaiting = TRUE;
-		StartChrono(&chrono);
-		for (;;)
-		{
-			if (!bMissingWorkerDetection) break;
-			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
-			if (!bWaiting) break;
-			if (bExit) break;
-			// Wait at least delay/10 and at most around 100 ms for each loop.
-			mSleep((long)min(delay*100.0, 100.0));
-		}
-		StopChronoQuick(&chrono);
-		bWaiting = FALSE;
-		EnterCriticalSection(&MissingWorkerCS);
-		bMissingWorkerDetection = FALSE;
-		if (bBrake_missingworker) bBrakeControl = FALSE;
-		detectratio_missingworker = 0;
-		LeaveCriticalSection(&MissingWorkerCS);
-	}
-	else if (strncmp(line, "startmissingworkertracking", strlen("startmissingworkertracking")) == 0)
-	{
-		EnterCriticalSection(&MissingWorkerCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_missingworker = u;
-		detectratio_missingworker = 0;
-		bMissingWorkerTrackingControl = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&MissingWorkerCS);
-	}
-	else if (strncmp(line, "stopmissingworkertracking", strlen("stopmissingworkertracking")) == 0)
-	{
-		EnterCriticalSection(&MissingWorkerCS);
-		bMissingWorkerTrackingControl = FALSE;
-		//bDistanceControl = FALSE;
-		//if (bBrake_missingworker) bBrakeControl = FALSE;
-		bHeadingControl = FALSE;
-		//bDepthControl = FALSE;
-		//bAltitudeAGLControl = FALSE;
-		detectratio_missingworker = 0;
-		LeaveCriticalSection(&MissingWorkerCS);
 	}
 	else 
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -1506,8 +1249,8 @@ inline int Commands(char* line)
 		) == 39)
 	{
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
-		rmin_externalvisuallocalization = ival1; rmax_externalvisuallocalization = ival2; gmin_externalvisuallocalization = ival3; gmax_externalvisuallocalization = ival4; bmin_externalvisuallocalization = ival5; bmax_externalvisuallocalization = ival6; 
-		hmin_externalvisuallocalization = ival7; hmax_externalvisuallocalization = ival8; smin_externalvisuallocalization = ival9; smax_externalvisuallocalization = ival10; lmin_externalvisuallocalization = ival11; lmax_externalvisuallocalization = ival12; 
+		hmin_externalvisuallocalization = ival1; hmax_externalvisuallocalization = ival2; smin_externalvisuallocalization = ival3; smax_externalvisuallocalization = ival4; lmin_externalvisuallocalization = ival5; lmax_externalvisuallocalization = ival6; 
+		bHExclusive_externalvisuallocalization = ival7; bSExclusive_externalvisuallocalization = ival8; bLExclusive_externalvisuallocalization = ival9; r_selpix_externalvisuallocalization = ival10; g_selpix_externalvisuallocalization = ival11; b_selpix_externalvisuallocalization = ival12; 
 		objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionRatio_externalvisuallocalization = dval3; objDetectionRatioDuration_externalvisuallocalization = (dval4 <= 0)? captureperiod: dval4;
 		T_externalvisuallocalization = rmatrix(4,4);
 		T_externalvisuallocalization.SetVal(1,1,T11); T_externalvisuallocalization.SetVal(2,1,T21); T_externalvisuallocalization.SetVal(3,1,T31); T_externalvisuallocalization.SetVal(4,1,T41); 

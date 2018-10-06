@@ -69,9 +69,6 @@
     <ClCompile Include="OpenCVGUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Pipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SeanetProcessing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -192,9 +189,6 @@
     <ClCompile Include="Hardware\IM483I.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="MissingWorker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Pinger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -279,9 +273,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OpenCVGUI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SeanetProcessing.h">
@@ -499,9 +490,6 @@
     </ClInclude>
     <ClInclude Include="Hardware\IM483I.h">
       <Filter>Hardware</Filter>
-    </ClInclude>
-    <ClInclude Include="MissingWorker.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pinger.h">
       <Filter>Header Files</Filter>

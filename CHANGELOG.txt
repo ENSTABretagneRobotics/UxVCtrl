@@ -1,3 +1,7 @@
+258
+Added opencvguiperiod parameter.
+Merged MissingWorker and Pipeline into Ball.
+
 257
 Updated CMakeLists.txt.
 

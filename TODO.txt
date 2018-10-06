@@ -1,3 +1,6 @@
+pouvoir activer la détection de plusieurs objets en même temps avec une id et un nom, comment gérer les actions, définir une priorité par objet?
+partager variables objdistance, etc.
+
 MAVLink : envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?), vérifier fonctionnement de rc_override vers UxVCtrl notamment pour voilier...
 pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
 
@@ -9,7 +12,10 @@ Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon auto
 Programme et article potential fields de 2013
 rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
 
-Preparer sample évitement d'obstacle en relatif
+wpsi voulu, wpsi après prise en compte obstacles, wpsi après prise en compte dynamique d'un voilier...
+mélanger à quel niveau avec potential fields?
+
+Preparer sample évitement d'obstacle ball et wallavoidance en relatif
 
 1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 
@@ -19,10 +25,6 @@ initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écras
 Rajouter params à linefollowingconfig pour que le robot ait automatiquement une précision plus importante quand il se rapproche de la destination->Attention si changement de r en cours de route, il risque d'attendre le chrono check strategy avant de changer de bord, il faut faire forcecheckstrategy si changement...
 linefollowingconfigex r gamma_infinite dist_end r_end gamma_infinite_end
 Linefollowingconfigex r debut, r milieu, r fin...
-
-Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT)
-
-params taux de détection sur durée ou équivalents, execute procid not implemented for some detection functions...
 
 Bat1 elec, bat2 actuators, should update energy estimation when V and I measured...
 récupérer tension batterie via 4G? Tension/courant dans log principal?->vbat1 et 2 mis à la fin de lognav...
@@ -231,7 +233,7 @@ lorsqu'il y a des erreurs de décodage opencv (e.g. avec rtp?), il y a des déconn
 Quand problème caméra (rpi2 avec cv310), tous les autres device reconnectent en boucle?->pas vu ce type de problème sous Windows ni rpiz cv2.4...
 UxVCtrl et fileconv : vérifier les conversions entre repère NED, NWU, ENU, marine units, etc.
 check sign Euler angles computation from quaternions and matrix for SBG, old and new MTi...
-check sign of omegaz for SBG on SAUC'ISSE!
+check sign of omegaz in PID for SBG on SAUC'ISSE!
 check ublox default values for CFG_NMEA...
 Problème headingrelativereg?
 Bug followme buggy peut-être à cause de u ou uw remis à 0, vérifier aussi pour bubble
@@ -315,8 +317,8 @@ LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment fa
 Exp image sonar pour mieux détecter murs?
 
 GUI, video
-Pouvoir lancer balltracking sans que ça fasse d'action...?
-ball detection : ajouter en option des prétraitements?
+mettre aussi BRG de ball par rapport au nord?
+object detection : ajouter en option des prétraitements?
 Effacer messages ffmpeg et limiter perturbations?
 error while decoding MB
 cabac decode of qscale diff failed
@@ -340,18 +342,15 @@ Afficher tension, direction vent, affichage des infos du waypoint courant missio
 modify waypoints/heading commands so that they do a line following in the case of a sailboat?
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
 Move MAVLinkInterface in Hardware with its own config file?
-rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!)->voir google api, niveaux de zoom, etc.->Mission Planner...
-mousecallback to set waypoints, lines...->Mission Planner...
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
 pouvoir avoir un nb de fenêtres indépendant du nb de caméras
-prévoir zoom sur la map, on a du mal à savoir son cap
 faudrait pouvoir enregistrer en high res en local en option->utiliser remotewebcammultisrv et se connecter dessus...
+prévoir zoom sur la map, on a du mal à savoir son cap
+pouvoir afficher robot indépendamment de l'échelle?
 mieux gérer les infos affichées selon le robot et selon le mode
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)->déjà affiché dans invite de commandes
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides->Mission Planner...
-pouvoir afficher robot indépendamment de l'échelle?
-mettre aussi BRG de ball par rapport au nord?
 FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
 MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
 (walltracking overlay fait aussi walldetect, wallavoidance)
@@ -361,7 +360,6 @@ params videoimgwidth/height, Horizontal/VerticalBeam sont pour les images utilis
 Pour la taille des images partagées, prendre la résolution min des webcams?
 utiliser bCleanup dans tous les threads pour le cvSet()?
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
-essayer de mettre en commun certaines parties du code de détection d'objet, e.g. savepicfiles() dans globals.h...->pas forcément souhaitable
 Mettre en var globale les périphériques?
 détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
 Arrêter proprement le programme si CTRL-C...
@@ -423,6 +421,7 @@ sauvegarder e,phi,delta_psi dans wall?
 
 Actuators
 rajouter option rampe comme sur robot CCI...
+Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT)
 Touches opencv gui->uNj(camera tilt), voir pour rajouter bras...
 Maestro, MAVLinkDevice : rajouter plus de channel PWM (24, 14), peut-être rajouter paramètre bEnable pour chacun si pas déjà plus ou moins fait, s'inspirer aussi de l'interface de Maestro Control Center...
 Maestro : avoir plus de flexibilité sur quel channel fait quoi...
@@ -564,8 +563,12 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+check sign of omegaz for SBG and old MTi->OK
+
 GUI bloquée si GoPro pas connectée...->prévoir option pour lancer OpenCVGUI en 1er?->peut-être résolu avec nouvelles CS Video et GUI séparées...
 
+rajouter fond d'ecran carte google earth (->possible hack with video, but a bit hard to set good coordinates!)->voir google api, niveaux de zoom, etc.->Mission Planner...
+mousecallback to set waypoints, lines...->Mission Planner+OpenCPN...
 Roscontrol et rosjava android apps (no longer maintained?), communication avec MAVLink?
 
 Chemin avec espace pour source...

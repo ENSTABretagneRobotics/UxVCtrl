@@ -135,8 +135,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		// Correction of bad lines on the borders of the video...
 		CorrectImageBordersRawBGR(data, videoimgwidth, videoimgheight, 2, 0, 0, 0);
 
-		// Simulated object for tests...
-
+#pragma region Simulated objects for tests
 		//for (i = 0; i < image->height; i++)
 		//{
 		//	for (j = 0; j < image->width; j++)
@@ -169,59 +168,44 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		//CvPoint* pts[1] = {points[0]};
 		//int npts[] = {4};
 
-		//cvFillPoly(image, pts, npts, 1, CV_RGB(255,255,0));
+		//if (((int)(10*GetTimeElapsedChronoQuick(&chrono)))%50 < 10) 
+		//	if (((int)(10*GetTimeElapsedChronoQuick(&chrono)))%10 < 5) 
+		//		cvFillPoly(image, pts, npts, 1, CV_RGB(255,0,0));
+#pragma endregion
 
-		//
-
+#pragma region Color selection
 		for (i = 0; i < image->height; i++)
 		{
 			for (j = 0; j < image->width; j++)
 			{
 				index = 3*(j+image->width*i);
-				double b = data[0+index];
-				double g = data[1+index];
-				double r = data[2+index];
+				double b = data[0+index], g = data[1+index], r = data[2+index];
 				double h = 0, s = 0, l = 0;
 				RGB2HSL_MSPaint(r, g, b, &h, &s, &l);
-				// Select the pixels without the right color.
-				//if (
-				//	(
-				//	(h < hmin_invalid)||(h > hmax_invalid)
-				//	)&&(
-				//	(s >= smin)&&(s <= smax)&&
-				//	(l >= lmin)&&(l <= lmax)
-				//	)
-				//	)
 				// Select the pixels with the right color.
 				if (
-					//((r >= rmin_externalvisuallocalization)&&(r <= rmax_externalvisuallocalization))&&
-					//((g >= gmin_externalvisuallocalization)&&(g <= gmax_externalvisuallocalization))&&
-					//((b >= bmin_externalvisuallocalization)&&(b <= bmax_externalvisuallocalization))
-					//((h >= hmin_externalvisuallocalization)&&(h <= hmax_externalvisuallocalization))&&
-					//((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization))&&
-					//((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization))
-					((h <= hmin_externalvisuallocalization)||(h >= hmax_externalvisuallocalization))&&
-					((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization))&&
-					((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization))
+					((!bHExclusive_externalvisuallocalization)&&((h >= hmin_externalvisuallocalization)&&(h <= hmax_externalvisuallocalization)))||
+					(((bHExclusive_externalvisuallocalization)&&((h < hmin_externalvisuallocalization)||(h > hmax_externalvisuallocalization))))
+					&&
+					((!bSExclusive_externalvisuallocalization)&&((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization)))||
+					(((bSExclusive_externalvisuallocalization)&&((s < smin_externalvisuallocalization)||(s > smax_externalvisuallocalization))))
+					&&
+					((!bLExclusive_externalvisuallocalization)&&((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization)))||
+					(((bLExclusive_externalvisuallocalization)&&((l < lmin_externalvisuallocalization)||(l > lmax_externalvisuallocalization))))
 					)
 				{
 					SelectedPixelsImage->imageData[index] = 1;
 					nbSelectedPixels++;
-
-
 					nbSelectedPixelsi[i]++;
 					nbSelectedPixelsj[j]++;
-
-					//if (nbSelectedPixelsi[i] > 10) i0 = i;
-
 
 					// Prepare the computation of the mean of selected pixels.
 					obji += i;
 					objj += j;
-					// Selected pixels are displayed in green.
-					overlaydata[0+index] = 0;
-					overlaydata[1+index] = 255;
-					overlaydata[2+index] = 0;
+					// Selected pixels are displayed in a specific color.
+					overlaydata[0+index] = (unsigned char)r_selpix_externalvisuallocalization;
+					overlaydata[1+index] = (unsigned char)g_selpix_externalvisuallocalization;
+					overlaydata[2+index] = (unsigned char)b_selpix_externalvisuallocalization;
 				}
 				else
 				{
@@ -229,6 +213,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				}
 			}
 		}
+#pragma endregion
 #pragma endregion
 		if (nbSelectedPixels == 0) 
 		{

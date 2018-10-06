@@ -19,7 +19,6 @@
 #ifndef DISABLE_OPENCV_SUPPORT
 #include "ExternalVisualLocalization.h"
 #include "Wall.h"
-#include "Pipeline.h"
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -30,7 +29,6 @@
 #include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
 #include "Pinger.h"
-#include "MissingWorker.h"
 #endif // !DISABLE_OPENCV_SUPPORT
 #include "FollowMe.h"
 #include "Simulator.h"
@@ -111,7 +109,6 @@ int main(int argc, char* argv[])
 #ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER ExternalVisualLocalizationThreadId;
 	THREAD_IDENTIFIER WallThreadId;
-	THREAD_IDENTIFIER PipelineThreadId;
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -122,7 +119,6 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
-	THREAD_IDENTIFIER MissingWorkerThreadId;
 #endif // !DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER FollowMeThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
@@ -241,7 +237,6 @@ int main(int argc, char* argv[])
 #ifndef DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
 	CreateDefaultThread(WallThread, NULL, &WallThreadId);
-	CreateDefaultThread(PipelineThread, NULL, &PipelineThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -252,7 +247,6 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
-	CreateDefaultThread(MissingWorkerThread, NULL, &MissingWorkerThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
@@ -481,7 +475,6 @@ int main(int argc, char* argv[])
 	if (robid & SIMULATOR_ROBID_MASK) WaitForThread(SimulatorThreadId);
 	WaitForThread(FollowMeThreadId);
 #ifndef DISABLE_OPENCV_SUPPORT
-	WaitForThread(MissingWorkerThreadId);
 	WaitForThread(PingerThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 	WaitForThread(VisualObstacleThreadId);
@@ -492,7 +485,6 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	WaitForThread(PipelineThreadId);
 	WaitForThread(WallThreadId);
 	WaitForThread(ExternalVisualLocalizationThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
