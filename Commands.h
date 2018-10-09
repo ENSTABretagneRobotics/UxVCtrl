@@ -3473,7 +3473,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "headingrelativereg %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wpsi = Center(psihat)+M_PI/2.0-dval*M_PI/180.0-angle_env;
+		wpsi = Center(psihat)-dval*M_PI/180.0;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
 		bHeadingControl = TRUE;
