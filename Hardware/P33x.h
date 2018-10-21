@@ -21,6 +21,9 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_P33X 256
 
+#define PRESSURE_CHANNEL_P33X 1
+#define TEMPERATURE_CHANNEL_P33X 4
+
 union uFloat_P33X
 {
 	float v;  
@@ -33,6 +36,7 @@ struct P33X
 	RS232PORT RS232Port;
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	double LastPressure;
+	double LastTemperature;
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
@@ -203,11 +207,12 @@ inline int ReadChannelP33x(P33X* pP33x, uint8 Channel, float* pValue)
 	return EXIT_SUCCESS;
 }
 
+// Pressure in bar.
 inline int GetPressureP33x(P33X* pP33x, double* pPressure)
 {
 	float fValue = 0;
 
-	if (ReadChannelP33x(pP33x, 1, &fValue) != EXIT_SUCCESS)
+	if (ReadChannelP33x(pP33x, PRESSURE_CHANNEL_P33X, &fValue) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -215,6 +220,23 @@ inline int GetPressureP33x(P33X* pP33x, double* pPressure)
 	*pPressure = (double)fValue;
 
 	pP33x->LastPressure = *pPressure;
+
+	return EXIT_SUCCESS;
+}
+
+// Temperature in Celsius degrees.
+inline int GetTemperatureP33x(P33X* pP33x, double* pTemperature)
+{
+	float fValue = 0;
+
+	if (ReadChannelP33x(pP33x, TEMPERATURE_CHANNEL_P33X, &fValue) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	*pTemperature = (double)fValue;
+
+	pP33x->LastTemperature = *pTemperature;
 
 	return EXIT_SUCCESS;
 }
@@ -271,6 +293,7 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 	//pP33x->pfSaveFile = NULL;
 
 	pP33x->LastPressure = 0;
+	pP33x->LastTemperature = 0;
 
 	if (OpenRS232Port(&pP33x->RS232Port, pP33x->szDevPath) != EXIT_SUCCESS)
 	{

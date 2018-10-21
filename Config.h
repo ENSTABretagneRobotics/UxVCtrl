@@ -2000,7 +2000,7 @@ inline int DisplayKeys(void)
 		"Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snapshot),r(record),p(mission),x(abort),h(help),!(alarms),?(battery),"
 		"bn(lights),uNj(camera tilt),F(alt RC mode),.(rearm),0(disarm),"
-		"ENTER(extended menu), ESC(exit)\n", 
+		"ENTER(extended menu),ESC(exit)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
 		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDEAGLCONTROL_KEY]);
 

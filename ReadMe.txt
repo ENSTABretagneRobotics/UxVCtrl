@@ -47,6 +47,9 @@ The principle of execution of the program is the following : main() launches all
 
 Warning : The configuration file formats might vary between the releases of the program, check for any changes before mixing different versions of the program and configuration files!
 
+Robot coordinate system : x is towards the nose and y towards the left of the robot, the origin is the center of the robot.
+Environment coordinate system : a local coordinate system defined in env.txt.
+
 During the program execution, a lot of variables make available to read/write the sensors and actuators data, with critical sections to be thread-safe (the same critical section is often used to protect a group of related variables for simplicity, e.g. StateVariablesCS for most observer and controller variables). Most the time, commands and mission threads do not set directly the actuators, they enable/disable low-level controls and set the desired inputs for these controls (e.g. Ball tracking activate heading control, depth control and distance control with inputs corresponding to the desired and current heading, depth and distance w.r.t. the detected ball). Check ControllerThread() to see which variables should be used for each control. Similarly, the variables computed by ObserverThread() should be used to get information on the current state of the robot, instead of raw sensor values. They are expressed in units common to most of the existing commands and missions.
 
 Modify the Commands() function in Commands.h to add a new command. Depending on the shared variables used, be sure to use the necessary critical sections. Depedending on what does the command, you might want to add something in DisableAllHorizontalControls() and DisableAllControls().

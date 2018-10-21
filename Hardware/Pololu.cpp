@@ -29,6 +29,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	int ivalue = 0;
 	double winddir = 0;
 	int counter = 0, counter_modulo = 0;
+	double dist1 = 0, dist2 = 0, dist3 = 0, dist4 = 0, dist5 = 0, dist6 = 0, dist7 = 0, dist8 = 0;
 	int showgetposition = -1;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -84,14 +85,14 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
-				if (pololu.vbat1analoginputchan != -1) vbat1_filtered = pololu.vbat1analoginputvaluethreshold; else vbat1_filtered = 0;
-				if (pololu.vbat1analoginputchan != -1) vbat1_threshold = pololu.vbat1analoginputvaluethreshold; else vbat1_threshold = 0;
-				if (pololu.ibat1analoginputchan != -1) ibat1_filtered = pololu.ibat1analoginputvaluethreshold; else ibat1_filtered = 0;
-				if (pololu.vbat2analoginputchan != -1) vbat2_filtered = pololu.vbat2analoginputvaluethreshold; else vbat2_filtered = 0;
-				if (pololu.vbat2analoginputchan != -1) vbat2_threshold = pololu.vbat2analoginputvaluethreshold; else vbat2_threshold = 0;
-				if (pololu.ibat2analoginputchan != -1) ibat2_filtered = pololu.ibat2analoginputvaluethreshold; else ibat2_filtered = 0;
-				vswitchcoef = pololu.switchanaloginputvaluecoef;
-				vswitchthreshold = pololu.switchanaloginputvaluethreshold;
+				if (pololu.vbat1analoginputchan != -1) vbat1_filtered = pololu.analoginputthreshold[pololu.vbat1analoginputchan]; else vbat1_filtered = 0;
+				if (pololu.vbat1analoginputchan != -1) vbat1_threshold = pololu.analoginputthreshold[pololu.vbat1analoginputchan]; else vbat1_threshold = 0;
+				if (pololu.ibat1analoginputchan != -1) ibat1_filtered = pololu.analoginputthreshold[pololu.ibat1analoginputchan]; else ibat1_filtered = 0;
+				if (pololu.vbat2analoginputchan != -1) vbat2_filtered = pololu.analoginputthreshold[pololu.vbat2analoginputchan]; else vbat2_filtered = 0;
+				if (pololu.vbat2analoginputchan != -1) vbat2_threshold = pololu.analoginputthreshold[pololu.vbat2analoginputchan]; else vbat2_threshold = 0;
+				if (pololu.ibat2analoginputchan != -1) ibat2_filtered = pololu.analoginputthreshold[pololu.ibat2analoginputchan]; else ibat2_filtered = 0;
+				vswitchcoef = pololu.analoginputcoef[pololu.switchanaloginputchan];
+				vswitchthreshold = pololu.analoginputthreshold[pololu.switchanaloginputchan];
 
 				LeaveCriticalSection(&StateVariablesCS);
 
@@ -198,7 +199,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					winddir = fmod_360(ivalue*pololu.winddiranaloginputvaluecoef+pololu.winddiranaloginputvalueoffset+180.0)+180.0;
+					winddir = fmod_360(ivalue*pololu.analoginputcoef[pololu.winddiranaloginputchan]+pololu.analoginputoffset[pololu.winddiranaloginputchan]+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
@@ -222,7 +223,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					vbat1 = pololu.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+pololu.vbat1analoginputvalueoffset; // *10.10101 for V, *18.00 for I, see sensor documentation...	
+					vbat1 = pololu.analoginputcoef[pololu.vbat1analoginputchan]*ivalue*5.0/1023.0+pololu.analoginputoffset[pololu.vbat1analoginputchan]; // *10.10101 for V, *18.00 for I, see sensor documentation...	
 					vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
 					LeaveCriticalSection(&StateVariablesCS);
 				}
@@ -291,7 +292,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					}
 					mSleep(10);
 					EnterCriticalSection(&StateVariablesCS);
-					winddir = fmod_360(ivalue*pololu.winddiranaloginputvaluecoef+pololu.winddiranaloginputvalueoffset+180.0)+180.0;
+					winddir = fmod_360(ivalue*pololu.analoginputcoef[pololu.winddiranaloginputchan]+pololu.analoginputoffset[pololu.winddiranaloginputchan]+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
 					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
@@ -317,7 +318,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						vbat1 = pololu.vbat1analoginputvaluecoef*ivalue*5.0/1023.0+pololu.vbat1analoginputvalueoffset;
+						vbat1 = pololu.analoginputcoef[pololu.vbat1analoginputchan]*ivalue*5.0/1023.0+pololu.analoginputoffset[pololu.vbat1analoginputchan];
 						vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -337,7 +338,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						ibat1 = pololu.ibat1analoginputvaluecoef*ivalue*5.0/1023.0+pololu.ibat1analoginputvalueoffset;
+						ibat1 = pololu.analoginputcoef[pololu.ibat1analoginputchan]*ivalue*5.0/1023.0+pololu.analoginputoffset[pololu.ibat1analoginputchan];
 						ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -357,7 +358,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						vbat2 = pololu.vbat2analoginputvaluecoef*ivalue*5.0/1023.0+pololu.vbat2analoginputvalueoffset;
+						vbat2 = pololu.analoginputcoef[pololu.vbat2analoginputchan]*ivalue*5.0/1023.0+pololu.analoginputoffset[pololu.vbat2analoginputchan];
 						vbat2_filtered = bat_filter_coef*vbat2_filtered+(1.0-bat_filter_coef)*vbat2;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -377,7 +378,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						}
 						mSleep(10);
 						EnterCriticalSection(&StateVariablesCS);
-						ibat2 = pololu.ibat2analoginputvaluecoef*ivalue*5.0/1023.0+pololu.ibat2analoginputvalueoffset;
+						ibat2 = pololu.analoginputcoef[pololu.ibat2analoginputchan]*ivalue*5.0/1023.0+pololu.analoginputoffset[pololu.ibat2analoginputchan];
 						ibat2_filtered = bat_filter_coef*ibat2_filtered+(1.0-bat_filter_coef)*ibat2;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
@@ -556,7 +557,28 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					mSleep(50);
 					break;
 				}
-				mSleep(50);
+				mSleep(20);
+				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
+					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1))
+				{
+					if (GetTelemetersPololu(&pololu, &dist1, &dist2, &dist3, &dist4, &dist5, &dist6, &dist7, &dist8) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					//EnterCriticalSection(&StateVariablesCS);
+					//
+					//i = pololu.telem1analoginputchan;
+					//pololu.analoginputx[i]+dist1*cos(pololu.analoginputpsi[i]);
+					//pololu.analoginputy[i]+dist1*sin(pololu.analoginputpsi[i]);
+					//
+					//LeaveCriticalSection(&StateVariablesCS);
+				}
+				else mSleep(30);
 				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
 				{
 					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
@@ -591,7 +613,28 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					mSleep(50);
 					break;
 				}
-				mSleep(50);
+				mSleep(20);
+				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
+					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1))
+				{
+					if (GetTelemetersPololu(&pololu, &dist1, &dist2, &dist3, &dist4, &dist5, &dist6, &dist7, &dist8) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					//EnterCriticalSection(&StateVariablesCS);
+					//
+					//i = pololu.telem1analoginputchan;
+					//pololu.analoginputx[i]+dist1*cos(pololu.analoginputpsi[i]);
+					//pololu.analoginputy[i]+dist1*sin(pololu.analoginputpsi[i]);
+					//
+					//LeaveCriticalSection(&StateVariablesCS);
+				}
+				else mSleep(30);
 				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
 				{
 					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)

@@ -1,3 +1,7 @@
+260
+Added GetTemperatureP33x().
+Updated Pololu to add analog sonars support.
+
 259
 Corrected bug in headingrelativereg.
 

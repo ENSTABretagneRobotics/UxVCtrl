@@ -11,6 +11,7 @@ COM6
 0
 % DeviceNumber (default is 12 for Maestro, 11 for Jrk)
 12
+% PWMs
 % channel 0
 % MinPW (in us)
 1000
@@ -371,6 +372,559 @@ COM6
 1
 % bProportionalPW (0 or 1)
 1
+% AIs
+% channel 0
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 1
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 2
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 3
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 4
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 5
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 6
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 7
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 8
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 9
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 10
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 11
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 12
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 13
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 14
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 15
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 16
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 17
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 18
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 19
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 20
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 21
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 22
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
+% channel 23
+% analoginputoffset
+0
+% analoginputthreshold
+0
+% analoginputcoef
+1
+% analoginputx (in m, in robot coordinate system)
+0
+% analoginputy (in m, in robot coordinate system)
+0
+% analoginputz (in m, in robot coordinate system)
+0
+% analoginputphi (in rad, in robot coordinate system)
+0
+% analoginputtheta (in rad, in robot coordinate system)
+0
+% analoginputpsi (in rad, in robot coordinate system)
+0
+% analoginputmin
+0
+% analoginputmax
+0
 % Specific channels...
 % rudderchan
 2
@@ -410,65 +964,43 @@ COM6
 19
 % winddiranaloginputchan (disabled if -1)
 -1
-% winddiranaloginputvalueoffset
-20.0
-% winddiranaloginputvaluethreshold
-0.0
-% winddiranaloginputvaluecoef
-0.333
 % windspeedanaloginputchan (disabled if -1)
 -1
-% windspeedanaloginputvalueoffset
-0.0
-% windspeedanaloginputvaluethreshold
-0.0
-% windspeedanaloginputvaluecoef
-1.0
 % vbat1analoginputchan (disabled if -1)
 -1
-% vbat1analoginputvalueoffset
-0.0
-% vbat1analoginputvaluethreshold
-0
-% vbat1analoginputvaluecoef
-10.10101
 % ibat1analoginputchan (disabled if -1)
 -1
-% ibat1analoginputvalueoffset
-0.0
-% ibat1analoginputvaluethreshold
-0
-% ibat1analoginputvaluecoef
-18.0
 % vbat2analoginputchan (disabled if -1)
 -1
-% vbat2analoginputvalueoffset
-0.0
-% vbat2analoginputvaluethreshold
-0
-% vbat2analoginputvaluecoef
-10.10101
 % ibat2analoginputchan (disabled if -1)
 -1
-% ibat2analoginputvalueoffset
-0.0
-% ibat2analoginputvaluethreshold
-0
-% ibat2analoginputvaluecoef
-18.0
 % switchanaloginputchan (disabled if -1)
 -1
-% switchanaloginputvalueoffset
-0.0
-% switchanaloginputvaluethreshold
-1.4
-% switchanaloginputvaluecoef
-1.0
+% telem1analoginputchan (disabled if -1)
+-1
+% telem2analoginputchan (disabled if -1)
+-1
+% telem3analoginputchan (disabled if -1)
+-1
+% telem4analoginputchan (disabled if -1)
+-1
+% telem5analoginputchan (disabled if -1)
+-1
+% telem6analoginputchan (disabled if -1)
+-1
+% telem7analoginputchan (disabled if -1)
+-1
+% telem8analoginputchan (disabled if -1)
+-1
 % MinAngle (in rad)
 -0.6
 % MidAngle (in rad)
 0
 % MaxAngle (in rad)
 0.6
+% alpha_max_err (in rad)
+0.01
+% d_max_err (in m)
+0.1
 % bEnableSetMultipleTargets
 0

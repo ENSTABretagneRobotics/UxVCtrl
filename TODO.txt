@@ -1,9 +1,20 @@
+affichage ultrasons maestro
+cycle entre les sonars, lidars, ultrasons pour drawsonar
+pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
+rajouter dans le menu option pour choisir quels sonar/lidar sont affichés par $, propre à chaque fenêtre...
+
+controller pour uv drone : rajouter param u_offset ou il y a quelque chose qui permet déjà de s'en sortir?
+
+show/setrcmavlinkdevice deviceid channel comme pour showgetpositionmaestro, typiquement pour pouvoir changer de mode...
+rajouter lidar-lite data (sonarrange, sonarvoltage) dans logs mavlink
+
+Param period pour tous les devices, pris en compte s'il est connecté...
+
 rename ball to hslobj?
 partager variables objDistance, etc.
 pouvoir activer la détection de plusieurs objets en même temps avec une id et un nom, comment gérer les actions, définir une priorité par objet?
 
-MAVLink : envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?), vérifier fonctionnement de rc_override vers UxVCtrl notamment pour voilier...
-pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
+Avoir un autre algo que le followme standard ou paramètre supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
 
 Geofence command
 Obstacles list added by LIDAR or other things
@@ -12,16 +23,13 @@ Obstacles statiques de toutes sortes à spécifier dans fichier de config
 Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon autour?
 Programme et article potential fields de 2013
 rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
-Garder en mémoire une arte des obstacle en parrallèle de l'env connu et statique et pouvoir le partager par réseau
-
+Garder en mémoire une carte des obstacles en parrallèle de l'env connu et statique et pouvoir le partager par réseau
 wpsi voulu, wpsi après prise en compte obstacles, wpsi après prise en compte dynamique d'un voilier, séparer de linefollowing...?
 mélanger à quel niveau avec potential fields?
-
 Preparer sample évitement d'obstacle ball et wallavoidance en relatif
 
 1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 
-Control voile fg, foc zs, ou l'inverse, avoir une option pour choisir si contrôle indépendant? Mais gestion du stop et generalstop dans scripts?
 Check observer omegazhat for submarines
 initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écrasé à cause de u, du coup c'est plutôt un u_0, uw_0, etc. qu'il faudrait?
 Rajouter params à linefollowingconfig pour que le robot ait automatiquement une précision plus importante quand il se rapproche de la destination->Attention si changement de r en cours de route, il risque d'attendre le chrono check strategy avant de changer de bord, il faut faire forcecheckstrategy si changement...
@@ -32,15 +40,6 @@ Bat1 elec, bat2 actuators, should update energy estimation when V and I measured
 récupérer tension batterie via 4G? Tension/courant dans log principal?->vbat1 et 2 mis à la fin de lognav...
 Attention à surcharge de maestro...->disabled if -1, sleep équilibrés, countermodulo...
 Maestrosleeptime=10+10*(vbat1chan!=-1?1:0)+10*(ibat1chan!=-1?1:0)+10*(vbat2chan!=-1?1:0)+10*(ibat2chan!=-1?1:0)
-faire un getmultiplevaluemaestro pour optimiser, mais pas sûr que ça marche?->pas urgent car pour l'instant on peut alterner les lectures, mais peut être intéressant si besoin de haute fréquence de lecture...
-
-compat CV7 : in if (ublox.bEnable_NMEA_MWV) take into account apparent wind speed and robot speed (SOG, COG...) and roll and pitch...
-to be able to get apparent and true wind data from the sensors without trying to compute true wind from apparent wind : replace bDisableRollWindCorrectionSailboat with int TrueWindComputationMode : 0 no true wind computation from apparent wind, 1 computation with all possible corrections, 2 computation with only yaw and roll correction
-pouvoir tester tous ces modes avec le simulateur
-Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et la vitesse du vent peut s'estimer grossièrement à partir de la vitesse du bateau, sauf que dépend aussi du courant...
-Prendre aussi en compte tangage, utiliser matrice d'euler
-setwindestimation/wgs : also add for water current and waves, any fluid...?
-prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 
 abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
@@ -84,15 +83,10 @@ Make a select.h for MSVC for compatibility (en essayant de déterminer le type de
 
 Composante latérale bluerov et ciscrea, brake si lateralthrust?
 
-Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
-Affichage tension batterie depuis mavlink, avec Energy_actuators...?
-Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
-
-Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
-
 update sonarstaticlocstructured, sonartest
 Corriger comments sur alphas dans uxvctrl.txt pour saucisse et séparer cas miniking et micron
 
+Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
 On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en historique theta, corrigé en historique theta et position...
 Drawsonarscreenshot_seanetpro
 Indiquer pings utilisés pour localisation
@@ -100,33 +94,6 @@ param zone morte sonar?
 
 Prise en compte de 2 GPS pour contracter le cap (ou 3 pour les 3 angles)
 Contraction cap avec gyros avec intégration sur une durée glissante
-
-why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
-
-add param to optionally display mavlink statustext...
-delay/wait, waypoint validation, fly to here wp not displayed on mp, how to display altitude, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
-
-MAV_FRAME_GLOBAL frame : altitude AMSL
-MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
-
-Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
-Cap pas correctement envoyé en mavlink osd
-Envoyer aussi rssi
-pouvoir envoyer image de caméra via télémétrie
-qgroundcontrol reconnait pas la position gps...
-force mode marche pas, d'où mode non armable...->use chan 5?
-add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
-
-https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
-Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
-Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
-https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
-
-Footprint RTL, ArduPilot Smart RTL?
-
-bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
-Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
-RTL en repassant en option par le chemin
 
 peut-être paramètres pour bRollControl, bPitchControl, commands to selectively disable them...?
 need to check nmeainterface with e.g. u-center, send altitude, heading, pitch, roll compatible with seanet...
@@ -160,6 +127,8 @@ revoir mes noms de variables pour les mesures, devraient être des intervalles av
 dans observer, c'est pas facile de choisir les bonnes equations d'état selon les capteurs dispos et l'état de leurs données (e.g. quadro avec optical flow, submarine avec DVL, précision GPS RTK...), si on fait avec la largeur des intervalles, définie dans les périphériques ça pourra aider...
 commande pour régler les erreurs des capteurs, et aussi en paramètres globaux?
 
+why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
+
 Nortek DVL supports RDI PD0, send Pathfinder commands, faire fichier RDIPD0Protocol.h?
 calib mag du DVL Nortek?
 prévoir commande pour mettre en veille le PathfinderDVL (avec warning s'il est en Ethernet)
@@ -192,8 +161,6 @@ Altitude from sonar : use qinter to allow outliers and take into account positio
 blueview, seanet, es, lidar qui pourraient marcher en même temps...
 minrange param, zone morte pour tous les sonar et echosondeurs...?
 
-pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
-
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
@@ -213,7 +180,6 @@ option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éven
 pas sur que px4flow soit fiable, plutôt utiliser hokuyo pour estimer vrx et vry...?
 
 chrono_period...
-change period also for other sensors/actuators?
 
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
 selon les accx_err, ça aura ou non une influence sur les équations d'état
@@ -284,6 +250,7 @@ cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, 
 cmake options static (attention cv342...), xp toolset visual studio?
 tester avec un nouveau mingw et linux, check inline and timegm in a small program
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
+cross compilation with cmake, variable PREFIX pour dépendances...
 Compiler uxvctrl pour le pixhawk?
 
 logs
@@ -296,6 +263,39 @@ fluiddir, fluidspeed, d_mes, alpha_mes units...
 différents types d'altitude, AMSL, venant d'un GPS imprécis, depth, AGL...
 add specific columns for raw GPS data in log file?->maybe not necessary since already in raw data log files, that can be easily replayed...
 Log update values in accrx, accry, accrz hat/err...
+
+MAVLink
+envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?), vérifier fonctionnement de rc_override vers UxVCtrl notamment pour voilier...
+pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
+param manualcontrol : prévoir valeur pour complètement désactiver rc_override
+Pouvoir renvoyer les rcout mavlinkinterface pour tester avec px dans les mains
+Touche pour mettre au milieu throttle fv pour pas tomber quand on active le rc_override
+Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
+Affichage tension batterie depuis mavlink, avec Energy_actuators...?
+Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
+add param to optionally display mavlink statustext...
+delay/wait, waypoint validation, fly to here wp not displayed on mp, how to display altitude, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
+MAV_FRAME_GLOBAL frame : altitude AMSL
+MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
+Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
+Cap pas correctement envoyé en mavlink osd
+Envoyer aussi rssi
+pouvoir envoyer image de caméra via télémétrie
+qgroundcontrol reconnait pas la position gps...
+force mode marche pas, d'où mode non armable...->use chan 5?
+add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
+https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
+Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
+Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
+https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
+Footprint RTL, ArduPilot Smart RTL?
+bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
+Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
+RTL en repassant en option par le chemin
+Arm : mode not armable->set mode stabilize pour s'en sortir?
+pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
+MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM? rajouter touches spéciales pour changer mode (manual, stabilize, etc.), touches pour désactiver l'override...
+save mavlink tlog for MAVLinkDevice?
 
 sonar, localisation, wf
 Prendre en compte le fait qu'on va voir le fond avec le sonar, surtout dans le cas de piscines à fond variable comme à l'IPN
@@ -424,11 +424,7 @@ Actuators
 rajouter option rampe comme sur robot CCI...
 Jrk getvariable pour pouvoir détecter déconnexions ou mode manuel (BOATBOT)
 Touches opencv gui->uNj(camera tilt), voir pour rajouter bras...
-Maestro, MAVLinkDevice : rajouter plus de channel PWM (24, 14), peut-être rajouter paramètre bEnable pour chacun si pas déjà plus ou moins fait, s'inspirer aussi de l'interface de Maestro Control Center...
-Maestro : avoir plus de flexibilité sur quel channel fait quoi...
-revoir mon organisation des pwm et analogin...
-Arm : mode not armable->set mode stabilize pour s'en sortir?
-MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM? rajouter touches spéciales pour changer mode (manual, stabilize, etc.), touches pour désactiver l'override...
+s'inspirer aussi de l'interface de Maestro Control Center...?
 reconnection auto de ssc32 a peu de chances de servir car on ne fait qu'envoyer des données...
 revoir l'organisation des actionneurs (IM483I, ue9, ciscrea...), configuration de u1,u2 avec canal, pwm us ou ms->voir ssc32
 Pin number (not used) dans config.txt, regarder fio ain de ue9...
@@ -437,7 +433,6 @@ trim/offset, min max facilement réglables dans interface, certains paramètres re
 quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
 voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)->utiliser InitPW?->mais écrasé par u dans le thread...
 vérifier la bonne utilisation d'InitPW...
-save mavlink tlog for MAVLinkDevice?
 
 GPS, NMEA, waypoints, AHRS, DVL
 AHRS matrice de rotation, bras de levier...
@@ -498,6 +493,14 @@ cas particulier du gate où c'est 2 objets éloignés d'une distance connue, pourra
 faire un tracking et voir s'ils se confirment
 
 voilier
+Control voile fg, foc zs, ou l'inverse, avoir une option pour choisir si contrôle indépendant? Mais gestion du stop et generalstop dans scripts?
+compat CV7 : in if (ublox.bEnable_NMEA_MWV) take into account apparent wind speed and robot speed (SOG, COG...) and roll and pitch...
+to be able to get apparent and true wind data from the sensors without trying to compute true wind from apparent wind : replace bDisableRollWindCorrectionSailboat with int TrueWindComputationMode : 0 no true wind computation from apparent wind, 1 computation with all possible corrections, 2 computation with only yaw and roll correction
+pouvoir tester tous ces modes avec le simulateur
+Estimation du vent vrai à partir de apparent : prendre en compte vitesse GPS et la vitesse du vent peut s'estimer grossièrement à partir de la vitesse du bateau, sauf que dépend aussi du courant...
+Prendre aussi en compte tangage, utiliser matrice d'euler
+setwindestimation/wgs : also add for water current and waves, any fluid...?
+prendre en compte vitesse gps et estimation de vtwind donnée en paramètre (en option, e.g. si vtwind_med pas mis à 0...)
 dans la phase de station, les actionneurs restent à leur dernière valeur, est-ce que c'est le mieux?
 si interruption de mission et qu'on reprend, il faudrait faire un forcecheckstragey et forcesailupdate...
 kalman pour retrouver vent vrai?
@@ -563,6 +566,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+faire un getmultiplevaluemaestro pour optimiser, mais pas sûr que ça marche?->pas urgent car pour l'instant on peut alterner les lectures, mais peut être intéressant si besoin de haute fréquence de lecture...
 
 check sign of omegaz for SBG and old MTi->OK
 

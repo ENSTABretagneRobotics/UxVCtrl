@@ -36,6 +36,8 @@
 
 #define NB_CHANNELS_PWM_POLOLU NB_CHANNELS_POLOLU
 
+#define NB_CHANNELS_AI_POLOLU NB_CHANNELS_POLOLU
+
 // 11 in decimal...
 #define DEFAULT_DEVICE_NUMBER_JRK 0x0B
 
@@ -75,6 +77,7 @@ struct POLOLU
 	RS232PORT RS232Port;
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	int LastPWs[NB_CHANNELS_PWM_POLOLU];
+	int LastAIs[NB_CHANNELS_AI_POLOLU];
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
@@ -90,6 +93,17 @@ struct POLOLU
 	int ThresholdPWs[NB_CHANNELS_PWM_POLOLU];
 	double CoefPWs[NB_CHANNELS_PWM_POLOLU];
 	int bProportionalPWs[NB_CHANNELS_PWM_POLOLU];
+	double analoginputoffset[NB_CHANNELS_AI_POLOLU];
+	double analoginputthreshold[NB_CHANNELS_AI_POLOLU];
+	double analoginputcoef[NB_CHANNELS_AI_POLOLU];
+	double analoginputx[NB_CHANNELS_AI_POLOLU];
+	double analoginputy[NB_CHANNELS_AI_POLOLU];
+	double analoginputz[NB_CHANNELS_AI_POLOLU];
+	double analoginputphi[NB_CHANNELS_AI_POLOLU];
+	double analoginputtheta[NB_CHANNELS_AI_POLOLU];
+	double analoginputpsi[NB_CHANNELS_AI_POLOLU];
+	double analoginputmin[NB_CHANNELS_AI_POLOLU];
+	double analoginputmax[NB_CHANNELS_AI_POLOLU];
 	int rudderchan;
 	int rightthrusterchan;
 	int leftthrusterchan;
@@ -109,36 +123,25 @@ struct POLOLU
 	int extra3chan;
 	int extra4chan;
 	int winddiranaloginputchan;
-	double winddiranaloginputvalueoffset;
-	double winddiranaloginputvaluethreshold;
-	double winddiranaloginputvaluecoef;
 	int windspeedanaloginputchan;
-	double windspeedanaloginputvalueoffset;
-	double windspeedanaloginputvaluethreshold;
-	double windspeedanaloginputvaluecoef;
 	int vbat1analoginputchan;
-	double vbat1analoginputvalueoffset;
-	double vbat1analoginputvaluethreshold;
-	double vbat1analoginputvaluecoef;
 	int ibat1analoginputchan;
-	double ibat1analoginputvalueoffset;
-	double ibat1analoginputvaluethreshold;
-	double ibat1analoginputvaluecoef;
 	int vbat2analoginputchan;
-	double vbat2analoginputvalueoffset;
-	double vbat2analoginputvaluethreshold;
-	double vbat2analoginputvaluecoef;
 	int ibat2analoginputchan;
-	double ibat2analoginputvalueoffset;
-	double ibat2analoginputvaluethreshold;
-	double ibat2analoginputvaluecoef;
 	int switchanaloginputchan;
-	double switchanaloginputvalueoffset;
-	double switchanaloginputvaluethreshold;
-	double switchanaloginputvaluecoef;
+	int telem1analoginputchan;
+	int telem2analoginputchan;
+	int telem3analoginputchan;
+	int telem4analoginputchan;
+	int telem5analoginputchan;
+	int telem6analoginputchan;
+	int telem7analoginputchan;
+	int telem8analoginputchan;
 	double MinAngle;
 	double MidAngle;
 	double MaxAngle;
+	double alpha_max_err;
+	double d_max_err;
 	BOOL bEnableSetMultipleTargets;
 };
 typedef struct POLOLU POLOLU;
@@ -189,6 +192,88 @@ inline int GetValuePololu(POLOLU* pPololu, int channel, int* pValue)
 	// Display and analyze received data.
 	//printf("Received : \"%s\"\n", recvbuf);
 	*pValue = recvbuf[0] + 256*recvbuf[1];
+
+	return EXIT_SUCCESS;
+}
+
+// int selectedchannels[NB_CHANNELS_AI_POLOLU], int ais[NB_CHANNELS_AI_POLOLU]
+inline int GetAllValuesPololu(POLOLU* pPololu, int* selectedchannels, int* ais)
+{
+	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
+	unsigned char recvbuf[MAX_NB_BYTES_POLOLU];
+	int sendbuflen = 0;
+	int recvbuflen = 0;
+	int channel = 0;
+	int index = 0, nbselectedchannels = 0;
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+
+	nbselectedchannels = 0;
+	index = 0;
+
+	for (channel = 0; channel < NB_CHANNELS_AI_POLOLU; channel++)
+	{
+		if (!selectedchannels[channel]) continue;
+
+		sendbuf[index] = (unsigned char)BAUD_RATE_INDICATION_BYTE_POLOLU;
+		sendbuf[index+1] = (unsigned char)pPololu->DeviceNumber;
+		sendbuf[index+2] = (unsigned char)(GET_POSITION_COMMAND_POLOLU & 0x7F);
+		sendbuf[index+3] = (unsigned char)channel;	
+		nbselectedchannels++;
+		index += 4;
+	}
+
+	if (nbselectedchannels == 0) return EXIT_SUCCESS;
+
+	sendbuflen = 4*nbselectedchannels;
+
+	//printf("%s\n", sendbuf);
+
+	if (WriteAllRS232Port(&pPololu->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pPololu->bSaveRawData)&&(pPololu->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pPololu->pfSaveFile);
+		fflush(pPololu->pfSaveFile);
+	}
+
+	mSleep(10); // Added because sometimes there was a timeout on the read() 
+	// (even though the data were available if read just after the timeout...)...
+
+	// Prepare the buffer that should receive data from device.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 2*nbselectedchannels;
+
+	if (ReadAllRS232Port(&pPololu->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pPololu->bSaveRawData)&&(pPololu->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pPololu->pfSaveFile);
+		fflush(pPololu->pfSaveFile);
+	}
+	
+	// Display and analyze received data.
+	//printf("Received : \"%s\"\n", recvbuf);
+
+	memset(ais, 0, NB_CHANNELS_AI_POLOLU*sizeof(int));
+	index = 0;
+
+	for (channel = 0; channel < NB_CHANNELS_AI_POLOLU; channel++)
+	{
+		if (!selectedchannels[channel]) continue;
+
+		ais[channel] = recvbuf[index] + 256*recvbuf[index+1];
+
+		// Update last known value.
+		pPololu->LastAIs[channel] = ais[channel];
+				
+		index += 2;
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -251,6 +336,7 @@ inline int SetPWMPololu(POLOLU* pPololu, int channel, int pw)
 
 // If digital output, bit = (pw >= 1500)? 1 : 0;.
 // pw in us.
+// int selectedchannels[NB_CHANNELS_PWM_POLOLU], int pws[NB_CHANNELS_PWM_POLOLU]
 inline int SetAllPWMsPololu(POLOLU* pPololu, int* selectedchannels, int* pws)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
@@ -691,6 +777,50 @@ inline int SetRudderJrkPololu(POLOLU* pPololu, double angle)
 	return SetPWMJrkPololu(pPololu, pw);
 }
 
+// In m.
+inline int GetTelemetersPololu(POLOLU* pPololu, double* pDist1, double* pDist2, double* pDist3, double* pDist4, double* pDist5, double* pDist6, double* pDist7, double* pDist8)
+{
+	int selectedchannels[NB_CHANNELS_AI_POLOLU];
+	int ais[NB_CHANNELS_AI_POLOLU];
+	int i = 0;
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(ais, 0, sizeof(ais));
+
+	selectedchannels[pPololu->telem1analoginputchan] = 1;
+	selectedchannels[pPololu->telem2analoginputchan] = 1;
+	selectedchannels[pPololu->telem3analoginputchan] = 1;
+	selectedchannels[pPololu->telem4analoginputchan] = 1;
+	selectedchannels[pPololu->telem5analoginputchan] = 1;
+	selectedchannels[pPololu->telem6analoginputchan] = 1;
+	selectedchannels[pPololu->telem7analoginputchan] = 1;
+	selectedchannels[pPololu->telem8analoginputchan] = 1;
+
+	if (GetAllValuesPololu(pPololu, selectedchannels, ais) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	i = pPololu->telem1analoginputchan;
+	*pDist1 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem2analoginputchan;
+	*pDist2 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem3analoginputchan;
+	*pDist3 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem4analoginputchan;
+	*pDist4 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem5analoginputchan;
+	*pDist5 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem6analoginputchan;
+	*pDist6 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem7analoginputchan;
+	*pDist7 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+	i = pPololu->telem8analoginputchan;
+	*pDist8 = pPololu->analoginputcoef[i]*ais[i]*5.0/1023.0+pPololu->analoginputoffset[i];
+
+	return EXIT_SUCCESS;
+}
+
 inline int CheckPololu(POLOLU* pPololu)
 {
 	if (SetRudderPololu(pPololu, -0.25) != EXIT_SUCCESS)
@@ -767,6 +897,20 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			pPololu->CoefPWs[channel] = 1;
 			pPololu->bProportionalPWs[channel] = 1;
 		}
+		for (channel = 0; channel < NB_CHANNELS_AI_POLOLU; channel++)
+		{
+			pPololu->analoginputoffset[channel] = 0;
+			pPololu->analoginputthreshold[channel] = 0;
+			pPololu->analoginputcoef[channel] = 1;
+			pPololu->analoginputx[channel] = 0;
+			pPololu->analoginputy[channel] = 0;
+			pPololu->analoginputz[channel] = 0;
+			pPololu->analoginputphi[channel] = 0;
+			pPololu->analoginputtheta[channel] = 0;
+			pPololu->analoginputpsi[channel] = 0;
+			pPololu->analoginputmin[channel] = 0;
+			pPololu->analoginputmax[channel] = 0;
+		}
 		pPololu->rudderchan = 2;
 		pPololu->rightthrusterchan = 1;
 		pPololu->leftthrusterchan = 0;
@@ -786,36 +930,25 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 		pPololu->extra3chan = 18;
 		pPololu->extra4chan = 19;
 		pPololu->winddiranaloginputchan = -1;
-		pPololu->winddiranaloginputvalueoffset = 0;
-		pPololu->winddiranaloginputvaluethreshold = 0;
-		pPololu->winddiranaloginputvaluecoef = 1;
 		pPololu->windspeedanaloginputchan = -1;
-		pPololu->windspeedanaloginputvalueoffset = 0;
-		pPololu->windspeedanaloginputvaluethreshold = 0;
-		pPololu->windspeedanaloginputvaluecoef = 1;
 		pPololu->vbat1analoginputchan = -1;
-		pPololu->vbat1analoginputvalueoffset = 0;
-		pPololu->vbat1analoginputvaluethreshold = 0;
-		pPololu->vbat1analoginputvaluecoef = 1;
 		pPololu->ibat1analoginputchan = -1;
-		pPololu->ibat1analoginputvalueoffset = 0;
-		pPololu->ibat1analoginputvaluethreshold = 0;
-		pPololu->ibat1analoginputvaluecoef = 1;
 		pPololu->vbat2analoginputchan = -1;
-		pPololu->vbat2analoginputvalueoffset = 0;
-		pPololu->vbat2analoginputvaluethreshold = 0;
-		pPololu->vbat2analoginputvaluecoef = 1;
 		pPololu->ibat2analoginputchan = -1;
-		pPololu->ibat2analoginputvalueoffset = 0;
-		pPololu->ibat2analoginputvaluethreshold = 0;
-		pPololu->ibat2analoginputvaluecoef = 1;
 		pPololu->switchanaloginputchan = -1;
-		pPololu->switchanaloginputvalueoffset = 0;
-		pPololu->switchanaloginputvaluethreshold = 0;
-		pPololu->switchanaloginputvaluecoef = 1;
+		pPololu->telem1analoginputchan = -1;
+		pPololu->telem2analoginputchan = -1;
+		pPololu->telem3analoginputchan = -1;
+		pPololu->telem4analoginputchan = -1;
+		pPololu->telem5analoginputchan = -1;
+		pPololu->telem6analoginputchan = -1;
+		pPololu->telem7analoginputchan = -1;
+		pPololu->telem8analoginputchan = -1;
 		pPololu->MinAngle = -0.5;
 		pPololu->MidAngle = 0;
 		pPololu->MaxAngle = 0.5;
+		pPololu->alpha_max_err = 0.01;
+		pPololu->d_max_err = 0.1;
 		pPololu->bEnableSetMultipleTargets = 1;
 
 		// Load data from a file.
@@ -851,6 +984,32 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 				if (sscanf(line, "%lf", &pPololu->CoefPWs[channel]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%d", &pPololu->bProportionalPWs[channel]) != 1) printf("Invalid configuration file.\n");
+			}
+
+			for (channel = 0; channel < NB_CHANNELS_AI_POLOLU; channel++)
+			{
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputoffset[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputthreshold[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputcoef[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputx[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputy[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputz[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputphi[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputtheta[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputpsi[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputmin[channel]) != 1) printf("Invalid configuration file.\n");
+				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%lf", &pPololu->analoginputmax[channel]) != 1) printf("Invalid configuration file.\n");
 			}
 
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -889,69 +1048,36 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pPololu->extra3chan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->extra4chan) != 1) printf("Invalid configuration file.\n");
-			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->winddiranaloginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->winddiranaloginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->winddiranaloginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->winddiranaloginputvaluecoef) != 1) printf("Invalid configuration file.\n");
-			
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->windspeedanaloginputchan) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->windspeedanaloginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->windspeedanaloginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->windspeedanaloginputvaluecoef) != 1) printf("Invalid configuration file.\n");
-			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->vbat1analoginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->vbat1analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->vbat1analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->vbat1analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
-			
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->ibat1analoginputchan) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->ibat1analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->ibat1analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->ibat1analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
-			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->vbat2analoginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->vbat2analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->vbat2analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->vbat2analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
-			
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->ibat2analoginputchan) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->ibat2analoginputvalueoffset) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->ibat2analoginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->ibat2analoginputvaluecoef) != 1) printf("Invalid configuration file.\n");
-			
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->switchanaloginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->switchanaloginputvalueoffset) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem1analoginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->switchanaloginputvaluethreshold) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem2analoginputchan) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%lf", &pPololu->switchanaloginputvaluecoef) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem3analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem4analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem5analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem6analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem7analoginputchan) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->telem8analoginputchan) != 1) printf("Invalid configuration file.\n");
 
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pPololu->MinAngle) != 1) printf("Invalid configuration file.\n");
@@ -959,6 +1085,11 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &pPololu->MidAngle) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pPololu->MaxAngle) != 1) printf("Invalid configuration file.\n");
+
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pPololu->alpha_max_err) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pPololu->d_max_err) != 1) printf("Invalid configuration file.\n");
 
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->bEnableSetMultipleTargets) != 1) printf("Invalid configuration file.\n");
@@ -992,7 +1123,7 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			(pPololu->ThresholdPWs[channel] < 0)
 			)
 		{
-			printf("Invalid parameters : channel %d.\n", channel);
+			printf("Invalid parameters : PWM channel %d.\n", channel);
 			pPololu->MinPWs[channel] = 1000;
 			pPololu->MidPWs[channel] = 1500;
 			pPololu->MaxPWs[channel] = 2000;
@@ -1002,6 +1133,15 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			pPololu->bProportionalPWs[channel] = 1;
 		}
 	}
+
+	//for (channel = 0; channel < NB_CHANNELS_AI_POLOLU; channel++)
+	//{
+	//	if ()
+	//	{
+	//		printf("Invalid parameters : AI channel %d.\n", channel);
+	//		pPololu->[channel] = 1;
+	//	}
+	//}
 
 	if ((pPololu->rudderchan < 0)||(pPololu->rudderchan >= NB_CHANNELS_PWM_POLOLU))
 	{
@@ -1137,12 +1277,28 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 		pPololu->MaxAngle = 0.5;
 	}
 
+	if (pPololu->alpha_max_err < 0)
+	{
+		printf("Invalid parameters : alpha_max_err.\n");
+		pPololu->alpha_max_err = 0.01;
+	}
+	if (pPololu->d_max_err < 0)
+	{
+		printf("Invalid parameters : d_max_err.\n");
+		pPololu->d_max_err = 0.1;
+	}
+
 	// Used to save raw data, should be handled specifically...
 	//pPololu->pfSaveFile = NULL;
 
 	for (channel = 0; channel < NB_CHANNELS_PWM_POLOLU; channel++)
 	{
 		pPololu->LastPWs[channel] = 0;
+	}
+
+	for (channel = 0; channel < NB_CHANNELS_AI_POLOLU; channel++)
+	{
+		pPololu->LastAIs[channel] = 0;
 	}
 
 	if (OpenRS232Port(&pPololu->RS232Port, pPololu->szDevPath) != EXIT_SUCCESS)
