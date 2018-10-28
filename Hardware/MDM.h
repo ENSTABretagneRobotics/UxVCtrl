@@ -21,14 +21,7 @@
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_MDM 1024
 
-#define MESSAGE_LEN_MDM 4
 #pragma region MDM-SPECIFIC DEFINITIONS
-// Device internal buffer (in bytes).
-#define INTERNAL_BUFFER_MDM 256
-
-// Acoustic transimission rate (in bps).
-#define ACOUSTIC_TRANSMISSION_RATE_MDM 40
-
 struct uint8bits_MDM
 {
 	unsigned int bit0 : 1;
@@ -207,6 +200,9 @@ struct MDM
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	int MessageLen;
+	int InternalBufferSize;
+	int ModemBitRate;
 	int DelayReadWriteEchoByte;
 };
 typedef struct MDM MDM;
@@ -230,7 +226,7 @@ inline int SendDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pSentBytes)
 	int i = 0;
 #endif // _DEBUG_MESSAGES_MDM
 
-	if (buflen > INTERNAL_BUFFER_MDM)
+	if (buflen > pMDM->InternalBufferSize)
 	{
 		printf("SendDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
@@ -284,7 +280,7 @@ inline int RecvDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pReceivedBytes)
 	int i = 0;
 #endif // _DEBUG_MESSAGES_MDM
 
-	if (buflen > INTERNAL_BUFFER_MDM)
+	if (buflen > pMDM->InternalBufferSize)
 	{
 		printf("RecvDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
@@ -359,7 +355,7 @@ inline int SendAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 	int i = 0;
 #endif // _DEBUG_MESSAGES_MDM
 
-	if (buflen > INTERNAL_BUFFER_MDM)
+	if (buflen > pMDM->InternalBufferSize)
 	{
 		printf("SendAllDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
@@ -414,7 +410,7 @@ inline int RecvAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 	int i = 0;
 #endif // _DEBUG_MESSAGES_MDM
 
-	if (buflen > INTERNAL_BUFFER_MDM)
+	if (buflen > pMDM->InternalBufferSize)
 	{
 		printf("RecvAllDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
@@ -465,18 +461,30 @@ Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */
 inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 {
-	uint8 writebuf[INTERNAL_BUFFER_MDM];
+	uint8* writebuf = NULL;
 #ifdef _DEBUG_MESSAGES_MDM
 	int i = 0;
 #endif // _DEBUG_MESSAGES_MDM
 
-	if (buflen+2 > INTERNAL_BUFFER_MDM)
+	writebuf = (uint8*)calloc(pMDM->InternalBufferSize, sizeof(uint8));
+	if (!writebuf)
+	{
+		printf("SendDataCRC16MDM error (%s) : %s"
+			"(pMDM=%#x)\n", 
+			strtime_m(), 
+			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY], 
+			(unsigned int)(intptr_t)pMDM);
+		return EXIT_FAILURE;
+	}
+
+	if (buflen+2 > pMDM->InternalBufferSize)
 	{
 		printf("SendDataCRC16MDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to send at once. ", 
 			(unsigned int)(intptr_t)pMDM);
+		free(writebuf);
 		return EXIT_FAILURE;
 	}
 
@@ -492,6 +500,7 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			strtime_m(), 
 			"Error sending data with the device. ", 
 			(unsigned int)(intptr_t)pMDM);
+		free(writebuf);
 		return EXIT_FAILURE;
 	}
 
@@ -511,6 +520,8 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 	}
 #endif // ENABLE_DEFAULT_SAVE_RAW_DATA_MDM
 
+	free(writebuf);
+
 	return EXIT_SUCCESS;
 }
 
@@ -526,20 +537,32 @@ Return : EXIT_SUCCESS, EXIT_INVALID_DATA if bad CRC-16 or EXIT_FAILURE if there 
 */
 inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 {
-	uint8 readbuf[INTERNAL_BUFFER_MDM];
+	uint8* readbuf = NULL;
 	uint8 crc_h = 0;
 	uint8 crc_l = 0;
 #ifdef _DEBUG_MESSAGES_MDM
 	int i = 0;
 #endif // _DEBUG_MESSAGES_MDM
 
-	if (buflen+2 > INTERNAL_BUFFER_MDM)
+	readbuf = (uint8*)calloc(pMDM->InternalBufferSize, sizeof(uint8));
+	if (!readbuf)
+	{
+		printf("RecvDataCRC16MDM error (%s) : %s"
+			"(pMDM=%#x)\n", 
+			strtime_m(), 
+			szOSUtilsErrMsgs[EXIT_OUT_OF_MEMORY], 
+			(unsigned int)(intptr_t)pMDM);
+		return EXIT_FAILURE;
+	}
+
+	if (buflen+2 > pMDM->InternalBufferSize)
 	{
 		printf("RecvDataCRC16MDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
 			"Too many data to receive at once. ", 
 			(unsigned int)(intptr_t)pMDM);
+		free(readbuf);
 		return EXIT_FAILURE;
 	}
 
@@ -550,6 +573,7 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			strtime_m(), 
 			"Error receiving data with the device. ", 
 			(unsigned int)(intptr_t)pMDM);
+		free(readbuf);
 		return EXIT_FAILURE;
 	}
 
@@ -582,8 +606,11 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 			strtime_m(), 
 			"Bad CRC-16. ", 
 			(unsigned int)(intptr_t)pMDM);
+		free(readbuf);
 		return EXIT_INVALID_DATA;	
 	}
+	
+	free(readbuf);
 
 	return EXIT_SUCCESS;
 }
@@ -655,6 +682,9 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 		pMDM->BaudRate = 9600;
 		pMDM->timeout = 8000;
 		pMDM->bSaveRawData = 1;
+		pMDM->MessageLen = 4;
+		pMDM->InternalBufferSize = 256;
+		pMDM->ModemBitRate = 40;
 		pMDM->DelayReadWriteEchoByte = 20;
 
 		// Load data from a file.
@@ -669,6 +699,12 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pMDM->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMDM->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMDM->MessageLen) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMDM->InternalBufferSize) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMDM->ModemBitRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMDM->DelayReadWriteEchoByte) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");

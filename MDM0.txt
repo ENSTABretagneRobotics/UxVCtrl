@@ -7,5 +7,11 @@ COM10
 8000
 % bSaveRawData
 1
+% MessageLen (in bytes)
+4
+% InternalBufferSize (device internal buffer in bytes)
+256
+% ModemBitRate (in bps)
+40
 % DelayReadWriteEchoByte (in ms)
 20
