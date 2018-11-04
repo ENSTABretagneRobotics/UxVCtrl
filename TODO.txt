@@ -1,12 +1,14 @@
+commande pour armer/désarmer...
+signe u, ul, comparer entre réel et sitl, pourquoi il y avait juste que pour uw qu'un - avait été rajouté...
+demander explicitement les messages rangefinder, distance_sensor, etc.
+altitude_AGL should be computed from lidar-lite, px4f ground_distance, if different should be compared with altitude, should be also corrected with pos xyz of the sensor...
+should fuse ultrasonic distances with rplidar and handle outliers...
 affichage ultrasons maestro
 cycle entre les sonars, lidars, ultrasons pour drawsonar
 pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
 rajouter dans le menu option pour choisir quels sonar/lidar sont affichés par $, propre à chaque fenêtre...
 
-controller pour uv drone : rajouter param u_offset ou il y a quelque chose qui permet déjà de s'en sortir?
-
-show/setrcmavlinkdevice deviceid channel comme pour showgetpositionmaestro, typiquement pour pouvoir changer de mode...
-rajouter lidar-lite data (sonarrange, sonarvoltage) dans logs mavlink
+controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?
 
 Param period pour tous les devices, pris en compte s'il est connecté...
 
@@ -265,6 +267,8 @@ add specific columns for raw GPS data in log file?->maybe not necessary since al
 Log update values in accrx, accry, accrz hat/err...
 
 MAVLink
+mavlinkinterface : ne pas envoyer toutes les trames à la même fréquence
+Utiliser mêmes messages mavlink px4f video via mavlink interface, comment gérer plusieurs caméras...?
 envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?), vérifier fonctionnement de rc_override vers UxVCtrl notamment pour voilier...
 pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
 param manualcontrol : prévoir valeur pour complètement désactiver rc_override
@@ -295,6 +299,7 @@ RTL en repassant en option par le chemin
 Arm : mode not armable->set mode stabilize pour s'en sortir?
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
 MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM? rajouter touches spéciales pour changer mode (manual, stabilize, etc.), touches pour désactiver l'override...
+SET_ATTITUDE_TARGET (doit être renvoyé régulièrement?)
 save mavlink tlog for MAVLinkDevice?
 
 sonar, localisation, wf
@@ -318,6 +323,7 @@ LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment fa
 Exp image sonar pour mieux détecter murs?
 
 GUI, video
+pouvoir afficher dans GUI un message temporaire dont le contenu s'efface après 2 s s'il n'a pas été modifié, un peu comme les alarmes...
 mettre aussi BRG de ball par rapport au nord?
 object detection : ajouter en option des prétraitements?
 Effacer messages ffmpeg et limiter perturbations?

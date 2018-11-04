@@ -46,7 +46,9 @@ inline int LoadConfig(void)
 	MAVLinkInterfaceTimeout = 1500;
 	MAVLinkInterface_mavlink_comm = 4;
 	MAVLinkInterface_system_id = 1;
-	MAVLinkInterface_component_id = 0;
+	MAVLinkInterface_component_id = 1;
+	MAVLinkInterface_target_system = 0;
+	MAVLinkInterface_target_component = 0;
 	bForceDefaultMAVLink1MAVLinkInterface = TRUE;
 	bDisableMAVLinkInterfaceIN = FALSE;
 	bNMEAInterface = TRUE;
@@ -322,6 +324,10 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &MAVLinkInterface_system_id) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &MAVLinkInterface_component_id) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_target_system) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_target_component) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bForceDefaultMAVLink1MAVLinkInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -989,7 +995,17 @@ inline int LoadConfig(void)
 	if ((MAVLinkInterface_component_id < 0)||(MAVLinkInterface_component_id >= 256))
 	{
 		printf("Invalid parameter : MAVLinkInterface_component_id.\n");
-		MAVLinkInterface_component_id = 0;
+		MAVLinkInterface_component_id = 1;
+	}
+	if ((MAVLinkInterface_target_system < 0)||(MAVLinkInterface_target_system >= 256))
+	{
+		printf("Invalid parameter : MAVLinkInterface_target_system.\n");
+		MAVLinkInterface_target_system = 0;
+	}
+	if ((MAVLinkInterface_target_component < 0)||(MAVLinkInterface_target_component >= 256))
+	{
+		printf("Invalid parameter : MAVLinkInterface_target_component.\n");
+		MAVLinkInterface_target_component = 0;
 	}
 	if ((u_max <= 0)||(u_max > 1))
 	{
@@ -1199,6 +1215,10 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", MAVLinkInterface_system_id) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", MAVLinkInterface_component_id) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_target_system) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_target_component) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bForceDefaultMAVLink1MAVLinkInterface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1993,7 +2013,7 @@ inline int TranslateKeys(int c)
 inline int DisplayKeys(void)
 {
 	printf("On OpenCVGUI : \n");
-	printf("%c%c%c%c(horizontal control),fv(vertical control or thrust limit),%c%c(lateral),%c(brake),space(stop),g(generalstop),t%c%cUH(heading, depth, alt_agl, pitch, roll control),"
+	printf("%c%c%c%c(horizontal control),fvB(vertical control or thrust limit),%c%c(lateral),%c(brake),space(stop),g(generalstop),t%c%cUH(heading, depth, alt_agl, pitch, roll control),"
 		"o(toggle OSD),c(toggle North and control),"
 		"m(toggle map),M(toggle Map),*(rotate map),i(toggle image),$(toggle sonar),;(other overlays),X(disableopencvgui),+-(coordspace zoom),"
 		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),V(enable/disableautodvllocalization),"

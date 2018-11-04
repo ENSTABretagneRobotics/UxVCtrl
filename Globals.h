@@ -268,6 +268,12 @@ extern double lights, cameratilt;
 
 extern unsigned int joystick_buttons;
 
+extern unsigned int rc_aux3_sw;
+extern BOOL rc_ail_sw;
+extern BOOL rc_gear_sw;
+extern BOOL rc_ele_sw;
+extern BOOL rc_rud_sw;
+
 extern double rudderminangle, ruddermidangle, ruddermaxangle;
 
 extern double Energy_electronics, Energy_actuators;
@@ -286,6 +292,8 @@ extern int MAVLinkInterfaceTimeout;
 extern int MAVLinkInterface_mavlink_comm;
 extern int MAVLinkInterface_system_id;
 extern int MAVLinkInterface_component_id;
+extern int MAVLinkInterface_target_system;
+extern int MAVLinkInterface_target_component;
 extern BOOL bForceDefaultMAVLink1MAVLinkInterface;
 extern BOOL bDisableMAVLinkInterfaceIN;
 extern BOOL bNMEAInterface;

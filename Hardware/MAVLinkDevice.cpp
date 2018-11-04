@@ -15,6 +15,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	MAVLINKDEVICE mavlinkdevice;
 	struct timeval tv;
 	MAVLINKDATA mavlinkdata;
+	int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
+	int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
 	int x_axis = 0, y_axis = 0, z_axis = 0, r_axis = 0;
 	unsigned int buttons = 0;
 	CHRONO chrono_GPSOK;
@@ -113,8 +115,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"fix_type;lat;lon;alt;eph;epv;vel;cog;satellites_visible;"
 						"roll (in rad);pitch (in rad);yaw (rad);rollspeed (in rad/s);pitchspeed (in rad/s);yawspeed (in rad/s);"
 						"press_abs (in bar);press_diff (in bar);temperature (in celsius degrees);"
-						"flow_x;flow_y;flow_comp_m_x;flow_comp_m_y;quality;ground_distance (in m);"
-						"integration_time_us;integrated_x;integrated_y;integrated_xgyro;integrated_ygyro;integrated_zgyro;temperature;quality;time_delta_distance_us;distance;"
+						"flow_x;flow_y;flow_comp_m_x;flow_comp_m_y;flow_rate_x;flow_rate_y;quality;ground_distance (in m);"
+						"optical_flow_rad.integration_time_us;optical_flow_rad.integrated_x;optical_flow_rad.integrated_y;optical_flow_rad.integrated_xgyro;optical_flow_rad.integrated_ygyro;optical_flow_rad.integrated_zgyro;optical_flow_rad.temperature;optical_flow_rad.quality;optical_flow_rad.time_delta_distance_us;optical_flow_rad.distance (in m);"
+						"rangefinder.distance (in m);rangefinder.voltage (in V);"
+						"distance_sensor.current_distance (in cm);distance_sensor.orientation;distance_sensor.covariance (in cm);distance_sensor.type;distance_sensor.id;"
 						"chan1_raw;chan2_raw;chan3_raw;chan4_raw;chan5_raw;chan6_raw;chan7_raw;chan8_raw;"
 						"servo1_raw;servo2_raw;servo3_raw;servo4_raw;servo5_raw;servo6_raw;servo7_raw;servo8_raw;"
 						"airspeed (in m/s);alt (in m);climb (in m/s);"
@@ -240,6 +244,11 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							vry_of = interval(-of_acc, of_acc);
 					}
 
+					if (mavlinkdata.rangefinder.distance > 0)
+					{
+						altitude_AGL = mavlinkdata.rangefinder.distance;
+					}
+
 					if (mavlinkdata.rc_channels.chancount >= mavlinkdevice.overridechan)
 					{
 						switch (mavlinkdevice.overridechan)
@@ -324,48 +333,44 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					}
 #pragma endregion
 #pragma region PWM
-					if (!mavlinkdevice.bDisablePWMOverride)
+					if (bRearmAutopilot)
 					{
-						// Temp...
-						int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
-						int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
-						switch (robid)
+						if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
 						{
-						case BLUEROV_ROBID:
-							if (bRearmAutopilot)
-							{
-								if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-								mSleep(25);
-								bRearmAutopilot = FALSE;
-							}
-							if (bForceDisarmAutopilot)
-							{
-								if (ArmMAVLinkDevice(&mavlinkdevice, FALSE) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-								mSleep(25);
-								bForceDisarmAutopilot = FALSE;
-							}
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
+						mSleep(25);
+						bRearmAutopilot = FALSE;
+					}
+					if (bForceDisarmAutopilot)
+					{
+						if (ArmMAVLinkDevice(&mavlinkdevice, FALSE) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
+						mSleep(25);
+						bForceDisarmAutopilot = FALSE;
+					}
 
-							if (mavlinkdevice.ManualControlMode != 1)
+					switch (robid)
+					{
+					case BLUEROV_ROBID:
+						if (mavlinkdevice.ManualControlMode != 1)
+						{
+							memset(selectedchannels, 0, sizeof(selectedchannels));
+							memset(pws, 0, sizeof(pws));
+							if (!mavlinkdevice.bDisablePWMOverride)
 							{
-								memset(selectedchannels, 0, sizeof(selectedchannels));
-								memset(pws, 0, sizeof(pws));
-
 								EnterCriticalSection(&StateVariablesCS);
 								// Convert u (in [-1;1]) into pulse width (in us).
 								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(up*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
@@ -390,185 +395,172 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								pws[7] = max(min(pws[7], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 								pws[8] = max(min(pws[8], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 								pws[9] = max(min(pws[9], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-
-								selectedchannels[0] = 1;
-								selectedchannels[1] = 1;
-								selectedchannels[2] = 1;
-								selectedchannels[3] = 1;
-								selectedchannels[4] = 1;
-								selectedchannels[5] = 1;
-								// 6 is reserved...
-								selectedchannels[7] = 1;
-								selectedchannels[8] = 1;
-								selectedchannels[9] = 1;
-
-								if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-							}
-							if (mavlinkdevice.ManualControlMode == 1)
-							{
-								EnterCriticalSection(&StateVariablesCS);
-								// https://github.com/bluerobotics/ardusub/issues/24
-								x_axis = (int)(1000*u); y_axis = (int)(-1000*ul); z_axis = (int)(500*uv+500); r_axis = (int)(-1000*uw);
-								buttons = joystick_buttons;
-								joystick_buttons = 0;
-								LeaveCriticalSection(&StateVariablesCS);
-
-								x_axis = max(min(x_axis, 1000), -1000);
-								y_axis = max(min(y_axis, 1000), -1000);
-								z_axis = max(min(z_axis, 1000), 0);
-								r_axis = max(min(r_axis, 1000), -1000);
-
-								if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-							}
-							if (mavlinkdevice.ManualControlMode == 2)
-							{
-								EnterCriticalSection(&StateVariablesCS);
-								buttons = joystick_buttons;
-								joystick_buttons = 0;
-								LeaveCriticalSection(&StateVariablesCS);
-
-								if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-							}
-							mSleep(25);
-							break;
-						case BUGGY_ROBID:
-						case ETAS_WHEEL_ROBID:
-						case BUBBLE_ROBID:
-						case MOTORBOAT_ROBID:
-						case COPTER_ROBID:
-						case ARDUCOPTER_ROBID:
-							if (bRearmAutopilot)
-							{
-								if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-								mSleep(25);
-								bRearmAutopilot = FALSE;
-							}
-							if (bForceDisarmAutopilot)
-							{
-								if (ArmMAVLinkDevice(&mavlinkdevice, FALSE) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-								mSleep(25);
-								bForceDisarmAutopilot = FALSE;
 							}
 
-							if (mavlinkdevice.ManualControlMode != 1)
-							{
-								memset(selectedchannels, 0, sizeof(selectedchannels));
-								memset(pws, 0, sizeof(pws));
+							selectedchannels[0] = 1;
+							selectedchannels[1] = 1;
+							selectedchannels[2] = 1;
+							selectedchannels[3] = 1;
+							selectedchannels[4] = 1;
+							selectedchannels[5] = 1;
+							// 6 is reserved...
+							selectedchannels[7] = 1;
+							selectedchannels[8] = 1;
+							selectedchannels[9] = 1;
 
+							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+						if (mavlinkdevice.ManualControlMode == 1)
+						{
+							EnterCriticalSection(&StateVariablesCS);
+							// https://github.com/bluerobotics/ardusub/issues/24
+							x_axis = (int)(1000*u); y_axis = (int)(-1000*ul); z_axis = (int)(500*uv+500); r_axis = (int)(-1000*uw);
+							buttons = joystick_buttons;
+							joystick_buttons = 0;
+							LeaveCriticalSection(&StateVariablesCS);
+
+							x_axis = max(min(x_axis, 1000), -1000);
+							y_axis = max(min(y_axis, 1000), -1000);
+							z_axis = max(min(z_axis, 1000), 0);
+							r_axis = max(min(r_axis, 1000), -1000);
+
+							if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+						if (mavlinkdevice.ManualControlMode == 2)
+						{
+							EnterCriticalSection(&StateVariablesCS);
+							buttons = joystick_buttons;
+							joystick_buttons = 0;
+							LeaveCriticalSection(&StateVariablesCS);
+
+							if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+						mSleep(25);
+						break;
+					case BUGGY_ROBID:
+					case ETAS_WHEEL_ROBID:
+					case BUBBLE_ROBID:
+					case MOTORBOAT_ROBID:
+					case COPTER_ROBID:
+					case ARDUCOPTER_ROBID:
+						if (mavlinkdevice.ManualControlMode != 1)
+						{
+							memset(selectedchannels, 0, sizeof(selectedchannels));
+							memset(pws, 0, sizeof(pws));
+							if (!mavlinkdevice.bDisablePWMOverride)
+							{
 								EnterCriticalSection(&StateVariablesCS);
 								// Convert u (in [-1;1]) into pulse width (in us).
 								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								if (rc_aux3_sw == 2) pws[4] = DEFAULT_MAX_PW_MAVLINKDEVICE;
+								else if (rc_aux3_sw == 1) pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE;
+								else pws[4] = DEFAULT_MIN_PW_MAVLINKDEVICE;
+								// 5 not used...
+								pws[6] = (rc_ail_sw)? DEFAULT_MAX_PW_MAVLINKDEVICE: DEFAULT_MIN_PW_MAVLINKDEVICE;
+								pws[7] = (rc_gear_sw)? DEFAULT_MAX_PW_MAVLINKDEVICE: DEFAULT_MIN_PW_MAVLINKDEVICE;
 								LeaveCriticalSection(&StateVariablesCS);
 
 								pws[0] = max(min(pws[0], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 								pws[1] = max(min(pws[1], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 								pws[2] = max(min(pws[2], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 								pws[3] = max(min(pws[3], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
-
-								selectedchannels[0] = 1;
-								selectedchannels[1] = 1;
-								selectedchannels[2] = 1;
-								selectedchannels[3] = 1;
-
-								if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
+								pws[4] = max(min(pws[4], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								// 5 not used...
+								pws[6] = max(min(pws[6], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
+								pws[7] = max(min(pws[7], DEFAULT_MAX_PW_MAVLINKDEVICE), DEFAULT_MIN_PW_MAVLINKDEVICE);
 							}
-							if (mavlinkdevice.ManualControlMode == 1)
+
+							selectedchannels[0] = 1;
+							selectedchannels[1] = 1;
+							selectedchannels[2] = 1;
+							selectedchannels[3] = 1;
+							selectedchannels[4] = 1;
+							// 5 not used...
+							selectedchannels[6] = 1;
+							selectedchannels[7] = 1;
+
+							if (SetAllPWMsMAVLinkDevice(&mavlinkdevice, selectedchannels, pws) != EXIT_SUCCESS)
 							{
-								EnterCriticalSection(&StateVariablesCS);
-								x_axis = (int)(1000*u); y_axis = (int)(1000*ul); z_axis = (int)(1000*uv); r_axis = (int)(1000*uw);
-								buttons = joystick_buttons;
-								joystick_buttons = 0;
-								LeaveCriticalSection(&StateVariablesCS);
-
-								x_axis = max(min(x_axis, 1000), -1000);
-								y_axis = max(min(y_axis, 1000), -1000);
-								z_axis = max(min(z_axis, 1000), -1000);
-								r_axis = max(min(r_axis, 1000), -1000);
-
-								if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
 							}
-							if (mavlinkdevice.ManualControlMode == 2)
-							{
-								EnterCriticalSection(&StateVariablesCS);
-								buttons = joystick_buttons;
-								joystick_buttons = 0;
-								LeaveCriticalSection(&StateVariablesCS);
-
-								if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
-								{
-									printf("Connection to a MAVLinkDevice lost.\n");
-									GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-									bConnected = FALSE;
-									DisconnectMAVLinkDevice(&mavlinkdevice);
-									mSleep(50);
-									break;
-								}
-							}
-							mSleep(25);
-							break;
-						default:
-							mSleep(25);
-							break;
 						}
+						if (mavlinkdevice.ManualControlMode == 1)
+						{
+							EnterCriticalSection(&StateVariablesCS);
+							x_axis = (int)(1000*u); y_axis = (int)(1000*ul); z_axis = (int)(1000*uv); r_axis = (int)(1000*uw);
+							buttons = joystick_buttons;
+							joystick_buttons = 0;
+							LeaveCriticalSection(&StateVariablesCS);
+
+							x_axis = max(min(x_axis, 1000), -1000);
+							y_axis = max(min(y_axis, 1000), -1000);
+							z_axis = max(min(z_axis, 1000), -1000);
+							r_axis = max(min(r_axis, 1000), -1000);
+
+							if (ManualControlMAVLinkDevice(&mavlinkdevice, x_axis, y_axis, z_axis, r_axis, buttons) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+						if (mavlinkdevice.ManualControlMode == 2)
+						{
+							EnterCriticalSection(&StateVariablesCS);
+							buttons = joystick_buttons;
+							joystick_buttons = 0;
+							LeaveCriticalSection(&StateVariablesCS);
+
+							if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+						mSleep(25);
+						break;
+					default:
+						mSleep(25);
+						break;
 					}
 #pragma endregion								
 				}
@@ -580,8 +572,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"%d;%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%.4f;%.4f;%.4f;%.4f;%.4f;%.4f;"
 						"%.4f;%.4f;%.1f;"
-						"%d;%d;%.4f;%.4f;%d;%.3f;"
+						"%d;%d;%.4f;%.4f;%.4f;%.4f;%d;%.3f;"
 						"%d;%f;%f;%f;%f;%f;%d;%d;%d;%f;"
+						"%.3f;%.3f;"
+						"%d;%d;%d;%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;"
 						"%d;%d;%d;%d;%d;%d;%d;%d;"
@@ -591,8 +585,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						(int)mavlinkdata.gps_raw_int.fix_type, (int)mavlinkdata.gps_raw_int.lat, (int)mavlinkdata.gps_raw_int.lon, (int)mavlinkdata.gps_raw_int.alt,(int)mavlinkdata.gps_raw_int.eph, (int)mavlinkdata.gps_raw_int.epv, (int)mavlinkdata.gps_raw_int.vel, (int)mavlinkdata.gps_raw_int.cog, (int)mavlinkdata.gps_raw_int.satellites_visible,
 						(double)mavlinkdata.attitude.roll, (double)mavlinkdata.attitude.pitch, (double)mavlinkdata.attitude.yaw, (double)mavlinkdata.attitude.rollspeed, (double)mavlinkdata.attitude.pitchspeed, (double)mavlinkdata.attitude.yawspeed,
 						(double)(mavlinkdata.scaled_pressure.press_abs*0.001), (double)(mavlinkdata.scaled_pressure.press_diff*0.001), (double)(mavlinkdata.scaled_pressure.temperature*0.01), 
-						(int)mavlinkdata.optical_flow.flow_x, (int)mavlinkdata.optical_flow.flow_y, (double)mavlinkdata.optical_flow.flow_comp_m_x, (double)mavlinkdata.optical_flow.flow_comp_m_y, (int)mavlinkdata.optical_flow.quality, (double)mavlinkdata.optical_flow.ground_distance,
+						(int)mavlinkdata.optical_flow.flow_x, (int)mavlinkdata.optical_flow.flow_y, (double)mavlinkdata.optical_flow.flow_comp_m_x, (double)mavlinkdata.optical_flow.flow_comp_m_y, (double)mavlinkdata.optical_flow.flow_rate_x, (double)mavlinkdata.optical_flow.flow_rate_y, (int)mavlinkdata.optical_flow.quality, (double)mavlinkdata.optical_flow.ground_distance,
 						(int)mavlinkdata.optical_flow_rad.integration_time_us, (double)mavlinkdata.optical_flow_rad.integrated_x, (double)mavlinkdata.optical_flow_rad.integrated_y, (double)mavlinkdata.optical_flow_rad.integrated_xgyro, (double)mavlinkdata.optical_flow_rad.integrated_ygyro, (double)mavlinkdata.optical_flow_rad.integrated_zgyro, (int)mavlinkdata.optical_flow_rad.temperature, (int)mavlinkdata.optical_flow_rad.quality, (int)mavlinkdata.optical_flow_rad.time_delta_distance_us, (double)mavlinkdata.optical_flow_rad.distance,
+						(double)mavlinkdata.rangefinder.distance, (double)mavlinkdata.rangefinder.voltage,
+						(int)mavlinkdata.distance_sensor.current_distance, (int)mavlinkdata.distance_sensor.orientation, (int)mavlinkdata.distance_sensor.covariance, (int)mavlinkdata.distance_sensor.type, (int)mavlinkdata.distance_sensor.id,
 						(int)mavlinkdata.rc_channels_raw.chan1_raw, (int)mavlinkdata.rc_channels_raw.chan2_raw, (int)mavlinkdata.rc_channels_raw.chan3_raw, (int)mavlinkdata.rc_channels_raw.chan4_raw, (int)mavlinkdata.rc_channels_raw.chan5_raw, (int)mavlinkdata.rc_channels_raw.chan6_raw, (int)mavlinkdata.rc_channels_raw.chan7_raw, (int)mavlinkdata.rc_channels_raw.chan8_raw, 
 						(int)mavlinkdata.rc_channels.chan1_raw, (int)mavlinkdata.rc_channels.chan2_raw, (int)mavlinkdata.rc_channels.chan3_raw, (int)mavlinkdata.rc_channels.chan4_raw, (int)mavlinkdata.rc_channels.chan5_raw, (int)mavlinkdata.rc_channels.chan6_raw, (int)mavlinkdata.rc_channels.chan7_raw, (int)mavlinkdata.rc_channels.chan8_raw, (int)mavlinkdata.rc_channels.chan9_raw, (int)mavlinkdata.rc_channels.chan10_raw, (int)mavlinkdata.rc_channels.chan11_raw, (int)mavlinkdata.rc_channels.chan12_raw, (int)mavlinkdata.rc_channels.chan13_raw, (int)mavlinkdata.rc_channels.chan14_raw, (int)mavlinkdata.rc_channels.chan15_raw, (int)mavlinkdata.rc_channels.chan16_raw, (int)mavlinkdata.rc_channels.chan17_raw, (int)mavlinkdata.rc_channels.chan18_raw, 
 						(int)mavlinkdata.servo_output_raw.servo1_raw, (int)mavlinkdata.servo_output_raw.servo2_raw, (int)mavlinkdata.servo_output_raw.servo3_raw, (int)mavlinkdata.servo_output_raw.servo4_raw, (int)mavlinkdata.servo_output_raw.servo5_raw, (int)mavlinkdata.servo_output_raw.servo6_raw, (int)mavlinkdata.servo_output_raw.servo7_raw, (int)mavlinkdata.servo_output_raw.servo8_raw, 

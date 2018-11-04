@@ -1,3 +1,10 @@
+262
+Updated extended menu in OpenCVGUI.
+Added MAVLinkInterface_target_system and MAVLinkInterface_target_component parameters.
+Updated MAVLinkDevice.
+Added rcswitches command.
+Added B key to set throttle to 50% easily.
+
 261
 Added MessageLen, InternalBufferSize and ModemBitRate parameters to MDM.
 

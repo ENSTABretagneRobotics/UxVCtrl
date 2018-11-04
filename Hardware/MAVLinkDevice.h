@@ -60,6 +60,8 @@ struct MAVLINKDATA
 	mavlink_scaled_pressure_t scaled_pressure;
 	mavlink_optical_flow_t optical_flow;
 	mavlink_optical_flow_rad_t optical_flow_rad;
+	mavlink_rangefinder_t rangefinder;
+	mavlink_distance_sensor_t distance_sensor;
 	mavlink_rc_channels_raw_t rc_channels_raw;
 	mavlink_rc_channels_t rc_channels;
 	mavlink_servo_output_raw_t servo_output_raw;
@@ -265,6 +267,12 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 				break;
 			case MAVLINK_MSG_ID_OPTICAL_FLOW_RAD:
 				mavlink_msg_optical_flow_rad_decode(&msg, &pMAVLinkData->optical_flow_rad);
+				break;
+			case MAVLINK_MSG_ID_RANGEFINDER:
+				mavlink_msg_rangefinder_decode(&msg, &pMAVLinkData->rangefinder);
+				break;
+			case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+				mavlink_msg_distance_sensor_decode(&msg, &pMAVLinkData->distance_sensor);
 				break;
 			case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
 				mavlink_msg_rc_channels_raw_decode(&msg, &pMAVLinkData->rc_channels_raw);
@@ -624,7 +632,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		pMAVLinkDevice->mavlink_comm = 0;
 		pMAVLinkDevice->system_id = 255;
 		pMAVLinkDevice->component_id = 0;
-		pMAVLinkDevice->target_system = 1;
+		pMAVLinkDevice->target_system = 0;
 		pMAVLinkDevice->target_component = 0;
 		pMAVLinkDevice->bForceDefaultMAVLink1 = 1;
 		pMAVLinkDevice->ManualControlMode = 0;
@@ -735,7 +743,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 	if ((pMAVLinkDevice->target_system < 0)||(pMAVLinkDevice->target_system >= 256))
 	{
 		printf("Invalid parameter : target_system.\n");
-		pMAVLinkDevice->target_system = 1;
+		pMAVLinkDevice->target_system = 0;
 	}
 	if ((pMAVLinkDevice->target_component < 0)||(pMAVLinkDevice->target_component >= 256))
 	{

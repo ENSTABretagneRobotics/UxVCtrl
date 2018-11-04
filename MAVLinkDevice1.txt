@@ -31,14 +31,14 @@
 0
 % mavlink_comm (from 0 to 4)
 1
-% system_id
+% system_id (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
 255
-% component_id
+% component_id (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
+1
+% target_system (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
 0
-% target_system
-1
-% target_component
-1
+% target_component (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
+0
 % bForceDefaultMAVLink1 (0 to enable default MAVLink v2 protocol, 1 to force to default MAVLink v1)
 1
 % ManualControlMode (0 to send RC_OVERRIDE, 1 to send MANUAL_CONTROL, 2 to send RC_OVERRIDE+MANUAL_CONTROL (only joystick buttons) MAVLink messages)

@@ -41,7 +41,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bExtendedMenu = FALSE;
 	BOOL bColorsExtendedMenu = FALSE;
 	BOOL bCISCREAOSDExtendedMenu = FALSE;
-	BOOL bOtherOSDOptionsExtendedMenu = FALSE;
+	BOOL bMAVLinkOSDExtendedMenu = FALSE;
+	BOOL bOSDDispOptionsExtendedMenu = FALSE;
+	BOOL bOtherOptionsExtendedMenu = FALSE;
 	CvPoint PlaySymbolPoints[3];
 	int nbPlaySymbolPoints = sizeof(PlaySymbolPoints);
 	CvPoint PauseSymbolPoints[4];
@@ -470,6 +472,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			}
 			break;
+		case 'B':
+			uv = (u_min_z+u_max_z)/2.0;
+			break;
 		case 'w':
 			bBrakeControl = TRUE;
 			bDistanceControl = FALSE;
@@ -774,14 +779,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("Alarms enabled.\n");
 			break;
 		case '?': bDispEPU = !bDispEPU; break;
-		case '.':
-			bRearmAutopilot = TRUE;
-			printf("Rearm.\n");
-			break;
-		case '0':
-			bForceDisarmAutopilot = TRUE;
-			printf("Disarm.\n");
-			break;
 		case 'F':
 			bEnableAltRCMode = !bEnableAltRCMode;
 			if (bEnableAltRCMode) printf("Alternate RC mode enabled.\n");
@@ -795,62 +792,113 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'X':
 			bEnableOpenCVGUIs[videoid] = FALSE;
 			break;
+		case '.':
+			bRearmAutopilot = TRUE;
+			printf("Rearm.\n");
+			break;
+		case '0':
+			bForceDisarmAutopilot = TRUE;
+			printf("Disarm.\n");
+			break;
 #pragma region EXTENDED MENU
 		case '1':
 			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 128));
-			else if (bOtherOSDOptionsExtendedMenu) bDispLLA = !bDispLLA;
-			else if (bExtendedMenu) bColorsExtendedMenu = TRUE;
-			break;
-		case '2':
-			if (bColorsExtendedMenu) CvCycleColors(&colorsonarlidarid, &colorsonarlidar, CV_RGB(0, 0, 255));
-			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; }
-			else if (bOtherOSDOptionsExtendedMenu) bDispAltitudeAGL = !bDispAltitudeAGL;
-			else if (bExtendedMenu) bCISCREAOSDExtendedMenu = TRUE;
-			break;
-		case '3':
-			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
-			else if (bOtherOSDOptionsExtendedMenu) bDispSOG = !bDispSOG;
-			else if (bExtendedMenu) bStdOutDetailedInfo = !bStdOutDetailedInfo;
-			break;
-		case '4': 
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; } 
-			else if (bOtherOSDOptionsExtendedMenu) bDispYPR = !bDispYPR;
-			else if (bExtendedMenu)
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_ele_sw = !rc_ele_sw;
+				if (rc_ele_sw) printf("RC ELE switch HIGH.\n");
+				else printf("RC ELE switch LOW.\n");
+			}
+			else if (bOSDDispOptionsExtendedMenu) bDispLLA = !bDispLLA;
+			else if (bOtherOptionsExtendedMenu)
 			{
 				bDisableRollWindCorrectionSailboat = !bDisableRollWindCorrectionSailboat;
 				if (bDisableRollWindCorrectionSailboat) printf("Sailboat roll wind correction disabled.\n");
 				else printf("Sailboat roll wind correction enabled.\n");
 			}
+			else if (bExtendedMenu) bColorsExtendedMenu = TRUE;
 			break;
-		case '5': 
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; } 
-			else if (bOtherOSDOptionsExtendedMenu) bDispERR = !bDispERR;
-			else if (bExtendedMenu)
+		case '2':
+			if (bColorsExtendedMenu) CvCycleColors(&colorsonarlidarid, &colorsonarlidar, CV_RGB(0, 0, 255));
+			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_aux3_sw = 2;
+				printf("RC AUX3 switch HIGH.\n");
+			}
+			else if (bOSDDispOptionsExtendedMenu) bDispAltitudeAGL = !bDispAltitudeAGL;
+			else if (bOtherOptionsExtendedMenu)
 			{
 				bEnableBackwardsMotorboat = !bEnableBackwardsMotorboat;
 				if (bEnableBackwardsMotorboat) printf("Motorboat backwards enabled.\n");
 				else printf("Motorboat backwards disabled.\n");
 			}
+			else if (bExtendedMenu) bCISCREAOSDExtendedMenu = TRUE;
 			break;
-		case '6': 
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; } 
-			else if (bExtendedMenu)
+		case '3':
+			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_ail_sw = !rc_ail_sw;
+				if (rc_ail_sw) printf("RC AIL switch HIGH.\n");
+				else printf("RC AIL switch LOW.\n");
+			}
+			else if (bOSDDispOptionsExtendedMenu) bDispSOG = !bDispSOG;
+			else if (bOtherOptionsExtendedMenu)
 			{
 				LoadKeys();
 				printf("Keys updated.\n");
 				DisplayKeys();
 			}
+			else if (bExtendedMenu) bMAVLinkOSDExtendedMenu = TRUE;
 			break;
-		case '7': 
-			if (bExtendedMenu) bOtherOSDOptionsExtendedMenu = TRUE;
+		case '4':
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_rud_sw = !rc_rud_sw;
+				if (rc_rud_sw) printf("RC RUD switch HIGH.\n");
+				else printf("RC RUD switch LOW.\n");
+			}
+			else if (bOSDDispOptionsExtendedMenu) bDispYPR = !bDispYPR;
+			else if (bExtendedMenu) bStdOutDetailedInfo = !bStdOutDetailedInfo;
 			break;
-		case '8': if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; } break;
+		case '5':
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_aux3_sw = 1;
+				printf("RC AUX3 switch MEDIUM.\n");
+			}
+			else if (bOSDDispOptionsExtendedMenu) bDispERR = !bDispERR;
+			else if (bExtendedMenu) bOSDDispOptionsExtendedMenu = TRUE;
+			break;
+		case '6':
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_gear_sw = !rc_gear_sw;
+				if (rc_gear_sw) printf("RC GEAR switch HIGH.\n");
+				else printf("RC GEAR switch LOW.\n");
+			}
+			else if (bExtendedMenu) bOtherOptionsExtendedMenu = TRUE;
+			break;
+		case '8':
+			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; }
+			else if (bMAVLinkOSDExtendedMenu)
+			{
+				rc_aux3_sw = 0;
+				printf("RC AUX3 switch LOW.\n");
+			}
+			break;
 		case 13: // ENTER
-			if (bExtendedMenu) 
+			if (bExtendedMenu)
 			{
 				if (bColorsExtendedMenu) bColorsExtendedMenu = FALSE;
 				else if (bCISCREAOSDExtendedMenu) bCISCREAOSDExtendedMenu = FALSE;
-				else if (bOtherOSDOptionsExtendedMenu) bOtherOSDOptionsExtendedMenu = FALSE;
+				else if (bMAVLinkOSDExtendedMenu) bMAVLinkOSDExtendedMenu = FALSE;
+				else if (bOSDDispOptionsExtendedMenu) bOSDDispOptionsExtendedMenu = FALSE;
+				else if (bOtherOptionsExtendedMenu) bOtherOptionsExtendedMenu = FALSE;
 				else bExtendedMenu = FALSE;
 			}
 			else bExtendedMenu = TRUE;
@@ -891,7 +939,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #pragma endregion
 		EnterCriticalSection(&dispimgsCS[videoid]);
 #pragma region EXTENDED MENU
-		if ((bExtendedMenu)&&(!bCISCREAOSDExtendedMenu))
+		if ((bExtendedMenu)&&(!bCISCREAOSDExtendedMenu)&&(!bMAVLinkOSDExtendedMenu))
 		{
 			if (bColorsExtendedMenu)
 			{
@@ -912,11 +960,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				strcpy(szText, "[ENTER] EXIT");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 			}
-			else if (bOtherOSDOptionsExtendedMenu)
+			else if (bOSDDispOptionsExtendedMenu)
 			{
 				offset = 0;
 				offset += 16;
-				strcpy(szText, "EXTENDED MENU\\OTHER OSD OPTIONS");
+				strcpy(szText, "EXTENDED MENU\\OSD DISP OPTIONS");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[1] DISPLAY LLA (%d)", (int)bDispLLA);
@@ -937,6 +985,25 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				strcpy(szText, "[ENTER] EXIT");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 			}
+			else if (bOtherOptionsExtendedMenu)
+			{
+				offset = 0;
+				offset += 16;
+				strcpy(szText, "EXTENDED MENU\\OTHER OPTIONS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[1] SAILBOAT ROLL WIND CORR (%d)", (int)!bDisableRollWindCorrectionSailboat);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[2] MOTORBOAT BACKWARDS (%d)", (int)bEnableBackwardsMotorboat);
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[3] LOAD KEYS");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[ENTER] EXIT");
+				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+			}
 			else
 			{
 				offset = 0;
@@ -950,19 +1017,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				strcpy(szText, "[2] CISCREA OSD (46825)");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				sprintf(szText, "[3] SHOW DETAILED INFO (%d)", (int)bStdOutDetailedInfo);
+				strcpy(szText, "[3] MAVLINK OSD");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				sprintf(szText, "[4] SAILBOAT ROLL WIND CORR (%d)", (int)!bDisableRollWindCorrectionSailboat);
+				sprintf(szText, "[4] SHOW DETAILED INFO (%d)", (int)bStdOutDetailedInfo);
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				sprintf(szText, "[5] MOTORBOAT BACKWARDS (%d)", (int)bEnableBackwardsMotorboat);
+				strcpy(szText, "[5] OSD DISP OPTIONS");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				strcpy(szText, "[6] LOAD KEYS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
-				offset += 16;
-				strcpy(szText, "[7] OTHER OSD OPTIONS");
+				strcpy(szText, "[6] OTHER OPTIONS");
 				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");

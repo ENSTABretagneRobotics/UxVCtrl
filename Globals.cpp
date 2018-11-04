@@ -80,6 +80,12 @@ double lights = 0, cameratilt = 0;
 
 unsigned int joystick_buttons = 0;
 
+unsigned int rc_aux3_sw = 0;
+BOOL rc_ail_sw = FALSE;
+BOOL rc_gear_sw = FALSE;
+BOOL rc_ele_sw = FALSE;
+BOOL rc_rud_sw = FALSE;
+
 double rudderminangle = 0, ruddermidangle = 0, ruddermaxangle = 0;
 
 double Energy_electronics = 0, Energy_actuators = 0;
@@ -98,6 +104,8 @@ int MAVLinkInterfaceTimeout = 0;
 int MAVLinkInterface_mavlink_comm = 0;
 int MAVLinkInterface_system_id = 0;
 int MAVLinkInterface_component_id = 0;
+int MAVLinkInterface_target_system = 0;
+int MAVLinkInterface_target_component = 0;
 BOOL bForceDefaultMAVLink1MAVLinkInterface = FALSE;
 BOOL bDisableMAVLinkInterfaceIN = FALSE;
 BOOL bNMEAInterface = FALSE;

@@ -31,13 +31,13 @@ COM12
 1
 % mavlink_comm (from 0 to 4)
 0
-% system_id
+% system_id (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
 255
-% component_id
-0
-% target_system
+% component_id (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
 1
-% target_component
+% target_system (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
+1
+% target_component (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
 1
 % bForceDefaultMAVLink1 (0 to enable default MAVLink v2 protocol, 1 to force to default MAVLink v1)
 1
@@ -107,13 +107,13 @@ COM12
 1
 % channel 4
 % MinPW (in us)
-800
+1000
 % MidPW (in us)
-800
+1500
 % MaxPW (in us)
 2000
 % InitPW (in us, 0 to disable channel)
-800
+1000
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
@@ -122,13 +122,13 @@ COM12
 1
 % channel 5
 % MinPW (in us)
-800
+1000
 % MidPW (in us)
-800
+1500
 % MaxPW (in us)
 2000
 % InitPW (in us, 0 to disable channel)
-800
+1000
 % ThresholdPW (in us)
 10
 % CoefPW (-1 or 1)
