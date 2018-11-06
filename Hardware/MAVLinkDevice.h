@@ -62,6 +62,7 @@ struct MAVLINKDATA
 	mavlink_optical_flow_rad_t optical_flow_rad;
 	mavlink_rangefinder_t rangefinder;
 	mavlink_distance_sensor_t distance_sensor;
+	mavlink_sys_status_t sys_status;
 	mavlink_rc_channels_raw_t rc_channels_raw;
 	mavlink_rc_channels_t rc_channels;
 	mavlink_servo_output_raw_t servo_output_raw;
@@ -273,6 +274,9 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 				break;
 			case MAVLINK_MSG_ID_DISTANCE_SENSOR:
 				mavlink_msg_distance_sensor_decode(&msg, &pMAVLinkData->distance_sensor);
+				break;
+			case MAVLINK_MSG_ID_SYS_STATUS:
+				mavlink_msg_sys_status_decode(&msg, &pMAVLinkData->sys_status);
 				break;
 			case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
 				mavlink_msg_rc_channels_raw_decode(&msg, &pMAVLinkData->rc_channels_raw);

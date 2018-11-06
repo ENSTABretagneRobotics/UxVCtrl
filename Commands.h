@@ -3257,6 +3257,18 @@ inline int Commands(char* line)
 		rc_aux3_sw = (rc_aux3_sw > 2)? 2: rc_aux3_sw;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else if (strncmp(line, "arm", strlen("arm")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		bForceArmAutopilot = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (strncmp(line, "disarm", strlen("disarm")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		bForceDisarmAutopilot = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "call %[^\r\n]255s", str) == 1)
 	{
 		CallMission(str);

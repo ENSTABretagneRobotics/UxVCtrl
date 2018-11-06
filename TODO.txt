@@ -1,14 +1,13 @@
-commande pour armer/désarmer...
-signe u, ul, comparer entre réel et sitl, pourquoi il y avait juste que pour uw qu'un - avait été rajouté...
 demander explicitement les messages rangefinder, distance_sensor, etc.
-altitude_AGL should be computed from lidar-lite, px4f ground_distance, if different should be compared with altitude, should be also corrected with pos xyz of the sensor...
+altitude_AGL should be computed from lidar-lite, px4f ground_distance, if different should be compared with altitude, should be also corrected with pos xyz of the sensor, attitude of the robot...
 should fuse ultrasonic distances with rplidar and handle outliers...
 affichage ultrasons maestro
 cycle entre les sonars, lidars, ultrasons pour drawsonar
 pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
 rajouter dans le menu option pour choisir quels sonar/lidar sont affichés par $, propre à chaque fenêtre...
 
-controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?
+MAVlink : commander drone en althold/loiter (attention, althold plus violent en horizontal) sans rcoverride même s'il ne capte pas le GPS...
+controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?->tester en simu si le terme intégral est suffisant, mais il est souvent remis à 0...
 
 Param period pour tous les devices, pris en compte s'il est connecté...
 
@@ -51,8 +50,6 @@ terme intégral line following (attention à le limiter, remettre à 0...), ne plus
 wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
 mission.txt : prévoir e.g. 32 registres double pour pouvoir faire des conditions dessus
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
-
-rajouter gestion de message manual control mavlinkinterface
 
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 
@@ -273,7 +270,6 @@ envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?),
 pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
 param manualcontrol : prévoir valeur pour complètement désactiver rc_override
 Pouvoir renvoyer les rcout mavlinkinterface pour tester avec px dans les mains
-Touche pour mettre au milieu throttle fv pour pas tomber quand on active le rc_override
 Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
 Affichage tension batterie depuis mavlink, avec Energy_actuators...?
 Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
@@ -284,10 +280,10 @@ MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position 
 Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
 Cap pas correctement envoyé en mavlink osd
 Envoyer aussi rssi
-pouvoir envoyer image de caméra via télémétrie
+rajouter gestion de message manual control mavlinkinterface
 qgroundcontrol reconnait pas la position gps...
 force mode marche pas, d'où mode non armable...->use chan 5?
-add control of chan 5 to be able to change mode like on RC or choose mode via MAVLink functions (make also script command)?
+choose mode via MAVLink functions (make also script command)?
 https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
 Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
 Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
@@ -296,9 +292,8 @@ Footprint RTL, ArduPilot Smart RTL?
 bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
 Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
 RTL en repassant en option par le chemin
-Arm : mode not armable->set mode stabilize pour s'en sortir?
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
-MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM? rajouter touches spéciales pour changer mode (manual, stabilize, etc.), touches pour désactiver l'override...
+MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM?
 SET_ATTITUDE_TARGET (doit être renvoyé régulièrement?)
 save mavlink tlog for MAVLinkDevice?
 
@@ -572,6 +567,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+signe u, ul, comparer entre réel et sitl, pourquoi il y avait juste que pour uw qu'un - avait été rajouté...
 
 faire un getmultiplevaluemaestro pour optimiser, mais pas sûr que ça marche?->pas urgent car pour l'instant on peut alterner les lectures, mais peut être intéressant si besoin de haute fréquence de lecture...
 

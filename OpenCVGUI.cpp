@@ -9,6 +9,17 @@
 
 #include "OpenCVGUI.h"
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 {
 	int videoid = (intptr_t)pParam;
@@ -377,7 +388,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					uv += 0.1*u_max_z;
+					uv += 0.1*max(fabs(u_min_z), fabs(u_max_z));
 					uv = (uv > u_max_z)? u_max_z: uv;
 				}
 				break;
@@ -406,7 +417,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					uv += 0.1*u_min_z;
+					uv -= 0.1*max(fabs(u_min_z), fabs(u_max_z));
 					uv = (uv < u_min_z)? u_min_z: uv;
 				}
 				break;
@@ -793,8 +804,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bEnableOpenCVGUIs[videoid] = FALSE;
 			break;
 		case '.':
-			bRearmAutopilot = TRUE;
-			printf("Rearm.\n");
+			bForceArmAutopilot = TRUE;
+			printf("Arm.\n");
 			break;
 		case '0':
 			bForceDisarmAutopilot = TRUE;
@@ -1067,6 +1078,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			case LIRMIA3_ROBID:
 				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u4*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
+				break;
+			case QUADRO_SIMULATOR_ROBID:
+			case COPTER_ROBID:
+			case BLUEROV_ROBID:
+			case ARDUCOPTER_ROBID:
+				sprintf(szText, "%c %+04d%% %+04d%% %+04d%% %+04d%% VBAT1:%.1fV", 
+					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(ul*100.0+0.05), (int)floor(uv*100.0+0.05), vbat1);
 				break;
 			default:
 				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
@@ -1852,3 +1870,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	return 0;
 }
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER

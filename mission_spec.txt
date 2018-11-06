@@ -328,6 +328,10 @@
 %
 %rcswitches rc_aux3_sw rc_ail_sw rc_gear_sw rc_ele_sw rc_rud_sw (rc_aux3_sw : int [0,2], rc_ail_sw : int [0,1], rc_gear_sw : int [0,1], rc_ele_sw : int [0,1], rc_rud_sw : int [0,1])
 %
+%arm
+%
+%disarm
+%
 %call mission.txt (only used from command-line)
 %
 %abort (abort the mission)

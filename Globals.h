@@ -717,7 +717,7 @@ extern BOOL bStdOutDetailedInfo;
 extern BOOL bDisableAllAlarms;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
-extern BOOL bRearmAutopilot;
+extern BOOL bForceArmAutopilot;
 extern BOOL bForceDisarmAutopilot;
 extern BOOL bExit;
 extern BOOL bWaiting;
