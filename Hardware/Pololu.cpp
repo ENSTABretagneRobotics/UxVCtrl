@@ -93,6 +93,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				if (pololu.ibat2analoginputchan != -1) ibat2_filtered = pololu.analoginputthreshold[pololu.ibat2analoginputchan]; else ibat2_filtered = 0;
 				vswitchcoef = pololu.analoginputcoef[pololu.switchanaloginputchan];
 				vswitchthreshold = pololu.analoginputthreshold[pololu.switchanaloginputchan];
+				
+				//ShowMaestroGetPositionPololu[deviceid] = -1;
+				//showgetposition = -1;
 
 				LeaveCriticalSection(&StateVariablesCS);
 

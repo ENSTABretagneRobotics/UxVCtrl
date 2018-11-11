@@ -19,6 +19,9 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
 	int x_axis = 0, y_axis = 0, z_axis = 0, r_axis = 0;
 	unsigned int buttons = 0;
+	int custom_mode = -1, iArm = -1, setattitudetargetperiod = -1, setattitudetargettype = -1;
+	double setattitudetargetroll = 0, setattitudetargetpitch = 0, setattitudetargetyaw = 0, 
+		setattitudetargetroll_rate = 0, setattitudetargetpitch_rate = 0, setattitudetargetyaw_rate = 0, setattitudetargetthrust = 0;
 	CHRONO chrono_GPSOK;
 	CHRONO chrono_heartbeat;
 	BOOL bConnected = FALSE;
@@ -90,6 +93,11 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				vswitchcoef = 1;
 				vswitchthreshold = 3.0;
 
+				custom_modeMAVLinkDevice[deviceid] = -1;
+				custom_mode = -1;
+				iArmMAVLinkDevice[deviceid] = -1;
+				iArm = -1;
+
 				LeaveCriticalSection(&StateVariablesCS);
 
 				if (mavlinkdevice.pfSaveFile != NULL)
@@ -130,7 +138,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						"rangefinder.distance (in m);rangefinder.voltage (in V);"
 						"distance_sensor.current_distance (in cm);distance_sensor.orientation;distance_sensor.covariance (in cm);distance_sensor.type;distance_sensor.id;"
 						"voltage_battery (in V);current_battery (in A);"
-						"chan1_raw;chan2_raw;chan3_raw;chan4_raw;chan5_raw;chan6_raw;chan7_raw;chan8_raw;"
+						"rc_channels_raw.chan1_raw;rc_channels_raw.chan2_raw;rc_channels_raw.chan3_raw;rc_channels_raw.chan4_raw;rc_channels_raw.chan5_raw;rc_channels_raw.chan6_raw;rc_channels_raw.chan7_raw;rc_channels_raw.chan8_raw;"
+						"rc_channels.chan1_raw;rc_channels.chan2_raw;rc_channels.chan3_raw;rc_channels.chan4_raw;rc_channels.chan5_raw;rc_channels.chan6_raw;rc_channels.chan7_raw;rc_channels.chan8_raw;rc_channels.chan9_raw;rc_channels.chan10_raw;rc_channels.chan11_raw;rc_channels.chan12_raw;rc_channels.chan13_raw;rc_channels.chan14_raw;rc_channels.chan15_raw;rc_channels.chan16_raw;rc_channels.chan17_raw;rc_channels.chan18_raw;"
 						"servo1_raw;servo2_raw;servo3_raw;servo4_raw;servo5_raw;servo6_raw;servo7_raw;servo8_raw;"
 						"airspeed (in m/s);alt (in m);climb (in m/s);"
 						"\n"
@@ -336,13 +345,27 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					}
 					vswitch = mavlinkdevice.bDisablePWMOverride? 0: 5;
 #pragma endregion
+#pragma region COMMANDS GLOBAL VARIABLES
+					mavlinkdevice.bDisplayStatusText = bDisplayStatusTextMAVLinkDevice[deviceid];
+					custom_mode = custom_modeMAVLinkDevice[deviceid];
+					iArm = iArmMAVLinkDevice[deviceid];
+					setattitudetargetperiod = setattitudetargetperiodMAVLinkDevice[deviceid];
+					setattitudetargettype = setattitudetargettypeMAVLinkDevice[deviceid];
+					setattitudetargetroll = setattitudetargetrollMAVLinkDevice[deviceid];
+					setattitudetargetpitch = setattitudetargetpitchMAVLinkDevice[deviceid];
+					setattitudetargetyaw = setattitudetargetyawMAVLinkDevice[deviceid];
+					setattitudetargetroll_rate = setattitudetargetroll_rateMAVLinkDevice[deviceid];
+					setattitudetargetpitch_rate = setattitudetargetpitch_rateMAVLinkDevice[deviceid];
+					setattitudetargetyaw_rate = setattitudetargetyaw_rateMAVLinkDevice[deviceid];
+					setattitudetargetthrust = setattitudetargetthrustMAVLinkDevice[deviceid];
+#pragma endregion
 					LeaveCriticalSection(&StateVariablesCS);
-				
-					mSleep(25);					
+
+					mSleep(25);
 #pragma region HEARTBEAT
 					if ((!mavlinkdevice.bDisableSendHeartbeat)&&(GetTimeElapsedChronoQuick(&chrono_heartbeat) > mavlinkdevice.chrono_heartbeat_period))
 					{
-						if (SendHeartbeatMAVLinkDevice(&mavlinkdevice) != EXIT_SUCCESS)
+						if (HeartbeatMAVLinkDevice(&mavlinkdevice) != EXIT_SUCCESS)
 						{
 							printf("Connection to a MAVLinkDevice lost.\n");
 							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
@@ -353,43 +376,85 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						}
 						StopChronoQuick(&chrono_heartbeat);
 						StartChrono(&chrono_heartbeat);
+						//mSleep(25);
+					}
+#pragma endregion
+#pragma region COMMANDS
+					if (iArm >= 0)
+					{
+						if (ArmMAVLinkDevice(&mavlinkdevice, (iArm == 0)? FALSE: TRUE) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
 						mSleep(25);
+						EnterCriticalSection(&StateVariablesCS);
+						iArmMAVLinkDevice[deviceid] = -1;
+						LeaveCriticalSection(&StateVariablesCS);
+						iArm = -1;
+					}
+					if (custom_mode >= 0)
+					{
+						if (SetModeMAVLinkDevice(&mavlinkdevice, custom_mode) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
+						mSleep(25);
+						EnterCriticalSection(&StateVariablesCS);
+						custom_modeMAVLinkDevice[deviceid] = -1;
+						LeaveCriticalSection(&StateVariablesCS);
+						custom_mode = -1;
+					}
+					if (setattitudetargetperiod >= 0)
+					{
+						if (setattitudetargettype == 0)
+						{
+							if (SetAttitudeTargetMAVLinkDevice(&mavlinkdevice, setattitudetargetroll, setattitudetargetpitch, setattitudetargetyaw, 
+								setattitudetargetroll_rate, setattitudetargetpitch_rate, setattitudetargetyaw_rate, setattitudetargetthrust) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+						else
+						{
+							if (SetAttitudeTargetMAVLinkDevice(&mavlinkdevice, 0.78*ul, 0.78*u, 0, 0, 0, uw*omegazmax, uv) != EXIT_SUCCESS)
+							{
+								printf("Connection to a MAVLinkDevice lost.\n");
+								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+								bConnected = FALSE;
+								DisconnectMAVLinkDevice(&mavlinkdevice);
+								mSleep(50);
+								break;
+							}
+						}
+					}
+					else
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						setattitudetargetperiodMAVLinkDevice[deviceid] = -1;
+						LeaveCriticalSection(&StateVariablesCS);
+						setattitudetargetperiod = -1;
 					}
 #pragma endregion
 #pragma region PWM
-					if (bForceArmAutopilot)
-					{
-						if (ArmMAVLinkDevice(&mavlinkdevice, TRUE) != EXIT_SUCCESS)
-						{
-							printf("Connection to a MAVLinkDevice lost.\n");
-							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-							bConnected = FALSE;
-							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
-							break;
-						}
-						mSleep(25);
-						bForceArmAutopilot = FALSE;
-					}
-					if (bForceDisarmAutopilot)
-					{
-						if (ArmMAVLinkDevice(&mavlinkdevice, FALSE) != EXIT_SUCCESS)
-						{
-							printf("Connection to a MAVLinkDevice lost.\n");
-							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
-							bConnected = FALSE;
-							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
-							break;
-						}
-						mSleep(25);
-						bForceDisarmAutopilot = FALSE;
-					}
-
 					switch (robid)
 					{
 					case BLUEROV_ROBID:
-						if (mavlinkdevice.ManualControlMode != 1)
+						if ((mavlinkdevice.ManualControlMode == 0)||(mavlinkdevice.ManualControlMode == 2))
 						{
 							memset(selectedchannels, 0, sizeof(selectedchannels));
 							memset(pws, 0, sizeof(pws));
@@ -509,7 +574,6 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								break;
 							}
 						}
-						mSleep(25);
 						break;
 					case BUGGY_ROBID:
 					case ETAS_WHEEL_ROBID:
@@ -517,7 +581,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					case MOTORBOAT_ROBID:
 					case COPTER_ROBID:
 					case ARDUCOPTER_ROBID:
-						if (mavlinkdevice.ManualControlMode != 1)
+						if ((mavlinkdevice.ManualControlMode == 0)||(mavlinkdevice.ManualControlMode == 2))
 						{
 							memset(selectedchannels, 0, sizeof(selectedchannels));
 							memset(pws, 0, sizeof(pws));
@@ -628,13 +692,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								break;
 							}
 						}
-						mSleep(25);
 						break;
 					default:
-						mSleep(25);
 						break;
 					}
 #pragma endregion								
+					mSleep(25);
 				}
 			
 				if (mavlinkdevice.bSaveRawData)

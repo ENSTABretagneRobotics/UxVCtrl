@@ -687,10 +687,9 @@ inline int Commands(char* line)
 	BOOL bContinueElseIf1 = FALSE, bContinueElseIf2 = FALSE, bContinueElseIf3 = FALSE, bContinueElseIf4 = FALSE, bContinueElseIf5 = FALSE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 	double dval = 0, dval1 = 0, dval2 = 0, dval3 = 0, dval4 = 0, dval5 = 0, 
 		dval6 = 0, dval7 = 0, dval8 = 0, dval9 = 0, dval10 = 0, dval11 = 0, dval12 = 0; 
-	int ival = 0, ival1 = 0, ival2 = 0, ival3 = 0;
+	int i = 0, ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
-	int ival4 = 0, ival5 = 0, ival6 = 0,
-		ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
+	int ival6 = 0, ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
 		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0, ival20 = 0;
 	char cval = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -2787,6 +2786,67 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (sscanf(line, "setmodemavlinkdevice %d %d", &ival, &ival1) == 2)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			custom_modeMAVLinkDevice[ival] = ival1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "statustextmavlinkdevice %d %d", &ival, &ival1) == 2)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			bDisplayStatusTextMAVLinkDevice[ival] = ival1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "armmavlinkdevice %d %d", &ival, &ival1) == 2)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			iArmMAVLinkDevice[ival] = ival1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "setattitudetargetmavlinkdevice %d %d %d %lf %lf %lf %lf %lf %lf %lf", 
+		&ival, &ival1, &ival2, &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7) == 10)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			setattitudetargetperiodMAVLinkDevice[ival] = ival1;
+			setattitudetargettypeMAVLinkDevice[i] = ival2;
+			setattitudetargetrollMAVLinkDevice[i] = dval1;
+			setattitudetargetpitchMAVLinkDevice[i] = dval2;
+			setattitudetargetyawMAVLinkDevice[i] = dval3;
+			setattitudetargetroll_rateMAVLinkDevice[i] = dval4;
+			setattitudetargetpitch_rateMAVLinkDevice[i] = dval5;
+			setattitudetargetyaw_rateMAVLinkDevice[i] = dval6;
+			setattitudetargetthrustMAVLinkDevice[i] = dval7;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS
 	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
@@ -3260,13 +3320,19 @@ inline int Commands(char* line)
 	else if (strncmp(line, "arm", strlen("arm")) == 0)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		bForceArmAutopilot = TRUE;
+		for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
+		{
+			iArmMAVLinkDevice[i] = 1;
+		}
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "disarm", strlen("disarm")) == 0)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		bForceDisarmAutopilot = TRUE;
+		for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
+		{
+			iArmMAVLinkDevice[i] = 0;
+		}
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "call %[^\r\n]255s", str) == 1)

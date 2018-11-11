@@ -1,12 +1,12 @@
-demander explicitement les messages rangefinder, distance_sensor, etc.
+accéder aux rcin avant override?->peut-être pas possible, utiliser set_attitude_target à la place de rc_override...?->vérifier rc_channels vs rc_channels_raw pour confirmer...
 altitude_AGL should be computed from lidar-lite, px4f ground_distance, if different should be compared with altitude, should be also corrected with pos xyz of the sensor, attitude of the robot...
 should fuse ultrasonic distances with rplidar and handle outliers...
 affichage ultrasons maestro
 cycle entre les sonars, lidars, ultrasons pour drawsonar
 pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
 rajouter dans le menu option pour choisir quels sonar/lidar sont affichés par $, propre à chaque fenêtre...
-
-MAVlink : commander drone en althold/loiter (attention, althold plus violent en horizontal) sans rcoverride même s'il ne capte pas le GPS...
+params pour choisir quelle caméra ou sonar apparait sur quelle fenêtre et pouvoir changer aussi dans extended menu
+gérer jusqu'à 4 caméras et 4 opencvgui et rajouter param pour leurs coordonnées lors du lancement
 controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?->tester en simu si le terme intégral est suffisant, mais il est souvent remis à 0...
 
 Param period pour tous les devices, pris en compte s'il est connecté...
@@ -264,38 +264,28 @@ add specific columns for raw GPS data in log file?->maybe not necessary since al
 Log update values in accrx, accry, accrz hat/err...
 
 MAVLink
-mavlinkinterface : ne pas envoyer toutes les trames à la même fréquence
-Utiliser mêmes messages mavlink px4f video via mavlink interface, comment gérer plusieurs caméras...?
+mavlinkinterface/device : ne pas envoyer/demander toutes les trames à la même fréquence, rajouter params, comme heartbeat...
+commander drone en althold/loiter/guided (attention, althold plus violent en horizontal) sans rcoverride même s'il ne capte pas le GPS...->SET_ATTITUDE_TARGET (doit être renvoyé régulièrement?), ne marche qu'en guided?
+Utiliser messages mavlink px4f video via mavlink interface, comment gérer plusieurs caméras...?
 envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?), vérifier fonctionnement de rc_override vers UxVCtrl notamment pour voilier...
 pouvoir envoyer VFR_HUD, wind_dir, wind_vel dans mp...
-param manualcontrol : prévoir valeur pour complètement désactiver rc_override
 Pouvoir renvoyer les rcout mavlinkinterface pour tester avec px dans les mains
 Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
 Affichage tension batterie depuis mavlink, avec Energy_actuators...?
-Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
-add param to optionally display mavlink statustext...
 delay/wait, waypoint validation, fly to here wp not displayed on mp, how to display altitude, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
 MAV_FRAME_GLOBAL frame : altitude AMSL
 MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
 Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
+qgroundcontrol reconnait pas la position gps...
 Cap pas correctement envoyé en mavlink osd
 Envoyer aussi rssi
 rajouter gestion de message manual control mavlinkinterface
-qgroundcontrol reconnait pas la position gps...
-force mode marche pas, d'où mode non armable...->use chan 5?
-choose mode via MAVLink functions (make also script command)?
-https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
-Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
-Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
-https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
-Footprint RTL, ArduPilot Smart RTL?
+Return Trough Footprints : RTL en choisissant quelle partie dans les footprints (définie par 1 cercle de zone (ou temps) de début et 1 cercle de zone (ou temps) de fin), voir code du follow me, ArduPilot Smart RTL...
 bForceConfirmHomeMsg : fait clignoter home en rouge si non confirmée ou ignorée manuellement
-Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission
-RTL en repassant en option par le chemin
 pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps...
 MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM?
-SET_ATTITUDE_TARGET (doit être renvoyé régulièrement?)
 save mavlink tlog for MAVLinkDevice?
+Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
 
 sonar, localisation, wf
 Prendre en compte le fait qu'on va voir le fond avec le sonar, surtout dans le cas de piscines à fond variable comme à l'IPN
@@ -567,6 +557,9 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+force mode marche pas, d'où mode non armable, peut-être à cause de chan 5?
+Home, prehome and preprehome pour pouvoir contourner en RTL/RTH, ne peuvent pas être mis dans env.txt car dépendent du robot, de la mission->RTL en repassant en option par le chemin comme SmartRTL
 
 signe u, ul, comparer entre réel et sitl, pourquoi il y avait juste que pour uw qu'un - avait été rajouté...
 

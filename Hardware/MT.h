@@ -748,9 +748,7 @@ inline int GetLatestData2MT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q1);
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q2);
 			offset = ConvertToDoubleMT(precisionoutputsettings, databuf, offset, &pMTData->q3);
-			roll = atan2(2*pMTData->q2*pMTData->q3+2*pMTData->q0*pMTData->q1,2*sqr(pMTData->q0)+2*sqr(pMTData->q3)-1);
-			pitch = -asin(constrain(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2, -1, 1)); // Attempt to avoid potential NAN...
-			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
+			quaternion2euler(pMTData->q0, pMTData->q1, pMTData->q2, pMTData->q3, &roll, &pitch, &yaw);
 			//yaw = fmod_2PI(yaw-M_PI/2.0); // Coordinate system different from legacy mode...
 			
 			// If raw Euler angles were not sent, ensure that they would still be in the log file.
@@ -963,9 +961,7 @@ inline int GetLatestDataMT(MT* pMT, MTDATA* pMTData)
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->q1);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->q2);
 			offset = ConvertToDoubleMT(pMT->OutputSettings, databuf, offset, &pMTData->q3);
-			roll = atan2(2*pMTData->q2*pMTData->q3+2*pMTData->q0*pMTData->q1,2*sqr(pMTData->q0)+2*sqr(pMTData->q3)-1);
-			pitch = -asin(constrain(2*pMTData->q1*pMTData->q3-2*pMTData->q0*pMTData->q2, -1, 1)); // Attempt to avoid potential NAN...
-			yaw = atan2(2*pMTData->q1*pMTData->q2+2*pMTData->q0*pMTData->q3,2*sqr(pMTData->q0)+2*sqr(pMTData->q1)-1);
+			quaternion2euler(pMTData->q0, pMTData->q1, pMTData->q2, pMTData->q3, &roll, &pitch, &yaw);
 			
 			// If raw Euler angles were not sent, ensure that they would still be in the log file.
 			pMTData->roll = roll*180.0/M_PI;

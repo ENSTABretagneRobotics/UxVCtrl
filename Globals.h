@@ -646,6 +646,18 @@ extern BOOL bPauseublox[MAX_NB_UBLOX];
 extern BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
+extern BOOL bDisplayStatusTextMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern int custom_modeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern int iArmMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern int setattitudetargetperiodMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern int setattitudetargettypeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetrollMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetpitchMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetyawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetroll_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetpitch_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetyaw_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double setattitudetargetthrustMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -717,8 +729,6 @@ extern BOOL bStdOutDetailedInfo;
 extern BOOL bDisableAllAlarms;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
-extern BOOL bForceArmAutopilot;
-extern BOOL bForceDisarmAutopilot;
 extern BOOL bExit;
 extern BOOL bWaiting;
 extern BOOL bMissionRunning;
@@ -939,6 +949,18 @@ inline int InitGlobals(void)
 
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
+		bDisplayStatusTextMAVLinkDevice[i] = FALSE;
+		custom_modeMAVLinkDevice[i] = -1;
+		iArmMAVLinkDevice[i] = -1;
+		setattitudetargetperiodMAVLinkDevice[i] = -1;
+		setattitudetargettypeMAVLinkDevice[i] = -1;
+		setattitudetargetrollMAVLinkDevice[i] = 0;
+		setattitudetargetpitchMAVLinkDevice[i] = 0;
+		setattitudetargetyawMAVLinkDevice[i] = 0;
+		setattitudetargetroll_rateMAVLinkDevice[i] = 0;
+		setattitudetargetpitch_rateMAVLinkDevice[i] = 0;
+		setattitudetargetyaw_rateMAVLinkDevice[i] = 0;
+		setattitudetargetthrustMAVLinkDevice[i] = 0;
 		GNSSqualityMAVLinkDevice[i] = 0;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bRestartMAVLinkDevice[i] = FALSE;
@@ -1130,6 +1152,18 @@ inline int ReleaseGlobals(void)
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
 		GNSSqualityMAVLinkDevice[i] = 0;
+		setattitudetargetthrustMAVLinkDevice[i] = 0;
+		setattitudetargetyaw_rateMAVLinkDevice[i] = 0;
+		setattitudetargetpitch_rateMAVLinkDevice[i] = 0;
+		setattitudetargetroll_rateMAVLinkDevice[i] = 0;
+		setattitudetargetyawMAVLinkDevice[i] = 0;
+		setattitudetargetpitchMAVLinkDevice[i] = 0;
+		setattitudetargetrollMAVLinkDevice[i] = 0;
+		setattitudetargettypeMAVLinkDevice[i] = -1;
+		setattitudetargetperiodMAVLinkDevice[i] = -1;
+		iArmMAVLinkDevice[i] = -1;
+		custom_modeMAVLinkDevice[i] = -1;
+		bDisplayStatusTextMAVLinkDevice[i] = FALSE;
 	}
 
 	for (i = MAX_NB_UBLOX-1; i >= 0; i--)

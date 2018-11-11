@@ -863,9 +863,7 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->q1);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->q2);
 			offset = ConvertToDoubleSBG(pSBG->OutputSettings, databuf, offset, &pSBGData->q3);
-			roll = atan2(2*pSBGData->q2*pSBGData->q3+2*pSBGData->q0*pSBGData->q1,2*sqr(pSBGData->q0)+2*sqr(pSBGData->q3)-1);
-			pitch = -asin(constrain(2*pSBGData->q1*pSBGData->q3-2*pSBGData->q0*pSBGData->q2, -1, 1)); // Attempt to avoid potential NAN...
-			yaw = atan2(2*pSBGData->q1*pSBGData->q2+2*pSBGData->q0*pSBGData->q3,2*sqr(pSBGData->q0)+2*sqr(pSBGData->q1)-1);
+			quaternion2euler(pSBGData->q0, pSBGData->q1, pSBGData->q2, pSBGData->q3, &roll, &pitch, &yaw);
 			
 			// If raw Euler angles were not sent, ensure that they would still be in the log file.
 			pMTData->roll = roll*180.0/M_PI;

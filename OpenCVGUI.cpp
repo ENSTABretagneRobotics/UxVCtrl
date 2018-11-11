@@ -804,11 +804,17 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bEnableOpenCVGUIs[videoid] = FALSE;
 			break;
 		case '.':
-			bForceArmAutopilot = TRUE;
+			for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
+			{
+				iArmMAVLinkDevice[i] = 1;
+			}
 			printf("Arm.\n");
 			break;
 		case '0':
-			bForceDisarmAutopilot = TRUE;
+			for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
+			{
+				iArmMAVLinkDevice[i] = 0;
+			}
 			printf("Disarm.\n");
 			break;
 #pragma region EXTENDED MENU

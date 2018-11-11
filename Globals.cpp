@@ -458,6 +458,18 @@ BOOL bPauseublox[MAX_NB_UBLOX];
 BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
+BOOL bDisplayStatusTextMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+int custom_modeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+int iArmMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+int setattitudetargetperiodMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+int setattitudetargettypeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetrollMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetpitchMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetyawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetroll_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetpitch_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetyaw_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double setattitudetargetthrustMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -529,8 +541,6 @@ BOOL bStdOutDetailedInfo = FALSE;
 BOOL bDisableAllAlarms = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;
 BOOL bEnableBackwardsMotorboat = FALSE;
-BOOL bForceArmAutopilot = FALSE;
-BOOL bForceDisarmAutopilot = FALSE;
 BOOL bExit = FALSE;
 BOOL bWaiting = FALSE;
 BOOL bMissionRunning = FALSE;

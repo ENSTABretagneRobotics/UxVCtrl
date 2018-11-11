@@ -1,3 +1,6 @@
+264
+Added statustextmavlinkdevice, setmodemavlinkdevice, armmavlinkdevice, setattitudetargetmavlinkdevice commands.
+
 263
 Updated MAVLinkDevice and OpenCVGUI.
 Added arm and disarm commands.
