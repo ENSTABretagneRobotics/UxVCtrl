@@ -1,3 +1,6 @@
+265
+Corrected setmodemavlinkdevice and setattitudetargetmavlinkdevice commands.
+
 264
 Added statustextmavlinkdevice, setmodemavlinkdevice, armmavlinkdevice, setattitudetargetmavlinkdevice commands.
 

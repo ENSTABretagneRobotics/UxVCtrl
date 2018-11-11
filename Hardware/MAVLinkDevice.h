@@ -354,7 +354,7 @@ inline int SetModeMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int custom_mode)
 
 	// Try to force mode using deprecated command...
 	memset(&set_mode, 0, sizeof(set_mode));
-	set_mode.base_mode = MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED;
+	set_mode.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
 	set_mode.custom_mode = custom_mode; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
 	set_mode.target_system = (uint8_t)pMAVLinkDevice->target_system;
 	mavlink_msg_set_mode_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &set_mode);
@@ -371,7 +371,7 @@ inline int SetModeMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int custom_mode)
 	memset(&mode_command, 0, sizeof(mode_command));
 	mode_command.command = MAV_CMD_DO_SET_MODE;
 	mode_command.confirmation = 0;
-	mode_command.param1 = MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED;
+	mode_command.param1 = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
 	mode_command.param2 = (float)custom_mode; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
 	mode_command.target_system = (uint8_t)pMAVLinkDevice->target_system;
 	mode_command.target_component = (uint8_t)pMAVLinkDevice->target_component;
@@ -1231,7 +1231,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		// Try to force mode using deprecated command...
 		memset(&set_mode, 0, sizeof(set_mode));
 		//set_mode.base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED; // Not sure it is correct...
-		set_mode.base_mode = MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED;
+		set_mode.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
 		set_mode.custom_mode = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
 		set_mode.target_system = (uint8_t)pMAVLinkDevice->target_system;
 		mavlink_msg_set_mode_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &set_mode);
@@ -1250,7 +1250,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		memset(&mode_command, 0, sizeof(mode_command));
 		mode_command.command = MAV_CMD_DO_SET_MODE;
 		mode_command.confirmation = 0;
-		mode_command.param1 = MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED;
+		mode_command.param1 = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
 		mode_command.param2 = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
 		mode_command.target_system = (uint8_t)pMAVLinkDevice->target_system;
 		mode_command.target_component = (uint8_t)pMAVLinkDevice->target_component;

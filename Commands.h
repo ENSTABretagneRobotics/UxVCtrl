@@ -2786,12 +2786,12 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "setmodemavlinkdevice %d %d", &ival, &ival1) == 2)
+	else if (sscanf(line, "statustextmavlinkdevice %d %d", &ival, &ival1) == 2)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			custom_modeMAVLinkDevice[ival] = ival1;
+			bDisplayStatusTextMAVLinkDevice[ival] = ival1;
 			LeaveCriticalSection(&StateVariablesCS);
 		}
 		else
@@ -2799,12 +2799,12 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "statustextmavlinkdevice %d %d", &ival, &ival1) == 2)
+	else if (sscanf(line, "setmodemavlinkdevice %d %d", &ival, &ival1) == 2)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			bDisplayStatusTextMAVLinkDevice[ival] = ival1;
+			custom_modeMAVLinkDevice[ival] = ival1;
 			LeaveCriticalSection(&StateVariablesCS);
 		}
 		else
@@ -2832,14 +2832,14 @@ inline int Commands(char* line)
 		{
 			EnterCriticalSection(&StateVariablesCS);
 			setattitudetargetperiodMAVLinkDevice[ival] = ival1;
-			setattitudetargettypeMAVLinkDevice[i] = ival2;
-			setattitudetargetrollMAVLinkDevice[i] = dval1;
-			setattitudetargetpitchMAVLinkDevice[i] = dval2;
-			setattitudetargetyawMAVLinkDevice[i] = dval3;
-			setattitudetargetroll_rateMAVLinkDevice[i] = dval4;
-			setattitudetargetpitch_rateMAVLinkDevice[i] = dval5;
-			setattitudetargetyaw_rateMAVLinkDevice[i] = dval6;
-			setattitudetargetthrustMAVLinkDevice[i] = dval7;
+			setattitudetargettypeMAVLinkDevice[ival] = ival2;
+			setattitudetargetrollMAVLinkDevice[ival] = dval1;
+			setattitudetargetpitchMAVLinkDevice[ival] = dval2;
+			setattitudetargetyawMAVLinkDevice[ival] = dval3;
+			setattitudetargetroll_rateMAVLinkDevice[ival] = dval4;
+			setattitudetargetpitch_rateMAVLinkDevice[ival] = dval5;
+			setattitudetargetyaw_rateMAVLinkDevice[ival] = dval6;
+			setattitudetargetthrustMAVLinkDevice[ival] = dval7;
 			LeaveCriticalSection(&StateVariablesCS);
 		}
 		else

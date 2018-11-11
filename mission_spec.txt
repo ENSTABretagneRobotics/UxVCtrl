@@ -210,11 +210,11 @@
 %
 %statustextmavlinkdevice deviceid bDisplay
 %
-%setmodemavlinkdevice deviceid custom_mode (custom_mode : int [0,32] see enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h (e.g. 0 : STABILIZE, 2 : ALT_HOLD, 3: AUTO, 4 : GUIDED, 5 : LOITER, 6 : RTL, 9 : LAND, 15 : AUTOTUNE, 20 : GUIDED_NOGPS, 21 : SMART_RTL, 23 : FOLLOW))
+%setmodemavlinkdevice deviceid custom_mode (custom_mode : int [0,32] see enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h (e.g. 0 : Stabilize, 2 : AltHold, 3: Auto, 4 : Guided, 5 : Loiter, 6 : RTL, 9 : Land, 15 : Autotune, 20 : Guided_NoGPS, 21 : Smart_RTL, 23 : Follow))
 %
 %armmavlinkdevice deviceid bArm
 %
-%setattitudetargetmavlinkdevice deviceid period type roll pitch yaw roll_rate pitch_rate yaw_rate thrust (period = -1 disables sending, type = 0 sends directly the parameters to the autopilot, type = 1 uses keyboard)
+%setattitudetargetmavlinkdevice deviceid period type roll pitch yaw roll_rate pitch_rate yaw_rate thrust (Copter needs to be in Guided mode for SET_ATTITUDE_TARGET MAVLink message, period = -1 disables sending, type = 0 sends directly the parameters to the autopilot, type = 1 uses keyboard)
 %
 % ACOUSTIC COMMANDS
 %

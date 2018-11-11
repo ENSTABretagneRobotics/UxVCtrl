@@ -93,6 +93,18 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				vswitchcoef = 1;
 				vswitchthreshold = 3.0;
 
+				if (mavlinkdevice.ManualControlMode == 3)
+				{
+					setattitudetargetperiodMAVLinkDevice[deviceid] = 0;
+					setattitudetargettypeMAVLinkDevice[deviceid] = 1;
+					setattitudetargetrollMAVLinkDevice[deviceid] = 0;
+					setattitudetargetpitchMAVLinkDevice[deviceid] = 0;
+					setattitudetargetyawMAVLinkDevice[deviceid] = 0;
+					setattitudetargetroll_rateMAVLinkDevice[deviceid] = 0;
+					setattitudetargetpitch_rateMAVLinkDevice[deviceid] = 0;
+					setattitudetargetyaw_rateMAVLinkDevice[deviceid] = 0;
+					setattitudetargetthrustMAVLinkDevice[deviceid] = 0;
+				}
 				custom_modeMAVLinkDevice[deviceid] = -1;
 				custom_mode = -1;
 				iArmMAVLinkDevice[deviceid] = -1;
@@ -431,7 +443,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						}
 						else
 						{
-							if (SetAttitudeTargetMAVLinkDevice(&mavlinkdevice, 0.78*ul, 0.78*u, 0, 0, 0, uw*omegazmax, uv) != EXIT_SUCCESS)
+							if (SetAttitudeTargetMAVLinkDevice(&mavlinkdevice, -0.78*ul, -0.78*u, 0, 0, 0, -uw*omegazmax, uv) != EXIT_SUCCESS)
 							{
 								printf("Connection to a MAVLinkDevice lost.\n");
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
