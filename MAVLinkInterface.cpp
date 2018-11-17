@@ -125,19 +125,33 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_statustext_t statustext;
 	mavlink_status_t status;
 	mavlink_rc_channels_override_t rc_channels_override;
+	mavlink_set_attitude_target_t set_attitude_target;
 	mavlink_set_position_target_global_int_t set_position_target;
+	mavlink_set_gps_global_origin_t set_gps_global_origin;
+	mavlink_gps_global_origin_t gps_global_origin;
 	mavlink_set_mode_t set_mode;
+	mavlink_mission_count_t mission_count;
+	mavlink_mission_request_list_t mission_request_list;
+	mavlink_mission_item_t mission_item;
+	mavlink_mission_request_t mission_request;
+	mavlink_mission_ack_t mission_ack;
+	mavlink_mission_clear_all_t mission_clear_all;
 	mavlink_command_long_t command;
 	mavlink_home_position_t home_position;
 	mavlink_gps_raw_int_t gps_raw_int;
 	mavlink_attitude_t attitude;
+	mavlink_vfr_hud_t vfr_hud;
+	mavlink_mission_current_t mission_current;
 	mavlink_servo_output_raw_t servo_output_raw;
 	mavlink_param_value_t param_value;
+	mavlink_command_ack_t command_ack;
+	//uint8_t result = MAV_RESULT_FAILED;
 	char Name[17];
 	int nbparams = 1;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 	double speed = 0, Rate = 0, Alt = 0, Deg = 0, angle = 0, Delay = 0, Lat = 0, Lon = 0;
 	int Dir = 0, rel = 0, Current = 0;
+	double roll = 0, pitch = 0, yaw = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
 	double d0 = 0, d1 = 0, d2 = 0;
 	char strtime_snap[MAX_BUF_LEN];
@@ -230,6 +244,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 				//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
 				switch (msg.msgid)
 				{
+#pragma region STANDARD MESSAGES
 				case MAVLINK_MSG_ID_HEARTBEAT:
 					mavlink_msg_heartbeat_decode(&msg, &heartbeat);
 					break;
@@ -294,10 +309,57 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					}
 					LeaveCriticalSection(&StateVariablesCS);
 					break;
+				case MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:
+					mavlink_msg_set_attitude_target_decode(&msg, &set_attitude_target);
+					EnterCriticalSection(&StateVariablesCS);
+					roll = 0; pitch = 0; yaw = 0;
+					quaternion2euler(set_attitude_target.q[0], set_attitude_target.q[1], set_attitude_target.q[2], set_attitude_target.q[3], &roll, &pitch, &yaw);
+					wphi = fmod_2PI(roll);
+					wtheta = fmod_2PI(-pitch);
+					wpsi = fmod_2PI(M_PI/2.0-yaw-angle_env);
+					switch (robid)
+					{
+					case BUBBLE_ROBID:
+					case MOTORBOAT_SIMULATOR_ROBID:
+					case MOTORBOAT_ROBID:
+					case SAILBOAT_SIMULATOR_ROBID:
+					case VAIMOS_ROBID:
+					case SAILBOAT_ROBID:
+					case SAILBOAT2_ROBID:
+					case TANK_SIMULATOR_ROBID:
+					case ETAS_WHEEL_ROBID:
+					case BUGGY_SIMULATOR_ROBID:
+					case BUGGY_ROBID:
+						if (!(set_attitude_target.type_mask&0x40)) u = set_attitude_target.thrust;
+						if (!(set_attitude_target.type_mask&0x04)) uw = -set_attitude_target.body_yaw_rate/omegazmax;
+						break;
+					case BLUEROV_ROBID:
+					case QUADRO_SIMULATOR_ROBID:
+					case COPTER_ROBID:
+					case ARDUCOPTER_ROBID:
+					default:
+						if (!(set_attitude_target.type_mask&0x04)) uw = -set_attitude_target.body_yaw_rate/omegazmax;
+						u = -pitch/0.78;
+						if (!(set_attitude_target.type_mask&0x40)) uv = set_attitude_target.thrust;
+						ul = -roll/0.78;
+						break;
+					}
+					LeaveCriticalSection(&StateVariablesCS);
+					break;
 				case MAVLINK_MSG_ID_SET_POSITION_TARGET_GLOBAL_INT:
 					mavlink_msg_set_position_target_global_int_decode(&msg, &set_position_target);
 					EnterCriticalSection(&StateVariablesCS);
-					if (fabs(u) < 0.01) u = 0.5;
+					switch (robid)
+					{
+					case SAILBOAT_SIMULATOR_ROBID:
+					case VAIMOS_ROBID:
+					case SAILBOAT_ROBID:
+					case SAILBOAT2_ROBID:
+						break;
+					default:
+						if (fabs(u) < 0.01) u = u_max;
+						break;
+					}
 					if (set_position_target.coordinate_frame == MAV_FRAME_GLOBAL_INT)
 					{
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt, &wx, &wy, &wz);
@@ -327,13 +389,89 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					}
 					LeaveCriticalSection(&StateVariablesCS);
 					break;
+				case MAVLINK_MSG_ID_SET_GPS_GLOBAL_ORIGIN:
+					mavlink_msg_set_gps_global_origin_decode(&msg, &set_gps_global_origin);
+					EnterCriticalSection(&StateVariablesCS);
+					lat_env = set_gps_global_origin.latitude/10000000.0;
+					long_env = set_gps_global_origin.longitude/10000000.0;
+					alt_env = set_gps_global_origin.altitude/1000.0;
+					angle_env = 0.0;
+					memset(&gps_global_origin, 0, sizeof(mavlink_gps_global_origin_t));
+					gps_global_origin.latitude = (int32_t)(lat_env*10000000.0);
+					gps_global_origin.longitude = (int32_t)(long_env*10000000.0);
+					gps_global_origin.altitude = (int32_t)(alt_env*1000.0);
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_gps_global_origin_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_global_origin);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					break;
 				case MAVLINK_MSG_ID_SET_MODE:
 					mavlink_msg_set_mode_decode(&msg, &set_mode);
-					if ((set_mode.base_mode == 1)&&(set_mode.custom_mode == 6))
+					 // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk and enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+					if ((set_mode.base_mode == MAV_MODE_FLAG_CUSTOM_MODE_ENABLED)&&(set_mode.custom_mode == 0))
+					{
+						// Stabilize.
+						EnterCriticalSection(&StateVariablesCS);
+						bLineFollowingControl = FALSE;
+						bWaypointControl = FALSE;
+						bHeadingControl = FALSE;
+						bDepthControl = FALSE;
+						bAltitudeAGLControl = FALSE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if ((set_mode.base_mode == MAV_MODE_FLAG_CUSTOM_MODE_ENABLED)&&(set_mode.custom_mode == 2))
+					{
+						// AltHold.
+						EnterCriticalSection(&StateVariablesCS);
+						bLineFollowingControl = FALSE;
+						bWaypointControl = FALSE;
+						bHeadingControl = FALSE;
+						bDepthControl = TRUE;
+						bAltitudeAGLControl = FALSE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if ((set_mode.base_mode == MAV_MODE_FLAG_CUSTOM_MODE_ENABLED)&&(set_mode.custom_mode == 3))
+					{
+						// Auto.
+
+						// Should call waypointslist...
+					}
+					else if ((set_mode.base_mode == MAV_MODE_FLAG_CUSTOM_MODE_ENABLED)&&(set_mode.custom_mode == 4))
+					{
+						// Guided.
+						EnterCriticalSection(&StateVariablesCS);
+						wx = Center(xhat); wy = Center(yhat); wz = Center(zhat); 
+						bLineFollowingControl = FALSE;
+						bWaypointControl = TRUE;
+						bHeadingControl = TRUE;
+						bDepthControl = TRUE;
+						bAltitudeAGLControl = FALSE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if ((set_mode.base_mode == MAV_MODE_FLAG_CUSTOM_MODE_ENABLED)&&(set_mode.custom_mode == 6))
 					{
 						// RTL.
 						EnterCriticalSection(&StateVariablesCS);
-						if (fabs(u) < 0.01) u = 0.5;
+						switch (robid)
+						{
+						case SAILBOAT_SIMULATOR_ROBID:
+						case VAIMOS_ROBID:
+						case SAILBOAT_ROBID:
+						case SAILBOAT2_ROBID:
+							break;
+						default:
+							if (fabs(u) < 0.01) u = u_max;
+							break;
+						}
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, lat_home, long_home, alt_home, &wx, &wy, &wz);
 						bLineFollowingControl = FALSE;
 						bWaypointControl = TRUE;
@@ -342,7 +480,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						bAltitudeAGLControl = FALSE;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
-					else if ((set_mode.base_mode == 1)&&(set_mode.custom_mode ==17))
+					else if ((set_mode.base_mode == 1)&&(set_mode.custom_mode == 17))
 					{
 						// Brake.
 						EnterCriticalSection(&StateVariablesCS);
@@ -354,11 +492,251 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 
 						LeaveCriticalSection(&StateVariablesCS);
 					}
+					memset(&command_ack, 0, sizeof(mavlink_command_ack_t));
+					command_ack.command = MAVLINK_MSG_ID_SET_MODE;
+					command_ack.result = MAV_RESULT_ACCEPTED; //result;
+					command_ack.target_system = msg.sysid;
+					command_ack.target_component = msg.compid;
+					mavlink_msg_command_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &command_ack);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
 					break;
+/*
+REQ_DATA_STREAM...
+*/
+#pragma endregion
+#pragma region MISSION PROTOCOL
+				// See https://mavlink.io/en/services/mission.html
+				// Home seems to be the first element of the sequence...
+				case MAVLINK_MSG_ID_MISSION_COUNT:
+					mavlink_msg_mission_count_decode(&msg, &mission_count);
+					EnterCriticalSection(&StateVariablesCS);
+					gcs_mission_count = (int)mission_count.count;
+					bWaypointsChanged = TRUE;
+					nbWPs = 0;
+					CurWP = 0;
+					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+					memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+					memset(&mission_request, 0, sizeof(mavlink_mission_request_t));
+					mission_request.seq = (uint16_t)0;
+					mission_request.target_system = msg.sysid;
+					mission_request.target_component = msg.compid;
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_mission_request_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_request);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					break;
+				case MAVLINK_MSG_ID_MISSION_REQUEST_LIST:
+					mavlink_msg_mission_request_list_decode(&msg, &mission_request_list);
+					memset(&mission_count, 0, sizeof(mavlink_mission_count_t));
+					EnterCriticalSection(&StateVariablesCS);
+					mission_count.count = (uint16_t)(nbWPs+1);
+					mission_count.target_system = msg.sysid;
+					mission_count.target_component = msg.compid;
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_mission_count_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_count);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					break;
+				case MAVLINK_MSG_ID_MISSION_REQUEST:
+					mavlink_msg_mission_request_decode(&msg, &mission_request);
+					memset(&mission_item, 0, sizeof(mavlink_mission_item_t));
+					EnterCriticalSection(&StateVariablesCS);
+					if ((mission_request.seq >= 0)&&(mission_request.seq < nbWPs+1))
+					{
+						if (mission_request.seq == 0)
+						{
+							mission_item.seq = mission_request.seq;
+							mission_item.x = (float)lat_home;
+							mission_item.y = (float)long_home;
+							mission_item.z = (float)alt_home;
+							mission_item.frame = MAV_FRAME_GLOBAL;
+							mission_item.command = MAV_CMD_DO_SET_HOME;
+							mission_item.param1 = 0; // 1=use current location, 0=use specified location
+						}
+						else
+						{
+							mission_item.seq = mission_request.seq;
+							mission_item.x = (float)wpslat[mission_request.seq-1];
+							mission_item.y = (float)wpslong[mission_request.seq-1];
+							mission_item.z = (float)(wpsalt[mission_request.seq-1]-alt_home);
+							mission_item.frame = MAV_FRAME_GLOBAL_RELATIVE_ALT;
+							mission_item.command = MAV_CMD_NAV_WAYPOINT;
+						}
+						mission_item.autocontinue = 1;
+						mission_item.target_system = msg.sysid;
+						mission_item.target_component = msg.compid;
+						LeaveCriticalSection(&StateVariablesCS);
+						mavlink_msg_mission_item_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_item);
+						memset(sendbuf, 0, sizeof(sendbuf));
+						sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+						if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+						{
+							return EXIT_FAILURE;
+						}
+						if (tlogfile)
+						{
+							fwrite_tlog(msg, tlogfile);
+							fflush(tlogfile);
+						}
+					}
+					else
+					{
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					break;
+				case MAVLINK_MSG_ID_MISSION_ITEM:
+					mavlink_msg_mission_item_decode(&msg, &mission_item);
+					EnterCriticalSection(&StateVariablesCS);
+					if ((mission_item.seq >= 0)&&(mission_item.seq < MAX_NB_WP+1))
+					{
+						if (mission_item.seq == 0)
+						{
+							switch (mission_item.frame)
+							{
+							case MAV_FRAME_GLOBAL_RELATIVE_ALT:
+								lat_home = (double)mission_item.x;
+								long_home = (double)mission_item.y;
+								alt_home = (double)mission_item.z+alt_home;
+								break;
+							case MAV_FRAME_GLOBAL:
+							default:
+								lat_home = (double)mission_item.x;
+								long_home = (double)mission_item.y;
+								alt_home = (double)mission_item.z;
+								break;
+							}
+						}
+						else
+						{
+							switch (mission_item.frame)
+							{
+							case MAV_FRAME_GLOBAL_RELATIVE_ALT:
+								wpslat[mission_item.seq-1] = (double)mission_item.x;
+								wpslong[mission_item.seq-1] = (double)mission_item.y;
+								wpsalt[mission_item.seq-1] = (double)mission_item.z+alt_home;
+								break;
+							case MAV_FRAME_GLOBAL:
+							default:
+								wpslat[mission_item.seq-1] = (double)mission_item.x;
+								wpslong[mission_item.seq-1] = (double)mission_item.y;
+								wpsalt[mission_item.seq-1] = (double)mission_item.z;
+								break;
+							}
+							if (mission_item.seq-1 >= nbWPs) nbWPs++;
+						}
+					}
+					if (nbWPs+1 < gcs_mission_count)
+					{
+						memset(&mission_request, 0, sizeof(mavlink_mission_request_t));
+						mission_request.seq = (uint16_t)(nbWPs+1);
+						mission_request.target_system = msg.sysid;
+						mission_request.target_component = msg.compid;
+						LeaveCriticalSection(&StateVariablesCS);
+						mavlink_msg_mission_request_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_request);
+						memset(sendbuf, 0, sizeof(sendbuf));
+						sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+						if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+						{
+							return EXIT_FAILURE;
+						}
+						if (tlogfile)
+						{
+							fwrite_tlog(msg, tlogfile);
+							fflush(tlogfile);
+						}
+					}
+					else
+					{
+						LeaveCriticalSection(&StateVariablesCS);
+						memset(&mission_ack, 0, sizeof(mavlink_mission_ack_t));
+						mission_ack.type = MAV_MISSION_ACCEPTED;
+						mission_ack.target_system = msg.sysid;
+						mission_ack.target_component = msg.compid;
+						mavlink_msg_mission_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_ack);
+						memset(sendbuf, 0, sizeof(sendbuf));
+						sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+						if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+						{
+							return EXIT_FAILURE;
+						}
+						if (tlogfile)
+						{
+							fwrite_tlog(msg, tlogfile);
+							fflush(tlogfile);
+						}
+					}
+					break;
+				case MAVLINK_MSG_ID_MISSION_CLEAR_ALL:
+					mavlink_msg_mission_clear_all_decode(&msg, &mission_clear_all);
+					EnterCriticalSection(&StateVariablesCS);
+					gcs_mission_count = 0;
+					bWaypointsChanged = TRUE;
+					nbWPs = 0;
+					CurWP = 0;
+					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+					memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+					LeaveCriticalSection(&StateVariablesCS);
+					memset(&mission_ack, 0, sizeof(mavlink_mission_ack_t));
+					mission_ack.type = MAV_MISSION_ACCEPTED;
+					mission_ack.target_system = msg.sysid;
+					mission_ack.target_component = msg.compid;
+					mavlink_msg_mission_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_ack);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					break;
+#pragma endregion
+#pragma region COMMAND PROTOCOL
 				case MAVLINK_MSG_ID_COMMAND_LONG:
 					mavlink_msg_command_long_decode(&msg, &command);
 					switch (command.command)
 					{
+					case MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN:
+						mavlink_msg_command_long_decode(&msg, &command);
+						if (command.param1 == 1) RebootComputer();
+						break;
+					case MAV_CMD_COMPONENT_ARM_DISARM:
+						mavlink_msg_command_long_decode(&msg, &command);
+						if (command.param1 == 0) DisableAllControls();
+						break;
 					case MAV_CMD_MISSION_START:
 						mavlink_msg_command_long_decode(&msg, &command);
 						EnterCriticalSection(&StateVariablesCS);
@@ -489,7 +867,17 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						EnterCriticalSection(&StateVariablesCS);
 						if ((Lat != 0)&&(Lon != 0)&&(Alt != 0))
 						{
-							if (fabs(u) < 0.01) u = 0.5;
+							switch (robid)
+							{
+							case SAILBOAT_SIMULATOR_ROBID:
+							case VAIMOS_ROBID:
+							case SAILBOAT_ROBID:
+							case SAILBOAT2_ROBID:
+								break;
+							default:
+								if (fabs(u) < 0.01) u = u_max;
+								break;
+							}
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, Lat, Lon, Alt, &wx, &wy, &wz);
 							bLineFollowingControl = FALSE;
 							bWaypointControl = TRUE;
@@ -501,7 +889,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						break;
 					case MAV_CMD_DO_SET_HOME:
 						mavlink_msg_command_long_decode(&msg, &command);
-						Current = (int)command.param1; // Set home location: 1=Set home as current location. 2=Use location specified in message parameters.
+						Current = (int)command.param1; // 1=use current location, 0=use specified location.
 						Lat = command.param5;
 						Lon = command.param6;
 						Alt = command.param7;
@@ -510,7 +898,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						{
 							EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lat_home, &long_home, &alt_home);
 						}
-						else if (Current == 2)
+						else if (Current == 0)
 						{
 							lat_home = Lat;
 							long_home = Lon;
@@ -543,10 +931,25 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						//printf("Unhandled command: SYS: %d, COMP: %d, CMD: %d\n", command.target_system, command.target_component, command.command);
 						break;
 					}
+					memset(&command_ack, 0, sizeof(mavlink_command_ack_t));
+					command_ack.command = command.command;
+					command_ack.result = MAV_RESULT_ACCEPTED; //result;
+					command_ack.target_system = msg.sysid;
+					command_ack.target_component = msg.compid;
+					mavlink_msg_command_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &command_ack);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
 					break;
-/*
-REQ_DATA_STREAM...
-*/
+#pragma endregion
 				default:
 					//printf("Unhandled packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
 					break;
@@ -623,6 +1026,14 @@ REQ_DATA_STREAM...
 	attitude.pitch = (float)fmod_2PI(-Center(thetahat));
 	attitude.yaw = (float)fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
 
+	memset(&vfr_hud, 0, sizeof(mavlink_vfr_hud_t));
+	vfr_hud.alt = (float)Center(zhat);
+	vfr_hud.heading = (int16_t)fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
+	vfr_hud.throttle = (uint16_t)fabs(u*100);
+
+	memset(&mission_current, 0, sizeof(mavlink_mission_current_t));
+	mission_current.seq = CurWP+1;
+
 	memset(&servo_output_raw, 0, sizeof(mavlink_servo_output_raw_t));
 	servo_output_raw.servo1_raw = (uint16_t)(1500+u1*500);
 	servo_output_raw.servo2_raw = (uint16_t)(1500+u2*500);
@@ -662,6 +1073,32 @@ REQ_DATA_STREAM...
 	}
 
 	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+
+	mavlink_msg_vfr_hud_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &vfr_hud);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+
+	mavlink_msg_mission_current_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_current);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
 	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)

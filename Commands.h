@@ -702,6 +702,7 @@ inline int Commands(char* line)
 #endif // !DISABLE_OPENCV_SUPPORT
 	BOOL bGenerateLineToFirst = FALSE, bStation = FALSE;
 	double delay = 0, delay_station = 0, delay_wait_new = 0;
+	double u_prev = 0;
 	CHRONO chrono, chrono_station;
 
 	memset(str, 0, sizeof(str));
@@ -2018,6 +2019,18 @@ inline int Commands(char* line)
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bHeadingControl = TRUE;
+		switch (robid)
+		{
+		case SAILBOAT_SIMULATOR_ROBID:
+		case VAIMOS_ROBID:
+		case SAILBOAT_ROBID:
+		case SAILBOAT2_ROBID:
+			break;
+		default:
+			if (fabs(u) < 0.01) u = u_max;
+			u_prev = u;
+			break;
+		}
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
 		bWaiting = TRUE;
@@ -2040,6 +2053,17 @@ inline int Commands(char* line)
 					bLineFollowingControl = FALSE;
 					bWaypointControl = FALSE;
 					bHeadingControl = FALSE;
+					switch (robid)
+					{
+					case SAILBOAT_SIMULATOR_ROBID:
+					case VAIMOS_ROBID:
+					case SAILBOAT_ROBID:
+					case SAILBOAT2_ROBID:
+						break;
+					default:
+						u = 0;
+						break;
+					}
 					StartChrono(&chrono_station);
 					for (;;)
 					{
@@ -2057,6 +2081,17 @@ inline int Commands(char* line)
 					bLineFollowingControl = TRUE;
 					bWaypointControl = FALSE;
 					bHeadingControl = TRUE;
+					switch (robid)
+					{
+					case SAILBOAT_SIMULATOR_ROBID:
+					case VAIMOS_ROBID:
+					case SAILBOAT_ROBID:
+					case SAILBOAT2_ROBID:
+						break;
+					default:
+						u = u_prev;
+						break;
+					}
 				}
 				else
 				{
@@ -3399,6 +3434,10 @@ inline int Commands(char* line)
 	{
 		ival = system(str);
 	}
+	else if (strncmp(line, "reboot", strlen("reboot")) == 0)
+	{
+		RebootComputer();
+	}
 #ifdef _WIN32
 	else if (sscanf(line, "playsoundasync %[^\r\n]255s", str) == 1)
 	{
@@ -3431,6 +3470,18 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS); // Just in case...
 		SaveConfig();
 		LeaveCriticalSection(&StateVariablesCS); // Just in case...
+	}
+	else if (sscanf(line, "sethome %lf %lf %lf", &dval1, &dval2, &dval3) == 3)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		lat_home = dval1; long_home = dval2; alt_home = dval3;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (strncmp(line, "home", strlen("home")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		printf("%.8f %.8f %.3f\n", lat_home, long_home, alt_home);
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "enablemavlinkinterfacein", strlen("enablemavlinkinterfacein")) == 0)
 	{

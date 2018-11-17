@@ -1,3 +1,7 @@
+266
+Updated MAVLinkInterface.
+Added reboot, home, sethome commands.
+
 265
 Corrected setmodemavlinkdevice and setattitudetargetmavlinkdevice commands.
 

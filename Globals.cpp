@@ -27,11 +27,15 @@ deque<double> wx_vector, wy_vector, wz_vector;
 double wagl = 0;
 double lat_home = 0, long_home = 0, alt_home = 0;
 
+int gcs_mission_count = 0;
+
 double wpstmplat[MAX_NB_WP];
 double wpstmplong[MAX_NB_WP];
+double wpstmpalt[MAX_NB_WP];
 int nbwpstmp = 0;
 double wpslat[MAX_NB_WP];
 double wpslong[MAX_NB_WP];
+double wpsalt[MAX_NB_WP];
 int nbWPs = 0, CurWP = 0;
 
 // Measurements.

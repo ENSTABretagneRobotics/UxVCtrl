@@ -213,11 +213,15 @@ extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
 extern double lat_home, long_home, alt_home;
 
+extern int gcs_mission_count;
+
 extern double wpstmplat[MAX_NB_WP];
 extern double wpstmplong[MAX_NB_WP];
+extern double wpstmpalt[MAX_NB_WP];
 extern int nbwpstmp;
 extern double wpslat[MAX_NB_WP];
 extern double wpslong[MAX_NB_WP];
+extern double wpsalt[MAX_NB_WP];
 extern int nbWPs, CurWP;
 
 // Measurements.
@@ -1054,11 +1058,13 @@ inline int InitGlobals(void)
 	nbwpstmp = 0;
 	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmpalt, 0, MAX_NB_WP*sizeof(double));
 	bWaypointsChanged = TRUE;
 	nbWPs = 0;
 	CurWP = 0;
 	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpsalt, 0, MAX_NB_WP*sizeof(double));
 
 	rudderminangle = -0.7;
 	ruddermidangle = 0.0;
@@ -1075,11 +1081,13 @@ inline int ReleaseGlobals(void)
 	nbwpstmp = 0;
 	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpstmpalt, 0, MAX_NB_WP*sizeof(double));
 	bWaypointsChanged = TRUE;
 	nbWPs = 0;
 	CurWP = 0;
 	memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 	memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+	memset(wpsalt, 0, MAX_NB_WP*sizeof(double));
 
 	DeleteCriticalSection(&strtimeCS);
 	DeleteCriticalSection(&OpenCVVideoRecordCS);

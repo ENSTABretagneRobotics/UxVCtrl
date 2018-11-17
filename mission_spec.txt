@@ -366,6 +366,8 @@
 %
 %system cmd (string representing the command or script file to run)
 %
+%reboot
+%
 % Windows only...
 %playsoundasync sound.wav
 %
@@ -382,6 +384,10 @@
 %reloadconfig
 %
 %saveconfig
+%
+%sethome lat_home long_home alt_home (lat_home, long_home, alt_home : double ]-oo,oo[ in decimal deg and m)
+%
+%home
 %
 %enablemavlinkinterfacein
 %

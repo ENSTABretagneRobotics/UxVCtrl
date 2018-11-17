@@ -197,6 +197,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 				CurWP = 0;
 				memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 				memset(wpslong, 0, MAX_NB_WP*sizeof(double));
+				memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 			}
 			if (nbWPs >= MAX_NB_WP)
 			{
@@ -234,6 +235,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 				nbwpstmp = 0;
 				memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
 				memset(wpstmplong, 0, MAX_NB_WP*sizeof(double));
+				memset(wpstmpalt, 0, MAX_NB_WP*sizeof(double));
 			}
 			if (nbwpstmp >= MAX_NB_WP)
 			{
