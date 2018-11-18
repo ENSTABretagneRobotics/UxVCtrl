@@ -29,7 +29,10 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	int ivalue = 0;
 	double winddir = 0;
 	int counter = 0, counter_modulo = 0;
-	double dist1 = 0, dist2 = 0, dist3 = 0, dist4 = 0, dist5 = 0, dist6 = 0, dist7 = 0, dist8 = 0;
+	double x = 0, y = 0;
+	struct timeval tv;
+	double angles[8];
+	double distances[8];
 	int showgetposition = -1;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -82,6 +85,10 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 			{
 				mSleep(50);
 				bConnected = TRUE; 
+
+				memset(&tv, 0, sizeof(tv));
+				memset(angles, 0, sizeof(angles));
+				memset(distances, 0, sizeof(distances));
 
 				EnterCriticalSection(&StateVariablesCS);
 
@@ -560,28 +567,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					mSleep(50);
 					break;
 				}
-				mSleep(20);
-				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
-					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1))
-				{
-					if (GetTelemetersPololu(&pololu, &dist1, &dist2, &dist3, &dist4, &dist5, &dist6, &dist7, &dist8) != EXIT_SUCCESS)
-					{
-						printf("Connection to a Pololu lost.\n");
-						bConnected = FALSE;
-						DisconnectPololu(&pololu);
-						mSleep(50);
-						break;
-					}
-					mSleep(10);
-					//EnterCriticalSection(&StateVariablesCS);
-					//
-					//i = pololu.telem1analoginputchan;
-					//pololu.analoginputx[i]+dist1*cos(pololu.analoginputpsi[i]);
-					//pololu.analoginputy[i]+dist1*sin(pololu.analoginputpsi[i]);
-					//
-					//LeaveCriticalSection(&StateVariablesCS);
-				}
-				else mSleep(30);
+				mSleep(50);
 				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))
 				{
 					if (GetValuePololu(&pololu, showgetposition, &ivalue) != EXIT_SUCCESS)
@@ -620,7 +606,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
 					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1))
 				{
-					if (GetTelemetersPololu(&pololu, &dist1, &dist2, &dist3, &dist4, &dist5, &dist6, &dist7, &dist8) != EXIT_SUCCESS)
+					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], &distances[6], &distances[7]) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
@@ -629,13 +615,63 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						break;
 					}
 					mSleep(10);
-					//EnterCriticalSection(&StateVariablesCS);
-					//
-					//i = pololu.telem1analoginputchan;
-					//pololu.analoginputx[i]+dist1*cos(pololu.analoginputpsi[i]);
-					//pololu.analoginputy[i]+dist1*sin(pololu.analoginputpsi[i]);
-					//
-					//LeaveCriticalSection(&StateVariablesCS);
+					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+					EnterCriticalSection(&StateVariablesCS);
+					i = pololu.telem1analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem2analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem3analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem4analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem5analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem6analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem7analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					i = pololu.telem8analoginputchan;
+					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
+					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					for (i = 0; i < 8; i++)
+					{
+						alpha_mes = angles[i];
+						d_mes = distances[i];
+
+						// For compatibility with a Seanet...
+
+						d_all_mes.clear();
+						d_all_mes.push_back(d_mes);
+						alpha_mes_vector.push_back(alpha_mes);
+						d_mes_vector.push_back(d_mes);
+						d_all_mes_vector.push_back(d_all_mes);
+						t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+						xhat_history_vector.push_back(xhat);
+						yhat_history_vector.push_back(yhat);
+						psihat_history_vector.push_back(psihat);
+						vrxhat_history_vector.push_back(vrxhat);
+
+						if ((int)alpha_mes_vector.size() > 8)
+						{
+							alpha_mes_vector.pop_front();
+							d_mes_vector.pop_front();
+							d_all_mes_vector.pop_front();
+							t_history_vector.pop_front();
+							xhat_history_vector.pop_front();
+							yhat_history_vector.pop_front();
+							psihat_history_vector.pop_front();
+							vrxhat_history_vector.pop_front();
+						}
+					}
+					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(30);
 				if ((showgetposition >= 0)&&(showgetposition < NB_CHANNELS_PWM_POLOLU))

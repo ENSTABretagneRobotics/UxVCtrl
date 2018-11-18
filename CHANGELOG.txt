@@ -1,3 +1,6 @@
+268
+Continuation of analog sonars integration.
+
 267
 Updated OpenCVGUI.
 Added snapshot command.
