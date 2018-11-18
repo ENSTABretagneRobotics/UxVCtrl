@@ -22,7 +22,8 @@
 
 THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 {
-	int videoid = (intptr_t)pParam;
+	int guiid = (intptr_t)pParam;
+	int videoid = -1;
 	int c = 0, i = 0, offset = 0;
 	double angle = 0, d0 = 0, d1 = 0, d2 = 0;
 	int days = 0, hours = 0, minutes = 0, seconds = 0;
@@ -43,7 +44,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bShowSonar = FALSE;
 	BOOL bShowOtherOverlays = TRUE;
 	COORDSYSTEM2IMG csMap2FullImg;
-	BOOL bVideoRecording = FALSE;
 	BOOL bDispRecordSymbol = FALSE;
 	BOOL bDispPlaySymbol = FALSE;
 	BOOL bDispPauseSymbol = FALSE;
@@ -59,11 +59,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	int nbPlaySymbolPoints = sizeof(PlaySymbolPoints);
 	CvPoint PauseSymbolPoints[4];
 	int nbPauseSymbolPoints = sizeof(PauseSymbolPoints);
-	char strtime_snap[MAX_BUF_LEN];
-	char snapfilename[MAX_BUF_LEN];
-	char picsnapfilename[MAX_BUF_LEN];
-	char kmlsnapfilename[MAX_BUF_LEN];
-	FILE* kmlsnapfile = NULL;
 	char s = 0;
 	char szText[MAX_BUF_LEN];
 	char windowname[MAX_BUF_LEN];
@@ -97,6 +92,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	}
 
 	if (bDisablePathfinderDVL&&bDisableNortekDVL) bDispDVL = FALSE; else bDispDVL = TRUE;
+
+	if ((guiid < MAX_NB_VIDEO)&&(!bDisableVideo[guiid])) videoid = guiid;
 
 	memset(szText, 0, sizeof(szText));
 	memset(windowname, 0, sizeof(windowname));
@@ -147,18 +144,18 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 		if (bExit) break;
 #pragma region IMAGES
-		if (bEnableOpenCVGUIs[videoid])
+		if (bEnableOpenCVGUIs[guiid])
 		{
 			if (windowname[0] == 0)
 			{
-				sprintf(windowname, "UxVOpenCVGUI%d", videoid);
+				sprintf(windowname, "UxVOpenCVGUI%d", guiid);
 				EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
-				cvMoveWindow(windowname, videoimgwidth*videoid, 0);
+				cvMoveWindow(windowname, ((videoimgwidth*guiid%1024)/videoimgwidth)*videoimgwidth, (videoimgwidth*guiid/1024)*videoimgheight);
 #else
 				cv::namedWindow(windowname, cv::WINDOW_AUTOSIZE);
-				cv::moveWindow(windowname, videoimgwidth*videoid, 0);
+				cv::moveWindow(windowname, ((videoimgwidth*guiid%1024)/videoimgwidth)*videoimgwidth, (videoimgwidth*guiid/1024)*videoimgheight);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 				LeaveCriticalSection(&OpenCVGUICS);
 			}
@@ -167,18 +164,28 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		{
 			if (windowname[0] != 0)
 			{
-				if (bVideoRecording)
+				if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 				{
 					EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
-					VideoRecordRequests[videoid]--;
-					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-					bVideoRecording = FALSE;
-					bDispRecordSymbol = FALSE;
+					if (VideoRecordRequests[videoid] > 0)
+					{
+						//VideoRecordRequests[videoid] = 0; // Force recording to stop.
+						LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+						bDispRecordSymbol = FALSE;
+					}
+					else
+					{
+						LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+					}
 				}
 				if (bMissionRunning)
 				{
 					//AbortMission();
 					bDispPlaySymbol = FALSE;
+					//if (bMissionPaused)
+					//{	
+					//	bDispPauseSymbol = FALSE;
+					//}
 				}
 				EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -197,21 +204,21 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			continue;
 		}
 
-		EnterCriticalSection(&dispimgsCS[videoid]);
-		if (bShowVideoOpenCVGUIs[videoid])
+		EnterCriticalSection(&dispimgsCS[guiid]);
+		if ((bShowVideoOpenCVGUIs[guiid])&&(videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 		{
 			EnterCriticalSection(&imgsCS[videoid]);
-			cvCopy(imgs[videoid], dispimgs[videoid], 0);
+			cvCopy(imgs[videoid], dispimgs[guiid], 0);
 			LeaveCriticalSection(&imgsCS[videoid]);
 		}
 		else
 		{
-			cvSet(dispimgs[videoid], CV_RGB(0, 0, 0), NULL);
+			cvSet(dispimgs[guiid], CV_RGB(0, 0, 0), NULL);
 		}
 		if (bShowSonar)
 		{
 			EnterCriticalSection(&SeanetOverlayImgCS);
-			CopyOverlay(SeanetOverlayImg, dispimgs[videoid]);
+			CopyOverlay(SeanetOverlayImg, dispimgs[guiid]);
 			LeaveCriticalSection(&SeanetOverlayImgCS);
 		}
 		if (bShowOtherOverlays)
@@ -219,47 +226,47 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			//if (bDynamicSonarLocalization) 		
 			//{
 			//	EnterCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
-			//	CopyOverlay(DynamicSonarLocalizationOverlayImg, dispimgs[videoid]);
+			//	CopyOverlay(DynamicSonarLocalizationOverlayImg, dispimgs[guiid]);
 			//	LeaveCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
 			//}
 			if (bExternalVisualLocalization&&(videoid == videoid_externalvisuallocalization))
 			{
 				EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-				CopyOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[videoid]);
+				CopyOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 			}
 			if ((bWallDetection||bWallTrackingControl||bWallAvoidanceControl))
 			{
 				EnterCriticalSection(&WallOverlayImgCS);
-				CopyOverlay(WallOverlayImg, dispimgs[videoid]);
+				CopyOverlay(WallOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&WallOverlayImgCS);
 			}
 			if ((bBallTrackingControl)&&(videoid == videoid_ball))
 			{
 				EnterCriticalSection(&BallOverlayImgCS);
-				CopyOverlay(BallOverlayImg, dispimgs[videoid]);
+				CopyOverlay(BallOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&BallOverlayImgCS);
 			}
 			if ((bVisualObstacleDetection||bVisualObstacleAvoidanceControl)&&(videoid == videoid_visualobstacle))
 			{
 				EnterCriticalSection(&VisualObstacleOverlayImgCS);
-				CopyOverlay(VisualObstacleOverlayImg, dispimgs[videoid]);
+				CopyOverlay(VisualObstacleOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&VisualObstacleOverlayImgCS);
 			}
 			if ((bSurfaceVisualObstacleDetection||bSurfaceVisualObstacleAvoidanceControl)&&(videoid == videoid_surfacevisualobstacle))
 			{
 				EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[videoid]);
+				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 			}
 			if (bPingerTrackingControl)
 			{
 				EnterCriticalSection(&PingerOverlayImgCS);
-				CopyOverlay(PingerOverlayImg, dispimgs[videoid]);
+				CopyOverlay(PingerOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&PingerOverlayImgCS);
 			}
 		}
-		LeaveCriticalSection(&dispimgsCS[videoid]);
+		LeaveCriticalSection(&dispimgsCS[guiid]);
 #pragma endregion
 
 		EnterCriticalSection(&StateVariablesCS);
@@ -589,7 +596,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bFullMap = !bFullMap;
 			break;
 		case '*': bRotatingMap = !bRotatingMap; break;
-		case 'i': bShowVideoOpenCVGUIs[videoid] = !bShowVideoOpenCVGUIs[videoid]; break;
+		case 'i': bShowVideoOpenCVGUIs[guiid] = !bShowVideoOpenCVGUIs[guiid]; break;
 		case '$': 
 
 			// Should cycle between different display modes...
@@ -691,65 +698,26 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bDynamicSonarLocalization = !bDynamicSonarLocalization;
 			break;
 		case 'P':
-			memset(strtime_snap, 0, sizeof(strtime_snap));
-			EnterCriticalSection(&strtimeCS);
-			strcpy(strtime_snap, strtime_fns());
-			LeaveCriticalSection(&strtimeCS);
-			for (i = 0; i < nbvideo; i++)
-			{
-				sprintf(snapfilename, "snap%d_%.64s.png", i, strtime_snap);
-				sprintf(picsnapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);
-				EnterCriticalSection(&imgsCS[i]);
-				if (!cvSaveImage(picsnapfilename, imgs[i], 0))
-				{
-					printf("Error saving a snapshot file.\n");
-				}
-				LeaveCriticalSection(&imgsCS[i]);
-				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
-				sprintf(kmlsnapfilename, PIC_FOLDER"snap%d_%.64s.kml", i, strtime_snap);
-				kmlsnapfile = fopen(kmlsnapfilename, "w");
-				if (kmlsnapfile == NULL)
-				{
-					printf("Error saving a snapshot file.\n");
-					continue;
-				}
-				fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-				fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
-				fprintf(kmlsnapfile, "<Document>\n<name>snap%d_%.64s</name>\n", i, strtime_snap);
-				fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>snap%d_%.64s</name>\n", i, strtime_snap);
-				fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", d1, d0, d2);
-				fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
-				fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
-				fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
-				fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
-				fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
-				fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
-				fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", snapfilename);
-				fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
-				fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", d1, d0, d2);
-				fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
-				fprintf(kmlsnapfile, "</Document>\n</kml>\n");
-				fclose(kmlsnapfile);
-			}
+			Snapshot();
 			printf("Snapshot.\n");
 			break;
 		case 'r':
-			if (bVideoRecording)
+			if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 			{
 				EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
-				VideoRecordRequests[videoid] = 0; // Force recording to stop.
-				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-				bVideoRecording = FALSE;
-				bDispRecordSymbol = FALSE;
-			}
-			else
-			{
-				EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
-				VideoRecordRequests[videoid] = 1; // Force recording to start.
-				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-				bVideoRecording = TRUE;
-				bDispRecordSymbol = TRUE;
-				StartChrono(&chrono_recording);
+				if (VideoRecordRequests[videoid] > 0)
+				{
+					VideoRecordRequests[videoid] = 0; // Force recording to stop.
+					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+					bDispRecordSymbol = FALSE;
+				}
+				else
+				{
+					VideoRecordRequests[videoid] = 1; // Force recording to start.
+					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+					bDispRecordSymbol = TRUE;
+					StartChrono(&chrono_recording);
+				}
 			}
 			break;
 		case 'p':
@@ -801,7 +769,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("Simulated DVL disabled.\n");
 			break;
 		case 'X':
-			bEnableOpenCVGUIs[videoid] = FALSE;
+			bEnableOpenCVGUIs[guiid] = FALSE;
 			break;
 		case '.':
 			for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
@@ -898,6 +866,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (rc_gear_sw) printf("RC GEAR switch HIGH.\n");
 				else printf("RC GEAR switch LOW.\n");
 			}
+			else if (bOSDDispOptionsExtendedMenu)
+			{
+				videoid++;
+				if (!((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))) videoid = -1;
+			}
 			else if (bExtendedMenu) bOtherOptionsExtendedMenu = TRUE;
 			break;
 		case '8':
@@ -954,7 +927,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		}
 #pragma endregion
-		EnterCriticalSection(&dispimgsCS[videoid]);
+		EnterCriticalSection(&dispimgsCS[guiid]);
 #pragma region EXTENDED MENU
 		if ((bExtendedMenu)&&(!bCISCREAOSDExtendedMenu)&&(!bMAVLinkOSDExtendedMenu))
 		{
@@ -963,91 +936,94 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset = 0;
 				offset += 16;
 				strcpy(szText, "EXTENDED MENU\\COLORS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[1] TEXT (%03u,%03u,%03u)", (unsigned int)colortext.val[2], (unsigned int)colortext.val[1], (unsigned int)colortext.val[0]);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[2] SONAR/LIDAR (%03u,%03u,%03u)", (unsigned int)colorsonarlidar.val[2], (unsigned int)colorsonarlidar.val[1], (unsigned int)colorsonarlidar.val[0]);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[3] MAP (%03u,%03u,%03u)", (unsigned int)colormap.val[2], (unsigned int)colormap.val[1], (unsigned int)colormap.val[0]);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}
 			else if (bOSDDispOptionsExtendedMenu)
 			{
 				offset = 0;
 				offset += 16;
 				strcpy(szText, "EXTENDED MENU\\OSD DISP OPTIONS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[1] DISPLAY LLA (%d)", (int)bDispLLA);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[2] DISPLAY ALTITUDE AGL (%d)", (int)bDispAltitudeAGL);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[3] DISPLAY SOG (%d)", (int)bDispSOG);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[4] DISPLAY YPR (%d)", (int)bDispYPR);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[5] DISPLAY ERR (%d)", (int)bDispERR);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[6] VIDEO ID (%d)", videoid);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}
 			else if (bOtherOptionsExtendedMenu)
 			{
 				offset = 0;
 				offset += 16;
 				strcpy(szText, "EXTENDED MENU\\OTHER OPTIONS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[1] SAILBOAT ROLL WIND CORR (%d)", (int)!bDisableRollWindCorrectionSailboat);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[2] MOTORBOAT BACKWARDS (%d)", (int)bEnableBackwardsMotorboat);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[3] LOAD KEYS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}
 			else
 			{
 				offset = 0;
 				offset += 16;
 				strcpy(szText, "EXTENDED MENU");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[1] COLORS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[2] CISCREA OSD (46825)");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[3] MAVLINK OSD");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[4] SHOW DETAILED INFO (%d)", (int)bStdOutDetailedInfo);
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[5] OSD DISP OPTIONS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[6] OTHER OPTIONS");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}
 		}
 #pragma endregion
@@ -1097,24 +1073,24 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				break;
 			}
 			offset += 16;
-			cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+			cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			if (bDispLLA)
 			{
 				// In deg in NED coordinate system.
 				if (bHeadingControl) sprintf(szText, "%.2f/%.2f", fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0), fmod_360_pos_rad2deg(-angle_env-wpsi+M_PI/2.0));
 				else sprintf(szText, "%.2f/--", fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0));
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				if (bDispYPR)
 				{
 					if (bPitchControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(-Center(thetahat)), fmod_360_rad2deg(-wtheta));
 					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(-Center(thetahat)));
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					if (bRollControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(phihat)), fmod_360_rad2deg(wphi));
 					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(phihat)));
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				}
 			}
 			else
@@ -1123,17 +1099,17 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bHeadingControl) sprintf(szText, "%.2f/%.2f", fmod_360_pos_rad2deg(Center(psihat)), fmod_360_pos_rad2deg(wpsi));
 				else sprintf(szText, "%.2f/--", fmod_360_pos_rad2deg(Center(psihat)));
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				if (bDispYPR)
 				{
 					if (bPitchControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(thetahat)), fmod_360_rad2deg(wtheta));
 					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(thetahat)));
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					if (bRollControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(phihat)), fmod_360_rad2deg(wphi));
 					else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(phihat)));
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				}
 			}
 			if (robid & SUBMARINE_ROBID_MASK) 
@@ -1141,13 +1117,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bDepthControl) sprintf(szText, "%.2f/%.2f", Center(zhat), wz);
 				else sprintf(szText, "%.2f/--", Center(zhat));
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispAltitudeAGL)
 				{
 					if (bAltitudeAGLControl) sprintf(szText, "AGL=%.2f/%.2f", altitude_AGL, wagl);
 					else sprintf(szText, "AGL=%.2f/--", altitude_AGL);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
 			if (robid & AERIAL_ROBID_MASK) 
@@ -1155,13 +1131,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bDepthControl) sprintf(szText, "%.2f/%.2f", Center(zhat), wz);
 				else sprintf(szText, "%.2f/--", Center(zhat));
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispAltitudeAGL)
 				{
 					if (bAltitudeAGLControl) sprintf(szText, "A_F=%.2f/%.2f", altitude_AGL, wagl);
 					else sprintf(szText, "A_F=%.2f/--", altitude_AGL);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
 			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
@@ -1171,32 +1147,32 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
 					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bDispLLA)
 			{
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
 				sprintf(szText, "POS:%.6f,%.6f", d0, d1);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			else
 			{
 				sprintf(szText, "POS:%.2f,%.2f", Center(xhat), Center(yhat));
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bDispERR)
 			{
 				sprintf(szText, "ERR:%.2f,%.2f", Width(xhat)/2.0, Width(yhat)/2.0);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}
 			if (bDynamicSonarLocalization)
 			{
 				sprintf(szText, "SNR DYN LOC");
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bDispDVL)
 			{
@@ -1206,12 +1182,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((Width(vrx_dvl) <= 4*dvl_acc)&&(Width(vry_dvl) <= 4*dvl_acc))
 					{
 						sprintf(szText, "DVL LOC");
-						cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+						cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					}
 					else
 					{
 						sprintf(szText, "DVL LOC N/A");
-						cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
 					}
 				}
 			}
@@ -1222,35 +1198,35 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 				case GNSS_ACC_LEVEL_RTK_FIXED:
 					if (bGPSLocalization) strcpy(szText, "RTK FIX (IN USE)"); else strcpy(szText, "RTK FIX");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					break;
 				case GNSS_ACC_LEVEL_RTK_FLOAT:
 					if (bGPSLocalization) strcpy(szText, "RTK FLT (IN USE)"); else strcpy(szText, "RTK FLT");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					break;
 				case GNSS_ACC_LEVEL_RTK_UNREL:
 					if (bGPSLocalization) strcpy(szText, "RTK ? (IN USE)"); else strcpy(szText, "RTK ?");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
 					break;
 				case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
 					if (bGPSLocalization) strcpy(szText, "GPS HIGH (IN USE)"); else strcpy(szText, "GPS HIGH");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					break;
 				case GNSS_ACC_LEVEL_GNSS_FIX_MED:
 					if (bGPSLocalization) strcpy(szText, "GPS MED (IN USE)"); else strcpy(szText, "GPS MED");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					break;
 				case GNSS_ACC_LEVEL_GNSS_FIX_LOW:
 					if (bGPSLocalization) strcpy(szText, "GPS LOW (IN USE)"); else strcpy(szText, "GPS LOW");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 					break;
 				case GNSS_ACC_LEVEL_GNSS_FIX_UNREL:
 					if (bGPSLocalization) strcpy(szText, "GPS ? (IN USE)"); else strcpy(szText, "GPS ?");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
 					break;
 				default:
 					strcpy(szText, "NO FIX");
-					cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
 					break;
 				}
 			}
@@ -1258,10 +1234,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				sprintf(szText, "SOG:%.2f", sog);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				sprintf(szText, "COG:%.2f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0, offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}
 			if (bDispEPU)
 			{
@@ -1292,7 +1268,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					StartChrono(&chrono_epu);
 				}
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}
 			if (bWaypointControl)
 			{
@@ -1301,25 +1277,25 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wx, wy, wz, &d0, &d1, &d2);
 					sprintf(szText, "WPT:%.6f,%.6f", d0, d1);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				else
 				{
 					sprintf(szText, "WPT:%.2f,%.2f", wx, wy);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				d0 = sqrt(pow(wx-Center(xhat),2)+pow(wy-Center(yhat),2));
 				sprintf(szText, "DIS:%.2f", d0);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispSOG)
 				{
 					if (sog > 0) d1 = d0/sog; else d1 = 0;
 					DecSec2DaysHoursMinSec(d1, &days, &hours, &minutes, &seconds, &deccsec);
 					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
 			if (bLineFollowingControl)
@@ -1329,49 +1305,49 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxb, wyb, wz, &d0, &d1, &d2);
 					sprintf(szText, "WPT:%.6f,%.6f", d0, d1);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				else
 				{
 					sprintf(szText, "WPT:%.2f,%.2f", wxb, wyb);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 				sprintf(szText, "XTE:%.2f", xte);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				d0 = sqrt(pow(wxb-Center(xhat),2)+pow(wyb-Center(yhat),2));
 				sprintf(szText, "DIS:%.2f", d0);
 				offset += 16;
-				cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				if (bDispSOG)
 				{
 					if (sog > 0) d1 = d0/sog; else d1 = 0;
 					DecSec2DaysHoursMinSec(d1, &days, &hours, &minutes, &seconds, &deccsec);
 					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds);
 					offset += 16;
-					cvPutText(dispimgs[videoid], szText, cvPoint(0,offset), &font, colortext);
+					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 				}
 			}
 			if (bOrientationCircle)
 			{
-				cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
+				cvCircle(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
 				if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 				{
 					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(psihat);
-					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
+					cvLine(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 
 						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 255), 2, 8, 0);
 				}
 				if (bHeadingControl) 
 				{
 					angle = M_PI/2.0+wpsi-Center(psihat);
-					cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
+					cvLine(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 
 						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 0), 2, 8, 0);
 				}
 				angle = M_PI-angle_env-Center(psihat);
-				cvLine(dispimgs[videoid], cvPoint(videoimgwidth-16, 32), 
+				cvLine(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 
 					cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 					CV_RGB(0, 0, 255), 2, 8, 0);
 			}
@@ -1380,10 +1356,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				int detailswidth = 96, detailsheight = 96;
 				int detailsj = videoimgwidth-detailswidth-8, detailsi = 48;
 				InitCS2ImgEx(&csMap2FullImg, &csMap, detailswidth, detailsheight, BEST_RATIO_COORDSYSTEM2IMG);
-				cvRectangle(dispimgs[videoid], 
+				cvRectangle(dispimgs[guiid], 
 					cvPoint(detailsj+detailswidth, detailsi+detailsheight), cvPoint(detailsj-1, detailsi-1), 
 					CV_RGB(255, 255, 255), 1, 8, 0);
-				cvRectangle(dispimgs[videoid], 
+				cvRectangle(dispimgs[guiid], 
 					cvPoint(detailsj+detailswidth-1, detailsi+detailsheight-1), cvPoint(detailsj, detailsi), 
 					CV_RGB(0, 0, 0), 1, 8, 0);
 				if (bRotatingMap)
@@ -1391,7 +1367,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1401,7 +1377,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1415,13 +1391,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Waypoint.
 					if (bWaypointControl)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1430,7 +1406,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					}
 					if (bLineFollowingControl)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1440,7 +1416,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1450,13 +1426,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1473,11 +1449,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 					default:
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, -0.4)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
 							CV_RGB(255, 128, 128), 4, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.4)), 
 							CV_RGB(0, 255, 0), 4, 8, 0);
@@ -1489,14 +1465,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, circles_x[i]), detailsi+YCS2IImg(&csMap2FullImg, circles_y[i])), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 1, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, walls_xa[i]), detailsi+YCS2IImg(&csMap2FullImg, walls_ya[i])), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, walls_xb[i]), detailsi+YCS2IImg(&csMap2FullImg, walls_yb[i])), 
 							colormap, 1, 8, 0);
@@ -1504,27 +1480,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Waypoint.
 					if (bWaypointControl)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxa), detailsi+YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxa), detailsi+YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
@@ -1538,11 +1514,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 					default:
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(psihat)))), 
 							CV_RGB(255, 128, 0), 4, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(psihat)))), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(psihat)))), 
 							CV_RGB(0, 255, 0), 4, 8, 0);
@@ -1558,7 +1534,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(circles_y[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (circles_x[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(circles_y[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1568,7 +1544,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(walls_ya[i]-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (walls_xa[i]-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(walls_ya[i]-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1582,13 +1558,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Waypoint.
 					if (bWaypointControl)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1597,7 +1573,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					}
 					if (bLineFollowingControl)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))), 
@@ -1606,7 +1582,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxa-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wya-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1616,13 +1592,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
@@ -1639,11 +1615,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 					default:
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.4)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.0)), 
 							CV_RGB(255, 128, 0), 8, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.0)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.4)), 
 							CV_RGB(0, 255, 0), 8, 8, 0);
@@ -1655,14 +1631,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Environment circles.
 					for (i = 0; i < nb_circles; i++)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, circles_x[i]), YCS2IImg(&csMap2FullImg, circles_y[i])), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 2, 8, 0);
 					}
 					// Environment walls.
 					for (i = 0; i < nb_walls; i++)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, walls_xa[i]), YCS2IImg(&csMap2FullImg, walls_ya[i])), 
 							cvPoint(XCS2JImg(&csMap2FullImg, walls_xb[i]), YCS2IImg(&csMap2FullImg, walls_yb[i])), 
 							colormap, 2, 8, 0);
@@ -1670,27 +1646,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					// Waypoint.
 					if (bWaypointControl)
 					{
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxa), YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
 							CV_RGB(255, 255, 255), 2, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxa), YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
 							CV_RGB(0, 0, 255), 1, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
-						cvCircle(dispimgs[videoid], 
+						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
 							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
 					}
@@ -1703,8 +1679,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							//CvPoint pts[10]; int npts = sizeof(pts); int contours = 0;
 							//pts[0] = cvPoint(videoimgwidth-28, 8-5);
 						
-							////cvPolyLine(dispimgs[videoid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
-							//cvFillConvexPoly(dispimgs[videoid], pts, npts, CV_RGB(0, 255, 0), 8, 0);
+							////cvPolyLine(dispimgs[guiid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
+							//cvFillConvexPoly(dispimgs[guiid], pts, npts, CV_RGB(0, 255, 0), 8, 0);
 							//break;
 						}
 					case BUBBLE_ROBID:
@@ -1712,11 +1688,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case MOTORBOAT_SIMULATOR_ROBID:
 					case MOTORBOAT_ROBID:
 					default:
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(psihat)))), 
 							CV_RGB(255, 128, 0), 8, 8, 0);
-						cvLine(dispimgs[videoid], 
+						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(psihat)))), 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(psihat)))), 
 							CV_RGB(0, 255, 0), 8, 8, 0);
@@ -1724,21 +1700,24 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					}
 				}
 			}
-			EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
-			if (VideoRecordRequests[videoid] > 0)
+			if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 			{
-				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-				if (GetTimeElapsedChronoQuick(&chrono_recording) > 0.5)
+				EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
+				if (VideoRecordRequests[videoid] > 0)
 				{
-					StopChronoQuick(&chrono_recording);
-					bDispRecordSymbol = !bDispRecordSymbol;
-					StartChrono(&chrono_recording);
+					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+					if (GetTimeElapsedChronoQuick(&chrono_recording) > 0.5)
+					{
+						StopChronoQuick(&chrono_recording);
+						bDispRecordSymbol = !bDispRecordSymbol;
+						StartChrono(&chrono_recording);
+					}
+					if (bDispRecordSymbol) cvCircle(dispimgs[guiid], cvPoint(videoimgwidth-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
 				}
-				if (bDispRecordSymbol) cvCircle(dispimgs[videoid], cvPoint(videoimgwidth-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
-			}
-			else
-			{
-				LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+				else
+				{
+					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+				}
 			}
 			if (bMissionRunning)
 			{
@@ -1754,7 +1733,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PlaySymbolPoints[0] = cvPoint(videoimgwidth-28, 8-5);
 					PlaySymbolPoints[1] = cvPoint(videoimgwidth-28, 8+5);
 					PlaySymbolPoints[2] = cvPoint(videoimgwidth-18, 8);
-					cvFillConvexPoly(dispimgs[videoid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					cvFillConvexPoly(dispimgs[guiid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
 				//if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
 				//{
@@ -1769,13 +1748,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PauseSymbolPoints[1] = cvPoint(videoimgwidth-28, 8+5);
 					PauseSymbolPoints[2] = cvPoint(videoimgwidth-25, 8+5);
 					PauseSymbolPoints[3] = cvPoint(videoimgwidth-25, 8-5);
-					cvFillConvexPoly(dispimgs[videoid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 					nbPauseSymbolPoints = 4;
 					PauseSymbolPoints[0] = cvPoint(videoimgwidth-21, 8-5);
 					PauseSymbolPoints[1] = cvPoint(videoimgwidth-21, 8+5);
 					PauseSymbolPoints[2] = cvPoint(videoimgwidth-18, 8+5);
 					PauseSymbolPoints[3] = cvPoint(videoimgwidth-18, 8-5);
-					cvFillConvexPoly(dispimgs[videoid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
 			}
 			if (!bDisableAllAlarms)
@@ -1788,7 +1767,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat1_threshold > 0.01)&&(vbat1_filtered < vbat1_threshold))
 					{
 						strcpy(szText, "BAT1 ALARM");
-						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 3.0)
@@ -1796,7 +1775,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat2_threshold > 0.01)&&(vbat2_filtered < vbat2_threshold))
 					{
 						strcpy(szText, "BAT2 ALARM");
-						cvPutText(dispimgs[videoid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 4.0)
@@ -1813,19 +1792,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 		}
 #pragma endregion
-		LeaveCriticalSection(&dispimgsCS[videoid]);
+		LeaveCriticalSection(&dispimgsCS[guiid]);
 		LeaveCriticalSection(&StateVariablesCS);
 
 #ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 		EnterCriticalSection(&OpenCVGUICS);
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
-		EnterCriticalSection(&dispimgsCS[videoid]);
+		EnterCriticalSection(&dispimgsCS[guiid]);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
-		cvShowImage(windowname, dispimgs[videoid]);
+		cvShowImage(windowname, dispimgs[guiid]);
 #else
-		cv::imshow(windowname, cv::cvarrToMat(dispimgs[videoid]));
+		cv::imshow(windowname, cv::cvarrToMat(dispimgs[guiid]));
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-		LeaveCriticalSection(&dispimgsCS[videoid]);
+		LeaveCriticalSection(&dispimgsCS[guiid]);
 #ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 		LeaveCriticalSection(&OpenCVGUICS);
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
@@ -1833,16 +1812,22 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		if (bExit) break;
 	}
 
-	if (bVideoRecording)
+	if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 	{
 		EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
-		VideoRecordRequests[videoid]--;
-		LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-		bVideoRecording = FALSE;
-		bDispRecordSymbol = FALSE;
+		if (VideoRecordRequests[videoid] > 0)
+		{
+			//VideoRecordRequests[videoid] = 0; // Force recording to stop.
+			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+			bDispRecordSymbol = FALSE;
+		}
+		else
+		{
+			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
+		}
 	}
 	if (bMissionRunning)
-	{	
+	{
 		//AbortMission();
 		bDispPlaySymbol = FALSE;
 		//if (bMissionPaused)

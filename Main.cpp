@@ -224,10 +224,10 @@ int main(int argc, char* argv[])
 	// Launch sensors, actuators, algorithms thread loops and wait for them to be ready...
 	if (!bDisablegpControl) CreateDefaultThread(gpControlThread, NULL, &gpControlThreadId);
 #ifndef DISABLE_OPENCV_SUPPORT
-	for (i = 0; i < nbvideo; i++)
+	for (i = 0; i < MAX_NB_VIDEO; i++)
 	{
-		CreateDefaultThread(VideoThread, (void*)(intptr_t)i, &VideoThreadId[i]);
-		CreateDefaultThread(VideoRecordThread, (void*)(intptr_t)i, &VideoRecordThreadId[i]);
+		if (!bDisableVideo[i]) CreateDefaultThread(VideoThread, (void*)(intptr_t)i, &VideoThreadId[i]);
+		if (!bDisableVideo[i]) CreateDefaultThread(VideoRecordThread, (void*)(intptr_t)i, &VideoRecordThreadId[i]);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -327,7 +327,7 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(MissionLogThread, NULL, &MissionLogThreadId);
 	if (bCommandPrompt) CreateDefaultThread(CommandsThread, NULL, &CommandsThreadId);
 #ifndef DISABLE_OPENCV_SUPPORT
-	for (i = 0; i < nbvideo; i++)
+	for (i = 0; i < nbopencvgui; i++)
 	{
 		CreateDefaultThread(OpenCVGUIThread, (void*)(intptr_t)i, &OpenCVGUIThreadId[i]);
 	}
@@ -344,7 +344,7 @@ int main(int argc, char* argv[])
 	if ((argc < 2)&&(!bCommandPrompt))
 	{
 		bGUIAvailable = FALSE;
-		for (i = 0; i < nbvideo; i++)
+		for (i = 0; i < nbopencvgui; i++)
 		{
 			bGUIAvailable = bGUIAvailable||bEnableOpenCVGUIs[i];
 		}
@@ -356,7 +356,7 @@ int main(int argc, char* argv[])
 	}
 
 #ifndef DISABLE_OPENCV_SUPPORT
-	for (i = nbvideo-1; i >= 0; i--)
+	for (i = nbopencvgui-1; i >= 0; i--)
 	{
 		WaitForThread(OpenCVGUIThreadId[i]);
 	}
@@ -493,10 +493,10 @@ int main(int argc, char* argv[])
 	WaitForThread(SeanetProcessingThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	for (i = nbvideo-1; i >= 0; i--)
+	for (i = MAX_NB_VIDEO-1; i >= 0; i--)
 	{
-		WaitForThread(VideoRecordThreadId[i]);
-		WaitForThread(VideoThreadId[i]);
+		if (!bDisableVideo[i]) WaitForThread(VideoRecordThreadId[i]);
+		if (!bDisableVideo[i]) WaitForThread(VideoThreadId[i]);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
 	if (!bDisablegpControl) WaitForThread(gpControlThreadId);

@@ -95,11 +95,12 @@ double rudderminangle = 0, ruddermidangle = 0, ruddermaxangle = 0;
 double Energy_electronics = 0, Energy_actuators = 0;
 
 #pragma region General parameters
-int robid = 0, nbvideo = 0, 
-videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0;
+int robid = 0;
+double roblength = 0, robwidth = 0, robheight = 0;
+int nbopencvgui = 0, videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0;
 char szVideoRecordCodec[5];
-BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
-BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
+BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
+BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
 int opencvguiperiod = 0;
 BOOL bMAVLinkInterface = FALSE;
 char szMAVLinkInterfacePath[MAX_BUF_LEN];
@@ -146,6 +147,7 @@ BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 #pragma endregion
 #pragma region Devices parameters
+BOOL bDisableVideo[MAX_NB_VIDEO];
 BOOL bDisablegpControl = FALSE;
 BOOL bDisablePathfinderDVL = FALSE;
 BOOL bDisableNortekDVL = FALSE;
@@ -509,10 +511,10 @@ BOOL bRestartVideo[MAX_NB_VIDEO];
 
 // Other.
 #ifndef DISABLE_OPENCV_SUPPORT
-IplImage* dispimgs[MAX_NB_VIDEO];
+IplImage* dispimgs[MAX_NB_OPENCVGUI];
 #endif // !DISABLE_OPENCV_SUPPORT
 int VideoRecordRequests[MAX_NB_VIDEO];
-CRITICAL_SECTION dispimgsCS[MAX_NB_VIDEO];
+CRITICAL_SECTION dispimgsCS[MAX_NB_OPENCVGUI];
 CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
 CRITICAL_SECTION SeanetConnectingCS;
 CRITICAL_SECTION SeanetDataCS;

@@ -807,7 +807,7 @@ inline int Commands(char* line)
 		kh_ball = dval6; kv_ball = dval7; 
 		lightMin_ball = ival13; lightPixRatio_ball = dval8; bAcoustic_ball = ival14;
 		bDepth_ball = ival15; camdir_ball = ival16; bDisableControl_ball = ival17; objtype_ball = ival18; mindistproc_ball = dval9; procid_ball = ival19;
-		if ((ival20 >= 0)&&(ival20 < nbvideo))
+		if ((ival20 >= 0)&&(ival20 < MAX_NB_VIDEO)&&(!bDisableVideo[ival20]))
 		{
 			videoid_ball = ival20;
 		}
@@ -851,7 +851,7 @@ inline int Commands(char* line)
 		rmin_visualobstacle = ival1; rmax_visualobstacle = ival2; gmin_visualobstacle = ival3; gmax_visualobstacle = ival4; bmin_visualobstacle = ival5; bmax_visualobstacle = ival6; 
 		obsPixRatio_visualobstacle = dval1; obsMinDetectionRatio_visualobstacle = dval2; obsDetectionRatioDuration_visualobstacle = (dval3 <= 0)? captureperiod: dval3; 
 		bBrake_visualobstacle = ival7; procid_visualobstacle = ival8; 
-		if ((ival9 >= 0)&&(ival9 < nbvideo))
+		if ((ival9 >= 0)&&(ival9 < MAX_NB_VIDEO)&&(!bDisableVideo[ival9]))
 		{
 			videoid_visualobstacle = ival9;
 		}
@@ -918,7 +918,7 @@ inline int Commands(char* line)
 		boatsize_surfacevisualobstacle = ival1; 
 		obsMinDetectionRatio_surfacevisualobstacle = dval1; obsDetectionRatioDuration_surfacevisualobstacle = (dval2 <= 0)? captureperiod: dval2; 
 		bBrake_surfacevisualobstacle = ival2;  procid_surfacevisualobstacle = ival3;
-		if ((ival4 >= 0)&&(ival4 < nbvideo))
+		if ((ival4 >= 0)&&(ival4 < MAX_NB_VIDEO)&&(!bDisableVideo[ival4]))
 		{
 			videoid_surfacevisualobstacle = ival4;
 		}
@@ -1259,7 +1259,7 @@ inline int Commands(char* line)
 		T_externalvisuallocalization.SetVal(1,4,T14); T_externalvisuallocalization.SetVal(2,4,T24); T_externalvisuallocalization.SetVal(3,4,T34); T_externalvisuallocalization.SetVal(4,4,T44); 
 		coef1_angle_externalvisuallocalization = dval5; coef2_angle_externalvisuallocalization = dval6; 
 		xerr_externalvisuallocalization = dval7; yerr_externalvisuallocalization = dval8; zerr_externalvisuallocalization = dval9; psierr_externalvisuallocalization = dval10; 
-		if ((ival15 >= 0)&&(ival15 < nbvideo))
+		if ((ival15 >= 0)&&(ival15 < MAX_NB_VIDEO)&&(!bDisableVideo[ival15]))
 		{
 			videoid_externalvisuallocalization = ival15;
 		}
@@ -2778,7 +2778,7 @@ inline int Commands(char* line)
 #ifndef DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "videoconfig %d %255s %d", &ival, str, &ival1) == 3)
 	{
-		if ((ival >= 0)&&(ival < nbvideo))
+		if ((ival >= 0)&&(ival < MAX_NB_VIDEO))
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "Video%d.txt", ival);
@@ -3229,7 +3229,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "enableopencvgui %d", &ival) == 1)
 	{
-		if ((ival >= 0)&&(ival < nbvideo))
+		if ((ival >= 0)&&(ival < nbopencvgui))
 		{
 			bEnableOpenCVGUIs[ival] = TRUE;
 		}
@@ -3240,7 +3240,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "disableopencvgui %d", &ival) == 1)
 	{
-		if ((ival >= 0)&&(ival < nbvideo))
+		if ((ival >= 0)&&(ival < nbopencvgui))
 		{
 			bEnableOpenCVGUIs[ival] = FALSE;
 		}
@@ -3251,7 +3251,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "startvideorecording %d", &ival) == 1)
 	{
-		if ((ival >= 0)&&(ival < nbvideo))
+		if ((ival >= 0)&&(ival < MAX_NB_VIDEO)&&(!bDisableVideo[ival]))
 		{
 			EnterCriticalSection(&VideoRecordRequestsCS[ival]);
 			VideoRecordRequests[ival] = 1; // Force recording to start.
@@ -3264,7 +3264,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "stopvideorecording %d", &ival) == 1)
 	{
-		if ((ival >= 0)&&(ival < nbvideo))
+		if ((ival >= 0)&&(ival < MAX_NB_VIDEO)&&(!bDisableVideo[ival]))
 		{
 			EnterCriticalSection(&VideoRecordRequestsCS[ival]);
 			VideoRecordRequests[ival] = 0; // Force recording to stop.
@@ -3274,6 +3274,12 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+	}
+	else if (strncmp(line, "snapshot", strlen("snapshot")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Snapshot();
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "cameratiltup", strlen("cameratiltup")) == 0)
 	{

@@ -320,6 +320,8 @@
 %
 %stopvideorecording videoid (int)
 %
+%snapshot
+%
 %cameratiltup
 %
 %cameratiltdown

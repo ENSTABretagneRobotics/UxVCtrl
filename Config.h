@@ -25,7 +25,10 @@ inline int LoadConfig(void)
 	// Default values.
 #pragma region General parameters
 	robid = SUBMARINE_SIMULATOR_ROBID;
-	nbvideo = 2;
+	roblength = 1;
+	robwidth = 1;
+	robheight = 1;
+	nbopencvgui = 1;
 	videoimgwidth = 320; 
 	videoimgheight = 240; 
 	captureperiod = 100;
@@ -35,9 +38,13 @@ inline int LoadConfig(void)
 	bEnableOpenCVGUIs[0] = TRUE;
 	bEnableOpenCVGUIs[1] = FALSE;
 	bEnableOpenCVGUIs[2] = FALSE;
+	bEnableOpenCVGUIs[3] = FALSE;
+	bEnableOpenCVGUIs[4] = FALSE;
 	bShowVideoOpenCVGUIs[0] = TRUE;
 	bShowVideoOpenCVGUIs[1] = TRUE;
 	bShowVideoOpenCVGUIs[2] = TRUE;
+	bShowVideoOpenCVGUIs[3] = TRUE;
+	bShowVideoOpenCVGUIs[4] = TRUE;
 	opencvguiperiod = 100;
 	bMAVLinkInterface = TRUE;
 	memset(szMAVLinkInterfacePath, 0, sizeof(szMAVLinkInterfacePath));
@@ -88,6 +95,11 @@ inline int LoadConfig(void)
 	bEcho = TRUE;
 #pragma endregion
 #pragma region Devices parameters
+	bDisableVideo[0] = TRUE;
+	bDisableVideo[1] = TRUE;
+	bDisableVideo[2] = TRUE;
+	bDisableVideo[3] = TRUE;
+	bDisableVideo[4] = TRUE;
 	bDisablegpControl = TRUE;
 	bDisablePathfinderDVL = TRUE;
 	bDisableNortekDVL = TRUE;
@@ -283,7 +295,13 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%i", &robid) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &nbvideo) != 1) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &roblength) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &robwidth) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &robheight) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &nbopencvgui) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &videoimgwidth) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -303,11 +321,19 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnableOpenCVGUIs[2]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEnableOpenCVGUIs[3]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEnableOpenCVGUIs[4]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[1]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[2]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[3]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bShowVideoOpenCVGUIs[4]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &opencvguiperiod) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -398,6 +424,16 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
 #pragma region Devices parameters
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableVideo[0]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableVideo[1]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableVideo[2]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableVideo[3]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableVideo[4]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisablegpControl) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -942,10 +978,10 @@ inline int LoadConfig(void)
 		robid = SUBMARINE_SIMULATOR_ROBID;
 		break;
 	}
-	if ((nbvideo < 0)||(nbvideo > MAX_NB_VIDEO))
+	if ((nbopencvgui < 0)||(nbopencvgui > MAX_NB_OPENCVGUI))
 	{
-		printf("Invalid parameter : nbvideo.\n");
-		nbvideo = 2;
+		printf("Invalid parameter : nbopencvgui.\n");
+		nbopencvgui = 1;
 	}
 	if (videoimgwidth <= 0)
 	{
@@ -972,20 +1008,30 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : VerticalBeam.\n");
 		VerticalBeam = 50;
 	}
-	if (bEnableOpenCVGUIs[0]&&(nbvideo <= 0))
+	if (bEnableOpenCVGUIs[0]&&(nbopencvgui <= 0))
 	{
 		printf("Invalid parameter : bEnableOpenCVGUIs[0].\n");
 		bEnableOpenCVGUIs[0] = FALSE;
 	}
-	if (bEnableOpenCVGUIs[1]&&(nbvideo <= 1))
+	if (bEnableOpenCVGUIs[1]&&(nbopencvgui <= 1))
 	{
 		printf("Invalid parameter : bEnableOpenCVGUIs[1].\n");
 		bEnableOpenCVGUIs[1] = FALSE;
 	}
-	if (bEnableOpenCVGUIs[2]&&(nbvideo <= 2))
+	if (bEnableOpenCVGUIs[2]&&(nbopencvgui <= 2))
 	{
 		printf("Invalid parameter : bEnableOpenCVGUIs[2].\n");
 		bEnableOpenCVGUIs[2] = FALSE;
+	}
+	if (bEnableOpenCVGUIs[3]&&(nbopencvgui <= 3))
+	{
+		printf("Invalid parameter : bEnableOpenCVGUIs[3].\n");
+		bEnableOpenCVGUIs[3] = FALSE;
+	}
+	if (bEnableOpenCVGUIs[4]&&(nbopencvgui <= 4))
+	{
+		printf("Invalid parameter : bEnableOpenCVGUIs[4].\n");
+		bEnableOpenCVGUIs[4] = FALSE;
 	}
 	if ((MAVLinkInterface_system_id < 0)||(MAVLinkInterface_system_id >= 256))
 	{
@@ -1174,7 +1220,13 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%#.8x\n", robid) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%d\n", nbvideo) < 0) printf("Error writing configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", roblength) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", robwidth) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", robheight) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", nbopencvgui) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", videoimgwidth) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1194,11 +1246,19 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnableOpenCVGUIs[2]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEnableOpenCVGUIs[3]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEnableOpenCVGUIs[4]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[0]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[1]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[2]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[3]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bShowVideoOpenCVGUIs[4]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", opencvguiperiod) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1289,6 +1349,16 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bEcho) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 #pragma region Devices parameters
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableVideo[0]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableVideo[1]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableVideo[2]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableVideo[3]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableVideo[4]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisablegpControl) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

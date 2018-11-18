@@ -26,7 +26,13 @@
 %0x00020000
 % ArduCopter
 %0x04000000
-% nbvideo (max 3)
+%roblength (in m)
+1
+%robwidth (in m)
+1
+%robheight (in m)
+1
+% nbopencvgui (max 5)
 2
 % videoimgwidth
 320
@@ -46,11 +52,19 @@ WMV2
 1
 % bEnableOpenCVGUIs[2]
 0
+% bEnableOpenCVGUIs[3]
+0
+% bEnableOpenCVGUIs[4]
+0
 % bShowVideoOpenCVGUIs[0]
 0
 % bShowVideoOpenCVGUIs[1]
 0
 % bShowVideoOpenCVGUIs[2]
+0
+% bShowVideoOpenCVGUIs[3]
+0
+% bShowVideoOpenCVGUIs[4]
 0
 % opencvguiperiod (in ms)
 100
@@ -139,6 +153,16 @@ WMV2
 % bCommandPrompt
 1
 % bEcho
+1
+% bDisableVideo[0]
+0
+% bDisableVideo[1]
+0
+% bDisableVideo[2]
+1
+% bDisableVideo[3]
+1
+% bDisableVideo[4]
 1
 % bDisablegpControl
 1

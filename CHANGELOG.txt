@@ -1,3 +1,8 @@
+267
+Updated OpenCVGUI.
+Added snapshot command.
+Added roblength, robwidth, robheight parameters.
+
 266
 Updated MAVLinkInterface.
 Added reboot, home, sethome commands.

@@ -121,7 +121,9 @@ typedef enum KEYS KEYS;
 #define MAX_NB_LABELS 256
 #define MAX_NB_PROCEDURES 256
 
-#define MAX_NB_VIDEO 3
+#define MAX_NB_OPENCVGUI 5
+
+#define MAX_NB_VIDEO 5
 #define MAX_NB_BLUEVIEW 2
 #define MAX_NB_NMEADEVICE 2
 #define MAX_NB_UBLOX 3
@@ -283,11 +285,12 @@ extern double rudderminangle, ruddermidangle, ruddermaxangle;
 extern double Energy_electronics, Energy_actuators;
 
 #pragma region General parameters
-extern int robid, nbvideo, 
-videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
+extern int robid;
+extern double roblength, robwidth, robheight;
+extern int nbopencvgui, videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
 extern char szVideoRecordCodec[5];
-extern BOOL bEnableOpenCVGUIs[MAX_NB_VIDEO];
-extern BOOL bShowVideoOpenCVGUIs[MAX_NB_VIDEO];
+extern BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
+extern BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
 extern int opencvguiperiod;
 extern BOOL bMAVLinkInterface;
 extern char szMAVLinkInterfacePath[MAX_BUF_LEN];
@@ -334,6 +337,7 @@ extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 #pragma endregion
 #pragma region Devices parameters
+extern BOOL bDisableVideo[MAX_NB_VIDEO];
 extern BOOL bDisablegpControl;
 extern BOOL bDisablePathfinderDVL;
 extern BOOL bDisableNortekDVL;
@@ -697,10 +701,10 @@ extern BOOL bRestartVideo[MAX_NB_VIDEO];
 
 // Other.
 #ifndef DISABLE_OPENCV_SUPPORT
-extern IplImage* dispimgs[MAX_NB_VIDEO];
+extern IplImage* dispimgs[MAX_NB_OPENCVGUI];
 #endif // !DISABLE_OPENCV_SUPPORT
 extern int VideoRecordRequests[MAX_NB_VIDEO];
-extern CRITICAL_SECTION dispimgsCS[MAX_NB_VIDEO];
+extern CRITICAL_SECTION dispimgsCS[MAX_NB_OPENCVGUI];
 extern CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
 extern CRITICAL_SECTION SeanetConnectingCS;
 extern CRITICAL_SECTION SeanetDataCS;
@@ -924,6 +928,63 @@ inline void ComputeGNSSPosition(double Latitude, double Longitude, double Altitu
 	}
 }
 
+inline void Snapshot(void)
+{
+#ifndef DISABLE_OPENCV_SUPPORT
+	int i = 0;
+	double d0 = 0, d1 = 0, d2 = 0;
+	char strtime_snap[MAX_BUF_LEN];
+	char snapfilename[MAX_BUF_LEN];
+	char picsnapfilename[MAX_BUF_LEN];
+	char kmlsnapfilename[MAX_BUF_LEN];
+	FILE* kmlsnapfile = NULL;
+
+	memset(strtime_snap, 0, sizeof(strtime_snap));
+	EnterCriticalSection(&strtimeCS);
+	strcpy(strtime_snap, strtime_fns());
+	LeaveCriticalSection(&strtimeCS);
+	for (i = 0; i < MAX_NB_VIDEO; i++)
+	{
+		if (!bDisableVideo[i])
+		{
+			sprintf(snapfilename, "snap%d_%.64s.png", i, strtime_snap);
+			sprintf(picsnapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);
+			EnterCriticalSection(&imgsCS[i]);
+			if (!cvSaveImage(picsnapfilename, imgs[i], 0))
+			{
+				printf("Error saving a snapshot file.\n");
+			}
+			LeaveCriticalSection(&imgsCS[i]);
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &d0, &d1, &d2);
+			sprintf(kmlsnapfilename, PIC_FOLDER"snap%d_%.64s.kml", i, strtime_snap);
+			kmlsnapfile = fopen(kmlsnapfilename, "w");
+			if (kmlsnapfile == NULL)
+			{
+				printf("Error saving a snapshot file.\n");
+				continue;
+			}
+			fprintf(kmlsnapfile, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+			fprintf(kmlsnapfile, "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+			fprintf(kmlsnapfile, "<Document>\n<name>snap%d_%.64s</name>\n", i, strtime_snap);
+			fprintf(kmlsnapfile, "\t<PhotoOverlay>\n\t\t<name>snap%d_%.64s</name>\n", i, strtime_snap);
+			fprintf(kmlsnapfile, "\t\t<Camera>\n\t\t\t<longitude>%.8f</longitude>\n\t\t\t<latitude>%.8f</latitude>\n\t\t\t<altitude>%.3f</altitude>\n", d1, d0, d2);
+			fprintf(kmlsnapfile, "\t\t\t<heading>%f</heading>\n\t\t\t<tilt>%f</tilt>\n\t\t\t<roll>%f</roll>\n", (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 0.0, 0.0);
+			fprintf(kmlsnapfile, "\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t</Camera>\n");
+			fprintf(kmlsnapfile, "\t\t<Style>\n\t\t\t<IconStyle>\n\t\t\t\t<Icon>\n\t\t\t\t\t<href>:/camera_mode.png</href>\n\t\t\t\t</Icon>\n\t\t\t</IconStyle>\n");
+			fprintf(kmlsnapfile, "\t\t\t<ListStyle>\n\t\t\t\t<listItemType>check</listItemType>\n\t\t\t\t<ItemIcon>\n\t\t\t\t\t<state>open closed error fetching0 fetching1 fetching2</state>\n");
+			fprintf(kmlsnapfile, "\t\t\t\t\t<href>http://maps.google.com/mapfiles/kml/shapes/camera-lv.png</href>\n\t\t\t\t</ItemIcon>\n\t\t\t\t<bgColor>00ffffff</bgColor>\n\t\t\t\t<maxSnippetLines>2</maxSnippetLines>\n");
+			fprintf(kmlsnapfile, "\t\t\t</ListStyle>\n\t\t</Style>\n");
+			fprintf(kmlsnapfile, "\t\t<Icon>\n\t\t\t<href>%.255s</href>\n\t\t</Icon>\n", snapfilename);
+			fprintf(kmlsnapfile, "\t\t<ViewVolume>\n\t\t\t<leftFov>-25</leftFov>\n\t\t\t<rightFov>25</rightFov>\n\t\t\t<bottomFov>-16.25</bottomFov>\n\t\t\t<topFov>16.25</topFov>\n\t\t\t<near>7.92675</near>\n\t\t</ViewVolume>\n");
+			fprintf(kmlsnapfile, "\t\t<Point>\n\t\t\t<altitudeMode>relativeToGround</altitudeMode>\n\t\t\t<gx:altitudeMode>relativeToSeaFloor</gx:altitudeMode>\n\t\t\t<coordinates>%.8f,%.8f,%.3f</coordinates>\n\t\t</Point>\n", d1, d0, d2);
+			fprintf(kmlsnapfile, "\t</PhotoOverlay>\n");
+			fprintf(kmlsnapfile, "</Document>\n</kml>\n");
+			fclose(kmlsnapfile);
+		}
+	}
+#endif // !DISABLE_OPENCV_SUPPORT
+}
+
 inline int InitGlobals(void)
 {
 	int i = 0;
@@ -978,22 +1039,26 @@ inline int InitGlobals(void)
 	}
 
 #ifndef DISABLE_OPENCV_SUPPORT
-	for (i = 0; i < nbvideo; i++)
+	for (i = 0; i < MAX_NB_VIDEO; i++)
 	{
 		InitCriticalSection(&imgsCS[i]);
-		InitCriticalSection(&dispimgsCS[i]);
-		InitCriticalSection(&VideoRecordRequestsCS[i]);
 		imgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(imgs[i], CV_RGB(0, 0, 0), NULL);
-		dispimgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
+		bPauseVideo[i] = FALSE;
+		bRestartVideo[i] = FALSE;
+		InitCriticalSection(&VideoRecordRequestsCS[i]);
 		VideoRecordRequests[i] = 0;
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
-		bPauseVideo[i] = FALSE;
-		bRestartVideo[i] = FALSE;
+	}
+
+	for (i = 0; i < nbopencvgui; i++)
+	{
+		InitCriticalSection(&dispimgsCS[i]);
+		dispimgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
 	}
 
 	ExternalVisualLocalizationOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
@@ -1131,19 +1196,23 @@ inline int ReleaseGlobals(void)
 
 	cvReleaseImage(&ExternalVisualLocalizationOverlayImg);
 
-	for (i = nbvideo-1; i >= 0; i--)
+	for (i = nbopencvgui-1; i >= 0; i--)
 	{
-		bRestartVideo[i] = FALSE;
-		bPauseVideo[i] = FALSE;
+		cvReleaseImage(&dispimgs[i]);
+		DeleteCriticalSection(&dispimgsCS[i]);
+	}
+
+	for (i = MAX_NB_VIDEO-1; i >= 0; i--)
+	{
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		VideoRecordRequests[i] = 0;
-		cvReleaseImage(&dispimgs[i]);
-		cvReleaseImage(&imgs[i]);
 		DeleteCriticalSection(&VideoRecordRequestsCS[i]);
-		DeleteCriticalSection(&dispimgsCS[i]);
+		bRestartVideo[i] = FALSE;
+		bPauseVideo[i] = FALSE;
+		cvReleaseImage(&imgs[i]);
 		DeleteCriticalSection(&imgsCS[i]);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
