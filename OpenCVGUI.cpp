@@ -881,7 +881,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				printf("RC AUX3 switch LOW.\n");
 			}
 			break;
+#ifdef _WIN32
 		case 13: // ENTER
+#else
+		case 10: // ENTER
+#endif // _WIN32
 			if (bExtendedMenu)
 			{
 				if (bColorsExtendedMenu) bColorsExtendedMenu = FALSE;
