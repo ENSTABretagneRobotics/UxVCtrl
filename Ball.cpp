@@ -209,14 +209,14 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				RGB2HSL_MSPaint(r, g, b, &h, &s, &l);
 				// Select the pixels with the right color.
 				if (
-					((!bHExclusive_ball)&&((h >= hmin_ball)&&(h <= hmax_ball)))||
-					(((bHExclusive_ball)&&((h < hmin_ball)||(h > hmax_ball))))
+					(((!bHExclusive_ball)&&((h >= hmin_ball)&&(h <= hmax_ball)))||
+					((bHExclusive_ball)&&((h < hmin_ball)||(h > hmax_ball))))
 					&&
-					((!bSExclusive_ball)&&((s >= smin_ball)&&(s <= smax_ball)))||
-					(((bSExclusive_ball)&&((s < smin_ball)||(s > smax_ball))))
+					(((!bSExclusive_ball)&&((s >= smin_ball)&&(s <= smax_ball)))||
+					((bSExclusive_ball)&&((s < smin_ball)||(s > smax_ball))))
 					&&
-					((!bLExclusive_ball)&&((l >= lmin_ball)&&(l <= lmax_ball)))||
-					(((bLExclusive_ball)&&((l < lmin_ball)||(l > lmax_ball))))
+					(((!bLExclusive_ball)&&((l >= lmin_ball)&&(l <= lmax_ball)))||
+					((bLExclusive_ball)&&((l < lmin_ball)||(l > lmax_ball))))
 					)
 				{
 					SelectedPixelsImage->imageData[index] = 1;

@@ -3360,7 +3360,7 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		rc_aux3_sw = ival1; rc_ail_sw = (ival2 != 0)? TRUE: FALSE; rc_gear_sw = (ival3 != 0)? TRUE: FALSE; rc_ele_sw = (ival4 != 0)? TRUE: FALSE; rc_rud_sw = (ival5 != 0)? TRUE: FALSE;
-		rc_aux3_sw = (rc_aux3_sw < 0)? 0: rc_aux3_sw;
+		//rc_aux3_sw = (rc_aux3_sw < 0)? 0: rc_aux3_sw;
 		rc_aux3_sw = (rc_aux3_sw > 2)? 2: rc_aux3_sw;
 		LeaveCriticalSection(&StateVariablesCS);
 	}

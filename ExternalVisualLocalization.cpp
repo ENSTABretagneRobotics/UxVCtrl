@@ -184,14 +184,14 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				RGB2HSL_MSPaint(r, g, b, &h, &s, &l);
 				// Select the pixels with the right color.
 				if (
-					((!bHExclusive_externalvisuallocalization)&&((h >= hmin_externalvisuallocalization)&&(h <= hmax_externalvisuallocalization)))||
-					(((bHExclusive_externalvisuallocalization)&&((h < hmin_externalvisuallocalization)||(h > hmax_externalvisuallocalization))))
+					(((!bHExclusive_externalvisuallocalization)&&((h >= hmin_externalvisuallocalization)&&(h <= hmax_externalvisuallocalization)))||
+					((bHExclusive_externalvisuallocalization)&&((h < hmin_externalvisuallocalization)||(h > hmax_externalvisuallocalization))))
 					&&
-					((!bSExclusive_externalvisuallocalization)&&((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization)))||
-					(((bSExclusive_externalvisuallocalization)&&((s < smin_externalvisuallocalization)||(s > smax_externalvisuallocalization))))
+					(((!bSExclusive_externalvisuallocalization)&&((s >= smin_externalvisuallocalization)&&(s <= smax_externalvisuallocalization)))||
+					((bSExclusive_externalvisuallocalization)&&((s < smin_externalvisuallocalization)||(s > smax_externalvisuallocalization))))
 					&&
-					((!bLExclusive_externalvisuallocalization)&&((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization)))||
-					(((bLExclusive_externalvisuallocalization)&&((l < lmin_externalvisuallocalization)||(l > lmax_externalvisuallocalization))))
+					(((!bLExclusive_externalvisuallocalization)&&((l >= lmin_externalvisuallocalization)&&(l <= lmax_externalvisuallocalization)))||
+					((bLExclusive_externalvisuallocalization)&&((l < lmin_externalvisuallocalization)||(l > lmax_externalvisuallocalization))))
 					)
 				{
 					SelectedPixelsImage->imageData[index] = 1;

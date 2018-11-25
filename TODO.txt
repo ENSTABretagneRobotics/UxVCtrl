@@ -23,7 +23,8 @@ Param period pour tous les devices, pris en compte s'il est connecté...
 
 rajouter possibilité de corriger l'estimation de vitesse des moteurs en fonction de la tension batterie mesurée
 
-rename ball to hslobj?
+rename ball to hslobj, pouvoir lancer plusieurs threads...?
+séparer aussi la partie détection de lumière...?
 partager variables objDistance, etc.
 pouvoir activer la détection de plusieurs objets en même temps avec une id et un nom, comment gérer les actions, définir une priorité par objet?
 

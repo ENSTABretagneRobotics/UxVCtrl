@@ -562,7 +562,8 @@ REQ_DATA_STREAM...
 					mavlink_msg_mission_request_decode(&msg, &mission_request);
 					memset(&mission_item, 0, sizeof(mavlink_mission_item_t));
 					EnterCriticalSection(&StateVariablesCS);
-					if ((mission_request.seq >= 0)&&(mission_request.seq < nbWPs+1))
+					//if ((mission_request.seq >= 0)&&(mission_request.seq < nbWPs+1))
+					if (mission_request.seq < nbWPs+1)
 					{
 						if (mission_request.seq == 0)
 						{
@@ -608,7 +609,8 @@ REQ_DATA_STREAM...
 				case MAVLINK_MSG_ID_MISSION_ITEM:
 					mavlink_msg_mission_item_decode(&msg, &mission_item);
 					EnterCriticalSection(&StateVariablesCS);
-					if ((mission_item.seq >= 0)&&(mission_item.seq < MAX_NB_WP+1))
+					//if ((mission_item.seq >= 0)&&(mission_item.seq < MAX_NB_WP+1))
+					if (mission_item.seq < MAX_NB_WP+1)
 					{
 						if (mission_item.seq == 0)
 						{
