@@ -152,7 +152,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				if ((nmeadevice.bEnableGPRMC&&(nmeadata.status == 'A'))||nmeadevice.bEnableGPVTG)
 				{
 					sog = nmeadata.SOG;
-					cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+					psi_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 				}
 
 				if (nmeadevice.bEnableGPRMC&&(nmeadata.status == 'A'))

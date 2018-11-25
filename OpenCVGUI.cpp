@@ -28,6 +28,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	double angle = 0, d0 = 0, d1 = 0, d2 = 0;
 	int days = 0, hours = 0, minutes = 0, seconds = 0;
 	double deccsec = 0;
+	int dispsource = 0;
 	BOOL bOSD = TRUE;
 	BOOL bOrientationCircle = TRUE;
 	BOOL bDispLLA = TRUE;
@@ -112,6 +113,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	//cv::startWindowThread();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 	//LeaveCriticalSection(&OpenCVGUICS);
+
+	dispsource = 0;
 
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0.0, 1, 8);
 	colortextid = 0;
@@ -868,10 +871,17 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			else if (bOSDDispOptionsExtendedMenu)
 			{
+				dispsource++;
+				if ((dispsource < 0)||(dispsource > 3)) dispsource = 0; // Temp...
+			}
+			else if (bExtendedMenu) bOtherOptionsExtendedMenu = TRUE;
+			break;
+		case '7':
+			if (bOSDDispOptionsExtendedMenu)
+			{
 				videoid++;
 				if (!((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))) videoid = -1;
 			}
-			else if (bExtendedMenu) bOtherOptionsExtendedMenu = TRUE;
 			break;
 		case '8':
 			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; }
@@ -976,7 +986,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "[5] DISPLAY ERR (%d)", (int)bDispERR);
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				sprintf(szText, "[6] VIDEO ID (%d)", videoid);
+				sprintf(szText, "[6] XXX (%d)", dispsource);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[7] VIDEO ID (%d)", videoid);
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
@@ -1239,7 +1252,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "SOG:%.2f", sog);
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
-				sprintf(szText, "COG:%.2f", (fmod_2PI(-angle_env-cog+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+				sprintf(szText, "COG:%.2f", fmod_360_pos_rad2deg(-angle_env-Center(psi_gps)+M_PI/2.0));
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}

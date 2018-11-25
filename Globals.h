@@ -227,15 +227,15 @@ extern double wpsalt[MAX_NB_WP];
 extern int nbWPs, CurWP;
 
 // Measurements.
-extern interval x_gps, y_gps, z_gps;
+extern interval x_gps, y_gps, z_gps, psi_gps;
 extern interval phi_ahrs, theta_ahrs, psi_ahrs, omegax_ahrs, omegay_ahrs, omegaz_ahrs, accrx_ahrs, accry_ahrs, accrz_ahrs;
-extern interval vrx_dvl, vry_dvl, vrz_dvl;
+extern interval psi_dvl, vrx_dvl, vry_dvl, vrz_dvl;
 extern interval vrx_of, vry_of, vrz_of;
 extern interval z_pressure;
 // Objects to track, distance control...
 extern double dist;
 // GPS.
-extern double sog, cog, xte, utc;
+extern double sog, xte, utc;
 #define MAX_NB_BYTES_RTCM_PARTS 8192
 //#define MAX_NB_RTCM_PARTS 1024
 //extern vector< deque<unsigned char*> > RTCMuserslist;
@@ -390,6 +390,7 @@ extern int sailformulatype;
 extern int controllerperiod;
 #pragma endregion
 #pragma region Observer parameters
+extern int psi_source, theta_phi_source, x_y_source, z_source;
 extern double z_pressure_acc;
 extern double dvl_acc;
 extern double of_acc;
@@ -411,6 +412,7 @@ extern double GPS_low_acc, GPS_low_acc_HDOP;
 extern int GPS_low_acc_nbsat;
 extern int GPS_min_sat_signal;
 extern double GPS_submarine_depth_limit;
+extern double GPS_SOG_for_valid_COG;
 extern int rangescale, sdir;
 extern int nb_outliers;
 extern double dynamicsonarlocalization_period;

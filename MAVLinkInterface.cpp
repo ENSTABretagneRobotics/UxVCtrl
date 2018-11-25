@@ -957,7 +957,7 @@ REQ_DATA_STREAM...
 			break;
 		}
 		gps_raw_int.vel = (uint16_t)(sog*100);
-		gps_raw_int.cog = (uint16_t)(fmod_360_pos((-angle_env-cog+M_PI/2.0)*180.0/M_PI)*100);
+		gps_raw_int.cog = (uint16_t)(fmod_360_pos_rad2deg(-angle_env-Center(psi_gps)+M_PI/2.0)*100);
 	}
 	else
 	{

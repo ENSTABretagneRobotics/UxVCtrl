@@ -237,7 +237,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							(mavlinkdata.gps_raw_int.eph == UINT16_MAX? 0: mavlinkdata.gps_raw_int.eph)/100.0);
 						sog = (mavlinkdata.gps_raw_int.vel == UINT16_MAX? 0: mavlinkdata.gps_raw_int.vel)/100.0;
 						cog_deg = (mavlinkdata.gps_raw_int.cog == UINT16_MAX? 0: mavlinkdata.gps_raw_int.cog)/100.0;
-						cog = fmod_2PI(M_PI/2.0-cog_deg*M_PI/180.0-angle_env);
+						psi_gps = fmod_2PI(M_PI/2.0-cog_deg*M_PI/180.0-angle_env)+interval(-M_PI,M_PI);
 					}
 
 					if (fabs(mavlinkdata.attitude.roll) > 0) phi_ahrs = fmod_2PI((double)mavlinkdata.attitude.roll)+interval(-phi_ahrs_acc, phi_ahrs_acc);

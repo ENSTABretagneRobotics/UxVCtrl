@@ -20,7 +20,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	//double dt_chrono = 0;
 	//interval xhat_prev_old, yhat_prev_old, psihat_prev_old;
 	double cosfilteredwinddir = 0, sinfilteredwinddir = 0;
-	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
+	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, coghat = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
 
@@ -101,6 +101,19 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		vtwindhat = wind_filter_coef*Center(vtwindhat)+(1.0-wind_filter_coef)*vtwind+interval(-vtwind_var,vtwind_var);
 
 		// Temporary...
+		switch (psi_source)
+		{
+		case 2:
+			psihat = (sog >= GPS_SOG_for_valid_COG)? psi_dvl: psi_ahrs; // Temp...
+			break;
+		case 1:
+			psihat = (sog >= GPS_SOG_for_valid_COG)? psi_gps: psi_ahrs;
+			break;
+		case 0:
+		default:
+			psihat = psi_ahrs;
+			break;
+		}
 		omegaxhat = omegax_ahrs;
 		omegayhat = omegay_ahrs;
 		//omegazhat = omegaz_ahrs;
@@ -119,7 +132,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				zhat = z_pressure+hwhat; // Waves influence...
 				phihat = phi_ahrs;
 				thetahat = theta_ahrs;
-				psihat = psi_ahrs;
 
 				imatrix R_Euler = RotationPhiThetaPsi(phihat, thetahat, psihat);
 				box Vr = box(vrxhat, vryhat, vrzhat);
@@ -148,10 +160,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 				//zhat = zhat & (z_pressure+hwhat);
 				zhat = z_pressure+hwhat; // Waves influence...
 				//psihat = psihat+dt*((u1-u2)*alphaomegazhat+psidotnoise);
-				//psihat = psihat & interval(psi_mes-psi_ahrs_acc,psi_mes+psi_ahrs_acc);
 				phihat = phi_ahrs;
 				thetahat = theta_ahrs;
-				psihat = psi_ahrs;
 				vrxhat = (
 					(1.0-dt*alphafvrxhat)*vrxhat
 					+dt*(u1+u2)*alphavrxhat
@@ -211,7 +221,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
-			psihat = psi_ahrs;
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			omegazhat = omegaz_ahrs;
 			if ((bGPSLocalization)&&(bCheckGNSSOK()))
@@ -234,7 +243,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			//xhat = xhat+dt*(vrxhat*Cos(psihat)+vchat*Cos(psichat)+xdotnoise);
 			//yhat = yhat+dt*(vrxhat*Sin(psihat)+vchat*Sin(psichat)+ydotnoise);
 			//zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
-			//psihat = interval(psi_mes-psi_ahrs_acc,psi_mes+psi_ahrs_acc);
 			//vrxhat = (
 			//	(1.0-dt*alphafvrxhat)*vrxhat
 			//	+dt*(u1+u2)*alphavrxhat
@@ -248,7 +256,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			zhat = z_gps;
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
-			psihat = psi_ahrs;
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			omegazhat = omegaz_ahrs;
 
@@ -271,7 +278,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
-			psihat = psi_ahrs;
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			omegazhat = omegaz_ahrs;
 			if ((bGPSLocalization)&&(bCheckGNSSOK()))
@@ -294,7 +300,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			//xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
 			//yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
 			//zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
-			//psihat = interval(psi_mes-psi_ahrs_acc,psi_mes+psi_ahrs_acc);
 			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			//omegazhat = interval(omegaz_mes-omegaz_ahrs_acc,omegaz_mes+omegaz_ahrs_acc);
 
@@ -303,7 +308,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			zhat = z_gps;
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
-			psihat = psi_ahrs;
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			omegazhat = omegaz_ahrs;
 
@@ -328,7 +332,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
-			psihat = psi_ahrs;
 			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			vrzhat = (Center(zhat-zhat_prev))/dt+vrzdotnoise;
 			omegazhat = omegaz_ahrs;
@@ -353,7 +356,6 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			zhat = z_gps;
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
-			psihat = psi_ahrs;
 			vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			omegazhat = omegaz_ahrs;
 
@@ -371,7 +373,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		}
 
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
-		headinghat = (fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+		headinghat = fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
+		coghat = fmod_360_pos_rad2deg(-angle_env-Center(psi_gps)+M_PI/2.0);
 
 		// Should be different if V and I are measured...
 
@@ -442,7 +445,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
-			t_epoch, lathat, longhat, althat, headinghat, cog, sog, altitude_AGL, pressure_mes, fluiddira, fluidspeeda, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
+			t_epoch, lathat, longhat, althat, headinghat, coghat, sog, altitude_AGL, pressure_mes, fluiddira, fluidspeeda, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
 			t, Center(xhat), Center(yhat), Center(zhat), Center(phihat), Center(thetahat), Center(psihat),
 			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat), Center(accrxhat), Center(accryhat), Center(accrzhat), 
 			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),

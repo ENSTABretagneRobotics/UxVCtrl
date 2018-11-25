@@ -192,6 +192,10 @@ inline int LoadConfig(void)
 	controllerperiod = 25;
 #pragma endregion
 #pragma region Observer parameters
+	psi_source = 0;
+	theta_phi_source = 0;
+	x_y_source = 0;
+	z_source = 0;
 	z_pressure_acc = 0.1;
 	dvl_acc = 0.1;
 	of_acc = 0.1;
@@ -240,6 +244,7 @@ inline int LoadConfig(void)
 	GPS_low_acc_nbsat = 4;
 	GPS_min_sat_signal = 20;
 	GPS_submarine_depth_limit = -0.5;
+	GPS_SOG_for_valid_COG = 0.2;
 	rangescale = 10;
 	sdir = 1;
 	nb_outliers = 25;
@@ -619,6 +624,14 @@ inline int LoadConfig(void)
 #pragma endregion
 #pragma region Observer parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &psi_source) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &theta_phi_source) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &x_y_source) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &z_source) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &z_pressure_acc) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &dvl_acc) != 1) printf("Invalid configuration file.\n");
@@ -795,6 +808,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &GPS_min_sat_signal) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &GPS_submarine_depth_limit) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &GPS_SOG_for_valid_COG) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &rangescale) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1112,6 +1127,26 @@ inline int LoadConfig(void)
 	{
 		printf("Invalid parameter : controllerperiod.\n");
 		controllerperiod = 25;
+	}
+	if ((psi_source < 0)||(psi_source > 5))
+	{
+		printf("Invalid parameter : psi_source.\n");
+		psi_source = 0;
+	}
+	if ((theta_phi_source < 0)||(theta_phi_source > 5))
+	{
+		printf("Invalid parameter : theta_phi_source.\n");
+		theta_phi_source = 0;
+	}
+	if ((x_y_source < 0)||(x_y_source > 5))
+	{
+		printf("Invalid parameter : x_y_source.\n");
+		x_y_source = 0;
+	}
+	if ((z_source < 0)||(z_source > 5))
+	{
+		printf("Invalid parameter : z_source.\n");
+		z_source = 0;
 	}
 	if (GPS_high_acc_nbsat < 0)
 	{
@@ -1544,6 +1579,14 @@ inline int SaveConfig(void)
 #pragma endregion
 #pragma region Observer parameters
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", psi_source) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", theta_phi_source) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", x_y_source) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", z_source) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", z_pressure_acc) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", dvl_acc) < 0) printf("Error writing configuration file.\n");
@@ -1700,6 +1743,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", GPS_min_sat_signal) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", GPS_submarine_depth_limit) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", GPS_SOG_for_valid_COG) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", rangescale) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

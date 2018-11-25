@@ -278,7 +278,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_VTG)
 							{
 								sog = nmeadata.SOG;
-								cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+								psi_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 							}
 							if ((!ublox.bEnable_NMEA_RMC)&&(ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_GLL))
 							{
@@ -364,7 +364,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (nmeadata.vstatus_earth == 'A')
 							{
 								sog = nmeadata.SOG;
-								cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+								psi_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 							}
 						}
 
@@ -511,7 +511,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)
 							{
 								sog = ubxdata.SOG;
-								cog = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env);
+								psi_gps = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env)+interval(-M_PI,M_PI);
 							}
 							if (ublox.bEnable_UBX_NAV_PVT)
 							{

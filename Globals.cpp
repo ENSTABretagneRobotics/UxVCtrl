@@ -39,17 +39,17 @@ double wpsalt[MAX_NB_WP];
 int nbWPs = 0, CurWP = 0;
 
 // Measurements.
-interval x_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), y_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), z_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval x_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), y_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), z_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psi_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval phi_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), theta_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psi_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
 omegax_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegay_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegaz_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY),
 accrx_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accry_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accrz_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
-interval vrx_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval psi_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrx_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval vrx_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval z_pressure(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 // Objects to track, distance control...
 double dist = 0;
 // GPS.
-double sog = 0, cog = 0, xte = 0, utc = 0;
+double sog = 0, xte = 0, utc = 0;
 vector< deque<unsigned char> > RTCMuserslist;
 deque<unsigned char> RTCMusers[MAX_NB_UBLOX];
 // Barometer, pressure sensor...
@@ -200,6 +200,7 @@ int sailformulatype = 0;
 int controllerperiod = 0;
 #pragma endregion
 #pragma region Observer parameters
+int psi_source = 0, theta_phi_source = 0, x_y_source = 0, z_source = 0;
 double z_pressure_acc = 0;
 double dvl_acc = 0;
 double of_acc = 0;
@@ -221,6 +222,7 @@ double GPS_low_acc = 0, GPS_low_acc_HDOP = 0;
 int GPS_low_acc_nbsat = 0;
 int GPS_min_sat_signal = 0;
 double GPS_submarine_depth_limit = 0;
+double GPS_SOG_for_valid_COG = 0;
 int rangescale = 0, sdir = 0;
 int nb_outliers = 0;
 double dynamicsonarlocalization_period = 0;

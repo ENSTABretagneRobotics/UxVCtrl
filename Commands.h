@@ -1134,6 +1134,12 @@ inline int Commands(char* line)
 	{
 		bDVLLocalization = FALSE;
 	}
+	else if (sscanf(line, "stateestimationconfig %d %d %d %d", &ival1, &ival2, &ival3, &ival4) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);				
+		psi_source = ival1; theta_phi_source = ival2; x_y_source = ival3; z_source = ival4;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "setstateestimationwgs %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)
 	{

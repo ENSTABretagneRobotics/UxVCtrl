@@ -133,7 +133,7 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 						if (nmeadata.vstatus_earth == 'A')
 						{
 							sog = nmeadata.SOG;
-							cog = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env);
+							psi_dvl = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 						}
 					}
 

@@ -343,6 +343,14 @@ WMV2
 % controllerperiod (in ms)
 25
 % Observer parameters
+% psi_source (0 for AHRS, 1 for GPS, 2 for DVL)
+0
+% theta_phi_source (not implemented)
+0
+% x_y_source (not implemented)
+0
+% z_source (not implemented)
+0
 % z_pressure_acc (in m)
 0.1
 % dvl_acc (in m/s)
@@ -505,6 +513,8 @@ WMV2
 20
 % GPS_submarine_depth_limit (in m, >=)
 -0.5
+% GPS_SOG_for_valid_COG (in m/s, >=)
+0.11
 % rangescale (in m, modified by Seanet)
 10
 % sdir

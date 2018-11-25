@@ -1,3 +1,6 @@
+270
+Added stateestimationconfig command.
+
 269
 Updated ENTER key code for Linux.
 
