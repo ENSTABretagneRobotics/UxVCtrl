@@ -1,4 +1,36 @@
+double alpha_mes = 0, d_mes = 0;
+vector<interval> d_all_mes;
+deque<double> alpha_mes_vector;
+deque<double> d_mes_vector;
+deque< vector<interval> > d_all_mes_vector;
+
+deque<double> alpha_mes_vector;
+deque< vector<interval> > d_all_mes_vector;
+pour chaque capteur?
+
+pour chaque sonar/lidar : une overlayimg qui peut être (raw ou waterfall) et (avec distances superposées, seules, ou absentes) et (corrigé en bras de leviers, +theta, +historique theta, +historique position)
+
+où calculer historique theta et positions, dans observer?
+
+Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
+On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...
+Indiquer pings utilisés pour localisation
+blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
+minrange param, zone morte pour tous les sonar et echosondeurs...?
+rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
+pour image sonar ça fait un peu n'importe quoi...
+zoom dans les images
+FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
+MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
+(walltracking overlay fait aussi walldetect, wallavoidance)
+
+flux optique avec données lidar pour déduire vrx et vry si on suppose que l'environnement est statique et essayer de déterminer si en fait il y a quand même des parties dynamiques pour les enlever
+Regression linéaire de ce qui a devant, derrière, droite, gauche et calcul du déplacement de la ligne connaissant vitesse de rotation
+
+helios : Accrxhat, etc. pas loggués dans logstate? D'où vient vxrhat?
+
 ne garder dans les user workspace que les fichiers de config vraiment potentiellement utiles?
+Mission Planner disarm button should abort any current mission?->peut-être pas car on veut pouvoir continuer à envoyer des waypoints via Mission Planner, sauf peut-être si le bouton MISSION_START peut relancer...
 vitesse et arrivée en fly to here, en RTL...?
 en mode Auto, lancer équivalent waypointslist, mais devrait être dans un autre thread...
 should add opencvgui key to call waypointslist (with last parameters?), mais devrait être dans un autre thread...
@@ -6,6 +38,7 @@ waypointslist 3D, gestion de l'altitude dans fly to here, w.r.t. home...
 accéder aux rcin avant override?->peut-être pas possible, utiliser set_attitude_target à la place de rc_override...?->vérifier rc_channels vs rc_channels_raw pour confirmer...
 
 altitude_AGL should be computed from lidar-lite, px4f ground_distance, if different should be compared with altitude, should be also corrected with pos xyz of the sensor, attitude of the robot...
+
 should fuse ultrasonic distances with rplidar and handle outliers...
 param extended menu pour choisir quels sonar/lidar sont affichés par $, sonarid (0 : Seanet, 1 : BlueView0, 2 : BlueView1, 3 : Hokuyo, 4 : RPLIDAR, 5 : sonars maestro, 6 : rngfnd mavlink, selon qu'ils soient disabled ou non l'id est inférieure ou égale) propre à chaque fenêtre...
 Orientation de l'image lidar pas pratique car sans doute corrigée en cap, il faut qu'on puisse choisir en option
@@ -98,12 +131,6 @@ Composante latérale bluerov et ciscrea, brake si lateralthrust?
 update sonarstaticlocstructured, sonartest
 Corriger comments sur alphas dans uxvctrl.txt pour saucisse et séparer cas miniking et micron
 
-Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
-On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...->faire un mode d'affichage brut, corrigé en theta, corrigé en historique theta, corrigé en historique theta et position...
-Drawsonarscreenshot_seanetpro
-Indiquer pings utilisés pour localisation
-param zone morte sonar?
-
 Prise en compte de 2 GPS pour contracter le cap (ou 3 pour les 3 angles)
 Contraction cap avec gyros avec intégration sur une durée glissante
 
@@ -124,9 +151,6 @@ gpszlocalization?
 commande pour régulation en vitesse?
 
 replace x_bias_err, x_max_rand_err with x_gps_bias_err, x_gps_max_rand_err...
-mt, sbg : fixtype, numsat, hdop...
-Pour chaque GPS, option bdisableuse, qui empêche mise à jour x_gps, bGPSOK, etc. mais il faut quand même qu'il reçoive les corrections rtcm...
-récupérer accel de mavlink, mt, sbg, razor, vérifier quand elles sont valides...?
 
 accéléros : peu précis, sensible aux chocs et vibrations rejeter que si incohérent avec au moins 2 autres capteurs/algos (e.g. pression, effets propulseurs, DVL, GPS pour vertical, effets propulseurs, sonar, DVL, GPS pour horizontal)
 calculer vz à partir de pression pour pouvoir comparer avec effets propulseurs, DVL et accéléros
@@ -170,14 +194,10 @@ Altitude from sonar : use qinter to allow outliers and take into account positio
 
 équations d'état bateaux... add bDisableStateEstimation, E key, like bGPSLocalization...
 
-blueview, seanet, es, lidar qui pourraient marcher en même temps...
-minrange param, zone morte pour tous les sonar et echosondeurs...?
-
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
 https://stackoverflow.com/questions/15453470/print-float-double-without-trailing-zeros
 
 rajouter touche bSonarAltitudeEstimation?
-rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
 
 Gyr/omegaz mais du coup je peux pas désactiver la centrale... voir pour pouvoir n'utiliser que gyros, utiliser options internes centrale? mais des fois je voudrais faire moi-même la fusion magnéto+gyros...
 ambiguités pour l'angle quand sort du champ de vision...
@@ -189,7 +209,6 @@ rajouter params calcul objAngle, si tous à 0 désactiver?
 bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station...
 Si vr error grande, utiliser state eq, autrement n'utiliser que vr
 option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
-pas sur que px4flow soit fiable, plutôt utiliser hokuyo pour estimer vrx et vry...?
 
 chrono_period...
 
@@ -337,7 +356,6 @@ afficher temps depuis début mission
 Rampe etas quand on accélère, en option...?
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
-pour image sonar ça fait un peu n'importe quoi...
 cv342 : rajouter plus de USE_OPENCV_HIGHGUI_CPP_API et ou rajouter une autre option USE_ONLY_OPENCV_CPP_API ou utiliser __cplusplus pour ne plus utiliser que les API C++, tout changer en cv::Mat vu que tout est basé sur les IplImage, désactiver temporairement les include de fonctions C pour voir quel code utilise encore du C...
 Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
 tester touches en nomachine, ssh -X...
@@ -346,7 +364,6 @@ modify waypoints/heading commands so that they do a line following in the case o
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
 Move MAVLinkInterface in Hardware with its own config file?
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
-pouvoir avoir un nb de fenêtres indépendant du nb de caméras
 faudrait pouvoir enregistrer en high res en local en option->utiliser remotewebcammultisrv et se connecter dessus...
 prévoir zoom sur la map, on a du mal à savoir son cap
 pouvoir afficher robot indépendamment de l'échelle?
@@ -354,11 +371,8 @@ mieux gérer les infos affichées selon le robot et selon le mode
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)->déjà affiché dans invite de commandes
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides->Mission Planner...
-FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
-MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
-(walltracking overlay fait aussi walldetect, wallavoidance)
 bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
-pouvoir lancer un opencvgui independamment du nombre de cameras, dynamic resolution changes?, voir le sonar comme une caméra?, appuyer sur la touche '0' met caméra '0', '1', caméra 1, '8' sonarscreenshot, '9' sonarwaterfall...
+dynamic resolution changes?
 params videoimgwidth/height, Horizontal/VerticalBeam sont pour les images utilisées pour les calculs, il faudrait en plus des valeurs propres à chaque OpenCVGUI...
 Pour la taille des images partagées, prendre la résolution min des webcams?
 utiliser bCleanup dans tous les threads pour le cvSet()?
@@ -437,6 +451,9 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS, DVL
+mt, sbg : fixtype, numsat, hdop...
+Pour chaque GPS, option bdisableuse, qui empêche mise à jour x_gps, bGPSOK, etc. mais il faut quand même qu'il reçoive les corrections rtcm...
+récupérer accel de mavlink, mt, sbg, razor, vérifier quand elles sont valides...?
 SBG pas accessible par réseau...
 AHRS matrice de rotation, bras de levier...
 ublox : surveiller problèmes de pragma pack, taille de packet dans SetCfg()...
