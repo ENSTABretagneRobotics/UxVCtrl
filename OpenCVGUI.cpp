@@ -1224,8 +1224,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else
 			{
 				// In deg in the reference coordinate system.
-				if (bHeadingControl) sprintf(szText, "%.2f/%.2f", fmod_360_pos_rad2deg(Center(psihat)), fmod_360_pos_rad2deg(wpsi));
-				else sprintf(szText, "%.2f/--", fmod_360_pos_rad2deg(Center(psihat)));
+				if (bHeadingControl) sprintf(szText, "%.2f/%.2f", fmod_360_rad2deg(Center(psihat)), fmod_360_rad2deg(wpsi));
+				else sprintf(szText, "%.2f/--", fmod_360_rad2deg(Center(psihat)));
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				if (bDispYPR)

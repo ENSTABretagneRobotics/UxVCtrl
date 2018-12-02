@@ -1106,6 +1106,7 @@ inline int InitGlobals(void)
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
 	colorsonarlidar = CV_RGB(0, 0, 255);
+	fSeanetOverlayImg = SONAR_IMG_LEVER_ARMS|SONAR_IMG_ALL_DISTANCES|SONAR_IMG_NORMAL;
 #endif // !DISABLE_OPENCV_SUPPORT
 
 	InitCriticalSection(&SonarAltitudeEstimationCS);
