@@ -156,6 +156,27 @@ typedef enum KEYS KEYS;
 #define RTK_FLOAT 5
 #define GNSS_ESTIMATED_FIX 6
 
+// Sonar image flags.
+#define SONAR_IMG_TYPE_SHIFT 0
+#define SONAR_IMG_DISTANCES_SHIFT 4
+#define SONAR_IMG_CORRECTIONS_SHIFT 8 
+
+#define SONAR_IMG_TYPE_MASK               0x0000000F
+#define SONAR_IMG_DISTANCES_MASK          0x000000F0
+#define SONAR_IMG_CORRECTIONS_MASK        0x0000FF00
+
+#define SONAR_IMG_NORMAL                  0x00000001
+#define SONAR_IMG_WATERFALL               0x00000002
+
+#define SONAR_IMG_FIRST_DISTANCES         0x00000010
+#define SONAR_IMG_ALL_DISTANCES           0x00000020
+
+#define SONAR_IMG_LEVER_ARMS              0x00000100
+#define SONAR_IMG_LEVER_ARMS_PSI          0x00000200
+#define SONAR_IMG_LEVER_ARMS_PSI_POS      0x00000400
+#define SONAR_IMG_LEVER_ARMS_HIST_PSI     0x00000800
+#define SONAR_IMG_LEVER_ARMS_HIST_PSI_POS 0x00001000
+
 // Acoustic modem messages.
 enum ACOUSTIC_MODEM_MESSAGES
 {
@@ -609,6 +630,7 @@ extern int AcousticCommandMDM;
 extern BOOL bPauseMDM, bRestartMDM;
 
 // Seanet variables.
+extern int fSeanetOverlayImg;
 extern CRITICAL_SECTION SeanetOverlayImgCS;
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* SeanetOverlayImg;

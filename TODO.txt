@@ -1,25 +1,8 @@
-double alpha_mes = 0, d_mes = 0;
-vector<interval> d_all_mes;
-deque<double> alpha_mes_vector;
-deque<double> d_mes_vector;
-deque< vector<interval> > d_all_mes_vector;
 
-deque<double> alpha_mes_vector;
-deque< vector<interval> > d_all_mes_vector;
-pour chaque capteur?
-
-pour chaque sonar/lidar : une overlayimg qui peut être (raw ou waterfall) et (avec distances superposées, seules, ou absentes) et (corrigé en bras de leviers, +theta, +historique theta, +historique position)
-
-où calculer historique theta et positions, dans observer?
-
-Rajouter param pour corriger le fait que sonar pas centré sur SAUC'ISSE
-On a dû mal à déterminer si le sens du sonar est bien pris en compte quand on regarde le dessin des données->c'est peut-être corrigé avec le theta sauf qu'il faudrait utiliser l'historique ou quelquechose comme ça...
-Indiquer pings utilisés pour localisation
 blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
 minrange param, zone morte pour tous les sonar et echosondeurs...?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
-pour image sonar ça fait un peu n'importe quoi...
-zoom dans les images
+Indiquer pings utilisés pour localisation
 FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
 MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
 (walltracking overlay fait aussi walldetect, wallavoidance)
@@ -27,7 +10,7 @@ MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDis
 flux optique avec données lidar pour déduire vrx et vry si on suppose que l'environnement est statique et essayer de déterminer si en fait il y a quand même des parties dynamiques pour les enlever
 Regression linéaire de ce qui a devant, derrière, droite, gauche et calcul du déplacement de la ligne connaissant vitesse de rotation
 
-helios : Accrxhat, etc. pas loggués dans logstate? D'où vient vxrhat?
+helios : Accrxhat, etc. pas loggués dans logstate? D'où vient vrxhat?
 
 ne garder dans les user workspace que les fichiers de config vraiment potentiellement utiles?
 Mission Planner disarm button should abort any current mission?->peut-être pas car on veut pouvoir continuer à envoyer des waypoints via Mission Planner, sauf peut-être si le bouton MISSION_START peut relancer...
@@ -586,6 +569,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+pour chaque sonar/lidar : une overlayimg qui peut être (normal ou waterfall ou rien) et (avec 1ères distances, toutes ou absentes) et (corrigé en bras de leviers, +psi, +pos, -pos+historique psi, +historique position, ou sans correction)
 
 bug bVideorecording à 0 après stop mission qui enregistrait (regarder quand on appuie sur r après le stopmission)? bVideoRecording and bVideoRecordRequests...
 crash du programme lorsqu'on appuie sur p pour stopper mission : video recording pas stoppé correctement (deletetimer doit pas être appelé si on a encore un timercallback en cours?)...? ou alors il ne faut pas arrêter en même temps les 2 vidéos... mais je les arrête pas...

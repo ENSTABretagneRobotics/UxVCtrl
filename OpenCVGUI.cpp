@@ -54,6 +54,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bColorsExtendedMenu = FALSE;
 	BOOL bCISCREAOSDExtendedMenu = FALSE;
 	BOOL bMAVLinkOSDExtendedMenu = FALSE;
+	BOOL bSonarDispOptionsExtendedMenu = FALSE;
 	BOOL bOSDDispOptionsExtendedMenu = FALSE;
 	BOOL bOtherOptionsExtendedMenu = FALSE;
 	CvPoint PlaySymbolPoints[3];
@@ -791,11 +792,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #pragma region EXTENDED MENU
 		case '1':
 			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 128));
+			else if (bCISCREAOSDExtendedMenu) {}
 			else if (bMAVLinkOSDExtendedMenu)
 			{
 				rc_ele_sw = !rc_ele_sw;
 				if (rc_ele_sw) printf("RC ELE switch HIGH.\n");
 				else printf("RC ELE switch LOW.\n");
+			}
+			else if (bSonarDispOptionsExtendedMenu)
+			{
+				i = (fSeanetOverlayImg&SONAR_IMG_TYPE_MASK)>>SONAR_IMG_TYPE_SHIFT;
+				i = (i <= 0)? 1: i<<1;
+				if (i > (SONAR_IMG_WATERFALL>>SONAR_IMG_TYPE_SHIFT)) i = 0;
+				fSeanetOverlayImg = ((i<<SONAR_IMG_TYPE_SHIFT)|(fSeanetOverlayImg&(~SONAR_IMG_TYPE_MASK)));
 			}
 			else if (bOSDDispOptionsExtendedMenu) bDispLLA = !bDispLLA;
 			else if (bOtherOptionsExtendedMenu)
@@ -814,6 +823,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				rc_aux3_sw = 2;
 				printf("RC AUX3 switch HIGH.\n");
 			}
+			else if (bSonarDispOptionsExtendedMenu)
+			{
+				i = (fSeanetOverlayImg&SONAR_IMG_DISTANCES_MASK)>>SONAR_IMG_DISTANCES_SHIFT;
+				i = (i <= 0)? 1: i<<1;
+				if (i > (SONAR_IMG_ALL_DISTANCES>>SONAR_IMG_DISTANCES_SHIFT)) i = 0;
+				fSeanetOverlayImg = ((i<<SONAR_IMG_DISTANCES_SHIFT)|(fSeanetOverlayImg&(~SONAR_IMG_DISTANCES_MASK)));
+			}
 			else if (bOSDDispOptionsExtendedMenu) bDispAltitudeAGL = !bDispAltitudeAGL;
 			else if (bOtherOptionsExtendedMenu)
 			{
@@ -825,11 +841,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case '3':
 			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
+			else if (bCISCREAOSDExtendedMenu) {}
 			else if (bMAVLinkOSDExtendedMenu)
 			{
 				rc_ail_sw = !rc_ail_sw;
 				if (rc_ail_sw) printf("RC AIL switch HIGH.\n");
 				else printf("RC AIL switch LOW.\n");
+			}
+			else if (bSonarDispOptionsExtendedMenu)
+			{
+				i = (fSeanetOverlayImg&SONAR_IMG_CORRECTIONS_MASK)>>SONAR_IMG_CORRECTIONS_SHIFT;
+				i = (i <= 0)? 1: i<<1;
+				if (i > (SONAR_IMG_LEVER_ARMS_HIST_PSI_POS>>SONAR_IMG_CORRECTIONS_SHIFT)) i = 0;
+				fSeanetOverlayImg = ((i<<SONAR_IMG_CORRECTIONS_SHIFT)|(fSeanetOverlayImg&(~SONAR_IMG_CORRECTIONS_MASK)));
 			}
 			else if (bOSDDispOptionsExtendedMenu) bDispSOG = !bDispSOG;
 			else if (bOtherOptionsExtendedMenu)
@@ -841,55 +865,74 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else if (bExtendedMenu) bMAVLinkOSDExtendedMenu = TRUE;
 			break;
 		case '4':
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; }
+			if (bColorsExtendedMenu) {}
+			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'L'; bOSDButtonPressedCISCREA = TRUE; }
 			else if (bMAVLinkOSDExtendedMenu)
 			{
 				rc_rud_sw = !rc_rud_sw;
 				if (rc_rud_sw) printf("RC RUD switch HIGH.\n");
 				else printf("RC RUD switch LOW.\n");
 			}
+			else if (bSonarDispOptionsExtendedMenu) {}
 			else if (bOSDDispOptionsExtendedMenu) bDispYPR = !bDispYPR;
+			else if (bOtherOptionsExtendedMenu) {}
 			else if (bExtendedMenu) bStdOutDetailedInfo = !bStdOutDetailedInfo;
 			break;
 		case '5':
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; }
+			if (bColorsExtendedMenu) {}
+			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'S'; bOSDButtonPressedCISCREA = TRUE; }
 			else if (bMAVLinkOSDExtendedMenu)
 			{
 				rc_aux3_sw = 1;
 				printf("RC AUX3 switch MEDIUM.\n");
 			}
+			else if (bSonarDispOptionsExtendedMenu) {}
 			else if (bOSDDispOptionsExtendedMenu) bDispERR = !bDispERR;
-			else if (bExtendedMenu) bOSDDispOptionsExtendedMenu = TRUE;
+			else if (bOtherOptionsExtendedMenu) {}
+			else if (bExtendedMenu) bSonarDispOptionsExtendedMenu = TRUE;
 			break;
 		case '6':
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; }
+			if (bColorsExtendedMenu) {}
+			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'R'; bOSDButtonPressedCISCREA = TRUE; }
 			else if (bMAVLinkOSDExtendedMenu)
 			{
 				rc_gear_sw = !rc_gear_sw;
 				if (rc_gear_sw) printf("RC GEAR switch HIGH.\n");
 				else printf("RC GEAR switch LOW.\n");
 			}
+			else if (bSonarDispOptionsExtendedMenu) {}
 			else if (bOSDDispOptionsExtendedMenu)
 			{
 				dispsource++;
 				if ((dispsource < 0)||(dispsource > 3)) dispsource = 0; // Temp...
 			}
-			else if (bExtendedMenu) bOtherOptionsExtendedMenu = TRUE;
+			else if (bOtherOptionsExtendedMenu) {}
+			else if (bExtendedMenu) bOSDDispOptionsExtendedMenu = TRUE;
 			break;
 		case '7':
-			if (bOSDDispOptionsExtendedMenu)
+			if (bColorsExtendedMenu) {}
+			else if (bCISCREAOSDExtendedMenu) {}
+			else if (bMAVLinkOSDExtendedMenu) {}
+			else if (bSonarDispOptionsExtendedMenu) {}
+			else if (bOSDDispOptionsExtendedMenu)
 			{
 				videoid++;
 				if (!((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))) videoid = -1;
 			}
+			else if (bOtherOptionsExtendedMenu) {}
+			else if (bExtendedMenu) bOtherOptionsExtendedMenu = TRUE;
 			break;
 		case '8':
-			if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; }
+			if (bColorsExtendedMenu) {}
+			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'U'; bOSDButtonPressedCISCREA = TRUE; }
 			else if (bMAVLinkOSDExtendedMenu)
 			{
 				rc_aux3_sw = 0;
 				printf("RC AUX3 switch LOW.\n");
 			}
+			else if (bSonarDispOptionsExtendedMenu) {}
+			else if (bOSDDispOptionsExtendedMenu) {}
+			else if (bOtherOptionsExtendedMenu) {}
 			break;
 #ifdef _WIN32
 		case 13: // ENTER
@@ -901,6 +944,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bColorsExtendedMenu) bColorsExtendedMenu = FALSE;
 				else if (bCISCREAOSDExtendedMenu) bCISCREAOSDExtendedMenu = FALSE;
 				else if (bMAVLinkOSDExtendedMenu) bMAVLinkOSDExtendedMenu = FALSE;
+				else if (bSonarDispOptionsExtendedMenu) bSonarDispOptionsExtendedMenu = FALSE;
 				else if (bOSDDispOptionsExtendedMenu) bOSDDispOptionsExtendedMenu = FALSE;
 				else if (bOtherOptionsExtendedMenu) bOtherOptionsExtendedMenu = FALSE;
 				else bExtendedMenu = FALSE;
@@ -959,6 +1003,70 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[3] MAP (%03u,%03u,%03u)", (unsigned int)colormap.val[2], (unsigned int)colormap.val[1], (unsigned int)colormap.val[0]);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[ENTER] EXIT");
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+			}
+			else if (bSonarDispOptionsExtendedMenu)
+			{
+				offset = 0;
+				offset += 16;
+				strcpy(szText, "EXTENDED MENU\\SONAR DISP OPTIONS");
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				//sprintf(szText, "[1] IMAGE TYPE (%d)", (int)(fSeanetOverlayImg & SONAR_IMG_TYPE_MASK));
+				switch (fSeanetOverlayImg & SONAR_IMG_TYPE_MASK)
+				{
+				case SONAR_IMG_NORMAL:
+					strcpy(szText, "[1] IMAGE TYPE (NORMAL)");
+					break;
+				case SONAR_IMG_WATERFALL:
+					strcpy(szText, "[1] IMAGE TYPE (WATERFALL)");
+					break;
+				default:
+					strcpy(szText, "[1] IMAGE TYPE (N/A)");
+					break;
+				}
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				//sprintf(szText, "[2] IMAGE DISTANCES (%d)", (int)(fSeanetOverlayImg & SONAR_IMG_DISTANCES_MASK));
+				switch (fSeanetOverlayImg & SONAR_IMG_DISTANCES_MASK)
+				{
+				case SONAR_IMG_FIRST_DISTANCES:
+					strcpy(szText, "[2] IMAGE DISTANCES (FIRST)");
+					break;
+				case SONAR_IMG_ALL_DISTANCES:
+					strcpy(szText, "[2] IMAGE DISTANCES (ALL)");
+					break;
+				default:
+					strcpy(szText, "[2] IMAGE DISTANCES (N/A)");
+					break;
+				}
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				//sprintf(szText, "[3] IMAGE CORRECTIONS (%d)", (int)(fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK));
+				switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
+				{
+				case SONAR_IMG_LEVER_ARMS:
+					strcpy(szText, "[3] IMG CORR (LVR ARM)");
+					break;
+				case SONAR_IMG_LEVER_ARMS_PSI:
+					strcpy(szText, "[3] IMG CORR (LVR ARM+PSI)");
+					break;
+				case SONAR_IMG_LEVER_ARMS_PSI_POS:
+					strcpy(szText, "[3] IMG CORR (LVR ARM+PSI POS)");
+					break;
+				case SONAR_IMG_LEVER_ARMS_HIST_PSI:
+					strcpy(szText, "[3] IMG CORR (LVR ARM+HIST PSI)");
+					break;
+				case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
+					strcpy(szText, "[3] IMG CORR (LVR ARM+HIST PSI POS)");
+					break;
+				default:
+					strcpy(szText, "[3] IMG CORR (N/A)");
+					break;
+				}
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");
@@ -1033,10 +1141,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "[4] SHOW DETAILED INFO (%d)", (int)bStdOutDetailedInfo);
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				strcpy(szText, "[5] OSD DISP OPTIONS");
+				strcpy(szText, "[5] SONAR DISP OPTIONS");
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
-				strcpy(szText, "[6] OTHER OPTIONS");
+				strcpy(szText, "[6] OSD DISP OPTIONS");
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				strcpy(szText, "[7] OTHER OPTIONS");
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");

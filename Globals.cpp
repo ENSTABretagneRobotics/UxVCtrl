@@ -419,6 +419,7 @@ int AcousticCommandMDM = 0;
 BOOL bPauseMDM = FALSE, bRestartMDM = FALSE;
 
 // Seanet variables.
+int fSeanetOverlayImg = 0;
 CRITICAL_SECTION SeanetOverlayImgCS;
 #ifndef DISABLE_OPENCV_SUPPORT
 IplImage* SeanetOverlayImg = NULL;
@@ -433,6 +434,18 @@ BOOL bRestartBlueView[MAX_NB_BLUEVIEW];
 BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;
 
 // RPLIDAR variables.
+//int fRPLIDAROverlayImg = 0;
+//deque<double> alpha_RPLIDAR;
+//deque< vector<interval> > d_RPLIDAR;
+//deque<double> t_hist_RPLIDAR;
+//deque<interval> xhat_hist_RPLIDAR;
+//deque<interval> yhat_hist_RPLIDAR;
+//deque<interval> psihat_hist_RPLIDAR;
+//deque<interval> vrxhat_hist_RPLIDAR;
+//CRITICAL_SECTION RPLIDAROverlayImgCS;
+//#ifndef DISABLE_OPENCV_SUPPORT
+//IplImage* RPLIDAROverlayImg = NULL;
+//#endif // !DISABLE_OPENCV_SUPPORT
 BOOL bPauseRPLIDAR = FALSE, bRestartRPLIDAR = FALSE;
 
 // MS580314BA variables.

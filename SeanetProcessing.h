@@ -45,11 +45,11 @@ inline void DrawObstacleDistError(double x, double y, double alpha, double d, do
 		color, 1, 1, 0);
 }
 
-inline void DrawSeanetScreenshot(double theta, double StepAngleSize, int NBins, unsigned char ADLow, unsigned char ADSpan, int adc8on, IplImage* img)
+inline void DrawSonar(double x, double y, double psi, double StepAngleSize, int NBins, unsigned char ADLow, unsigned char ADSpan, int adc8on, IplImage* img)
 {
 	COORDSYSTEM2IMG csMap2Img;
 	int i = 0, j = 0;
-	double x = 0, y = 0;
+	double x0 = 0, y0 = 0;
 	unsigned char r = 0, g = 0, b = 0;
 	unsigned char* imgdata = (unsigned char*)img->imageData;
 
@@ -59,11 +59,13 @@ inline void DrawSeanetScreenshot(double theta, double StepAngleSize, int NBins, 
 	{
 		for (j = videoimgwidth-1; j >= 0; j--)
 		{
-			IJImg2XYCS(&csMap2Img, i, j, &x, &y);
+			IJImg2XYCS(&csMap2Img, i, j, &x0, &y0);
 
-			int bin = (int)(sqrt(sqr(x)+sqr(y))*NBins/rangescale);
+			x0 += x; y0 += y;
+
+			int bin = (int)(sqrt(sqr(x0)+sqr(y0))*NBins/rangescale);
 			if (bin >= NBins) continue;
-			double angle = (fmod_2PI(-(atan2(y,x)-theta-Center(alphashat))/sdir-M_PI)+M_PI)*180.0/M_PI;
+			double angle = (fmod_2PI(-(atan2(y0,x0)-psi-Center(alphashat))/sdir-M_PI)+M_PI)*180.0/M_PI;
 
 			r = g = b = DynamicRangeControl(wtfasort[(int)(angle/StepAngleSize)*NBins+bin], ADLow, ADSpan, adc8on);
 			//Gray2RGB_Seanet(DynamicRangeControl(wtfasort[(int)(angle/StepAngleSize)*NBins+bin], ADLow, ADSpan, adc8on), &r, &g, &b);
@@ -75,6 +77,28 @@ inline void DrawSeanetScreenshot(double theta, double StepAngleSize, int NBins, 
 	}
 }
 
+inline void DrawSonarWaterfall(int NSteps, int NBins, unsigned char ADLow, unsigned char ADSpan, int adc8on, IplImage* img)
+{
+	int i = 0, j = 0;
+	unsigned char r = 0, g = 0, b = 0;
+	unsigned char* imgdata = (unsigned char*)img->imageData;
+
+	for (i = videoimgheight-1; i >= 0; i--)
+	{
+		for (j = videoimgwidth-1; j >= 0; j--)
+		{
+			int bin = (int)(j*NBins/videoimgwidth);
+			if (bin >= NBins) continue;
+
+			r = g = b = DynamicRangeControl(wtftsort[(int)(NSteps*i/videoimgheight)*NBins+bin], ADLow, ADSpan, adc8on);
+			//Gray2RGB_Seanet(DynamicRangeControl(wtftsort[(int)(NSteps*i/videoimgheight)*NBins+bin], ADLow, ADSpan, adc8on), &r, &g, &b);
+			int index = i*img->widthStep+j*img->nChannels;
+			imgdata[index+0] = b;
+			imgdata[index+1] = g;
+			imgdata[index+2] = r;
+		}
+	}
+}
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
 #pragma warning(default : 4459) 
