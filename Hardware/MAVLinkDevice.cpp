@@ -234,9 +234,9 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						ComputeGNSSPosition(mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0,
 							GNSSqualityMAVLinkDevice[deviceid],
 							(mavlinkdata.gps_raw_int.satellites_visible == 255? 0: mavlinkdata.gps_raw_int.satellites_visible),
-							(mavlinkdata.gps_raw_int.eph == UINT16_MAX? 0: mavlinkdata.gps_raw_int.eph)/100.0);
-						sog = (mavlinkdata.gps_raw_int.vel == UINT16_MAX? 0: mavlinkdata.gps_raw_int.vel)/100.0;
-						cog_deg = (mavlinkdata.gps_raw_int.cog == UINT16_MAX? 0: mavlinkdata.gps_raw_int.cog)/100.0;
+							(mavlinkdata.gps_raw_int.eph == 65535? 0: mavlinkdata.gps_raw_int.eph)/100.0);
+						sog = (mavlinkdata.gps_raw_int.vel == 65535? 0: mavlinkdata.gps_raw_int.vel)/100.0;
+						cog_deg = (mavlinkdata.gps_raw_int.cog == 65535? 0: mavlinkdata.gps_raw_int.cog)/100.0;
 						psi_gps = fmod_2PI(M_PI/2.0-cog_deg*M_PI/180.0-angle_env)+interval(-M_PI,M_PI);
 					}
 
@@ -298,58 +298,58 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						switch (mavlinkdevice.overridechan)
 						{
 						case 1:
-							if (mavlinkdata.rc_channels.chan1_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan1_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan1_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan1_raw > 1750)? TRUE: FALSE;
 							break;
 						case 2:
-							if (mavlinkdata.rc_channels.chan2_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan2_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan2_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan2_raw > 1750)? TRUE: FALSE;
 							break;
 						case 3:
-							if (mavlinkdata.rc_channels.chan3_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan3_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan3_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan3_raw > 1750)? TRUE: FALSE;
 							break;
 						case 4:
-							if (mavlinkdata.rc_channels.chan4_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan4_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan4_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan4_raw > 1750)? TRUE: FALSE;
 							break;
 						case 5:
-							if (mavlinkdata.rc_channels.chan5_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan5_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan5_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan5_raw > 1750)? TRUE: FALSE;
 							break;
 						case 6:
-							if (mavlinkdata.rc_channels.chan6_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan6_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan6_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan6_raw > 1750)? TRUE: FALSE;
 							break;
 						case 7:
-							if (mavlinkdata.rc_channels.chan7_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan7_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan7_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan7_raw > 1750)? TRUE: FALSE;
 							break;
 						case 8:
-							if (mavlinkdata.rc_channels.chan8_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan8_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan8_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan8_raw > 1750)? TRUE: FALSE;
 							break;
 						case 9:
-							if (mavlinkdata.rc_channels.chan9_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan9_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan9_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan9_raw > 1750)? TRUE: FALSE;
 							break;
 						case 10:
-							if (mavlinkdata.rc_channels.chan10_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan10_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan10_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan10_raw > 1750)? TRUE: FALSE;
 							break;
 						case 11:
-							if (mavlinkdata.rc_channels.chan11_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan11_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan11_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan11_raw > 1750)? TRUE: FALSE;
 							break;
 						case 12:
-							if (mavlinkdata.rc_channels.chan12_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan12_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan12_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan12_raw > 1750)? TRUE: FALSE;
 							break;
 						case 13:
-							if (mavlinkdata.rc_channels.chan13_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan13_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan13_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan13_raw > 1750)? TRUE: FALSE;
 							break;
 						case 14:
-							if (mavlinkdata.rc_channels.chan14_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan14_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan14_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan14_raw > 1750)? TRUE: FALSE;
 							break;
 						case 15:
-							if (mavlinkdata.rc_channels.chan15_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan15_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan15_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan15_raw > 1750)? TRUE: FALSE;
 							break;
 						case 16:
-							if (mavlinkdata.rc_channels.chan16_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan16_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan16_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan16_raw > 1750)? TRUE: FALSE;
 							break;
 						case 17:
-							if (mavlinkdata.rc_channels.chan17_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan17_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan17_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan17_raw > 1750)? TRUE: FALSE;
 							break;
 						case 18:
-							if (mavlinkdata.rc_channels.chan18_raw != UINT16_MAX) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan18_raw > 1750)? TRUE: FALSE;
+							if (mavlinkdata.rc_channels.chan18_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan18_raw > 1750)? TRUE: FALSE;
 							break;
 						default:
 							break;
@@ -576,7 +576,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							joystick_buttons = 0;
 							LeaveCriticalSection(&StateVariablesCS);
 
-							if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
+							if (ManualControlMAVLinkDevice(&mavlinkdevice, 32767, 32767, 32767, 32767, buttons) != EXIT_SUCCESS)
 							{
 								printf("Connection to a MAVLinkDevice lost.\n");
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
@@ -694,7 +694,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							joystick_buttons = 0;
 							LeaveCriticalSection(&StateVariablesCS);
 
-							if (ManualControlMAVLinkDevice(&mavlinkdevice, INT16_MAX, INT16_MAX, INT16_MAX, INT16_MAX, buttons) != EXIT_SUCCESS)
+							if (ManualControlMAVLinkDevice(&mavlinkdevice, 32767, 32767, 32767, 32767, buttons) != EXIT_SUCCESS)
 							{
 								printf("Connection to a MAVLinkDevice lost.\n");
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;

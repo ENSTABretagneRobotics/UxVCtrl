@@ -93,6 +93,13 @@
 #include <valgrind/memcheck.h>
 #endif // !defined(_WIN32) && defined(ENABLE_VALGRIND_DEBUG)
 
+#ifdef _WIN32
+#ifdef _MSC_VER
+// Disable some Visual Studio warnings.
+#pragma warning(disable : 4701) 
+#endif // _MSC_VER
+#endif // _WIN32
+
 int main(int argc, char* argv[])
 {
 	int i = 0;

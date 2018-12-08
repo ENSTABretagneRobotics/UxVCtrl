@@ -964,14 +964,14 @@ REQ_DATA_STREAM...
 	else
 	{
 		gps_raw_int.fix_type = GPS_FIX_TYPE_NO_FIX;
-		gps_raw_int.vel = UINT16_MAX;
-		gps_raw_int.cog = UINT16_MAX;
+		gps_raw_int.vel = 65535;
+		gps_raw_int.cog = 65535;
 	}
 	gps_raw_int.lat = (int32_t)(lathat*10000000.0);
 	gps_raw_int.lon = (int32_t)(longhat*10000000.0);
 	gps_raw_int.alt = (int32_t)(althat*1000.0);
-	gps_raw_int.eph = UINT16_MAX;
-	gps_raw_int.epv = UINT16_MAX;
+	gps_raw_int.eph = 65535;
+	gps_raw_int.epv = 65535;
 	gps_raw_int.satellites_visible = 255;
 
 	memset(&attitude, 0, sizeof(mavlink_attitude_t));

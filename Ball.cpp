@@ -563,12 +563,20 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(snapfilename, "pic_%.64s.jpg", strtime_pic);
 				sprintf(picsnapfilename, PIC_FOLDER"pic_%.64s.jpg", strtime_pic);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				if (!cvSaveImage(picsnapfilename, image, 0))
+#else
+				if (!cv::imwrite(picsnapfilename, cv::cvarrToMat(image)))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				{
 					printf("Error saving a picture file.\n");
 				}
 				sprintf(dtcfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				if (!cvSaveImage(dtcfilename, overlayimage, 0))
+#else
+				if (!cv::imwrite(dtcfilename, cv::cvarrToMat(overlayimage)))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				{
 					printf("Error saving a picture file.\n");
 				}

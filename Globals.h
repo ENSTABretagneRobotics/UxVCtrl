@@ -974,7 +974,11 @@ inline void Snapshot(void)
 			sprintf(snapfilename, "snap%d_%.64s.png", i, strtime_snap);
 			sprintf(picsnapfilename, PIC_FOLDER"snap%d_%.64s.png", i, strtime_snap);
 			EnterCriticalSection(&imgsCS[i]);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 			if (!cvSaveImage(picsnapfilename, imgs[i], 0))
+#else
+			if (!cv::imwrite(picsnapfilename, cv::cvarrToMat(imgs[i])))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			{
 				printf("Error saving a snapshot file.\n");
 			}
