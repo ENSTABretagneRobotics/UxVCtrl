@@ -934,11 +934,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else if (bOSDDispOptionsExtendedMenu) {}
 			else if (bOtherOptionsExtendedMenu) {}
 			break;
-#ifdef _WIN32
-		case 13: // ENTER
-#else
-		case 10: // ENTER
-#endif // _WIN32
+		case CV_KEY_CODE_ENTER:
 			if (bExtendedMenu)
 			{
 				if (bColorsExtendedMenu) bColorsExtendedMenu = FALSE;

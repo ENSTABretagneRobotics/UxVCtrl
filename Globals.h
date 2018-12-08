@@ -17,7 +17,8 @@
 #include "RS232Port.h"
 #include "CoordSystem2Img.h"
 #ifndef DISABLE_OPENCV_SUPPORT
-#include "CvUtils.h"
+#include "CvDraw.h"
+#include "CvProc.h"
 #ifdef ENABLE_CVKINECT2SDKHOOK
 #ifndef INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
 #define INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK

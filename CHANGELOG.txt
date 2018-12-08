@@ -1,3 +1,6 @@
+276
+Improved compatibility with OpenCV 4.0.0.
+
 275
 Updated Visual Studio 2017 project files target platform.
 Improved compatibility with GCC.

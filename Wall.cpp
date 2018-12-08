@@ -163,7 +163,11 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			strcpy(strtime_pic, strtime_fns());
 			LeaveCriticalSection(&strtimeCS);
 			sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 			if (!cvSaveImage(picfilename, overlayimage, 0))
+#else
+			if (!cv::imwrite(picfilename, cv::cvarrToMat(overlayimage)))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			{
 				printf("Error saving a picture file.\n");
 			}
@@ -196,7 +200,11 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 				strcpy(strtime_pic, strtime_fns());
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				if (!cvSaveImage(picfilename, overlayimage, 0))
+#else
+				if (!cv::imwrite(picfilename, cv::cvarrToMat(overlayimage)))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				{
 					printf("Error saving a picture file.\n");
 				}
@@ -229,7 +237,11 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 				strcpy(strtime_pic, strtime_fns());
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 				if (!cvSaveImage(picfilename, overlayimage, 0))
+#else
+				if (!cv::imwrite(picfilename, cv::cvarrToMat(overlayimage)))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				{
 					printf("Error saving a picture file.\n");
 				}

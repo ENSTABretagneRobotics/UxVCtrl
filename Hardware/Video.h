@@ -454,7 +454,13 @@ inline int recvdecode(VIDEO* pVideo)
 			return EXIT_FAILURE;
 		}
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		imagenew = cvDecodeImage(mat, CV_LOAD_IMAGE_COLOR);
+#else
+		cv::Mat _matnew = cv::imdecode(cv::cvarrToMat(mat), cv::IMREAD_COLOR);
+		IplImage _imagenew = _matnew;
+		imagenew = &_imagenew;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		if (imagenew == NULL)
 		{
 			printf("cvDecodeImage() failed.\n");
@@ -543,7 +549,13 @@ inline int recvdecode(VIDEO* pVideo)
 			return EXIT_FAILURE;
 		}
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		imagenew = cvDecodeImage(mat, CV_LOAD_IMAGE_COLOR);
+#else
+		cv::Mat _matnew = cv::imdecode(cv::cvarrToMat(mat), cv::IMREAD_COLOR);
+		IplImage _imagenew = _matnew;
+		imagenew = &_imagenew;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		if (imagenew == NULL)
 		{
 			printf("cvDecodeImage() failed.\n");
