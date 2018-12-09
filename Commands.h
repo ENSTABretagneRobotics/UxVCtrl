@@ -1006,7 +1006,49 @@ inline int Commands(char* line)
 	}
 	else 
 #endif // !DISABLE_OPENCV_SUPPORT
-	if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
+	if (sscanf(line, "externalprogramtriggerconfig %255s %d %d %d %d %d", str, &ival1, &ival2, &ival3, &ival4, &ival) == 6)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
+		{
+			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
+			memset(ExternalProgramTriggerFileName[ival], 0, MAX_BUF_LEN);
+			strcpy(ExternalProgramTriggerFileName[ival], str);
+			period_externalprogramtrigger[ival] = ival1; retrydelay_externalprogramtrigger[ival] = ival2; nbretries_externalprogramtrigger[ival] = ival3; procid_externalprogramtrigger[ival] = ival4;
+			bExternalProgramTriggerDetected[ival] = FALSE;
+			LeaveCriticalSection(&ExternalProgramTriggerCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "enableexternalprogramtrigger %d", &ival) == 1)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
+		{
+			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
+			bExternalProgramTrigger[ival] = TRUE;
+			LeaveCriticalSection(&ExternalProgramTriggerCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "disableexternalprogramtrigger %d", &ival) == 1)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
+		{
+			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
+			bExternalProgramTrigger[ival] = FALSE;
+			LeaveCriticalSection(&ExternalProgramTriggerCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
 	{
 		EnterCriticalSection(&FollowMeCS);
 		dmin_followme = dval1; dmax_followme = dval2; uidle_followme = dval3; umin_followme = dval4; umax_followme = dval5; spaceperiod_followme = dval6; forbidlat_followme = dval7; forbidlong_followme = dval8; forbidalt_followme = dval9; forbidradius_followme = dval10; target_followme = ival1; mode_followme = ival2; bDepth_followme = ival3;

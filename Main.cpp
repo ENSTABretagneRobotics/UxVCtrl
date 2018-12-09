@@ -30,6 +30,7 @@
 #include "SurfaceVisualObstacle.h"
 #include "Pinger.h"
 #endif // !DISABLE_OPENCV_SUPPORT
+#include "ExternalProgramTrigger.h"
 #include "FollowMe.h"
 #include "Simulator.h"
 #include "PathfinderDVL.h"
@@ -127,6 +128,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
 #endif // !DISABLE_OPENCV_SUPPORT
+	THREAD_IDENTIFIER ExternalProgramTriggerThreadId[MAX_NB_EXTERNALPROGRAMTRIGGER];
 	THREAD_IDENTIFIER FollowMeThreadId;
 	THREAD_IDENTIFIER SimulatorThreadId;
 	THREAD_IDENTIFIER PathfinderDVLThreadId;
@@ -255,6 +257,10 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
+	for (i = 0; i < MAX_NB_EXTERNALPROGRAMTRIGGER; i++)
+	{
+		CreateDefaultThread(ExternalProgramTriggerThread, (void*)(intptr_t)i, &ExternalProgramTriggerThreadId[i]);
+	}
 	CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
 	if (!bDisablePathfinderDVL) CreateDefaultThread(PathfinderDVLThread, NULL, &PathfinderDVLThreadId);
@@ -481,6 +487,10 @@ int main(int argc, char* argv[])
 	if (!bDisablePathfinderDVL) WaitForThread(PathfinderDVLThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) WaitForThread(SimulatorThreadId);
 	WaitForThread(FollowMeThreadId);
+	for (i = MAX_NB_EXTERNALPROGRAMTRIGGER-1; i >= 0; i--)
+	{
+		WaitForThread(ExternalProgramTriggerThreadId[i]);
+	}
 #ifndef DISABLE_OPENCV_SUPPORT
 	WaitForThread(PingerThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);

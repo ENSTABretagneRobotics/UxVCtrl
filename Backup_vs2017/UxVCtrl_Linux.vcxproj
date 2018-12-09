@@ -76,6 +76,7 @@
     <ClCompile Include="Computations.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="ExternalProgramTrigger.cpp" />
     <ClCompile Include="ExternalVisualLocalization.cpp" />
     <ClCompile Include="FollowMe.cpp" />
     <ClCompile Include="Globals.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Computations.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="ExternalProgramTrigger.h" />
     <ClInclude Include="ExternalVisualLocalization.h" />
     <ClInclude Include="FollowMe.h" />
     <ClInclude Include="Globals.h" />

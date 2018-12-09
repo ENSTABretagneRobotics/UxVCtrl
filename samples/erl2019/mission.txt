@@ -1,0 +1,67 @@
+
+procedure 0
+% check entrance 1 and 2 also, but do not try to enter
+%goto...
+% waypoints from entrance 0 with obs avoid, and back to start
+%goto...
+abort
+return
+
+procedure 1
+% check entrance 2 also, but do not try to enter
+%goto...
+% waypoints from entrance 1 with obs avoid, and back to start
+%goto...
+% end of the mission
+abort
+return
+
+procedure 2
+% waypoints from entrance 2 with obs avoid, and back to start
+%goto...
+% end of the mission
+abort
+return
+
+procedure 5
+% waypoints to check entrance 1
+%goto...
+% Wait in front of entrance 1 and try to detect
+externalprogramtriggerconfig trig1.txt 1 1
+enableexternalprogramtrigger 1
+% wait and move around it...
+%wait, goto...
+disableexternalprogramtrigger 1
+return
+
+procedure 6
+% waypoints to check entrance 2
+%goto...
+% Wait in front of entrance 1 and try to detect
+externalprogramtriggerconfig trig2.txt 2 2
+enableexternalprogramtrigger 2
+% wait and move around it...
+%wait, goto...
+disableexternalprogramtrigger 2
+return
+
+% waypoints from start to entrances with obs avoid
+%goto...
+
+% waypoints to check entrance 0
+%goto...
+% Wait in front of entrance 0 and try to detect
+externalprogramtriggerconfig trig0.txt 0 0
+enableexternalprogramtrigger 0
+% wait and move around it...
+%wait, goto...
+disableexternalprogramtrigger 0
+
+% if no trigger, choose next entrance...
+execute 5
+
+% if no trigger, choose next entrance...
+execute 6
+
+% if no trigger, choose the entrance in the middle and hope that obs avoid will make the robot go inside the building from where it is possible...
+%goto

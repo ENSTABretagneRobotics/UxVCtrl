@@ -1,3 +1,6 @@
+277
+Added ExternalProgramTrigger.cpp.
+
 276
 Improved compatibility with OpenCV 4.0.0.
 

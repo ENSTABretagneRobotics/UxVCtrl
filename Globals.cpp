@@ -378,6 +378,16 @@ double u_pinger = 0;
 BOOL bPingerFound = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 
+// ExternalProgramTrigger variables.
+BOOL bExternalProgramTrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+CRITICAL_SECTION ExternalProgramTriggerCS[MAX_NB_EXTERNALPROGRAMTRIGGER];
+char ExternalProgramTriggerFileName[MAX_NB_EXTERNALPROGRAMTRIGGER][MAX_BUF_LEN];
+int period_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+int retrydelay_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+int nbretries_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+int procid_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+BOOL bExternalProgramTriggerDetected[MAX_NB_EXTERNALPROGRAMTRIGGER];
+
 // Follow me variables.
 BOOL bFollowMeTrackingControl = FALSE;
 CRITICAL_SECTION FollowMeCS;

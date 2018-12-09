@@ -33,6 +33,10 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 	memset(&ublox, 0, sizeof(UBLOX));
 
+	memset(&nmeadata, 0, sizeof(nmeadata));
+	memset(&ubxdata, 0, sizeof(ubxdata));
+	memset(rtcmdata, 0, sizeof(rtcmdata));
+
 	GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 
 	StartChrono(&chrono_svin);

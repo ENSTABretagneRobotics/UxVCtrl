@@ -131,6 +131,8 @@ typedef enum KEYS KEYS;
 #define MAX_NB_MAVLINKDEVICE 2
 #define MAX_NB_POLOLU 3
 
+#define MAX_NB_EXTERNALPROGRAMTRIGGER 8
+
 #define MAX_NB_WP 1024
 
 #define MAX_CFGFILE_SIZE 16384
@@ -589,6 +591,16 @@ extern int bUseFile_pinger;
 extern double u_pinger;
 extern BOOL bPingerFound;
 #endif // !DISABLE_OPENCV_SUPPORT
+
+// ExternalProgramTrigger variables.
+extern BOOL bExternalProgramTrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+extern CRITICAL_SECTION ExternalProgramTriggerCS[MAX_NB_EXTERNALPROGRAMTRIGGER];
+extern char ExternalProgramTriggerFileName[MAX_NB_EXTERNALPROGRAMTRIGGER][MAX_BUF_LEN];
+extern int period_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+extern int retrydelay_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+extern int nbretries_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+extern int procid_externalprogramtrigger[MAX_NB_EXTERNALPROGRAMTRIGGER];
+extern BOOL bExternalProgramTriggerDetected[MAX_NB_EXTERNALPROGRAMTRIGGER];
 
 // Follow me variables.
 extern BOOL bFollowMeTrackingControl;
@@ -1089,56 +1101,76 @@ inline int InitGlobals(void)
 		dispimgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
 	}
+#endif // !DISABLE_OPENCV_SUPPORT
 
+	InitCriticalSection(&SonarAltitudeEstimationCS);
+
+#ifndef DISABLE_OPENCV_SUPPORT
+	InitCriticalSection(&ExternalVisualLocalizationCS);
+	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	ExternalVisualLocalizationOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(ExternalVisualLocalizationOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	InitCriticalSection(&WallCS);
+	InitCriticalSection(&WallOverlayImgCS);
 	WallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(WallOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	InitCriticalSection(&BallCS);
+	InitCriticalSection(&BallOverlayImgCS);
 	BallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(BallOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	InitCriticalSection(&VisualObstacleCS);
+	InitCriticalSection(&VisualObstacleOverlayImgCS);
 	VisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(VisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	InitCriticalSection(&SurfaceVisualObstacleCS);
+	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	SurfaceVisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 
+	InitCriticalSection(&PingerCS);
+	InitCriticalSection(&PingerOverlayImgCS);
 	PingerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
+#endif // !DISABLE_OPENCV_SUPPORT
 
+	for (i = 0; i < MAX_NB_EXTERNALPROGRAMTRIGGER; i++)
+	{
+		bExternalProgramTrigger[i] = FALSE;
+		InitCriticalSection(&ExternalProgramTriggerCS[i]);
+		memset(ExternalProgramTriggerFileName[i], 0, MAX_BUF_LEN);
+		period_externalprogramtrigger[i] = 100;
+		retrydelay_externalprogramtrigger[i] = 100;
+		nbretries_externalprogramtrigger[i] = -1;
+		procid_externalprogramtrigger[i] = -1;
+		bExternalProgramTriggerDetected[i] = FALSE;
+	}
+
+	InitCriticalSection(&FollowMeCS);
+
+	InitCriticalSection(&MDMCS);
+
+	InitCriticalSection(&SeanetOverlayImgCS);
+	InitCriticalSection(&SeanetConnectingCS);
+	InitCriticalSection(&SeanetDataCS);
+#ifndef DISABLE_OPENCV_SUPPORT
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
 	colorsonarlidar = CV_RGB(0, 0, 255);
 	fSeanetOverlayImg = SONAR_IMG_LEVER_ARMS|SONAR_IMG_ALL_DISTANCES|SONAR_IMG_NORMAL;
 #endif // !DISABLE_OPENCV_SUPPORT
 
-	InitCriticalSection(&SonarAltitudeEstimationCS);
-#ifndef DISABLE_OPENCV_SUPPORT
-	InitCriticalSection(&ExternalVisualLocalizationCS);
-	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-	InitCriticalSection(&WallCS);
-	InitCriticalSection(&WallOverlayImgCS);
-	InitCriticalSection(&BallCS);
-	InitCriticalSection(&BallOverlayImgCS);
-	InitCriticalSection(&VisualObstacleCS);
-	InitCriticalSection(&VisualObstacleOverlayImgCS);
-	InitCriticalSection(&SurfaceVisualObstacleCS);
-	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-	InitCriticalSection(&PingerCS);
-	InitCriticalSection(&PingerOverlayImgCS);
-#endif // !DISABLE_OPENCV_SUPPORT
-	InitCriticalSection(&FollowMeCS);
-	InitCriticalSection(&MDMCS);
-	InitCriticalSection(&SeanetOverlayImgCS);
-	InitCriticalSection(&SeanetConnectingCS);
-	InitCriticalSection(&SeanetDataCS);
 	InitCriticalSection(&StateVariablesCS);
+
 	InitCriticalSection(&MissionFilesCS);
+
 	InitCriticalSection(&OpenCVGUICS);
 	InitCriticalSection(&OpenCVVideoCS);
 	InitCriticalSection(&OpenCVVideoRecordCS);
+
 	InitCriticalSection(&strtimeCS);
 
 	StartChrono(&chrono_mission);
@@ -1185,47 +1217,60 @@ inline int ReleaseGlobals(void)
 	memset(wpsalt, 0, MAX_NB_WP*sizeof(double));
 
 	DeleteCriticalSection(&strtimeCS);
+
 	DeleteCriticalSection(&OpenCVVideoRecordCS);
 	DeleteCriticalSection(&OpenCVVideoCS);
 	DeleteCriticalSection(&OpenCVGUICS);
+
 	DeleteCriticalSection(&MissionFilesCS);
+
 	DeleteCriticalSection(&StateVariablesCS);
-	DeleteCriticalSection(&SeanetDataCS);
-	DeleteCriticalSection(&SeanetConnectingCS);
-	DeleteCriticalSection(&SeanetOverlayImgCS);
-	DeleteCriticalSection(&MDMCS);
-	DeleteCriticalSection(&FollowMeCS);
-#ifndef DISABLE_OPENCV_SUPPORT
-	DeleteCriticalSection(&PingerOverlayImgCS);
-	DeleteCriticalSection(&PingerCS);
-	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-	DeleteCriticalSection(&SurfaceVisualObstacleCS);
-	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
-	DeleteCriticalSection(&VisualObstacleCS);
-	DeleteCriticalSection(&BallOverlayImgCS);
-	DeleteCriticalSection(&BallCS);
-	DeleteCriticalSection(&WallOverlayImgCS);
-	DeleteCriticalSection(&WallCS);
-	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-	DeleteCriticalSection(&ExternalVisualLocalizationCS);
-#endif // !DISABLE_OPENCV_SUPPORT
-	DeleteCriticalSection(&SonarAltitudeEstimationCS);
 
 #ifndef DISABLE_OPENCV_SUPPORT
 	cvReleaseImage(&SeanetOverlayImg);
+#endif // !DISABLE_OPENCV_SUPPORT
+	DeleteCriticalSection(&SeanetDataCS);
+	DeleteCriticalSection(&SeanetConnectingCS);
+	DeleteCriticalSection(&SeanetOverlayImgCS);
 
+	DeleteCriticalSection(&MDMCS);
+
+	DeleteCriticalSection(&FollowMeCS);
+
+	for (i = MAX_NB_EXTERNALPROGRAMTRIGGER-1; i >= 0; i--)
+	{
+		DeleteCriticalSection(&ExternalProgramTriggerCS[i]);
+	}
+
+#ifndef DISABLE_OPENCV_SUPPORT
 	cvReleaseImage(&PingerOverlayImg);
+	DeleteCriticalSection(&PingerOverlayImgCS);
+	DeleteCriticalSection(&PingerCS);
 
 	cvReleaseImage(&SurfaceVisualObstacleOverlayImg);
+	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
+	DeleteCriticalSection(&SurfaceVisualObstacleCS);
 
 	cvReleaseImage(&VisualObstacleOverlayImg);
+	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
+	DeleteCriticalSection(&VisualObstacleCS);
 
 	cvReleaseImage(&BallOverlayImg);
+	DeleteCriticalSection(&BallOverlayImgCS);
+	DeleteCriticalSection(&BallCS);
 
 	cvReleaseImage(&WallOverlayImg);
+	DeleteCriticalSection(&WallOverlayImgCS);
+	DeleteCriticalSection(&WallCS);
 
 	cvReleaseImage(&ExternalVisualLocalizationOverlayImg);
+	DeleteCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
+	DeleteCriticalSection(&ExternalVisualLocalizationCS);
+#endif // !DISABLE_OPENCV_SUPPORT
 
+	DeleteCriticalSection(&SonarAltitudeEstimationCS);
+
+#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = nbopencvgui-1; i >= 0; i--)
 	{
 		cvReleaseImage(&dispimgs[i]);

@@ -249,6 +249,9 @@
     <ClCompile Include="Hardware\Pololu.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="ExternalProgramTrigger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -595,6 +598,9 @@
     </ClInclude>
     <ClInclude Include="Hardware\Pololu.h">
       <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="ExternalProgramTrigger.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
