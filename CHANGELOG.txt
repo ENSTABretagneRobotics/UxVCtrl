@@ -1,3 +1,6 @@
+278
+Corrected CMakeLists.txt.
+
 277
 Added ExternalProgramTrigger.cpp.
 

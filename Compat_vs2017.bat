@@ -214,12 +214,6 @@
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClInclude Include=""Ball.h"" />" /replacestr "<ClInclude Include=""Ball.h""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClInclude>"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClCompile Include=""ExternalProgramTrigger.cpp"" />" /replacestr "<ClCompile Include=""ExternalProgramTrigger.cpp""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClCompile>"
-@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
-
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClInclude Include=""ExternalProgramTrigger.h"" />" /replacestr "<ClInclude Include=""ExternalProgramTrigger.h""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClInclude>"
-@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
-
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClCompile Include=""ExternalVisualLocalization.cpp"" />" /replacestr "<ClCompile Include=""ExternalVisualLocalization.cpp""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClCompile>"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
