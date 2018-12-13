@@ -1,3 +1,6 @@
+279
+Added regset, regprint, regeq and reglt commands.
+
 278
 Corrected CMakeLists.txt.
 

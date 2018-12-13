@@ -47,7 +47,7 @@ séparer aussi la partie détection de lumière...?
 partager variables objDistance, etc.
 pouvoir activer la détection de plusieurs objets en même temps avec une id et un nom, comment gérer les actions, définir une priorité par objet?
 
-Avoir un autre algo que le followme standard ou paramètre supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
+Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
 
 Geofence command
 Obstacles list added by LIDAR or other things
@@ -80,7 +80,6 @@ PololuInterfaceType
 missing BOATBOT robid...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
 wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
-mission.txt : prévoir e.g. 32 registres double pour pouvoir faire des conditions dessus
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
 
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?

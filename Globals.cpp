@@ -548,6 +548,7 @@ CRITICAL_SECTION MissionFilesCS;
 CRITICAL_SECTION OpenCVGUICS;
 CRITICAL_SECTION OpenCVVideoCS;
 CRITICAL_SECTION OpenCVVideoRecordCS;
+CRITICAL_SECTION RegistersCS;
 CRITICAL_SECTION strtimeCS;
 STATE state = INVALID_STATE;
 double vbat1 = 0; 
@@ -597,6 +598,7 @@ int procdefineaddrs[MAX_NB_PROCEDURES];
 int procreturnaddrs[MAX_NB_PROCEDURES];
 int procstackids[MAX_NB_PROCEDURES];
 int procstack = 0;
+double registers[MAX_NB_REGISTERS];
 char keys[NB_CONFIGURABLE_KEYS];
 
 #ifndef DISABLE_OPENCV_SUPPORT

@@ -121,6 +121,7 @@ typedef enum KEYS KEYS;
 
 #define MAX_NB_LABELS 256
 #define MAX_NB_PROCEDURES 256
+#define MAX_NB_REGISTERS 32
 
 #define MAX_NB_OPENCVGUI 5
 
@@ -750,6 +751,7 @@ extern CRITICAL_SECTION MissionFilesCS;
 extern CRITICAL_SECTION OpenCVGUICS;
 extern CRITICAL_SECTION OpenCVVideoCS;
 extern CRITICAL_SECTION OpenCVVideoRecordCS;
+extern CRITICAL_SECTION RegistersCS;
 extern CRITICAL_SECTION strtimeCS;
 extern STATE state;
 extern double vbat1;
@@ -799,6 +801,7 @@ extern int procdefineaddrs[MAX_NB_PROCEDURES];
 extern int procreturnaddrs[MAX_NB_PROCEDURES];
 extern int procstackids[MAX_NB_PROCEDURES];
 extern int procstack;
+extern double registers[MAX_NB_REGISTERS];
 extern char keys[NB_CONFIGURABLE_KEYS];
 
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -1171,6 +1174,8 @@ inline int InitGlobals(void)
 	InitCriticalSection(&OpenCVVideoCS);
 	InitCriticalSection(&OpenCVVideoRecordCS);
 
+	InitCriticalSection(&RegistersCS);
+
 	InitCriticalSection(&strtimeCS);
 
 	StartChrono(&chrono_mission);
@@ -1181,6 +1186,8 @@ inline int InitGlobals(void)
 	memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
 	memset(procstackids, 0, sizeof(procstackids));
 
+	memset(registers, 0, sizeof(registers));
+	
 	bDeleteRoute = TRUE;
 	nbwpstmp = 0;
 	memset(wpstmplat, 0, MAX_NB_WP*sizeof(double));
@@ -1217,6 +1224,8 @@ inline int ReleaseGlobals(void)
 	memset(wpsalt, 0, MAX_NB_WP*sizeof(double));
 
 	DeleteCriticalSection(&strtimeCS);
+
+	DeleteCriticalSection(&RegistersCS);
 
 	DeleteCriticalSection(&OpenCVVideoRecordCS);
 	DeleteCriticalSection(&OpenCVVideoCS);

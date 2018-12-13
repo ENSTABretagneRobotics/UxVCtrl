@@ -685,6 +685,7 @@ inline void ReturnProcedure(void)
 inline int Commands(char* line)
 {
 	BOOL bContinueElseIf1 = FALSE, bContinueElseIf2 = FALSE, bContinueElseIf3 = FALSE, bContinueElseIf4 = FALSE, bContinueElseIf5 = FALSE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+	BOOL bval = FALSE;
 	double dval = 0, dval1 = 0, dval2 = 0, dval3 = 0, dval4 = 0, dval5 = 0, 
 		dval6 = 0, dval7 = 0, dval8 = 0, dval9 = 0, dval10 = 0, dval11 = 0, dval12 = 0; 
 	int i = 0, ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0;
@@ -3459,6 +3460,90 @@ inline int Commands(char* line)
 	else if (strncmp(line, "exit", strlen("exit")) == 0)
 	{
 		bExit = TRUE;
+	}
+	else if (sscanf(line, "regset %d %lf", &ival, &dval) == 2)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = dval;
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regprint %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			printf("%f\n", registers[ival]);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regeq %d %d %d %d", &ival1, &ival2, &ival3, &ival4) == 4)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			bval = (fabs(registers[ival1]-registers[ival2]) < 0.0000000001);
+			LeaveCriticalSection(&RegistersCS);
+			if (bval)
+			{
+				if (ival3 != -1)
+				{
+					if (bEcho) printf("execute %d\n", ival3);
+					ExecuteProcedure(ival3);
+				}
+			}
+			else
+			{
+				if (ival4 != -1)
+				{
+					if (bEcho) printf("execute %d\n", ival4);
+					ExecuteProcedure(ival4);
+				}
+			}
+		}
+	}
+	else if (sscanf(line, "reglt %d %d %d %d", &ival1, &ival2, &ival3, &ival4) == 4)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			bval = (registers[ival1] < registers[ival2]);
+			LeaveCriticalSection(&RegistersCS);
+			if (bval)
+			{
+				if (ival3 != -1)
+				{
+					if (bEcho) printf("execute %d\n", ival3);
+					ExecuteProcedure(ival3);
+				}
+			}
+			else
+			{
+				if (ival4 != -1)
+				{
+					if (bEcho) printf("execute %d\n", ival4);
+					ExecuteProcedure(ival4);
+				}
+			}
+		}
 	}
 	else if (strncmp(line, "help", strlen("help")) == 0)
 	{
