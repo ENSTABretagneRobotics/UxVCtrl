@@ -134,11 +134,22 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 		}
 		else
 		{
-			VideoRecordRequests[videoid] = 0; 
+			VideoRecordRequests[videoid] = 0;
 			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-			if (bVideoRecording) 
+			if (bVideoRecording)
 			{
 				DeleteTimer(&timer, FALSE);
+				strcpy(endvideorecordfilenames[videoid], videorecordfilenames[videoid]);
+				RemoveExtensionInFilePath(endvideorecordfilenames[videoid]);
+				strcat(endvideorecordfilenames[videoid], ".txt");
+				endvideorecordfiles[videoid] = fopen(endvideorecordfilenames[videoid], "w");
+				if (endvideorecordfiles[videoid])
+				{
+					EnterCriticalSection(&strtimeCS);
+					fprintf(endvideorecordfiles[videoid], "%.64s", strtime_fns());
+					LeaveCriticalSection(&strtimeCS);
+					fclose(endvideorecordfiles[videoid]);
+				}
 				mSleep(captureperiod);
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -155,9 +166,20 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 		if (bExit) break;
 	}
 
-	if (bVideoRecording) 
+	if (bVideoRecording)
 	{
 		DeleteTimer(&timer, FALSE);
+		strcpy(endvideorecordfilenames[videoid], videorecordfilenames[videoid]);
+		RemoveExtensionInFilePath(endvideorecordfilenames[videoid]);
+		strcat(endvideorecordfilenames[videoid], ".txt");
+		endvideorecordfiles[videoid] = fopen(endvideorecordfilenames[videoid], "w");
+		if (endvideorecordfiles[videoid])
+		{
+			EnterCriticalSection(&strtimeCS);
+			fprintf(endvideorecordfiles[videoid], "%.64s", strtime_fns());
+			LeaveCriticalSection(&strtimeCS);
+			fclose(endvideorecordfiles[videoid]);
+		}
 		mSleep(captureperiod);
 		EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API

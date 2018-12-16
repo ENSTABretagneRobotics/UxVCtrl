@@ -13,6 +13,9 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
+	FILE* logpingerfile = NULL;
+	char logpingerfilename[MAX_BUF_LEN];
+
 	// Estimated d to the object (in m).
 	//double objDistance = 0;
 	// Estimated bearing to the object (in rad).
@@ -30,20 +33,20 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logpingertaskfilename, LOG_FOLDER"logpingertask_%.64s.csv", strtime_fns());
+	sprintf(logpingerfilename, LOG_FOLDER"logpinger_%.64s.csv", strtime_fns());
 	LeaveCriticalSection(&strtimeCS);
-	logpingertaskfile = fopen(logpingertaskfilename, "w");
-	if (logpingertaskfile == NULL)
+	logpingerfile = fopen(logpingerfilename, "w");
+	if (logpingerfile == NULL)
 	{
 		printf("Unable to create log file.\n");
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
-	fprintf(logpingertaskfile, 
+	fprintf(logpingerfile, 
 		"%% Time (in s);Angle to the pinger (in deg);Angle error (in deg);Distance to the pinger (in m);Distance error (in m);\n"
 		); 
-	fflush(logpingertaskfile);
+	fflush(logpingerfile);
 
 	StartChrono(&chrono);
 
@@ -76,10 +79,10 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 					if (fclose(filedetect) != EXIT_SUCCESS) printf("fclose() failed.\n");
 				}
 
-				fprintf(logpingertaskfile, "%f;%f;%f;%f;%f;\n", 
+				fprintf(logpingerfile, "%f;%f;%f;%f;%f;\n", 
 					GetTimeElapsedChronoQuick(&chrono), pingerdir, pingerdirerr, pingerdist, pingerdisterr
 					);
-				fflush(logpingertaskfile);
+				fflush(logpingerfile);
 
 
 				objBearing = fmod_2PI_deg2rad(-pingerdir);
@@ -105,7 +108,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 	StopChronoQuick(&chrono);
 
-	fclose(logpingertaskfile);
+	fclose(logpingerfile);
 
 	cvReleaseImage(&overlayimage);
 

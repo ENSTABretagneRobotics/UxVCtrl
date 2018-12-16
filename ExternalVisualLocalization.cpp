@@ -13,6 +13,9 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
+	FILE* logexternalvisuallocalizationfile = NULL;
+	char logexternalvisuallocalizationfilename[MAX_BUF_LEN];
+
 	// Missing error checking...
 	int nbTotalPixels = videoimgwidth*videoimgheight;
 	// Used to detect the bounds of the detected object.
@@ -84,22 +87,22 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logexternalvisuallocalizationtaskfilename, LOG_FOLDER"logexternalvisuallocalizationtask_%.64s.csv", strtime_fns());
+	sprintf(logexternalvisuallocalizationfilename, LOG_FOLDER"logexternalvisuallocalization_%.64s.csv", strtime_fns());
 	LeaveCriticalSection(&strtimeCS);
-	logexternalvisuallocalizationtaskfile = fopen(logexternalvisuallocalizationtaskfilename, "w");
-	if (logexternalvisuallocalizationtaskfile == NULL)
+	logexternalvisuallocalizationfile = fopen(logexternalvisuallocalizationfilename, "w");
+	if (logexternalvisuallocalizationfile == NULL)
 	{
 		printf("Unable to create log file.\n");
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
-	fprintf(logexternalvisuallocalizationtaskfile, 
+	fprintf(logexternalvisuallocalizationfile, 
 		"%% Time (in s); Distance (in m); Bearing (in rad); Elevation (in rad); Radius (in pixels); Orientation (in rad); Orientation validity; "
 		"x position (in m); y position (in m); z position (in m); theta orientation (in rad); "
 		"Latitude (in decimal degrees); Longitude (in decimal degrees); Altitude (in m); Heading (in deg);\n"
 		); 
-	fflush(logexternalvisuallocalizationtaskfile);
+	fflush(logexternalvisuallocalizationfile);
 
 	StartChrono(&chrono);
 
@@ -488,12 +491,12 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 			LeaveCriticalSection(&StateVariablesCS);
 
-			fprintf(logexternalvisuallocalizationtaskfile, "%f;%f;%f;%f;%d;%f;%d;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
+			fprintf(logexternalvisuallocalizationfile, "%f;%f;%f;%f;%d;%f;%d;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
 				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, objRadius, objAngle, (int)bobjAngleValid, 
 				x_externalvisuallocalization, y_externalvisuallocalization, z_externalvisuallocalization, psi_externalvisuallocalization, 
 				lat_externalvisuallocalization, long_externalvisuallocalization, alt_externalvisuallocalization, heading_externalvisuallocalization
 				);
-			fflush(logexternalvisuallocalizationtaskfile);
+			fflush(logexternalvisuallocalizationfile);
 #pragma endregion
 		}
 		else
@@ -512,7 +515,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 	StopChronoQuick(&chrono);
 
-	fclose(logexternalvisuallocalizationtaskfile);
+	fclose(logexternalvisuallocalizationfile);
 
 	cvReleaseImage(&overlayimage);
 	cvReleaseImage(&image);

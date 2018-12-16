@@ -310,33 +310,33 @@ int procid_wall = 0;
 double u_wall = 0;
 
 // Ball variables.
-BOOL bBallTrackingControl = FALSE;
-CRITICAL_SECTION BallCS;
-CRITICAL_SECTION BallOverlayImgCS;
-IplImage* BallOverlayImg = NULL;
-int hmin_ball = 0, hmax_ball = 0, smin_ball = 0, smax_ball = 0, lmin_ball = 0, lmax_ball = 0;
-BOOL bHExclusive_ball = 0, bSExclusive_ball = 0, bLExclusive_ball = 0;
-int r_selpix_ball = 0, g_selpix_ball = 0, b_selpix_ball = 0; 
-double objMinRadiusRatio_ball = 0, objRealRadius_ball = 0, objMinDetectionRatio_ball = 0, objDetectionRatioDuration_ball = 0, d0_ball = 0; 
-double kh_ball = 0, kv_ball = 0;
-int lightMin_ball = 0;
-double lightPixRatio_ball = 0; 
-int bAcoustic_ball = 0;
-int bDepth_ball = 0;
-int camdir_ball = 0;
-int bDisableControl_ball = 0;
-int objtype_ball = 0; 
-double mindistproc_ball = 0;
-int procid_ball = 0;
-int videoid_ball = 0; 
-double u_ball = 0;
-double x_ball = 0, y_ball = 0, z_ball = 0;
-double psi_ball = 0;
-double lat_ball = 0, long_ball = 0, alt_ball = 0;
-double heading_ball = 0;
-double detectratio_ball = 0;
-BOOL bBallFound = FALSE;
-int lightStatus_ball = 0;
+BOOL bBallTrackingControl[MAX_NB_BALL];
+CRITICAL_SECTION BallCS[MAX_NB_BALL];
+CRITICAL_SECTION BallOverlayImgCS[MAX_NB_BALL];
+IplImage* BallOverlayImg[MAX_NB_BALL];
+int hmin_ball[MAX_NB_BALL], hmax_ball[MAX_NB_BALL], smin_ball[MAX_NB_BALL], smax_ball[MAX_NB_BALL], lmin_ball[MAX_NB_BALL], lmax_ball[MAX_NB_BALL];
+BOOL bHExclusive_ball[MAX_NB_BALL], bSExclusive_ball[MAX_NB_BALL], bLExclusive_ball[MAX_NB_BALL];
+int r_selpix_ball[MAX_NB_BALL], g_selpix_ball[MAX_NB_BALL], b_selpix_ball[MAX_NB_BALL]; 
+double objMinRadiusRatio_ball[MAX_NB_BALL], objRealRadius_ball[MAX_NB_BALL], objMinDetectionRatio_ball[MAX_NB_BALL], objDetectionRatioDuration_ball[MAX_NB_BALL], d0_ball[MAX_NB_BALL]; 
+double kh_ball[MAX_NB_BALL], kv_ball[MAX_NB_BALL];
+int lightMin_ball[MAX_NB_BALL];
+double lightPixRatio_ball[MAX_NB_BALL]; 
+int bAcoustic_ball[MAX_NB_BALL];
+int bDepth_ball[MAX_NB_BALL];
+int camdir_ball[MAX_NB_BALL];
+int bDisableControl_ball[MAX_NB_BALL];
+int objtype_ball[MAX_NB_BALL]; 
+double mindistproc_ball[MAX_NB_BALL];
+int procid_ball[MAX_NB_BALL];
+int videoid_ball[MAX_NB_BALL]; 
+double u_ball[MAX_NB_BALL];
+double x_ball[MAX_NB_BALL], y_ball[MAX_NB_BALL], z_ball[MAX_NB_BALL];
+double psi_ball[MAX_NB_BALL];
+double lat_ball[MAX_NB_BALL], long_ball[MAX_NB_BALL], alt_ball[MAX_NB_BALL];
+double heading_ball[MAX_NB_BALL];
+double detectratio_ball[MAX_NB_BALL];
+BOOL bBallFound[MAX_NB_BALL];
+int lightStatus_ball[MAX_NB_BALL];
 
 // Visual obstacle variables.
 BOOL bVisualObstacleDetection = FALSE;
@@ -609,6 +609,8 @@ cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
+FILE* endvideorecordfiles[MAX_NB_VIDEO];
+char endvideorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 FILE* missionfile = NULL;
 
@@ -623,24 +625,3 @@ char logmissionfilename[MAX_BUF_LEN];
 
 FILE* tlogfile = NULL;
 char tlogfilename[MAX_BUF_LEN];
-
-FILE* logexternalvisuallocalizationtaskfile = NULL;
-char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
-
-FILE* logwalltaskfile = NULL;
-char logwalltaskfilename[MAX_BUF_LEN];
-
-FILE* logpipelinetaskfile = NULL;
-char logpipelinetaskfilename[MAX_BUF_LEN];
-
-FILE* logballtaskfile = NULL;
-char logballtaskfilename[MAX_BUF_LEN];
-
-FILE* logpingertaskfile = NULL;
-char logpingertaskfilename[MAX_BUF_LEN];
-
-FILE* logmissingworkertaskfile = NULL;
-char logmissingworkertaskfilename[MAX_BUF_LEN];
-
-FILE* logfollowmetaskfile = NULL;
-char logfollowmetaskfilename[MAX_BUF_LEN];

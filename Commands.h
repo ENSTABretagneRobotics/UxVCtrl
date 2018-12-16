@@ -33,11 +33,16 @@ inline void DisableAllHorizontalControls(void)
 
 inline void DisableAllControls(void)
 {
+	int i = 0;
+
 	EnterCriticalSection(&StateVariablesCS);
 #ifndef DISABLE_OPENCV_SUPPORT
 	bWallTrackingControl = FALSE;
 	bWallAvoidanceControl = FALSE;
-	bBallTrackingControl = FALSE;
+	for (i = 0; i < MAX_NB_BALL; i++)
+	{
+		bBallTrackingControl[i] = FALSE;
+	}
 	bVisualObstacleAvoidanceControl = FALSE;
 	bSurfaceVisualObstacleAvoidanceControl = FALSE;
 	bPingerTrackingControl = FALSE;
@@ -791,59 +796,81 @@ inline int Commands(char* line)
 		"%lf %lf "
 		"%d %lf %d "
 		"%d %d %d %d %lf %d "
-		"%d", 
+		"%d %d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, &dval4, &dval5, 
 		&dval6, &dval7, 
 		&ival13, &dval8, &ival14, 
 		&ival15, &ival16, &ival17, &ival18, &dval9, &ival19, 
-		&ival20
-		) == 29)
+		&ival20, &ival
+		) == 30)
 	{
-		EnterCriticalSection(&BallCS);
-		hmin_ball = ival1; hmax_ball = ival2; smin_ball = ival3; smax_ball = ival4; lmin_ball = ival5; lmax_ball = ival6; 
-		bHExclusive_ball = ival7; bSExclusive_ball = ival8; bLExclusive_ball = ival9; r_selpix_ball = ival10; g_selpix_ball = ival11; b_selpix_ball = ival12; 
-		objMinRadiusRatio_ball = dval1; objRealRadius_ball = dval2; objMinDetectionRatio_ball = dval3; objDetectionRatioDuration_ball = (dval4 <= 0)? captureperiod: dval4; d0_ball = dval5; 
-		kh_ball = dval6; kv_ball = dval7; 
-		lightMin_ball = ival13; lightPixRatio_ball = dval8; bAcoustic_ball = ival14;
-		bDepth_ball = ival15; camdir_ball = ival16; bDisableControl_ball = ival17; objtype_ball = ival18; mindistproc_ball = dval9; procid_ball = ival19;
-		if ((ival20 >= 0)&&(ival20 < MAX_NB_VIDEO)&&(!bDisableVideo[ival20]))
+		if ((ival >= 0)&&(ival < MAX_NB_BALL))
 		{
-			videoid_ball = ival20;
+			EnterCriticalSection(&BallCS[ival]);
+			hmin_ball[ival] = ival1; hmax_ball[ival] = ival2; smin_ball[ival] = ival3; smax_ball[ival] = ival4; lmin_ball[ival] = ival5; lmax_ball[ival] = ival6;
+			bHExclusive_ball[ival] = ival7; bSExclusive_ball[ival] = ival8; bLExclusive_ball[ival] = ival9; r_selpix_ball[ival] = ival10; g_selpix_ball[ival] = ival11; b_selpix_ball[ival] = ival12;
+			objMinRadiusRatio_ball[ival] = dval1; objRealRadius_ball[ival] = dval2; objMinDetectionRatio_ball[ival] = dval3; objDetectionRatioDuration_ball[ival] = (dval4 <= 0)? captureperiod: dval4; d0_ball[ival] = dval5;
+			kh_ball[ival] = dval6; kv_ball[ival] = dval7;
+			lightMin_ball[ival] = ival13; lightPixRatio_ball[ival] = dval8; bAcoustic_ball[ival] = ival14;
+			bDepth_ball[ival] = ival15; camdir_ball[ival] = ival16; bDisableControl_ball[ival] = ival17; objtype_ball[ival] = ival18; mindistproc_ball[ival] = dval9; procid_ball[ival] = ival19;
+			if ((ival20 >= 0)&&(ival20 < MAX_NB_VIDEO)&&(!bDisableVideo[ival20]))
+			{
+				videoid_ball[ival] = ival20;
+			}
+			else
+			{
+				printf("Invalid parameter.\n");
+			}
+			bBallFound[ival] = FALSE;
+			LeaveCriticalSection(&BallCS[ival]);
 		}
 		else
 		{
 			printf("Invalid parameter.\n");
 		}
-		bBallFound = FALSE;
-		LeaveCriticalSection(&BallCS);
 	}
-	else if (strncmp(line, "startballtracking", strlen("startballtracking")) == 0)
+	else if (sscanf(line, "startballtracking %d", &ival) == 1)
 	{
-		EnterCriticalSection(&BallCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_ball = u;
-		psi_ball = Center(psihat);
-		detectratio_ball = 0;
-		bBallTrackingControl = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&BallCS);
-	}
-	else if (strncmp(line, "stopballtracking", strlen("stopballtracking")) == 0)
-	{
-		EnterCriticalSection(&BallCS);
-		bBallTrackingControl = FALSE;
-		bDistanceControl = FALSE;
-		//if (bDisableControl_ball) bBrakeControl = FALSE;
-		bHeadingControl = FALSE;
-		if (bDepth_ball) 
+		if ((ival >= 0)&&(ival < MAX_NB_BALL))
 		{
-			bDepthControl = FALSE;
-			bAltitudeAGLControl = FALSE;
+			EnterCriticalSection(&BallCS[ival]);
+			EnterCriticalSection(&StateVariablesCS);
+			u_ball[ival] = u;
+			psi_ball[ival] = Center(psihat);
+			detectratio_ball[ival] = 0;
+			bBallTrackingControl[ival] = TRUE;
+			LeaveCriticalSection(&StateVariablesCS);
+			LeaveCriticalSection(&BallCS[ival]);
 		}
-		detectratio_ball = 0;
-		LeaveCriticalSection(&BallCS);
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "stopballtracking %d", &ival) == 1)
+	{
+
+		if ((ival >= 0)&&(ival < MAX_NB_BALL))
+		{
+			EnterCriticalSection(&BallCS[ival]);
+			bBallTrackingControl[ival] = FALSE;
+			bDistanceControl = FALSE;
+			//if (bDisableControl_ball[ival]) bBrakeControl = FALSE;
+			bHeadingControl = FALSE;
+			if (bDepth_ball[ival])
+			{
+				bDepthControl = FALSE;
+				bAltitudeAGLControl = FALSE;
+			}
+			detectratio_ball[ival] = 0;
+			LeaveCriticalSection(&BallCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
 	}
 	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %lf %lf %d %d %d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6, &dval1, &dval2, &dval3, &ival7, &ival8, &ival9) == 12)

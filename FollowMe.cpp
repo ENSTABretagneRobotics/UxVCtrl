@@ -13,26 +13,29 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
+	FILE* logfollowmefile = NULL;
+	char logfollowmefilename[MAX_BUF_LEN];
+
 	int i = 0;
 	double distance = 0, step = 0, norm_ba = 0;
 
 	CHRONO chrono;
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logfollowmetaskfilename, LOG_FOLDER"logfollowmetask_%.64s.csv", strtime_fns());
+	sprintf(logfollowmefilename, LOG_FOLDER"logfollowme_%.64s.csv", strtime_fns());
 	LeaveCriticalSection(&strtimeCS);
-	logfollowmetaskfile = fopen(logfollowmetaskfilename, "w");
-	if (logfollowmetaskfile == NULL)
+	logfollowmefile = fopen(logfollowmefilename, "w");
+	if (logfollowmefile == NULL)
 	{
 		printf("Unable to create log file.\n");
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
-	fprintf(logfollowmetaskfile,
+	fprintf(logfollowmefile,
 		"%% Time (in s); xtarget; ytarget; ztarget; distance (in m); wx[last]; wy[last]; wz[last]; step (in m);\n"
 		); 
-	fflush(logfollowmetaskfile);
+	fflush(logfollowmefile);
 
 	StartChrono(&chrono);
 
@@ -100,8 +103,8 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 
 		if (wx_vector.size() > 0)
 		{
-			fprintf(logfollowmetaskfile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), xtarget_followme, ytarget_followme, ztarget_followme, distance, wx_vector[wx_vector.size()-1], wy_vector[wy_vector.size()-1], wz_vector[wz_vector.size()-1], step);
-			fflush(logfollowmetaskfile);
+			fprintf(logfollowmefile, "%f;%f;%f;%f;%f;%f;%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), xtarget_followme, ytarget_followme, ztarget_followme, distance, wx_vector[wx_vector.size()-1], wy_vector[wy_vector.size()-1], wz_vector[wz_vector.size()-1], step);
+			fflush(logfollowmefile);
 		}
 
 		if (bFollowMeTrackingControl)
@@ -194,7 +197,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 
 	StopChronoQuick(&chrono);
 
-	fclose(logfollowmetaskfile);
+	fclose(logfollowmefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

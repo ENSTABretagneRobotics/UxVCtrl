@@ -1,6 +1,11 @@
-Synchro vidéos et logstate et lidar?->faire fichier log contenant correspondance exacte temps de début et temps de fin, rajouter dans le nom des fichiers les dixièmes et centièmes de seconde, pour les vidéos juste créer un fichier vid0_temps_de_fin.txt pour indiquer le temps de fin...?
-
+Synchro vidéos et logstate et lidar?->rajouter dans le nom des fichiers les dixièmes et centièmes de seconde...?
+résolution Kinect
+OBJTYPE_CARDS qui fait traitement de Julien
+prendre l'habitude de faire un ballconfig après le stopballtracking pour reset variables
 pouvoir combiner les résultats de détection de plusieurs couleurs pour dire que l'objet a été détecté...
+rename ball to hslobj, séparer aussi la partie détection de lumière, partager variables objDistance, etc., comment gérer les actions, l'id pourrait servir de priorité...?
+
+Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2...
 
 blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
 minrange param, zone morte pour tous les sonar et echosondeurs...?
@@ -41,11 +46,6 @@ roboteq serial
 Param period pour tous les devices, pris en compte s'il est connecté...
 
 rajouter possibilité de corriger l'estimation de vitesse des moteurs en fonction de la tension batterie mesurée
-
-rename ball to hslobj, pouvoir lancer plusieurs threads...?
-séparer aussi la partie détection de lumière...?
-partager variables objDistance, etc.
-pouvoir activer la détection de plusieurs objets en même temps avec une id et un nom, comment gérer les actions, définir une priorité par objet?
 
 Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
 

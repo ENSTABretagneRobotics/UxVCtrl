@@ -13,25 +13,26 @@ THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 {
 	int id = (intptr_t)pParam;
 
+	FILE* logexternalprogramtriggerfile = NULL;
+	char logexternalprogramtriggerfilename[MAX_BUF_LEN];
+
 	FILE* file = NULL;
 	int i = 0;
 	CHRONO chrono;
 
-	//EnterCriticalSection(&strtimeCS);
-	//sprintf(logexternalprogramtriggertaskfilename[id], LOG_FOLDER"logexternalprogramtriggertask%d_%.64s.csv", id, strtime_fns());
-	//LeaveCriticalSection(&strtimeCS);
-	//logexternalprogramtriggertaskfile[id] = fopen(logexternalprogramtriggertaskfilename[id], "w");
-	//if (logexternalprogramtriggertaskfile[id] == NULL)
-	//{
-	//	printf("Unable to create log file.\n");
-	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
-	//	return 0;
-	//}
+	EnterCriticalSection(&strtimeCS);
+	sprintf(logexternalprogramtriggerfilename, LOG_FOLDER"logexternalprogramtrigger%d_%.64s.csv", id, strtime_fns());
+	LeaveCriticalSection(&strtimeCS);
+	logexternalprogramtriggerfile = fopen(logexternalprogramtriggerfilename, "w");
+	if (logexternalprogramtriggerfile == NULL)
+	{
+		printf("Unable to create log file.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
+		return 0;
+	}
 
-	//fprintf(logexternalprogramtriggertaskfile[id], 
-	//	"%% Time (in s); (1 : on, 0 : off);\n"
-	//	); 
-	//fflush(logexternalprogramtriggertaskfile[id]);
+	fprintf(logexternalprogramtriggerfile, "%% Time (in s); Trigger (1 : on, 0 : off);\n");
+	fflush(logexternalprogramtriggerfile);
 
 	StartChrono(&chrono);
 
@@ -50,9 +51,8 @@ THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 			fclose(file);
 			bExternalProgramTriggerDetected[id] = TRUE;
 #pragma region Actions
-			//fprintf(logexternalprogramtriggertaskfile[id], "%f;%d;\n", 
-			//	GetTimeElapsedChronoQuick(&chrono), bExternalProgramTriggerDetected[id]);
-			//fflush(logexternalprogramtriggertaskfile[id]);
+			fprintf(logexternalprogramtriggerfile, "%f;%d;\n", GetTimeElapsedChronoQuick(&chrono), bExternalProgramTriggerDetected[id]);
+			fflush(logexternalprogramtriggerfile);
 
 			if (procid_externalprogramtrigger[id] != -1)
 			{
@@ -77,7 +77,7 @@ THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 
 	StopChronoQuick(&chrono);
 
-	//fclose(logexternalprogramtriggertaskfile[id]);
+	fclose(logexternalprogramtriggerfile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

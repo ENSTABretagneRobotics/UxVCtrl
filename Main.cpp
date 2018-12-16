@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	THREAD_IDENTIFIER BallThreadId;
+	THREAD_IDENTIFIER BallThreadId[MAX_NB_BALL];
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -249,7 +249,10 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	CreateDefaultThread(BallThread, NULL, &BallThreadId);
+	for (i = 0; i < MAX_NB_BALL; i++)
+	{
+		CreateDefaultThread(BallThread, (void*)(intptr_t)i, &BallThreadId[i]);
+	}
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -498,7 +501,10 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	WaitForThread(BallThreadId);
+	for (i = MAX_NB_BALL-1; i >= 0; i--)
+	{
+		WaitForThread(BallThreadId[i]);
+	}
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT

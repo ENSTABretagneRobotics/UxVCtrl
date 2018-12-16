@@ -369,11 +369,17 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				LeaveCriticalSection(&MDMCS);
 				memset(buf, 0, sizeof(buf));
 				memset(&sendxy, 0, sizeof(sendxy));
-				EnterCriticalSection(&BallCS);
-				sprintf((char*)buf, "OPI%d", lightStatus_ball?1:0);
-				sendxy.s[0] = (short)x_ball;
-				sendxy.s[1] = (short)y_ball;
-				LeaveCriticalSection(&BallCS);
+				for (i = 0; i < MAX_NB_BALL; i++)
+				{
+					EnterCriticalSection(&BallCS[i]);
+					if ((bAcoustic_ball[i])&&(bBallFound[i]))
+					{
+						sprintf((char*)buf, "OPI%d", lightStatus_ball[i]?1:0);
+						sendxy.s[0] = (short)x_ball[i];
+						sendxy.s[1] = (short)y_ball[i];
+					}
+					LeaveCriticalSection(&BallCS[i]);
+				}
 				memcpy(buf+strlen((char*)buf), &sendxy, sizeof(sendxy));
 				for (i = 0; i < 2; i++)
 				{

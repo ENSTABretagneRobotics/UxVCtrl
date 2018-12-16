@@ -13,6 +13,9 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
+	FILE* logwallfile = NULL;
+	char logwallfilename[MAX_BUF_LEN];
+
 	COORDSYSTEM2IMG csMap2FullImg;
 	vector<double> Valpha_filtered; 
 	vector<double> Vdistances_filtered;
@@ -40,20 +43,20 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logwalltaskfilename, LOG_FOLDER"logwalltask_%.64s.csv", strtime_fns());
+	sprintf(logwallfilename, LOG_FOLDER"logwall_%.64s.csv", strtime_fns());
 	LeaveCriticalSection(&strtimeCS);
-	logwalltaskfile = fopen(logwalltaskfilename, "w");
-	if (logwalltaskfile == NULL)
+	logwallfile = fopen(logwallfilename, "w");
+	if (logwallfile == NULL)
 	{
 		printf("Unable to create log file.\n");
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
 
-	fprintf(logwalltaskfile, 
+	fprintf(logwallfile, 
 		"%% Time (in s); Distance to the wall (in m); Angle of the wall (in rad);\n"
 		); 
-	fflush(logwalltaskfile);
+	fflush(logwallfile);
 
 	StartChrono(&chrono);
 
@@ -152,8 +155,8 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 		sprintf(szText, "RNG=%.2fm,ORN=%ddeg", distance, (int)((fmod_2PI(-angle_env-(Center(psihat)+phi)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI));
 		cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
 
-		fprintf(logwalltaskfile, "%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), distance, Center(psihat)+phi);
-		fflush(logwalltaskfile);
+		fprintf(logwallfile, "%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), distance, Center(psihat)+phi);
+		fflush(logwallfile);
 
 		if (bWallDetection)
 		{
@@ -306,7 +309,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 	StopChronoQuick(&chrono);
 
-	fclose(logwalltaskfile);
+	fclose(logwallfile);
 
 	cvReleaseImage(&overlayimage);
 

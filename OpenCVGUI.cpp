@@ -24,6 +24,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 {
 	int guiid = (intptr_t)pParam;
 	int videoid = -1;
+	int ballid = -1;
 	int c = 0, i = 0, offset = 0;
 	double angle = 0, d0 = 0, d1 = 0, d2 = 0;
 	int days = 0, hours = 0, minutes = 0, seconds = 0;
@@ -96,6 +97,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	if (bDisablePathfinderDVL&&bDisableNortekDVL) bDispDVL = FALSE; else bDispDVL = TRUE;
 
 	if ((guiid < MAX_NB_VIDEO)&&(!bDisableVideo[guiid])) videoid = guiid;
+	
+	if ((guiid >= 0)&&(guiid< MAX_NB_BALL)) ballid = guiid;
 
 	memset(szText, 0, sizeof(szText));
 	memset(windowname, 0, sizeof(windowname));
@@ -245,11 +248,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				CopyOverlay(WallOverlayImg, dispimgs[guiid]);
 				LeaveCriticalSection(&WallOverlayImgCS);
 			}
-			if ((bBallTrackingControl)&&(videoid == videoid_ball))
+			if ((ballid >= 0)&&(ballid < MAX_NB_BALL)&&(bBallTrackingControl[ballid]))
 			{
-				EnterCriticalSection(&BallOverlayImgCS);
-				CopyOverlay(BallOverlayImg, dispimgs[guiid]);
-				LeaveCriticalSection(&BallOverlayImgCS);
+				EnterCriticalSection(&BallOverlayImgCS[ballid]);
+				CopyOverlay(BallOverlayImg[ballid], dispimgs[guiid]);
+				LeaveCriticalSection(&BallOverlayImgCS[ballid]);
 			}
 			if ((bVisualObstacleDetection||bVisualObstacleAvoidanceControl)&&(videoid == videoid_visualobstacle))
 			{
@@ -931,7 +934,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				printf("RC AUX3 switch LOW.\n");
 			}
 			else if (bSonarDispOptionsExtendedMenu) {}
-			else if (bOSDDispOptionsExtendedMenu) {}
+			else if (bOSDDispOptionsExtendedMenu)
+			{
+				ballid++;
+				if (!((ballid >= 0)&&(ballid < MAX_NB_BALL))) ballid = -1;
+			}
 			else if (bOtherOptionsExtendedMenu) {}
 			break;
 		case CV_KEY_CODE_ENTER:
@@ -1094,6 +1101,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				sprintf(szText, "[7] VIDEO ID (%d)", videoid);
+				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
+				offset += 16;
+				sprintf(szText, "[8] BALL ID (%d)", ballid);
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 				offset += 16;
 				strcpy(szText, "[ENTER] EXIT");

@@ -132,6 +132,7 @@ typedef enum KEYS KEYS;
 #define MAX_NB_MAVLINKDEVICE 2
 #define MAX_NB_POLOLU 3
 
+#define MAX_NB_BALL 8
 #define MAX_NB_EXTERNALPROGRAMTRIGGER 8
 
 #define MAX_NB_WP 1024
@@ -141,6 +142,7 @@ typedef enum KEYS KEYS;
 #define OBJTYPE_BALL 0
 #define OBJTYPE_PIPELINE 1
 #define OBJTYPE_PINGER 2
+#define OBJTYPE_CARDS 3
 
 // GNSS accuracy levels.
 #define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
@@ -525,33 +527,33 @@ extern int procid_wall;
 extern double u_wall;
 
 // Ball variables.
-extern BOOL bBallTrackingControl;
-extern CRITICAL_SECTION BallCS;
-extern CRITICAL_SECTION BallOverlayImgCS;
-extern IplImage* BallOverlayImg;
-extern int hmin_ball, hmax_ball, smin_ball, smax_ball, lmin_ball, lmax_ball;
-extern BOOL bHExclusive_ball, bSExclusive_ball, bLExclusive_ball;
-extern int r_selpix_ball, g_selpix_ball, b_selpix_ball;
-extern double objMinRadiusRatio_ball, objRealRadius_ball, objMinDetectionRatio_ball, objDetectionRatioDuration_ball, d0_ball; 
-extern double kh_ball, kv_ball; // Not used...
-extern int lightMin_ball;
-extern double lightPixRatio_ball; 
-extern int bAcoustic_ball;
-extern int bDepth_ball;
-extern int camdir_ball;
-extern int bDisableControl_ball;
-extern int objtype_ball;
-extern double mindistproc_ball;
-extern int procid_ball;
-extern int videoid_ball;
-extern double u_ball;
-extern double x_ball, y_ball, z_ball;
-extern double psi_ball; // Not used...
-extern double lat_ball, long_ball, alt_ball;
-extern double heading_ball; // Not used...
-extern double detectratio_ball;
-extern BOOL bBallFound;
-extern int lightStatus_ball;
+extern BOOL bBallTrackingControl[MAX_NB_BALL];
+extern CRITICAL_SECTION BallCS[MAX_NB_BALL];
+extern CRITICAL_SECTION BallOverlayImgCS[MAX_NB_BALL];
+extern IplImage* BallOverlayImg[MAX_NB_BALL];
+extern int hmin_ball[MAX_NB_BALL], hmax_ball[MAX_NB_BALL], smin_ball[MAX_NB_BALL], smax_ball[MAX_NB_BALL], lmin_ball[MAX_NB_BALL], lmax_ball[MAX_NB_BALL];
+extern BOOL bHExclusive_ball[MAX_NB_BALL], bSExclusive_ball[MAX_NB_BALL], bLExclusive_ball[MAX_NB_BALL];
+extern int r_selpix_ball[MAX_NB_BALL], g_selpix_ball[MAX_NB_BALL], b_selpix_ball[MAX_NB_BALL];
+extern double objMinRadiusRatio_ball[MAX_NB_BALL], objRealRadius_ball[MAX_NB_BALL], objMinDetectionRatio_ball[MAX_NB_BALL], objDetectionRatioDuration_ball[MAX_NB_BALL], d0_ball[MAX_NB_BALL]; 
+extern double kh_ball[MAX_NB_BALL], kv_ball[MAX_NB_BALL];
+extern int lightMin_ball[MAX_NB_BALL];
+extern double lightPixRatio_ball[MAX_NB_BALL]; 
+extern int bAcoustic_ball[MAX_NB_BALL];
+extern int bDepth_ball[MAX_NB_BALL];
+extern int camdir_ball[MAX_NB_BALL];
+extern int bDisableControl_ball[MAX_NB_BALL];
+extern int objtype_ball[MAX_NB_BALL];
+extern double mindistproc_ball[MAX_NB_BALL];
+extern int procid_ball[MAX_NB_BALL];
+extern int videoid_ball[MAX_NB_BALL];
+extern double u_ball[MAX_NB_BALL];
+extern double x_ball[MAX_NB_BALL], y_ball[MAX_NB_BALL], z_ball[MAX_NB_BALL];
+extern double psi_ball[MAX_NB_BALL];
+extern double lat_ball[MAX_NB_BALL], long_ball[MAX_NB_BALL], alt_ball[MAX_NB_BALL];
+extern double heading_ball[MAX_NB_BALL];
+extern double detectratio_ball[MAX_NB_BALL];
+extern BOOL bBallFound[MAX_NB_BALL];
+extern int lightStatus_ball[MAX_NB_BALL];
 
 // Visual obstacle variables.
 extern BOOL bVisualObstacleDetection;
@@ -812,6 +814,8 @@ extern cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
+extern FILE* endvideorecordfiles[MAX_NB_VIDEO];
+extern char endvideorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 extern FILE* missionfile;
 
@@ -826,27 +830,6 @@ extern char logmissionfilename[MAX_BUF_LEN];
 
 extern FILE* tlogfile;
 extern char tlogfilename[MAX_BUF_LEN];
-
-extern FILE* logexternalvisuallocalizationtaskfile;
-extern char logexternalvisuallocalizationtaskfilename[MAX_BUF_LEN];
-
-extern FILE* logwalltaskfile;
-extern char logwalltaskfilename[MAX_BUF_LEN];
-
-extern FILE* logpipelinetaskfile;
-extern char logpipelinetaskfilename[MAX_BUF_LEN];
-
-extern FILE* logballtaskfile;
-extern char logballtaskfilename[MAX_BUF_LEN];
-
-extern FILE* logpingertaskfile;
-extern char logpingertaskfilename[MAX_BUF_LEN];
-
-extern FILE* logmissingworkertaskfile;
-extern char logmissingworkertaskfilename[MAX_BUF_LEN];
-
-extern FILE* logfollowmetaskfile;
-extern char logfollowmetaskfilename[MAX_BUF_LEN];
 
 inline int GetGNSSlevel(void)
 {
@@ -1096,6 +1079,8 @@ inline int InitGlobals(void)
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
+		endvideorecordfiles[i] = NULL;
+		memset(endvideorecordfilenames[i], 0, sizeof(endvideorecordfilenames[i]));
 	}
 
 	for (i = 0; i < nbopencvgui; i++)
@@ -1119,10 +1104,37 @@ inline int InitGlobals(void)
 	WallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(WallOverlayImg, CV_RGB(0, 0, 0), NULL);
 
-	InitCriticalSection(&BallCS);
-	InitCriticalSection(&BallOverlayImgCS);
-	BallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-	cvSet(BallOverlayImg, CV_RGB(0, 0, 0), NULL);
+	for (i = 0; i < MAX_NB_BALL; i++)
+	{
+		bBallTrackingControl[i] = FALSE;
+		InitCriticalSection(&BallCS[i]);
+		InitCriticalSection(&BallOverlayImgCS[i]);
+		BallOverlayImg[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+		cvSet(BallOverlayImg[i], CV_RGB(0, 0, 0), NULL);
+		hmin_ball[i] = 0; hmax_ball[i] = 0; smin_ball[i] = 0; smax_ball[i] = 0; lmin_ball[i] = 0; lmax_ball[i] = 0;
+		bHExclusive_ball[i] = 0; bSExclusive_ball[i] = 0; bLExclusive_ball[i] = 0;
+		r_selpix_ball[i] = 0, g_selpix_ball[i] = 0, b_selpix_ball[i] = 0;
+		objMinRadiusRatio_ball[i] = 0; objRealRadius_ball[i] = 0; objMinDetectionRatio_ball[i] = 0; objDetectionRatioDuration_ball[i] = 0; d0_ball[i] = 0;
+		kh_ball[i] = 0; kv_ball[i] = 0;
+		lightMin_ball[i] = 0;
+		lightPixRatio_ball[i] = 0;
+		bAcoustic_ball[i] = 0;
+		bDepth_ball[i] = 0;
+		camdir_ball[i] = 0;
+		bDisableControl_ball[i] = 0;
+		objtype_ball[i] = 0;
+		mindistproc_ball[i] = 0;
+		procid_ball[i] = 0;
+		videoid_ball[i] = 0;
+		u_ball[i] = 0;
+		x_ball[i] = 0; y_ball[i] = 0; z_ball[i] = 0;
+		psi_ball[i] = 0;
+		lat_ball[i] = 0; long_ball[i] = 0; alt_ball[i] = 0;
+		heading_ball[i] = 0;
+		detectratio_ball[i] = 0;
+		bBallFound[i] = FALSE;
+		lightStatus_ball[i] = 0;
+	}
 
 	InitCriticalSection(&VisualObstacleCS);
 	InitCriticalSection(&VisualObstacleOverlayImgCS);
@@ -1263,10 +1275,13 @@ inline int ReleaseGlobals(void)
 	cvReleaseImage(&VisualObstacleOverlayImg);
 	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
 	DeleteCriticalSection(&VisualObstacleCS);
-
-	cvReleaseImage(&BallOverlayImg);
-	DeleteCriticalSection(&BallOverlayImgCS);
-	DeleteCriticalSection(&BallCS);
+		
+	for (i = MAX_NB_BALL-1; i >= 0; i--)
+	{
+		cvReleaseImage(&BallOverlayImg[i]);
+		DeleteCriticalSection(&BallOverlayImgCS[i]);
+		DeleteCriticalSection(&BallCS[i]);
+	}
 
 	cvReleaseImage(&WallOverlayImg);
 	DeleteCriticalSection(&WallOverlayImgCS);
@@ -1288,6 +1303,8 @@ inline int ReleaseGlobals(void)
 
 	for (i = MAX_NB_VIDEO-1; i >= 0; i--)
 	{
+		memset(endvideorecordfilenames[i], 0, sizeof(endvideorecordfilenames[i]));
+		endvideorecordfiles[i] = NULL;
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
