@@ -91,7 +91,7 @@ THREAD_PROC_RETURN_VALUE MS583730BAThread(void* pParam)
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);
-					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtime_fns());
+					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					ms583730ba.pfSaveFile = fopen(szSaveFilePath, "w");
 					if (ms583730ba.pfSaveFile == NULL) 

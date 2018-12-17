@@ -25,7 +25,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logstatefilename, LOG_FOLDER"logstate_%.64s.csv", strtime_fns());
+	sprintf(logstatefilename, LOG_FOLDER"logstate_%.64s.csv", strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logstatefile = fopen(logstatefilename, "w");
 	if (logstatefile == NULL)

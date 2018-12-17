@@ -284,7 +284,7 @@ inline void CallMission(char* str)
 		else
 		{
 			EnterCriticalSection(&strtimeCS);
-			sprintf(logmissionfilename, LOG_FOLDER"logmission_%.64s.csv", strtime_fns());
+			sprintf(logmissionfilename, LOG_FOLDER"logmission_%.64s.csv", strtimeex_fns());
 			LeaveCriticalSection(&strtimeCS);
 			logmissionfile = fopen(logmissionfilename, "w");
 			if (logmissionfile == NULL)

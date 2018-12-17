@@ -43,7 +43,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logwallfilename, LOG_FOLDER"logwall_%.64s.csv", strtime_fns());
+	sprintf(logwallfilename, LOG_FOLDER"logwall_%.64s.csv", strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logwallfile = fopen(logwallfilename, "w");
 	if (logwallfile == NULL)
@@ -163,7 +163,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			// Save a picture showing the detection.
 			memset(strtime_pic, 0, sizeof(strtime_pic));
 			EnterCriticalSection(&strtimeCS);
-			strcpy(strtime_pic, strtime_fns());
+			strcpy(strtime_pic, strtimeex_fns());
 			LeaveCriticalSection(&strtimeCS);
 			sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -200,7 +200,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 				// Save a picture showing the detection.
 				memset(strtime_pic, 0, sizeof(strtime_pic));
 				EnterCriticalSection(&strtimeCS);
-				strcpy(strtime_pic, strtime_fns());
+				strcpy(strtime_pic, strtimeex_fns());
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -237,7 +237,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 				// Save a picture showing the detection.
 				memset(strtime_pic, 0, sizeof(strtime_pic));
 				EnterCriticalSection(&strtimeCS);
-				strcpy(strtime_pic, strtime_fns());
+				strcpy(strtime_pic, strtimeex_fns());
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API

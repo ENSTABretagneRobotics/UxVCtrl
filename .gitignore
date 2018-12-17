@@ -263,6 +263,12 @@ $RECYCLE.BIN/
 # Other
 # =========================
 
+aud/*.txt
+aud/*.TXT
+aud/*.csv
+aud/*.CSV
+aud/*.kml
+aud/*.KML
 aud/*.wav
 aud/*.WAV
 aud/*.wma
@@ -285,6 +291,12 @@ log/*.log
 log/*.LOG
 log/*.tlog
 log/*.TLOG
+pic/*.txt
+pic/*.TXT
+pic/*.csv
+pic/*.CSV
+pic/*.kml
+pic/*.KML
 pic/*.jpg
 pic/*.JPG
 pic/*.jpeg
@@ -293,8 +305,12 @@ pic/*.png
 pic/*.PNG
 pic/*.bmp
 pic/*.BMP
-pic/*.kml
-pic/*.KML
+vid/*.txt
+vid/*.TXT
+vid/*.csv
+vid/*.CSV
+vid/*.kml
+vid/*.KML
 vid/*.wmv
 vid/*.WMV
 vid/*.mp4

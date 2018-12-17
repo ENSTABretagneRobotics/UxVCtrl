@@ -22,7 +22,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 	CHRONO chrono;
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logfollowmefilename, LOG_FOLDER"logfollowme_%.64s.csv", strtime_fns());
+	sprintf(logfollowmefilename, LOG_FOLDER"logfollowme_%.64s.csv", strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logfollowmefile = fopen(logfollowmefilename, "w");
 	if (logfollowmefile == NULL)

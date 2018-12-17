@@ -21,7 +21,7 @@ THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 	CHRONO chrono;
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logexternalprogramtriggerfilename, LOG_FOLDER"logexternalprogramtrigger%d_%.64s.csv", id, strtime_fns());
+	sprintf(logexternalprogramtriggerfilename, LOG_FOLDER"logexternalprogramtrigger%d_%.64s.csv", id, strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logexternalprogramtriggerfile = fopen(logexternalprogramtriggerfilename, "w");
 	if (logexternalprogramtriggerfile == NULL)

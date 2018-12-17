@@ -34,7 +34,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logsimufilename, LOG_FOLDER"logsimu_%.64s.csv", strtime_fns());
+	sprintf(logsimufilename, LOG_FOLDER"logsimu_%.64s.csv", strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logsimufile = fopen(logsimufilename, "w");
 	if (logsimufile == NULL)

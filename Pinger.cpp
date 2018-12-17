@@ -33,7 +33,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logpingerfilename, LOG_FOLDER"logpinger_%.64s.csv", strtime_fns());
+	sprintf(logpingerfilename, LOG_FOLDER"logpinger_%.64s.csv", strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logpingerfile = fopen(logpingerfilename, "w");
 	if (logpingerfile == NULL)

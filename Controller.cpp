@@ -51,7 +51,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	if (!bDisablelognav)
 	{
 		EnterCriticalSection(&strtimeCS);
-		sprintf(lognavfilename, LOG_FOLDER"lognav_%.64s.csv", strtime_fns());
+		sprintf(lognavfilename, LOG_FOLDER"lognav_%.64s.csv", strtimeex_fns());
 		LeaveCriticalSection(&strtimeCS);
 		lognavfile = fopen(lognavfilename, "w");
 		if (lognavfile == NULL)

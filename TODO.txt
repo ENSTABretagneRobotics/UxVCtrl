@@ -1,4 +1,3 @@
-Synchro vidéos et logstate et lidar?->rajouter dans le nom des fichiers les dixièmes et centièmes de seconde...?
 résolution Kinect
 OBJTYPE_CARDS qui fait traitement de Julien
 prendre l'habitude de faire un ballconfig après le stopballtracking pour reset variables

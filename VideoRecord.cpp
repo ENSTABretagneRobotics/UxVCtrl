@@ -62,7 +62,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 #ifdef USE_ALTERNATE_RECORDING
 				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtimeex_fns());
 				LeaveCriticalSection(&strtimeCS);
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
@@ -71,7 +71,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					//CV_FOURCC('I', 'Y', 'U', 'V'), 
 #else
 				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtime_fns(), videorecordextension);
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtimeex_fns(), videorecordextension);
 				LeaveCriticalSection(&strtimeCS);
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
@@ -89,7 +89,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 #else
 #ifdef USE_ALTERNATE_RECORDING
 				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtime_fns());
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.avi", videoid, strtimeex_fns());
 				LeaveCriticalSection(&strtimeCS);
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
@@ -98,7 +98,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					//CV_FOURCC('I', 'Y', 'U', 'V'), 
 #else
 				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtime_fns(), videorecordextension);
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtimeex_fns(), videorecordextension);
 				LeaveCriticalSection(&strtimeCS);
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
@@ -146,7 +146,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				if (endvideorecordfiles[videoid])
 				{
 					EnterCriticalSection(&strtimeCS);
-					fprintf(endvideorecordfiles[videoid], "%.64s", strtime_fns());
+					fprintf(endvideorecordfiles[videoid], "%.64s", strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					fclose(endvideorecordfiles[videoid]);
 				}
@@ -176,7 +176,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 		if (endvideorecordfiles[videoid])
 		{
 			EnterCriticalSection(&strtimeCS);
-			fprintf(endvideorecordfiles[videoid], "%.64s", strtime_fns());
+			fprintf(endvideorecordfiles[videoid], "%.64s", strtimeex_fns());
 			LeaveCriticalSection(&strtimeCS);
 			fclose(endvideorecordfiles[videoid]);
 		}

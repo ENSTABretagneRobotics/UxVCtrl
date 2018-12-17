@@ -109,7 +109,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
 
 	EnterCriticalSection(&strtimeCS);
-	sprintf(logballfilename, LOG_FOLDER"logball%d_%.64s.csv", id, strtime_fns());
+	sprintf(logballfilename, LOG_FOLDER"logball%d_%.64s.csv", id, strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	logballfile = fopen(logballfilename, "w");
 	if (logballfile == NULL)
@@ -562,7 +562,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				// Save a picture showing the detection.
 				memset(strtime_pic, 0, sizeof(strtime_pic));
 				EnterCriticalSection(&strtimeCS);
-				strcpy(strtime_pic, strtime_fns());
+				strcpy(strtime_pic, strtimeex_fns());
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(snapfilename, "pic_%.64s.jpg", strtime_pic);
 				sprintf(picsnapfilename, PIC_FOLDER"pic_%.64s.jpg", strtime_pic);

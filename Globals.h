@@ -964,7 +964,7 @@ inline void Snapshot(void)
 
 	memset(strtime_snap, 0, sizeof(strtime_snap));
 	EnterCriticalSection(&strtimeCS);
-	strcpy(strtime_snap, strtime_fns());
+	strcpy(strtime_snap, strtimeex_fns());
 	LeaveCriticalSection(&strtimeCS);
 	for (i = 0; i < MAX_NB_VIDEO; i++)
 	{

@@ -80,7 +80,7 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);
-					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtime_fns());
+					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					pathfinderdvl.pfSaveFile = fopen(szSaveFilePath, "wb");
 					if (pathfinderdvl.pfSaveFile == NULL) 

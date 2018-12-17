@@ -132,7 +132,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);
-					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.csv", szTemp, strtime_fns());
+					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.csv", szTemp, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					mavlinkdevice.pfSaveFile = fopen(szSaveFilePath, "w");
 					if (mavlinkdevice.pfSaveFile == NULL) 

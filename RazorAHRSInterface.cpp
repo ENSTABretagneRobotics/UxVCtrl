@@ -172,7 +172,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtime_fns());
+	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
 	//tlogfile = fopen(tlogfilename, "w");
 	//if (tlogfile == NULL)
