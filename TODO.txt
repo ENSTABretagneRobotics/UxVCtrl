@@ -1,4 +1,7 @@
-résolution Kinect
+if img size resized by video server...?
+set resolution for ball from the video automatically?
+dynamic gui resolution changes?
+Pour la taille des images partagées, prendre la résolution min des webcams?
 OBJTYPE_CARDS qui fait traitement de Julien
 prendre l'habitude de faire un ballconfig après le stopballtracking pour reset variables
 pouvoir combiner les résultats de détection de plusieurs couleurs pour dire que l'objet a été détecté...
@@ -349,17 +352,12 @@ modify waypoints/heading commands so that they do a line following in the case o
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
 Move MAVLinkInterface in Hardware with its own config file?
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
-faudrait pouvoir enregistrer en high res en local en option->utiliser remotewebcammultisrv et se connecter dessus...
 prévoir zoom sur la map, on a du mal à savoir son cap
 pouvoir afficher robot indépendamment de l'échelle?
-mieux gérer les infos affichées selon le robot et selon le mode
 alterner les valeurs affichées toutes les s?
 afficher le commentaire action d'une mission (e.g. en bas...)->déjà affiché dans invite de commandes
 Fichier motif ou images pour dessiner robots comme buggy MATLAB Kalman, ou même coder en dur quand il y a plusieurs solides->Mission Planner...
 bug enregistrement de la 2ème caméra quand c'est dans le script? -> enregistrer vidéo manuellement ou rajouter un délai...
-dynamic resolution changes?
-params videoimgwidth/height, Horizontal/VerticalBeam sont pour les images utilisées pour les calculs, il faudrait en plus des valeurs propres à chaque OpenCVGUI...
-Pour la taille des images partagées, prendre la résolution min des webcams?
 utiliser bCleanup dans tous les threads pour le cvSet()?
 opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut en ouvrir une 2ème?
 Mettre en var globale les périphériques?

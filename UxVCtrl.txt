@@ -44,7 +44,9 @@
 70
 % VerticalBeam (in ]0..360] deg)
 50
-% szVideoRecordCodec (WMV2, MJPG, DIVX, XVID, etc., see OpenCV FOURCC codecs)
+% bCropOnResize
+0
+% szVideoRecordCodec (WMV2, MJPG, HFYU, DIVX, XVID, etc., see OpenCV FOURCC codecs)
 WMV2
 % bEnableOpenCVGUIs[0]
 1
@@ -66,6 +68,26 @@ WMV2
 0
 % bShowVideoOpenCVGUIs[4]
 0
+% opencvguiimgwidth[0]
+320
+% opencvguiimgwidth[1]
+320
+% opencvguiimgwidth[2]
+320
+% opencvguiimgwidth[3]
+320
+% opencvguiimgwidth[4]
+320
+% opencvguiimgheight[0]
+240
+% opencvguiimgheight[1]
+240
+% opencvguiimgheight[2]
+240
+% opencvguiimgheight[3]
+240
+% opencvguiimgheight[4]
+240
 % opencvguiperiod (in ms)
 100
 % bMAVLinkInterface

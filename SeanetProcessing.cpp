@@ -474,7 +474,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 #ifndef DISABLE_OPENCV_SUPPORT
 		EnterCriticalSection(&SeanetOverlayImgCS);
-		cvCopy(overlayimage, SeanetOverlayImg, 0);
+		CopyResizeScale(overlayimage, SeanetOverlayImg, bCropOnResize);
 		LeaveCriticalSection(&SeanetOverlayImgCS);
 #endif // !DISABLE_OPENCV_SUPPORT
 

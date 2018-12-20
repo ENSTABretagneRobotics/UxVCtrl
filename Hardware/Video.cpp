@@ -14,6 +14,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 {
 	VIDEO video;
 	IplImage* img = NULL;
+	IplImage* imgtmp = NULL;
 	BOOL bConnected = FALSE;
 	int videoid = (intptr_t)pParam;
 	char szCfgFilePath[256];
@@ -86,14 +87,16 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 			if (GetImgVideo(&video, img) == EXIT_SUCCESS)
 			{
 				EnterCriticalSection(&imgsCS[videoid]);
-				if ((video.videoimgwidth == videoimgwidth)&&(video.videoimgheight == videoimgheight))
+				if ((img->width != imgs[videoid]->width)||(img->height != imgs[videoid]->height))
 				{
-					cvCopy(img, imgs[videoid], 0);
+					imgtmp = cvCreateImage(cvSize(img->width, img->height), img->depth, img->nChannels);
+					if (imgtmp)
+					{
+						cvReleaseImage(&imgs[videoid]);
+						imgs[videoid] = imgtmp;
+					}
 				}
-				else
-				{
-					cvResize(img, imgs[videoid], CV_INTER_LINEAR);
-				}
+				cvCopy(img, imgs[videoid], 0);
 				LeaveCriticalSection(&imgsCS[videoid]);
 			}
 			else

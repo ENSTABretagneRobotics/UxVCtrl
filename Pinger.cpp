@@ -100,7 +100,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 		LeaveCriticalSection(&PingerCS);
 
 		EnterCriticalSection(&PingerOverlayImgCS);
-		cvCopy(overlayimage, PingerOverlayImg, 0);
+		CopyResizeScale(overlayimage, PingerOverlayImg, bCropOnResize);
 		LeaveCriticalSection(&PingerOverlayImgCS);
 
 		if (bExit) break;

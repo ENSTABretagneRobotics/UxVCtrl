@@ -128,7 +128,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 		// Get an image from the webcam or video.
 		EnterCriticalSection(&imgsCS[videoid_externalvisuallocalization]);
-		cvCopy(imgs[videoid_externalvisuallocalization], image, 0);
+		CopyResizeScale(imgs[videoid_externalvisuallocalization], image, bCropOnResize);
 		LeaveCriticalSection(&imgsCS[videoid_externalvisuallocalization]);
 
 		// Convert image->imageData from char* to unsigned char* to work with color values in 0..255.
@@ -222,7 +222,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		{
 			LeaveCriticalSection(&ExternalVisualLocalizationCS);
 			EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-			cvCopy(overlayimage, ExternalVisualLocalizationOverlayImg, 0);
+			CopyResizeScale(overlayimage, ExternalVisualLocalizationOverlayImg, bCropOnResize);
 			LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 			if (bExit) break;
 			continue;
@@ -507,7 +507,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		LeaveCriticalSection(&ExternalVisualLocalizationCS);
 
 		EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-		cvCopy(overlayimage, ExternalVisualLocalizationOverlayImg, 0);
+		CopyResizeScale(overlayimage, ExternalVisualLocalizationOverlayImg, bCropOnResize);
 		LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 
 		if (bExit) break;

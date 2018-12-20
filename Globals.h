@@ -315,9 +315,12 @@ extern double Energy_electronics, Energy_actuators;
 extern int robid;
 extern double roblength, robwidth, robheight;
 extern int nbopencvgui, videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
+extern BOOL bCropOnResize;
 extern char szVideoRecordCodec[5];
 extern BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
 extern BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
+extern int opencvguiimgwidth[MAX_NB_OPENCVGUI];
+extern int opencvguiimgheight[MAX_NB_OPENCVGUI];
 extern int opencvguiperiod;
 extern BOOL bMAVLinkInterface;
 extern char szMAVLinkInterfacePath[MAX_BUF_LEN];
@@ -739,13 +742,27 @@ extern BOOL bRestartVideo[MAX_NB_VIDEO];
 #endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion
 
+// VideoRecord variables.
+extern int VideoRecordRequests[MAX_NB_VIDEO];
+extern BOOL bVideoRecordRestart[MAX_NB_VIDEO];
+extern CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
+#ifndef DISABLE_OPENCV_SUPPORT
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
+#else
+extern cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+#endif // !DISABLE_OPENCV_SUPPORT
+extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
+extern FILE* endvideorecordfiles[MAX_NB_VIDEO];
+extern char endvideorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
+extern int videorecordwidth[MAX_NB_VIDEO], videorecordheight[MAX_NB_VIDEO];
+
 // Other.
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* dispimgs[MAX_NB_OPENCVGUI];
 #endif // !DISABLE_OPENCV_SUPPORT
-extern int VideoRecordRequests[MAX_NB_VIDEO];
 extern CRITICAL_SECTION dispimgsCS[MAX_NB_OPENCVGUI];
-extern CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
 extern CRITICAL_SECTION SeanetConnectingCS;
 extern CRITICAL_SECTION SeanetDataCS;
 extern CRITICAL_SECTION StateVariablesCS;
@@ -805,17 +822,6 @@ extern int procstackids[MAX_NB_PROCEDURES];
 extern int procstack;
 extern double registers[MAX_NB_REGISTERS];
 extern char keys[NB_CONFIGURABLE_KEYS];
-
-#ifndef DISABLE_OPENCV_SUPPORT
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-extern CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
-#else
-extern cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
-#endif // !DISABLE_OPENCV_SUPPORT
-extern char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
-extern FILE* endvideorecordfiles[MAX_NB_VIDEO];
-extern char endvideorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 extern FILE* missionfile;
 
@@ -1075,18 +1081,21 @@ inline int InitGlobals(void)
 		bRestartVideo[i] = FALSE;
 		InitCriticalSection(&VideoRecordRequestsCS[i]);
 		VideoRecordRequests[i] = 0;
+		bVideoRecordRestart[i] = FALSE;
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 		endvideorecordfiles[i] = NULL;
 		memset(endvideorecordfilenames[i], 0, sizeof(endvideorecordfilenames[i]));
+		videorecordwidth[i] = videoimgwidth;
+		videorecordheight[i] = videoimgheight;
 	}
 
 	for (i = 0; i < nbopencvgui; i++)
 	{
 		InitCriticalSection(&dispimgsCS[i]);
-		dispimgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+		dispimgs[i] = cvCreateImage(cvSize(opencvguiimgwidth[i], opencvguiimgheight[i]), IPL_DEPTH_8U, 3);
 		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -1303,12 +1312,15 @@ inline int ReleaseGlobals(void)
 
 	for (i = MAX_NB_VIDEO-1; i >= 0; i--)
 	{
+		videorecordheight[i] = videoimgheight;
+		videorecordwidth[i] = videoimgwidth;
 		memset(endvideorecordfilenames[i], 0, sizeof(endvideorecordfilenames[i]));
 		endvideorecordfiles[i] = NULL;
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+		bVideoRecordRestart[i] = FALSE;
 		VideoRecordRequests[i] = 0;
 		DeleteCriticalSection(&VideoRecordRequestsCS[i]);
 		bRestartVideo[i] = FALSE;

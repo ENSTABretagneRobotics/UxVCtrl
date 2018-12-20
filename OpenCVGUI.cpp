@@ -159,10 +159,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvNamedWindow(windowname, CV_WINDOW_AUTOSIZE);
-				cvMoveWindow(windowname, ((videoimgwidth*guiid%1024)/videoimgwidth)*videoimgwidth, (videoimgwidth*guiid/1024)*videoimgheight);
+				cvMoveWindow(windowname, ((opencvguiimgwidth[guiid]*guiid%1024)/opencvguiimgwidth[guiid])*opencvguiimgwidth[guiid], (opencvguiimgwidth[guiid]*guiid/1024)*opencvguiimgheight[guiid]);
 #else
 				cv::namedWindow(windowname, cv::WINDOW_AUTOSIZE);
-				cv::moveWindow(windowname, ((videoimgwidth*guiid%1024)/videoimgwidth)*videoimgwidth, (videoimgwidth*guiid/1024)*videoimgheight);
+				cv::moveWindow(windowname, ((opencvguiimgwidth[guiid]*guiid%1024)/opencvguiimgwidth[guiid])*opencvguiimgwidth[guiid], (opencvguiimgwidth[guiid]*guiid/1024)*opencvguiimgheight[guiid]);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 				LeaveCriticalSection(&OpenCVGUICS);
 			}
@@ -215,7 +215,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		if ((bShowVideoOpenCVGUIs[guiid])&&(videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 		{
 			EnterCriticalSection(&imgsCS[videoid]);
-			cvCopy(imgs[videoid], dispimgs[guiid], 0);
+			CopyResizeScale(imgs[videoid], dispimgs[guiid], bCropOnResize);
 			LeaveCriticalSection(&imgsCS[videoid]);
 		}
 		else
@@ -225,7 +225,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		if (bShowSonar)
 		{
 			EnterCriticalSection(&SeanetOverlayImgCS);
-			CopyOverlay(SeanetOverlayImg, dispimgs[guiid]);
+			CopyResizeScaleOverlay(SeanetOverlayImg, dispimgs[guiid], bCropOnResize);
 			LeaveCriticalSection(&SeanetOverlayImgCS);
 		}
 		if (bShowOtherOverlays)
@@ -233,43 +233,43 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			//if (bDynamicSonarLocalization) 		
 			//{
 			//	EnterCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
-			//	CopyOverlay(DynamicSonarLocalizationOverlayImg, dispimgs[guiid]);
+			//	CopyResizeScaleOverlay(DynamicSonarLocalizationOverlayImg, dispimgs[guiid], bCropOnResize);
 			//	LeaveCriticalSection(&DynamicSonarLocalizationOverlayImgCS);
 			//}
 			if (bExternalVisualLocalization&&(videoid == videoid_externalvisuallocalization))
 			{
 				EnterCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
-				CopyOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[guiid]);
+				CopyResizeScaleOverlay(ExternalVisualLocalizationOverlayImg, dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 			}
 			if ((bWallDetection||bWallTrackingControl||bWallAvoidanceControl))
 			{
 				EnterCriticalSection(&WallOverlayImgCS);
-				CopyOverlay(WallOverlayImg, dispimgs[guiid]);
+				CopyResizeScaleOverlay(WallOverlayImg, dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&WallOverlayImgCS);
 			}
 			if ((ballid >= 0)&&(ballid < MAX_NB_BALL)&&(bBallTrackingControl[ballid]))
 			{
 				EnterCriticalSection(&BallOverlayImgCS[ballid]);
-				CopyOverlay(BallOverlayImg[ballid], dispimgs[guiid]);
+				CopyResizeScaleOverlay(BallOverlayImg[ballid], dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&BallOverlayImgCS[ballid]);
 			}
 			if ((bVisualObstacleDetection||bVisualObstacleAvoidanceControl)&&(videoid == videoid_visualobstacle))
 			{
 				EnterCriticalSection(&VisualObstacleOverlayImgCS);
-				CopyOverlay(VisualObstacleOverlayImg, dispimgs[guiid]);
+				CopyResizeScaleOverlay(VisualObstacleOverlayImg, dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&VisualObstacleOverlayImgCS);
 			}
 			if ((bSurfaceVisualObstacleDetection||bSurfaceVisualObstacleAvoidanceControl)&&(videoid == videoid_surfacevisualobstacle))
 			{
 				EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-				CopyOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[guiid]);
+				CopyResizeScaleOverlay(SurfaceVisualObstacleOverlayImg, dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 			}
 			if (bPingerTrackingControl)
 			{
 				EnterCriticalSection(&PingerOverlayImgCS);
-				CopyOverlay(PingerOverlayImg, dispimgs[guiid]);
+				CopyResizeScaleOverlay(PingerOverlayImg, dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&PingerOverlayImgCS);
 			}
 		}
@@ -1465,30 +1465,30 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			if (bOrientationCircle)
 			{
-				cvCircle(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
+				cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
 				if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 				{
 					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(psihat);
-					cvLine(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 
-						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
+					cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 
+						cvPoint((int)(opencvguiimgwidth[guiid]-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 255), 2, 8, 0);
 				}
 				if (bHeadingControl) 
 				{
 					angle = M_PI/2.0+wpsi-Center(psihat);
-					cvLine(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 
-						cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
+					cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 
+						cvPoint((int)(opencvguiimgwidth[guiid]-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 						CV_RGB(0, 255, 0), 2, 8, 0);
 				}
 				angle = M_PI-angle_env-Center(psihat);
-				cvLine(dispimgs[guiid], cvPoint(videoimgwidth-16, 32), 
-					cvPoint((int)(videoimgwidth-16+12*cos(angle)), (int)(32-12*sin(angle))), 
+				cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 
+					cvPoint((int)(opencvguiimgwidth[guiid]-16+12*cos(angle)), (int)(32-12*sin(angle))), 
 					CV_RGB(0, 0, 255), 2, 8, 0);
 			}
 			if (bMap)
 			{
 				int detailswidth = 96, detailsheight = 96;
-				int detailsj = videoimgwidth-detailswidth-8, detailsi = 48;
+				int detailsj = opencvguiimgwidth[guiid]-detailswidth-8, detailsi = 48;
 				InitCS2ImgEx(&csMap2FullImg, &csMap, detailswidth, detailsheight, BEST_RATIO_COORDSYSTEM2IMG);
 				cvRectangle(dispimgs[guiid], 
 					cvPoint(detailsj+detailswidth, detailsi+detailsheight), cvPoint(detailsj-1, detailsi-1), 
@@ -1662,7 +1662,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			if (bFullMap)
 			{
-				InitCS2ImgEx(&csMap2FullImg, &csMap, videoimgwidth, videoimgheight, BEST_RATIO_COORDSYSTEM2IMG);
+				InitCS2ImgEx(&csMap2FullImg, &csMap, opencvguiimgwidth[guiid], opencvguiimgheight[guiid], BEST_RATIO_COORDSYSTEM2IMG);
 				if (bRotatingMap)
 				{
 					// Environment circles.
@@ -1811,7 +1811,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case BUGGY_ROBID:
 						{
 							//CvPoint pts[10]; int npts = sizeof(pts); int contours = 0;
-							//pts[0] = cvPoint(videoimgwidth-28, 8-5);
+							//pts[0] = cvPoint(opencvguiimgwidth[guiid]-28, 8-5);
 						
 							////cvPolyLine(dispimgs[guiid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
 							//cvFillConvexPoly(dispimgs[guiid], pts, npts, CV_RGB(0, 255, 0), 8, 0);
@@ -1846,7 +1846,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						bDispRecordSymbol = !bDispRecordSymbol;
 						StartChrono(&chrono_recording);
 					}
-					if (bDispRecordSymbol) cvCircle(dispimgs[guiid], cvPoint(videoimgwidth-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
+					if (bDispRecordSymbol) cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
 				}
 				else
 				{
@@ -1864,9 +1864,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bDispPlaySymbol) 
 				{
 					nbPlaySymbolPoints = 3;
-					PlaySymbolPoints[0] = cvPoint(videoimgwidth-28, 8-5);
-					PlaySymbolPoints[1] = cvPoint(videoimgwidth-28, 8+5);
-					PlaySymbolPoints[2] = cvPoint(videoimgwidth-18, 8);
+					PlaySymbolPoints[0] = cvPoint(opencvguiimgwidth[guiid]-28, 8-5);
+					PlaySymbolPoints[1] = cvPoint(opencvguiimgwidth[guiid]-28, 8+5);
+					PlaySymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-18, 8);
 					cvFillConvexPoly(dispimgs[guiid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
 				//if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
@@ -1878,16 +1878,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bDispPauseSymbol) 
 				{
 					nbPauseSymbolPoints = 4;
-					PauseSymbolPoints[0] = cvPoint(videoimgwidth-28, 8-5);
-					PauseSymbolPoints[1] = cvPoint(videoimgwidth-28, 8+5);
-					PauseSymbolPoints[2] = cvPoint(videoimgwidth-25, 8+5);
-					PauseSymbolPoints[3] = cvPoint(videoimgwidth-25, 8-5);
+					PauseSymbolPoints[0] = cvPoint(opencvguiimgwidth[guiid]-28, 8-5);
+					PauseSymbolPoints[1] = cvPoint(opencvguiimgwidth[guiid]-28, 8+5);
+					PauseSymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-25, 8+5);
+					PauseSymbolPoints[3] = cvPoint(opencvguiimgwidth[guiid]-25, 8-5);
 					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 					nbPauseSymbolPoints = 4;
-					PauseSymbolPoints[0] = cvPoint(videoimgwidth-21, 8-5);
-					PauseSymbolPoints[1] = cvPoint(videoimgwidth-21, 8+5);
-					PauseSymbolPoints[2] = cvPoint(videoimgwidth-18, 8+5);
-					PauseSymbolPoints[3] = cvPoint(videoimgwidth-18, 8-5);
+					PauseSymbolPoints[0] = cvPoint(opencvguiimgwidth[guiid]-21, 8-5);
+					PauseSymbolPoints[1] = cvPoint(opencvguiimgwidth[guiid]-21, 8+5);
+					PauseSymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-18, 8+5);
+					PauseSymbolPoints[3] = cvPoint(opencvguiimgwidth[guiid]-18, 8-5);
 					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
 			}
@@ -1901,7 +1901,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat1_threshold > 0.01)&&(vbat1_filtered < vbat1_threshold))
 					{
 						strcpy(szText, "BAT1 ALARM");
-						cvPutText(dispimgs[guiid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(opencvguiimgwidth[guiid]-16*8, opencvguiimgheight[guiid]-8-3*16), &font, CV_RGB(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 3.0)
@@ -1909,7 +1909,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat2_threshold > 0.01)&&(vbat2_filtered < vbat2_threshold))
 					{
 						strcpy(szText, "BAT2 ALARM");
-						cvPutText(dispimgs[guiid], szText, cvPoint(videoimgwidth-16*8, videoimgheight-8-3*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(opencvguiimgwidth[guiid]-16*8, opencvguiimgheight[guiid]-8-3*16), &font, CV_RGB(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 4.0)

@@ -99,7 +99,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			//printf("Unable to find the wall to detect.\n");
 			LeaveCriticalSection(&WallCS);
 			EnterCriticalSection(&WallOverlayImgCS);
-			cvCopy(overlayimage, WallOverlayImg, 0);
+			CopyResizeScale(overlayimage, WallOverlayImg, bCropOnResize);
 			LeaveCriticalSection(&WallOverlayImgCS);
 			if (bExit) break;
 			continue;
@@ -301,7 +301,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 		LeaveCriticalSection(&WallCS);
 
 		EnterCriticalSection(&WallOverlayImgCS);
-		cvCopy(overlayimage, WallOverlayImg, 0);
+		CopyResizeScale(overlayimage, WallOverlayImg, bCropOnResize);
 		LeaveCriticalSection(&WallOverlayImgCS);
 
 		if (bExit) break;

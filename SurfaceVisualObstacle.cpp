@@ -479,7 +479,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 		// Get an image from the webcam or video.
 		EnterCriticalSection(&imgsCS[videoid_surfacevisualobstacle]);
-		cvCopy(imgs[videoid_surfacevisualobstacle], image, 0);
+		CopyResizeScale(imgs[videoid_surfacevisualobstacle], image, bCropOnResize);
 		LeaveCriticalSection(&imgsCS[videoid_surfacevisualobstacle]);
 
 		// Convert image->imageData from char* to unsigned char* to work with color values in 0..255.
@@ -635,7 +635,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		LeaveCriticalSection(&SurfaceVisualObstacleCS);
 
 		EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
-		cvCopy(overlayimage, SurfaceVisualObstacleOverlayImg, 0);
+		CopyResizeScale(overlayimage, SurfaceVisualObstacleOverlayImg, bCropOnResize);
 		LeaveCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 
 		if (bExit) break;

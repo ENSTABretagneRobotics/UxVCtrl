@@ -98,9 +98,12 @@ double Energy_electronics = 0, Energy_actuators = 0;
 int robid = 0;
 double roblength = 0, robwidth = 0, robheight = 0;
 int nbopencvgui = 0, videoimgwidth = 0, videoimgheight = 0, captureperiod = 0, HorizontalBeam = 0, VerticalBeam = 0;
+BOOL bCropOnResize = FALSE;
 char szVideoRecordCodec[5];
 BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
 BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
+int opencvguiimgwidth[MAX_NB_OPENCVGUI];
+int opencvguiimgheight[MAX_NB_OPENCVGUI];
 int opencvguiperiod = 0;
 BOOL bMAVLinkInterface = FALSE;
 char szMAVLinkInterfacePath[MAX_BUF_LEN];
@@ -534,13 +537,27 @@ BOOL bRestartVideo[MAX_NB_VIDEO];
 #endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion
 
+// VideoRecord variables.
+int VideoRecordRequests[MAX_NB_VIDEO];
+BOOL bVideoRecordRestart[MAX_NB_VIDEO];
+CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
+#ifndef DISABLE_OPENCV_SUPPORT
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
+#else
+cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+#endif // !DISABLE_OPENCV_SUPPORT
+char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
+FILE* endvideorecordfiles[MAX_NB_VIDEO];
+char endvideorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
+int videorecordwidth[MAX_NB_VIDEO], videorecordheight[MAX_NB_VIDEO];
+
 // Other.
 #ifndef DISABLE_OPENCV_SUPPORT
 IplImage* dispimgs[MAX_NB_OPENCVGUI];
 #endif // !DISABLE_OPENCV_SUPPORT
-int VideoRecordRequests[MAX_NB_VIDEO];
 CRITICAL_SECTION dispimgsCS[MAX_NB_OPENCVGUI];
-CRITICAL_SECTION VideoRecordRequestsCS[MAX_NB_VIDEO];
 CRITICAL_SECTION SeanetConnectingCS;
 CRITICAL_SECTION SeanetDataCS;
 CRITICAL_SECTION StateVariablesCS;
@@ -600,17 +617,6 @@ int procstackids[MAX_NB_PROCEDURES];
 int procstack = 0;
 double registers[MAX_NB_REGISTERS];
 char keys[NB_CONFIGURABLE_KEYS];
-
-#ifndef DISABLE_OPENCV_SUPPORT
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-CvVideoWriter* videorecordfiles[MAX_NB_VIDEO];
-#else
-cv::VideoWriter videorecordfiles[MAX_NB_VIDEO];
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
-#endif // !DISABLE_OPENCV_SUPPORT
-char videorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
-FILE* endvideorecordfiles[MAX_NB_VIDEO];
-char endvideorecordfilenames[MAX_NB_VIDEO][MAX_BUF_LEN];
 
 FILE* missionfile = NULL;
 

@@ -1,3 +1,7 @@
+282
+Removed USE_ALTERNATE_RECORDING option.
+Added bCropOnResize, opencvguiimgwidth, opencvguiimgheight parameters.
+
 281
 Added more accurate time in logs filenames.
 

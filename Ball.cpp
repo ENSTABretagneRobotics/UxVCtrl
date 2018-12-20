@@ -153,7 +153,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 		// Get an image from the webcam or video.
 		EnterCriticalSection(&imgsCS[videoid_ball[id]]);
-		cvCopy(imgs[videoid_ball[id]], image, 0);
+		CopyResizeScale(imgs[videoid_ball[id]], image, bCropOnResize);
 		LeaveCriticalSection(&imgsCS[videoid_ball[id]]);
 
 		// Convert image->imageData from char* to unsigned char* to work with color values in 0..255.
@@ -265,7 +265,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			//bTemporaryObjectDetected = FALSE;
 			LeaveCriticalSection(&BallCS[id]);
 			EnterCriticalSection(&BallOverlayImgCS[id]);
-			cvCopy(overlayimage, BallOverlayImg[id], 0);
+			CopyResizeScale(overlayimage, BallOverlayImg[id], bCropOnResize);
 			LeaveCriticalSection(&BallOverlayImgCS[id]);
 			if (bExit) break;
 			continue;
@@ -724,7 +724,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		LeaveCriticalSection(&BallCS[id]);
 
 		EnterCriticalSection(&BallOverlayImgCS[id]);
-		cvCopy(overlayimage, BallOverlayImg[id], 0);
+		CopyResizeScale(overlayimage, BallOverlayImg[id], bCropOnResize);
 		LeaveCriticalSection(&BallOverlayImgCS[id]);
 
 		if (bExit) break;

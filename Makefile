@@ -5,7 +5,6 @@
 # Additionally, you might need to install additional prerequisites, as described in ReadMe.txt.
 # For more information on the configuration used, see http://www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt .
 # Use dos2unix *.txt to ensure line endings are correct for Linux in the configuration files.
-# In case of codecs problems, try with USE_ALTERNATE_RECORDING...
 # On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the program stops immediately after opening OpenCV windows.
 
 PROGS = UxVCtrl
@@ -25,7 +24,6 @@ CFLAGS += -D OPENCV2413
 #CFLAGS += -D OPENCV320
 #CFLAGS += -D USE_FFMPEG_VIDEO
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
-#CFLAGS += -D USE_ALTERNATE_RECORDING
 #CFLAGS += -D DISABLE_OPENCV_SUPPORT
 CFLAGS += -D ENABLE_MAVLINK_SUPPORT
 CFLAGS += -D ENABLE_LABJACK_SUPPORT
