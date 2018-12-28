@@ -1,6 +1,11 @@
+
+env obstacles interdit intérieur 
+
+Commande pour changer facilement quelle vidéo est envoyée en remote?
+VideoInterface (from RemoteWebcamMultiSrv), params pour choisir le nombre, ports et la source (peut être superposition comme un opencvgui, ou même une gui?)?
 if img size resized by video server...?
-set resolution for ball from the video automatically?
 dynamic gui resolution changes?
+set resolution for ball from the video automatically?
 Pour la taille des images partagées, prendre la résolution min des webcams?
 OBJTYPE_CARDS qui fait traitement de Julien
 prendre l'habitude de faire un ballconfig après le stopballtracking pour reset variables
@@ -8,14 +13,6 @@ pouvoir combiner les résultats de détection de plusieurs couleurs pour dire que 
 rename ball to hslobj, séparer aussi la partie détection de lumière, partager variables objDistance, etc., comment gérer les actions, l'id pourrait servir de priorité...?
 
 Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2...
-
-blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
-minrange param, zone morte pour tous les sonar et echosondeurs...?
-rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
-Indiquer pings utilisés pour localisation
-FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
-MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
-(walltracking overlay fait aussi walldetect, wallavoidance)
 
 flux optique avec données lidar pour déduire vrx et vry si on suppose que l'environnement est statique et essayer de déterminer si en fait il y a quand même des parties dynamiques pour les enlever
 Regression linéaire de ce qui a devant, derrière, droite, gauche et calcul du déplacement de la ligne connaissant vitesse de rotation
@@ -38,6 +35,13 @@ Orientation de l'image lidar pas pratique car sans doute corrigée en cap, il fau
 d, alpha, beta, rgbie, accuracy, xyz, sensor space, robot space, env
 Several views : as camera, as 2D sonar, as 2D lidar, vue sous forme de projection ou coupe...
 pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
+blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
+minrange param, zone morte pour tous les sonar et echosondeurs...?
+rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
+Indiquer pings utilisés pour localisation
+FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
+MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
+(walltracking overlay fait aussi walldetect, wallavoidance)
 
 controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?->tester en simu si le terme intégral est suffisant, mais il est souvent remis à 0...
 
@@ -368,6 +372,7 @@ Faire programme pour aider à la mag calib
 fournir simple couche d'adaptation pour pouvoir traiter webcam sans opencv
 
 acousticmodemlocalization
+rename acousticmodem commands to modem?
 transmettre aussi t pour améliorer précision de localisation
 commande comme setstateestimation/gpslocalization qui contracte la position par acoustique
 quand il y a incohérence, agrandir et recommencer à contracter 3 fois?

@@ -257,6 +257,8 @@ d_max_rand_err = 0, d_bias_err = 0,
 alphavrx = 0, alphaomegaz = 0, alphafvrx = 0, alphafomegaz = 0, alphaz = 0, vzup = 0, 
 alphas = 0, omegas = 0;
 double outliers_ratio = 0;
+BOOL bNoSimGNSSInsideObstacles = FALSE;
+BOOL bRawSimStateInMAVLinkInterface = FALSE;
 int simulatorperiod = 0;
 #pragma endregion
 
@@ -269,6 +271,10 @@ box box_env;
 
 // Environment variables.
 COORDSYSTEM csMap;
+
+// Simulator variables.
+double x_sim = 0, y_sim = 0, z_sim = 0, phi_sim = 0, theta_sim = 0, psi_sim = 0, vrx_sim = 0, vry_sim = 0, vrz_sim = 0, omegax_sim = 0, omegay_sim = 0, omegaz_sim = 0;
+double alpha_sim = 0, d_sim = 0;
 
 // SonarAltitudeEstimation variables.
 BOOL bSonarAltitudeEstimation = FALSE;
@@ -405,6 +411,7 @@ double forbidx_followme = 0, forbidy_followme = 0, forbidz_followme = 0;
 
 // Simulator variables.
 int GNSSqualitySimulator = 0;
+BOOL bEnableSimulatedGNSS = TRUE;
 BOOL bEnableSimulatedDVL = FALSE;
 
 // CISCREA variables.

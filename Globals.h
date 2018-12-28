@@ -474,6 +474,8 @@ d_max_rand_err, d_bias_err,
 alphavrx, alphaomegaz, alphafvrx, alphafomegaz, alphaz, vzup, 
 alphas, omegas;
 extern double outliers_ratio;
+extern BOOL bNoSimGNSSInsideObstacles;
+extern BOOL bRawSimStateInMAVLinkInterface;
 extern int simulatorperiod;
 #pragma endregion
 
@@ -486,6 +488,10 @@ extern box box_env;
 
 // Environment variables.
 extern COORDSYSTEM csMap;
+
+// Simulator variables.
+extern double x_sim, y_sim, z_sim, phi_sim, theta_sim, psi_sim, vrx_sim, vry_sim, vrz_sim, omegax_sim, omegay_sim, omegaz_sim;
+extern double alpha_sim, d_sim;
 
 // SonarAltitudeEstimation variables.
 extern BOOL bSonarAltitudeEstimation;
@@ -622,6 +628,7 @@ extern double forbidx_followme, forbidy_followme, forbidz_followme;
 
 // Simulator variables.
 extern int GNSSqualitySimulator;
+extern BOOL bEnableSimulatedGNSS;
 extern BOOL bEnableSimulatedDVL;
 
 // CISCREA variables.
@@ -1016,6 +1023,42 @@ inline void Snapshot(void)
 		}
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
+}
+
+// Determine whether (x,y) is inside an obstacle. Return positive (inside), negative (outside), or zero (on an edge) value, correspondingly. 
+// When measureDist == false, the return value is +1, -1, and 0, respectively. 
+// Otherwise, the return value is a signed distance between the point and the nearest obstacle edge.
+inline double CheckInsideObstacle(double x, double y, bool measureDist)
+{
+	double result = -1;
+
+#ifndef DISABLE_OPENCV_SUPPORT
+	int i = 0;
+	double d = 0;
+	vector<cv::Point2f> contours;
+
+	// Environment circles.
+	for (i = 0; i < (int)circles_r.size(); i++)
+	{
+		d = circles_r[i]-sqrt(sqr(circles_x[i]-x)+sqr(circles_y[i]-y));
+		if ((!measureDist)&&(d != 0)) d = sign(d, 0);
+		result = max(d, result);
+	}
+
+	// Environment walls.
+	for (i = 0; i < (int)walls_xa.size(); i++)
+	{
+		contours.push_back(cv::Point2f((float)walls_xa[i], (float)walls_ya[i]));
+		contours.push_back(cv::Point2f((float)walls_xb[i], (float)walls_yb[i]));
+	}
+	if (contours.size() > 0) result = max(cv::pointPolygonTest(contours, cv::Point2f((float)x, (float)y), measureDist), result);
+#else
+	UNREFERENCED_PARAMETER(x);
+	UNREFERENCED_PARAMETER(y);
+	UNREFERENCED_PARAMETER(measureDist);
+#endif // !DISABLE_OPENCV_SUPPORT
+
+	return result;
 }
 
 inline int InitGlobals(void)

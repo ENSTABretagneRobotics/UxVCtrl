@@ -659,8 +659,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				double latitude = 0, longitude = 0, altitude = 0;
 
 				// We do not use GPS altitude for that as it is not reliable...
-				// Assume that latitude,longitude is only updated by GPS...
-				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(x_gps), Center(y_gps), Center(z_gps), &latitude, &longitude, &altitude);
 				lat_env = latitude; long_env = longitude;
 			}
 			break;
@@ -769,6 +768,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bEnableAltRCMode = !bEnableAltRCMode;
 			if (bEnableAltRCMode) printf("Alternate RC mode enabled.\n");
 			else printf("Alternate RC mode disabled.\n");
+			break;
+		case '§':
+			bEnableSimulatedGNSS = !bEnableSimulatedGNSS;
+			if (bEnableSimulatedGNSS) printf("Simulated GNSS enabled.\n");
+			else printf("Simulated GNSS disabled.\n");
 			break;
 		case '#':
 			bEnableSimulatedDVL = !bEnableSimulatedDVL;
@@ -1499,7 +1503,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bRotatingMap)
 				{
 					// Environment circles.
-					for (i = 0; i < nb_circles; i++)
+					for (i = 0; i < (int)circles_r.size(); i++)
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
@@ -1509,7 +1513,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 1, 8, 0);
 					}
 					// Environment walls.
-					for (i = 0; i < nb_walls; i++)
+					for (i = 0; i < (int)walls_xa.size(); i++)
 					{
 						cvLine(dispimgs[guiid], 
 							cvPoint(
@@ -1597,14 +1601,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				else
 				{
 					// Environment circles.
-					for (i = 0; i < nb_circles; i++)
+					for (i = 0; i < (int)circles_r.size(); i++)
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, circles_x[i]), detailsi+YCS2IImg(&csMap2FullImg, circles_y[i])), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 1, 8, 0);
 					}
 					// Environment walls.
-					for (i = 0; i < nb_walls; i++)
+					for (i = 0; i < (int)walls_xa.size(); i++)
 					{
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, walls_xa[i]), detailsi+YCS2IImg(&csMap2FullImg, walls_ya[i])), 
@@ -1666,7 +1670,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bRotatingMap)
 				{
 					// Environment circles.
-					for (i = 0; i < nb_circles; i++)
+					for (i = 0; i < (int)circles_r.size(); i++)
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
@@ -1676,7 +1680,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 2, 8, 0);
 					}
 					// Environment walls.
-					for (i = 0; i < nb_walls; i++)
+					for (i = 0; i < (int)walls_xa.size(); i++)
 					{
 						cvLine(dispimgs[guiid], 
 							cvPoint(
@@ -1763,14 +1767,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				else
 				{
 					// Environment circles.
-					for (i = 0; i < nb_circles; i++)
+					for (i = 0; i < (int)circles_r.size(); i++)
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, circles_x[i]), YCS2IImg(&csMap2FullImg, circles_y[i])), 
 							(int)(circles_r[i]*csMap2FullImg.JXRatio), colormap, 2, 8, 0);
 					}
 					// Environment walls.
-					for (i = 0; i < nb_walls; i++)
+					for (i = 0; i < (int)walls_xa.size(); i++)
 					{
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, walls_xa[i]), YCS2IImg(&csMap2FullImg, walls_ya[i])), 

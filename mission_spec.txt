@@ -80,7 +80,11 @@
 %
 %setwindestimation psitwind vtwind (psitwind : double [-pi,pi[ mod(2*pi) true wind vector direction in rad, vtwind : double ]-oo,oo[ true wind speed in m/s)
 %
+%windfilterconfig wind_filter_coef (wind_filter_coef : double [0,1] wind filter coefficient where 0 disables the filter)
+%
 %drconfig alphavrxhat.inf alphavrxhat.sup alphaomegazhat.inf alphaomegazhat.sup alphafvrxhat.inf alphafvrxhat.sup alphafomegazhat.inf alphafomegazhat.sup alphazhat.inf alphazhat.sup vzuphat.inf vzuphat.sup
+%
+%calibalphavrx t (double [0,oo[ timeout in s, the function blocks while moving forward with heading control until the timeout is reached, it uses GPS to try to estimate alphavrx coefficient)
 %
 %staticsonarlocalization t [nbretries, retryperiod?] (double [0,oo[ timeout in s, the function blocks until the timeout is reached[, nbretries : int [0,oo[ number of retries if the algorithm reports that the data might be unreliable, make the robot go backward and turn a little bit before a retry], this command can be used when the submarine is stopped to get a better estimation of the current position using sonar. If the algorithm reports that the data might be unreliable, this estimation will be ignored. Otherwise, if the new estimated position is inconsistent with any previously estimated position, this replaces any previously estimated position)
 %
@@ -405,6 +409,11 @@
 %
 %saveconfig
 %
+% Might be unsafe...
+%reloadenv
+%
+%saveenv
+%
 %sethome lat_home long_home alt_home (lat_home, long_home, alt_home : double ]-oo,oo[ in decimal deg and m)
 %
 %home
@@ -412,6 +421,10 @@
 %enablemavlinkinterfacein
 %
 %disablemavlinkinterfacein
+%
+%enablesimulatedgps
+%
+%disablesimulatedgps
 %
 %enablesimulateddvl
 %
@@ -428,8 +441,6 @@
 %wxcontrolconfig Kp_wx Kd_wx Ki_z up_max_wx ud_max_wx ui_max_wx u_min_wx u_max_wx error_min_wx error_max_wx omega_max_wx
 %
 %sailboatconfig betatrav betaarr zeta check_strategy_period sail_update_period sailboattacktype sailformulatype (betatrav : double ]-oo,oo[ sail angle when the wind comes from the side in rad, betaarr : double ]-oo,oo[ sail angle when the wind comes from the rear in rad, zeta : double ]-oo,oo[ close-hauled angle in rad, check_strategy_period : double [0,oo[ in s, sail_update_period : double [0,oo[ in s, sailboattacktype : int [0,2], sailformulatype : int [0,2])
-%
-%windfilterconfig wind_filter_coef (wind_filter_coef : double [0,1] wind filter coefficient where 0 disables the filter)
 %
 % SIMPLE MOVING COMMANDS
 %

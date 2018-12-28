@@ -1144,8 +1144,7 @@ inline int Commands(char* line)
 				double latitude = 0, longitude = 0, altitude = 0;
 
 				// We do not use GPS altitude for that as it is not reliable...
-				// Assume that latitude,longitude is only updated by GPS...
-				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(x_gps), Center(y_gps), Center(z_gps), &latitude, &longitude, &altitude);
 				lat_env = latitude; long_env = longitude;
 			}
 			LeaveCriticalSection(&StateVariablesCS);
@@ -1249,23 +1248,70 @@ inline int Commands(char* line)
 		vtwind = dval2;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else if (sscanf(line, "windfilterconfig %lf", &dval1) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wind_filter_coef = dval1;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "drconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		alphavrxhat.inf = dval1;
-		alphavrxhat.sup = dval2;
-		alphaomegazhat.inf = dval3;
-		alphaomegazhat.sup = dval4;
-		alphafvrxhat.inf = dval5;
-		alphafvrxhat.sup = dval6;
-		alphafomegazhat.inf = dval7;
-		alphafomegazhat.sup = dval8;
-		alphazhat.inf = dval9;
-		alphazhat.sup = dval10;
-		vzuphat.inf = dval11;
-		vzuphat.sup = dval12;
+		alphavrxhat = interval(dval1, dval2);
+		alphaomegazhat = interval(dval3, dval4);
+		alphafvrxhat = interval(dval5, dval6);
+		alphafomegazhat = interval(dval7, dval8);
+		alphazhat = interval(dval9, dval10);
+		vzuphat = interval(dval11, dval12);
 		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "calibalphavrx %lf", &delay) == 1)
+	{
+		if (delay > 0)
+		{
+			double delta_x = 0, delta_y = 0;
+
+			EnterCriticalSection(&StateVariablesCS);
+			u = 1;
+			wpsi = Center(psihat);
+			bDistanceControl = FALSE;
+			bBrakeControl = FALSE;
+			bLineFollowingControl = FALSE;
+			bWaypointControl = FALSE;
+			bHeadingControl = TRUE;
+			if (bCheckGNSSOK())
+			{
+				delta_x = Center(x_gps); delta_y = Center(y_gps); 
+			}
+			LeaveCriticalSection(&StateVariablesCS);
+			delay = fabs(delay);
+			bWaiting = TRUE;
+			StartChrono(&chrono);
+			for (;;)
+			{
+				if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+				if (!bWaiting) break;
+				if (bExit) break;
+				// Wait at least delay/10 and at most around 100 ms for each loop.
+				mSleep((long)min(delay*100.0, 100.0));
+			}
+			StopChronoQuick(&chrono);
+			bWaiting = FALSE;
+			EnterCriticalSection(&StateVariablesCS);
+			if ((bCheckGNSSOK())&&(delay*u != 0))
+			{
+				delta_x -= Center(x_gps); delta_y -= Center(y_gps);
+				dval = sqrt(sqr(delta_x)+sqr(delta_y))/(delay*u);
+				alphavrxhat = interval(dval-0.01,dval+0.01);
+			}
+			bHeadingControl = FALSE;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
 	}
 	else if (sscanf(line, "staticsonarlocalization %lf", &delay) == 1)
 	{
@@ -3637,6 +3683,21 @@ inline int Commands(char* line)
 		SaveConfig();
 		LeaveCriticalSection(&StateVariablesCS); // Just in case...
 	}
+	else if (strncmp(line, "reloadenv", strlen("reloadenv")) == 0)
+	{
+
+		// Might be unsafe...
+
+		EnterCriticalSection(&StateVariablesCS); // Just in case...
+		LoadEnv();
+		LeaveCriticalSection(&StateVariablesCS); // Just in case...
+	}
+	else if (strncmp(line, "saveenv", strlen("saveenv")) == 0)
+	{
+		EnterCriticalSection(&StateVariablesCS); // Just in case...
+		SaveEnv();
+		LeaveCriticalSection(&StateVariablesCS); // Just in case...
+	}
 	else if (sscanf(line, "sethome %lf %lf %lf", &dval1, &dval2, &dval3) == 3)
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -3656,6 +3717,14 @@ inline int Commands(char* line)
 	else if (strncmp(line, "disablemavlinkinterfacein", strlen("disablemavlinkinterfacein")) == 0)
 	{
 		bDisableMAVLinkInterfaceIN = TRUE;
+	}
+	else if (strncmp(line, "enablesimulatedgps", strlen("enablesimulatedgps")) == 0)
+	{
+		bEnableSimulatedGNSS = TRUE;
+	}
+	else if (strncmp(line, "disablesimulatedgps", strlen("disablesimulatedgps")) == 0)
+	{
+		bEnableSimulatedGNSS = FALSE;
 	}
 	else if (strncmp(line, "enablesimulateddvl", strlen("enablesimulateddvl")) == 0)
 	{
@@ -3707,12 +3776,6 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		betaside = dval1; betarear = dval2; zeta = dval3; check_strategy_period = dval4; sail_update_period = dval5; sailboattacktype = ival1; sailformulatype = ival2;
-		LeaveCriticalSection(&StateVariablesCS);
-	}
-	else if (sscanf(line, "windfilterconfig %lf", &dval1) == 1)
-	{
-		EnterCriticalSection(&StateVariablesCS);
-		wind_filter_coef = dval1;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 #pragma endregion

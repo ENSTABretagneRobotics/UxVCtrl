@@ -19,8 +19,6 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double d1 = 0, d2 = 0;
 
 	double vc = 0, psic = 0, hw = 0;
-	double x = 0, y = 0, z = 0, phi = 0, theta = 0, psi = 0, vrx = 0, vry = 0, vrz = 0, omegax = 0, omegay = 0, omegaz = 0;
-	double alpha = 0, d = 0;
 	
 	// Motorboat simulator...
 	double alphafvry = 0.1;
@@ -58,8 +56,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	t = 0;
 
-	x = x_0; y = y_0; z = z_0; phi = phi_0; theta = theta_0; psi = psi_0; vrx = vrx_0; vry = vry_0; vrz = vrz_0; omegax = omegax_0; omegay = omegay_0; omegaz = omegaz_0;
-	alpha_mes = alpha_0; d = d_0;
+	x_sim = x_0; y_sim = y_0; z_sim = z_0; phi_sim = phi_0; theta_sim = theta_0; psi_sim = psi_0; vrx_sim = vrx_0; vry_sim = vry_0; vrz_sim = vrz_0; omegax_sim = omegax_0; omegay_sim = omegay_0; omegaz_sim = omegaz_0;
+	alpha_mes = alpha_0; d_sim = d_0;
 
 	StartChrono(&chrono);
 
@@ -80,7 +78,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 		if (robid == SUBMARINE_SIMULATOR_ROBID)
 		{
-			// z should change when at the surface because of waves, but not underwater...
+			// z_sim should change when at the surface because of waves, but not underwater...
 			// z_mes should change underwater because of waves, but not at the surface...
 
 			// Simulated environnement evolution (current and waves).
@@ -89,35 +87,37 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			hw = hw_var*(2.0*rand()/(double)RAND_MAX-1.0);
 
 			// Simulated state evolution.
-			double xdot = vrx*cos(psi)+vc*cos(psic);
-			double ydot = vrx*sin(psi)+vc*sin(psic);
+			double xdot = vrx_sim*cos(psi_sim)+vc*cos(psic);
+			double ydot = vrx_sim*sin(psi_sim)+vc*sin(psic);
 			double zdot = u3*alphaz+vzup;
 			double psidot = (u1-u2)*alphaomegaz;
-			//double psidot = omegaz;
-			double vrxdot = (u1+u2)*alphavrx-vrx*alphafvrx;
-			//double omegazdot = (u1-u2)*alphaomegaz-omegaz*alphafomegaz;
-			x = x+dt*xdot;
-			y = y+dt*ydot;
-			z = min(z+dt*zdot, 0.0); // z always negative.
-			psi = psi+dt*psidot;
-			vrx = vrx+dt*vrxdot;
-			//omegaz = omegaz+dt*omegazdot;
+			//double psidot = omegaz_sim;
+			double vrxdot = (u1+u2)*alphavrx-vrx_sim*alphafvrx;
+			//double omegazdot = (u1-u2)*alphaomegaz-omegaz_sim*alphafomegaz;
+			x_sim = x_sim+dt*xdot;
+			y_sim = y_sim+dt*ydot;
+			z_sim = min(z_sim+dt*zdot, 0.0); // z always negative.
+			psi_sim = psi_sim+dt*psidot;
+			vrx_sim = vrx_sim+dt*vrxdot;
+			//omegaz_sim = omegaz_sim+dt*omegazdot;
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// Pressure sensor.
 			// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
 			// Les vagues perturbent ses mesures.
-			z_pressure = z+z_bias_err+z_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+hw+interval(-z_pressure_acc, z_pressure_acc); // Waves influence...
+			z_pressure = z_sim+z_bias_err+z_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+hw+interval(-z_pressure_acc, z_pressure_acc); // Waves influence...
 			// GPS available on surface.
-			if (z >= GPS_submarine_depth_limit)
+			if ((bEnableSimulatedGNSS)&&
+				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0)))&&
+				(z_sim >= GPS_submarine_depth_limit))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -130,9 +130,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			// DVL.
 			if (bEnableSimulatedDVL)
 			{
-				double vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double vry_mes = vry+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double vrz_mes = vrz+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double vrx_mes = vrx_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double vry_mes = vry_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double vrz_mes = vrz_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				vrx_dvl = interval(vrx_mes-dvl_acc, vrx_mes+dvl_acc);
 				vry_dvl = interval(vry_mes-dvl_acc, vry_mes+dvl_acc);
 				vrz_dvl = interval(vrz_mes-dvl_acc, vrz_mes+dvl_acc);
@@ -147,30 +147,38 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		else if (robid == MOTORBOAT_SIMULATOR_ROBID)
 		{
 			// Simulated state evolution.
-			double xdot = vrx*cos(psi)*cos(alphaomegaz*uw)+vc*cos(psic);
-			double ydot = vrx*sin(psi)*cos(alphaomegaz*uw)+vc*sin(psic);
-			double psidot = vrx*sin(alphaomegaz*uw)/alphaz;
-			double vrxdot = u*alphavrx-vrx*alphafvrx;
-			double vrydot = -vry*alphafvry;
-			x = x+dt*xdot;
-			y = y+dt*ydot;
-			psi = psi+dt*psidot;
-			vrx = vrx+dt*vrxdot;
-			vry = vry+dt*vrydot;
+			double xdot = vrx_sim*cos(psi_sim)*cos(alphaomegaz*uw)+vc*cos(psic);
+			double ydot = vrx_sim*sin(psi_sim)*cos(alphaomegaz*uw)+vc*sin(psic);
+			double psidot = vrx_sim*sin(alphaomegaz*uw)/alphaz;
+			double vrxdot = u*alphavrx-vrx_sim*alphafvrx;
+			double vrydot = -vry_sim*alphafvry;
+			x_sim = x_sim+dt*xdot;
+			y_sim = y_sim+dt*ydot;
+			psi_sim = psi_sim+dt*psidot;
+			vrx_sim = vrx_sim+dt*vrxdot;
+			vry_sim = vry_sim+dt*vrydot;
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			// GPS always available.
-			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
-			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS.
+			if ((bEnableSimulatedGNSS)&&
+				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
+			{
+				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			}
+			else
+			{
+				GNSSqualitySimulator = GNSS_NO_FIX;
+			}
 		}
 		else if (robid == SAILBOAT_SIMULATOR_ROBID)
 		{
@@ -193,85 +201,109 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			double deltar = alphaomegaz*uw;
 			double deltasmaxsimu = deltasminreal+u*(deltasmaxreal-deltasminreal);
 
-			double gamma = cos(theta-psi)+cos(deltasmaxsimu);
-			if (gamma<0) deltas = M_PI-theta+psi; // Voile en drapeau.
-			else if (sin(theta-psi)>0) deltas = deltasmaxsimu; else deltas = -deltasmaxsimu;
-			double fg = alphaz*vrx*sin(deltar);
-			double fv = alphavrx*V*sin(theta+deltas-psi);
-			x += (vrx*cos(theta)+beta*V*cos(psi)+vc*cos(psic))*dt;
-			y += (vrx*sin(theta)+beta*V*sin(psi)+vc*sin(psic))*dt;
-			theta += omegaz*dt;
-			omegaz += (1/Jz)*((l-rs*cos(deltas))*fv-rr*cos(deltar)*fg-alphafomegaz*omegaz+alphaw*hw)*dt;
-			vrx += (1/m)*(sin(deltas)*fv-sin(deltar)*fg-alphafvrx*vrx*vrx)*dt;
-			phidot += (-alphaomegax*phidot/Jx+fv*h*cos(deltas)*cos(phi)/Jx-m*9.81*leq*sin(phi)/Jx)*dt;
-			phi += phidot*dt;
+			double gamma = cos(theta_sim-psi_sim)+cos(deltasmaxsimu);
+			if (gamma<0) deltas = M_PI-theta_sim+psi_sim; // Voile en drapeau.
+			else if (sin(theta_sim-psi_sim)>0) deltas = deltasmaxsimu; else deltas = -deltasmaxsimu;
+			double fg = alphaz*vrx_sim*sin(deltar);
+			double fv = alphavrx*V*sin(theta_sim+deltas-psi_sim);
+			x_sim += (vrx_sim*cos(theta_sim)+beta*V*cos(psi_sim)+vc*cos(psic))*dt;
+			y_sim += (vrx_sim*sin(theta_sim)+beta*V*sin(psi_sim)+vc*sin(psic))*dt;
+			theta_sim += omegaz_sim*dt;
+			omegaz_sim += (1/Jz)*((l-rs*cos(deltas))*fv-rr*cos(deltar)*fg-alphafomegaz*omegaz_sim+alphaw*hw)*dt;
+			vrx_sim += (1/m)*(sin(deltas)*fv-sin(deltar)*fg-alphafvrx*vrx_sim*vrx_sim)*dt;
+			phidot += (-alphaomegax*phidot/Jx+fv*h*cos(deltas)*cos(phi_sim)/Jx-m*9.81*leq*sin(phi_sim)/Jx)*dt;
+			phi_sim += phidot*dt;
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			// GPS always available.
-			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
-			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS.
+			if ((bEnableSimulatedGNSS)&&
+				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
+			{
+				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			}
+			else
+			{
+				GNSSqualitySimulator = GNSS_NO_FIX;
+			}
 		}
 		else if (robid == TANK_SIMULATOR_ROBID)
 		{
-			psi = alphaomegaz*uw;
-			vrx = alphavrx*u;
+			psi_sim = alphaomegaz*uw;
+			vrx_sim = alphavrx*u;
 
 			// Simulated state evolution.
-			double xdot = vrx*cos(psi);
-			double ydot = vrx*sin(psi);
-			x = x+dt*xdot;
-			y = y+dt*ydot;
+			double xdot = vrx_sim*cos(psi_sim);
+			double ydot = vrx_sim*sin(psi_sim);
+			x_sim = x_sim+dt*xdot;
+			y_sim = y_sim+dt*ydot;
 
 			// Simulated sensors measurements.
 			// Compass.
-			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			// GPS always available.
-			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
-			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS.
+			if ((bEnableSimulatedGNSS)&&
+				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
+			{
+				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			}
+			else
+			{
+				GNSSqualitySimulator = GNSS_NO_FIX;
+			}
 			// Odometers...
-			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			//vrx_mes = vrx_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		}
 		else if (robid == BUGGY_SIMULATOR_ROBID)
 		{
-			vrx = alphavrx*u;
+			vrx_sim = alphavrx*u;
 
 			// Simulated state evolution.
-			double xdot = vrx*cos(psi)*cos(alphaomegaz*uw);
-			double ydot = vrx*sin(psi)*cos(alphaomegaz*uw);
-			double psidot = vrx*sin(alphaomegaz*uw)/alphaz;
-			x = x+dt*xdot;
-			y = y+dt*ydot;
-			psi = psi+dt*psidot;
+			double xdot = vrx_sim*cos(psi_sim)*cos(alphaomegaz*uw);
+			double ydot = vrx_sim*sin(psi_sim)*cos(alphaomegaz*uw);
+			double psidot = vrx_sim*sin(alphaomegaz*uw)/alphaz;
+			x_sim = x_sim+dt*xdot;
+			y_sim = y_sim+dt*ydot;
+			psi_sim = psi_sim+dt*psidot;
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			// GPS always available.
-			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
-			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS.
+			if ((bEnableSimulatedGNSS)&&
+				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
+			{
+				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			}
+			else
+			{
+				GNSSqualitySimulator = GNSS_NO_FIX;
+			}
 			// Odometers...
-			//vrx_mes = vrx+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+			//vrx_mes = vrx_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		}
 		else if (robid == QUADRO_SIMULATOR_ROBID)
 		{
@@ -282,27 +314,27 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			sqrtuquadro[1] = sqrt(u1); sqrtuquadro[2] = sqrt(u2); sqrtuquadro[3] = sqrt(u3); sqrtuquadro[4] = sqrt(u4);
 			box w = 5*sqrtuquadro;
 
-			imatrix R_Euler = RotationPhiThetaPsi(phi, theta, psi);
-			box Vr = box(vrx, vry, vrz);
+			imatrix R_Euler = RotationPhiThetaPsi(phi_sim, theta_sim, psi_sim);
+			box Vr = box(vrx_sim, vry_sim, vrz_sim);
 			box pdot = R_Euler*Vr;
-			box p = box(x, y, z);
+			box p = box(x_sim, y_sim, z_sim);
 			p = p+dt*pdot;
-			x = Center(p[1]);
-			y = Center(p[2]);
-			z = Center(p[3]);
+			x_sim = Center(p[1]);
+			y_sim = Center(p[2]);
+			z_sim = Center(p[3]);
 
 			rmatrix M = Zeros(3, 3);
-			M.SetVal(1, 1, 1); M.SetVal(1, 2, tan(theta)*sin(phi)); M.SetVal(1, 3, tan(theta)*cos(phi));
-			M.SetVal(2, 1, 0); M.SetVal(2, 2, cos(phi)); M.SetVal(2, 3, -sin(phi));
-			M.SetVal(3, 1, 0); M.SetVal(3, 2, sin(phi)/cos(theta)); M.SetVal(3, 3, cos(phi)/cos(theta));
+			M.SetVal(1, 1, 1); M.SetVal(1, 2, tan(theta_sim)*sin(phi_sim)); M.SetVal(1, 3, tan(theta_sim)*cos(phi_sim));
+			M.SetVal(2, 1, 0); M.SetVal(2, 2, cos(phi_sim)); M.SetVal(2, 3, -sin(phi_sim));
+			M.SetVal(3, 1, 0); M.SetVal(3, 2, sin(phi_sim)/cos(theta_sim)); M.SetVal(3, 3, cos(phi_sim)/cos(theta_sim));
 
-			box Wr = box(omegax, omegay, omegaz);
+			box Wr = box(omegax_sim, omegay_sim, omegaz_sim);
 			box anglesdot = imatrix(M)*Wr;
-			box angles = box(phi, theta, psi);
+			box angles = box(phi_sim, theta_sim, psi_sim);
 			angles = angles+dt*anglesdot;
-			phi = Center(angles[1]);
-			theta = Center(angles[2]);
-			psi = Center(angles[3]);
+			phi_sim = Center(angles[1]);
+			theta_sim = Center(angles[2]);
+			psi_sim = Center(angles[3]);
 			
 			rmatrix B = Zeros(4, 4);
 			B.SetVal(1, 1, b); B.SetVal(1, 2, b); B.SetVal(1, 3, b); B.SetVal(1, 4, b);
@@ -317,9 +349,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			box Vrdot = Transpose(R_Euler)*box(0, 0, STANDARD_GRAVITY)+box(0, 0, -tau[1]/m)-box(Wr[2]*Vr[3]-Wr[3]*Vr[2], Wr[3]*Vr[1]-Wr[1]*Vr[3], Wr[1]*Vr[2]-Wr[2]*Vr[1]);
 			Vr = Vr+dt*Vrdot;
-			vrx = Center(Vr[1]);
-			vry = Center(Vr[2]);
-			vrz = Center(Vr[3]);
+			vrx_sim = Center(Vr[1]);
+			vry_sim = Center(Vr[2]);
+			vrz_sim = Center(Vr[3]);
 
 			rmatrix I = Zeros(3, 3);
 			I.SetVal(1, 1, 10); I.SetVal(1, 2, 0); I.SetVal(1, 3, 0);
@@ -329,38 +361,46 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			box IWr = imatrix(I)*Wr;
 			box Wrdot = imatrix(Inv(I))*(box(tau[2], tau[3], tau[4])-box(Wr[2]*IWr[3]-Wr[3]*IWr[2], Wr[3]*IWr[1]-Wr[1]*IWr[3], Wr[1]*IWr[2]-Wr[2]*IWr[1]));
 			Wr = Wr+dt*Wrdot;
-			omegax = Center(Wr[1]);
-			omegay = Center(Wr[2]);
-			omegaz = Center(Wr[3]);
+			omegax_sim = Center(Wr[1]);
+			omegay_sim = Center(Wr[2]);
+			omegaz_sim = Center(Wr[3]);
 			
 			//// Not fully implemented...
 
-			//psi = alphaomegaz*uw;
-			//vrx = alphavrx*u;
-			//vry = alphavrx*ul;
-			//vrz = u3*alphaz;
+			//psi_sim = alphaomegaz*uw;
+			//vrx_sim = alphavrx*u;
+			//vry_sim = alphavrx*ul;
+			//vrz_sim = u3*alphaz;
 
 			//// Simulated state evolution.
-			//double xdot = vrx*cos(psi)-vry*sin(psi);
-			//double ydot = vry*cos(psi)+vrx*sin(psi);
-			//double zdot = vrz;
-			//x = x+dt*xdot;
-			//y = y+dt*ydot;
-			//z = z+dt*zdot;
+			//double xdot = vrx_sim*cos(psi_sim)-vry_sim*sin(psi_sim);
+			//double ydot = vry_sim*cos(psi_sim)+vrx_sim*sin(psi_sim);
+			//double zdot = vrz_sim;
+			//x_sim = x_sim+dt*xdot;
+			//y_sim = y_sim+dt*ydot;
+			//z_sim = z_sim+dt*zdot;
 
 			// Simulated sensors measurements.
 			// AHRS.
-			phi_ahrs = phi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			psi_ahrs = psi+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			// GPS always available.
-			GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-			double x_gps_mes = x+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double y_gps_mes = y+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-			double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
-			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
-			ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// GPS.
+			if ((bEnableSimulatedGNSS)&&
+				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
+			{
+				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
+				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
+				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
+				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+			}
+			else
+			{
+				GNSSqualitySimulator = GNSS_NO_FIX;
+			}
 		}
 
 		// Sonar.
@@ -369,19 +409,19 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		{
 			alpha_mes = alpha_0;
 		}
-		alpha = alpha_mes-alpha_bias_err-alpha_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		alpha_sim = alpha_mes-alpha_bias_err-alpha_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		// Compute the distance to the first obstacle d. d might be oo if no obstacle found.
-		d1 = DistanceDirSegments(x, y, alpha+alphas+psi, walls_xa, walls_ya, walls_xb, walls_yb);
-		d2 = DistanceDirCircles(x, y, alpha+alphas+psi, circles_x, circles_y, circles_r);
-		d = min(d1, d2);
+		d1 = DistanceDirSegments(x_sim, y_sim, alpha_sim+alphas+psi_sim, walls_xa, walls_ya, walls_xb, walls_yb);
+		d2 = DistanceDirCircles(x_sim, y_sim, alpha_sim+alphas+psi_sim, circles_x, circles_y, circles_r);
+		d_sim = min(d1, d2);
 
 		// Generate outliers.
 		if ((double)rand()/(double)RAND_MAX < outliers_ratio)
 		{
-			d = rangescale*(double)rand()/(double)RAND_MAX;
+			d_sim = rangescale*(double)rand()/(double)RAND_MAX;
 		}
 
-		d_mes = d+d_bias_err+d_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		d_mes = d_sim+d_bias_err+d_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 		d_mes = max(0.0, d_mes);
 		//d_mes = max(0.0, min((double)rangescale, d_mes));
 
@@ -419,8 +459,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			vrxhat_history_vector.pop_front();
 		}
 		
-		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x, y, z, &lat, &lon, &alt);
-		hdg = (fmod_2PI(-angle_env-psi+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat, &lon, &alt);
+		hdg = (fmod_2PI(-angle_env-psi_sim+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
 		// Log.
 		fprintf(logsimufile, 			
@@ -432,9 +472,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
 			"%.3f;%.3f;\n",
-			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d, fmod_360_rad2deg(alpha), 0.0, utc,
-			t, x, y, z, 0.0, 0.0, psi,
-			vrx, 0.0, 0.0, 0.0, 0.0, omegaz, 0.0, 0.0, 0.0,
+			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d_sim, fmod_360_rad2deg(alpha_sim), 0.0, utc,
+			t, x_sim, y_sim, z_sim, 0.0, 0.0, psi_sim,
+			vrx_sim, 0.0, 0.0, 0.0, 0.0, omegaz_sim, 0.0, 0.0, 0.0,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 

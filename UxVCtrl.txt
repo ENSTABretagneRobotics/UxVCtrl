@@ -681,5 +681,9 @@ WMV2
 2.3562
 % outliers_ratio
 0.5
+% bNoSimGNSSInsideObstacles
+0
+% bRawSimStateInMAVLinkInterface
+0
 % simulatorperiod (in ms)
 70

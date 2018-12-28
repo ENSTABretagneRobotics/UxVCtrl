@@ -301,6 +301,8 @@ inline int LoadConfig(void)
 	alphas = 0;
 	omegas = 2.3562;
 	outliers_ratio = 0.5;
+	bNoSimGNSSInsideObstacles = FALSE;
+	bRawSimStateInMAVLinkInterface = FALSE;
 	simulatorperiod = 70;
 #pragma endregion
 
@@ -986,6 +988,10 @@ inline int LoadConfig(void)
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &outliers_ratio) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bNoSimGNSSInsideObstacles) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bRawSimStateInMAVLinkInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &simulatorperiod) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
@@ -1944,6 +1950,10 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", outliers_ratio) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bNoSimGNSSInsideObstacles) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bRawSimStateInMAVLinkInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", simulatorperiod) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 
@@ -2064,16 +2074,18 @@ inline int LoadEnv(void)
 		printf("Configuration file not found.\n");
 		return EXIT_FAILURE;
 	}
-
-	if (nb_circles < 0)
+#pragma region Parameters check
+	if ((nb_circles < 0)||((int)circles_x.size() != nb_circles)||((int)circles_y.size() != nb_circles)||((int)circles_r.size() != nb_circles))
 	{
 		printf("Invalid parameter : nb_circles.\n");
 		nb_circles = 0;
+		circles_x.clear(); circles_y.clear(); circles_r.clear();
 	}
-	if (nb_walls < 0)
+	if ((nb_walls < 0)||((int)walls_xa.size() != nb_walls)||((int)walls_ya.size() != nb_walls)||((int)walls_xb.size() != nb_walls)||((int)walls_yb.size() != nb_walls))
 	{
 		printf("Invalid parameter : nb_walls.\n");
 		nb_walls = 0;
+		walls_xa.clear(); walls_ya.clear(); walls_xb.clear(); walls_yb.clear();
 	}
 	if ((box_env.IsEmpty())||(box_env[1].inf >= box_env[1].sup)||(box_env[2].inf >= box_env[2].sup))
 	{
@@ -2085,8 +2097,103 @@ inline int LoadEnv(void)
 		printf("Invalid parameter : csMap.\n");
 		csMap.xMin = -10; csMap.xMax = 10; csMap.yMin = -10; csMap.yMax = 10; 
 	}
-
+#pragma endregion
 	lat_home = lat_env; long_home = long_env; alt_home = alt_env;
+
+	return EXIT_SUCCESS;
+}
+
+inline int SaveEnv(void)
+{
+	FILE* filein = NULL;
+	FILE* fileout = NULL;
+	char line[MAX_BUF_LEN];
+	int i = 0;
+
+	// Missing error checking...
+
+	memset(line, 0, sizeof(line));
+
+	filein = fopen("env.txt", "r");
+	if (filein == NULL)
+	{
+		printf("Error saving configuration file.\n");
+		return EXIT_FAILURE;
+	}
+	fileout = fopen("~env.txt", "w");
+	if (fileout == NULL)
+	{
+		printf("Error saving configuration file.\n");
+		fclose(filein);
+		return EXIT_FAILURE;
+	}
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", (M_PI/2.0-angle_env)*180.0/M_PI) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", lat_env) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", long_env) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", alt_env) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", (int)circles_r.size()) < 0) printf("Error writing configuration file.\n");
+	for (i = 0; i < (int)circles_r.size(); i++)
+	{
+		if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (fprintf(fileout, "%.10g %.10g %.10g\n", circles_x[i], circles_y[i], circles_r[i]) < 0) printf("Error writing configuration file.\n");
+	}
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", (int)walls_xa.size()) < 0) printf("Error writing configuration file.\n");
+	for (i = 0; i < (int)walls_xa.size(); i++)
+	{
+		if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (fprintf(fileout, "%.10g %.10g %.10g %.10g\n", walls_xa[i], walls_ya[i], walls_xb[i], walls_yb[i]) < 0) printf("Error writing configuration file.\n");
+	}
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", box_env[0].inf) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", box_env[0].sup) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", box_env[1].inf) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", box_env[1].sup) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", csMap.xMin) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", csMap.xMax) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", csMap.xMin) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", csMap.xMax) < 0) printf("Error writing configuration file.\n");
+
+	if (fclose(fileout) != EXIT_SUCCESS)
+	{
+		printf("Error saving configuration file.\n");
+		fclose(filein);
+		return EXIT_FAILURE;
+	}
+	if (fclose(filein) != EXIT_SUCCESS)
+	{
+		printf("Error saving configuration file.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (remove("env.txt") != EXIT_SUCCESS)
+	{
+		printf("Error saving configuration file.\n");
+		return EXIT_FAILURE;
+	}
+	if (rename("~env.txt", "env.txt") != EXIT_SUCCESS)
+	{
+		printf("Error saving configuration file.\n");
+		return EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }

@@ -1,3 +1,9 @@
+283
+Added enable/disablesimulatedgps, reload/saveenv, calibalphavrx commands.
+Corrected gpssetenvcoordposition to ensure it is the GPS position that is used.
+Corrected drconfig.
+Added bNoSimGNSSInsideObstacles (temporary implementation) and bRawSimStateInMAVLinkInterface parameters.
+
 282
 Removed USE_ALTERNATE_RECORDING option.
 Added bCropOnResize, opencvguiimgwidth, opencvguiimgheight parameters.

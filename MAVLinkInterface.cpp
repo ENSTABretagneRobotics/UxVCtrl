@@ -152,6 +152,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	double speed = 0, Rate = 0, Alt = 0, Deg = 0, angle = 0, Delay = 0, Lat = 0, Lon = 0;
 	int Dir = 0, rel = 0, Current = 0;
 	double roll = 0, pitch = 0, yaw = 0;
+	double lat_sim = 0, long_sim = 0, alt_sim = 0, heading_sim = 0;
 
 	// Get data from GCS...
 	if ((!bDisableMAVLinkInterfaceIN)&&(CheckAvailableBytesRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS))
@@ -996,6 +997,23 @@ REQ_DATA_STREAM...
 	servo_output_raw.servo6_raw = (uint16_t)(1500+u6*500);
 	servo_output_raw.servo7_raw = (uint16_t)(1500+u7*500);
 	servo_output_raw.servo8_raw = (uint16_t)(1500+u8*500);
+	
+	if ((robid & SIMULATOR_ROBID_MASK)&&(bRawSimStateInMAVLinkInterface))
+	{
+		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat_sim, &long_sim, &alt_sim);
+		heading_sim = (fmod_2PI(-angle_env-psi_sim+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
+
+		gps_raw_int.lat = (int32_t)(lat_sim*10000000.0);
+		gps_raw_int.lon = (int32_t)(long_sim*10000000.0);
+		gps_raw_int.alt = (int32_t)(alt_sim*1000.0);
+
+		attitude.roll = (float)fmod_2PI(phi_sim);
+		attitude.pitch = (float)fmod_2PI(-theta_sim);
+		attitude.yaw = (float)fmod_2PI(-angle_env-psi_sim+M_PI/2.0);
+
+		vfr_hud.alt = (float)z_sim;
+		vfr_hud.heading = (int16_t)fmod_360_pos_rad2deg(-angle_env-psi_sim+M_PI/2.0);
+	}
 
 	LeaveCriticalSection(&StateVariablesCS);
 
