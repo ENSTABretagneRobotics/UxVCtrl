@@ -103,9 +103,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+sensor_err(phi_bias_err, phi_max_rand_err)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+			theta_ahrs = theta_sim+sensor_err(theta_bias_err, theta_max_rand_err)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+			psi_ahrs = psi_sim+sensor_err(psi_bias_err, psi_max_rand_err)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// Pressure sensor.
 			// Simplification : on suppose qu'il envoie directement z au lieu de pressure.
 			// Les vagues perturbent ses mesures.
@@ -116,8 +116,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				(z_sim >= GPS_submarine_depth_limit))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+sensor_err(x_bias_err, x_max_rand_err);
+				double y_gps_mes = y_sim+sensor_err(y_bias_err, y_max_rand_err);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -130,9 +130,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			// DVL.
 			if (bEnableSimulatedDVL)
 			{
-				double vrx_mes = vrx_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double vry_mes = vry_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double vrz_mes = vrz_sim+vrx_bias_err+vrx_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double vrx_mes = vrx_sim+sensor_err(vrx_bias_err, vrx_max_rand_err);
+				double vry_mes = vry_sim+sensor_err(vry_bias_err, vry_max_rand_err);
+				double vrz_mes = vrz_sim+sensor_err(vrz_bias_err, vrz_max_rand_err);
 				vrx_dvl = interval(vrx_mes-dvl_acc, vrx_mes+dvl_acc);
 				vry_dvl = interval(vry_mes-dvl_acc, vry_mes+dvl_acc);
 				vrz_dvl = interval(vrz_mes-dvl_acc, vrz_mes+dvl_acc);
@@ -160,16 +160,16 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+sensor_err(phi_bias_err, phi_max_rand_err)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+			theta_ahrs = theta_sim+sensor_err(theta_bias_err, theta_max_rand_err)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+			psi_ahrs = psi_sim+sensor_err(psi_bias_err, psi_max_rand_err)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS.
 			if ((bEnableSimulatedGNSS)&&
 				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+sensor_err(x_bias_err, x_max_rand_err);
+				double y_gps_mes = y_sim+sensor_err(y_bias_err, y_max_rand_err);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -216,16 +216,16 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// AHRS.
-			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+sensor_err(phi_bias_err, phi_max_rand_err)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+			theta_ahrs = theta_sim+sensor_err(theta_bias_err, theta_max_rand_err)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+			psi_ahrs = psi_sim+sensor_err(psi_bias_err, psi_max_rand_err)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS.
 			if ((bEnableSimulatedGNSS)&&
 				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+sensor_err(x_bias_err, x_max_rand_err);
+				double y_gps_mes = y_sim+sensor_err(y_bias_err, y_max_rand_err);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -249,14 +249,14 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// Compass.
-			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			psi_ahrs = psi_sim+sensor_err(psi_bias_err, psi_max_rand_err)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS.
 			if ((bEnableSimulatedGNSS)&&
 				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+sensor_err(x_bias_err, x_max_rand_err);
+				double y_gps_mes = y_sim+sensor_err(y_bias_err, y_max_rand_err);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -282,17 +282,15 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			psi_sim = psi_sim+dt*psidot;
 
 			// Simulated sensors measurements.
-			// AHRS.
-			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			// Compass.
+			psi_ahrs = psi_sim+sensor_err(psi_bias_err, psi_max_rand_err)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS.
 			if ((bEnableSimulatedGNSS)&&
 				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+sensor_err(x_bias_err, x_max_rand_err);
+				double y_gps_mes = y_sim+sensor_err(y_bias_err, y_max_rand_err);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -382,16 +380,16 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 			// Simulated sensors measurements.
 			// AHRS.
-			phi_ahrs = phi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			theta_ahrs = theta_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
-			psi_ahrs = psi_sim+psi_bias_err+psi_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+			phi_ahrs = phi_sim+sensor_err(phi_bias_err, phi_max_rand_err)+interval(-phi_ahrs_acc, phi_ahrs_acc);
+			theta_ahrs = theta_sim+sensor_err(theta_bias_err, theta_max_rand_err)+interval(-theta_ahrs_acc, theta_ahrs_acc);
+			psi_ahrs = psi_sim+sensor_err(psi_bias_err, psi_max_rand_err)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 			// GPS.
 			if ((bEnableSimulatedGNSS)&&
 				((!bNoSimGNSSInsideObstacles)||((bNoSimGNSSInsideObstacles)&&(CheckInsideObstacle(x_sim, y_sim, false) < 0))))
 			{
 				GNSSqualitySimulator = AUTONOMOUS_GNSS_FIX;
-				double x_gps_mes = x_sim+x_bias_err+x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
-				double y_gps_mes = y_sim+y_bias_err+y_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+				double x_gps_mes = x_sim+sensor_err(x_bias_err, x_max_rand_err);
+				double y_gps_mes = y_sim+sensor_err(y_bias_err, y_max_rand_err);
 				double z_gps_mes = 0+5*x_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
@@ -409,7 +407,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		{
 			alpha_mes = alpha_0;
 		}
-		alpha_sim = alpha_mes-alpha_bias_err-alpha_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		alpha_sim = alpha_mes-sensor_err(alpha_bias_err, alpha_max_rand_err);
 		// Compute the distance to the first obstacle d. d might be oo if no obstacle found.
 		d1 = DistanceDirSegments(x_sim, y_sim, alpha_sim+alphas+psi_sim, walls_xa, walls_ya, walls_xb, walls_yb);
 		d2 = DistanceDirCircles(x_sim, y_sim, alpha_sim+alphas+psi_sim, circles_x, circles_y, circles_r);
@@ -421,7 +419,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			d_sim = rangescale*(double)rand()/(double)RAND_MAX;
 		}
 
-		d_mes = d_sim+d_bias_err+d_max_rand_err*(2.0*rand()/(double)RAND_MAX-1.0);
+		d_mes = d_sim+sensor_err(d_bias_err, d_max_rand_err);
 		d_mes = max(0.0, d_mes);
 		//d_mes = max(0.0, min((double)rangescale, d_mes));
 

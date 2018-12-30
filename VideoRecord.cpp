@@ -21,19 +21,16 @@ TIMERCALLBACK_RETURN_VALUE VideoRecordCallbackFunction(void* pParam, BOOLEAN b)
 	{
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		if (!cvWriteFrame(videorecordfiles[videoid], imgs[videoid]))
-		{
-			printf("Error writing to a video file.\n");
-		}
 #else
 		try
 		{
 			videorecordfiles[videoid].write(cv::cvarrToMat(imgs[videoid]));
 		}
 		catch (...)
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		{
 			printf("Error writing to a video file.\n");
 		}
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	}
 	else bRestart = TRUE;
 	LeaveCriticalSection(&imgsCS[videoid]);
@@ -108,43 +105,35 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 				videorecordheight[videoid] = imgs[videoid]->height;
 				LeaveCriticalSection(&imgsCS[videoid]);
 				memset(videorecordextension, 0, sizeof(videorecordextension));
-				if (strncmp(szVideoRecordCodec, "WMV2", strlen("WMV2")) == 0) strcpy(videorecordextension, "wmv"); 
-				else if (strncmp(szVideoRecordCodec, "DIVX", strlen("DIVX")) == 0) strcpy(videorecordextension, "avi"); 
-				else if (strncmp(szVideoRecordCodec, "XVID", strlen("XVID")) == 0) strcpy(videorecordextension, "avi"); 
-				else if (strncmp(szVideoRecordCodec, "MJPG", strlen("MJPG")) == 0) strcpy(videorecordextension, "avi"); 
+				if (strncmp(szVideoRecordCodec, "WMV2", strlen("WMV2")) == 0) strcpy(videorecordextension, "wmv");
+				else if (strncmp(szVideoRecordCodec, "DIVX", strlen("DIVX")) == 0) strcpy(videorecordextension, "avi");
+				else if (strncmp(szVideoRecordCodec, "XVID", strlen("XVID")) == 0) strcpy(videorecordextension, "avi");
+				else if (strncmp(szVideoRecordCodec, "MJPG", strlen("MJPG")) == 0) strcpy(videorecordextension, "avi");
 				else strcpy(videorecordextension, "avi");
+				EnterCriticalSection(&strtimeCS);
+				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtimeex_fns(), videorecordextension);
+				LeaveCriticalSection(&strtimeCS);
+				EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
-				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtimeex_fns(), videorecordextension);
-				LeaveCriticalSection(&strtimeCS);
-				EnterCriticalSection(&OpenCVVideoRecordCS);
-				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid], 
+				videorecordfiles[videoid] = cvCreateVideoWriter(videorecordfilenames[videoid],
 					//CV_FOURCC_PROMPT,
-					CV_FOURCC(szVideoRecordCodec[0],szVideoRecordCodec[1],szVideoRecordCodec[2],szVideoRecordCodec[3]), 
-					1000.0/(double)captureperiod, 
-					cvSize(videorecordwidth[videoid],videorecordheight[videoid]), 
+					CV_FOURCC(szVideoRecordCodec[0], szVideoRecordCodec[1], szVideoRecordCodec[2], szVideoRecordCodec[3]),
+					1000.0/(double)captureperiod,
+					cvSize(videorecordwidth[videoid], videorecordheight[videoid]),
 					1);
-				LeaveCriticalSection(&OpenCVVideoRecordCS);
 				if (!videorecordfiles[videoid])
-				{
-					printf("Error creating a video file.\n");
-				}
 #else
-				EnterCriticalSection(&strtimeCS);
-				sprintf(videorecordfilenames[videoid], VID_FOLDER"vid%d_%.64s.%.15s", videoid, strtimeex_fns(), videorecordextension);
-				LeaveCriticalSection(&strtimeCS);
-				EnterCriticalSection(&OpenCVVideoRecordCS);
-				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid], 
+				if (!videorecordfiles[videoid].open(videorecordfilenames[videoid],
 					//CV_FOURCC_PROMPT,
-					CV_FOURCC(szVideoRecordCodec[0],szVideoRecordCodec[1],szVideoRecordCodec[2],szVideoRecordCodec[3]), 
-					1000.0/(double)captureperiod, 
-					cvSize(videorecordwidth[videoid],videorecordheight[videoid]), 
+					CV_FOURCC(szVideoRecordCodec[0], szVideoRecordCodec[1], szVideoRecordCodec[2], szVideoRecordCodec[3]),
+					1000.0/(double)captureperiod,
+					cvSize(videorecordwidth[videoid], videorecordheight[videoid]),
 					1))
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				{
 					LeaveCriticalSection(&OpenCVVideoRecordCS);
 					printf("Error creating a video file.\n");
 				}
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
 				else
 				{
 					LeaveCriticalSection(&OpenCVVideoRecordCS);

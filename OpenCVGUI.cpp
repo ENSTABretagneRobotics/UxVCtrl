@@ -254,12 +254,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				CopyResizeScaleOverlay(BallOverlayImg[ballid], dispimgs[guiid], bCropOnResize);
 				LeaveCriticalSection(&BallOverlayImgCS[ballid]);
 			}
-			if ((bVisualObstacleDetection||bVisualObstacleAvoidanceControl)&&(videoid == videoid_visualobstacle))
-			{
-				EnterCriticalSection(&VisualObstacleOverlayImgCS);
-				CopyResizeScaleOverlay(VisualObstacleOverlayImg, dispimgs[guiid], bCropOnResize);
-				LeaveCriticalSection(&VisualObstacleOverlayImgCS);
-			}
 			if ((bSurfaceVisualObstacleDetection||bSurfaceVisualObstacleAvoidanceControl)&&(videoid == videoid_surfacevisualobstacle))
 			{
 				EnterCriticalSection(&SurfaceVisualObstacleOverlayImgCS);

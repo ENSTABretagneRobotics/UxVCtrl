@@ -26,8 +26,8 @@
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-#include "VisualObstacle.h"
 #include "SurfaceVisualObstacle.h"
+#include "Obstacle.h"
 #include "Pinger.h"
 #endif // !DISABLE_OPENCV_SUPPORT
 #include "ExternalProgramTrigger.h"
@@ -83,6 +83,9 @@
 #include "RazorAHRSInterface.h"
 #include "SSC32Interface.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
+#include "VideoInterface.h"
+#endif // !DISABLE_OPENCV_SUPPORT
 #include "Observer.h"
 #include "Controller.h"
 #include "Commands.h"
@@ -124,8 +127,8 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	THREAD_IDENTIFIER VisualObstacleThreadId;
 	THREAD_IDENTIFIER SurfaceVisualObstacleThreadId;
+	THREAD_IDENTIFIER ObstacleThreadId;
 	THREAD_IDENTIFIER PingerThreadId;
 #endif // !DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER ExternalProgramTriggerThreadId[MAX_NB_EXTERNALPROGRAMTRIGGER];
@@ -181,6 +184,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
 	THREAD_IDENTIFIER SSC32InterfaceThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
+	THREAD_IDENTIFIER VideoInterfaceThreadId;
+#endif // !DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER ObserverThreadId;
 	THREAD_IDENTIFIER ControllerThreadId;
 	THREAD_IDENTIFIER MissionThreadId;
@@ -256,8 +262,8 @@ int main(int argc, char* argv[])
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	CreateDefaultThread(VisualObstacleThread, NULL, &VisualObstacleThreadId);
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
+	CreateDefaultThread(ObstacleThread, NULL, &ObstacleThreadId);
 	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < MAX_NB_EXTERNALPROGRAMTRIGGER; i++)
@@ -335,6 +341,10 @@ int main(int argc, char* argv[])
 	if (bSSC32Interface) CreateDefaultThread(SSC32InterfaceThread, NULL, &SSC32InterfaceThreadId);
 	if (bSSC32Interface) DetachThread(SSC32InterfaceThreadId); // Not easy to stop it correctly...
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+#ifndef DISABLE_OPENCV_SUPPORT
+	if (bVideoInterface) CreateDefaultThread(VideoInterfaceThread, NULL, &VideoInterfaceThreadId);
+	if (bVideoInterface) DetachThread(VideoInterfaceThreadId); // Not easy to stop it correctly...
+#endif // !DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(ObserverThread, NULL, &ObserverThreadId);
 	CreateDefaultThread(ControllerThread, NULL, &ControllerThreadId);
 
@@ -415,6 +425,11 @@ int main(int argc, char* argv[])
 	// Stop sensors, actuators, algorithms thread loops...
 	WaitForThread(ControllerThreadId);
 	WaitForThread(ObserverThreadId);
+#ifndef DISABLE_OPENCV_SUPPORT
+	// Not easy to stop it correctly...
+	//if (bVideoInterface) WaitForThread(bVideoInterfaceThreadId);
+	if (bVideoInterface) mSleep(100);
+#endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	// Not easy to stop it correctly...
 	//if (bSSC32Interface) WaitForThread(SSC32InterfaceThreadId);
@@ -496,8 +511,8 @@ int main(int argc, char* argv[])
 	}
 #ifndef DISABLE_OPENCV_SUPPORT
 	WaitForThread(PingerThreadId);
+	WaitForThread(ObstacleThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
-	WaitForThread(VisualObstacleThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT

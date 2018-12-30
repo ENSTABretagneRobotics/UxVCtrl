@@ -43,7 +43,6 @@ inline void DisableAllControls(void)
 	{
 		bBallTrackingControl[i] = FALSE;
 	}
-	bVisualObstacleAvoidanceControl = FALSE;
 	bSurfaceVisualObstacleAvoidanceControl = FALSE;
 	bPingerTrackingControl = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -696,7 +695,7 @@ inline int Commands(char* line)
 	int i = 0, ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
 	int ival6 = 0, ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
-		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0, ival20 = 0;
+		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0;
 	char cval = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
 	char str[MAX_BUF_LEN];
@@ -707,6 +706,7 @@ inline int Commands(char* line)
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
 	BOOL bGenerateLineToFirst = FALSE, bStation = FALSE;
+	int id = 0, videoid = 0, guiid = 0, procid = 0;
 	double delay = 0, delay_station = 0, delay_wait_new = 0;
 	double u_prev = 0;
 	CHRONO chrono, chrono_station;
@@ -721,11 +721,11 @@ inline int Commands(char* line)
 #pragma region MISSIONS
 #ifndef DISABLE_OPENCV_SUPPORT
 	if (sscanf(line, "wallconfig %lf %lf %lf %lf %lf %lf %lf %d %d %d", 
-		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &ival1, &ival2, &ival3) == 10)
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &ival1, &ival2, &procid) == 10)
 	{
 		EnterCriticalSection(&WallCS);
 		d0_wall = dval1; beta_wall = dval2; delta_wall = dval3; dmin_wall = dval4; dmax_wall = dval5; 
-		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2; procid_wall = ival3; 
+		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2; procid_wall = procid; 
 		LeaveCriticalSection(&WallCS);
 	}
 	else if (sscanf(line, "walldetection %lf", &delay) == 1)
@@ -795,160 +795,95 @@ inline int Commands(char* line)
 		"%lf %lf %lf %lf %lf "
 		"%lf %lf "
 		"%d %lf %d "
-		"%d %d %d %d %lf %d "
+		"%d %d %d %d %d %lf %d "
 		"%d %d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
 		&dval1, &dval2, &dval3, &dval4, &dval5, 
 		&dval6, &dval7, 
 		&ival13, &dval8, &ival14, 
-		&ival15, &ival16, &ival17, &ival18, &dval9, &ival19, 
-		&ival20, &ival
-		) == 30)
+		&ival15, &ival16, &ival17, &ival18, &ival19, &dval9, &procid, 
+		&videoid, &id
+		) == 31)
 	{
-		if ((ival >= 0)&&(ival < MAX_NB_BALL))
+		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
-			EnterCriticalSection(&BallCS[ival]);
-			hmin_ball[ival] = ival1; hmax_ball[ival] = ival2; smin_ball[ival] = ival3; smax_ball[ival] = ival4; lmin_ball[ival] = ival5; lmax_ball[ival] = ival6;
-			bHExclusive_ball[ival] = ival7; bSExclusive_ball[ival] = ival8; bLExclusive_ball[ival] = ival9; r_selpix_ball[ival] = ival10; g_selpix_ball[ival] = ival11; b_selpix_ball[ival] = ival12;
-			objMinRadiusRatio_ball[ival] = dval1; objRealRadius_ball[ival] = dval2; objMinDetectionRatio_ball[ival] = dval3; objDetectionRatioDuration_ball[ival] = (dval4 <= 0)? captureperiod: dval4; d0_ball[ival] = dval5;
-			kh_ball[ival] = dval6; kv_ball[ival] = dval7;
-			lightMin_ball[ival] = ival13; lightPixRatio_ball[ival] = dval8; bAcoustic_ball[ival] = ival14;
-			bDepth_ball[ival] = ival15; camdir_ball[ival] = ival16; bDisableControl_ball[ival] = ival17; objtype_ball[ival] = ival18; mindistproc_ball[ival] = dval9; procid_ball[ival] = ival19;
-			if ((ival20 >= 0)&&(ival20 < MAX_NB_VIDEO)&&(!bDisableVideo[ival20]))
+			EnterCriticalSection(&BallCS[id]);
+			hmin_ball[id] = ival1; hmax_ball[id] = ival2; smin_ball[id] = ival3; smax_ball[id] = ival4; lmin_ball[id] = ival5; lmax_ball[id] = ival6;
+			bHExclusive_ball[id] = ival7; bSExclusive_ball[id] = ival8; bLExclusive_ball[id] = ival9; r_selpix_ball[id] = ival10; g_selpix_ball[id] = ival11; b_selpix_ball[id] = ival12;
+			objMinRadiusRatio_ball[id] = dval1; objRealRadius_ball[id] = dval2; objMinDetectionRatio_ball[id] = dval3; objDetectionRatioDuration_ball[id] = (dval4 <= 0)? captureperiod: dval4; d0_ball[id] = dval5;
+			kh_ball[id] = dval6; kv_ball[id] = dval7;
+			lightMin_ball[id] = ival13; lightPixRatio_ball[id] = dval8; bAcoustic_ball[id] = ival14;
+			bDepth_ball[id] = ival15; camdir_ball[id] = ival16; bDisableControl_ball[id] = ival17; bBrake_ball[id] = ival18; objtype_ball[id] = ival19; mindistproc_ball[id] = dval9; procid_ball[id] = procid;
+			if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 			{
-				videoid_ball[ival] = ival20;
+				videoid_ball[id] = videoid;
 			}
 			else
 			{
 				printf("Invalid parameter.\n");
 			}
-			bBallFound[ival] = FALSE;
-			LeaveCriticalSection(&BallCS[ival]);
+			bBallFound[id] = FALSE;
+			LeaveCriticalSection(&BallCS[id]);
 		}
 		else
 		{
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "startballtracking %d", &ival) == 1)
+	else if (sscanf(line, "startballtracking %d", &id) == 1)
 	{
-		if ((ival >= 0)&&(ival < MAX_NB_BALL))
+		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
-			EnterCriticalSection(&BallCS[ival]);
+			EnterCriticalSection(&BallCS[id]);
 			EnterCriticalSection(&StateVariablesCS);
-			u_ball[ival] = u;
-			psi_ball[ival] = Center(psihat);
-			detectratio_ball[ival] = 0;
-			bBallTrackingControl[ival] = TRUE;
+			u_ball[id] = u;
+			psi_ball[id] = Center(psihat);
+			detectratio_ball[id] = 0;
+			bBallTrackingControl[id] = TRUE;
 			LeaveCriticalSection(&StateVariablesCS);
-			LeaveCriticalSection(&BallCS[ival]);
+			LeaveCriticalSection(&BallCS[id]);
 		}
 		else
 		{
 			printf("Invalid parameter.\n");
 		}
 	}
-	else if (sscanf(line, "stopballtracking %d", &ival) == 1)
+	else if (sscanf(line, "stopballtracking %d", &id) == 1)
 	{
 
-		if ((ival >= 0)&&(ival < MAX_NB_BALL))
+		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
-			EnterCriticalSection(&BallCS[ival]);
-			bBallTrackingControl[ival] = FALSE;
+			EnterCriticalSection(&BallCS[id]);
+			bBallTrackingControl[id] = FALSE;
 			bDistanceControl = FALSE;
-			//if (bDisableControl_ball[ival]) bBrakeControl = FALSE;
+			if (bBrake_ball[id]) bBrakeControl = FALSE;
+			//if (bDisableControl_ball[id]) bBrakeControl = FALSE;
 			bHeadingControl = FALSE;
-			if (bDepth_ball[ival])
+			if (bDepth_ball[id])
 			{
 				bDepthControl = FALSE;
 				bAltitudeAGLControl = FALSE;
 			}
-			detectratio_ball[ival] = 0;
-			LeaveCriticalSection(&BallCS[ival]);
+			detectratio_ball[id] = 0;
+			LeaveCriticalSection(&BallCS[id]);
 		}
 		else
 		{
 			printf("Invalid parameter.\n");
 		}
-	}
-	else if (sscanf(line, "visualobstacleconfig %d %d %d %d %d %d %lf %lf %lf %d %d %d", 
-		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6, &dval1, &dval2, &dval3, &ival7, &ival8, &ival9) == 12)
-	{
-		EnterCriticalSection(&VisualObstacleCS);
-		rmin_visualobstacle = ival1; rmax_visualobstacle = ival2; gmin_visualobstacle = ival3; gmax_visualobstacle = ival4; bmin_visualobstacle = ival5; bmax_visualobstacle = ival6; 
-		obsPixRatio_visualobstacle = dval1; obsMinDetectionRatio_visualobstacle = dval2; obsDetectionRatioDuration_visualobstacle = (dval3 <= 0)? captureperiod: dval3; 
-		bBrake_visualobstacle = ival7; procid_visualobstacle = ival8; 
-		if ((ival9 >= 0)&&(ival9 < MAX_NB_VIDEO)&&(!bDisableVideo[ival9]))
-		{
-			videoid_visualobstacle = ival9;
-		}
-		else
-		{
-			printf("Invalid parameter.\n");
-		}
-		LeaveCriticalSection(&VisualObstacleCS);
-	}
-	else if (sscanf(line, "visualobstacledetection %lf", &delay) == 1)
-	{
-		EnterCriticalSection(&VisualObstacleCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_visualobstacle = u;
-		detectratio_visualobstacle = 0;
-		bVisualObstacleDetection = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&VisualObstacleCS);
-		delay = fabs(delay);
-		bWaiting = TRUE;
-		StartChrono(&chrono);
-		for (;;)
-		{
-			if (!bVisualObstacleDetection) break;
-			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
-			if (!bWaiting) break;
-			if (bExit) break;
-			// Wait at least delay/10 and at most around 100 ms for each loop.
-			mSleep((long)min(delay*100.0, 100.0));
-		}
-		StopChronoQuick(&chrono);
-		bWaiting = FALSE;
-		EnterCriticalSection(&VisualObstacleCS);
-		bVisualObstacleDetection = FALSE;
-		if (bBrake_visualobstacle) bBrakeControl = FALSE;
-		detectratio_visualobstacle = 0;
-		LeaveCriticalSection(&VisualObstacleCS);
-	}
-	else if (strncmp(line, "startvisualobstacleavoidance", strlen("startvisualobstacleavoidance")) == 0)
-	{
-		EnterCriticalSection(&VisualObstacleCS);
-		EnterCriticalSection(&StateVariablesCS);
-		u_visualobstacle = u;
-		detectratio_visualobstacle = 0;
-		bVisualObstacleAvoidanceControl = TRUE;
-		LeaveCriticalSection(&StateVariablesCS);
-		LeaveCriticalSection(&VisualObstacleCS);
-	}
-	else if (strncmp(line, "stopvisualobstacleavoidance", strlen("stopvisualobstacleavoidance")) == 0)
-	{
-		EnterCriticalSection(&VisualObstacleCS);
-		bVisualObstacleAvoidanceControl = FALSE;
-		bDistanceControl = FALSE;
-		if (bBrake_visualobstacle) bBrakeControl = FALSE;
-		bHeadingControl = FALSE;
-		detectratio_visualobstacle = 0;
-		LeaveCriticalSection(&VisualObstacleCS);
 	}
 	else if (sscanf(line, "surfacevisualobstacleconfig %c %d %lf %lf %d %d %d", 
-		&cval, &ival1, &dval1, &dval2, &ival2, &ival3, &ival4) == 7)
+		&cval, &ival1, &dval1, &dval2, &ival2, &procid, &videoid) == 7)
 	{
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 		weather_surfacevisualobstacle = cval;
 		boatsize_surfacevisualobstacle = ival1; 
 		obsMinDetectionRatio_surfacevisualobstacle = dval1; obsDetectionRatioDuration_surfacevisualobstacle = (dval2 <= 0)? captureperiod: dval2; 
-		bBrake_surfacevisualobstacle = ival2;  procid_surfacevisualobstacle = ival3;
-		if ((ival4 >= 0)&&(ival4 < MAX_NB_VIDEO)&&(!bDisableVideo[ival4]))
+		bBrake_surfacevisualobstacle = ival2;  procid_surfacevisualobstacle = procid;
+		if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 		{
-			videoid_surfacevisualobstacle = ival4;
+			videoid_surfacevisualobstacle = videoid;
 		}
 		else
 		{
@@ -1034,14 +969,14 @@ inline int Commands(char* line)
 	}
 	else 
 #endif // !DISABLE_OPENCV_SUPPORT
-	if (sscanf(line, "externalprogramtriggerconfig %255s %d %d %d %d %d", str, &ival1, &ival2, &ival3, &ival4, &ival) == 6)
+	if (sscanf(line, "externalprogramtriggerconfig %255s %d %d %d %d %d", str, &ival1, &ival2, &ival3, &procid, &ival) == 6)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
 		{
 			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
 			memset(ExternalProgramTriggerFileName[ival], 0, MAX_BUF_LEN);
 			strcpy(ExternalProgramTriggerFileName[ival], str);
-			period_externalprogramtrigger[ival] = ival1; retrydelay_externalprogramtrigger[ival] = ival2; nbretries_externalprogramtrigger[ival] = ival3; procid_externalprogramtrigger[ival] = ival4;
+			period_externalprogramtrigger[ival] = ival1; retrydelay_externalprogramtrigger[ival] = ival2; nbretries_externalprogramtrigger[ival] = ival3; procid_externalprogramtrigger[ival] = procid;
 			bExternalProgramTriggerDetected[ival] = FALSE;
 			LeaveCriticalSection(&ExternalProgramTriggerCS[ival]);
 		}
@@ -3510,21 +3445,21 @@ inline int Commands(char* line)
 	{
 		JumpMission(ival);
 	}
-	else if (sscanf(line, "label %d", &ival) == 1)
+	else if (sscanf(line, "label %d", &id) == 1)
 	{
-		LabelMission(ival);
+		LabelMission(id);
 	}
-	else if (sscanf(line, "goto %d", &ival) == 1)
+	else if (sscanf(line, "goto %d", &id) == 1)
 	{
-		GotoMission(ival);
+		GotoMission(id);
 	}
-	else if (sscanf(line, "procedure %d", &ival) == 1)
+	else if (sscanf(line, "procedure %d", &procid) == 1)
 	{
-		DefineProcedure(ival);
+		DefineProcedure(procid);
 	}
-	else if (sscanf(line, "execute %d", &ival) == 1)
+	else if (sscanf(line, "execute %d", &procid) == 1)
 	{
-		ExecuteProcedure(ival);
+		ExecuteProcedure(procid);
 	}
 	else if (strncmp(line, "return", strlen("return")) == 0)
 	{
@@ -3544,6 +3479,19 @@ inline int Commands(char* line)
 		{
 			EnterCriticalSection(&RegistersCS);
 			registers[ival] = dval;
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regsetrand %d %lf %lf", &ival, &dval1, &dval2) == 3)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = remap2range((double)rand(), 0, (double)RAND_MAX, dval1, dval2);
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
@@ -3717,6 +3665,10 @@ inline int Commands(char* line)
 	else if (strncmp(line, "disablemavlinkinterfacein", strlen("disablemavlinkinterfacein")) == 0)
 	{
 		bDisableMAVLinkInterfaceIN = TRUE;
+	}
+	else if (sscanf(line, "setvideointerfacesource %d %d", &guiid, &videoid) == 2)
+	{
+		guiid_VideoInterface = guiid; videoid_VideoInterface = videoid;
 	}
 	else if (strncmp(line, "enablesimulatedgps", strlen("enablesimulatedgps")) == 0)
 	{

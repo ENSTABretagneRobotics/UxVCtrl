@@ -142,7 +142,8 @@ typedef enum KEYS KEYS;
 #define OBJTYPE_BALL 0
 #define OBJTYPE_PIPELINE 1
 #define OBJTYPE_PINGER 2
-#define OBJTYPE_CARDS 3
+#define OBJTYPE_VISUALOBSTACLE 3
+#define OBJTYPE_CARDS 4
 
 // GNSS accuracy levels.
 #define GNSS_ACC_LEVEL_GNSS_NO_FIX 0
@@ -362,6 +363,14 @@ extern BOOL bSSC32Interface;
 extern char szSSC32InterfacePath[MAX_BUF_LEN];
 extern int SSC32InterfaceBaudRate;
 extern int SSC32InterfaceTimeout;
+extern BOOL bVideoInterface;
+extern char VideoInterfacePort[MAX_BUF_LEN];
+extern int videoimgwidth_VideoInterface, videoimgheight_VideoInterface, captureperiod_VideoInterface;
+extern int VideoInterfaceTimeout;
+extern BOOL bUDP_VideoInterface;
+extern int guiid_VideoInterface;
+extern int videoid_VideoInterface;
+extern int encodequality_VideoInterface;
 extern BOOL bDisablelognav;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
@@ -466,8 +475,12 @@ extern double
 x_max_rand_err, x_bias_err, 
 y_max_rand_err, y_bias_err,
 z_max_rand_err, z_bias_err, 
+phi_max_rand_err, phi_bias_err, 
+theta_max_rand_err, theta_bias_err, 
 psi_max_rand_err, psi_bias_err, 
 vrx_max_rand_err, vrx_bias_err, 
+vry_max_rand_err, vry_bias_err, 
+vrz_max_rand_err, vrz_bias_err, 
 omegaz_max_rand_err, omegaz_bias_err, 
 alpha_max_rand_err, alpha_bias_err, 
 d_max_rand_err, d_bias_err,
@@ -550,7 +563,8 @@ extern double lightPixRatio_ball[MAX_NB_BALL];
 extern int bAcoustic_ball[MAX_NB_BALL];
 extern int bDepth_ball[MAX_NB_BALL];
 extern int camdir_ball[MAX_NB_BALL];
-extern int bDisableControl_ball[MAX_NB_BALL];
+extern BOOL bDisableControl_ball[MAX_NB_BALL];
+extern BOOL bBrake_ball[MAX_NB_BALL];
 extern int objtype_ball[MAX_NB_BALL];
 extern double mindistproc_ball[MAX_NB_BALL];
 extern int procid_ball[MAX_NB_BALL];
@@ -563,20 +577,6 @@ extern double heading_ball[MAX_NB_BALL];
 extern double detectratio_ball[MAX_NB_BALL];
 extern BOOL bBallFound[MAX_NB_BALL];
 extern int lightStatus_ball[MAX_NB_BALL];
-
-// Visual obstacle variables.
-extern BOOL bVisualObstacleDetection;
-extern BOOL bVisualObstacleAvoidanceControl;
-extern CRITICAL_SECTION VisualObstacleCS;
-extern CRITICAL_SECTION VisualObstacleOverlayImgCS;
-extern IplImage* VisualObstacleOverlayImg;
-extern int rmin_visualobstacle, rmax_visualobstacle, gmin_visualobstacle, gmax_visualobstacle, bmin_visualobstacle, bmax_visualobstacle;
-extern double obsPixRatio_visualobstacle, obsMinDetectionRatio_visualobstacle, obsDetectionRatioDuration_visualobstacle; 
-extern int bBrake_visualobstacle;
-extern int procid_visualobstacle;
-extern int videoid_visualobstacle;
-extern double u_visualobstacle;
-extern double detectratio_visualobstacle;
 
 // Surface visual obstacle variables.
 extern BOOL bSurfaceVisualObstacleDetection;
@@ -592,6 +592,11 @@ extern int procid_surfacevisualobstacle;
 extern int videoid_surfacevisualobstacle;
 extern double u_surfacevisualobstacle;
 extern double detectratio_surfacevisualobstacle;
+
+// Obstacle variables.
+extern CRITICAL_SECTION ObstacleCS;
+extern CRITICAL_SECTION ObstacleOverlayImgCS;
+extern IplImage* ObstacleOverlayImg;
 
 // Pinger variables.
 extern BOOL bPingerTrackingControl;
@@ -1164,7 +1169,7 @@ inline int InitGlobals(void)
 		BallOverlayImg[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(BallOverlayImg[i], CV_RGB(0, 0, 0), NULL);
 		hmin_ball[i] = 0; hmax_ball[i] = 0; smin_ball[i] = 0; smax_ball[i] = 0; lmin_ball[i] = 0; lmax_ball[i] = 0;
-		bHExclusive_ball[i] = 0; bSExclusive_ball[i] = 0; bLExclusive_ball[i] = 0;
+		bHExclusive_ball[i] = FALSE; bSExclusive_ball[i] = FALSE; bLExclusive_ball[i] = FALSE;
 		r_selpix_ball[i] = 0, g_selpix_ball[i] = 0, b_selpix_ball[i] = 0;
 		objMinRadiusRatio_ball[i] = 0; objRealRadius_ball[i] = 0; objMinDetectionRatio_ball[i] = 0; objDetectionRatioDuration_ball[i] = 0; d0_ball[i] = 0;
 		kh_ball[i] = 0; kv_ball[i] = 0;
@@ -1173,7 +1178,8 @@ inline int InitGlobals(void)
 		bAcoustic_ball[i] = 0;
 		bDepth_ball[i] = 0;
 		camdir_ball[i] = 0;
-		bDisableControl_ball[i] = 0;
+		bDisableControl_ball[i] = FALSE;
+		bBrake_ball[i] = FALSE;
 		objtype_ball[i] = 0;
 		mindistproc_ball[i] = 0;
 		procid_ball[i] = 0;
@@ -1188,15 +1194,15 @@ inline int InitGlobals(void)
 		lightStatus_ball[i] = 0;
 	}
 
-	InitCriticalSection(&VisualObstacleCS);
-	InitCriticalSection(&VisualObstacleOverlayImgCS);
-	VisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-	cvSet(VisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
-
 	InitCriticalSection(&SurfaceVisualObstacleCS);
 	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	SurfaceVisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
+
+	InitCriticalSection(&ObstacleCS);
+	InitCriticalSection(&ObstacleOverlayImgCS);
+	ObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+	cvSet(ObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
 
 	InitCriticalSection(&PingerCS);
 	InitCriticalSection(&PingerOverlayImgCS);
@@ -1320,13 +1326,13 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&PingerOverlayImgCS);
 	DeleteCriticalSection(&PingerCS);
 
+	cvReleaseImage(&ObstacleOverlayImg);
+	DeleteCriticalSection(&ObstacleOverlayImgCS);
+	DeleteCriticalSection(&ObstacleCS);
+
 	cvReleaseImage(&SurfaceVisualObstacleOverlayImg);
 	DeleteCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	DeleteCriticalSection(&SurfaceVisualObstacleCS);
-
-	cvReleaseImage(&VisualObstacleOverlayImg);
-	DeleteCriticalSection(&VisualObstacleOverlayImgCS);
-	DeleteCriticalSection(&VisualObstacleCS);
 		
 	for (i = MAX_NB_BALL-1; i >= 0; i--)
 	{

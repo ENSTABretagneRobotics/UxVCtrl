@@ -1,12 +1,13 @@
 
+erl : avec les proc, on peut faire en sorte que le robot détecte d'abord un objet orange pas très grand et se rapproche pour essayer de détecter un objet plus grand...
+Ball : param 2ème seuil de taille pour confirmer ou non?
+
 env obstacles interdit intérieur 
 
-Commande pour changer facilement quelle vidéo est envoyée en remote?
-VideoInterface (from RemoteWebcamMultiSrv), params pour choisir le nombre, ports et la source (peut être superposition comme un opencvgui, ou même une gui?)?
+multiple VideoInterface?
 if img size resized by video server...?
 dynamic gui resolution changes?
-set resolution for ball from the video automatically?
-Pour la taille des images partagées, prendre la résolution min des webcams?
+set resolution for ball from the video automatically? Pour la taille des images partagées, prendre la résolution min des webcams?
 OBJTYPE_CARDS qui fait traitement de Julien
 prendre l'habitude de faire un ballconfig après le stopballtracking pour reset variables
 pouvoir combiner les résultats de détection de plusieurs couleurs pour dire que l'objet a été détecté...
@@ -285,6 +286,7 @@ add specific columns for raw GPS data in log file?->maybe not necessary since al
 Log update values in accrx, accry, accrz hat/err...
 
 MAVLink
+altitude, mode pas affichés dans Mission Planner
 en Guided il ne maintient pas la position avec juste que SET_ATTITUDE_TARGET...->check for mavlink command to loiter or similar?
 change ManualControlMode dynamically...
 mavlinkinterface/device : ne pas envoyer/demander toutes les trames à la même fréquence, rajouter params, comme heartbeat...
@@ -299,7 +301,6 @@ MAV_FRAME_GLOBAL frame : altitude AMSL
 MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
 Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
 qgroundcontrol reconnait pas la position si no gps lock...
-altitude, mode pas affichés dans Mission Planner
 Cap pas correctement envoyé en mavlink osd
 Envoyer aussi rssi
 rajouter gestion de message manual control mavlinkinterface

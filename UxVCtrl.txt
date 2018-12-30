@@ -170,6 +170,26 @@ WMV2
 9600
 % SSC32InterfaceTimeout (in ms)
 1000
+% bVideoInterface
+1
+% VideoInterfacePort (server TCP port (e.g. :4014))
+:4014
+% videoimgwidth_VideoInterface
+320
+% videoimgheight_VideoInterface
+240
+% captureperiod_VideoInterface (in ms)
+40
+% VideoInterfaceTimeout (in ms)
+5
+% bUDP_VideoInterface
+0
+% guiid_VideoInterface (-1 to disable)
+-1
+% videoid_VideoInterface
+0
+% encodequality_VideoInterface (JPEG : in [0,100], the higher is the better quality, but uses more CPU and bandwidth)
+50
 % bDisablelognav
 0
 % bCommandPrompt
@@ -631,6 +651,14 @@ WMV2
 0.05
 % z_bias_err (in m)
 0.02
+% phi_max_rand_err (in rad)
+0.02
+% phi_bias_err (in rad)
+0.01
+% theta_max_rand_err (in rad)
+0.02
+% theta_bias_err (in rad)
+0.01
 % psi_max_rand_err (in rad)
 0.02
 % psi_bias_err (in rad)
@@ -638,6 +666,14 @@ WMV2
 % vrx_max_rand_err (in m/s)
 0.0025
 % vrx_bias_err (in m/s)
+0.001
+% vry_max_rand_err (in m/s)
+0.0025
+% vry_bias_err (in m/s)
+0.001
+% vrz_max_rand_err (in m/s)
+0.0025
+% vrz_bias_err (in m/s)
 0.001
 % omegaz_max_rand_err (in rad/s)
 0.05

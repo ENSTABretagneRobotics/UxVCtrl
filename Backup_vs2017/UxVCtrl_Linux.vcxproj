@@ -99,6 +99,7 @@
     <ClCompile Include="MAVLinkInterface.cpp" />
     <ClCompile Include="NMEAInterface.cpp" />
     <ClCompile Include="Observer.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
     <ClCompile Include="Pinger.cpp" />
     <ClCompile Include="RazorAHRSInterface.cpp" />
@@ -108,8 +109,8 @@
     <ClCompile Include="SonarLocalization.cpp" />
     <ClCompile Include="SSC32Interface.cpp" />
     <ClCompile Include="SurfaceVisualObstacle.cpp" />
+    <ClCompile Include="VideoInterface.cpp" />
     <ClCompile Include="VideoRecord.cpp" />
-    <ClCompile Include="VisualObstacle.cpp" />
     <ClCompile Include="Wall.cpp" />
     <ClCompile Include="..\OSUtils\OSComputerRS232Port.c" />
     <ClCompile Include="..\OSUtils\OSCore.c" />
@@ -194,6 +195,7 @@
     <ClInclude Include="MAVLinkInterface.h" />
     <ClInclude Include="NMEAInterface.h" />
     <ClInclude Include="Observer.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pinger.h" />
     <ClInclude Include="RazorAHRSInterface.h" />
@@ -203,8 +205,8 @@
     <ClInclude Include="SonarLocalization.h" />
     <ClInclude Include="SSC32Interface.h" />
     <ClInclude Include="SurfaceVisualObstacle.h" />
+    <ClInclude Include="VideoInterface.h" />
     <ClInclude Include="VideoRecord.h" />
-    <ClInclude Include="VisualObstacle.h" />
     <ClInclude Include="Wall.h" />
     <ClInclude Include="..\OSUtils\OSComputerRS232Port.h" />
     <ClInclude Include="..\OSUtils\OSCore.h" />

@@ -7,11 +7,11 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
-#ifndef VISUALOBSTACLE_H
-#define VISUALOBSTACLE_H
+#ifndef VIDEOINTERFACE_H
+#define VIDEOINTERFACE_H
 
-#include "Config.h"
+#include "Commands.h"
 
-THREAD_PROC_RETURN_VALUE VisualObstacleThread(void* pParam);
+THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam);
 
-#endif // !VISUALOBSTACLE_H
+#endif // !VIDEOINTERFACE_H

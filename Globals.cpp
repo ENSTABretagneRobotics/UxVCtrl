@@ -145,6 +145,14 @@ BOOL bSSC32Interface = FALSE;
 char szSSC32InterfacePath[MAX_BUF_LEN];
 int SSC32InterfaceBaudRate = 0;
 int SSC32InterfaceTimeout = 0;
+BOOL bVideoInterface = FALSE;
+char VideoInterfacePort[MAX_BUF_LEN];
+int videoimgwidth_VideoInterface = 0, videoimgheight_VideoInterface = 0, captureperiod_VideoInterface = 0;
+int VideoInterfaceTimeout = 0;
+BOOL bUDP_VideoInterface = FALSE;
+int guiid_VideoInterface = -1;
+int videoid_VideoInterface = -1;
+int encodequality_VideoInterface = 0;
 BOOL bDisablelognav = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
@@ -249,8 +257,12 @@ double
 x_max_rand_err = 0, x_bias_err = 0,
 y_max_rand_err = 0, y_bias_err = 0,
 z_max_rand_err = 0, z_bias_err = 0,
+phi_max_rand_err = 0, phi_bias_err = 0, 
+theta_max_rand_err = 0, theta_bias_err = 0, 
 psi_max_rand_err = 0, psi_bias_err = 0, 
 vrx_max_rand_err = 0, vrx_bias_err = 0,
+vry_max_rand_err = 0, vry_bias_err = 0,
+vrz_max_rand_err = 0, vrz_bias_err = 0,
 omegaz_max_rand_err = 0, omegaz_bias_err = 0,
 alpha_max_rand_err = 0, alpha_bias_err = 0, 
 d_max_rand_err = 0, d_bias_err = 0, 
@@ -333,7 +345,8 @@ double lightPixRatio_ball[MAX_NB_BALL];
 int bAcoustic_ball[MAX_NB_BALL];
 int bDepth_ball[MAX_NB_BALL];
 int camdir_ball[MAX_NB_BALL];
-int bDisableControl_ball[MAX_NB_BALL];
+BOOL bDisableControl_ball[MAX_NB_BALL];
+BOOL bBrake_ball[MAX_NB_BALL];
 int objtype_ball[MAX_NB_BALL]; 
 double mindistproc_ball[MAX_NB_BALL];
 int procid_ball[MAX_NB_BALL];
@@ -346,20 +359,6 @@ double heading_ball[MAX_NB_BALL];
 double detectratio_ball[MAX_NB_BALL];
 BOOL bBallFound[MAX_NB_BALL];
 int lightStatus_ball[MAX_NB_BALL];
-
-// Visual obstacle variables.
-BOOL bVisualObstacleDetection = FALSE;
-BOOL bVisualObstacleAvoidanceControl = FALSE;
-CRITICAL_SECTION VisualObstacleCS;
-CRITICAL_SECTION VisualObstacleOverlayImgCS;
-IplImage* VisualObstacleOverlayImg = NULL;
-int rmin_visualobstacle = 0, rmax_visualobstacle = 0, gmin_visualobstacle = 0, gmax_visualobstacle = 0, bmin_visualobstacle = 0, bmax_visualobstacle = 0; 
-double obsPixRatio_visualobstacle = 0, obsMinDetectionRatio_visualobstacle = 0, obsDetectionRatioDuration_visualobstacle = 0; 
-int bBrake_visualobstacle = 0;
-int procid_visualobstacle = 0;
-int videoid_visualobstacle = 0; 
-double u_visualobstacle = 0;
-double detectratio_visualobstacle = 0;
 
 // Surface visual obstacle variables.
 BOOL bSurfaceVisualObstacleDetection = FALSE;
@@ -375,6 +374,11 @@ int procid_surfacevisualobstacle = 0;
 int videoid_surfacevisualobstacle = 0; 
 double u_surfacevisualobstacle = 0;
 double detectratio_surfacevisualobstacle = 0;
+
+// Obstacle variables.
+CRITICAL_SECTION ObstacleCS;
+CRITICAL_SECTION ObstacleOverlayImgCS;
+IplImage* ObstacleOverlayImg = NULL;
 
 // Pinger variables.
 BOOL bPingerTrackingControl = FALSE;

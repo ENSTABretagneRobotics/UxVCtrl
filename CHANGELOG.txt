@@ -1,3 +1,10 @@
+284
+Added regsetrand command.
+Added phi_max_rand_err, phi_bias_err, theta_max_rand_err, theta_bias_err, vry_max_rand_err, vry_bias_err, vrz_max_rand_err, vrz_bias_err parameters.
+Merged VisualObstacle into Ball.
+Corrections in VideoRecord.
+Added VideoInterface.
+
 283
 Added enable/disablesimulatedgps, reload/saveenv, calibalphavrx commands.
 Corrected gpssetenvcoordposition to ensure it is the GPS position that is used.

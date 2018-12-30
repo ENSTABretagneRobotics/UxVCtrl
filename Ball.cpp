@@ -34,6 +34,9 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	int* nbSelectedPixelsi = (int*)calloc(videoimgheight, sizeof(int)); // Number of selected pixels for the line i.
 	// Number of selected pixels in the picture.
 	int nbSelectedPixels = 0;
+	int nbSelectedPixelsLeft = 0;
+	int nbSelectedPixelsRight = 0;
+	int nbSelectedPixelsMiddle = 0;
 	// Number of selected pixels in the picture for the light.
 	int nbSelectedPixelsLight = 0;
 	// Image indicating selected pixels.
@@ -145,6 +148,9 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		memset(nbSelectedPixelsj, 0, videoimgwidth*sizeof(int));
 		memset(nbSelectedPixelsi, 0, videoimgheight*sizeof(int));
 		nbSelectedPixels = 0;
+		nbSelectedPixelsLeft = 0;
+		nbSelectedPixelsRight = 0;
+		nbSelectedPixelsMiddle = 0;
 		nbSelectedPixelsLight = 0;
 		obji = 0;
 		objj = 0;
@@ -224,6 +230,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				{
 					SelectedPixelsImage->imageData[index] = 1;
 					nbSelectedPixels++;
+					if (j > 2*image->width/3) nbSelectedPixelsLeft++; else if (j < image->width/3) nbSelectedPixelsRight++; else nbSelectedPixelsMiddle++;
 					nbSelectedPixelsi[i]++;
 					nbSelectedPixelsj[j]++;
 
@@ -493,8 +500,20 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 		{
 			bBallFound[id] = TRUE;
 #pragma region Actions
-			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
-			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
+			if (objtype_ball[id] == OBJTYPE_VISUALOBSTACLE)
+			{
+				if ((nbSelectedPixelsMiddle > nbSelectedPixelsRight)&&(nbSelectedPixelsMiddle > nbSelectedPixelsLeft))
+					cvPutText(overlayimage, "Obstacle detected", cvPoint(10, videoimgheight-20), &font, CV_RGB(255, 0, 128));
+				else if (nbSelectedPixelsLeft > nbSelectedPixelsRight)
+					cvPutText(overlayimage, "Obstacle detected on the left", cvPoint(10, videoimgheight-20), &font, CV_RGB(255, 0, 128));
+				else
+					cvPutText(overlayimage, "Obstacle detected on the right", cvPoint(10, videoimgheight-20), &font, CV_RGB(255, 0, 128));
+			}
+			else
+			{
+				sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
+				cvPutText(overlayimage, szText, cvPoint(10, videoimgheight-20), &font, CV_RGB(255, 0, 128));
+			}
 
 			if (nbSelectedPixelsLight > nbTotalPixels*lightPixRatio_ball[id]) 
 			{
@@ -548,7 +567,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			}
 			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_ball[id], y_ball[id], z_ball[id], &lat_ball[id], &long_ball[id], &alt_ball[id]);
 			LeaveCriticalSection(&StateVariablesCS);
-
+#pragma region Log and snapshot
 			fprintf(logballfile, "%f;%f;%f;%f;%d;%f;%d;%d;%f;%f;%f;%f;%f;%f;%f;%f;\n", 
 				GetTimeElapsedChronoQuick(&chrono), objDistance, objBearing, objElevation, objRadius, objAngle, (int)bobjAngleValid, 
 				lightStatus_ball[id], x_ball[id], y_ball[id], z_ball[id], psi_ball[id], 
@@ -613,7 +632,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 				}
 			}
 			else pic_counter++;
-
+#pragma endregion
 			if (!bDisableControl_ball[id])
 			{
 				if (objtype_ball[id] == OBJTYPE_PIPELINE)
@@ -625,6 +644,40 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					//bDistanceControl = FALSE;
 					//bBrakeControl = FALSE;
 					bHeadingControl = TRUE;
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+				else if (objtype_ball[id] == OBJTYPE_VISUALOBSTACLE)
+				{
+					EnterCriticalSection(&StateVariablesCS);
+					// Temporary...
+
+					BOOL bDistanceControl0 = bDistanceControl;
+					BOOL bBrakeControl0 = bBrakeControl;
+					BOOL bHeadingControl0 = bHeadingControl;
+
+					if (bBrake_ball[id]) u = 0;
+					if ((nbSelectedPixelsMiddle > nbSelectedPixelsRight)&&(nbSelectedPixelsMiddle > nbSelectedPixelsLeft))
+						uw = rand()/(double)RAND_MAX < 0.5? -1: 1; // Obstacle detected in the middle.
+					else if (nbSelectedPixelsLeft > nbSelectedPixelsRight)
+						uw = -1; // Obstacle detected on the left.
+					else
+						uw = 1; // Obstacle detected on the right.
+					bDistanceControl = FALSE;
+					if (bBrake_ball[id]) bBrakeControl = TRUE;
+					bHeadingControl = FALSE;
+					LeaveCriticalSection(&StateVariablesCS);
+					mSleep(1000);
+					EnterCriticalSection(&StateVariablesCS);
+					u = u_ball[id];
+					uw = 0;
+					//wpsi = M_PI*(2.0*rand()/(double)RAND_MAX-1.0);
+					if (bBrake_ball[id]) bBrakeControl = FALSE;
+					//bHeadingControl = TRUE;
+
+					bDistanceControl = bDistanceControl0;
+					bBrakeControl = bBrakeControl0;
+					bHeadingControl = bHeadingControl0;
+
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else
@@ -702,6 +755,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					// stopballtracking to avoid multiple execute...
 					bBallTrackingControl[id] = FALSE;
 					bDistanceControl = FALSE;
+					if (bBrake_ball[id]) bBrakeControl = FALSE;
 					//if (bDisableControl_ball[id]) bBrakeControl = FALSE;
 					bHeadingControl = FALSE;
 					if (bDepth_ball[id])

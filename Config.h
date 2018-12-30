@@ -36,6 +36,7 @@ inline int LoadConfig(void)
 	VerticalBeam = 50;
 	bCropOnResize = FALSE;
 	memset(szVideoRecordCodec, 0, sizeof(szVideoRecordCodec));
+	sprintf(szVideoRecordCodec, "WMV2");
 	bEnableOpenCVGUIs[0] = TRUE;
 	bEnableOpenCVGUIs[1] = FALSE;
 	bEnableOpenCVGUIs[2] = FALSE;
@@ -101,6 +102,17 @@ inline int LoadConfig(void)
 	sprintf(szSSC32InterfacePath, ":5004");
 	SSC32InterfaceBaudRate = 9600;
 	SSC32InterfaceTimeout = 1000;
+	bVideoInterface = FALSE;
+	memset(VideoInterfacePort, 0, sizeof(szSSC32InterfacePath));
+	sprintf(VideoInterfacePort, ":4014");
+	videoimgwidth_VideoInterface = 320;
+	videoimgheight_VideoInterface = 240;
+	captureperiod_VideoInterface = 100;
+	VideoInterfaceTimeout = 0;
+	bUDP_VideoInterface = FALSE;
+	guiid_VideoInterface = -1;
+	videoid_VideoInterface = -1;
+	encodequality_VideoInterface = 0;
 	bDisablelognav = FALSE;
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
@@ -287,8 +299,12 @@ inline int LoadConfig(void)
 	x_max_rand_err = 5; x_bias_err = 2;
 	y_max_rand_err = 5; y_bias_err = -1;
 	z_max_rand_err = 0.05; z_bias_err = 0.02;
+	phi_max_rand_err = 0.05; phi_bias_err = 0.02;
+	theta_max_rand_err = 0.05; theta_bias_err = 0.02;
 	psi_max_rand_err = 0.05; psi_bias_err = 0.02;
 	vrx_max_rand_err = 0.05; vrx_bias_err = 0.02;
+	vry_max_rand_err = 0.05; vry_bias_err = 0.02;
+	vrz_max_rand_err = 0.05; vrz_bias_err = 0.02;
 	omegaz_max_rand_err = 0.05; omegaz_bias_err = 0.02;
 	alpha_max_rand_err = 0.005; alpha_bias_err = 0.002;
 	d_max_rand_err = 0.25; d_bias_err = -0.1;
@@ -456,6 +472,26 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &SSC32InterfaceBaudRate) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &SSC32InterfaceTimeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bVideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%[^\r\n]255s", VideoInterfacePort) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &videoimgwidth_VideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &videoimgheight_VideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &captureperiod_VideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &VideoInterfaceTimeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bUDP_VideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &guiid_VideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &videoid_VideoInterface) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &encodequality_VideoInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisablelognav) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -945,6 +981,16 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &z_bias_err) != 1) printf("Invalid configuration file.\n");
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &phi_max_rand_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &phi_bias_err) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &theta_max_rand_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &theta_bias_err) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &psi_max_rand_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &psi_bias_err) != 1) printf("Invalid configuration file.\n");
@@ -953,6 +999,16 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &vrx_max_rand_err) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &vrx_bias_err) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vry_max_rand_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vry_bias_err) != 1) printf("Invalid configuration file.\n");
+
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vrz_max_rand_err) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%lf", &vrz_bias_err) != 1) printf("Invalid configuration file.\n");
 
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%lf", &omegaz_max_rand_err) != 1) printf("Invalid configuration file.\n");
@@ -1438,6 +1494,26 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", SSC32InterfaceTimeout) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bVideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.255s\n", VideoInterfacePort) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", videoimgwidth_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", videoimgheight_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", captureperiod_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", VideoInterfaceTimeout) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bUDP_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", guiid_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", videoid_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", encodequality_VideoInterface) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisablelognav) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bCommandPrompt) < 0) printf("Error writing configuration file.\n");
@@ -1906,6 +1982,16 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%.10g\n", z_bias_err) < 0) printf("Error writing configuration file.\n");
 
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", phi_max_rand_err) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", phi_bias_err) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", theta_max_rand_err) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", theta_bias_err) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", psi_max_rand_err) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", psi_bias_err) < 0) printf("Error writing configuration file.\n");
@@ -1914,6 +2000,16 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%.10g\n", vrx_max_rand_err) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", vrx_bias_err) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", vry_max_rand_err) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", vry_bias_err) < 0) printf("Error writing configuration file.\n");
+
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", vrz_max_rand_err) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%.10g\n", vrz_bias_err) < 0) printf("Error writing configuration file.\n");
 
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.10g\n", omegaz_max_rand_err) < 0) printf("Error writing configuration file.\n");
