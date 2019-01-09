@@ -287,6 +287,8 @@ extern deque<interval> xhat_history_vector;
 extern deque<interval> yhat_history_vector;
 extern deque<interval> psihat_history_vector;
 extern deque<interval> vrxhat_history_vector;
+// Up vertical telemeter.
+extern double distance_above;
 // Echosounder.
 extern double altitude_AGL;
 // Modem.

@@ -3743,7 +3743,7 @@ inline int Commands(char* line)
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #endif // __GNUC__
-	if (bContinueElseIf5) if (sscanf(line, "depthreg %lf", &dval) == 1)
+	if (bContinueElseIf5) if ((sscanf(line, "depthreg %lf", &dval) == 1)||(sscanf(line, "altreg %lf", &dval) == 1))
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
@@ -3797,11 +3797,11 @@ inline int Commands(char* line)
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (strncmp(line, "enabledepthreg", strlen("enabledepthreg")) == 0)
+	else if ((strncmp(line, "enabledepthreg", strlen("enabledepthreg")) == 0)||(strncmp(line, "enablealtreg", strlen("enablealtreg")) == 0))
 	{
 		bDepthControl = TRUE;
 	}
-	else if (strncmp(line, "disabledepthreg", strlen("disabledepthreg")) == 0)
+	else if ((strncmp(line, "disabledepthreg", strlen("disabledepthreg")) == 0)||(strncmp(line, "disablealtreg", strlen("disablealtreg")) == 0))
 	{
 		bDepthControl = FALSE;
 	}

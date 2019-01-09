@@ -137,8 +137,9 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 				omegay_ahrs = mtdata.gyrY+interval(-omegay_ahrs_acc, omegay_ahrs_acc);
 				psi_ahrs = fmod_2PI(M_PI/2.0+mtdata.Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 				omegaz_ahrs = mtdata.gyrZ+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
-
-				// accel...
+				accrx_ahrs = mtdata.accX+interval(-accrx_ahrs_acc, accrx_ahrs_acc);
+				accry_ahrs = mtdata.accY+interval(-accry_ahrs_acc, accry_ahrs_acc);
+				accrz_ahrs = mtdata.accZ+interval(-accrz_ahrs_acc, accrz_ahrs_acc);
 
 				if ((int)mtdata.UTCTime.Valid >= VALID_UTC_UTC_TIME_FLAG_MT)
 				{

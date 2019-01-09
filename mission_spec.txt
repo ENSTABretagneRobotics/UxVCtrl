@@ -442,6 +442,8 @@
 %
 %depthreg z (double ]-oo,oo[ in m (negative underwater), enable depth control)
 %
+%altreg z (double ]-oo,oo[ in m (alias for depthreg)
+%
 %aglreg z (double ]-oo,oo[ in m, enable altitude Above Ground Level control)
 %
 %rollreg orientation (double [-180,180[ mod(360) in deg in North - East - Down coordinate system)
@@ -455,6 +457,10 @@
 %enabledepthreg
 %
 %disabledepthreg
+%
+%enablealtreg (alias for enabledepthreg)
+%
+%disablealtreg (alias for disabledepthreg)
 %
 %enableaglhreg
 %

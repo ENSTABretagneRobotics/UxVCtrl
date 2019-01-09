@@ -137,6 +137,9 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				omegay_ahrs = -sbgdata.gyrY+interval(-omegay_ahrs_acc, omegay_ahrs_acc);
 				psi_ahrs = fmod_2PI(M_PI/2.0-sbgdata.Yaw-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
 				omegaz_ahrs = -sbgdata.gyrZ+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
+				accrx_ahrs = sbgdata.accX+interval(-accrx_ahrs_acc, accrx_ahrs_acc);
+				accry_ahrs = -sbgdata.accY+interval(-accry_ahrs_acc, accry_ahrs_acc);
+				accrz_ahrs = -sbgdata.accZ+interval(-accrz_ahrs_acc, accrz_ahrs_acc);
 
 				// Check accuracy at 3*sigma to use GPS data.
 				if ((sbgdata.positionStdDev[0] > 0)&&(sbgdata.positionStdDev[0] < sbg.gpsaccuracythreshold/3.0)&&

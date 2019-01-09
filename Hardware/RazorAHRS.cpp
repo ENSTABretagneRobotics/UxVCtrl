@@ -119,12 +119,12 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 					!((razorahrsdata.gyrx == 0)&&(razorahrsdata.gyry == 0)&&(razorahrsdata.gyrz == 0)&&
 					(razorahrsdata.accx == 0)&&(razorahrsdata.accy == 0)&&(razorahrsdata.accz == 0)))
 				{
-					omegax_ahrs = razorahrsdata.gyrx;
-					omegay_ahrs = -razorahrsdata.gyry;
-					omegaz_ahrs = -razorahrsdata.gyrz;
-					accrx_ahrs = razorahrsdata.accx*9.8/256.0;
-					accry_ahrs = -razorahrsdata.accy*9.8/256.0;
-					accrz_ahrs = -razorahrsdata.accz*9.8/256.0;
+					omegax_ahrs = razorahrsdata.gyrx+interval(-omegax_ahrs_acc, omegax_ahrs_acc);
+					omegay_ahrs = -razorahrsdata.gyry+interval(-omegay_ahrs_acc, omegay_ahrs_acc);
+					omegaz_ahrs = -razorahrsdata.gyrz+interval(-omegaz_ahrs_acc, omegaz_ahrs_acc);
+					accrx_ahrs = razorahrsdata.accx*9.8/256.0+interval(-accrx_ahrs_acc, accrx_ahrs_acc);
+					accry_ahrs = -razorahrsdata.accy*9.8/256.0+interval(-accry_ahrs_acc, accry_ahrs_acc);
+					accrz_ahrs = -razorahrsdata.accz*9.8/256.0+interval(-accrz_ahrs_acc, accrz_ahrs_acc);
 				}
 
 				LeaveCriticalSection(&StateVariablesCS);

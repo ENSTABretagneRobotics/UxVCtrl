@@ -69,6 +69,8 @@ deque<interval> xhat_history_vector;
 deque<interval> yhat_history_vector;
 deque<interval> psihat_history_vector;
 deque<interval> vrxhat_history_vector;
+// Up vertical telemeter.
+double distance_above = 0;
 // Echosounder.
 double altitude_AGL = 0;
 // Modem.

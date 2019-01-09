@@ -1,8 +1,70 @@
+Altitude_AGL : avec vertical lidar-lite et/ou px4f ground_distance, corriger avec roll pitch et ne pas prendre en compte si roll pitch trop élevés, si lidar pas dispo, utiliser la dernière altitude_agl valide avec les variations d'altitude mesurée par baro et/ou GPS
+Altitude : c'est l'altitude par rapport au repère env.txt (où l'altitude GPS est en général donnée) ou alors en option affichée en wgs, si GPS pas dispo ou pour fusionner, utiliser la variation de pression par rapport à l'origine de l'env (qui pourrait en option être prise comme la pression au démarrage ou l'armement du robot...)
 
-erl : avec les proc, on peut faire en sorte que le robot détecte d'abord un objet orange pas très grand et se rapproche pour essayer de détecter un objet plus grand...
-Ball : param 2ème seuil de taille pour confirmer ou non?
+Rajouter pression air à l'origine de l'env et vitesse son eau, altitude of sea floor dans env.txt
 
+Should add code in Observer that make the fusion depending on the robot and the sensors currently enabled, do not update z_mes directly in the sensors files... 
+baro data from mavlink, sbg, mt...
+altitude pressure vs gps pour un sous-marin dans un lac, robot terrestre, drone...
+gpszlocalization?
+
+controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?->tester en simu si le terme intégral est suffisant, mais il est souvent remis à 0...
+
+px4f : est-ce que flow_comp_m_x prend en compte l'altitude?->a priori non, juste compensé avec gyros, attention aux données aberrantes ponctuelles du LIDAR...
+
+drone : pour suivre un vecteur, faire en sorte que l'orientation du drone aille progressivement dans le bon sens quand on le contrôle avec u et ul...
+
+Obstacle avoidance, loiter
+
+Faire en sorte que le drone reste en position par rapport aux obstacles (distancecontrol en u et ul)
+
+waitarea area.txt procid t : execute procid quand on rentre dans la zone, un peu comme waitline
+
+Lire sonars en PWM sur rcin, mais peuvent-il être synchronisés?
+comment gérer le sonar vers le haut?->distance_above
 env obstacles interdit intérieur 
+
+Composante latérale bluerov et ciscrea, brake si lateralthrust?
+bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station...
+Si vr error grande, utiliser state eq, autrement n'utiliser que vr
+option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
+
+wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
+the control part of obstacle avoidance could be centralized to handle all the types of obstacles (punctual, line...), maybe using vector fields
+add vector field obstacle avoidance mission like visual obstacle, e.g using AIS and simulatedinternetswarmondevice
+Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
+Fuir le prédateur
+2.5D, plusieurs plans pour passer par des portes 3D...
+Obstacles liés au robot (antennes)
+Obstacles mobiles
+Toujours tourner à droite si on ne peut pas suivre la direction voulue?
+Detected obstacles list added by LIDAR or other things+env
+Potential fields to compute wtheta that fuses geofence, obstacles, theta_star
+Obstacles statiques de toutes sortes à spécifier dans fichier de config
+Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon autour?
+Programme et article potential fields de 2013
+Se poser la question si obstacle est franchissable ou pas en fonction de taille robot et taille obstacle
+Prendre en compte obstacles statiques connus étroits si besoin de faire demi-tour, pour ne pas sortir des footprints à un endroit où on peut être coincé
+rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, enable/disablegeofence coordinates/file command...
+Garder en mémoire une carte des obstacles en parallèle de l'env connu et statique et pouvoir le partager par réseau
+wpsi voulu, wpsi après prise en compte obstacles, wpsi après prise en compte dynamique d'un voilier, séparer de linefollowing...?
+mélanger à quel niveau avec potential fields?
+Preparer sample évitement d'obstacle ball et wallavoidance en relatif
+simple reactive obstacle avoidance during line or waypoint following...
+meilleur geofencing ou similaire pour follow me
+minrange param, zone morte pour tous les sonar et echosondeurs...?
+rajouter params deadzone sonar/lidar?->dépend des missions, algos? dmin=d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight))...
+should fuse ultrasonic distances with rplidar and handle outliers...
+param extended menu pour choisir quels sonar/lidar sont affichés par $, sonarid (0 : Seanet, 1 : BlueView0, 2 : BlueView1, 3 : Hokuyo, 4 : RPLIDAR, 5 : sonars maestro, 6 : rngfnd mavlink, selon qu'ils soient disabled ou non l'id est inférieure ou égale) propre à chaque fenêtre...
+Orientation de l'image lidar pas pratique car sans doute corrigée en cap, il faut qu'on puisse choisir en option
+d, alpha, beta, rgbie, accuracy, xyz, sensor space, robot space, env
+Several views : as camera, as 2D sonar, as 2D lidar, vue sous forme de projection ou coupe...
+pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
+blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
+Indiquer pings utilisés pour localisation
+FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
+MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
+(walltracking overlay fait aussi walldetect, wallavoidance)
 
 multiple VideoInterface?
 if img size resized by video server...?
@@ -10,15 +72,13 @@ dynamic gui resolution changes?
 set resolution for ball from the video automatically? Pour la taille des images partagées, prendre la résolution min des webcams?
 OBJTYPE_CARDS qui fait traitement de Julien
 prendre l'habitude de faire un ballconfig après le stopballtracking pour reset variables
+erl : avec les proc, on peut faire en sorte que le robot détecte d'abord un objet orange pas très grand et se rapproche pour essayer de détecter un objet plus grand...
+Ball : param 2ème seuil de taille pour confirmer ou non?
 pouvoir combiner les résultats de détection de plusieurs couleurs pour dire que l'objet a été détecté...
 rename ball to hslobj, séparer aussi la partie détection de lumière, partager variables objDistance, etc., comment gérer les actions, l'id pourrait servir de priorité...?
 
-Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2...
-
 flux optique avec données lidar pour déduire vrx et vry si on suppose que l'environnement est statique et essayer de déterminer si en fait il y a quand même des parties dynamiques pour les enlever
 Regression linéaire de ce qui a devant, derrière, droite, gauche et calcul du déplacement de la ligne connaissant vitesse de rotation
-
-helios : Accrxhat, etc. pas loggués dans logstate? D'où vient vrxhat?
 
 ne garder dans les user workspace que les fichiers de config vraiment potentiellement utiles?
 Mission Planner disarm button should abort any current mission?->peut-être pas car on veut pouvoir continuer à envoyer des waypoints via Mission Planner, sauf peut-être si le bouton MISSION_START peut relancer...
@@ -28,24 +88,6 @@ should add opencvgui key to call waypointslist (with last parameters?), mais dev
 waypointslist 3D, gestion de l'altitude dans fly to here, w.r.t. home...
 accéder aux rcin avant override?->peut-être pas possible, utiliser set_attitude_target à la place de rc_override...?->vérifier rc_channels vs rc_channels_raw pour confirmer...
 
-altitude_AGL should be computed from lidar-lite, px4f ground_distance, if different should be compared with altitude, should be also corrected with pos xyz of the sensor, attitude of the robot...
-
-should fuse ultrasonic distances with rplidar and handle outliers...
-param extended menu pour choisir quels sonar/lidar sont affichés par $, sonarid (0 : Seanet, 1 : BlueView0, 2 : BlueView1, 3 : Hokuyo, 4 : RPLIDAR, 5 : sonars maestro, 6 : rngfnd mavlink, selon qu'ils soient disabled ou non l'id est inférieure ou égale) propre à chaque fenêtre...
-Orientation de l'image lidar pas pratique car sans doute corrigée en cap, il faut qu'on puisse choisir en option
-d, alpha, beta, rgbie, accuracy, xyz, sensor space, robot space, env
-Several views : as camera, as 2D sonar, as 2D lidar, vue sous forme de projection ou coupe...
-pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
-blueview, seanet, es, rplidar, hokuyo, ultrasons qui pourraient marcher en même temps...
-minrange param, zone morte pour tous les sonar et echosondeurs...?
-rajouter params deadzone sonar/lidar?->dépend des missions, algos? En attendant c'est codé en dur pour le sonar, c'est pas top...
-Indiquer pings utilisés pour localisation
-FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
-MiniatureImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)
-(walltracking overlay fait aussi walldetect, wallavoidance)
-
-controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?->tester en simu si le terme intégral est suffisant, mais il est souvent remis à 0...
-
 menu dispsource (0 : default, 1 : AHRS, 2 : GPS, 3 : DVL)...
 
 roboteq serial
@@ -53,22 +95,6 @@ roboteq serial
 Param period pour tous les devices, pris en compte s'il est connecté...
 
 rajouter possibilité de corriger l'estimation de vitesse des moteurs en fonction de la tension batterie mesurée
-
-Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
-
-Geofence command
-Obstacles list added by LIDAR or other things
-Potential fields to compute wtheta that fuses geofence, obstacles, theta_star
-Obstacles statiques de toutes sortes à spécifier dans fichier de config
-Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon autour?
-Programme et article potential fields de 2013
-rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, commandes start/stop geofence...
-Garder en mémoire une carte des obstacles en parrallèle de l'env connu et statique et pouvoir le partager par réseau
-wpsi voulu, wpsi après prise en compte obstacles, wpsi après prise en compte dynamique d'un voilier, séparer de linefollowing...?
-mélanger à quel niveau avec potential fields?
-Preparer sample évitement d'obstacle ball et wallavoidance en relatif
-
-1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 
 Check observer omegazhat for submarines
 initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écrasé à cause de u, du coup c'est plutôt un u_0, uw_0, etc. qu'il faudrait?
@@ -89,6 +115,7 @@ terme intégral line following (attention à le limiter, remettre à 0...), ne plus
 wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
 ComputeNMEAchecksum %X code VAIMOS, Iridium...
 
+1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
 
 bug com with opencpn when it sends also other nmea messages, because of period of 500 ms for nmea interface, the period should be lower and 500 ms should be used only to choose when to send data, add parameters for the send period of each individual nmea message...
@@ -98,9 +125,6 @@ inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
 nb waypoints impairs, juste 1, reset CurWP, index qui démarre à 0 ou 1...
 show WPT(CurWP) on OpenCVGUI when waypointslist is in use?
 longitude180handling?
-
-param friendly name
-Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
 
 udp : réfléchir à la logique des recvfrom, sendto que doit utiliser mavproxy (start mavproxy.exe --master=tcp:127.0.0.1:5760 --out=udp:127.0.0.1:14550) et mission planner pour comprendre pourquoi mavproxy binde sur un port random...->c'est peut-être moi qui doit faire bind sur 14550 et un recvfrom dessus pour récupérer le port utilisé par mavproxy...
 rajouter commentaires qui indiquent qu'on peut faire udp://...
@@ -118,8 +142,6 @@ crash si changement de streaming window gopro via gstreamer...
 Need to check ReadLatestRS232Port() and others as well as checkdata (see MAVLinkInterface), waitfordata (see IridiumComm)...
 Make a select.h for MSVC for compatibility (en essayant de déterminer le type de fd qui est passé (en appelant une fonction de socket et voir si elle échoue...), si c'est une socket essayer d'appeler la bonne fonction, qu'on aurait renommée plus tôt, voir pour faire la même chose pour les fichiers pour les open et read...)...
 
-Composante latérale bluerov et ciscrea, brake si lateralthrust?
-
 update sonarstaticlocstructured, sonartest
 Corriger comments sur alphas dans uxvctrl.txt pour saucisse et séparer cas miniking et micron
 
@@ -130,17 +152,12 @@ peut-être paramètres pour bRollControl, bPitchControl, commands to selectively d
 need to check nmeainterface with e.g. u-center, send altitude, heading, pitch, roll compatible with seanet...
 arducopter : vérifier touches a,e remises au neutre, avec space, etc.
 
-update env to enable 3D, specify also altitude of sea floor...
-
-Localisation sonar dynamique avec Dvl->c'est pas les bonnes équations pour l'historique, etc.
+Localisation sonar dynamique avec DVL->c'est pas les bonnes équations pour l'historique, etc.
 touche extended menu pour simulated dvl->juste une commande et touche # pour l'instant...
 mieux gérer les out of range de dvl, optical flow vs quand il y a des trames sans données, voir aussi GPS...
 si dvl ou of activés, indiquer dans GUI si valides...->bVrOK, ou alors juste regarder la largeur des intervalles?
 sog gps vs dvl->toujours essayer d'estimer la SOG soit à partir de mesures directes soit à partir de vr et R...
 pour les bateaux, si vraiment on détecte qu'il n'y a pas de GPS, passer en dr...
-altitude pressure vs gps pour un sous-marin dans un lac, robot terrestre, drone...
-gpszlocalization?
-commande pour régulation en vitesse?
 
 replace x_bias_err, x_max_rand_err with x_gps_bias_err, x_gps_max_rand_err...
 
@@ -154,13 +171,6 @@ commande pour choisir aussi quelles équations d'état on utilise, désignées par u
 revoir mes noms de variables pour les mesures, devraient être des intervalles avec le nom du périphérique, et la largeur de l'intervalle doit être fixée par le capteur...?
 dans observer, c'est pas facile de choisir les bonnes equations d'état selon les capteurs dispos et l'état de leurs données (e.g. quadro avec optical flow, submarine avec DVL, précision GPS RTK...), si on fait avec la largeur des intervalles, définie dans les périphériques ça pourra aider...
 commande pour régler les erreurs des capteurs, et aussi en paramètres globaux?
-
-why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
-
-Nortek DVL supports RDI PD0, send Pathfinder commands, faire fichier RDIPD0Protocol.h?
-calib mag du DVL Nortek?
-prévoir commande pour mettre en veille le PathfinderDVL (avec warning s'il est en Ethernet)
-Test piscine avec DVL+staticsonalocalization : mettre plus grande erreur sur boussole et faire du suivi de ligne avec effet intégral pour corriger les erreurs de cap...->non en fait le DVL n'aidera pas vraiment...
 
 pour tous les capteurs rajouter : signx, signy, signz, signphi, signtheta, signpsi (changement de repère), x, y, z, phi, theta, psi (position du device dans robot), psip1, psip2 (calib mag pour corriger les perturbations en dernier recours)
 MT : Coordinate system different from legacy mode, hardcode harmonization or not...?
@@ -179,11 +189,6 @@ concept de boost mode en lien avec les régulations en z et pitch et roll?
 Ui=matrix*[uvx,uvy,uvz,uwx,uwy,uwz] dans fichier de config principal...? Mais si on veut relations non linéaires?->et on en a déjà avec le boost mode...->to hardcode depending on the robot?
 add in params wphi, wtheta and other things related to lateral movements like in quadrotors, key to activate roll and pitch control? in ArduPilot it depends on the mode...->to hardcode depending on the robot for the moment since the robots that need roll and pitch stabilization usually always need it...
 
-altitude from GPS vs pressure?->Should add code in Observer that make the fusion depending on the robot and the sensors currently enabled, do not update z_mes directly in the sensors files... 
-rename global latitude,longitude,altitude to _GPS...
-baro data from mavlink, sbg, mt...
-Altitude from sonar : use qinter to allow outliers and take into account position of the sonar on the submarine as well as roll and pitch
-
 équations d'état bateaux... add bDisableStateEstimation, E key, like bGPSLocalization...
 
 voir aussi pour enregistrement des fichiers de config des périphériques, see if old config file format would be better to save/load parameters...?
@@ -197,12 +202,6 @@ PsiEstimationMode : 0 normal, 1 gyro, 2 razor-like fusion mag+gyr, 3 with state 
 If Width(psihat) < M_PI le prendre en compte pour gérer l'ambiguité
 quand on fait setstateestimation, psihat et zhat sont tout de suite écrasés par psi_mes et z_mes, même s'ils sont invalides...
 rajouter params calcul objAngle, si tous à 0 désactiver?
-
-bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station...
-Si vr error grande, utiliser state eq, autrement n'utiliser que vr
-option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
-
-chrono_period...
 
 Prise en compte des accéléros dans équations d'état... rajouter gyrx_hat/mes, gyry_hat/mes..., acc, v
 selon les accx_err, ça aura ou non une influence sur les équations d'état
@@ -264,6 +263,7 @@ bug seanet et peut-être d'autres : en sortie de la boucle de thread principal il
 déco temp mti-g sardine->probably internal mti-g bug, its position estimation and packet counter seem to reset... ou alors le fait que j'ai changé la période du thread?
 surface intempestif pendant sonar map->bug dans mission, rajouter sleep entre headingreg et depthreg? comme si depthreg -2 pas pris en compte et régulation profondeur désactivée?->problème un peu comme avec le voilier qui validait pas waypoints et continuait régulé, deadlock...?
 fly to alt veut pas nombre à virgule ni alt nulle...
+surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
@@ -287,6 +287,9 @@ Log update values in accrx, accry, accrz hat/err...
 
 MAVLink
 altitude, mode pas affichés dans Mission Planner
+pouvoir utiliser pxihawk comme pwmin et/ou pwmout et/ou ahrs, etc.
+pouvoir utiliser rcin pour controler robot à la télécommande
+add scaled_imu to get accel in mavlinkdevice and mavlinkinterface
 en Guided il ne maintient pas la position avec juste que SET_ATTITUDE_TARGET...->check for mavlink command to loiter or similar?
 change ManualControlMode dynamically...
 mavlinkinterface/device : ne pas envoyer/demander toutes les trames à la même fréquence, rajouter params, comme heartbeat...
@@ -398,15 +401,11 @@ peut-être qu'il vaudrait mieux regrouper les 2 positions dans le même message po
 disableallcontrols désactive aussi toute commande acoustique... (sans doute parce qu'il peut y avoir des régulations dues à une commande acoustique...)
 
 Missions
-Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?
 Procid dans wallavoidance pour faire manoeuvre évitement auto robots terrestres, est-ce qu'on peut relancer le wallavoidance en fin de procédure?
-simple reactive obstacle avoidance during line or waypoint following...
 command sethome, RTH/Land/Surface after a timeout valid even when no mission running...
 Gate : Définir 1 point de départ fixe, utiliser un peu sonar pour mesurer distance au mur devant ou derrière le robot? En fait l'algo de localisation dynamique est peut-être quand même mieux, la partie difficile est l'estimation statique au départ...
-meilleur geofencing ou similaire pour follow me
 Snapshot should generate ply
-Rajouter génération de kml comme dans snapshot pour pipe aussi
-Rajouter détection de rouge sur pipe et support de procid
+Rajouter détection de rouge sur pipe...
 Temps et status à mettre dans logs kml
 mettre logvid2imgoverlay sur github, corriger bug de flip ou autre avec vue rochers sauc-e, update rotation etc. with what is in Video
 Mosaiquing video avec les logs de 2014
@@ -421,9 +420,17 @@ Pouvoir programmer avec les touches de la télécommande
 commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
 ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
+Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2...
+Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 sauvegarder e,phi,delta_psi dans wall?
+commande pour régulation en vitesse?
+configdistancecomputation
+distancecomputation
+commande waitdistanceless/more/wgs x y d
+param friendly name
+Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
 
 Actuators
 rajouter option rampe comme sur robot CCI...
@@ -440,6 +447,11 @@ voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop im
 vérifier la bonne utilisation d'InitPW...
 
 GPS, NMEA, waypoints, AHRS, DVL
+why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
+Nortek DVL supports RDI PD0, send Pathfinder commands, faire fichier RDIPD0Protocol.h?
+calib mag du DVL Nortek?
+prévoir commande pour mettre en veille le PathfinderDVL (avec warning s'il est en Ethernet)
+Test piscine avec DVL+staticsonalocalization : mettre plus grande erreur sur boussole et faire du suivi de ligne avec effet intégral pour corriger les erreurs de cap...->non en fait le DVL n'aidera pas vraiment...
 mt, sbg : fixtype, numsat, hdop...
 Pour chaque GPS, option bdisableuse, qui empêche mise à jour x_gps, bGPSOK, etc. mais il faut quand même qu'il reçoive les corrections rtcm...
 récupérer accel de mavlink, mt, sbg, razor, vérifier quand elles sont valides...?
@@ -479,20 +491,8 @@ send Razor calib params like ROS (param bSendCalib)?
 adapter NMEAProtocol.h pour gérer NMEA Nortek (without tags, otherwise > 80 characters...)
 Pourquoi le #ox#o1 de razor apparait dans le second log?->parce que le nouveau log n'est créé qu'après le connect...
 
-Obstacle avoidance
-enable/disablegeofence coordinates/file command, in 3D
-surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
-positionobstacleavoidance : faire tuto ajout step-by-step
-wallavoidance, visualobstacleavoidance : it is reactive behavior
-wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
-the control part of obstacle avoidance could be centralized to handle all the types of obstacles (punctual, line...), maybe using vector fields
-add vector field obstacle avoidance mission like visual obstacle, e.g using AIS and simulatedinternetswarmondevice
-
-configdistancecomputation
-distancecomputation
-commande waitdistanceless/more/wgs x y d
-
 Altitude sonar, objects detection sonar
+Altitude from sonar : use qinter to allow outliers and take into account position of the sonar on the submarine as well as roll and pitch
 sonaraltitudeestimation : chercher le plus petit rayon où il y a plus de 50% de pings qui ont une détection...
 faire filtre passe-bas sur le dernier tour sonar, afficher <dmin si résultat trop petit ou >rangescale si oo renvoyé par firstobsdist avec threshold à 5 ou faible
 prévoir aussi mode sécurité altitude (mais peut être intempestif si dans piscine avec sonar) et profondeur->commandes startaltitude/depthprotection
@@ -575,6 +575,9 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+helios : D'où vient vrxhat?->calculé dans observer...
+helios : Accrxhat, etc. pas loggués dans logstate?->corrigé
 
 pour chaque sonar/lidar : une overlayimg qui peut être (normal ou waterfall ou rien) et (avec 1ères distances, toutes ou absentes) et (corrigé en bras de leviers, +psi, +pos, -pos+historique psi, +historique position, ou sans correction)
 

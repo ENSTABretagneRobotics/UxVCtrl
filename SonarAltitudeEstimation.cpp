@@ -21,7 +21,7 @@ THREAD_PROC_RETURN_VALUE SonarAltitudeEstimationThread(void* pParam)
 
 	// Missing error checking...
 
-	dmin_sonaraltitudeestimation = 1.0; // Temp...
+	dmin_sonaraltitudeestimation = d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
 
 	StartChrono(&chrono);
 

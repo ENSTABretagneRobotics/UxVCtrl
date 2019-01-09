@@ -17,6 +17,17 @@
 #include "OSThread.h"
 #endif // !DISABLE_IM483ITHREAD
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 //#define TIMEOUT_MESSAGE_IM483I 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
 #define MAX_NB_BYTES_IM483I 512
@@ -345,5 +356,15 @@ inline int DisconnectIM483I(IM483I* pIM483I)
 #ifndef DISABLE_IM483ITHREAD
 THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam);
 #endif // !DISABLE_IM483ITHREAD
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER
 
 #endif // !IM483I_H

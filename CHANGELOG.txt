@@ -1,3 +1,8 @@
+285
+Corrected accelerations handling.
+Added altreg, enablealtreg, disablealtreg as alias for depthreg commands.
+Improved compatibility with Mac OS.
+
 284
 Added regsetrand command.
 Added phi_max_rand_err, phi_bias_err, theta_max_rand_err, theta_bias_err, vry_max_rand_err, vry_bias_err, vrz_max_rand_err, vrz_bias_err parameters.
