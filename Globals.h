@@ -1060,9 +1060,49 @@ inline double CheckInsideObstacle(double x, double y, bool measureDist)
 	}
 	if (contours.size() > 0) result = max(cv::pointPolygonTest(contours, cv::Point2f((float)x, (float)y), measureDist), result);
 #else
-	UNREFERENCED_PARAMETER(x);
-	UNREFERENCED_PARAMETER(y);
-	UNREFERENCED_PARAMETER(measureDist);
+	int i = 0, j = 0, c = 0, nvert = 0;
+	double d = 0, Xmin = MAX_UNCERTAINTY, Xmax = -MAX_UNCERTAINTY, Ymin = MAX_UNCERTAINTY, Ymax = -MAX_UNCERTAINTY;
+	std::vector<double> vertx, verty;
+
+	// Environment circles.
+	for (i = 0; i < (int)circles_r.size(); i++)
+	{
+		d = circles_r[i]-sqrt(sqr(circles_x[i]-x)+sqr(circles_y[i]-y));
+		if ((!measureDist)&&(d != 0)) d = sign(d, 0);
+		result = max(d, result);
+	}
+
+	// Environment walls.
+	for (i = 0; i < (int)walls_xa.size(); i++)
+	{
+		Xmin = min(Xmin, walls_xa[i]); Xmin = min(Xmin, walls_xb[i]);
+		Xmax = max(Xmax, walls_xa[i]); Xmax = max(Xmax, walls_xb[i]);
+		Ymin = min(Ymin, walls_ya[i]); Ymin = min(Ymin, walls_yb[i]);
+		Ymax = max(Ymax, walls_ya[i]); Ymax = max(Ymax, walls_yb[i]);
+		vertx.push_back(walls_xa[i]);
+		vertx.push_back(walls_xb[i]);
+		verty.push_back(walls_ya[i]);
+		verty.push_back(walls_yb[i]);
+	}
+	// First check bounding rectangle.
+	if ((x < Xmin)||(x > Xmax)||(y < Ymin)||(y > Ymax))
+	{
+		// Approximation...
+		result = max(-1, result);
+	}
+	else
+	{
+		// Approximation...
+		// https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
+		nvert = (int)vertx.size();
+		for (i = 0, j = nvert-1; i < nvert; j = i++)
+		{
+			if (((verty[i] > y) != (verty[j]> y)) &&
+				(x < (vertx[j]-vertx[i]) * (y-verty[i]) / (verty[j]-verty[i]) + vertx[i]))
+				c = !c;
+		}
+		if (c) result = max(1, result); else result = max(-1, result);
+	}
 #endif // !DISABLE_OPENCV_SUPPORT
 
 	return result;

@@ -217,6 +217,7 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+Kinect/CLEye support and USE_OPENCV_HIGHGUI_CPP_API?
 crash opencv cpp mingw5
 problème echosondeur sur port série de rpizw?
 bug ublox voit pas $gnrmc à cause des corrections rtk, du coup on doit activer gga?

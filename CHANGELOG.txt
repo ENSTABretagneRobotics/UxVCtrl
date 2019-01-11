@@ -1,3 +1,6 @@
+286
+Added an approximate implementation for CheckInsideObstacle() when OpenCV is not available.
+
 285
 Corrected accelerations handling.
 Added altreg, enablealtreg, disablealtreg as alias for depthreg commands.
