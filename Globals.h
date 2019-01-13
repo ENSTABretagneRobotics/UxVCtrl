@@ -51,6 +51,17 @@
 #include "rmatrix.h"
 #include <deque>
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
 #pragma warning(disable : 4459) 
@@ -1470,5 +1481,15 @@ inline int ReleaseGlobals(void)
 
 	return EXIT_SUCCESS;
 }
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER
 
 #endif // !GLOBALS_H

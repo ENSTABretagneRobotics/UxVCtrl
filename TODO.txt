@@ -1,3 +1,5 @@
+warnings Mac OS...
+
 Altitude_AGL : avec vertical lidar-lite et/ou px4f ground_distance, corriger avec roll pitch et ne pas prendre en compte si roll pitch trop élevés, si lidar pas dispo, utiliser la dernière altitude_agl valide avec les variations d'altitude mesurée par baro et/ou GPS
 Altitude : c'est l'altitude par rapport au repère env.txt (où l'altitude GPS est en général donnée) ou alors en option affichée en wgs, si GPS pas dispo ou pour fusionner, utiliser la variation de pression par rapport à l'origine de l'env (qui pourrait en option être prise comme la pression au démarrage ou l'armement du robot...)
 
@@ -268,6 +270,7 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+cmake : faire copier ce qu'il faut du dossier source dans build si différents...?
 cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
 cmake options static (attention cv342...), xp toolset visual studio?
 tester avec un nouveau mingw et linux, check inline and timegm in a small program
@@ -287,6 +290,7 @@ add specific columns for raw GPS data in log file?->maybe not necessary since al
 Log update values in accrx, accry, accrz hat/err...
 
 MAVLink
+envoyer global_position_int pour gérer le fait que qgc n'affiche pas position GPS si pas de fix? revérifier apmp, qgc sitl si no gps lock...
 altitude, mode pas affichés dans Mission Planner
 pouvoir utiliser pxihawk comme pwmin et/ou pwmout et/ou ahrs, etc.
 pouvoir utiliser rcin pour controler robot à la télécommande
@@ -304,7 +308,6 @@ delay/wait, waypoint validation, fly to here wp not displayed on mp, how to disp
 MAV_FRAME_GLOBAL frame : altitude AMSL
 MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
 Utilisation de qgroundcontrol : regarder ses options et s'en inspirer, rajouter paramètres...
-qgroundcontrol reconnait pas la position si no gps lock...
 Cap pas correctement envoyé en mavlink osd
 Envoyer aussi rssi
 rajouter gestion de message manual control mavlinkinterface
@@ -547,6 +550,9 @@ add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
 UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
 reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations pour d'autres robots, et/ou intégrer les devices simulés et équations de robots dans UxVCtrl?->au moins les équations, il y a déjà des robid prévus pour différents simulateurs...
 Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
+
+Mac OS
+pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative...
 
 CISCREA
 après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070

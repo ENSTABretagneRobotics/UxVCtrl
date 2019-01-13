@@ -1,3 +1,7 @@
+287
+Updated bRawSimStateInMAVLinkInterface behavior.
+Improved compatibility with Mac OS.
+
 286
 Added an approximate implementation for CheckInsideObstacle() when OpenCV is not available.
 

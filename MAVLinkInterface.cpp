@@ -1003,6 +1003,8 @@ REQ_DATA_STREAM...
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat_sim, &long_sim, &alt_sim);
 		heading_sim = (fmod_2PI(-angle_env-psi_sim+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
+		gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FIXED;
+
 		gps_raw_int.lat = (int32_t)(lat_sim*10000000.0);
 		gps_raw_int.lon = (int32_t)(long_sim*10000000.0);
 		gps_raw_int.alt = (int32_t)(alt_sim*1000.0);

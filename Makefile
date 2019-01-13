@@ -36,6 +36,9 @@ CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
 #CFLAGS += -D ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 
+# Depending on your OS (old Linux or Mac OS)...
+#CFLAGS += -DUSE_OLD_CHRONO
+
 CFLAGS += -I../OSUtils 
 CFLAGS += -I../Extensions/Devices/LabjackUtils/liblabjackusb
 CFLAGS += -I../Extensions/Devices/LabjackUtils/U3Utils
@@ -48,13 +51,17 @@ CFLAGS += -I/usr/local/include/sbgECom/src -I/usr/local/include/sbgECom/common
 
 CXXFLAGS += $(CFLAGS) -fpermissive
 
+# For Linux, if static needed...
 #LDFLAGS += -static-libgcc -static-libstdc++ -static
+
 LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
 #LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
 LDFLAGS += -lmodbus
 LDFLAGS += -lsbgECom
 LDFLAGS += -lbvtsdk
 #LDFLAGS += -lusb-1.0
+
+# Might need to remove -lrt for Mac OS...
 LDFLAGS += -lpthread -lrt -lm
 
 default: $(PROGS)
