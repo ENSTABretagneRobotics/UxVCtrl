@@ -1,4 +1,3 @@
-warnings Mac OS...
 
 Altitude_AGL : avec vertical lidar-lite et/ou px4f ground_distance, corriger avec roll pitch et ne pas prendre en compte si roll pitch trop élevés, si lidar pas dispo, utiliser la dernière altitude_agl valide avec les variations d'altitude mesurée par baro et/ou GPS
 Altitude : c'est l'altitude par rapport au repère env.txt (où l'altitude GPS est en général donnée) ou alors en option affichée en wgs, si GPS pas dispo ou pour fusionner, utiliser la variation de pression par rapport à l'origine de l'env (qui pourrait en option être prise comme la pression au démarrage ou l'armement du robot...)
@@ -270,6 +269,9 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+Tester Hardware-MATLAB MAVLink et SBG support : 
+export CMAKE_C_FLAGS=${CMAKE_C_FLAGS} -fPIC
+Pour compilation SBG MATLAB Linux et Mac OS
 cmake : faire copier ce qu'il faut du dossier source dans build si différents...?
 cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
 cmake options static (attention cv342...), xp toolset visual studio?
@@ -277,6 +279,7 @@ tester avec un nouveau mingw et linux, check inline and timegm in a small progra
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
 cross compilation with cmake, variable PREFIX pour dépendances...
 Compiler uxvctrl pour le pixhawk?
+Mac OS : pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative...
 
 logs
 Dashboard : rajouter image en fond, cap voulu en remontée au vent car depend de l'estimation de vent
@@ -551,8 +554,6 @@ UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDev
 reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations pour d'autres robots, et/ou intégrer les devices simulés et équations de robots dans UxVCtrl?->au moins les équations, il y a déjà des robid prévus pour différents simulateurs...
 Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
 
-Mac OS
-pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative...
 
 CISCREA
 après un test rapide en rs485 sur le ciscrea dissous, il semble que la période du thread ciscrea ait des pics de 0.095 s, moyenne 0.070

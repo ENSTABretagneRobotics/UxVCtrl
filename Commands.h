@@ -1046,20 +1046,20 @@ inline int Commands(char* line)
 	else bContinueElseIf1 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic ignored "-Wparentheses"
-#if (__GNUC__ >= 7)
+#if (__GNUC__ >= 7) || defined(__clang__)
 #pragma GCC diagnostic ignored "-Wdangling-else"
 #endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	if (bContinueElseIf1) if (sscanf(line, "setenvcoord %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic pop
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -2201,20 +2201,20 @@ inline int Commands(char* line)
 	else bContinueElseIf2 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic ignored "-Wparentheses"
-#if (__GNUC__ >= 7)
+#if (__GNUC__ >= 7) || defined(__clang__)
 #pragma GCC diagnostic ignored "-Wdangling-else"
 #endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	if (bContinueElseIf2) if (sscanf(line, "cicreaconfig %255s %d", str, &ival1) == 2)
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic pop
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	{
 		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")) != 0)
@@ -2944,20 +2944,20 @@ inline int Commands(char* line)
 	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic ignored "-Wparentheses"
-#if (__GNUC__ >= 7)
+#if (__GNUC__ >= 7) || defined(__clang__)
 #pragma GCC diagnostic ignored "-Wdangling-else"
 #endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	if (bContinueElseIf3) if (strncmp(line, "startrngmsgacousticmodem", strlen("startrngmsgacousticmodem")) == 0)
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic pop
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	{
 		EnterCriticalSection(&MDMCS);
@@ -3215,20 +3215,20 @@ inline int Commands(char* line)
 	else bContinueElseIf4 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic ignored "-Wparentheses"
-#if (__GNUC__ >= 7)
+#if (__GNUC__ >= 7) || defined(__clang__)
 #pragma GCC diagnostic ignored "-Wdangling-else"
 #endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	if (bContinueElseIf4) if (sscanf(line, "showdetailedinfo %d", &ival) == 1)
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic pop
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	{
 		bStdOutDetailedInfo = ival? TRUE: FALSE;
@@ -3735,20 +3735,20 @@ inline int Commands(char* line)
 	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #ifdef __GNUC__
 // Disable some GCC warnings.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic ignored "-Wparentheses"
-#if (__GNUC__ >= 7)
+#if (__GNUC__ >= 7) || defined(__clang__)
 #pragma GCC diagnostic ignored "-Wdangling-else"
 #endif // (__GNUC__ >= 7)
 #pragma GCC diagnostic push
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	if (bContinueElseIf5) if ((sscanf(line, "depthreg %lf", &dval) == 1)||(sscanf(line, "altreg %lf", &dval) == 1))
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.
-#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #pragma GCC diagnostic pop
-#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	{
 		EnterCriticalSection(&StateVariablesCS);

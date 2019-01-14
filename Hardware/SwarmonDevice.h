@@ -265,7 +265,7 @@ inline int ConnectSwarmonDevice(SWARMONDEVICE* pSwarmonDevice, char* szCfgFilePa
 		}
 	}
 
-	if (!pSwarmonDevice->address||!pSwarmonDevice->port)
+	if (!(pSwarmonDevice->address[0])||!(pSwarmonDevice->port[0]))
 	{
 		printf("Invalid parameter : szRequest.\n");
 		memset(pSwarmonDevice->szRequest, 0, sizeof(pSwarmonDevice->szRequest));

@@ -1,3 +1,6 @@
+288
+Improved compatibility with Mac OS.
+
 287
 Updated bRawSimStateInMAVLinkInterface behavior.
 Improved compatibility with Mac OS.
