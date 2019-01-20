@@ -275,6 +275,35 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		switch ((char)TranslateKeys(c))
 		{
 		case 'z':
+			if (bForceOverrideInputs)
+			{
+				u_ovrid += 0.1*u_max_ovrid;
+				u_ovrid = (u_ovrid > u_max_ovrid)? u_max_ovrid: u_ovrid;
+				switch (robid)
+				{
+				case SAILBOAT_SIMULATOR_ROBID:
+				case VAIMOS_ROBID:
+				case SAILBOAT_ROBID:
+				case SAILBOAT2_ROBID:
+					break;
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+					if (bEnableAltRCMode) u_ovrid = u_max_ovrid;
+					break;
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+					if (bEnableAltRCMode) u_ovrid = u_max_ovrid;
+					uw_ovrid = 0;
+					break;
+				default:
+					uw_ovrid = 0;
+					break;
+				}
+			}
+			else
+			{
 			u += 0.1*u_max;
 			u = (u > u_max)? u_max: u;
 			switch (robid)
@@ -299,9 +328,40 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (!bHeadingControl) uw = 0;
 				break;
 			}
+			}
 			bZQSDPressed = TRUE;
 			break;
 		case 's':
+			if (bForceOverrideInputs)
+			{
+				u_ovrid -= 0.1*u_max_ovrid;
+				u_ovrid = (u_ovrid < -u_max_ovrid)? -u_max_ovrid: u_ovrid;
+				switch (robid)
+				{
+				case SAILBOAT_SIMULATOR_ROBID:
+				case VAIMOS_ROBID:
+				case SAILBOAT_ROBID:
+				case SAILBOAT2_ROBID:
+					u_ovrid = (u_ovrid < 0)? 0: u_ovrid;
+					break;
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+					if (bEnableAltRCMode) u_ovrid = -u_max_ovrid;
+					break;
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+					if (bEnableAltRCMode) u_ovrid = -u_max_ovrid;
+					uw_ovrid = 0;
+					break;
+				default:
+					uw_ovrid = 0;
+					break;
+				}
+			}
+			else
+			{
 			u -= 0.1*u_max;
 			u = (u < -u_max)? -u_max: u;
 			switch (robid)
@@ -327,9 +387,26 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (!bHeadingControl) uw = 0;
 				break;
 			}
+			}
 			bZQSDPressed = TRUE;
 			break;
 		case 'q':
+			if (bForceOverrideInputs)
+			{
+				uw_ovrid += 0.1*uw_max_ovrid;
+				uw_ovrid = (uw_ovrid > uw_max_ovrid)? uw_max_ovrid: uw_ovrid;
+				switch (robid)
+				{
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+					if (bEnableAltRCMode) uw_ovrid = uw_max_ovrid;
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
 			if (bHeadingControl)
 			{
 				wpsi += 0.03;
@@ -349,9 +426,26 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					break;
 				}
 			}
+			}
 			bZQSDPressed = TRUE;
 			break;
 		case 'd':
+			if (bForceOverrideInputs)
+			{
+				uw_ovrid -= 0.1*uw_max_ovrid;
+				uw_ovrid = (uw_ovrid < -uw_max_ovrid)? -uw_max_ovrid: uw_ovrid;
+				switch (robid)
+				{
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+					if (bEnableAltRCMode) uw_ovrid = -uw_max_ovrid;
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
 			if (bHeadingControl)
 			{
 				wpsi -= 0.03;
@@ -371,9 +465,31 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					break;
 				}
 			}
+			}
 			bZQSDPressed = TRUE;
 			break;
 		case 'f':
+			if (bForceOverrideInputs)
+			{
+				switch (robid)
+				{
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+					u_max_ovrid += 0.025;
+					u_max_ovrid = (u_max_ovrid > 1)? 1: u_max_ovrid;
+					break;
+				default:
+					uv_ovrid += 0.1*max(fabs(u_min_z), fabs(u_max_z));
+					uv_ovrid = (uv_ovrid > u_max_z)? u_max_z: uv_ovrid;
+					break;
+				}
+			}
+			else
+			{
 			switch (robid)
 			{
 			case MOTORBOAT_SIMULATOR_ROBID:
@@ -401,8 +517,30 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				break;
 			}
+			}
 			break;
 		case 'v':
+			if (bForceOverrideInputs)
+			{
+				switch (robid)
+				{
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+					u_max_ovrid -= 0.025;
+					u_max_ovrid = (u_max_ovrid < 0)? 0: u_max_ovrid;
+					break;
+				default:
+					uv_ovrid -= 0.1*max(fabs(u_min_z), fabs(u_max_z));
+					uv_ovrid = (uv_ovrid < u_min_z)? u_min_z: uv_ovrid;
+					break;
+				}
+			}
+			else
+			{
 			switch (robid)
 			{
 			case MOTORBOAT_SIMULATOR_ROBID:
@@ -430,8 +568,42 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				break;
 			}
+			}
 			break;
 		case 'a':
+			if (bForceOverrideInputs)
+			{
+				switch (robid)
+				{
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
+				case SAILBOAT_SIMULATOR_ROBID:
+				case VAIMOS_ROBID:
+				case SAILBOAT_ROBID:
+				case SAILBOAT2_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+					uw_ovrid = 0;
+					break;
+				case QUADRO_SIMULATOR_ROBID:
+				case COPTER_ROBID:
+				case BLUEROV_ROBID:
+				case ARDUCOPTER_ROBID:
+					ul_ovrid += 0.1;
+					ul_ovrid = (ul_ovrid > 1)? 1: ul_ovrid;
+					break;
+				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
+				case ETAS_WHEEL_ROBID:
+					uw_max_ovrid += 0.1;
+					uw_max_ovrid = (uw_max_ovrid > 1)? 1: uw_max_ovrid;
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
 			switch (robid)
 			{
 			case MOTORBOAT_SIMULATOR_ROBID:
@@ -460,8 +632,42 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			default:
 				break;
 			}
+			}
 			break;
 		case 'e':
+			if (bForceOverrideInputs)
+			{
+				switch (robid)
+				{
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
+				case SAILBOAT_SIMULATOR_ROBID:
+				case VAIMOS_ROBID:
+				case SAILBOAT_ROBID:
+				case SAILBOAT2_ROBID:
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+					uw_ovrid = 0;
+					break;
+				case QUADRO_SIMULATOR_ROBID:
+				case COPTER_ROBID:
+				case BLUEROV_ROBID:
+				case ARDUCOPTER_ROBID:
+					ul_ovrid -= 0.1;
+					ul_ovrid = (ul_ovrid < -1)? -1: ul_ovrid;
+					break;
+				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
+				case ETAS_WHEEL_ROBID:
+					uw_max_ovrid -= 0.1;
+					uw_max_ovrid = (uw_max_ovrid < 0)? 0: uw_max_ovrid;
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
 			switch (robid)
 			{
 			case MOTORBOAT_SIMULATOR_ROBID:
@@ -490,20 +696,52 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			default:
 				break;
 			}
+			}
 			break;
 		case 'B':
+			if (bForceOverrideInputs)
+			{
+				uv_ovrid = (u_min_z+u_max_z)/2.0;
+			}
+			else
+			{
 			uv = (u_min_z+u_max_z)/2.0;
-			break;
-		case 'w':
-			bBrakeControl = TRUE;
-			bDistanceControl = FALSE;
-			u = 0;
+			}
 			break;
 		case ' ':
+			if (bForceOverrideInputs)
+			{
+				u_ovrid = 0; uw_ovrid = 0; ul_ovrid = 0;
+			}
+			else
+			{
 			DisableAllHorizontalControls(); // wpsi = 0;
+			}
 			break;
 		case 'g':
+			if (bForceOverrideInputs)
+			{
+				u_ovrid = 0; uw_ovrid = 0; uv_ovrid = 0; ul_ovrid = 0; up_ovrid = 0; ur_ovrid = 0;
+			}
+			else
+			{
 			DisableAllControls(); // wpsi = 0; wz = 0;
+			}
+			break;
+		case 'R':
+			bEnableAltRCMode = !bEnableAltRCMode;
+			if (bEnableAltRCMode) printf("Alternate RC mode enabled.\n");
+			else printf("Alternate RC mode disabled.\n");
+			break;
+		case 'F':
+			bForceOverrideInputs = !bForceOverrideInputs;
+			if (bForceOverrideInputs)
+			{
+				printf("Force override inputs enabled.\n");
+				u_ovrid = u; uw_ovrid = uw; uv_ovrid = uv; ul_ovrid = ul; up_ovrid = up; ur_ovrid = ur;
+				u_max_ovrid = u_max; uw_max_ovrid = uw_max;
+			}
+			else printf("Force override inputs disabled.\n");
 			break;
 		case 't':
 			if (!bHeadingControl)
@@ -561,6 +799,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			//if (bRollControl) printf("Roll control enabled.\n");
 			//else printf("Roll control disabled.\n");
+			break;
+		case 'w':
+			bBrakeControl = TRUE;
+			bDistanceControl = FALSE;
+			u = 0;
 			break;
 		case 'b':
 			lights += 0.1;
@@ -758,11 +1001,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("Alarms enabled.\n");
 			break;
 		case '?': bDispEPU = !bDispEPU; break;
-		case 'F':
-			bEnableAltRCMode = !bEnableAltRCMode;
-			if (bEnableAltRCMode) printf("Alternate RC mode enabled.\n");
-			else printf("Alternate RC mode disabled.\n");
-			break;
 		case '§':
 			bEnableSimulatedGNSS = !bEnableSimulatedGNSS;
 			if (bEnableSimulatedGNSS) printf("Simulated GNSS enabled.\n");
@@ -962,6 +1200,30 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				bZQSDPressed = FALSE;
 				if (bEnableAltRCMode)
 				{
+					if (bForceOverrideInputs)
+					{
+						switch (robid)
+						{
+						case SAILBOAT_SIMULATOR_ROBID:
+						case VAIMOS_ROBID:
+						case SAILBOAT_ROBID:
+						case SAILBOAT2_ROBID:
+							uw_ovrid = 0;
+							break;
+						case MOTORBOAT_SIMULATOR_ROBID:
+						case MOTORBOAT_ROBID:
+						case BUGGY_SIMULATOR_ROBID:
+						case BUGGY_ROBID:
+							u_ovrid = 0;
+							break;
+						default:
+							u_ovrid = 0;
+							uw_ovrid = 0;
+							break;
+						}
+					}
+					else
+					{
 					switch (robid)
 					{
 					case SAILBOAT_SIMULATOR_ROBID:
@@ -980,6 +1242,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						u = 0;
 						if (!bHeadingControl) uw = 0;
 						break;
+					}
 					}
 				}
 			}
@@ -1168,13 +1431,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
-				sprintf(szText, "%d%% %d%% %d%% %d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw_max*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
+				sprintf(szText, "%d%% %d%% %d%% %d%%", (int)floor((bForceOverrideInputs? u_max_ovrid: u_max)*100.0+0.05), (int)floor((bForceOverrideInputs? uw_max_ovrid: uw_max)*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
 			case MOTORBOAT_SIMULATOR_ROBID:
 			case MOTORBOAT_ROBID:
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
-				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor(u_max*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05));
+				sprintf(szText, "%+04d%% %+04d%% %+04d%%", (int)floor((bForceOverrideInputs? u_max_ovrid: u_max)*100.0+0.05), (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05));
 				break;
 			case SAILBOAT_SIMULATOR_ROBID:
 			case VAIMOS_ROBID:
@@ -1188,20 +1451,20 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				default: s = 'I'; break;
 				}
 				sprintf(szText, "%c %c %d%% %d%% VBAT1:%.1fV",
-					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), vbat1);
+					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), vbat1);
 				break;
 			case LIRMIA3_ROBID:
-				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u4*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
+				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%% %d%%", (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), (int)floor(u4*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
 			case QUADRO_SIMULATOR_ROBID:
 			case COPTER_ROBID:
 			case BLUEROV_ROBID:
 			case ARDUCOPTER_ROBID:
 				sprintf(szText, "%c %+04d%% %+04d%% %+04d%% %+04d%% VBAT1:%.1fV", 
-					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(ul*100.0+0.05), (int)floor(uv*100.0+0.05), vbat1);
+					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), (int)floor(ul_f*100.0+0.05), (int)floor(uv_f*100.0+0.05), vbat1);
 				break;
 			default:
-				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw*100.0+0.05), (int)floor(u*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
+				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%%", (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
 				break;
 			}
 			offset += 16;

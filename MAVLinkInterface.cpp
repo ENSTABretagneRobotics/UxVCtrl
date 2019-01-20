@@ -13,8 +13,20 @@
 #define LOCAL_TYPE_MAVLINKINTERFACE 0
 #define REMOTE_TYPE_MAVLINKINTERFACE 1
 
+enum MAVLINKINTERFACE_PARAM_ID
+{
+	RC_OVERRIDE_TIME_PARAM_ID = 0,
+	OVRID_CH_PARAM_ID,
+	DFLT_DIS_OVRID_PARAM_ID,
+	F_OVRID_IN_CH_PARAM_ID,
+	DFLT_F_OVRID_IN_PARAM_ID,
+	F_OVRID_IN_PARAM_ID
+};
+typedef enum MAVLINKINTERFACE_PARAM_ID MAVLINKINTERFACE_PARAM_ID;
+
 // Temp...
 RS232PORT MAVLinkInterfacePseudoRS232Port;
+BOOL MAVLinkInterface_bDisablePWMOverride = FALSE;
 
 int connectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
@@ -124,6 +136,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_heartbeat_t heartbeat;
 	mavlink_statustext_t statustext;
 	mavlink_status_t status;
+	mavlink_param_set_t param_set;
 	mavlink_rc_channels_override_t rc_channels_override;
 	mavlink_set_attitude_target_t set_attitude_target;
 	mavlink_set_position_target_global_int_t set_position_target;
@@ -147,7 +160,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_command_ack_t command_ack;
 	//uint8_t result = MAV_RESULT_FAILED;
 	char Name[17];
-	int nbparams = 1;
+	int nbparams = 6;
+	BOOL bForceOverrideInputs_prev = bForceOverrideInputs;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 	double speed = 0, Rate = 0, Alt = 0, Deg = 0, angle = 0, Delay = 0, Lat = 0, Lon = 0;
 	int Dir = 0, rel = 0, Current = 0;
@@ -157,6 +171,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	// Get data from GCS...
 	if ((!bDisableMAVLinkInterfaceIN)&&(CheckAvailableBytesRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS))
 	{	
+#pragma region READ DATA
 		StartChrono(&chrono);
 
 		// Prepare the buffers.
@@ -209,7 +224,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 			// Only the last recvbuflen bytes received should be taken into account in what follows.
 			BytesReceived = recvbuflen;
 		}
-
+#pragma endregion
 		// Analyze data.
 
 		for (i = 0; i < BytesReceived; ++i)
@@ -235,6 +250,11 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 
 				// Packet received
 				//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
+				if (tlogfile)
+				{
+					fwrite_tlog(msg, tlogfile);
+					fflush(tlogfile);
+				}
 				switch (msg.msgid)
 				{
 #pragma region STANDARD MESSAGES
@@ -245,17 +265,174 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					mavlink_msg_statustext_decode(&msg, &statustext);
 					printf("%.50s\n", statustext.text);
 					break;
+#pragma region PARAMETERS
+				case MAVLINK_MSG_ID_PARAM_SET:
+					mavlink_msg_param_set_decode(&msg, &param_set);
+					if (strncmp(param_set.param_id, "RC_OVERRIDE_TIME", strlen("RC_OVERRIDE_TIME")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						MAVLinkInterface_rc_override_time = (int)param_set.param_value;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if (strncmp(param_set.param_id, "OVRID_CH", strlen("OVRID_CH")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						MAVLinkInterface_overridechan = (int)param_set.param_value;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if (strncmp(param_set.param_id, "DFLT_DIS_OVRID", strlen("DFLT_DIS_OVRID")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						MAVLinkInterface_bDefaultDisablePWMOverride = (fabs(param_set.param_value) < 0.001)? FALSE: TRUE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if (strncmp(param_set.param_id, "F_OVRID_IN_CH", strlen("F_OVRID_IN_CH")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						MAVLinkInterface_forceoverrideinputschan = (int)param_set.param_value;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if (strncmp(param_set.param_id, "DFLT_F_OVRID_IN", strlen("DFLT_F_OVRID_IN")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						MAVLinkInterface_bDefaultForceOverrideInputs = (fabs(param_set.param_value) < 0.001)? FALSE: TRUE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if (strncmp(param_set.param_id, "F_OVRID_IN", strlen("F_OVRID_IN")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						bForceOverrideInputs = (fabs(param_set.param_value) < 0.001)? FALSE: TRUE;
+						if (bForceOverrideInputs)
+						{
+							printf("Force override inputs enabled.\n");
+							u_ovrid = u; uw_ovrid = uw; uv_ovrid = uv; ul_ovrid = ul; up_ovrid = up; ur_ovrid = ur;
+							u_max_ovrid = u_max; uw_max_ovrid = uw_max;
+						}
+						else printf("Force override inputs disabled.\n");
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					// No break for the case, to be able to send back updated parameters...
 				case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 				case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
 					EnterCriticalSection(&StateVariablesCS);
 					memset(Name, 0, sizeof(Name));
 					memset(&param_value, 0, sizeof(mavlink_param_value_t));
-					sprintf(Name, "REAL32_PARAM");
+					sprintf(Name, "RC_OVERRIDE_TIME");
 					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
-					param_value.param_value = 0;
+					param_value.param_value = (float)MAVLinkInterface_rc_override_time;
 					param_value.param_type = MAV_PARAM_TYPE_REAL32;
 					param_value.param_count = (uint16_t)nbparams;
-					param_value.param_index = 0;// (uint16_t)(-1) to ignore...?
+					param_value.param_index = (uint16_t)RC_OVERRIDE_TIME_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "OVRID_CH");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)MAVLinkInterface_overridechan;
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)OVRID_CH_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "DFLT_DIS_OVRID");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)(MAVLinkInterface_bDefaultDisablePWMOverride? 1: 0);
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)DFLT_DIS_OVRID_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "F_OVRID_IN_CH");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)MAVLinkInterface_forceoverrideinputschan;
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)F_OVRID_IN_CH_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "DFLT_F_OVRID_IN");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)(MAVLinkInterface_bDefaultForceOverrideInputs? 1: 0);
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)DFLT_F_OVRID_IN_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "F_OVRID_IN");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)(bForceOverrideInputs? 1: 0);
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)F_OVRID_IN_PARAM_ID;// (uint16_t)(-1) to ignore...?
 					LeaveCriticalSection(&StateVariablesCS);
 					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
 					memset(sendbuf, 0, sizeof(sendbuf));
@@ -270,38 +447,195 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						fflush(tlogfile);
 					}
 					break;
+#pragma endregion
+#pragma region RC_CHANNELS_OVERRIDE
 				case MAVLINK_MSG_ID_RC_CHANNELS_OVERRIDE:
 					mavlink_msg_rc_channels_override_decode(&msg, &rc_channels_override);
 					EnterCriticalSection(&StateVariablesCS);
-					switch (robid)
+					if (MAVLinkInterface_rc_override_time)
 					{
-					case BUBBLE_ROBID:
-					case MOTORBOAT_SIMULATOR_ROBID:
-					case MOTORBOAT_ROBID:
-					case SAILBOAT_SIMULATOR_ROBID:
-					case VAIMOS_ROBID:
-					case SAILBOAT_ROBID:
-					case SAILBOAT2_ROBID:
-					case TANK_SIMULATOR_ROBID:
-					case ETAS_WHEEL_ROBID:
-					case BUGGY_SIMULATOR_ROBID:
-					case BUGGY_ROBID:
-						u = (rc_channels_override.chan3_raw-1500.0)/500.0;
-						uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
-						break;
-					case BLUEROV_ROBID:
-					case QUADRO_SIMULATOR_ROBID:
-					case COPTER_ROBID:
-					case ARDUCOPTER_ROBID:
-					default:
-						uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
-						u = (rc_channels_override.chan2_raw-1500.0)/500.0;
-						uv = (rc_channels_override.chan3_raw-1500.0)/500.0;
-						ul = (rc_channels_override.chan4_raw-1500.0)/500.0;
-						break;
+						switch (MAVLinkInterface_overridechan)
+						{
+						case 1:
+							if (rc_channels_override.chan1_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan1_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 2:
+							if (rc_channels_override.chan2_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan2_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 3:
+							if (rc_channels_override.chan3_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan3_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 4:
+							if (rc_channels_override.chan4_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan4_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 5:
+							if (rc_channels_override.chan5_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan5_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 6:
+							if (rc_channels_override.chan6_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan6_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 7:
+							if (rc_channels_override.chan7_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan7_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 8:
+							if (rc_channels_override.chan8_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan8_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 9:
+							if (rc_channels_override.chan9_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan9_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 10:
+							if (rc_channels_override.chan10_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan10_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 11:
+							if (rc_channels_override.chan11_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan11_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 12:
+							if (rc_channels_override.chan12_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan12_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 13:
+							if (rc_channels_override.chan13_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan13_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 14:
+							if (rc_channels_override.chan14_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan14_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 15:
+							if (rc_channels_override.chan15_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan15_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 16:
+							if (rc_channels_override.chan16_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan16_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 17:
+							if (rc_channels_override.chan17_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan17_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						case 18:
+							if (rc_channels_override.chan18_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan18_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						default:
+							MAVLinkInterface_bDisablePWMOverride = MAVLinkInterface_bDefaultDisablePWMOverride;
+							break;
+						}
+						bForceOverrideInputs_prev = bForceOverrideInputs;
+						switch (MAVLinkInterface_forceoverrideinputschan)
+						{
+						case 1:
+							if (rc_channels_override.chan1_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan1_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 2:
+							if (rc_channels_override.chan2_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan2_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 3:
+							if (rc_channels_override.chan3_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan3_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 4:
+							if (rc_channels_override.chan4_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan4_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 5:
+							if (rc_channels_override.chan5_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan5_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 6:
+							if (rc_channels_override.chan6_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan6_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 7:
+							if (rc_channels_override.chan7_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan7_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 8:
+							if (rc_channels_override.chan8_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan8_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 9:
+							if (rc_channels_override.chan9_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan9_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 10:
+							if (rc_channels_override.chan10_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan10_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 11:
+							if (rc_channels_override.chan11_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan11_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 12:
+							if (rc_channels_override.chan12_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan12_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 13:
+							if (rc_channels_override.chan13_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan13_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 14:
+							if (rc_channels_override.chan14_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan14_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 15:
+							if (rc_channels_override.chan15_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan15_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 16:
+							if (rc_channels_override.chan16_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan16_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 17:
+							if (rc_channels_override.chan17_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan17_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						case 18:
+							if (rc_channels_override.chan18_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan18_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							break;
+						default:
+							break;
+						}
+						if (bForceOverrideInputs_prev != bForceOverrideInputs)
+						{
+							if (bForceOverrideInputs)
+							{
+								printf("Force override inputs enabled.\n");
+								u_ovrid = u; uw_ovrid = uw; uv_ovrid = uv; ul_ovrid = ul; up_ovrid = up; ur_ovrid = ur;
+								u_max_ovrid = u_max; uw_max_ovrid = uw_max;
+							}
+							else printf("Force override inputs disabled.\n");
+						}
+						if (!MAVLinkInterface_bDisablePWMOverride)
+						{
+							switch (robid)
+							{
+							case BUBBLE_ROBID:
+							case MOTORBOAT_SIMULATOR_ROBID:
+							case MOTORBOAT_ROBID:
+							case SAILBOAT_SIMULATOR_ROBID:
+							case VAIMOS_ROBID:
+							case SAILBOAT_ROBID:
+							case SAILBOAT2_ROBID:
+							case TANK_SIMULATOR_ROBID:
+							case ETAS_WHEEL_ROBID:
+							case BUGGY_SIMULATOR_ROBID:
+							case BUGGY_ROBID:
+								if (bForceOverrideInputs)
+								{
+									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) u_ovrid = (rc_channels_override.chan3_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw_ovrid = (rc_channels_override.chan1_raw-1500.0)/500.0;
+								}
+								else
+								{
+									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) u = (rc_channels_override.chan3_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
+								}
+								break;
+							case BLUEROV_ROBID:
+							case QUADRO_SIMULATOR_ROBID:
+							case COPTER_ROBID:
+							case ARDUCOPTER_ROBID:
+							default:
+								if (bForceOverrideInputs)
+								{
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw_ovrid = (rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) u_ovrid = (rc_channels_override.chan2_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) uv_ovrid = (rc_channels_override.chan3_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) ul_ovrid = (rc_channels_override.chan4_raw-1500.0)/500.0;
+								}
+								else
+								{
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) u = (rc_channels_override.chan2_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) uv = (rc_channels_override.chan3_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) ul = (rc_channels_override.chan4_raw-1500.0)/500.0;
+								}
+								break;
+							}
+						}
 					}
 					LeaveCriticalSection(&StateVariablesCS);
 					break;
+#pragma endregion
 				case MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:
 					mavlink_msg_set_attitude_target_decode(&msg, &set_attitude_target);
 					EnterCriticalSection(&StateVariablesCS);
@@ -323,18 +657,36 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					case ETAS_WHEEL_ROBID:
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
+						if (bForceOverrideInputs)
+						{
+							if (!(set_attitude_target.type_mask&0x40)) u_ovrid = set_attitude_target.thrust;
+							if (!(set_attitude_target.type_mask&0x04)) uw_ovrid = -set_attitude_target.body_yaw_rate/omegazmax;
+						}
+						else
+						{
 						if (!(set_attitude_target.type_mask&0x40)) u = set_attitude_target.thrust;
 						if (!(set_attitude_target.type_mask&0x04)) uw = -set_attitude_target.body_yaw_rate/omegazmax;
+						}
 						break;
 					case BLUEROV_ROBID:
 					case QUADRO_SIMULATOR_ROBID:
 					case COPTER_ROBID:
 					case ARDUCOPTER_ROBID:
 					default:
+						if (bForceOverrideInputs)
+						{
+							if (!(set_attitude_target.type_mask&0x04)) uw_ovrid = -set_attitude_target.body_yaw_rate/omegazmax;
+							u_ovrid = -pitch/0.78;
+							if (!(set_attitude_target.type_mask&0x40)) uv_ovrid = set_attitude_target.thrust;
+							ul_ovrid = -roll/0.78;
+						}
+						else
+						{
 						if (!(set_attitude_target.type_mask&0x04)) uw = -set_attitude_target.body_yaw_rate/omegazmax;
 						u = -pitch/0.78;
 						if (!(set_attitude_target.type_mask&0x40)) uv = set_attitude_target.thrust;
 						ul = -roll/0.78;
+						}
 						break;
 					}
 					LeaveCriticalSection(&StateVariablesCS);
@@ -350,7 +702,14 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					case SAILBOAT2_ROBID:
 						break;
 					default:
+						if (bForceOverrideInputs)
+						{
+							if (fabs(u_ovrid) < 0.01) u_ovrid = u_max_ovrid;
+						}
+						else
+						{
 						if (fabs(u) < 0.01) u = u_max;
+						}
 						break;
 					}
 					if (set_position_target.coordinate_frame == MAV_FRAME_GLOBAL_INT)
@@ -462,7 +821,14 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						case SAILBOAT2_ROBID:
 							break;
 						default:
+							if (bForceOverrideInputs)
+							{
+								if (fabs(u_ovrid) < 0.01) u_ovrid = u_max_ovrid;
+							}
+							else
+							{
 							if (fabs(u) < 0.01) u = u_max;
+							}
 							break;
 						}
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, lat_home, long_home, alt_home, &wx, &wy, &wz);
@@ -477,12 +843,19 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					{
 						// Brake.
 						EnterCriticalSection(&StateVariablesCS);
+						if (bForceOverrideInputs)
+						{
+							u_ovrid = 0; uw_ovrid = 0; ul_ovrid = 0;
+						}
+						else
+						{
 						//bDistanceControl = FALSE;
 						//bBrakeControl = TRUE;
 						//u = 0;
 
 						DisableAllHorizontalControls();
 
+						}
 						LeaveCriticalSection(&StateVariablesCS);
 					}
 					memset(&command_ack, 0, sizeof(mavlink_command_ack_t));
@@ -983,7 +1356,7 @@ REQ_DATA_STREAM...
 	memset(&vfr_hud, 0, sizeof(mavlink_vfr_hud_t));
 	vfr_hud.alt = (float)Center(zhat);
 	vfr_hud.heading = (int16_t)fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
-	vfr_hud.throttle = (uint16_t)fabs(u*100);
+	vfr_hud.throttle = (uint16_t)fabs(u_f*100);
 
 	memset(&mission_current, 0, sizeof(mavlink_mission_current_t));
 	mission_current.seq = (uint16_t)CurWP+1;
@@ -1104,12 +1477,6 @@ REQ_DATA_STREAM...
 
 int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 {
-	/*
-	// Should send a full image when connecting for method 0 and 1...
-	//BOOL bForceSendFullImg = TRUE; 
-	BOOL bInitDone = FALSE;
-	char httpbuf[2048];
-	*/
 	int timeout = 5;
 	RS232PORT MAVLinkInterfacePseudoRS232Port_tmp = MAVLinkInterfacePseudoRS232Port;
 

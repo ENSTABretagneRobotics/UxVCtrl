@@ -1,3 +1,5 @@
+add a third MAVLinkDevice?
+pouvoir gérer followme avec nmeainterface, bExternal...
 
 Altitude_AGL : avec vertical lidar-lite et/ou px4f ground_distance, corriger avec roll pitch et ne pas prendre en compte si roll pitch trop élevés, si lidar pas dispo, utiliser la dernière altitude_agl valide avec les variations d'altitude mesurée par baro et/ou GPS
 Altitude : c'est l'altitude par rapport au repère env.txt (où l'altitude GPS est en général donnée) ou alors en option affichée en wgs, si GPS pas dispo ou pour fusionner, utiliser la variation de pression par rapport à l'origine de l'env (qui pourrait en option être prise comme la pression au démarrage ou l'armement du robot...)
@@ -15,13 +17,15 @@ px4f : est-ce que flow_comp_m_x prend en compte l'altitude?->a priori non, juste
 
 drone : pour suivre un vecteur, faire en sorte que l'orientation du drone aille progressivement dans le bon sens quand on le contrôle avec u et ul...
 
+Use more sonars in front, do not forget up sonar
+logobstacle?
+
 Obstacle avoidance, loiter
 
 Faire en sorte que le drone reste en position par rapport aux obstacles (distancecontrol en u et ul)
 
 waitarea area.txt procid t : execute procid quand on rentre dans la zone, un peu comme waitline
 
-Lire sonars en PWM sur rcin, mais peuvent-il être synchronisés?
 comment gérer le sonar vers le haut?->distance_above
 env obstacles interdit intérieur 
 
@@ -95,14 +99,13 @@ roboteq serial
 
 Param period pour tous les devices, pris en compte s'il est connecté...
 
-rajouter possibilité de corriger l'estimation de vitesse des moteurs en fonction de la tension batterie mesurée
-
 Check observer omegazhat for submarines
 initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écrasé à cause de u, du coup c'est plutôt un u_0, uw_0, etc. qu'il faudrait?
 Rajouter params à linefollowingconfig pour que le robot ait automatiquement une précision plus importante quand il se rapproche de la destination->Attention si changement de r en cours de route, il risque d'attendre le chrono check strategy avant de changer de bord, il faut faire forcecheckstrategy si changement...
 linefollowingconfigex r gamma_infinite dist_end r_end gamma_infinite_end
 Linefollowingconfigex r debut, r milieu, r fin...
 
+rajouter possibilité de corriger l'estimation de vitesse des moteurs en fonction de la tension batterie mesurée
 Bat1 elec, bat2 actuators, should update energy estimation when V and I measured...
 récupérer tension batterie via 4G? Tension/courant dans log principal?->vbat1 et 2 mis à la fin de lognav...
 Attention à surcharge de maestro...->disabled if -1, sleep équilibrés, countermodulo...
@@ -218,6 +221,7 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+sometimes the program stays blocked forever in the interfaces in select() in waitforclifortcpsrv(), lots of mem leaked if MAVLinkInterface was connected...
 Kinect/CLEye support and USE_OPENCV_HIGHGUI_CPP_API?
 crash opencv cpp mingw5
 problème echosondeur sur port série de rpizw?
@@ -427,8 +431,7 @@ Pouvoir programmer avec les touches de la télécommande
 commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
 ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
-Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2...
-Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?
+Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2... Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?->bForceOverrideInputs...
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
 setresumepoint : command to indicate a resumepoint (updates the resume file with the current mission line)
 sauvegarder e,phi,delta_psi dans wall?
@@ -583,6 +586,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+u_f, devices, interfaces, text in gui, observer...
 
 helios : D'où vient vrxhat?->calculé dans observer...
 helios : Accrxhat, etc. pas loggués dans logstate?->corrigé

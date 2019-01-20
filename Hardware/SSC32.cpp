@@ -120,8 +120,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			case SAILBOAT2_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
-				thrust = u;
+				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				thrust = u_f;
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrusterSSC32(&ssc32, rudder, thrust) != EXIT_SUCCESS)
 				{
@@ -134,7 +134,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderSSC32(&ssc32, rudder) != EXIT_SUCCESS)
 				{
@@ -148,15 +148,15 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 #ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
-				thrust = fabs(u);
+				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				thrust = fabs(u_f);
 				if (bEnableBackwardsMotorboat)
 				{
-					if (u < 0) flux = -1; else flux = 1;
+					if (u_f < 0) flux = -1; else flux = 1;
 				}
 				else
 				{
-					if (u < 0) thrust = 0;
+					if (u_f < 0) thrust = 0;
 					flux = 1;
 				}
 				LeaveCriticalSection(&StateVariablesCS);
@@ -171,11 +171,11 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				UNREFERENCED_PARAMETER(flux);
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
-				thrust = u;
+				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				thrust = u_f;
 				if (!bEnableBackwardsMotorboat)
 				{
-					if (u < 0) thrust = 0;
+					if (u_f < 0) thrust = 0;
 				}
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrusterSSC32(&ssc32, rudder, thrust) != EXIT_SUCCESS)

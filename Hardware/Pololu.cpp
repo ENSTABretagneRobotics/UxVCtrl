@@ -149,8 +149,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 			case BUGGY_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
-				thrust = u;
+				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				thrust = u_f;
 				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrustersFluxPololu(&pololu, rudder, thrust, 0, 0, 0) != EXIT_SUCCESS)
@@ -184,8 +184,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				counter_modulo = 11;
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
-				thrust = u;
+				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				thrust = u_f;
 				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrusterPololu(&pololu, rudder, thrust) != EXIT_SUCCESS)
@@ -277,8 +277,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				counter_modulo = 16;
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
-				thrust = u;
+				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				thrust = u_f;
 				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrustersPololu(&pololu, rudder, thrust, thrust) != EXIT_SUCCESS)
@@ -437,7 +437,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
 				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderPololu(&pololu, rudder) != EXIT_SUCCESS)
@@ -471,15 +471,15 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 #ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
-				thrust = fabs(u);
+				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				thrust = fabs(u_f);
 				if (bEnableBackwardsMotorboat)
 				{
-					if (u < 0) flux = -1; else flux = 1;
+					if (u_f < 0) flux = -1; else flux = 1;
 				}
 				else
 				{
-					if (u < 0) thrust = 0;
+					if (u_f < 0) thrust = 0;
 					flux = 1;
 				}
 				showgetposition = ShowMaestroGetPositionPololu[deviceid];
@@ -497,11 +497,11 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				UNREFERENCED_PARAMETER(flux);
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
-				thrust = u;
+				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				thrust = u_f;
 				if (!bEnableBackwardsMotorboat)
 				{
-					if (u < 0) thrust = 0;
+					if (u_f < 0) thrust = 0;
 				}
 				showgetposition = ShowMaestroGetPositionPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);

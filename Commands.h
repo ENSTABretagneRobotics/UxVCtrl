@@ -3410,7 +3410,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "rcswitches %d %d %d %d %d", &ival1, &ival2, &ival3, &ival4, &ival5) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		rc_aux3_sw = ival1; rc_ail_sw = (ival2 != 0)? TRUE: FALSE; rc_gear_sw = (ival3 != 0)? TRUE: FALSE; rc_ele_sw = (ival4 != 0)? TRUE: FALSE; rc_rud_sw = (ival5 != 0)? TRUE: FALSE;
+		rc_aux3_sw = (ival1 >= 0)? ival1: 0; rc_ail_sw = (ival2 != 0)? TRUE: FALSE; rc_gear_sw = (ival3 != 0)? TRUE: FALSE; rc_ele_sw = (ival4 != 0)? TRUE: FALSE; rc_rud_sw = (ival5 != 0)? TRUE: FALSE;
 		//rc_aux3_sw = (rc_aux3_sw < 0)? 0: rc_aux3_sw;
 		rc_aux3_sw = (rc_aux3_sw > 2)? 2: rc_aux3_sw;
 		LeaveCriticalSection(&StateVariablesCS);
@@ -3658,33 +3658,33 @@ inline int Commands(char* line)
 		printf("%.8f %.8f %.3f\n", lat_home, long_home, alt_home);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (strncmp(line, "enablemavlinkinterfacein", strlen("enablemavlinkinterfacein")) == 0)
-	{
-		bDisableMAVLinkInterfaceIN = FALSE;
-	}
-	else if (strncmp(line, "disablemavlinkinterfacein", strlen("disablemavlinkinterfacein")) == 0)
-	{
-		bDisableMAVLinkInterfaceIN = TRUE;
-	}
 	else if (sscanf(line, "setvideointerfacesource %d %d", &guiid, &videoid) == 2)
 	{
 		guiid_VideoInterface = guiid; videoid_VideoInterface = videoid;
 	}
-	else if (strncmp(line, "enablesimulatedgps", strlen("enablesimulatedgps")) == 0)
+	else if (sscanf(line, "simulatedgps %d", &ival) == 1)
 	{
-		bEnableSimulatedGNSS = TRUE;
+		if (ival) bEnableSimulatedGNSS = TRUE; else bEnableSimulatedGNSS = FALSE;
 	}
-	else if (strncmp(line, "disablesimulatedgps", strlen("disablesimulatedgps")) == 0)
+	else if (sscanf(line, "simulateddvl %d", &ival) == 1)
 	{
-		bEnableSimulatedGNSS = FALSE;
+		if (ival) bEnableSimulatedDVL = TRUE; else bEnableSimulatedDVL = FALSE;
 	}
-	else if (strncmp(line, "enablesimulateddvl", strlen("enablesimulateddvl")) == 0)
+	else if (sscanf(line, "mavlinkinterfacein %d", &ival) == 1)
 	{
-		bEnableSimulatedDVL = TRUE;
+		if (ival) bDisableMAVLinkInterfaceIN = FALSE; else bDisableMAVLinkInterfaceIN = TRUE;
 	}
-	else if (strncmp(line, "disablesimulateddvl", strlen("disablesimulateddvl")) == 0)
+	else if (sscanf(line, "overrideinputs %d", &ival) == 1)
 	{
-		bEnableSimulatedDVL = FALSE;
+		EnterCriticalSection(&StateVariablesCS);
+		if (ival)
+		{
+			bForceOverrideInputs = TRUE;
+			u_ovrid = u; uw_ovrid = uw; uv_ovrid = uv; ul_ovrid = ul; up_ovrid = up; ur_ovrid = ur;
+			u_max_ovrid = u_max; uw_max_ovrid = uw_max;
+		}
+		else bForceOverrideInputs = FALSE;
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "controlconfig %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
 	{
@@ -3878,6 +3878,29 @@ inline int Commands(char* line)
 		uv = dval;
 		bDepthControl = FALSE;
 		bAltitudeAGLControl = FALSE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "setinput %d %lf", &ival, &dval) == 2)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		switch (ival)
+		{
+		case 1: u1 = dval; u1 = (u1 < 1)? u1: 1; u1 = (u1 > -1)? u1: -1; break;
+		case 2: u2 = dval; u2 = (u2 < 1)? u2: 1; u2 = (u2 > -1)? u2: -1; break;
+		case 3: u3 = dval; u3 = (u3 < 1)? u3: 1; u3 = (u3 > -1)? u3: -1; break;
+		case 4: u4 = dval; u4 = (u4 < 1)? u4: 1; u4 = (u4 > -1)? u4: -1; break;
+		case 5: u5 = dval; u5 = (u5 < 1)? u5: 1; u5 = (u5 > -1)? u5: -1; break;
+		case 6: u6 = dval; u6 = (u6 < 1)? u6: 1; u6 = (u6 > -1)? u6: -1; break;
+		case 7: u7 = dval; u7 = (u7 < 1)? u7: 1; u7 = (u7 > -1)? u7: -1; break;
+		case 8: u8 = dval; u8 = (u8 < 1)? u8: 1; u8 = (u8 > -1)? u8: -1; break;
+		case 9: u9 = dval; u9 = (u9 < 1)? u9: 1; u9 = (u9 > -1)? u9: -1; break;
+		case 10: u10 = dval; u10 = (u10 < 1)? u10: 1; u10 = (u10 > -1)? u10: -1; break;
+		case 11: u11 = dval; u11 = (u11 < 1)? u11: 1; u11 = (u11 > -1)? u11: -1; break;
+		case 12: u12 = dval; u12 = (u12 < 1)? u12: 1; u12 = (u12 > -1)? u12: -1; break;
+		case 13: u13 = dval; u13 = (u13 < 1)? u13: 1; u13 = (u13 > -1)? u13: -1; break;
+		case 14: u14 = dval; u14 = (u14 < 1)? u14: 1; u14 = (u14 > -1)? u14: -1; break;
+		default: printf("Invalid parameter.\n"); break;
+		}
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "brake", strlen("brake")) == 0)

@@ -249,6 +249,9 @@ extern interval vtwindhat, psitwindhat;
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 extern double u, uw, uv, ul, up, ur, wx, wy, wz, wphi, wtheta, wpsi, wd, wu;
+extern double u_ovrid, uw_ovrid, uv_ovrid, ul_ovrid, up_ovrid, ur_ovrid,
+u_max_ovrid, uw_max_ovrid;
+extern double u_f, uw_f, uv_f, ul_f, up_f, ur_f;
 extern double wxa, wya, wza, wxb, wyb, wzb;
 extern deque<double> wx_vector, wy_vector, wz_vector;
 extern double wagl; // Altitude Above Ground Level.
@@ -347,6 +350,11 @@ extern int MAVLinkInterface_target_system;
 extern int MAVLinkInterface_target_component;
 extern BOOL bForceDefaultMAVLink1MAVLinkInterface;
 extern BOOL bDisableMAVLinkInterfaceIN;
+extern int MAVLinkInterface_rc_override_time;
+extern int MAVLinkInterface_overridechan;
+extern BOOL MAVLinkInterface_bDefaultDisablePWMOverride;
+extern int MAVLinkInterface_forceoverrideinputschan;
+extern BOOL MAVLinkInterface_bDefaultForceOverrideInputs;
 extern BOOL bNMEAInterface;
 extern char szNMEAInterfacePath[MAX_BUF_LEN];
 extern int NMEAInterfaceBaudRate;
@@ -818,6 +826,7 @@ extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
 extern BOOL bStdOutDetailedInfo;
 extern BOOL bDisableAllAlarms;
+extern BOOL bForceOverrideInputs;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
 extern BOOL bExit;

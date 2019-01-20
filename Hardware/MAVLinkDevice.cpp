@@ -443,7 +443,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						}
 						else
 						{
-							if (SetAttitudeTargetMAVLinkDevice(&mavlinkdevice, -0.78*ul, -0.78*u, 0, 0, 0, -uw*omegazmax, uv) != EXIT_SUCCESS)
+							if (SetAttitudeTargetMAVLinkDevice(&mavlinkdevice, -0.78*ul_f, -0.78*u_f, 0, 0, 0, -uw_f*omegazmax, uv_f) != EXIT_SUCCESS)
 							{
 								printf("Connection to a MAVLinkDevice lost.\n");
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
@@ -486,12 +486,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								
 								EnterCriticalSection(&StateVariablesCS);
 								// Convert u (in [-1;1]) into pulse width (in us).
-								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(up*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ur*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[5] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(up_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(ur_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(u_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[5] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-ul_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 								// 6 is reserved...
 								pws[7] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(cameratilt*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 								pws[8] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)((2*lights-1)*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
@@ -549,7 +549,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						{
 							EnterCriticalSection(&StateVariablesCS);
 							// https://github.com/bluerobotics/ardusub/issues/24
-							x_axis = (int)(1000*u); y_axis = (int)(-1000*ul); z_axis = (int)(500*uv+500); r_axis = (int)(-1000*uw);
+							x_axis = (int)(1000*u_f); y_axis = (int)(-1000*ul_f); z_axis = (int)(500*uv_f+500); r_axis = (int)(-1000*uw_f);
 							buttons = joystick_buttons;
 							joystick_buttons = 0;
 							LeaveCriticalSection(&StateVariablesCS);
@@ -611,10 +611,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								
 								EnterCriticalSection(&StateVariablesCS);
 								// Convert u (in [-1;1]) into pulse width (in us).
-								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-ul*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-u*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
-								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[0] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-ul_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[1] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-u_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[2] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(uv_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
+								pws[3] = DEFAULT_MID_PW_MAVLINKDEVICE+(int)(-uw_f*(DEFAULT_MAX_PW_MAVLINKDEVICE-DEFAULT_MIN_PW_MAVLINKDEVICE)/2.0);
 								if (rc_aux3_sw == 2) pws[4] = DEFAULT_MAX_PW_MAVLINKDEVICE;
 								else if (rc_aux3_sw == 1) pws[4] = DEFAULT_MID_PW_MAVLINKDEVICE;
 								else pws[4] = DEFAULT_MIN_PW_MAVLINKDEVICE;
@@ -667,7 +667,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						if (mavlinkdevice.ManualControlMode == 1)
 						{
 							EnterCriticalSection(&StateVariablesCS);
-							x_axis = (int)(1000*u); y_axis = (int)(1000*ul); z_axis = (int)(1000*uv); r_axis = (int)(1000*uw);
+							x_axis = (int)(1000*u_f); y_axis = (int)(1000*ul_f); z_axis = (int)(1000*uv_f); r_axis = (int)(1000*uw_f);
 							buttons = joystick_buttons;
 							joystick_buttons = 0;
 							LeaveCriticalSection(&StateVariablesCS);

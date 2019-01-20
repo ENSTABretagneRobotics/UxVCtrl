@@ -456,58 +456,80 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		uv = (uv > u_max_z)? u_max_z: uv;
 		uv = (uv < u_min_z)? u_min_z: uv;
 
+		// Final inputs, to be used by actuators.
+		if (bForceOverrideInputs)
+		{
+			u_ovrid = (u_ovrid > u_max_ovrid)? u_max_ovrid: u_ovrid;
+			u_ovrid = (u_ovrid < -u_max_ovrid)? -u_max_ovrid: u_ovrid;
+			uw_ovrid = (uw_ovrid > uw_max_ovrid)? uw_max_ovrid: uw_ovrid;
+			uw_ovrid = (uw_ovrid < -uw_max_ovrid)? -uw_max_ovrid: uw_ovrid;
+			ul_ovrid = (ul_ovrid > 1)? 1: ul_ovrid;
+			ul_ovrid = (ul_ovrid < -1)? -1: ul_ovrid;
+			up_ovrid = (up_ovrid > u_max_wy)? u_max_wy: up_ovrid;
+			up_ovrid = (up_ovrid < u_min_wy)? u_min_wy: up_ovrid;
+			ur_ovrid = (ur_ovrid > u_max_wx)? u_max_wx: ur_ovrid;
+			ur_ovrid = (ur_ovrid < u_min_wx)? u_min_wx: ur_ovrid;
+			uv_ovrid = (uv_ovrid > u_max_z)? u_max_z: uv_ovrid;
+			uv_ovrid = (uv_ovrid < u_min_z)? u_min_z: uv_ovrid;
+			u_f = u_ovrid; uw_f = uw_ovrid; uv_f = uv_ovrid; ul_f = ul_ovrid; up_f = up_ovrid; ur_f = ur_ovrid;
+		}
+		else
+		{
+			u_f = u; uw_f = uw; uv_f = uv; ul_f = ul; up_f = up; ur_f = ur;
+		}
+
 		switch (robid)
 		{
 		case QUADRO_SIMULATOR_ROBID:
 		case COPTER_ROBID:
-			u1 = 1.0*uv+0.2*uw+0.4*up;
-			u2 = 1.0*uv-0.2*uw+0.4*ur;
-			u3 = 1.0*uv+0.2*uw-0.4*up;
-			u4 = 1.0*uv-0.2*uw-0.4*ur;
+			u1 = 1.0*uv_f+0.2*uw_f+0.4*up_f;
+			u2 = 1.0*uv_f-0.2*uw_f+0.4*ur_f;
+			u3 = 1.0*uv_f+0.2*uw_f-0.4*up_f;
+			u4 = 1.0*uv_f-0.2*uw_f-0.4*ur_f;
 			break;
 		case LIRMIA3_ROBID:
-			if (u_coef*u+uw_coef*abs(uw) > 1)
+			if (u_coef*u_f+uw_coef*abs(uw_f) > 1)
 			{
-				double uw_boost = u_coef*u+uw_coef*abs(uw)-1;
-				u1 = u_coef*u+uw_coef*uw-uw_boost;
-				u2 = u_coef*u-uw_coef*uw-uw_boost;
+				double uw_boost = u_coef*u_f+uw_coef*abs(uw_f)-1;
+				u1 = u_coef*u_f+uw_coef*uw_f-uw_boost;
+				u2 = u_coef*u_f-uw_coef*uw_f-uw_boost;
 			}
-			else if (u_coef*u-uw_coef*abs(uw) < -1)
+			else if (u_coef*u_f-uw_coef*abs(uw_f) < -1)
 			{
-				double uw_boost = -(u_coef*u-uw_coef*abs(uw))-1;
-				u1 = u_coef*u+uw_coef*uw+uw_boost;
-				u2 = u_coef*u-uw_coef*uw+uw_boost;
+				double uw_boost = -(u_coef*u_f-uw_coef*abs(uw_f))-1;
+				u1 = u_coef*u_f+uw_coef*uw_f+uw_boost;
+				u2 = u_coef*u_f-uw_coef*uw_f+uw_boost;
 			}
 			else
 			{
-				u1 = u_coef*u+uw_coef*uw;
-				u2 = u_coef*u-uw_coef*uw;
+				u1 = u_coef*u_f+uw_coef*uw_f;
+				u2 = u_coef*u_f-uw_coef*uw_f;
 			}
-			u3 = uv+up;
-			u4 = uv-up;
+			u3 = uv_f+up_f;
+			u4 = uv_f-up_f;
 			break;
 		default:
-			//u1 = (u+uw)/2;
-			//u2 = (u-uw)/2;
+			//u1 = (u_f+uw_f)/2;
+			//u2 = (u_f-uw_f)/2;
 			// Force to slow down to be able to rotate correctly when too fast...
-			if (u_coef*u+uw_coef*abs(uw) > 1)
+			if (u_coef*u_f+uw_coef*abs(uw_f) > 1)
 			{
-				double uw_boost = u_coef*u+uw_coef*abs(uw)-1;
-				u1 = u_coef*u+uw_coef*uw-uw_boost;
-				u2 = u_coef*u-uw_coef*uw-uw_boost;
+				double uw_boost = u_coef*u_f+uw_coef*abs(uw_f)-1;
+				u1 = u_coef*u_f+uw_coef*uw_f-uw_boost;
+				u2 = u_coef*u_f-uw_coef*uw_f-uw_boost;
 			}
-			else if (u_coef*u-uw_coef*abs(uw) < -1)
+			else if (u_coef*u_f-uw_coef*abs(uw_f) < -1)
 			{
-				double uw_boost = -(u_coef*u-uw_coef*abs(uw))-1;
-				u1 = u_coef*u+uw_coef*uw+uw_boost;
-				u2 = u_coef*u-uw_coef*uw+uw_boost;
+				double uw_boost = -(u_coef*u_f-uw_coef*abs(uw_f))-1;
+				u1 = u_coef*u_f+uw_coef*uw_f+uw_boost;
+				u2 = u_coef*u_f-uw_coef*uw_f+uw_boost;
 			}
 			else
 			{
-				u1 = u_coef*u+uw_coef*uw;
-				u2 = u_coef*u-uw_coef*uw;
+				u1 = u_coef*u_f+uw_coef*uw_f;
+				u2 = u_coef*u_f-uw_coef*uw_f;
 			}
-			u3 = uv;
+			u3 = uv_f;
 			break;
 		}
 #pragma region Saturation
@@ -582,8 +604,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					printf("State is %d (invalid state).\n", (int)state);
 					break;
 				}
-				printf("Rudder angle is %.1f deg.\n", (uw >= 0)? fmod_360_rad2deg(ruddermidangle+uw*(rudderminangle-ruddermidangle)): fmod_360_rad2deg(ruddermidangle+uw*(ruddermidangle-ruddermaxangle)));
-				printf("Sail maximum angle is %.1f deg.\n", u*q1*180.0/M_PI);
+				printf("Rudder angle is %.1f deg.\n", (uw_f >= 0)? fmod_360_rad2deg(ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): fmod_360_rad2deg(ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)));
+				printf("Sail maximum angle is %.1f deg.\n", u_f*q1*180.0/M_PI);
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
 #pragma endregion
@@ -599,7 +621,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				printf("Position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", Center(xhat), Center(yhat), latitude, longitude);
 				printf("Waypoint position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", wxb, wyb, wlatb, wlongb);
 				printf("Distance to the waypoint is %.2f m, distance to the line is %.2f m.\n", norm_bm, e);
-				printf("%+04d%% %+04d%% %+04d%%\n", (int)floor(u*100.0+0.05), (int)floor(uw*100.0+0.05), (int)floor(uv*100.0+0.05));
+				printf("%+04d%% %+04d%% %+04d%%\n", (int)floor(u_f*100.0+0.05), (int)floor(uw_f*100.0+0.05), (int)floor(uv_f*100.0+0.05));
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
 			}
@@ -627,7 +649,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat),
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0,
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state,
-				(uw >= 0)? (ruddermidangle+uw*(rudderminangle-ruddermidangle)): (ruddermidangle+uw*(ruddermidangle-ruddermaxangle)), u*q1, wpsi, vbat1, vbat2, vswitch);
+				(uw_f >= 0)? (ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): (ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)), u_f*q1, wpsi, vbat1, vbat2, vswitch);
 			fflush(lognavfile);
 		}
 #pragma endregion

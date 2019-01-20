@@ -112,6 +112,16 @@ WMV2
 1
 % bDisableMAVLinkInterfaceIN
 0
+% MAVLinkInterface_rc_override_time (0 to disable RC override)
+3
+% MAVLinkInterface_overridechan (RC input channel used to disable RC override, from 1 to 18)
+6
+% MAVLinkInterface_bDefaultDisablePWMOverride
+1
+% MAVLinkInterface_forceoverrideinputschan (RC input channel used to enable force override inputs, from 1 to 18)
+6
+% MAVLinkInterface_bDefaultForceOverrideInputs
+0
 % bNMEAInterface
 1
 % szNMEAInterfacePath (server TCP port (e.g. :5001), client IP address and TCP port (e.g. 127.0.0.1:5001) or local RS232 port)

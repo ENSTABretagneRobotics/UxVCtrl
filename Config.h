@@ -70,6 +70,11 @@ inline int LoadConfig(void)
 	MAVLinkInterface_target_component = 0;
 	bForceDefaultMAVLink1MAVLinkInterface = TRUE;
 	bDisableMAVLinkInterfaceIN = FALSE;
+	MAVLinkInterface_rc_override_time = 3;
+	MAVLinkInterface_overridechan = 6;
+	MAVLinkInterface_bDefaultDisablePWMOverride = TRUE;
+	MAVLinkInterface_forceoverrideinputschan = 6;
+	MAVLinkInterface_bDefaultForceOverrideInputs = FALSE;
 	bNMEAInterface = TRUE;
 	memset(szNMEAInterfacePath, 0, sizeof(szNMEAInterfacePath));
 	sprintf(szNMEAInterfacePath, ":5001");
@@ -414,6 +419,16 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bForceDefaultMAVLink1MAVLinkInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMAVLinkInterfaceIN) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_rc_override_time) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_overridechan) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_bDefaultDisablePWMOverride) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_forceoverrideinputschan) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_bDefaultForceOverrideInputs) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bNMEAInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1436,6 +1451,16 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableMAVLinkInterfaceIN) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_rc_override_time) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_overridechan) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_bDefaultDisablePWMOverride) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_forceoverrideinputschan) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_bDefaultForceOverrideInputs) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bNMEAInterface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.255s\n", szNMEAInterfacePath) < 0) printf("Error writing configuration file.\n");
@@ -2392,7 +2417,7 @@ inline int DisplayKeys(void)
 		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),V(enable/disableautodvllocalization),"
 		"Z(resetstateestimation),S(staticsonarlocalization),D(enable/disabledynamicsonarlocalization),"
 		"P(snapshot),r(record),p(mission),x(abort),h(help),!(alarms),?(battery),"
-		"bn(lights),uNj(camera tilt),F(alt RC mode),.(rearm),0(disarm),"
+		"bn(lights),uNj(camera tilt),R(alt RC mode),F(override inputs),.(rearm),0(disarm),"
 		"ENTER(extended menu),ESC(exit)\n", 
 		keys[FWD_KEY], keys[BWD_KEY], keys[LEFT_KEY], keys[RIGHT_KEY], keys[LAT_LEFT_KEY], keys[LAT_RIGHT_KEY], 
 		keys[BRAKE_KEY], keys[DEPTHCONTROL_KEY], keys[ALTITUDEAGLCONTROL_KEY]);

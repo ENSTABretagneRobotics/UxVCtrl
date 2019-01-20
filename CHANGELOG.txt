@@ -1,3 +1,9 @@
+289
+Added overrideinputs and setinput commands and updated simulatedgps, simulateddvl and mavlinkinterfacein.
+Added also received MAVLink messages in the tlog file.
+Added MAVLinkInterface_rc_override_time, MAVLinkInterface_overridechan, MAVLinkInterface_bDefaultDisablePWMOverride, MAVLinkInterface_forceoverrideinputschan and MAVLinkInterface_bDefaultForceOverrideInputs parameters.
+Updated RC_CHANNELS_OVERRIDE support in MAVLinkInterface.
+
 288
 Improved compatibility with Mac OS.
 
@@ -63,7 +69,7 @@ Updated ReadMe.txt and CMakeLists.txt.
 
 271
 Corrected color selection condition.
-Corrected some warnings on Linux .
+Corrected some warnings on Linux.
 
 270
 Added stateestimationconfig command.

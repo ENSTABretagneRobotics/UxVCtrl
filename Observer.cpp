@@ -273,8 +273,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		}
 		else if ((robid == BUGGY_SIMULATOR_ROBID)||(robid == BUGGY_ROBID))
 		{
-			xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
-			yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
+			xhat = xhat+dt*(alphavrxhat*u_f*Cos(psihat)*Cos(alphaomegazhat*uw_f)+xdotnoise);
+			yhat = yhat+dt*(alphavrxhat*u_f*Sin(psihat)*Cos(alphaomegazhat*uw_f)+ydotnoise);
 			zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
 			phihat = phi_ahrs;
 			thetahat = theta_ahrs;
@@ -297,8 +297,8 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		else if ((robid == MOTORBOAT_SIMULATOR_ROBID)||(robid == MOTORBOAT_ROBID))
 		{
 			//// Temp...
-			//xhat = xhat+dt*(alphavrxhat*u*Cos(psihat)*Cos(alphaomegazhat*uw)+xdotnoise);
-			//yhat = yhat+dt*(alphavrxhat*u*Sin(psihat)*Cos(alphaomegazhat*uw)+ydotnoise);
+			//xhat = xhat+dt*(alphavrxhat*u_f*Cos(psihat)*Cos(alphaomegazhat*uw_f)+xdotnoise);
+			//yhat = yhat+dt*(alphavrxhat*u_f*Sin(psihat)*Cos(alphaomegazhat*uw_f)+ydotnoise);
 			//zhat = interval(-5*GPS_low_acc,5*GPS_low_acc);
 			//vrxhat = sqrt(sqr(Center(xhat-xhat_prev))+sqr(Center(yhat-yhat_prev)))/dt+vrxdotnoise;
 			//omegazhat = interval(omegaz_mes-omegaz_ahrs_acc,omegaz_mes+omegaz_ahrs_acc);
@@ -399,7 +399,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		case BUGGY_SIMULATOR_ROBID:
 		case BUGGY_ROBID:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*(u*P_actuators_1+uw*P_actuators_2+P_actuators_4)/3600.0;
+			Energy_actuators += dt*(u_f*P_actuators_1+uw_f*P_actuators_2+P_actuators_4)/3600.0;
 			break;
 		case BUBBLE_ROBID:
 		case TANK_SIMULATOR_ROBID:
@@ -412,7 +412,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		case ARDUCOPTER_ROBID:
 		default:
 			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*((u+uw+uv+ul)*P_actuators_1+P_actuators_4)/3600.0;
+			Energy_actuators += dt*((u_f+uw_f+uv_f+ul_f)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
 		}
 
@@ -451,7 +451,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
 			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0), Width(accrxhat/2.0), Width(accryhat/2.0), Width(accrzhat/2.0),
 			wx, wy, wz, wphi, wtheta, wpsi, wd, wu, wagl, 
-			u, ul, uv, ur, up, uw, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
+			u_f, ul_f, uv_f, ur_f, up_f, uw_f, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
 			Energy_electronics, Energy_actuators);
 		fflush(logstatefile);
 

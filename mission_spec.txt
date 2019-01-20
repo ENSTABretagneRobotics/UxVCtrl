@@ -412,19 +412,15 @@
 %
 %home
 %
-%enablemavlinkinterfacein
-%
-%disablemavlinkinterfacein
-%
 %setvideointerfacesource guiid videoid (guiid, videoid : int, -1 to disable)
 %
-%enablesimulatedgps
+%simulatedgps bEnable
 %
-%disablesimulatedgps
+%simulateddvl bEnable
 %
-%enablesimulateddvl
+%overrideinputs bEnable
 %
-%disablesimulateddvl
+%mavlinkinterfacein bEnable
 %
 %controlconfig u_max uw_max u_coef uw_coef (double [0,1])
 %
@@ -489,6 +485,8 @@
 %rollthrust u (double [-1,1])
 %
 %verticalthrust u (double [-1,1])
+%
+%setinput id u (id : int [1,14], u : double [-1,1])
 %
 %brake (try to stop the robot taking into account horizontal thrusters speed)
 %

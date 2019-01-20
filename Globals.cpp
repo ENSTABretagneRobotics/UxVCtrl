@@ -22,6 +22,9 @@ interval vtwindhat(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), psitwindhat(-MAX_UNCERTAI
 // Controller variables.
 // u > 0 to go forward, uw > 0 to turn in positive direction, uv > 0 to go up.
 double u = 0, uw = 0, uv = 0, ul = 0, up = 0, ur = 0, wx = 0, wy = 0, wz = 0, wphi = 0, wtheta = 0, wpsi = 0, wd = 0, wu = 0;
+double u_ovrid = 0, uw_ovrid = 0, uv_ovrid = 0, ul_ovrid = 0, up_ovrid = 0, ur_ovrid = 0,
+u_max_ovrid = 0, uw_max_ovrid = 0;
+double u_f = 0, uw_f = 0, uv_f = 0, ul_f = 0, up_f = 0, ur_f = 0;
 double wxa = 0, wya = 0, wza = 0, wxb = 0, wyb = 0, wzb = 0;
 deque<double> wx_vector, wy_vector, wz_vector;
 double wagl = 0;
@@ -118,6 +121,11 @@ int MAVLinkInterface_target_system = 0;
 int MAVLinkInterface_target_component = 0;
 BOOL bForceDefaultMAVLink1MAVLinkInterface = FALSE;
 BOOL bDisableMAVLinkInterfaceIN = FALSE;
+int MAVLinkInterface_rc_override_time = 0;
+int MAVLinkInterface_overridechan = 0;
+BOOL MAVLinkInterface_bDefaultDisablePWMOverride = FALSE;
+int MAVLinkInterface_forceoverrideinputschan = 0;
+BOOL MAVLinkInterface_bDefaultForceOverrideInputs = FALSE;
 BOOL bNMEAInterface = FALSE;
 char szNMEAInterfacePath[MAX_BUF_LEN];
 int NMEAInterfaceBaudRate = 0;
@@ -601,6 +609,7 @@ char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;
 BOOL bStdOutDetailedInfo = FALSE;
 BOOL bDisableAllAlarms = FALSE;
+BOOL bForceOverrideInputs = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;
 BOOL bEnableBackwardsMotorboat = FALSE;
 BOOL bExit = FALSE;
