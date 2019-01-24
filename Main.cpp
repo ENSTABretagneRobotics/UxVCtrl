@@ -353,10 +353,12 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(MissionLogThread, NULL, &MissionLogThreadId);
 	if (bCommandPrompt) CreateDefaultThread(CommandsThread, NULL, &CommandsThreadId);
 #ifndef DISABLE_OPENCV_SUPPORT
+#ifndef FORCE_SINGLE_THREAD_OPENCVGUI
 	for (i = 0; i < nbopencvgui; i++)
 	{
 		CreateDefaultThread(OpenCVGUIThread, (void*)(intptr_t)i, &OpenCVGUIThreadId[i]);
 	}
+#endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 #endif // !DISABLE_OPENCV_SUPPORT
 
 	// Launch a mission file if specified as argument.
@@ -382,10 +384,14 @@ int main(int argc, char* argv[])
 	}
 
 #ifndef DISABLE_OPENCV_SUPPORT
+#ifndef FORCE_SINGLE_THREAD_OPENCVGUI
 	for (i = nbopencvgui-1; i >= 0; i--)
 	{
 		WaitForThread(OpenCVGUIThreadId[i]);
 	}
+#else
+	if (nbopencvgui == 1) OpenCVGUIThread((void*)(intptr_t)0);
+#endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 #endif // !DISABLE_OPENCV_SUPPORT
 	if (bCommandPrompt)
 	{

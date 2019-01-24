@@ -480,6 +480,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						case 8:
 							if (rc_channels_override.chan8_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan8_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
+							// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						case 9:
 							if (rc_channels_override.chan9_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan9_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
@@ -510,6 +512,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						case 18:
 							if (rc_channels_override.chan18_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan18_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						default:
 							MAVLinkInterface_bDisablePWMOverride = MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
@@ -541,6 +544,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						case 8:
 							if (rc_channels_override.chan8_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan8_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
+							// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						case 9:
 							if (rc_channels_override.chan9_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan9_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
@@ -571,6 +576,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						case 18:
 							if (rc_channels_override.chan18_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan18_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						default:
 							break;
 						}
@@ -861,8 +867,11 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					memset(&command_ack, 0, sizeof(mavlink_command_ack_t));
 					command_ack.command = MAVLINK_MSG_ID_SET_MODE;
 					command_ack.result = MAV_RESULT_ACCEPTED; //result;
+					// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 					command_ack.target_system = msg.sysid;
 					command_ack.target_component = msg.compid;
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 					mavlink_msg_command_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &command_ack);
 					memset(sendbuf, 0, sizeof(sendbuf));
 					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
@@ -1261,8 +1270,11 @@ REQ_DATA_STREAM...
 					memset(&command_ack, 0, sizeof(mavlink_command_ack_t));
 					command_ack.command = command.command;
 					command_ack.result = MAV_RESULT_ACCEPTED; //result;
+					// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 					command_ack.target_system = msg.sysid;
 					command_ack.target_component = msg.compid;
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 					mavlink_msg_command_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &command_ack);
 					memset(sendbuf, 0, sizeof(sendbuf));
 					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);

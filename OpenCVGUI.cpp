@@ -1001,7 +1001,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else printf("Alarms enabled.\n");
 			break;
 		case '?': bDispEPU = !bDispEPU; break;
-		case '§':
+		case '\'':
 			bEnableSimulatedGNSS = !bEnableSimulatedGNSS;
 			if (bEnableSimulatedGNSS) printf("Simulated GNSS enabled.\n");
 			else printf("Simulated GNSS disabled.\n");

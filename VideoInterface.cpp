@@ -218,7 +218,7 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		encodeparams_VideoInterface[0] = CV_IMWRITE_JPEG_QUALITY;
 		encodeparams_VideoInterface[1] = encodequality_VideoInterface;
 #else
-		encodeparams_VideoInterface.push_back(CV_IMWRITE_JPEG_QUALITY);
+		encodeparams_VideoInterface.push_back(cv::IMWRITE_JPEG_QUALITY);
 		encodeparams_VideoInterface.push_back(encodequality_VideoInterface);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 	}
@@ -228,7 +228,7 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		encodeparams_VideoInterface[0] = CV_IMWRITE_PNG_COMPRESSION;
 		encodeparams_VideoInterface[1] = encodequality_VideoInterface;
 #else
-		encodeparams_VideoInterface.push_back(CV_IMWRITE_PNG_COMPRESSION);
+		encodeparams_VideoInterface.push_back(cv::IMWRITE_PNG_COMPRESSION);
 		encodeparams_VideoInterface.push_back(encodequality_VideoInterface);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 	}
@@ -238,7 +238,7 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		encodeparams_VideoInterface[0] = CV_IMWRITE_PXM_BINARY;
 		encodeparams_VideoInterface[1] = encodequality_VideoInterface;
 #else
-		encodeparams_VideoInterface.push_back(CV_IMWRITE_PXM_BINARY);
+		encodeparams_VideoInterface.push_back(cv::IMWRITE_PXM_BINARY);
 		encodeparams_VideoInterface.push_back(encodequality_VideoInterface);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 	}

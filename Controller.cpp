@@ -276,6 +276,20 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			wpsi = atan2(wy-Center(yhat), wx-Center(xhat));
 		}
 
+
+/*
+		if (bHeadingControl||bWaypointControl||bLineFollowingControl)
+		{
+			// wpsi_tmp = wpsi
+		}
+		else
+		{
+			// wpsi_tmp = psi
+		}
+		// Should modify here wpsi_tmp depending on obstacles without modifying wpsi
+		wpsi_tmp = ObstacleAvoidance(wpsi_tmp...)
+*/
+
 		// Low-level controls.
 
 		if (bDistanceControl)

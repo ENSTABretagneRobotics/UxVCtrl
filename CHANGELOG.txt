@@ -1,3 +1,8 @@
+290
+Corrected MAVLink v1 compatibility.
+Improved compatibility with OpenCV 4.0.1.
+Added FORCE_SINGLE_THREAD_OPENCVGUI option.
+
 289
 Added overrideinputs and setinput commands and updated simulatedgps, simulateddvl and mavlinkinterfacein.
 Added also received MAVLink messages in the tlog file.

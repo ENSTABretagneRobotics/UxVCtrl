@@ -1,3 +1,10 @@
+
+Le RC mode perturbe les missions autonomes et aussi le contrôle via MAVLinkInterface car il remet u à 0 tout le temps, ne pas l'activer par défaut?->n'activer le RC mode que si on appuie sur zqsdaefv (faire fonction SetAltRCMode(&bAltRCmode)) et le stopper dès que le u a été remis à 0 du fait qu'on n'ait appuyé sur aucune touche...->il y a déjà le bZQSDPressed...
+Bug altrcmode : ne se produit que si on a appuyé une fois sur une touche dans OpenCVGUI...
+sous Mac (sans OpenCV), thrust/turn 1 ne fait pas bouger le buggy/AUV simulé ou alors très lentement?->tester sous Linux...
+
+rajouter support setekforigin
+
 add a third MAVLinkDevice?
 pouvoir gérer followme avec nmeainterface, bExternal...
 
@@ -37,7 +44,7 @@ option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éven
 wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
 the control part of obstacle avoidance could be centralized to handle all the types of obstacles (punctual, line...), maybe using vector fields
 add vector field obstacle avoidance mission like visual obstacle, e.g using AIS and simulatedinternetswarmondevice
-Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le bugyy qui ne peut que passer par les traces du robot->footprintrelay
+Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le buggy qui ne peut que passer par les traces du robot->footprintrelay
 Fuir le prédateur
 2.5D, plusieurs plans pour passer par des portes 3D...
 Obstacles liés au robot (antennes)

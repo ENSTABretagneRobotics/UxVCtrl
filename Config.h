@@ -1103,11 +1103,19 @@ inline int LoadConfig(void)
 		robid = SUBMARINE_SIMULATOR_ROBID;
 		break;
 	}
+#ifndef FORCE_SINGLE_THREAD_OPENCVGUI
 	if ((nbopencvgui < 0)||(nbopencvgui > MAX_NB_OPENCVGUI))
 	{
 		printf("Invalid parameter : nbopencvgui.\n");
 		nbopencvgui = 1;
 	}
+#else
+	if ((nbopencvgui < 0)||(nbopencvgui > 1))
+	{
+		printf("Invalid parameter : nbopencvgui (only 1 OpenCVGUI can be used if FORCE_SINGLE_THREAD_OPENCVGUI is defined).\n");
+		nbopencvgui = 1;
+	}
+#endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 	if (videoimgwidth <= 0)
 	{
 		printf("Invalid parameter : videoimgwidth.\n");

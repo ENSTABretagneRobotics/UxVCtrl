@@ -1178,7 +1178,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		rc_override.chan6_raw = (uint16_t)pMAVLinkDevice->InitPWs[5];
 		rc_override.chan7_raw = (uint16_t)pMAVLinkDevice->InitPWs[6];
 		rc_override.chan8_raw = (uint16_t)pMAVLinkDevice->InitPWs[7];
-	// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+		// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
 #ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 		rc_override.chan9_raw = (uint16_t)pMAVLinkDevice->InitPWs[8];
 		rc_override.chan10_raw = (uint16_t)pMAVLinkDevice->InitPWs[9];
