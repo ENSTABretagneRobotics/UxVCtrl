@@ -1,3 +1,6 @@
+291
+Corrected bug in SSC32Interface introduced in V289.
+
 290
 Corrected MAVLink v1 compatibility.
 Improved compatibility with OpenCV 4.0.1.

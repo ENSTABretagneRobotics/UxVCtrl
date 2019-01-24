@@ -113,24 +113,24 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 				case ETAS_WHEEL_ROBID:
 				case BUGGY_SIMULATOR_ROBID:
 				case BUGGY_ROBID:
-					if (chan == 2) u_f = (pw-1500.0)/500.0;
-					if (chan == 0) uw_f = (pw-1500.0)/500.0;
+					if (chan == 2) u = (pw-1500.0)/500.0;
+					if (chan == 0) uw = (pw-1500.0)/500.0;
 					break;
 				case SAILBOAT_SIMULATOR_ROBID:
 				case VAIMOS_ROBID:
 				case SAILBOAT_ROBID:
 				case SAILBOAT2_ROBID:
-					if (chan == 1) u_f = (pw-1500.0)/500.0;
-					if (chan == 2) uw_f = (pw-1500.0)/500.0;
+					if (chan == 1) u = (pw-1500.0)/500.0;
+					if (chan == 2) uw = (pw-1500.0)/500.0;
 					break;
 				case QUADRO_SIMULATOR_ROBID:
 				case COPTER_ROBID:
 				case ARDUCOPTER_ROBID:
 				default:
-					if (chan == 0) uw_f = (pw-1500.0)/500.0;
-					if (chan == 1) u_f = (pw-1500.0)/500.0;
-					if (chan == 2) uv_f = (pw-1500.0)/500.0;
-					if (chan == 3) ul_f = (pw-1500.0)/500.0;
+					if (chan == 0) uw = (pw-1500.0)/500.0;
+					if (chan == 1) u = (pw-1500.0)/500.0;
+					if (chan == 2) uv = (pw-1500.0)/500.0;
+					if (chan == 3) ul = (pw-1500.0)/500.0;
 					break;
 				}
 			}
