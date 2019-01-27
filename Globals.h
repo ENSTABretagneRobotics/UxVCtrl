@@ -653,6 +653,16 @@ extern double forbidx_followme, forbidy_followme, forbidz_followme;
 #pragma endregion
 
 // Simulator variables.
+extern double alpha_mes_simulator, d_mes_simulator;
+extern vector<interval> d_all_mes_simulator;
+extern deque<double> alpha_mes_simulator_vector;
+extern deque<double> d_mes_simulator_vector;
+extern deque< vector<interval> > d_all_mes_simulator_vector;
+extern deque<double> t_simulator_history_vector;
+extern deque<interval> xhat_simulator_history_vector;
+extern deque<interval> yhat_simulator_history_vector;
+extern deque<interval> psihat_simulator_history_vector;
+extern deque<interval> vrxhat_simulator_history_vector;
 extern int GNSSqualitySimulator;
 extern BOOL bEnableSimulatedGNSS;
 extern BOOL bEnableSimulatedDVL;
@@ -687,16 +697,56 @@ extern CRITICAL_SECTION SeanetOverlayImgCS;
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* SeanetOverlayImg;
 #endif // !DISABLE_OPENCV_SUPPORT
+extern double alpha_mes_seanet, d_mes_seanet;
+extern vector<interval> d_all_mes_seanet;
+extern deque<double> alpha_mes_seanet_vector;
+extern deque<double> d_mes_seanet_vector;
+extern deque< vector<interval> > d_all_mes_seanet_vector;
+extern deque<double> t_seanet_history_vector;
+extern deque<interval> xhat_seanet_history_vector;
+extern deque<interval> yhat_seanet_history_vector;
+extern deque<interval> psihat_seanet_history_vector;
+extern deque<interval> vrxhat_seanet_history_vector;
 extern BOOL bPauseSeanet, bRestartSeanet;
 
 // BlueView variables.
+extern double alpha_mes_blueview[MAX_NB_BLUEVIEW], d_mes_blueview[MAX_NB_BLUEVIEW];
+extern vector<interval> d_all_mes_blueview[MAX_NB_BLUEVIEW];
+extern deque<double> alpha_mes_blueview_vector[MAX_NB_BLUEVIEW];
+extern deque<double> d_mes_blueview_vector[MAX_NB_BLUEVIEW];
+extern deque< vector<interval> > d_all_mes_blueview_vector[MAX_NB_BLUEVIEW];
+extern deque<double> t_blueview_history_vector[MAX_NB_BLUEVIEW];
+extern deque<interval> xhat_blueview_history_vector[MAX_NB_BLUEVIEW];
+extern deque<interval> yhat_blueview_history_vector[MAX_NB_BLUEVIEW];
+extern deque<interval> psihat_blueview_history_vector[MAX_NB_BLUEVIEW];
+extern deque<interval> vrxhat_blueview_history_vector[MAX_NB_BLUEVIEW];
 extern BOOL bPauseBlueView[MAX_NB_BLUEVIEW];
 extern BOOL bRestartBlueView[MAX_NB_BLUEVIEW];
 
 // Hokuyo variables.
+extern double alpha_mes_hokuyo, d_mes_hokuyo;
+extern vector<interval> d_all_mes_hokuyo;
+extern deque<double> alpha_mes_hokuyo_vector;
+extern deque<double> d_mes_hokuyo_vector;
+extern deque< vector<interval> > d_all_mes_hokuyo_vector;
+extern deque<double> t_hokuyo_history_vector;
+extern deque<interval> xhat_hokuyo_history_vector;
+extern deque<interval> yhat_hokuyo_history_vector;
+extern deque<interval> psihat_hokuyo_history_vector;
+extern deque<interval> vrxhat_hokuyo_history_vector;
 extern BOOL bPauseHokuyo, bRestartHokuyo;
 
 // RPLIDAR variables.
+extern double alpha_mes_rplidar, d_mes_rplidar;
+extern vector<interval> d_all_mes_rplidar;
+extern deque<double> alpha_mes_rplidar_vector;
+extern deque<double> d_mes_rplidar_vector;
+extern deque< vector<interval> > d_all_mes_rplidar_vector;
+extern deque<double> t_rplidar_history_vector;
+extern deque<interval> xhat_rplidar_history_vector;
+extern deque<interval> yhat_rplidar_history_vector;
+extern deque<interval> psihat_rplidar_history_vector;
+extern deque<interval> vrxhat_rplidar_history_vector;
 extern BOOL bPauseRPLIDAR, bRestartRPLIDAR;
 
 // MS580314BA variables.
@@ -756,6 +806,16 @@ extern BOOL bPauseUE9A, bRestartUE9A;
 extern BOOL bPauseSSC32, bRestartSSC32;
 
 // Pololu variables.
+extern double alpha_mes_pololu[MAX_NB_POLOLU], d_mes_pololu[MAX_NB_POLOLU];
+extern vector<interval> d_all_mes_pololu[MAX_NB_POLOLU];
+extern deque<double> alpha_mes_pololu_vector[MAX_NB_POLOLU];
+extern deque<double> d_mes_pololu_vector[MAX_NB_POLOLU];
+extern deque< vector<interval> > d_all_mes_pololu_vector[MAX_NB_POLOLU];
+extern deque<double> t_pololu_history_vector[MAX_NB_POLOLU];
+extern deque<interval> xhat_pololu_history_vector[MAX_NB_POLOLU];
+extern deque<interval> yhat_pololu_history_vector[MAX_NB_POLOLU];
+extern deque<interval> psihat_pololu_history_vector[MAX_NB_POLOLU];
+extern deque<interval> vrxhat_pololu_history_vector[MAX_NB_POLOLU];
 extern int ShowMaestroGetPositionPololu[MAX_NB_POLOLU];
 extern BOOL bPausePololu[MAX_NB_POLOLU];
 extern BOOL bRestartPololu[MAX_NB_POLOLU];
@@ -770,6 +830,16 @@ extern BOOL bPauseIM483I, bRestartIM483I;
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 extern IplImage* imgs[MAX_NB_VIDEO];
+extern double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
+extern vector<interval> d_all_mes_video[MAX_NB_VIDEO];
+extern deque<double> alpha_mes_video_vector[MAX_NB_VIDEO];
+extern deque<double> d_mes_video_vector[MAX_NB_VIDEO];
+extern deque< vector<interval> > d_all_mes_video_vector[MAX_NB_VIDEO];
+extern deque<double> t_video_history_vector[MAX_NB_VIDEO];
+extern deque<interval> xhat_video_history_vector[MAX_NB_VIDEO];
+extern deque<interval> yhat_video_history_vector[MAX_NB_VIDEO];
+extern deque<interval> psihat_video_history_vector[MAX_NB_VIDEO];
+extern deque<interval> vrxhat_video_history_vector[MAX_NB_VIDEO];
 extern BOOL bPauseVideo[MAX_NB_VIDEO];
 extern BOOL bRestartVideo[MAX_NB_VIDEO];
 #endif // !DISABLE_OPENCV_SUPPORT

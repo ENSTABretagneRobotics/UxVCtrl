@@ -21,6 +21,42 @@
 #endif // !min
 #endif // !_MSC_VER
 
+void set_htelemeters_vectors(double* angles, double* distances, int nbhtelemeters, struct timeval tv, int deviceid)
+{
+	int i = 0;
+
+	for (i = 0; i < nbhtelemeters; i++)
+	{
+		alpha_mes_pololu[deviceid] = angles[i];
+		d_mes_pololu[deviceid] = distances[i];
+
+		// For compatibility with a Seanet...
+		d_all_mes_pololu[deviceid].clear();
+		d_all_mes_pololu[deviceid].push_back(d_mes_pololu[deviceid]);
+
+		alpha_mes_pololu_vector[deviceid].push_back(alpha_mes_pololu[deviceid]);
+		d_mes_pololu_vector[deviceid].push_back(d_mes_pololu[deviceid]);
+		d_all_mes_pololu_vector[deviceid].push_back(d_all_mes_pololu[deviceid]);
+		t_pololu_history_vector[deviceid].push_back(tv.tv_sec+0.000001*tv.tv_usec);
+		xhat_pololu_history_vector[deviceid].push_back(xhat);
+		yhat_pololu_history_vector[deviceid].push_back(yhat);
+		psihat_pololu_history_vector[deviceid].push_back(psihat);
+		vrxhat_pololu_history_vector[deviceid].push_back(vrxhat);
+
+		if ((int)alpha_mes_pololu_vector[deviceid].size() > nbhtelemeters)
+		{
+			alpha_mes_pololu_vector[deviceid].pop_front();
+			d_mes_pololu_vector[deviceid].pop_front();
+			d_all_mes_pololu_vector[deviceid].pop_front();
+			t_pololu_history_vector[deviceid].pop_front();
+			xhat_pololu_history_vector[deviceid].pop_front();
+			yhat_pololu_history_vector[deviceid].pop_front();
+			psihat_pololu_history_vector[deviceid].pop_front();
+			vrxhat_pololu_history_vector[deviceid].pop_front();
+		}
+	}
+}
+
 THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 {
 	POLOLU pololu;
@@ -31,8 +67,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	int counter = 0, counter_modulo = 0;
 	double x = 0, y = 0, z = 0;
 	struct timeval tv;
-	double angles[8];
-	double distances[8];
+	int nbhtelemeters = 0;
+	double angles[MAX_NB_TELEMETERS_POLOLU];
+	double distances[MAX_NB_TELEMETERS_POLOLU];
 	int showgetposition = -1;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -607,6 +644,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1))
 				{
 					// Assume 8 planar telemeters...
+					nbhtelemeters = 8;
 					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], &distances[6], &distances[7]) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Pololu lost.\n");
@@ -642,42 +680,14 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					i = pololu.telem8analoginputchan;
 					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
 					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
-					for (i = 0; i < 8; i++)
-					{
-						alpha_mes = angles[i];
-						d_mes = distances[i];
-
-						// For compatibility with a Seanet...
-
-						d_all_mes.clear();
-						d_all_mes.push_back(d_mes);
-						alpha_mes_vector.push_back(alpha_mes);
-						d_mes_vector.push_back(d_mes);
-						d_all_mes_vector.push_back(d_all_mes);
-						t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-						xhat_history_vector.push_back(xhat);
-						yhat_history_vector.push_back(yhat);
-						psihat_history_vector.push_back(psihat);
-						vrxhat_history_vector.push_back(vrxhat);
-
-						if ((int)alpha_mes_vector.size() > 8)
-						{
-							alpha_mes_vector.pop_front();
-							d_mes_vector.pop_front();
-							d_all_mes_vector.pop_front();
-							t_history_vector.pop_front();
-							xhat_history_vector.pop_front();
-							yhat_history_vector.pop_front();
-							psihat_history_vector.pop_front();
-							vrxhat_history_vector.pop_front();
-						}
-					}
+					set_htelemeters_vectors(angles, distances, nbhtelemeters, tv, deviceid);
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
 					(pololu.telem5analoginputchan != -1))
 				{
 					// Assume 4 planar+1 up vertical telemeters...
+					nbhtelemeters = 4;
 					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], &distances[6], &distances[7]) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Pololu lost.\n");
@@ -707,36 +717,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					z = pololu.analoginputz[i]+distances[i];
 					distance_above = z;
 
-					for (i = 0; i < 4; i++)
-					{
-						alpha_mes = angles[i];
-						d_mes = distances[i];
-
-						// For compatibility with a Seanet...
-
-						d_all_mes.clear();
-						d_all_mes.push_back(d_mes);
-						alpha_mes_vector.push_back(alpha_mes);
-						d_mes_vector.push_back(d_mes);
-						d_all_mes_vector.push_back(d_all_mes);
-						t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-						xhat_history_vector.push_back(xhat);
-						yhat_history_vector.push_back(yhat);
-						psihat_history_vector.push_back(psihat);
-						vrxhat_history_vector.push_back(vrxhat);
-
-						if ((int)alpha_mes_vector.size() > 8)
-						{
-							alpha_mes_vector.pop_front();
-							d_mes_vector.pop_front();
-							d_all_mes_vector.pop_front();
-							t_history_vector.pop_front();
-							xhat_history_vector.pop_front();
-							yhat_history_vector.pop_front();
-							psihat_history_vector.pop_front();
-							vrxhat_history_vector.pop_front();
-						}
-					}
+					set_htelemeters_vectors(angles, distances, nbhtelemeters, tv, deviceid);
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(30);

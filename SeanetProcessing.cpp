@@ -26,9 +26,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 {
 	CHRONO chrono_period;
 	int nbnew = 0;
-	int i = 0;
+	int i = 0, j = 0, k = 0, nb_alpha_mes_total = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
-	int j = 0;
 	COORDSYSTEM2IMG csMap2Img;
 #endif // !DISABLE_OPENCV_SUPPORT
 	struct timeval tv;
@@ -115,46 +114,44 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					angle = anglestsort[i]; // Angle of the transducer in degrees.
 					memcpy(scanline, wtftsort+i*NBins, NBins);
 
-					alpha_mes = fmod_2PI(-M_PI*angle/180.0); // Angle of the transducer in rad.
+					alpha_mes_seanet = fmod_2PI(-M_PI*angle/180.0); // Angle of the transducer in rad.
 
 					minDist = 0.75;
 					maxDist = rangescale-d_max_err;
 
-					d_all_mes.clear();
-					//GetFirstObstacleDist(scanline, threshold, minDist, maxDist, NBins, rangescale, &d_mes);
-					//d_all_mes.push_back(d_mes);
-					//GetLastObstacleDist(scanline, threshold, minDist, maxDist, NBins, rangescale, &d_mes);
-					//d_all_mes.push_back(d_mes);
-					//GetAllObstaclesDist(scanline, threshold, minDist, maxDist, NBins, rangescale, d_all_mes);
-					//GetAllObstaclesDist2(scanline, 75, minDist, maxDist, NBins, rangescale, AdLow, AdSpan, Hdctrl.bits.adc8on, d_all_mes);
-					//GetAllObstaclesDist3(scanline, 50, 5, minDist, maxDist, NBins, rangescale, d_all_mes);
-					//GetAllObstaclesDist4(scanline, 125, 5, minDist, maxDist, NBins, rangescale, AdLow, AdSpan, Hdctrl.bits.adc8on, d_all_mes);
-					GetAllObstaclesDist5(scanline, 224, 2, minDist, maxDist, NBins, rangescale, (unsigned char)AdLow, (unsigned char)AdSpan, Hdctrl.bits.adc8on, d_all_mes);
-					d_mes = Center(d_all_mes[0]);
+					d_all_mes_seanet.clear();
+					//GetFirstObstacleDist(scanline, threshold, minDist, maxDist, NBins, rangescale, &d_mes_seanet);
+					//d_all_mes_seanet.push_back(d_mes_seanet);
+					//GetLastObstacleDist(scanline, threshold, minDist, maxDist, NBins, rangescale, &d_mes_seanet);
+					//d_all_mes_seanet.push_back(d_mes_seanet);
+					//GetAllObstaclesDist(scanline, threshold, minDist, maxDist, NBins, rangescale, d_all_mes_seanet);
+					//GetAllObstaclesDist2(scanline, 75, minDist, maxDist, NBins, rangescale, AdLow, AdSpan, Hdctrl.bits.adc8on, d_all_mes_seanet);
+					//GetAllObstaclesDist3(scanline, 50, 5, minDist, maxDist, NBins, rangescale, d_all_mes_seanet);
+					//GetAllObstaclesDist4(scanline, 125, 5, minDist, maxDist, NBins, rangescale, AdLow, AdSpan, Hdctrl.bits.adc8on, d_all_mes_seanet);
+					GetAllObstaclesDist5(scanline, 224, 2, minDist, maxDist, NBins, rangescale, (unsigned char)AdLow, (unsigned char)AdSpan, Hdctrl.bits.adc8on, d_all_mes_seanet);
+					d_mes_seanet = Center(d_all_mes_seanet[0]);
 
-					alpha_mes_vector.push_back(alpha_mes);
-					d_mes_vector.push_back(d_mes);
-					d_all_mes_vector.push_back(d_all_mes);
-					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-					xhat_history_vector.push_back(xhat);
-					yhat_history_vector.push_back(yhat);
-					psihat_history_vector.push_back(psihat);
-					vrxhat_history_vector.push_back(vrxhat);
+					alpha_mes_seanet_vector.push_back(alpha_mes_seanet);
+					d_mes_seanet_vector.push_back(d_mes_seanet);
+					d_all_mes_seanet_vector.push_back(d_all_mes_seanet);
+					t_seanet_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+					xhat_seanet_history_vector.push_back(xhat);
+					yhat_seanet_history_vector.push_back(yhat);
+					psihat_seanet_history_vector.push_back(psihat);
+					vrxhat_seanet_history_vector.push_back(vrxhat);
 
-					if ((int)alpha_mes_vector.size() > NSteps)
+					if ((int)alpha_mes_seanet_vector.size() > NSteps)
 					{
-						alpha_mes_vector.pop_front();
-						d_mes_vector.pop_front();
-						d_all_mes_vector.pop_front();
-						t_history_vector.pop_front();
-						xhat_history_vector.pop_front();
-						yhat_history_vector.pop_front();
-						psihat_history_vector.pop_front();
-						vrxhat_history_vector.pop_front();
+						alpha_mes_seanet_vector.pop_front();
+						d_mes_seanet_vector.pop_front();
+						d_all_mes_seanet_vector.pop_front();
+						t_seanet_history_vector.pop_front();
+						xhat_seanet_history_vector.pop_front();
+						yhat_seanet_history_vector.pop_front();
+						psihat_seanet_history_vector.pop_front();
+						vrxhat_seanet_history_vector.pop_front();
 					}
 				}
-
-
 #ifndef DISABLE_OPENCV_SUPPORT
 				switch (fSeanetOverlayImg & SONAR_IMG_TYPE_MASK)
 				{
@@ -187,136 +184,16 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				default:
 					break;
 				}
-				switch (fSeanetOverlayImg & SONAR_IMG_DISTANCES_MASK)
-				{
-				case SONAR_IMG_FIRST_DISTANCES:
-					j = 0;
-					switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
-					{
-					case SONAR_IMG_LEVER_ARMS:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_PSI:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_PSI_POS:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_HIST_PSI:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-						break;
-					default:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-						break;
-					}
-					break;
-				case SONAR_IMG_ALL_DISTANCES:
-					switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
-					{
-					case SONAR_IMG_LEVER_ARMS:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-							{
-								// Might be infinity, but does not seem to be a problem...
-								DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-							}
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_PSI:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-							{
-								// Might be infinity, but does not seem to be a problem...
-								DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-							}
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_PSI_POS:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-							{
-								// Might be infinity, but does not seem to be a problem...
-								DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-							}
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_HIST_PSI:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-							{
-								// Might be infinity, but does not seem to be a problem...
-								DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-							}
-						}
-						break;
-					case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-							{
-								// Might be infinity, but does not seem to be a problem...
-								DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-							}
-						}
-						break;
-					default:
-						for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-						{
-							for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-							{
-								// Might be infinity, but does not seem to be a problem...
-								DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-							}
-						}
-						break;
-					}
-					break;
-				default:
-					break;
-				}
 #endif // !DISABLE_OPENCV_SUPPORT
-
-
 				LeaveCriticalSection(&StateVariablesCS);
 			}
 			LeaveCriticalSection(&SeanetConnectingCS);
 		}
 
-		if ((robid & SIMULATOR_ROBID_MASK)||(!bDisableHokuyo)||(!bDisableRPLIDAR)||(!bDisablePololu[0])||(!bDisablePololu[1])||(!bDisablePololu[2]))
+		if ((robid & SIMULATOR_ROBID_MASK)||(!bDisableHokuyo)||(!bDisableRPLIDAR)||(!bDisablePololu[0])||(!bDisablePololu[1])||(!bDisablePololu[2])||
+			(!bDisableBlueView[0])||(!bDisableBlueView[1])||(!bDisableVideo[0])||(!bDisableVideo[1])||(!bDisableVideo[2])||(!bDisableVideo[3])||(!bDisableVideo[4]))
 		{
 			EnterCriticalSection(&StateVariablesCS);
-
 #ifndef DISABLE_OPENCV_SUPPORT
 			InitCS2ImgEx(&csMap2Img, &csMap, overlayimage->width, overlayimage->height, BEST_RATIO_COORDSYSTEM2IMG);
 			switch (fSeanetOverlayImg & SONAR_IMG_TYPE_MASK)
@@ -349,128 +226,374 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			default:
 				break;
 			}
-			switch (fSeanetOverlayImg & SONAR_IMG_DISTANCES_MASK)
+#endif // !DISABLE_OPENCV_SUPPORT
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+
+		EnterCriticalSection(&StateVariablesCS);
+#pragma region FUSION
+		nb_alpha_mes_total = alpha_mes_simulator_vector.size()+alpha_mes_seanet_vector.size()+alpha_mes_hokuyo_vector.size()+alpha_mes_rplidar_vector.size();
+		for (k = 0; k < MAX_NB_POLOLU; k++)
+		{
+			nb_alpha_mes_total += alpha_mes_pololu_vector[k].size();
+		}
+		for (k = 0; k < MAX_NB_BLUEVIEW; k++)
+		{
+			nb_alpha_mes_total += alpha_mes_blueview_vector[k].size();
+		}
+		for (k = 0; k < MAX_NB_VIDEO; k++)
+		{
+			nb_alpha_mes_total += alpha_mes_video_vector[k].size();
+		}
+
+		for (i = 0; i < (int)alpha_mes_simulator_vector.size(); i++)
+		{
+			alpha_mes = alpha_mes_simulator;
+			d_mes = d_mes_simulator;
+
+			d_all_mes.clear();
+			for (j = 0; j < (int)d_all_mes_simulator.size(); j++)
 			{
-			case SONAR_IMG_FIRST_DISTANCES:
-				j = 0;
-				switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
+				d_all_mes.push_back(d_all_mes_simulator[j]);
+			}
+
+			alpha_mes_vector.push_back(alpha_mes_simulator_vector[i]);
+			d_mes_vector.push_back(d_mes_simulator_vector[i]);
+			d_all_mes_vector.push_back(d_all_mes_simulator_vector[i]);
+			t_history_vector.push_back(t_simulator_history_vector[i]);
+			xhat_history_vector.push_back(xhat_simulator_history_vector[i]);
+			yhat_history_vector.push_back(yhat_simulator_history_vector[i]);
+			psihat_history_vector.push_back(psihat_simulator_history_vector[i]);
+			vrxhat_history_vector.push_back(vrxhat_simulator_history_vector[i]);
+			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			{
+				alpha_mes_vector.pop_front();
+				d_mes_vector.pop_front();
+				d_all_mes_vector.pop_front();
+				t_history_vector.pop_front();
+				xhat_history_vector.pop_front();
+				yhat_history_vector.pop_front();
+				psihat_history_vector.pop_front();
+				vrxhat_history_vector.pop_front();
+			}
+		}
+		for (i = 0; i < (int)alpha_mes_seanet_vector.size(); i++)
+		{
+			alpha_mes = alpha_mes_seanet;
+			d_mes = d_mes_seanet;
+
+			d_all_mes.clear();
+			for (j = 0; j < (int)d_all_mes_seanet.size(); j++)
+			{
+				d_all_mes.push_back(d_all_mes_seanet[j]);
+			}
+
+			alpha_mes_vector.push_back(alpha_mes_seanet_vector[i]);
+			d_mes_vector.push_back(d_mes_seanet_vector[i]);
+			d_all_mes_vector.push_back(d_all_mes_seanet_vector[i]);
+			t_history_vector.push_back(t_seanet_history_vector[i]);
+			xhat_history_vector.push_back(xhat_seanet_history_vector[i]);
+			yhat_history_vector.push_back(yhat_seanet_history_vector[i]);
+			psihat_history_vector.push_back(psihat_seanet_history_vector[i]);
+			vrxhat_history_vector.push_back(vrxhat_seanet_history_vector[i]);
+			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			{
+				alpha_mes_vector.pop_front();
+				d_mes_vector.pop_front();
+				d_all_mes_vector.pop_front();
+				t_history_vector.pop_front();
+				xhat_history_vector.pop_front();
+				yhat_history_vector.pop_front();
+				psihat_history_vector.pop_front();
+				vrxhat_history_vector.pop_front();
+			}
+		}
+		for (i = 0; i < (int)alpha_mes_hokuyo_vector.size(); i++)
+		{
+			alpha_mes = alpha_mes_hokuyo;
+			d_mes = d_mes_hokuyo;
+
+			d_all_mes.clear();
+			for (j = 0; j < (int)d_all_mes_hokuyo.size(); j++)
+			{
+				d_all_mes.push_back(d_all_mes_hokuyo[j]);
+			}
+
+			alpha_mes_vector.push_back(alpha_mes_hokuyo_vector[i]);
+			d_mes_vector.push_back(d_mes_hokuyo_vector[i]);
+			d_all_mes_vector.push_back(d_all_mes_hokuyo_vector[i]);
+			t_history_vector.push_back(t_hokuyo_history_vector[i]);
+			xhat_history_vector.push_back(xhat_hokuyo_history_vector[i]);
+			yhat_history_vector.push_back(yhat_hokuyo_history_vector[i]);
+			psihat_history_vector.push_back(psihat_hokuyo_history_vector[i]);
+			vrxhat_history_vector.push_back(vrxhat_hokuyo_history_vector[i]);
+			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			{
+				alpha_mes_vector.pop_front();
+				d_mes_vector.pop_front();
+				d_all_mes_vector.pop_front();
+				t_history_vector.pop_front();
+				xhat_history_vector.pop_front();
+				yhat_history_vector.pop_front();
+				psihat_history_vector.pop_front();
+				vrxhat_history_vector.pop_front();
+			}
+		}
+		for (i = 0; i < (int)alpha_mes_rplidar_vector.size(); i++)
+		{
+			alpha_mes = alpha_mes_rplidar;
+			d_mes = d_mes_rplidar;
+
+			d_all_mes.clear();
+			for (j = 0; j < (int)d_all_mes_rplidar.size(); j++)
+			{
+				d_all_mes.push_back(d_all_mes_rplidar[j]);
+			}
+
+			alpha_mes_vector.push_back(alpha_mes_rplidar_vector[i]);
+			d_mes_vector.push_back(d_mes_rplidar_vector[i]);
+			d_all_mes_vector.push_back(d_all_mes_rplidar_vector[i]);
+			t_history_vector.push_back(t_rplidar_history_vector[i]);
+			xhat_history_vector.push_back(xhat_rplidar_history_vector[i]);
+			yhat_history_vector.push_back(yhat_rplidar_history_vector[i]);
+			psihat_history_vector.push_back(psihat_rplidar_history_vector[i]);
+			vrxhat_history_vector.push_back(vrxhat_rplidar_history_vector[i]);
+			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			{
+				alpha_mes_vector.pop_front();
+				d_mes_vector.pop_front();
+				d_all_mes_vector.pop_front();
+				t_history_vector.pop_front();
+				xhat_history_vector.pop_front();
+				yhat_history_vector.pop_front();
+				psihat_history_vector.pop_front();
+				vrxhat_history_vector.pop_front();
+			}
+		}
+		for (k = 0; k < MAX_NB_POLOLU; k++)
+		{
+			for (i = 0; i < (int)alpha_mes_pololu_vector[k].size(); i++)
+			{
+				alpha_mes = alpha_mes_pololu[k];
+				d_mes = d_mes_pololu[k];
+
+				d_all_mes.clear();
+				for (j = 0; j < (int)d_all_mes_pololu[k].size(); j++)
 				{
-				case SONAR_IMG_LEVER_ARMS:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+					d_all_mes.push_back(d_all_mes_pololu[k][j]);
+				}
+
+				alpha_mes_vector.push_back(alpha_mes_pololu_vector[k][i]);
+				d_mes_vector.push_back(d_mes_pololu_vector[k][i]);
+				d_all_mes_vector.push_back(d_all_mes_pololu_vector[k][i]);
+				t_history_vector.push_back(t_pololu_history_vector[k][i]);
+				xhat_history_vector.push_back(xhat_pololu_history_vector[k][i]);
+				yhat_history_vector.push_back(yhat_pololu_history_vector[k][i]);
+				psihat_history_vector.push_back(psihat_pololu_history_vector[k][i]);
+				vrxhat_history_vector.push_back(vrxhat_pololu_history_vector[k][i]);
+				if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+				{
+					alpha_mes_vector.pop_front();
+					d_mes_vector.pop_front();
+					d_all_mes_vector.pop_front();
+					t_history_vector.pop_front();
+					xhat_history_vector.pop_front();
+					yhat_history_vector.pop_front();
+					psihat_history_vector.pop_front();
+					vrxhat_history_vector.pop_front();
+				}
+			}
+		}
+		for (k = 0; k < MAX_NB_BLUEVIEW; k++)
+		{
+			for (i = 0; i < (int)alpha_mes_blueview_vector[k].size(); i++)
+			{
+				alpha_mes = alpha_mes_blueview[k];
+				d_mes = d_mes_blueview[k];
+
+				d_all_mes.clear();
+				for (j = 0; j < (int)d_all_mes_blueview[k].size(); j++)
+				{
+					d_all_mes.push_back(d_all_mes_blueview[k][j]);
+				}
+
+				alpha_mes_vector.push_back(alpha_mes_blueview_vector[k][i]);
+				d_mes_vector.push_back(d_mes_blueview_vector[k][i]);
+				d_all_mes_vector.push_back(d_all_mes_blueview_vector[k][i]);
+				t_history_vector.push_back(t_blueview_history_vector[k][i]);
+				xhat_history_vector.push_back(xhat_blueview_history_vector[k][i]);
+				yhat_history_vector.push_back(yhat_blueview_history_vector[k][i]);
+				psihat_history_vector.push_back(psihat_blueview_history_vector[k][i]);
+				vrxhat_history_vector.push_back(vrxhat_blueview_history_vector[k][i]);
+				if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+				{
+					alpha_mes_vector.pop_front();
+					d_mes_vector.pop_front();
+					d_all_mes_vector.pop_front();
+					t_history_vector.pop_front();
+					xhat_history_vector.pop_front();
+					yhat_history_vector.pop_front();
+					psihat_history_vector.pop_front();
+					vrxhat_history_vector.pop_front();
+				}
+			}
+		}
+		for (k = 0; k < MAX_NB_VIDEO; k++)
+		{
+			for (i = 0; i < (int)alpha_mes_video_vector[k].size(); i++)
+			{
+				alpha_mes = alpha_mes_video[k];
+				d_mes = d_mes_video[k];
+
+				d_all_mes.clear();
+				for (j = 0; j < (int)d_all_mes_video[k].size(); j++)
+				{
+					d_all_mes.push_back(d_all_mes_video[k][j]);
+				}
+
+				alpha_mes_vector.push_back(alpha_mes_video_vector[k][i]);
+				d_mes_vector.push_back(d_mes_video_vector[k][i]);
+				d_all_mes_vector.push_back(d_all_mes_video_vector[k][i]);
+				t_history_vector.push_back(t_video_history_vector[k][i]);
+				xhat_history_vector.push_back(xhat_video_history_vector[k][i]);
+				yhat_history_vector.push_back(yhat_video_history_vector[k][i]);
+				psihat_history_vector.push_back(psihat_video_history_vector[k][i]);
+				vrxhat_history_vector.push_back(vrxhat_video_history_vector[k][i]);
+				if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+				{
+					alpha_mes_vector.pop_front();
+					d_mes_vector.pop_front();
+					d_all_mes_vector.pop_front();
+					t_history_vector.pop_front();
+					xhat_history_vector.pop_front();
+					yhat_history_vector.pop_front();
+					psihat_history_vector.pop_front();
+					vrxhat_history_vector.pop_front();
+				}
+			}
+		}
+#pragma endregion
+#ifndef DISABLE_OPENCV_SUPPORT
+		switch (fSeanetOverlayImg & SONAR_IMG_DISTANCES_MASK)
+		{
+		case SONAR_IMG_FIRST_DISTANCES:
+			j = 0;
+			switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
+			{
+			case SONAR_IMG_LEVER_ARMS:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					// Might be infinity, but does not seem to be a problem...
+					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_PSI:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					// Might be infinity, but does not seem to be a problem...
+					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_PSI_POS:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					// Might be infinity, but does not seem to be a problem...
+					DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_HIST_PSI:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					// Might be infinity, but does not seem to be a problem...
+					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					// Might be infinity, but does not seem to be a problem...
+					DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+				}
+				break;
+			default:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					// Might be infinity, but does not seem to be a problem...
+					DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+				}
+				break;
+			}
+			break;
+		case SONAR_IMG_ALL_DISTANCES:
+			switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
+			{
+			case SONAR_IMG_LEVER_ARMS:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
 						DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_PSI:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_PSI:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
 						DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_PSI_POS:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_PSI_POS:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
 						DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_HIST_PSI:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_HIST_PSI:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
 						DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				}
+				break;
+			case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
 						DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
-					break;
-				default:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				}
+				break;
+			default:
+				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+				{
+					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
 						DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
-					break;
 				}
-				break;
-			case SONAR_IMG_ALL_DISTANCES:
-				switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
-				{
-				case SONAR_IMG_LEVER_ARMS:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-					{
-						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_PSI:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-					{
-						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_PSI_POS:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-					{
-						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_HIST_PSI:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-					{
-						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-					}
-					break;
-				case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-					{
-						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-					}
-					break;
-				default:
-					for (i = 0; i < (int)d_all_mes_vector.size(); i++)
-					{
-						for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
-						{
-							// Might be infinity, but does not seem to be a problem...
-							DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
-						}
-					}
-					break;
-				}
-				break;
-			default:
 				break;
 			}
-#endif // !DISABLE_OPENCV_SUPPORT
-
-			LeaveCriticalSection(&StateVariablesCS);
+			break;
+		default:
+			break;
 		}
+#endif // !DISABLE_OPENCV_SUPPORT
+		LeaveCriticalSection(&StateVariablesCS);
 
 #ifndef DISABLE_OPENCV_SUPPORT
 		EnterCriticalSection(&SeanetOverlayImgCS);

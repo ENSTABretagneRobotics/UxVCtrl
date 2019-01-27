@@ -114,32 +114,32 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 
 				for (i = 0; i < hokuyo.StepCount; i++)
 				{
-					alpha_mes = angles[i];
-					d_mes = distances[i];
+					alpha_mes_hokuyo = angles[i];
+					d_mes_hokuyo = distances[i];
 
 					// For compatibility with a Seanet...
+					d_all_mes_hokuyo.clear();
+					d_all_mes_hokuyo.push_back(d_mes_hokuyo);
 
-					d_all_mes.clear();
-					d_all_mes.push_back(d_mes);
-					alpha_mes_vector.push_back(alpha_mes);
-					d_mes_vector.push_back(d_mes);
-					d_all_mes_vector.push_back(d_all_mes);
-					t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-					xhat_history_vector.push_back(xhat);
-					yhat_history_vector.push_back(yhat);
-					psihat_history_vector.push_back(psihat);
-					vrxhat_history_vector.push_back(vrxhat);
+					alpha_mes_hokuyo_vector.push_back(alpha_mes_hokuyo);
+					d_mes_hokuyo_vector.push_back(d_mes_hokuyo);
+					d_all_mes_hokuyo_vector.push_back(d_all_mes_hokuyo);
+					t_hokuyo_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+					xhat_hokuyo_history_vector.push_back(xhat);
+					yhat_hokuyo_history_vector.push_back(yhat);
+					psihat_hokuyo_history_vector.push_back(psihat);
+					vrxhat_hokuyo_history_vector.push_back(vrxhat);
 
-					if ((int)alpha_mes_vector.size() > hokuyo.StepCount)
+					if ((int)alpha_mes_hokuyo_vector.size() > hokuyo.StepCount)
 					{
-						alpha_mes_vector.pop_front();
-						d_mes_vector.pop_front();
-						d_all_mes_vector.pop_front();
-						t_history_vector.pop_front();
-						xhat_history_vector.pop_front();
-						yhat_history_vector.pop_front();
-						psihat_history_vector.pop_front();
-						vrxhat_history_vector.pop_front();
+						alpha_mes_hokuyo_vector.pop_front();
+						d_mes_hokuyo_vector.pop_front();
+						d_all_mes_hokuyo_vector.pop_front();
+						t_hokuyo_history_vector.pop_front();
+						xhat_hokuyo_history_vector.pop_front();
+						yhat_hokuyo_history_vector.pop_front();
+						psihat_hokuyo_history_vector.pop_front();
+						vrxhat_hokuyo_history_vector.pop_front();
 					}
 				}
 

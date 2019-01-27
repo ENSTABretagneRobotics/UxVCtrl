@@ -9,6 +9,24 @@
 
 #include "Controller.h"
 
+int ObstacleAvoidance(double* pwpsi_obs)
+{
+	double wpsi_obs = *pwpsi_obs;
+
+	/*
+	Take into account obstacles of known position and obstacles in d_mes_vector...
+
+	this function need to have few processing...
+
+	critical section specific to obstacles?
+
+	*/
+
+	*pwpsi_obs = wpsi_obs;
+
+	return EXIT_SUCCESS;
+}
+
 THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 {
 	CHRONO chrono;
@@ -16,6 +34,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	int counter = 0;
 	double norm_ba = 0, norm_ma = 0, norm_bm = 0, sinalpha = 0, phi = 0, e = 0; // For line following control.
 	double wxa_prev = 0, wya_prev = 0, wxb_prev = 0, wyb_prev = 0, wlata = 0, wlonga = 0, wlatb = 0, wlongb = 0, walt = 0; // For line following control.
+	double wpsi_obs = 0;// , e_obs = 0; // For obstacle avoidance.
 	double delta_d = 0; // For distance control.
 	double delta_angle = 0; // For heading control.
 	double wpsi_prev = 0, ipsi = 0; // For heading control.
@@ -108,20 +127,20 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			{
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxa, wya, wz, &wlata, &wlonga, &walt); // GPS coordinates of a.
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxb, wyb, wz, &wlatb, &wlongb, &walt); // GPS coordinates of b.
-				norm_ba = sqrt(pow(wxb-wxa,2)+pow(wyb-wya,2)); // Length of the line (norm of b-a).
-				phi = atan2(wyb-wya,wxb-wxa); // Angle of the line.
+				norm_ba = sqrt(pow(wxb-wxa, 2)+pow(wyb-wya, 2)); // Length of the line (norm of b-a).
+				phi = atan2(wyb-wya, wxb-wxa); // Angle of the line.
 #pragma region Sailboat supervisor
 				bForceCheckStrategy = 1;
 				bForceSailUpdate = 1;
 #pragma endregion
 			}
 
-			norm_ma = sqrt(pow(Center(xhat)-wxa,2)+pow(Center(yhat)-wya,2)); // Distance from the beginning of the line (norm of m-a).	
-			norm_bm = sqrt(pow(wxb-Center(xhat),2)+pow(wyb-Center(yhat),2)); // Distance to the destination waypoint of the line (norm of b-m).	
+			norm_ma = sqrt(pow(Center(xhat)-wxa, 2)+pow(Center(yhat)-wya, 2)); // Distance from the beginning of the line (norm of m-a).	
+			norm_bm = sqrt(pow(wxb-Center(xhat), 2)+pow(wyb-Center(yhat), 2)); // Distance to the destination waypoint of the line (norm of b-m).	
 
 			if ((norm_ma != 0)&&(norm_ba != 0))
 				sinalpha = ((wxb-wxa)*(Center(yhat)-wya)-(wyb-wya)*(Center(xhat)-wxa))/(norm_ma*norm_ba);
-			else 
+			else
 				sinalpha = 0;
 
 			e = norm_ma*sinalpha; // Distance to the line (signed).
@@ -130,13 +149,44 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 			wpsi = LineFollowing(phi, e, gamma_infinite, radius);
 
+			wxa_prev = wxa; wya_prev = wya; wxb_prev = wxb; wyb_prev = wyb; 
+		}
+
+		if (bWaypointControl)
+		{
+			wpsi = atan2(wy-Center(yhat), wx-Center(xhat));
+		}
+
+		// Obstacles handling...
+
+		if (bLineFollowingControl||bWaypointControl||bHeadingControl)
+		{
+			wpsi_obs = wpsi;
+			//e_obs = e;
+		}
+		else
+		{
+			wpsi_obs = Center(psihat);
+			//e_obs = 0;
+		}
+
+		// Should modify here wpsi_obs depending on obstacles without modifying wpsi...
+		ObstacleAvoidance(&wpsi_obs);
+		
+		// All the code after that should use wpsi_obs instead of just wpsi...
+
+		if (bLineFollowingControl)
+		{
 #pragma region Sailboat supervisor
-			if (robid & SAILBOAT_CLASS_ROBID_MASK) 
+
+			// Not sure of the behavior for sailboat when there is an obstacle...
+
+			if (robid & SAILBOAT_CLASS_ROBID_MASK)
 			{
-				double theta_star = wpsi;
+				double theta_star = wpsi_obs;
 				double psiw = Center(psitwindhat);
 				double psi = Center(psihat);
-				
+
 				q1 = betarear;
 				q2 = (log(betarear)-log(betaside))/log(2.0);
 
@@ -230,22 +280,22 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				switch (state)
 				{
 				case STARBOARD_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI+zeta; // Heading command.
+					wpsi_obs = psiw+M_PI+zeta; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				case PORT_TACK_TRAJECTORY:
-					wpsi = psiw+M_PI-zeta; // Heading command.
+					wpsi_obs = psiw+M_PI-zeta; // Heading command.
 					deltasmax = 0; // Sail command.
 					break;
 				case DIRECT_TRAJECTORY:
 				default:
-					wpsi = theta_star; // Heading command.
+					wpsi_obs = theta_star; // Heading command.
 					// Sail command.
 					switch (sailformulatype)
 					{
 					default:
 					case 0:
-						deltasmax = q1*pow((cos(psiw-wpsi)+1.0)/2.0, q2);
+						deltasmax = q1*pow((cos(psiw-wpsi_obs)+1.0)/2.0, q2);
 						break;
 					case 1:
 						deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0, q2);
@@ -264,31 +314,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					if (bStdOutDetailedInfo) printf("Sail update.\n");
 					u = deltasmax/q1;
 					StartChrono(&chrono_sail_update);
-				}			
+				}
 			}
 #pragma endregion
-
-			wxa_prev = wxa; wya_prev = wya; wxb_prev = wxb; wyb_prev = wyb; 
 		}
-
-		if (bWaypointControl)
-		{
-			wpsi = atan2(wy-Center(yhat), wx-Center(xhat));
-		}
-
-
-/*
-		if (bHeadingControl||bWaypointControl||bLineFollowingControl)
-		{
-			// wpsi_tmp = wpsi
-		}
-		else
-		{
-			// wpsi_tmp = psi
-		}
-		// Should modify here wpsi_tmp depending on obstacles without modifying wpsi
-		wpsi_tmp = ObstacleAvoidance(wpsi_tmp...)
-*/
 
 		// Low-level controls.
 
@@ -315,9 +344,9 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		if (bHeadingControl)
 		{
-			if (wpsi != wpsi_prev) ipsi = 0;
+			if (wpsi_obs != wpsi_prev) ipsi = 0;
 
-			delta_angle = Center(psihat)-wpsi;
+			delta_angle = Center(psihat)-wpsi_obs;
 
 			if (cos(delta_angle) > cosdelta_angle_threshold)
 			{
@@ -378,7 +407,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				ipsi = 0;
 			}
 
-			wpsi_prev = wpsi;
+			wpsi_prev = wpsi_obs;
 		}
 		else
 		{
@@ -663,7 +692,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat),
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0,
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state,
-				(uw_f >= 0)? (ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): (ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)), u_f*q1, wpsi, vbat1, vbat2, vswitch);
+				(uw_f >= 0)? (ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): (ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)), u_f*q1, wpsi_obs, vbat1, vbat2, vswitch);
 			fflush(lognavfile);
 		}
 #pragma endregion

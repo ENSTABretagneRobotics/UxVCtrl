@@ -1,3 +1,6 @@
+292
+Updated SeanetProcessing.cpp.
+
 291
 Corrected bug in SSC32Interface introduced in V289.
 

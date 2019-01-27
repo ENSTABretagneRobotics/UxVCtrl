@@ -57,7 +57,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	t = 0;
 
 	x_sim = x_0; y_sim = y_0; z_sim = z_0; phi_sim = phi_0; theta_sim = theta_0; psi_sim = psi_0; vrx_sim = vrx_0; vry_sim = vry_0; vrz_sim = vrz_0; omegax_sim = omegax_0; omegay_sim = omegay_0; omegaz_sim = omegaz_0;
-	alpha_mes = alpha_0; d_sim = d_0;
+	alpha_mes_simulator = alpha_0; d_sim = d_0;
 
 	StartChrono(&chrono);
 
@@ -402,12 +402,12 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 
 		// Sonar.
-		alpha_mes = alpha_mes+(simulatorperiod/1000.0)*omegas;
-		if (alpha_mes > 2*M_PI+alpha_0)
+		alpha_mes_simulator = alpha_mes_simulator+(simulatorperiod/1000.0)*omegas;
+		if (alpha_mes_simulator > 2*M_PI+alpha_0)
 		{
-			alpha_mes = alpha_0;
+			alpha_mes_simulator = alpha_0;
 		}
-		alpha_sim = alpha_mes-sensor_err(alpha_bias_err, alpha_max_rand_err);
+		alpha_sim = alpha_mes_simulator-sensor_err(alpha_bias_err, alpha_max_rand_err);
 		// Compute the distance to the first obstacle d. d might be oo if no obstacle found.
 		d1 = DistanceDirSegments(x_sim, y_sim, alpha_sim+alphas+psi_sim, walls_xa, walls_ya, walls_xb, walls_yb);
 		d2 = DistanceDirCircles(x_sim, y_sim, alpha_sim+alphas+psi_sim, circles_x, circles_y, circles_r);
@@ -419,42 +419,42 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			d_sim = rangescale*(double)rand()/(double)RAND_MAX;
 		}
 
-		d_mes = d_sim+sensor_err(d_bias_err, d_max_rand_err);
-		d_mes = max(0.0, d_mes);
-		//d_mes = max(0.0, min((double)rangescale, d_mes));
+		d_mes_simulator = d_sim+sensor_err(d_bias_err, d_max_rand_err);
+		d_mes_simulator = max(0.0, d_mes_simulator);
+		//d_mes_simulator = max(0.0, min((double)rangescale, d_mes_simulator));
 
 		// For compatibility with a Seanet...
-
-		d_all_mes.clear();
+		d_all_mes_simulator.clear();
 		/*		
 		// Outlier before the wall.
-		d_all_mes.push_back(d_mes*(double)rand()/(double)RAND_MAX);
+		d_all_mes_simulator.push_back(d_mes_simulator*(double)rand()/(double)RAND_MAX);
 		*/
 		// Wall (or sometimes also an outlier...).
-		d_all_mes.push_back(d_mes);
+		d_all_mes_simulator.push_back(d_mes_simulator);
 		/*		
 		// Outlier after the wall.
-		d_all_mes.push_back(d_mes+(rangescale-d_mes)*(double)rand()/(double)RAND_MAX);
+		d_all_mes_simulator.push_back(d_mes_simulator+(rangescale-d_mes_simulator)*(double)rand()/(double)RAND_MAX);
 		*/
-		alpha_mes_vector.push_back(alpha_mes);
-		d_mes_vector.push_back(d_mes);
-		d_all_mes_vector.push_back(d_all_mes);
-		t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-		xhat_history_vector.push_back(xhat);
-		yhat_history_vector.push_back(yhat);
-		psihat_history_vector.push_back(psihat);
-		vrxhat_history_vector.push_back(vrxhat);
 
-		if ((int)alpha_mes_vector.size() > 2*M_PI/((simulatorperiod/1000.0)*omegas))
+		alpha_mes_simulator_vector.push_back(alpha_mes_simulator);
+		d_mes_simulator_vector.push_back(d_mes_simulator);
+		d_all_mes_simulator_vector.push_back(d_all_mes_simulator);
+		t_simulator_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
+		xhat_simulator_history_vector.push_back(xhat);
+		yhat_simulator_history_vector.push_back(yhat);
+		psihat_simulator_history_vector.push_back(psihat);
+		vrxhat_simulator_history_vector.push_back(vrxhat);
+
+		if ((int)alpha_mes_simulator_vector.size() > 2*M_PI/((simulatorperiod/1000.0)*omegas))
 		{
-			alpha_mes_vector.pop_front();
-			d_mes_vector.pop_front();
-			d_all_mes_vector.pop_front();
-			t_history_vector.pop_front();
-			xhat_history_vector.pop_front();
-			yhat_history_vector.pop_front();
-			psihat_history_vector.pop_front();
-			vrxhat_history_vector.pop_front();
+			alpha_mes_simulator_vector.pop_front();
+			d_mes_simulator_vector.pop_front();
+			d_all_mes_simulator_vector.pop_front();
+			t_simulator_history_vector.pop_front();
+			xhat_simulator_history_vector.pop_front();
+			yhat_simulator_history_vector.pop_front();
+			psihat_simulator_history_vector.pop_front();
+			vrxhat_simulator_history_vector.pop_front();
 		}
 		
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat, &lon, &alt);

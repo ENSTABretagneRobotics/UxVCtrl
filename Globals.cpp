@@ -424,6 +424,16 @@ double forbidx_followme = 0, forbidy_followme = 0, forbidz_followme = 0;
 #pragma endregion
 
 // Simulator variables.
+double alpha_mes_simulator, d_mes_simulator;
+vector<interval> d_all_mes_simulator;
+deque<double> alpha_mes_simulator_vector;
+deque<double> d_mes_simulator_vector;
+deque< vector<interval> > d_all_mes_simulator_vector;
+deque<double> t_simulator_history_vector;
+deque<interval> xhat_simulator_history_vector;
+deque<interval> yhat_simulator_history_vector;
+deque<interval> psihat_simulator_history_vector;
+deque<interval> vrxhat_simulator_history_vector;
 int GNSSqualitySimulator = 0;
 BOOL bEnableSimulatedGNSS = TRUE;
 BOOL bEnableSimulatedDVL = FALSE;
@@ -458,28 +468,61 @@ CRITICAL_SECTION SeanetOverlayImgCS;
 #ifndef DISABLE_OPENCV_SUPPORT
 IplImage* SeanetOverlayImg = NULL;
 #endif // !DISABLE_OPENCV_SUPPORT
+double alpha_mes_seanet, d_mes_seanet;
+vector<interval> d_all_mes_seanet;
+deque<double> alpha_mes_seanet_vector;
+deque<double> d_mes_seanet_vector;
+deque< vector<interval> > d_all_mes_seanet_vector;
+deque<double> t_seanet_history_vector;
+deque<interval> xhat_seanet_history_vector;
+deque<interval> yhat_seanet_history_vector;
+deque<interval> psihat_seanet_history_vector;
+deque<interval> vrxhat_seanet_history_vector;
 BOOL bPauseSeanet = FALSE, bRestartSeanet = FALSE;
 
 // BlueView variables.
+double alpha_mes_blueview[MAX_NB_BLUEVIEW], d_mes_blueview[MAX_NB_BLUEVIEW];
+vector<interval> d_all_mes_blueview[MAX_NB_BLUEVIEW];
+deque<double> alpha_mes_blueview_vector[MAX_NB_BLUEVIEW];
+deque<double> d_mes_blueview_vector[MAX_NB_BLUEVIEW];
+deque< vector<interval> > d_all_mes_blueview_vector[MAX_NB_BLUEVIEW];
+deque<double> t_blueview_history_vector[MAX_NB_BLUEVIEW];
+deque<interval> xhat_blueview_history_vector[MAX_NB_BLUEVIEW];
+deque<interval> yhat_blueview_history_vector[MAX_NB_BLUEVIEW];
+deque<interval> psihat_blueview_history_vector[MAX_NB_BLUEVIEW];
+deque<interval> vrxhat_blueview_history_vector[MAX_NB_BLUEVIEW];
 BOOL bPauseBlueView[MAX_NB_BLUEVIEW];
 BOOL bRestartBlueView[MAX_NB_BLUEVIEW];
 
 // Hokuyo variables.
+double alpha_mes_hokuyo, d_mes_hokuyo;
+vector<interval> d_all_mes_hokuyo;
+deque<double> alpha_mes_hokuyo_vector;
+deque<double> d_mes_hokuyo_vector;
+deque< vector<interval> > d_all_mes_hokuyo_vector;
+deque<double> t_hokuyo_history_vector;
+deque<interval> xhat_hokuyo_history_vector;
+deque<interval> yhat_hokuyo_history_vector;
+deque<interval> psihat_hokuyo_history_vector;
+deque<interval> vrxhat_hokuyo_history_vector;
 BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;
 
 // RPLIDAR variables.
 //int fRPLIDAROverlayImg = 0;
-//deque<double> alpha_RPLIDAR;
-//deque< vector<interval> > d_RPLIDAR;
-//deque<double> t_hist_RPLIDAR;
-//deque<interval> xhat_hist_RPLIDAR;
-//deque<interval> yhat_hist_RPLIDAR;
-//deque<interval> psihat_hist_RPLIDAR;
-//deque<interval> vrxhat_hist_RPLIDAR;
 //CRITICAL_SECTION RPLIDAROverlayImgCS;
 //#ifndef DISABLE_OPENCV_SUPPORT
 //IplImage* RPLIDAROverlayImg = NULL;
 //#endif // !DISABLE_OPENCV_SUPPORT
+double alpha_mes_rplidar, d_mes_rplidar;
+vector<interval> d_all_mes_rplidar;
+deque<double> alpha_mes_rplidar_vector;
+deque<double> d_mes_rplidar_vector;
+deque< vector<interval> > d_all_mes_rplidar_vector;
+deque<double> t_rplidar_history_vector;
+deque<interval> xhat_rplidar_history_vector;
+deque<interval> yhat_rplidar_history_vector;
+deque<interval> psihat_rplidar_history_vector;
+deque<interval> vrxhat_rplidar_history_vector;
 BOOL bPauseRPLIDAR = FALSE, bRestartRPLIDAR = FALSE;
 
 // MS580314BA variables.
@@ -539,6 +582,16 @@ BOOL bPauseUE9A = FALSE, bRestartUE9A = FALSE;
 BOOL bPauseSSC32 = FALSE, bRestartSSC32 = FALSE;
 
 // Pololu variables.
+double alpha_mes_pololu[MAX_NB_POLOLU], d_mes_pololu[MAX_NB_POLOLU];
+vector<interval> d_all_mes_pololu[MAX_NB_POLOLU];
+deque<double> alpha_mes_pololu_vector[MAX_NB_POLOLU];
+deque<double> d_mes_pololu_vector[MAX_NB_POLOLU];
+deque< vector<interval> > d_all_mes_pololu_vector[MAX_NB_POLOLU];
+deque<double> t_pololu_history_vector[MAX_NB_POLOLU];
+deque<interval> xhat_pololu_history_vector[MAX_NB_POLOLU];
+deque<interval> yhat_pololu_history_vector[MAX_NB_POLOLU];
+deque<interval> psihat_pololu_history_vector[MAX_NB_POLOLU];
+deque<interval> vrxhat_pololu_history_vector[MAX_NB_POLOLU];
 int ShowMaestroGetPositionPololu[MAX_NB_POLOLU];
 BOOL bPausePololu[MAX_NB_POLOLU];
 BOOL bRestartPololu[MAX_NB_POLOLU];
@@ -553,6 +606,16 @@ BOOL bPauseIM483I = FALSE, bRestartIM483I = FALSE;
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 IplImage* imgs[MAX_NB_VIDEO];
+double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
+vector<interval> d_all_mes_video[MAX_NB_VIDEO];
+deque<double> alpha_mes_video_vector[MAX_NB_VIDEO];
+deque<double> d_mes_video_vector[MAX_NB_VIDEO];
+deque< vector<interval> > d_all_mes_video_vector[MAX_NB_VIDEO];
+deque<double> t_video_history_vector[MAX_NB_VIDEO];
+deque<interval> xhat_video_history_vector[MAX_NB_VIDEO];
+deque<interval> yhat_video_history_vector[MAX_NB_VIDEO];
+deque<interval> psihat_video_history_vector[MAX_NB_VIDEO];
+deque<interval> vrxhat_video_history_vector[MAX_NB_VIDEO];
 BOOL bPauseVideo[MAX_NB_VIDEO];
 BOOL bRestartVideo[MAX_NB_VIDEO];
 #endif // !DISABLE_OPENCV_SUPPORT
