@@ -178,6 +178,7 @@ BOOL bDisableSeanet = FALSE;
 BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 BOOL bDisableHokuyo = FALSE;
 BOOL bDisableRPLIDAR = FALSE;
+BOOL bDisableSRF02 = FALSE;
 BOOL bDisableMS580314BA = FALSE;
 BOOL bDisableMS583730BA = FALSE;
 BOOL bDisableP33x = FALSE;
@@ -525,6 +526,19 @@ deque<interval> psihat_rplidar_history_vector;
 deque<interval> vrxhat_rplidar_history_vector;
 BOOL bPauseRPLIDAR = FALSE, bRestartRPLIDAR = FALSE;
 
+// SRF02 variables.
+double alpha_mes_srf02, d_mes_srf02;
+vector<interval> d_all_mes_srf02;
+deque<double> alpha_mes_srf02_vector;
+deque<double> d_mes_srf02_vector;
+deque< vector<interval> > d_all_mes_srf02_vector;
+deque<double> t_srf02_history_vector;
+deque<interval> xhat_srf02_history_vector;
+deque<interval> yhat_srf02_history_vector;
+deque<interval> psihat_srf02_history_vector;
+deque<interval> vrxhat_srf02_history_vector;
+BOOL bPauseSRF02 = FALSE, bRestartSRF02 = FALSE;
+
 // MS580314BA variables.
 BOOL bPauseMS580314BA = FALSE, bRestartMS580314BA = FALSE;
 
@@ -592,7 +606,8 @@ deque<interval> xhat_pololu_history_vector[MAX_NB_POLOLU];
 deque<interval> yhat_pololu_history_vector[MAX_NB_POLOLU];
 deque<interval> psihat_pololu_history_vector[MAX_NB_POLOLU];
 deque<interval> vrxhat_pololu_history_vector[MAX_NB_POLOLU];
-int ShowMaestroGetPositionPololu[MAX_NB_POLOLU];
+int ShowGetPositionMaestroPololu[MAX_NB_POLOLU];
+int SetPositionMaestroPololu[MAX_NB_POLOLU];
 BOOL bPausePololu[MAX_NB_POLOLU];
 BOOL bRestartPololu[MAX_NB_POLOLU];
 
@@ -602,10 +617,11 @@ BOOL bPauseMiniSSC = FALSE, bRestartMiniSSC = FALSE;
 // IM483I variables.
 BOOL bPauseIM483I = FALSE, bRestartIM483I = FALSE;
 
-#ifndef DISABLE_OPENCV_SUPPORT
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
+#ifndef DISABLE_OPENCV_SUPPORT
 IplImage* imgs[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
 vector<interval> d_all_mes_video[MAX_NB_VIDEO];
 deque<double> alpha_mes_video_vector[MAX_NB_VIDEO];
@@ -618,7 +634,6 @@ deque<interval> psihat_video_history_vector[MAX_NB_VIDEO];
 deque<interval> vrxhat_video_history_vector[MAX_NB_VIDEO];
 BOOL bPauseVideo[MAX_NB_VIDEO];
 BOOL bRestartVideo[MAX_NB_VIDEO];
-#endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion
 
 // VideoRecord variables.

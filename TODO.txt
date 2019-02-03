@@ -1,11 +1,10 @@
 CorrectImageBordersRawBGR() : param nbpixborder devrait pas être en dur...
 
-https://stackoverflow.com/questions/5801813/c-usleep-is-obsolete-workarounds-for-windows-mingw
-
-rajouter support setekforigin
-
+mavlinkdevice.overridechan : si on éteint la télécommande, faut-il laisser le PWM override ou laisser le RTL s'activer?->rajouter param bDefaultDisablePWMOverride pour qu'on puisse choisir la logique souhaitée...
+récupérer les entrées de la télécommande sur le MAVLinkDevice comme entrées et les corriger avec évitement doit être possible si on utilise setattitudetarget en guided, rajouter commande pour gérer cela...
 add a third MAVLinkDevice?
 pouvoir gérer followme avec nmeainterface, bExternal...
+rajouter support setekforigin
 
 Altitude_AGL : avec vertical lidar-lite et/ou px4f ground_distance, corriger avec roll pitch et ne pas prendre en compte si roll pitch trop élevés, si lidar pas dispo, utiliser la dernière altitude_agl valide avec les variations d'altitude mesurée par baro et/ou GPS
 Altitude : c'est l'altitude par rapport au repère env.txt (où l'altitude GPS est en général donnée) ou alors en option affichée en wgs, si GPS pas dispo ou pour fusionner, utiliser la variation de pression par rapport à l'origine de l'env (qui pourrait en option être prise comme la pression au démarrage ou l'armement du robot...)
@@ -27,13 +26,23 @@ Obstacle avoidance, loiter
 
 u_obs...
 
-1 DO pour trigger sonars quand on veut
-support de 12 telem max dont config 8+2
-ouverture angulaire des sonars, rajouter param beamangle?
+support de 12 telem max dont config 8+2, GetTelemetersPololu(tableau)...?
+ouverture angulaire des sonars, rajouter param anolginputbeam?
+rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
 
 Faire en sorte que le drone reste en position par rapport aux obstacles (distancecontrol en u et ul)
 
-waitarea area.txt bIn procid t : execute procid quand on rentre dans la zone (bIn == 1) ou sort (bIn == 0), un peu comme waitline
+%waitareaconfig area.txt bIn procid id (execute procid quand on rentre dans la zone (bIn == 1) ou sort (bIn == 0))
+%
+%enablewaitarea id
+%
+%disablewaitarea id
+
+%geofenceconfig area.txt bIn id
+%
+%enablegeofence id
+%
+%disablegeofence id
 
 comment gérer le sonar vers le haut?->distance_above
 env obstacles interdit intérieur 
@@ -236,6 +245,7 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+VC_Linux internal bug : remote current build directory does not correspond to the directory containing .vcxproj file, see https://github.com/Microsoft/VSLinux/issues/325
 UxVCtrl_MacOS a été compilé avec un vieux mavlink...
 sometimes the program stays blocked forever in the interfaces in select() in waitforclifortcpsrv(), lots of mem leaked if MAVLinkInterface was connected...
 Kinect/CLEye support and USE_OPENCV_HIGHGUI_CPP_API?
@@ -509,7 +519,6 @@ MT, SBG specific NMEA messages... : attention, les trames NMEA sont mélangées au
 bNMEAInterfaceHighPrec pour nombre de décimales dans trames (voir ce que fait ublox)
 add recvuntil for rs232...?
 convert AIS to C code...
-rajouter OSComputerI2CPort rpi
 auto magnetic calbration algo in plane and space, see Matlab code in ptrbrtz, add magnetic declination in AHRS config files (or use yaworientation parameter)?
 gérer gpsd (Linux only?)
 Should be possible to remove NMEADevice now if necessary...
@@ -602,6 +611,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+1 DO pour trigger sonars quand on veut->utiliser extra1chan
 
 sous vm Mac, thrust/turn 1 fait bouger le buggy/AUV simulé très lentement?->tester sous vm Linux...->semble lié à USE_OLD_CHRONO version clock_t, actuellement si ENABLE_GETTIMEOFDAY_WIN32 est pas activé c'est celle-là qui est prise même sous Linux/Mac mais clock_t ne fonctionne pas bien dans une vm...
 

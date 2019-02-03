@@ -91,17 +91,96 @@ void set_kinect_d_vectors()
 }
 */
 
+#ifdef DEVEL_WAITAREA
+THREAD_PROC_RETURN_VALUE WaitAreaThread(void* pParam)
+{
+	int id = (intptr_t)pParam;
+
+	//FILE* logwaitareafile = NULL;
+	//char logwaitareafilename[MAX_BUF_LEN];
+
+	int i = 0;
+	CHRONO chrono;
+
+	//EnterCriticalSection(&strtimeCS);
+	//sprintf(logwaitareafilename, LOG_FOLDER"logwaitarea%d_%.64s.csv", id, strtimeex_fns());
+	//LeaveCriticalSection(&strtimeCS);
+	//logwaitareafile = fopen(logwaitareafilename, "w");
+	//if (logwaitareafile == NULL)
+	//{
+	//	printf("Unable to create log file.\n");
+	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
+	//	return 0;
+	//}
+	//
+	//fprintf(logwaitareafile, "%% Time (in s); Trigger (1 : on, 0 : off);\n");
+	//fflush(logwaitareafile);
+
+	StartChrono(&chrono);
+
+	for (;;)
+	{
+		mSleep(period_waitarea[id] > 0? period_waitarea[id]: 100);
+
+		if (bExit) break;
+		if (!bWaitArea[id]) continue;
+
+		EnterCriticalSection(&WaitAreaCS[id]);
+
+
+		res = checkinarea(polygons);
+
+
+		if (((res) && (bIn_waitarea))||((!res) && (!bIn_waitarea)))
+		{
+			bWaitAreaDetected[id] = TRUE;
+#pragma region Actions
+			//fprintf(logwaitareafile, "%f;%d;\n", GetTimeElapsedChronoQuick(&chrono), bWaitAreaDetected[id]);
+			//fflush(logwaitareafile);
+
+			if (procid_waitarea[id] != -1)
+			{
+				// disablewaitarea to avoid multiple execute...
+				bWaitArea[id] = FALSE;
+				for (i = 0; i < nbretries_waitarea[id]; i++)
+				{
+					if (remove(WaitAreaFileName[id]) == 0) break;
+					mSleep(retrydelay_waitarea[id]);
+				}
+				if (bEcho) printf("execute %d\n", procid_waitarea[id]);
+				ExecuteProcedure(procid_waitarea[id]);
+				bWaiting = FALSE; // To interrupt and force execution of the next commands...
+			}
+#pragma endregion
+		}
+
+		LeaveCriticalSection(&WaitAreaCS[id]);
+
+		if (bExit) break;
+	}
+
+	StopChronoQuick(&chrono);
+
+	//fclose(logwaitareafile);
+
+	if (!bExit) bExit = TRUE; // Unexpected program exit...
+
+	return 0;
+}
+#endif // DEVEL_WAITAREA
+
 THREAD_PROC_RETURN_VALUE ObstacleThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
-/*
+
 	CHRONO chrono;
 
 	StartChrono(&chrono);
 
 	for (;;)
 	{
-		mSleep(captureperiod);
+		mSleep(50);
+
 
 		if (bExit) break;
 	}
@@ -109,6 +188,6 @@ THREAD_PROC_RETURN_VALUE ObstacleThread(void* pParam)
 	StopChronoQuick(&chrono);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
-*/
+
 	return 0;
 }

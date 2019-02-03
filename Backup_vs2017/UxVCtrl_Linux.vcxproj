@@ -47,16 +47,16 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <IncludePath>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(IncludePath);$(ISenseIncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <IncludePath>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(IncludePath);$(ISenseIncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <IncludePath>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(IncludePath);$(ISenseIncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <IncludePath>$(IncludePath);$(ISenseIncludePath)</IncludePath>
+    <IncludePath>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(IncludePath);$(ISenseIncludePath)</IncludePath>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="..\Extensions\Devices\LabjackUtils\liblabjackusb\labjackusb.c">
@@ -71,6 +71,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\OSUtils\OSComputerI2CBus.c" />
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="Computations.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="Hardware\BlueView.cpp" />
     <ClCompile Include="Hardware\gpControl.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
+    <ClCompile Include="Hardware\I2CBus.cpp" />
     <ClCompile Include="Hardware\LIRMIA3.cpp" />
     <ClCompile Include="Hardware\MAVLinkDevice.cpp" />
     <ClCompile Include="Hardware\MiniSSC.cpp" />
@@ -94,6 +96,7 @@
     <ClCompile Include="Hardware\Pololu.cpp" />
     <ClCompile Include="Hardware\RPLIDAR.cpp" />
     <ClCompile Include="Hardware\SBG.cpp" />
+    <ClCompile Include="Hardware\SRF02.cpp" />
     <ClCompile Include="Hardware\ublox.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MAVLinkInterface.cpp" />
@@ -162,6 +165,7 @@
     <ClInclude Include="..\Extensions\Img\CvProc.h" />
     <ClInclude Include="..\Extensions\Img\CvUtils.h" />
     <ClInclude Include="..\Extensions\Misc\Misc.h" />
+    <ClInclude Include="..\OSUtils\OSComputerI2CBus.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="Computations.h" />
@@ -175,6 +179,7 @@
     <ClInclude Include="Hardware\BlueView.h" />
     <ClInclude Include="Hardware\gpControl.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
+    <ClInclude Include="Hardware\I2CBus.h" />
     <ClInclude Include="Hardware\LIRMIA3.h" />
     <ClInclude Include="Hardware\MAVLinkDevice.h" />
     <ClInclude Include="Hardware\MAVLinkProtocol.h" />
@@ -190,6 +195,7 @@
     <ClInclude Include="Hardware\RTCM2Protocol.h" />
     <ClInclude Include="Hardware\RTCM3Protocol.h" />
     <ClInclude Include="Hardware\SBG.h" />
+    <ClInclude Include="Hardware\SRF02.h" />
     <ClInclude Include="Hardware\ublox.h" />
     <ClInclude Include="Hardware\UBXProtocol.h" />
     <ClInclude Include="MAVLinkInterface.h" />
@@ -545,6 +551,12 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
+    <None Include="SRF020.txt">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+    </None>
     <Text Include="TODO.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -567,10 +579,10 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;OPENCV249;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LINUX_SDK_DIR)\include;$(LINUX_SDK_DIR)\include\x86_64-linux-gnu;$(LINUX_SDK_DIR)\local\include;$(LINUX_SDK_DIR)\local\include\sbgECom\src;$(LINUX_SDK_DIR)\local\include\sbgECom\common;/home/user/projects/$(ProjectName)/UxVCtrl;/home/user/projects/$(ProjectName);../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;./Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -585,10 +597,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(LINUX_SDK_DIR)\include;$(LINUX_SDK_DIR)\include\x86_64-linux-gnu;$(LINUX_SDK_DIR)\local\include;$(LINUX_SDK_DIR)\local\include\sbgECom\src;$(LINUX_SDK_DIR)\local\include\sbgECom\common;/home/user/projects/$(ProjectName)/UxVCtrl;/home/user/projects/$(ProjectName);../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;./Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV249;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <CAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -603,10 +615,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;OPENCV249;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LINUX_SDK_DIR)\include;$(LINUX_SDK_DIR)\include\x86_64-linux-gnu;$(LINUX_SDK_DIR)\local\include;$(LINUX_SDK_DIR)\local\include\sbgECom\src;$(LINUX_SDK_DIR)\local\include\sbgECom\common;/home/user/projects/$(ProjectName)/UxVCtrl;/home/user/projects/$(ProjectName);../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;./Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <CAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -621,10 +633,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(LINUX_SDK_DIR)\include;$(LINUX_SDK_DIR)\include\x86_64-linux-gnu;$(LINUX_SDK_DIR)\local\include;$(LINUX_SDK_DIR)\local\include\sbgECom\src;$(LINUX_SDK_DIR)\local\include\sbgECom\common;/home/user/projects/$(ProjectName)/UxVCtrl;/home/user/projects/$(ProjectName);../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../interval;../matrix_lib;./Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV249;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <CAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;switch;no-deprecated-declarations;empty-body;conversion;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>

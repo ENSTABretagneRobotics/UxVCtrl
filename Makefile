@@ -32,6 +32,7 @@ CFLAGS += -D ENABLE_LABJACK_SUPPORT
 CFLAGS += -D ENABLE_LIBMODBUS_SUPPORT
 CFLAGS += -D ENABLE_SBG_SUPPORT
 CFLAGS += -D ENABLE_BLUEVIEW_SUPPORT
+CFLAGS += -D ENABLE_COMPUTERI2CBUS_SUPPORT
 #CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
 CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD 
 CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
@@ -68,6 +69,9 @@ LDFLAGS += -lpthread -lrt -lm
 default: $(PROGS)
 
 ############################# OSUtils #############################
+
+OSComputerI2CBus.o: ../OSUtils/OSComputerI2CBus.c ../OSUtils/OSComputerI2CBus.h OSTime.o
+	$(CC) $(CFLAGS) -c $<
 
 OSComputerRS232Port.o: ../OSUtils/OSComputerRS232Port.c ../OSUtils/OSComputerRS232Port.h OSTime.o
 	$(CC) $(CFLAGS) -c $<
@@ -153,6 +157,9 @@ gpControl.o: ./Hardware/gpControl.cpp ./Hardware/gpControl.h
 Hokuyo.o: ./Hardware/Hokuyo.cpp ./Hardware/Hokuyo.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+I2CBus.o: ./Hardware/I2CBus.cpp ./Hardware/I2CBus.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 IM483I.o: ./Hardware/IM483I.cpp ./Hardware/IM483I.h
 	$(CXX) $(CXXFLAGS) -c $<
 
@@ -208,6 +215,9 @@ SBG.o: ./Hardware/SBG.cpp ./Hardware/SBG.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 Seanet.o: ./Hardware/Seanet.cpp ./Hardware/Seanet.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+SRF02.o: ./Hardware/SRF02.cpp ./Hardware/SRF02.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 SSC32.o: ./Hardware/SSC32.cpp ./Hardware/SSC32.h
@@ -305,7 +315,7 @@ VideoRecord.o: VideoRecord.cpp VideoRecord.h
 Wall.o: Wall.cpp Wall.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VideoRecord.o VideoInterface.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o OpenCVGUI.o Obstacle.o Observer.o NortekDVL.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o ExternalProgramTrigger.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o
+UxVCtrl: Wall.o VideoRecord.o VideoInterface.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o RazorAHRSInterface.o Pinger.o OpenCVGUI.o Obstacle.o Observer.o NortekDVL.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o ExternalProgramTrigger.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o SRF02.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o I2CBus.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o OSComputerI2CBus.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

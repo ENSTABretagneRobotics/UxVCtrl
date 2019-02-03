@@ -255,6 +255,15 @@
     <ClCompile Include="Obstacle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\SRF02.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSComputerI2CBus.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\I2CBus.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -608,6 +617,15 @@
     <ClInclude Include="Obstacle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\SRF02.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSComputerI2CBus.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\I2CBus.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -733,6 +751,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="Pololu0.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="SRF020.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

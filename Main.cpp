@@ -43,6 +43,7 @@
 #endif // ENABLE_BLUEVIEW_SUPPORT
 #include "Hokuyo.h"
 #include "RPLIDAR.h"
+#include "SRF02.h"
 #include "MS580314BA.h"
 #include "MS583730BA.h"
 #include "P33x.h"
@@ -144,6 +145,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_BLUEVIEW_SUPPORT
 	THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER RPLIDARThreadId;
+	THREAD_IDENTIFIER SRF02ThreadId;
 	THREAD_IDENTIFIER MS580314BAThreadId;
 	THREAD_IDENTIFIER MS583730BAThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
@@ -285,6 +287,7 @@ int main(int argc, char* argv[])
 #endif // ENABLE_BLUEVIEW_SUPPORT
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableRPLIDAR) CreateDefaultThread(RPLIDARThread, NULL, &RPLIDARThreadId);
+	if (!bDisableSRF02) CreateDefaultThread(SRF02Thread, NULL, &SRF02ThreadId);
 	if (!bDisableMS580314BA) CreateDefaultThread(MS580314BAThread, NULL, &MS580314BAThreadId);
 	if (!bDisableMS583730BA) CreateDefaultThread(MS583730BAThread, NULL, &MS583730BAThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
@@ -496,6 +499,7 @@ int main(int argc, char* argv[])
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
 	if (!bDisableMS583730BA) WaitForThread(MS583730BAThreadId);
 	if (!bDisableMS580314BA) WaitForThread(MS580314BAThreadId);
+	if (!bDisableSRF02) WaitForThread(SRF02ThreadId);
 	if (!bDisableRPLIDAR) WaitForThread(RPLIDARThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);
 #ifdef ENABLE_BLUEVIEW_SUPPORT

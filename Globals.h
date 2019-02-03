@@ -407,6 +407,7 @@ extern BOOL bDisableSeanet;
 extern BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 extern BOOL bDisableHokuyo;
 extern BOOL bDisableRPLIDAR;
+extern BOOL bDisableSRF02;
 extern BOOL bDisableMS580314BA;
 extern BOOL bDisableMS583730BA;
 extern BOOL bDisableP33x;
@@ -749,6 +750,19 @@ extern deque<interval> psihat_rplidar_history_vector;
 extern deque<interval> vrxhat_rplidar_history_vector;
 extern BOOL bPauseRPLIDAR, bRestartRPLIDAR;
 
+// SRF02 variables.
+extern double alpha_mes_srf02, d_mes_srf02;
+extern vector<interval> d_all_mes_srf02;
+extern deque<double> alpha_mes_srf02_vector;
+extern deque<double> d_mes_srf02_vector;
+extern deque< vector<interval> > d_all_mes_srf02_vector;
+extern deque<double> t_srf02_history_vector;
+extern deque<interval> xhat_srf02_history_vector;
+extern deque<interval> yhat_srf02_history_vector;
+extern deque<interval> psihat_srf02_history_vector;
+extern deque<interval> vrxhat_srf02_history_vector;
+extern BOOL bPauseSRF02, bRestartSRF02;
+
 // MS580314BA variables.
 extern BOOL bPauseMS580314BA, bRestartMS580314BA;
 
@@ -816,7 +830,8 @@ extern deque<interval> xhat_pololu_history_vector[MAX_NB_POLOLU];
 extern deque<interval> yhat_pololu_history_vector[MAX_NB_POLOLU];
 extern deque<interval> psihat_pololu_history_vector[MAX_NB_POLOLU];
 extern deque<interval> vrxhat_pololu_history_vector[MAX_NB_POLOLU];
-extern int ShowMaestroGetPositionPololu[MAX_NB_POLOLU];
+extern int ShowGetPositionMaestroPololu[MAX_NB_POLOLU];
+extern int SetPositionMaestroPololu[MAX_NB_POLOLU];
 extern BOOL bPausePololu[MAX_NB_POLOLU];
 extern BOOL bRestartPololu[MAX_NB_POLOLU];
 
@@ -826,10 +841,11 @@ extern BOOL bPauseMiniSSC, bRestartMiniSSC;
 // IM483I variables.
 extern BOOL bPauseIM483I, bRestartIM483I;
 
-#ifndef DISABLE_OPENCV_SUPPORT
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
+#ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* imgs[MAX_NB_VIDEO];
+#endif // !DISABLE_OPENCV_SUPPORT
 extern double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
 extern vector<interval> d_all_mes_video[MAX_NB_VIDEO];
 extern deque<double> alpha_mes_video_vector[MAX_NB_VIDEO];
@@ -842,7 +858,6 @@ extern deque<interval> psihat_video_history_vector[MAX_NB_VIDEO];
 extern deque<interval> vrxhat_video_history_vector[MAX_NB_VIDEO];
 extern BOOL bPauseVideo[MAX_NB_VIDEO];
 extern BOOL bRestartVideo[MAX_NB_VIDEO];
-#endif // !DISABLE_OPENCV_SUPPORT
 #pragma endregion
 
 // VideoRecord variables.
@@ -1246,17 +1261,19 @@ inline int InitGlobals(void)
 
 	for (i = 0; i < MAX_NB_POLOLU; i++)
 	{
-		ShowMaestroGetPositionPololu[i] = -1;
+		ShowGetPositionMaestroPololu[i] = -1;
+		SetPositionMaestroPololu[i] = -1;
 		bPausePololu[i] = FALSE;
 		bRestartPololu[i] = FALSE;
 	}
 
-#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < MAX_NB_VIDEO; i++)
 	{
 		InitCriticalSection(&imgsCS[i]);
+#ifndef DISABLE_OPENCV_SUPPORT
 		imgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(imgs[i], CV_RGB(0, 0, 0), NULL);
+#endif // !DISABLE_OPENCV_SUPPORT
 		bPauseVideo[i] = FALSE;
 		bRestartVideo[i] = FALSE;
 		InitCriticalSection(&VideoRecordRequestsCS[i]);
@@ -1275,10 +1292,11 @@ inline int InitGlobals(void)
 	for (i = 0; i < nbopencvgui; i++)
 	{
 		InitCriticalSection(&dispimgsCS[i]);
+#ifndef DISABLE_OPENCV_SUPPORT
 		dispimgs[i] = cvCreateImage(cvSize(opencvguiimgwidth[i], opencvguiimgheight[i]), IPL_DEPTH_8U, 3);
 		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
-	}
 #endif // !DISABLE_OPENCV_SUPPORT
+	}
 
 	InitCriticalSection(&SonarAltitudeEstimationCS);
 
@@ -1484,10 +1502,11 @@ inline int ReleaseGlobals(void)
 
 	DeleteCriticalSection(&SonarAltitudeEstimationCS);
 
-#ifndef DISABLE_OPENCV_SUPPORT
 	for (i = nbopencvgui-1; i >= 0; i--)
 	{
+#ifndef DISABLE_OPENCV_SUPPORT
 		cvReleaseImage(&dispimgs[i]);
+#endif // !DISABLE_OPENCV_SUPPORT
 		DeleteCriticalSection(&dispimgsCS[i]);
 	}
 
@@ -1506,16 +1525,18 @@ inline int ReleaseGlobals(void)
 		DeleteCriticalSection(&VideoRecordRequestsCS[i]);
 		bRestartVideo[i] = FALSE;
 		bPauseVideo[i] = FALSE;
+#ifndef DISABLE_OPENCV_SUPPORT
 		cvReleaseImage(&imgs[i]);
+#endif // !DISABLE_OPENCV_SUPPORT
 		DeleteCriticalSection(&imgsCS[i]);
 	}
-#endif // !DISABLE_OPENCV_SUPPORT
 
 	for (i = MAX_NB_POLOLU-1; i >= 0; i--)
 	{
 		bRestartPololu[i] = FALSE;
 		bPausePololu[i] = FALSE;
-		ShowMaestroGetPositionPololu[i] = -1;
+		SetPositionMaestroPololu[i] = -1;
+		ShowGetPositionMaestroPololu[i] = -1;
 	}
 
 	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)

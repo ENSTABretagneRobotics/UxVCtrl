@@ -170,18 +170,44 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			//e_obs = 0;
 		}
 
+/*
+		// For a sailboat, everything should be cast to a line following...
+
+		if (robid & SAILBOAT_CLASS_ROBID_MASK)
+		{
+			if (!bLineFollowingControl)
+			{
+				if (bWaypointControl)
+				{
+					wxa = ???; wya = ???; 
+					wxb = wx; wyb = wy;
+					phi = 
+					e = 
+					//bFakeLineFollowingControl = TRUE;
+					// Validation condition???
+				} 
+				else if (bHeadingControl)
+				{
+					wxa = ???; wya = ???; 
+					wxb = ???; wyb = ???;
+					phi = 
+					e = 
+					//bFakeLineFollowingControl = TRUE;
+				}
+			}
+		}
+*/
+
 		// Should modify here wpsi_obs depending on obstacles without modifying wpsi...
 		ObstacleAvoidance(&wpsi_obs);
 		
 		// All the code after that should use wpsi_obs instead of just wpsi...
 
-		if (bLineFollowingControl)
-		{
 #pragma region Sailboat supervisor
 
 			// Not sure of the behavior for sailboat when there is an obstacle...
 
-			if (robid & SAILBOAT_CLASS_ROBID_MASK)
+			if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bLineFollowingControl))//||(bWaypointControl)||(bHeadingControl)
 			{
 				double theta_star = wpsi_obs;
 				double psiw = Center(psitwindhat);
@@ -317,7 +343,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				}
 			}
 #pragma endregion
-		}
 
 		// Low-level controls.
 

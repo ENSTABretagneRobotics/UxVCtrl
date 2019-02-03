@@ -236,6 +236,8 @@ WMV2
 1
 % bDisableRPLIDAR
 1
+% bDisableSRF02
+1
 % bDisableMS580314BA
 1
 % bDisableMS583730BA

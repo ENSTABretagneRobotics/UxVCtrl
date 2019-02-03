@@ -1011,6 +1011,80 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+#ifdef DEVEL_WAITAREA
+	else if (sscanf(line, "waitareaconfig %255s %d %d", str, &ival1, &procid, &ival) == 4)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_WAITAREA))
+		{
+			EnterCriticalSection(&WaitAreaCS[ival]);
+			memset(WaitAreaFileName[ival], 0, MAX_BUF_LEN);
+			strcpy(WaitAreaFileName[ival], str);
+		bIn_waitarea[ival] = (ival1 != 0)? TRUE: FALSE; procid_waitarea[ival] = procid;
+			bWaitAreaDetected[ival] = FALSE;
+
+
+		FILE* farea = NULL;
+	char larea[MAX_BUF_LEN];
+	memset(larea, 0, sizeof(larea));
+	//nb_polygons = 0;
+	nb_points_area = 0;
+	points_area_x.clear();
+	points_area_y.clear();
+
+	farea = fopen(str, "r");
+	if (farea != NULL)
+	{
+		if (fgets3(farea, larea, sizeof(larea)) == NULL) printf("Invalid area file.\n");
+		if (sscanf(larea, "%d", &nb_points_area) != 1) printf("Invalid area file.\n");
+		for (i = 0; i < nb_points; i++)
+		{
+			if (fgets3(farea, larea, sizeof(larea)) == NULL) printf("Invalid area file.\n");
+			if (sscanf(larea, "%lf %lf", &dval1, &dval2) != 2) printf("Invalid area file.\n");
+			points_area_x.push_back(dval1);
+			points_area_y.push_back(dval2);
+		}
+		if (fclose(farea) != EXIT_SUCCESS) printf("fclose() failed.\n");
+	}
+	else
+	{
+		printf("Area file not found.\n");
+	}
+
+
+			LeaveCriticalSection(&WaitAreaCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}		
+	}
+	else if (sscanf(line, "enablewaitarea %d", &ival) == 1)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
+		{
+			EnterCriticalSection(&WaitAreaCS[ival]);
+			bWaitArea[ival] = TRUE;
+			LeaveCriticalSection(&WaitAreaCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "disablewaitarea %d", &ival) == 1)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
+		{
+			EnterCriticalSection(&WaitAreaCS[ival]);
+			bWaitArea[ival] = FALSE;
+			LeaveCriticalSection(&WaitAreaCS[ival]);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+#endif // DEVEL_WAITAREA
 	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
 	{
 		EnterCriticalSection(&FollowMeCS);
@@ -2466,6 +2540,28 @@ inline int Commands(char* line)
 		if (!ival1) bRestartRPLIDAR = TRUE;
 		bPauseRPLIDAR = ival1;
 	}
+	else if (sscanf(line, "srf02config %255s %d", str, &ival1) == 2)
+	{
+		if (strncmp(str, "SRF020.txt", strlen("SRF020.txt")) != 0)
+		{
+			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
+			if (buf)
+			{
+				if (fcopyload(str, "SRF020.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
+				{
+					printf("Unable to copy file.\n");
+				}
+				free(buf);
+			}
+			else
+			{
+				printf("Unable to allocate data.\n");
+			}
+		}
+		mSleep(500);
+		if (!ival1) bRestartSRF02 = TRUE;
+		bPauseSRF02 = ival1;
+	}
 	else if (sscanf(line, "ms580314baconfig %255s %d", str, &ival1) == 2)
 	{
 		if (strncmp(str, "MS580314BA0.txt", strlen("MS580314BA0.txt")) != 0)
@@ -2870,7 +2966,20 @@ inline int Commands(char* line)
 		if ((ival >= 0)&&(ival < MAX_NB_POLOLU))
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			ShowMaestroGetPositionPololu[ival] = ival1;
+			ShowGetPositionMaestroPololu[ival] = ival1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "setpositionmaestro %d %d %d", &ival, &ival1, &ival2) == 3)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_POLOLU))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			SetPositionMaestroPololu[ival] = ival1+100*ival2;
 			LeaveCriticalSection(&StateVariablesCS);
 		}
 		else

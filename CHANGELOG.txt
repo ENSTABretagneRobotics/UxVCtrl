@@ -1,3 +1,7 @@
+293
+Added preliminary SRF02 support.
+Added setpositionmaestro command.
+
 292
 Updated SeanetProcessing.cpp.
 

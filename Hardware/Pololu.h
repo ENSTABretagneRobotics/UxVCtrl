@@ -823,6 +823,22 @@ inline int GetTelemetersPololu(POLOLU* pPololu, double* pDist1, double* pDist2, 
 	return EXIT_SUCCESS;
 }
 
+// duration in us.
+inline int SetPulsePololu(POLOLU* pPololu, int channel, int duration)
+{
+	if (SetPWMPololu(pPololu, channel, 2000) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	mSleep(duration/1000);
+	if (SetPWMPololu(pPololu, channel, 1000) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 inline int CheckPololu(POLOLU* pPololu)
 {
 	if (SetRudderPololu(pPololu, -0.25) != EXIT_SUCCESS)

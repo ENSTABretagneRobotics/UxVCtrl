@@ -178,6 +178,8 @@
 %
 %rplidarconfig RPLIDAR.txt bPause
 %
+%srf02config SRF02.txt bPause
+%
 %ms580314baconfig MS580314BA.txt bPause
 %
 %ms583730baconfig MS583730BA.txt bPause
@@ -210,7 +212,9 @@
 %
 %videoconfig videoid Video.txt bPause
 %
-%showgetpositionmaestro deviceid channel
+%showgetpositionmaestro deviceid channel (channel : int [0,24])
+%
+%setpositionmaestro deviceid channel pwm (channel : int [0,24], pwm : int [500,2500] PWM in us)
 %
 %statustextmavlinkdevice deviceid bDisplay
 %

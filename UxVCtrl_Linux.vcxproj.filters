@@ -279,6 +279,15 @@
     <ClCompile Include="VideoInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\SRF02.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OSUtils\OSComputerI2CBus.c">
+      <Filter>OSUtils</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\I2CBus.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -638,6 +647,15 @@
     <ClInclude Include="VideoInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\SRF02.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OSUtils\OSComputerI2CBus.h">
+      <Filter>OSUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\I2CBus.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
@@ -784,6 +802,9 @@
     </None>
     <None Include="restore\log\ReadMe.txt">
       <Filter>restore\log</Filter>
+    </None>
+    <None Include="SRF020.txt">
+      <Filter>Input Files</Filter>
     </None>
   </ItemGroup>
 </Project>

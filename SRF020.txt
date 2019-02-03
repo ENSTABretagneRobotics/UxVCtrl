@@ -1,0 +1,256 @@
+% I2C bus
+/dev/i2c-1
+% nbretries
+2
+% Timeout (in ms)
+2000
+% bSaveRawData
+1
+% RangingDelay (in ms)
+66
+% nbdevices
+5
+% Device 0
+% addr
+0x70
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 1
+% addr
+0x71
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 2
+% addr
+0x72
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 3
+% addr
+0x73
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 4
+% addr
+0x74
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 5
+% addr
+0x75
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 6
+% addr
+0x76
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 7
+% addr
+0x77
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 8
+% addr
+0x78
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 9
+% addr
+0x79
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 10
+% addr
+0x7A
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 11
+% addr
+0x7B
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 12
+% addr
+0x7C
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 13
+% addr
+0x7D
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 14
+% addr
+0x7E
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% Device 15
+% addr
+0x7F
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
+% alpha_max_err (in rad)
+0.01
+% d_max_err (in m)
+0.1
