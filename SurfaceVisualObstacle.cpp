@@ -399,7 +399,7 @@ cv::Point2f detectObstacle(cv::Mat src, char weather, int boatSize){
     Point2f massCenter = seaContour(srcObsInit, srcCroppedHD);
 
     if(massCenter == cv::Point2f(0,0)){return cv::Point2f(-1, 0);}
-    char obs = (char)obstacleDetected(massCenter, srcCroppedHD);
+    signed char obs = (signed char)obstacleDetected(massCenter, srcCroppedHD);
   //  imshow("output", srcCroppedHD);
     /* Analyse de l'obstacle trouve pour determiner sa position par rapport au bateau */
 

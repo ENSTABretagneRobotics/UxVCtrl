@@ -24,7 +24,7 @@ COM12
 % bDisableArmingCheck
 0
 % bOverridePWMAtStartup
-1
+0
 % bForceStabilizeModeAtStartup
 0
 % bArmAtStartup
@@ -43,6 +43,8 @@ COM12
 1
 % ManualControlMode (-1 to disable, 0 to send RC_OVERRIDE, 1 to send MANUAL_CONTROL, 2 to send RC_OVERRIDE+MANUAL_CONTROL (only joystick buttons), 3 to send SET_ATTITUDE_TARGET (Copter needs to be in Guided mode) MAVLink messages)
 0
+% bDefaultDisablePWMOverride
+1
 % overridechan (RC input channel used to disable RC override, from 1 to 18)
 6
 % channel 0

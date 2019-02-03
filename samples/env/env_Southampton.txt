@@ -4,6 +4,12 @@
 50.817721
 -1.309401
 0
+% AirPressure (pressure in bar)
+1
+% WaterVelocityOfSound (in m/s)
+1530
+% WaterFloorAltitude (in the environment coordinate system in m)
+-3
 % Number of circles
 0
 % x  y  r (in m)

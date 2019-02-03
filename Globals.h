@@ -516,6 +516,7 @@ extern int simulatorperiod;
 
 // Environment parameters.
 extern double angle_env, lat_env, long_env, alt_env;
+extern double AirPressure, WaterVelocityOfSound, WaterFloorAltitude;
 extern int nb_circles, nb_walls;
 extern vector<double> circles_x, circles_y, circles_r;
 extern vector<double> walls_xa, walls_ya, walls_xb, walls_yb;
@@ -794,6 +795,7 @@ extern BOOL bPauseublox[MAX_NB_UBLOX];
 extern BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
+extern BOOL bEnableMAVLinkDeviceIN[MAX_NB_MAVLINKDEVICE];
 extern BOOL bDisplayStatusTextMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern int custom_modeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern int iArmMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -1242,6 +1244,7 @@ inline int InitGlobals(void)
 
 	for (i = 0; i < MAX_NB_MAVLINKDEVICE; i++)
 	{
+		bEnableMAVLinkDeviceIN[i] = FALSE;
 		bDisplayStatusTextMAVLinkDevice[i] = FALSE;
 		custom_modeMAVLinkDevice[i] = -1;
 		iArmMAVLinkDevice[i] = -1;
@@ -1279,9 +1282,11 @@ inline int InitGlobals(void)
 		InitCriticalSection(&VideoRecordRequestsCS[i]);
 		VideoRecordRequests[i] = 0;
 		bVideoRecordRestart[i] = FALSE;
+#ifndef DISABLE_OPENCV_SUPPORT
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+#endif // !DISABLE_OPENCV_SUPPORT
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
 		endvideorecordfiles[i] = NULL;
 		memset(endvideorecordfilenames[i], 0, sizeof(endvideorecordfilenames[i]));
@@ -1517,9 +1522,11 @@ inline int ReleaseGlobals(void)
 		memset(endvideorecordfilenames[i], 0, sizeof(endvideorecordfilenames[i]));
 		endvideorecordfiles[i] = NULL;
 		memset(videorecordfilenames[i], 0, sizeof(videorecordfilenames[i]));
+#ifndef DISABLE_OPENCV_SUPPORT
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		videorecordfiles[i] = NULL;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+#endif // !DISABLE_OPENCV_SUPPORT
 		bVideoRecordRestart[i] = FALSE;
 		VideoRecordRequests[i] = 0;
 		DeleteCriticalSection(&VideoRecordRequestsCS[i]);
@@ -1556,6 +1563,7 @@ inline int ReleaseGlobals(void)
 		iArmMAVLinkDevice[i] = -1;
 		custom_modeMAVLinkDevice[i] = -1;
 		bDisplayStatusTextMAVLinkDevice[i] = FALSE;
+		bEnableMAVLinkDeviceIN[i] = FALSE;
 	}
 
 	for (i = MAX_NB_UBLOX-1; i >= 0; i--)

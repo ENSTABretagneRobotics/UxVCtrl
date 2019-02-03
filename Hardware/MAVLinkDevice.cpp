@@ -17,6 +17,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	MAVLINKDATA mavlinkdata;
 	int selectedchannels[NB_CHANNELS_PWM_MAVLINKDEVICE];
 	int pws[NB_CHANNELS_PWM_MAVLINKDEVICE];
+	uint16_t chan_tmp = 0;
 	int x_axis = 0, y_axis = 0, z_axis = 0, r_axis = 0;
 	unsigned int buttons = 0;
 	int custom_mode = -1, iArm = -1, setattitudetargetperiod = -1, setattitudetargettype = -1;
@@ -292,69 +293,127 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						ibat1 = mavlinkdata.sys_status.current_battery*0.01;
 						ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
 					}
-
+					
+					if ((mavlinkdata.rc_channels.chancount > 0)&&(bEnableMAVLinkDeviceIN[deviceid]))
+					{
+						switch (robid)
+						{
+						case BUBBLE_ROBID:
+						case MOTORBOAT_SIMULATOR_ROBID:
+						case MOTORBOAT_ROBID:
+						case SAILBOAT_SIMULATOR_ROBID:
+						case VAIMOS_ROBID:
+						case SAILBOAT_ROBID:
+						case SAILBOAT2_ROBID:
+						case TANK_SIMULATOR_ROBID:
+						case ETAS_WHEEL_ROBID:
+						case BUGGY_SIMULATOR_ROBID:
+						case BUGGY_ROBID:
+							if ((mavlinkdata.rc_channels.chan3_raw)&&(mavlinkdata.rc_channels.chan3_raw != 65535)) u = (mavlinkdata.rc_channels.chan3_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan1_raw)&&(mavlinkdata.rc_channels.chan1_raw != 65535)) uw = (mavlinkdata.rc_channels.chan1_raw-1500.0)/500.0;
+							break;
+						case BLUEROV_ROBID:
+							if ((mavlinkdata.rc_channels.chan1_raw)&&(mavlinkdata.rc_channels.chan1_raw != 65535)) up = (mavlinkdata.rc_channels.chan1_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan2_raw)&&(mavlinkdata.rc_channels.chan2_raw != 65535)) ur = (mavlinkdata.rc_channels.chan2_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan3_raw)&&(mavlinkdata.rc_channels.chan3_raw != 65535)) uv = (mavlinkdata.rc_channels.chan3_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan4_raw)&&(mavlinkdata.rc_channels.chan4_raw != 65535)) uw = -(mavlinkdata.rc_channels.chan4_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan5_raw)&&(mavlinkdata.rc_channels.chan5_raw != 65535)) u = (mavlinkdata.rc_channels.chan5_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan6_raw)&&(mavlinkdata.rc_channels.chan6_raw != 65535)) ul = -(mavlinkdata.rc_channels.chan6_raw-1500.0)/500.0;
+							break;
+						case QUADRO_SIMULATOR_ROBID:
+						case COPTER_ROBID:
+						case ARDUCOPTER_ROBID:
+						default:
+							if ((mavlinkdata.rc_channels.chan1_raw)&&(mavlinkdata.rc_channels.chan1_raw != 65535)) ul = -(mavlinkdata.rc_channels.chan1_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan2_raw)&&(mavlinkdata.rc_channels.chan2_raw != 65535)) u = -(mavlinkdata.rc_channels.chan2_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan3_raw)&&(mavlinkdata.rc_channels.chan3_raw != 65535)) uv = (mavlinkdata.rc_channels.chan3_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan4_raw)&&(mavlinkdata.rc_channels.chan4_raw != 65535)) uw = -(mavlinkdata.rc_channels.chan4_raw-1500.0)/500.0;
+							break;
+						}
+					}
+#pragma region overridechan
 					if (mavlinkdata.rc_channels.chancount >= mavlinkdevice.overridechan)
 					{
 						switch (mavlinkdevice.overridechan)
 						{
 						case 1:
-							if (mavlinkdata.rc_channels.chan1_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan1_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan1_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 2:
-							if (mavlinkdata.rc_channels.chan2_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan2_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan2_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 3:
-							if (mavlinkdata.rc_channels.chan3_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan3_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan3_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 4:
-							if (mavlinkdata.rc_channels.chan4_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan4_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan4_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 5:
-							if (mavlinkdata.rc_channels.chan5_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan5_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan5_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 6:
-							if (mavlinkdata.rc_channels.chan6_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan6_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan6_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 7:
-							if (mavlinkdata.rc_channels.chan7_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan7_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan7_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 8:
-							if (mavlinkdata.rc_channels.chan8_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan8_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan8_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 9:
-							if (mavlinkdata.rc_channels.chan9_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan9_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan9_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 10:
-							if (mavlinkdata.rc_channels.chan10_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan10_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan10_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 11:
-							if (mavlinkdata.rc_channels.chan11_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan11_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan11_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 12:
-							if (mavlinkdata.rc_channels.chan12_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan12_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan12_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 13:
-							if (mavlinkdata.rc_channels.chan13_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan13_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan13_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 14:
-							if (mavlinkdata.rc_channels.chan14_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan14_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan14_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 15:
-							if (mavlinkdata.rc_channels.chan15_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan15_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan15_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 16:
-							if (mavlinkdata.rc_channels.chan16_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan16_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan16_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 17:
-							if (mavlinkdata.rc_channels.chan17_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan17_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan17_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						case 18:
-							if (mavlinkdata.rc_channels.chan18_raw != 65535) mavlinkdevice.bDisablePWMOverride = (mavlinkdata.rc_channels.chan18_raw > 1750)? TRUE: FALSE;
+							chan_tmp = mavlinkdata.rc_channels.chan18_raw;
+							mavlinkdevice.bDisablePWMOverride = ((chan_tmp != 65535)&&(chan_tmp > 1750))? !mavlinkdevice.bDefaultDisablePWMOverride: mavlinkdevice.bDefaultDisablePWMOverride;
 							break;
 						default:
 							break;
 						}
 					}
+#pragma endregion
+					if (mavlinkdata.rc_channels.chancount <= 0) mavlinkdevice.bDisablePWMOverride = mavlinkdevice.bDefaultDisablePWMOverride; // Loss of RC?
 					vswitch = mavlinkdevice.bDisablePWMOverride? 0: 5;
 #pragma endregion
 #pragma region COMMANDS GLOBAL VARIABLES

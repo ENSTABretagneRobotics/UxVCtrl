@@ -232,7 +232,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 
 		EnterCriticalSection(&StateVariablesCS);
 #pragma region FUSION
-		nb_alpha_mes_total = alpha_mes_simulator_vector.size()+alpha_mes_seanet_vector.size()+alpha_mes_hokuyo_vector.size()+alpha_mes_rplidar_vector.size();
+		nb_alpha_mes_total = alpha_mes_simulator_vector.size()+alpha_mes_seanet_vector.size()+alpha_mes_hokuyo_vector.size()+alpha_mes_rplidar_vector.size()+alpha_mes_srf02_vector.size();
 		for (k = 0; k < MAX_NB_POLOLU; k++)
 		{
 			nb_alpha_mes_total += alpha_mes_pololu_vector[k].size();
@@ -358,6 +358,37 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			yhat_history_vector.push_back(yhat_rplidar_history_vector[i]);
 			psihat_history_vector.push_back(psihat_rplidar_history_vector[i]);
 			vrxhat_history_vector.push_back(vrxhat_rplidar_history_vector[i]);
+			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			{
+				alpha_mes_vector.pop_front();
+				d_mes_vector.pop_front();
+				d_all_mes_vector.pop_front();
+				t_history_vector.pop_front();
+				xhat_history_vector.pop_front();
+				yhat_history_vector.pop_front();
+				psihat_history_vector.pop_front();
+				vrxhat_history_vector.pop_front();
+			}
+		}
+		for (i = 0; i < (int)alpha_mes_srf02_vector.size(); i++)
+		{
+			alpha_mes = alpha_mes_srf02;
+			d_mes = d_mes_srf02;
+
+			d_all_mes.clear();
+			for (j = 0; j < (int)d_all_mes_srf02.size(); j++)
+			{
+				d_all_mes.push_back(d_all_mes_srf02[j]);
+			}
+
+			alpha_mes_vector.push_back(alpha_mes_srf02_vector[i]);
+			d_mes_vector.push_back(d_mes_srf02_vector[i]);
+			d_all_mes_vector.push_back(d_all_mes_srf02_vector[i]);
+			t_history_vector.push_back(t_srf02_history_vector[i]);
+			xhat_history_vector.push_back(xhat_srf02_history_vector[i]);
+			yhat_history_vector.push_back(yhat_srf02_history_vector[i]);
+			psihat_history_vector.push_back(psihat_srf02_history_vector[i]);
+			vrxhat_history_vector.push_back(vrxhat_srf02_history_vector[i]);
 			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
 			{
 				alpha_mes_vector.pop_front();

@@ -1,6 +1,10 @@
+Gotoopi opiid
+Regsettoheading
+Regsettox
+Regsettoz
+
 CorrectImageBordersRawBGR() : param nbpixborder devrait pas être en dur...
 
-mavlinkdevice.overridechan : si on éteint la télécommande, faut-il laisser le PWM override ou laisser le RTL s'activer?->rajouter param bDefaultDisablePWMOverride pour qu'on puisse choisir la logique souhaitée...
 récupérer les entrées de la télécommande sur le MAVLinkDevice comme entrées et les corriger avec évitement doit être possible si on utilise setattitudetarget en guided, rajouter commande pour gérer cela...
 add a third MAVLinkDevice?
 pouvoir gérer followme avec nmeainterface, bExternal...
@@ -9,7 +13,7 @@ rajouter support setekforigin
 Altitude_AGL : avec vertical lidar-lite et/ou px4f ground_distance, corriger avec roll pitch et ne pas prendre en compte si roll pitch trop élevés, si lidar pas dispo, utiliser la dernière altitude_agl valide avec les variations d'altitude mesurée par baro et/ou GPS
 Altitude : c'est l'altitude par rapport au repère env.txt (où l'altitude GPS est en général donnée) ou alors en option affichée en wgs, si GPS pas dispo ou pour fusionner, utiliser la variation de pression par rapport à l'origine de l'env (qui pourrait en option être prise comme la pression au démarrage ou l'armement du robot...)
 
-Rajouter pression air à l'origine de l'env et vitesse son eau, altitude of sea floor dans env.txt
+estimation altitude of sea floor à partir de celle dans env.txt et des autres mesures d'altitude
 
 Should add code in Observer that make the fusion depending on the robot and the sensors currently enabled, do not update z_mes directly in the sensors files... 
 baro data from mavlink, sbg, mt...
@@ -27,7 +31,7 @@ Obstacle avoidance, loiter
 u_obs...
 
 support de 12 telem max dont config 8+2, GetTelemetersPololu(tableau)...?
-ouverture angulaire des sonars, rajouter param anolginputbeam?
+ouverture angulaire des sonars, rajouter param analoginputbeam?->un peu déjà géré par alpha_max_err mais suppose que tous les télémètres sont identiques...
 rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
 
 Faire en sorte que le drone reste en position par rapport aux obstacles (distancecontrol en u et ul)
@@ -366,6 +370,7 @@ Utilisation de headingreg et depthreg pendant staticloc, mouvements dus au propu
 seanet : index_scanlines est peut-être moyennement géré si sector scan...
 données aberrantes vrxhat dans logstate?
 vhat->vxhat, vhat=Cabs(Sqrt(Sqr(vxhat)+..., vhat=Cequal(sog) if gps... vr...
+SRF02 gérer usb iss rs232 et i2c rpi
 hokuyo/RPLIDAR device like sonar, tool to convert data files to seanet, should make getlatestmessage able to handle all messages types since the device can send messages continuously...
 flux acoustique sur un mur pas tout à fait droit...
 LIDAR/sonar : estimer vitesse longi (peut-être pas lat, ça peut être vraiment faux...) si le cap change peu et les obstacles changent peu avec le faisceau avant et arrière
@@ -611,6 +616,19 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+messages rc_override ne peuvent être envoyés que juste au début si bOverridePWMAtStartup ou ManualControlMode==0 ou 2
+
+mode auto : rc_override envoie des valeurs différents de 0 et 65535 pour certains channels->bDisablePWMOverride==TRUE
+mode télécommandé : rc_override envoie 0 pour tous les channels qui ont pu être modifiés->bDisablePWMOverride==FALSE
+
+overridechan est tout le temps surveillé si chancount >= overridechan et overridechan entre 1 et 18, sinon il n'est pas utilisé
+
+bDisablePWMOverride est déterminé en fonction de overridechan et bDefaultDisablePWMOverride
+
+au début ou si perte de connexion avec la télécommande, bDisablePWMOverride=bDefaultDisablePWMOverride
+perte de connexion avec la télécommande : chancount <= 0 ou chan de overridechan à 0 ou 65535
+si overridechan>1750 et != 65535 bDisablePWMOverride=!bDefaultDisablePWMOverride
 
 1 DO pour trigger sonars quand on veut->utiliser extra1chan
 

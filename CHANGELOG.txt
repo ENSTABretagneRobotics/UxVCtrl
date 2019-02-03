@@ -1,3 +1,8 @@
+294
+Added AirPressure, WaterVelocityOfSound, WaterFloorAltitude parameters to env.txt.
+Added bDefaultDisablePWMOverride parameter to MAVLinkDevice.
+Added mavlinkdevicein command.
+
 293
 Added preliminary SRF02 support.
 Added setpositionmaestro command.

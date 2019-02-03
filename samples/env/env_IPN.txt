@@ -3,7 +3,13 @@
 % Latitude, longitude, altitude of the environment coordinate system w.r.t. East - North - Up coordinate system (in decimal deg and m)
 19.499828
 -99.137749
-0
+2238
+% AirPressure (pressure in bar)
+0.8
+% WaterVelocityOfSound (in m/s)
+1475
+% WaterFloorAltitude (in the environment coordinate system in m)
+-2.5
 % Number of circles
 0
 % x  y  r (in m)

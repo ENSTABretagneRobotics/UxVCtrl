@@ -224,6 +224,8 @@
 %
 %setattitudetargetmavlinkdevice deviceid period type roll pitch yaw roll_rate pitch_rate yaw_rate thrust (Copter needs to be in Guided mode for SET_ATTITUDE_TARGET MAVLink message, period = -1 disables sending, type = 0 sends directly the parameters to the autopilot, type = 1 uses keyboard)
 %
+%mavlinkdevicein deviceid bEnable
+%
 % ACOUSTIC COMMANDS
 %
 %%rngacousticmodem nbretries retryperiod (send rng and wait for the result)

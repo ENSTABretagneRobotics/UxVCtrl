@@ -3048,6 +3048,19 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (sscanf(line, "mavlinkdevicein %d %d", &ival, &ival1) == 2)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			bEnableMAVLinkDeviceIN[ival] = ival1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS
 	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...

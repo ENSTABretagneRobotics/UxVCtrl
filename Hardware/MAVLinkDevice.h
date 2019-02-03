@@ -103,6 +103,7 @@ struct MAVLINKDEVICE
 	int target_component;
 	BOOL bForceDefaultMAVLink1;
 	int ManualControlMode;
+	BOOL bDefaultDisablePWMOverride;
 	int overridechan;
 	int MinPWs[NB_CHANNELS_PWM_MAVLINKDEVICE];
 	int MidPWs[NB_CHANNELS_PWM_MAVLINKDEVICE];
@@ -671,6 +672,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		pMAVLinkDevice->target_component = 0;
 		pMAVLinkDevice->bForceDefaultMAVLink1 = 1;
 		pMAVLinkDevice->ManualControlMode = 0;
+		pMAVLinkDevice->bDefaultDisablePWMOverride = 1;
 		pMAVLinkDevice->overridechan = 17;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MAVLINKDEVICE; channel++)
 		{
@@ -731,6 +733,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (sscanf(line, "%d", &pMAVLinkDevice->bForceDefaultMAVLink1) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->ManualControlMode) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->bDefaultDisablePWMOverride) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->overridechan) != 1) printf("Invalid configuration file.\n");
 
@@ -798,7 +802,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			(pMAVLinkDevice->MidPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAVLINKDEVICE)||(pMAVLinkDevice->MidPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAVLINKDEVICE)||
 			(pMAVLinkDevice->MaxPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAVLINKDEVICE)||(pMAVLinkDevice->MaxPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAVLINKDEVICE)
 			||(
-			(pMAVLinkDevice->InitPWs[channel] != 0)&&
+			(pMAVLinkDevice->InitPWs[channel] != 0)&&(pMAVLinkDevice->InitPWs[channel] != 65535)&&
 			((pMAVLinkDevice->InitPWs[channel] < DEFAULT_ABSOLUTE_MIN_PW_MAVLINKDEVICE)||(pMAVLinkDevice->InitPWs[channel] > DEFAULT_ABSOLUTE_MAX_PW_MAVLINKDEVICE)||
 			(pMAVLinkDevice->MinPWs[channel] > pMAVLinkDevice->InitPWs[channel])||(pMAVLinkDevice->InitPWs[channel] > pMAVLinkDevice->MaxPWs[channel]))			
 			)||
@@ -817,7 +821,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		}
 	}
 
-	pMAVLinkDevice->bDisablePWMOverride = FALSE;
+	pMAVLinkDevice->bDisablePWMOverride = pMAVLinkDevice->bDefaultDisablePWMOverride;
 	pMAVLinkDevice->bDisplayStatusText = TRUE;
 
 	// Used to save raw data, should be handled specifically...

@@ -287,6 +287,7 @@ int simulatorperiod = 0;
 
 // Environment parameters.
 double angle_env = 0, lat_env = 0, long_env = 0, alt_env = 0;
+double AirPressure = 0, WaterVelocityOfSound = 0, WaterFloorAltitude = 0;
 int nb_circles = 0, nb_walls = 0;
 vector<double> circles_x, circles_y, circles_r;
 vector<double> walls_xa, walls_ya, walls_xb, walls_yb;
@@ -570,6 +571,7 @@ BOOL bPauseublox[MAX_NB_UBLOX];
 BOOL bRestartublox[MAX_NB_UBLOX];
 
 // MAVLinkDevice variables.
+BOOL bEnableMAVLinkDeviceIN[MAX_NB_MAVLINKDEVICE];
 BOOL bDisplayStatusTextMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 int custom_modeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 int iArmMAVLinkDevice[MAX_NB_MAVLINKDEVICE];

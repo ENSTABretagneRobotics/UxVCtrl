@@ -162,6 +162,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	char Name[17];
 	int nbparams = 6;
 	BOOL bForceOverrideInputs_prev = bForceOverrideInputs;
+	uint16_t chan_tmp = 0;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
 	double speed = 0, Rate = 0, Alt = 0, Deg = 0, angle = 0, Delay = 0, Lat = 0, Lon = 0;
 	int Dir = 0, rel = 0, Current = 0;
@@ -457,60 +458,78 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						switch (MAVLinkInterface_overridechan)
 						{
 						case 1:
-							if (rc_channels_override.chan1_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan1_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan1_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 2:
-							if (rc_channels_override.chan2_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan2_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan2_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 3:
-							if (rc_channels_override.chan3_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan3_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan3_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 4:
-							if (rc_channels_override.chan4_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan4_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan4_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 5:
-							if (rc_channels_override.chan5_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan5_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan5_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 6:
-							if (rc_channels_override.chan6_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan6_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan6_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 7:
-							if (rc_channels_override.chan7_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan7_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan7_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 8:
-							if (rc_channels_override.chan8_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan8_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan8_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 							// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
 #ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						case 9:
-							if (rc_channels_override.chan9_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan9_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan9_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 10:
-							if (rc_channels_override.chan10_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan10_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan10_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 11:
-							if (rc_channels_override.chan11_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan11_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan11_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 12:
-							if (rc_channels_override.chan12_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan12_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan12_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 13:
-							if (rc_channels_override.chan13_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan13_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan13_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 14:
-							if (rc_channels_override.chan14_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan14_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan14_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 15:
-							if (rc_channels_override.chan15_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan15_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan15_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 16:
-							if (rc_channels_override.chan16_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan16_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan16_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 17:
-							if (rc_channels_override.chan17_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan17_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan17_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 						case 18:
-							if (rc_channels_override.chan18_raw != 65535) MAVLinkInterface_bDisablePWMOverride = (rc_channels_override.chan18_raw > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
+							chan_tmp = rc_channels_override.chan18_raw;
+							if (chan_tmp != 65535) MAVLinkInterface_bDisablePWMOverride = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultDisablePWMOverride: MAVLinkInterface_bDefaultDisablePWMOverride;
 							break;
 #endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						default:
@@ -521,60 +540,78 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						switch (MAVLinkInterface_forceoverrideinputschan)
 						{
 						case 1:
-							if (rc_channels_override.chan1_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan1_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan1_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 2:
-							if (rc_channels_override.chan2_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan2_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan2_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 3:
-							if (rc_channels_override.chan3_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan3_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan3_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 4:
-							if (rc_channels_override.chan4_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan4_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan4_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 5:
-							if (rc_channels_override.chan5_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan5_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan5_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 6:
-							if (rc_channels_override.chan6_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan6_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan6_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 7:
-							if (rc_channels_override.chan7_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan7_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan7_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 8:
-							if (rc_channels_override.chan8_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan8_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan8_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 							// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
 #ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						case 9:
-							if (rc_channels_override.chan9_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan9_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan9_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 10:
-							if (rc_channels_override.chan10_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan10_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan10_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 11:
-							if (rc_channels_override.chan11_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan11_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan11_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 12:
-							if (rc_channels_override.chan12_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan12_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan12_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 13:
-							if (rc_channels_override.chan13_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan13_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan13_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 14:
-							if (rc_channels_override.chan14_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan14_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan14_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 15:
-							if (rc_channels_override.chan15_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan15_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan15_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 16:
-							if (rc_channels_override.chan16_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan16_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan16_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 17:
-							if (rc_channels_override.chan17_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan17_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan17_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 						case 18:
-							if (rc_channels_override.chan18_raw != 65535) bForceOverrideInputs = (rc_channels_override.chan18_raw > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
+							chan_tmp = rc_channels_override.chan18_raw;
+							if (chan_tmp != 65535) bForceOverrideInputs = (chan_tmp > 1750)? !MAVLinkInterface_bDefaultForceOverrideInputs: MAVLinkInterface_bDefaultForceOverrideInputs;
 							break;
 #endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 						default:
@@ -617,23 +654,42 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 								}
 								break;
 							case BLUEROV_ROBID:
+								if (bForceOverrideInputs)
+								{
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) up_ovrid = (rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) ur_ovrid = (rc_channels_override.chan2_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) uv_ovrid = (rc_channels_override.chan3_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) uw_ovrid = -(rc_channels_override.chan4_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan5_raw)&&(rc_channels_override.chan5_raw != 65535)) u_ovrid = (rc_channels_override.chan5_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan6_raw)&&(rc_channels_override.chan6_raw != 65535)) ul_ovrid = -(rc_channels_override.chan6_raw-1500.0)/500.0;
+								}
+								else
+								{
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) up = (rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) ur = (rc_channels_override.chan2_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) uv = (rc_channels_override.chan3_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) uw = -(rc_channels_override.chan4_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan5_raw)&&(rc_channels_override.chan5_raw != 65535)) u = (rc_channels_override.chan5_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan6_raw)&&(rc_channels_override.chan6_raw != 65535)) ul = -(rc_channels_override.chan6_raw-1500.0)/500.0;
+								}
+								break;
 							case QUADRO_SIMULATOR_ROBID:
 							case COPTER_ROBID:
 							case ARDUCOPTER_ROBID:
 							default:
 								if (bForceOverrideInputs)
 								{
-									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw_ovrid = (rc_channels_override.chan1_raw-1500.0)/500.0;
-									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) u_ovrid = (rc_channels_override.chan2_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) ul_ovrid = -(rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) u_ovrid = -(rc_channels_override.chan2_raw-1500.0)/500.0;
 									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) uv_ovrid = (rc_channels_override.chan3_raw-1500.0)/500.0;
-									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) ul_ovrid = (rc_channels_override.chan4_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) uw_ovrid = -(rc_channels_override.chan4_raw-1500.0)/500.0;
 								}
 								else
 								{
-									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
-									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) u = (rc_channels_override.chan2_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) ul = -(rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan2_raw)&&(rc_channels_override.chan2_raw != 65535)) u = -(rc_channels_override.chan2_raw-1500.0)/500.0;
 									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) uv = (rc_channels_override.chan3_raw-1500.0)/500.0;
-									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) ul = (rc_channels_override.chan4_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan4_raw)&&(rc_channels_override.chan4_raw != 65535)) uw = -(rc_channels_override.chan4_raw-1500.0)/500.0;
 								}
 								break;
 							}
