@@ -114,7 +114,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					angle = anglestsort[i]; // Angle of the transducer in degrees.
 					memcpy(scanline, wtftsort+i*NBins, NBins);
 
-					alpha_mes_seanet = fmod_2PI(-M_PI*angle/180.0); // Angle of the transducer in rad.
+					alpha_mes_seanet = sdir*fmod_2PI(-M_PI*angle/180.0)+Center(alphashat); // Angle of the transducer in rad, corrected.
 
 					minDist = 0.75;
 					maxDist = rangescale-d_max_err;
@@ -515,35 +515,35 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 				{
 					// Might be infinity, but does not seem to be a problem...
-					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+					DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 				}
 				break;
 			case SONAR_IMG_LEVER_ARMS_PSI:
 				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 				{
 					// Might be infinity, but does not seem to be a problem...
-					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+					DrawObstacleDistError(0, 0, alpha_mes_vector[i]+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 				}
 				break;
 			case SONAR_IMG_LEVER_ARMS_PSI_POS:
 				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 				{
 					// Might be infinity, but does not seem to be a problem...
-					DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+					DrawObstacleDistError(Center(xhat), Center(yhat), alpha_mes_vector[i]+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 				}
 				break;
 			case SONAR_IMG_LEVER_ARMS_HIST_PSI:
 				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 				{
 					// Might be infinity, but does not seem to be a problem...
-					DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+					DrawObstacleDistError(0, 0, alpha_mes_vector[i]+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 				}
 				break;
 			case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
 				for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 				{
 					// Might be infinity, but does not seem to be a problem...
-					DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+					DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), alpha_mes_vector[i]+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 				}
 				break;
 			default:
@@ -564,7 +564,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
-						DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+						DrawObstacleDistError(0, 0, alpha_mes_vector[i]+M_PI/2.0, Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
 				}
 				break;
@@ -574,7 +574,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
-						DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+						DrawObstacleDistError(0, 0, alpha_mes_vector[i]+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
 				}
 				break;
@@ -584,7 +584,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
-						DrawObstacleDistError(Center(xhat), Center(yhat), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+						DrawObstacleDistError(Center(xhat), Center(yhat), alpha_mes_vector[i]+Center(psihat), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
 				}
 				break;
@@ -594,7 +594,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
-						DrawObstacleDistError(0, 0, sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+						DrawObstacleDistError(0, 0, alpha_mes_vector[i]+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
 				}
 				break;
@@ -604,7 +604,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 					for (j = 0; j < (int)d_all_mes_vector[i].size(); j++)
 					{
 						// Might be infinity, but does not seem to be a problem...
-						DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), sdir*alpha_mes_vector[i]+Center(alphashat)+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
+						DrawObstacleDistError(Center(xhat_history_vector[i]), Center(yhat_history_vector[i]), alpha_mes_vector[i]+Center(psihat_history_vector[i]), Center(d_all_mes_vector[i][j]), 0.5*Width(d_all_mes_vector[i][j])+d_max_err, colorsonarlidar, overlayimage);
 					}
 				}
 				break;

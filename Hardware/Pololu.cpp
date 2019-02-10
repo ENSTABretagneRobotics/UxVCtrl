@@ -609,11 +609,13 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				}
 				mSleep(10);
 				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
-					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1))
+					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1)&&
+					(pololu.telem9analoginputchan != -1)&&(pololu.telem10analoginputchan != -1))
 				{
-					// Assume 8 planar telemeters...
-					nbhtelemeters = 8;
-					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], &distances[6], &distances[7]) != EXIT_SUCCESS)
+					// Assume 8 planar+2 up vertical telemeters...
+					nbhtelemeters = 10;
+					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], 
+						&distances[6], &distances[7], &distances[8], &distances[9], &distances[10], &distances[11]) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
@@ -649,6 +651,14 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
 					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
 					set_htelemeters_vectors_Pololu(angles, distances, nbhtelemeters, tv, deviceid);
+					
+					// Up vertical...
+					i = pololu.telem9analoginputchan;
+					z = pololu.analoginputz[i]+distances[i];
+					i = pololu.telem10analoginputchan;
+					z = min(z, pololu.analoginputz[i]+distances[i]);
+					distance_above = z;
+
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
@@ -656,7 +666,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				{
 					// Assume 4 planar+1 up vertical telemeters...
 					nbhtelemeters = 4;
-					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], &distances[6], &distances[7]) != EXIT_SUCCESS)
+					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], 
+						&distances[6], &distances[7], &distances[8], &distances[9], &distances[10], &distances[11]) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
@@ -679,13 +690,13 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					i = pololu.telem4analoginputchan;
 					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
 					angles[i] = atan2(y, x); distances[i] = sqrt(sqr(x)+sqr(y));
+					set_htelemeters_vectors_Pololu(angles, distances, nbhtelemeters, tv, deviceid);
 					
 					// Up vertical...
 					i = pololu.telem5analoginputchan;
 					z = pololu.analoginputz[i]+distances[i];
 					distance_above = z;
 
-					set_htelemeters_vectors_Pololu(angles, distances, nbhtelemeters, tv, deviceid);
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);

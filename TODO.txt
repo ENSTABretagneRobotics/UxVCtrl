@@ -28,7 +28,7 @@ controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque ch
 
 Obstacle avoidance, loiter
 
-support de 12 telem max dont config 8+2, GetTelemetersPololu(tableau)...?
+GetTelemetersPololu(tableau)...?
 ouverture angulaire des sonars, rajouter param analoginputbeam?->un peu déjà géré par alpha_max_err mais suppose que tous les télémètres sont identiques...
 rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
 
@@ -36,7 +36,6 @@ commande pour activer traitement kinectto2dlidar minheight maxheight minwidth ma
 rajouter mark/quality et/ou type (pour connaitre le capteur d'origine) pour chaque d_mes pour aider dans la fusion lidar, video(kinect), sonar?
 commande pour changer quels capteurs rentrent dans la fusion : sonarprocessing simulator seanet hokuyo rplidar pololu0 pololu1 pololu2 BlueView0 BlueView1 video0 video1 video2
 
-influence de sdir, alphashat à revoir dans la fusion, devrait être propre à chaque périphérique, ne devrait pas apparaître dans Contract()...?
 s'assurer que out of range correspond à oo pour tous les capteurs...
 d_mes vs d_all_mes : s'assurer que d_mes est le min...
 

@@ -992,6 +992,14 @@ COM6
 -1
 % telem8analoginputchan (disabled if -1)
 -1
+% telem9analoginputchan (disabled if -1)
+-1
+% telem10analoginputchan (disabled if -1)
+-1
+% telem11analoginputchan (disabled if -1)
+-1
+% telem12analoginputchan (disabled if -1)
+-1
 % MinAngle (in rad)
 -0.6
 % MidAngle (in rad)

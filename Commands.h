@@ -22,6 +22,7 @@ THREAD_PROC_RETURN_VALUE MissionLogThread(void* pParam);
 inline void DisableAllHorizontalControls(void)
 {
 	EnterCriticalSection(&StateVariablesCS);
+	bObstacleAvoidanceControl = FALSE;
 	bLineFollowingControl = FALSE;
 	bWaypointControl = FALSE;
 	bGuidedControl = FALSE;

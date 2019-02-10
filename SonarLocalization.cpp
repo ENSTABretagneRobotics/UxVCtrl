@@ -43,7 +43,7 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 
 			deque< vector<interval> > d_all_mes_vector_tmp = d_all_mes_vector; deque<double> alpha_mes_vector_tmp = alpha_mes_vector; 
 			interval psihat_tmp = psihat; 
-			double d_max_err_tmp = d_max_err; double alpha_max_err_tmp = alpha_max_err; int sdir_tmp = sdir; interval alphashat_tmp = alphashat; 
+			double d_max_err_tmp = d_max_err; double alpha_max_err_tmp = alpha_max_err; int sdir_tmp = 1; interval alphashat_tmp = 0; 
 			vector<double> walls_xa_tmp = walls_xa; vector<double> walls_ya_tmp = walls_ya; vector<double> walls_xb_tmp = walls_xb; vector<double> walls_yb_tmp = walls_yb; 
 			vector<double> circles_x_tmp = circles_x; vector<double> circles_y_tmp = circles_y; vector<double> circles_r_tmp = circles_r;
 			LeaveCriticalSection(&StateVariablesCS);
@@ -96,7 +96,7 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 			deque< vector<interval> > d_all_mes_vector_tmp = d_all_mes_vector; deque<double> alpha_mes_vector_tmp = alpha_mes_vector; 
 			deque<double> t_history_vector_tmp = t_history_vector; deque<interval> xhat_history_vector_tmp = xhat_history_vector; deque<interval> yhat_history_vector_tmp = yhat_history_vector; 
 			deque<interval> psihat_history_vector_tmp = psihat_history_vector; deque<interval> vrxhat_history_vector_tmp = vrxhat_history_vector; 
-			double d_max_err_tmp = d_max_err; double alpha_max_err_tmp = alpha_max_err; int sdir_tmp = sdir; interval alphashat_tmp = alphashat; 
+			double d_max_err_tmp = d_max_err; double alpha_max_err_tmp = alpha_max_err; int sdir_tmp = 1; interval alphashat_tmp = 0; 
 			vector<double> walls_xa_tmp = walls_xa; vector<double> walls_ya_tmp = walls_ya; vector<double> walls_xb_tmp = walls_xb; vector<double> walls_yb_tmp = walls_yb; 
 			vector<double> circles_x_tmp = circles_x; vector<double> circles_y_tmp = circles_y; vector<double> circles_r_tmp = circles_r;
 			LeaveCriticalSection(&StateVariablesCS);

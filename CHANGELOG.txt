@@ -1,3 +1,7 @@
+296
+Corrected sdir and alphashat handling.
+Added support to more telemeters in Pololu.
+
 295
 Added bGuidedControl.
 Added obstacleavoidance command.

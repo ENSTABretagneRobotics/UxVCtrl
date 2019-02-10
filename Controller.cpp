@@ -20,7 +20,7 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 	double wz_obs = *pwz_obs;
 	BOOL bHObstacleToAvoid = FALSE;
 	BOOL bVObstacleToAvoid = FALSE;
-	double min_distance_around = d_max_err+2*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
+	//double min_distance_around = d_max_err+2*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
 	double min_distance_above = d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
 	double min_altitude_AGL = min_distance_above;
 
@@ -30,8 +30,11 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 
 	critical section specific to obstacles?
 
-	*/
+	Should not change heading for robots that have lateral thrust...?
 
+	*/
+/*
+	// In robot coordinate system...
 	int i = 0, j = 0;
 	double vect_x = 0, vect_y = 0, wvect_x = 0, wvect_y = 0;
 	j = 0;
@@ -49,12 +52,33 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 
 	if (bHObstacleToAvoid)
 	{
-		wvect_x += u_obs*cos(wpsi_obs)+vect_x;
-		wvect_y += u_obs*sin(wpsi_obs)+vect_y;
-		u_obs = sqrt(sqr(wvect_x)+sqr(wvect_y));
-		wpsi_obs = atan2(wvect_y, wvect_x);
+		wvect_x = u_obs*cos(wpsi_obs-Center(psihat))-ul_obs*sin(wpsi_obs-Center(psihat));
+		wvect_y = u_obs*sin(wpsi_obs-Center(psihat))+ul_obs*cos(wpsi_obs-Center(psihat));
+		wvect_x = 0.5*(wvect_x+vect_x);
+		wvect_y = 0.5*(wvect_y+vect_y);
+		switch (robid)
+		{
+		case SAILBOAT_SIMULATOR_ROBID:
+		case VAIMOS_ROBID:
+		case SAILBOAT_ROBID:
+		case SAILBOAT2_ROBID:
+			wpsi_obs = atan2(wvect_y, wvect_x)+Center(psihat);
+			break;
+		case CISCREA_ROBID:
+		case BLUEROV_ROBID:
+		case COPTER_ROBID:
+		case ARDUCOPTER_ROBID:
+			u_obs = sqrt(sqr(wvect_x)+sqr(wvect_y))*cos(atan2(wvect_y, wvect_x)+Center(psihat));
+			ul_obs = sqrt(sqr(wvect_x)+sqr(wvect_y))*sin(atan2(wvect_y, wvect_x)+Center(psihat));
+			//wpsi_obs = atan2(wvect_y, wvect_x)+Center(psihat);
+			break;
+		default:
+			//u_obs = sqrt(sqr(wvect_x)+sqr(wvect_y));
+			wpsi_obs = atan2(wvect_y, wvect_x)+Center(psihat);
+			break;
+		}
 	}
-
+*/
 	// Should not trigger avoidance in z if landing, check wagl != 0...?
 	
 	// > 0 to check if data is valid...

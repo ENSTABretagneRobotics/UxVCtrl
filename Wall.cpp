@@ -79,7 +79,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 		Vdistances_filtered.clear();
 		for (i = 0; i < (int)alpha_mes_vector.size(); i++)
 		{
-			double alpha_mes_robot = sdir*alpha_mes_vector[i]+Center(alphashat);
+			double alpha_mes_robot = alpha_mes_vector[i];
 			// Search for the pings that are between beta1 = delta-0.5*beta and beta2 = delta+0.5*beta.
 			if ((sin(alpha_mes_robot-(delta_wall-0.5*beta_wall)) > 0)&&(sin((delta_wall+0.5*beta_wall)-alpha_mes_robot) > 0))
 			{

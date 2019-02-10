@@ -42,7 +42,7 @@ THREAD_PROC_RETURN_VALUE SonarAltitudeEstimationThread(void* pParam)
 		Vdistances_filtered.clear();
 		for (i = 0; i < (int)alpha_mes_vector.size(); i++)
 		{
-			double alpha_mes_robot = sdir*alpha_mes_vector[i]+Center(alphashat);
+			double alpha_mes_robot = alpha_mes_vector[i];
 			// Filter the distances that are too close or too far away.
 			//if ((d_mes_vector[i] >= dmin_sonaraltitudeestimation)&&(d_mes_vector[i] <= rangescale))
 			if (d_mes_vector[i] >= dmin_sonaraltitudeestimation)
