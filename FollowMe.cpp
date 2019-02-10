@@ -115,6 +115,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 				u = umax_followme;
 				bLineFollowingControl = TRUE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = TRUE;
 				if (bDepth_followme)
 				{
@@ -137,6 +138,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 						//printf("Warning : No more waypoints to follow.\n");
 						bLineFollowingControl = FALSE;
 						bWaypointControl = FALSE;
+						bGuidedControl = FALSE;
 						bHeadingControl = FALSE;
 						u = uidle_followme;
 						uw = 0;
@@ -149,6 +151,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 				u = umin_followme;
 				bLineFollowingControl = TRUE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = TRUE;
 				if (bDepth_followme)
 				{
@@ -171,6 +174,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 						//printf("Warning : No more waypoints to follow.\n");
 						bLineFollowingControl = FALSE;
 						bWaypointControl = FALSE;
+						bGuidedControl = FALSE;
 						bHeadingControl = FALSE;
 						u = uidle_followme;
 						uw = 0;
@@ -182,6 +186,7 @@ THREAD_PROC_RETURN_VALUE FollowMeThread(void* pParam)
 			{
 				bLineFollowingControl = FALSE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = FALSE;
 				u = uidle_followme;
 				uw = 0;

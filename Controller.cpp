@@ -9,20 +9,86 @@
 
 #include "Controller.h"
 
-int ObstacleAvoidance(double* pwpsi_obs)
+int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* pul_obs, double* pwpsi_obs, double* pwagl_obs, double* pwz_obs, BOOL* pbHObstacleToAvoid, BOOL* pbVObstacleToAvoid)
 {
+	double u_obs = *pu_obs;
+	double uw_obs = *puw_obs;
+	double uv_obs = *puv_obs;
+	double ul_obs = *pul_obs;
 	double wpsi_obs = *pwpsi_obs;
+	double wagl_obs = *pwagl_obs;
+	double wz_obs = *pwz_obs;
+	BOOL bHObstacleToAvoid = FALSE;
+	BOOL bVObstacleToAvoid = FALSE;
+	double min_distance_around = d_max_err+2*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
+	double min_distance_above = d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
+	double min_altitude_AGL = min_distance_above;
 
 	/*
-	Take into account obstacles of known position and obstacles in d_mes_vector...
 
-	this function need to have few processing...
+	this function needs to have few processing...
 
 	critical section specific to obstacles?
 
 	*/
 
+	int i = 0, j = 0;
+	double vect_x = 0, vect_y = 0, wvect_x = 0, wvect_y = 0;
+	j = 0;
+	for (i = 0; i < (int)d_all_mes_vector.size(); i++)
+	{
+		// Might be infinity...
+		double d = Center(d_all_mes_vector[i][j]);
+		if ((d > 0)&&(d < min_distance_around))
+		{
+			vect_x -= (min_distance_around-d)*cos(alpha_mes_vector[i])/min_distance_around;
+			vect_y -= (min_distance_around-d)*sin(alpha_mes_vector[i])/min_distance_around;
+			bHObstacleToAvoid = TRUE;
+		}
+	}
+
+	if (bHObstacleToAvoid)
+	{
+		wvect_x += u_obs*cos(wpsi_obs)+vect_x;
+		wvect_y += u_obs*sin(wpsi_obs)+vect_y;
+		u_obs = sqrt(sqr(wvect_x)+sqr(wvect_y));
+		wpsi_obs = atan2(wvect_y, wvect_x);
+	}
+
+	// Should not trigger avoidance in z if landing, check wagl != 0...?
+	
+	// > 0 to check if data is valid...
+	if ((distance_above > 0)&&(distance_above < min_distance_above)&&(altitude_AGL > 0)&&(altitude_AGL < min_altitude_AGL))
+	{
+		//if (bDepthControl) wz_obs = Center(zhat)+0.5*(distance_above-min_distance_above+min_altitude_AGL-altitude_AGL);
+		//else if (bAltitudeAGLControl) wagl_obs = altitude_AGL+0.5*(distance_above-min_distance_above+min_altitude_AGL-altitude_AGL);
+		wz_obs = Center(zhat)+0.5*(distance_above-min_distance_above+min_altitude_AGL-altitude_AGL);
+		bVObstacleToAvoid = TRUE;
+	}
+	else if ((distance_above > 0)&&(distance_above < min_distance_above))
+	{
+		//if (bDepthControl) wz_obs = Center(zhat)+distance_above-min_distance_above;
+		//else if (bAltitudeAGLControl) wagl_obs = altitude_AGL+distance_above-min_distance_above;
+		wz_obs = Center(zhat)+distance_above-min_distance_above;
+		bVObstacleToAvoid = TRUE;
+	}
+	else if ((altitude_AGL > 0)&&(altitude_AGL < min_altitude_AGL))
+	{
+		//if (bDepthControl) wz_obs = Center(zhat)+min_altitude_AGL-altitude_AGL;
+		//else if (bAltitudeAGLControl) wagl_obs = altitude_AGL+min_altitude_AGL-altitude_AGL;
+		wz_obs = Center(zhat)+min_altitude_AGL-altitude_AGL;
+		bVObstacleToAvoid = TRUE;
+	}
+
+	*pu_obs = u_obs;
+	*puw_obs = uw_obs;
+	*puv_obs = uv_obs;
+	*pul_obs = ul_obs;
 	*pwpsi_obs = wpsi_obs;
+	*pwagl_obs = wagl_obs;
+	*pwz_obs = wz_obs;
+	*pbHObstacleToAvoid = bHObstacleToAvoid;
+	*pbVObstacleToAvoid = bVObstacleToAvoid;
 
 	return EXIT_SUCCESS;
 }
@@ -34,7 +100,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	int counter = 0;
 	double norm_ba = 0, norm_ma = 0, norm_bm = 0, sinalpha = 0, phi = 0, e = 0; // For line following control.
 	double wxa_prev = 0, wya_prev = 0, wxb_prev = 0, wyb_prev = 0, wlata = 0, wlonga = 0, wlatb = 0, wlongb = 0, walt = 0; // For line following control.
-	double wpsi_obs = 0;// , e_obs = 0; // For obstacle avoidance.
+	BOOL bHObstacleToAvoid = FALSE, bVObstacleToAvoid = FALSE;
+	double u_obs = 0, uw_obs = 0, uv_obs = 0, ul_obs = 0, wpsi_obs = 0, wagl_obs = 0, wz_obs = 0;// , e_obs = 0; // For obstacle avoidance.
 	double delta_d = 0; // For distance control.
 	double delta_angle = 0; // For heading control.
 	double wpsi_prev = 0, ipsi = 0; // For heading control.
@@ -152,22 +219,56 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			wxa_prev = wxa; wya_prev = wya; wxb_prev = wxb; wyb_prev = wyb; 
 		}
 
-		if (bWaypointControl)
+		if ((bWaypointControl)||(bGuidedControl))
 		{
 			wpsi = atan2(wy-Center(yhat), wx-Center(xhat));
 		}
-
-		// Obstacles handling...
-
-		if (bLineFollowingControl||bWaypointControl||bHeadingControl)
+/*
+		if (bLoiterControl)
 		{
-			wpsi_obs = wpsi;
-			//e_obs = e;
+
+			// Should use rear and lateral thrust capabilities when available and try to keep heading...
+			// Do like bGuidedControl for robots without lateral thrust?
+
+			switch (robid)
+			{
+			case SAILBOAT_SIMULATOR_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
+				break;
+			default:
+				// When no input, the robot will try to stay at the current place...
+				if ((fabs(u) < 0.01)&&(fabs(ul) < 0.01))
+				{
+					wx = Center(xhat); 
+					wy = Center(yhat); 
+				}
+
+				if ((wx != wx_prev)||(wy != wy_prev)) { ix = 0; iy = 0; }
+				u = PID_control(wu, wu_prev, Center(hat), Center(vrxhat), &ix, 1, dt,
+					Kp_x, Kd_x, Ki_x, up_max_x, ud_max_x, ui_max_x,
+					u_min_x, u_max_x, error_min_x, error_max_x, dx_max_x);
+				ul = PID_control(wul, wul_prev, Center(hat), Center(vryhat), &iy, 1, dt,
+					Kp_y, Kd_y, Ki_y, up_max_y, ud_max_y, ui_max_y,
+					u_min_y, u_max_y, error_min_y, error_max_y, dy_max_y);
+				wx_prev = wx;
+				wy_prev = wy;
+				break;
+			}
 		}
 		else
 		{
-			wpsi_obs = Center(psihat);
-			//e_obs = 0;
+			ix = 0; 
+			iy = 0;
+		}
+*/
+		if ((bDistanceControl)&&(!(robid & SAILBOAT_CLASS_ROBID_MASK)))
+		{
+			delta_d = dist-wd;
+			if (delta_d > wdradius) u = fabs(wu);
+			else if (delta_d < -wdradius) u = -fabs(wu); 
+			else u = 0;
 		}
 
 /*
@@ -177,7 +278,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		{
 			if (!bLineFollowingControl)
 			{
-				if (bWaypointControl)
+				if ((bWaypointControl)||(bGuidedControl))
 				{
 					wxa = ???; wya = ???; 
 					wxb = wx; wyb = wy;
@@ -198,16 +299,39 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		}
 */
 
-		// Should modify here wpsi_obs depending on obstacles without modifying wpsi...
-		ObstacleAvoidance(&wpsi_obs);
+		// Obstacles handling...
+
+		u_obs = u;
+		uw_obs = uw; // Useless?
+		uv_obs = uv; // Useless?
+		ul_obs = ul;
+		if (bLineFollowingControl||bWaypointControl||bGuidedControl||bHeadingControl)
+		{
+			wpsi_obs = wpsi;
+			//e_obs = e;
+		}
+		else
+		{
+			wpsi_obs = Center(psihat);
+			//e_obs = 0;
+		}
+		if (bAltitudeAGLControl) wagl_obs = wagl; else wagl_obs = altitude_AGL; // Useless?
+		if (bDepthControl) wz_obs = wz; else wz_obs = Center(zhat);
+
+		if (bObstacleAvoidanceControl)
+		{
+			// Should modify here u/ul/wpsi/wz_obs depending on obstacles without modifying u/ul/wpsi/wz...
+			bHObstacleToAvoid = FALSE; bVObstacleToAvoid = FALSE;
+			ObstacleAvoidance(&u_obs, &uw_obs, &uv_obs, &ul_obs, &wpsi_obs, &wagl_obs, &wz_obs, &bHObstacleToAvoid, &bVObstacleToAvoid);
+		}
 		
-		// All the code after that should use wpsi_obs instead of just wpsi...
+		// All the code after that should use wpsi/wz_obs instead of just wpsi/wz...
 
 #pragma region Sailboat supervisor
 
 			// Not sure of the behavior for sailboat when there is an obstacle...
 
-			if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bLineFollowingControl))//||(bWaypointControl)||(bHeadingControl)
+			if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bLineFollowingControl))//||(bWaypointControl)||(bGuidedControl)||(bHeadingControl)
 			{
 				double theta_star = wpsi_obs;
 				double psiw = Center(psitwindhat);
@@ -346,28 +470,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		// Low-level controls.
 
-		if (bDistanceControl)
-		{
-			delta_d = dist-wd;
-			if (delta_d > wdradius) u = fabs(wu);
-			else if (delta_d < -wdradius) u = -fabs(wu); 
-			else u = 0;
-		}
-				
-		//if (bReactiveAvoidanceControl)
-		//{
-		//	// Make a specific avoidance trajectory...?
-
-		//}
-
-		if (bBrakeControl)
-		{
-			if (Center(vrxhat) > 0.05) u = -u_max;
-			else if (Center(vrxhat) < -0.05) u = u_max;
-			else u = 0;
-		}
-
-		if (bHeadingControl)
+		if ((bHeadingControl)||((bObstacleAvoidanceControl)&&(bHObstacleToAvoid)))
 		{
 			if (wpsi_obs != wpsi_prev) ipsi = 0;
 
@@ -438,7 +541,36 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		{
 			ipsi = 0;
 		}
-		
+
+		if ((bGuidedControl)&&((bObstacleAvoidanceControl)&&(!bHObstacleToAvoid)))
+		{
+			switch (robid)
+			{
+			case SAILBOAT_SIMULATOR_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
+				break;
+			default:
+				if (sqrt(pow(wx-Center(xhat), 2)+pow(wy-Center(yhat), 2)) < 0.5*radius)
+				{
+					u = 0; uw = 0; ul = 0;
+				}
+				else if (sqrt(pow(wx-Center(xhat), 2)+pow(wy-Center(yhat), 2)) < radius)
+				{
+					if ((fabs(u) < 0.01)||((fabs(u) > 0.25*u_max))) u = 0.25*u_max;
+				}
+				else if (fabs(u) < 0.01) u = u_max;
+				break;
+			}
+		}
+
+		if ((bBrakeControl)&&(!(robid & SAILBOAT_CLASS_ROBID_MASK))&&((bObstacleAvoidanceControl)&&(!bHObstacleToAvoid)))
+		{
+			if (Center(vrxhat) > 0.05) u = -u_max;
+			else if (Center(vrxhat) < -0.05) u = u_max;
+			else u = 0;
+		}
 
 		if (bPitchControl)
 		{
@@ -464,8 +596,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		else
 		{
 			iphi = 0;
-		}
-
+		}		
 
 		//if (bAltitudeAGLControl)
 		//{
@@ -477,13 +608,12 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		//if (bDepthControl)
 		//{
-		//	delta_z = Center(zhat)-wz;
+		//	delta_z = Center(zhat)-wz_obs;
 		//	if (delta_z > error_max_z) uv = u_min_z;
 		//	else if (delta_z < error_min_z) uv = u_max_z; 
 		//	else uv = 0;
 		//}
-
-		
+				
 		if (bAltitudeAGLControl)
 		{
 			if (wagl != wagl_prev) iagl = 0;
@@ -497,19 +627,24 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			iagl = 0;
 		}
 
-		if (bDepthControl)
+		if ((bDepthControl)||((bObstacleAvoidanceControl)&&(bVObstacleToAvoid)))
 		{
-			if (wz != wz_prev) iz = 0;
-			uv = PID_control(wz, wz_prev, Center(zhat), Center(vrzhat), &iz, 1, dt,
+			if (wz_obs != wz_prev) iz = 0;
+			uv = PID_control(wz_obs, wz_prev, Center(zhat), Center(vrzhat), &iz, 1, dt,
 				Kp_z, Kd_z, Ki_z, up_max_z, ud_max_z, ui_max_z,
 				u_min_z, u_max_z, error_min_z, error_max_z, dz_max_z);
-			wz_prev = wz;
+			wz_prev = wz_obs;
 		}
 		else
 		{
 			iz = 0;
 		}
-		
+
+		if ((bObstacleAvoidanceControl)&&(bHObstacleToAvoid))
+		{
+			u = u_obs;
+			ul = ul_obs;
+		}
 
 		u = (u > u_max)? u_max: u;
 		u = (u < -u_max)? -u_max: u;

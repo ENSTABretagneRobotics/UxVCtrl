@@ -1,3 +1,7 @@
+295
+Added bGuidedControl.
+Added obstacleavoidance command.
+
 294
 Added AirPressure, WaterVelocityOfSound, WaterFloorAltitude parameters to env.txt.
 Added bDefaultDisablePWMOverride parameter to MAVLinkDevice.

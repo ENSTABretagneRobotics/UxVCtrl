@@ -1,10 +1,14 @@
+
+pour chaque lidar prévoir comme excluded_area_points dans video...
+
 Gotoopi opiid
 Regsettoheading
 Regsettox
 Regsettoz
 
-CorrectImageBordersRawBGR() : param nbpixborder devrait pas être en dur...
+CorrectImageBordersRawBGR() : param nbpixborder devrait pas être hardcoded...
 
+Pouvoir lancer un takeoff
 récupérer les entrées de la télécommande sur le MAVLinkDevice comme entrées et les corriger avec évitement doit être possible si on utilise setattitudetarget en guided, rajouter commande pour gérer cela...
 add a third MAVLinkDevice?
 pouvoir gérer followme avec nmeainterface, bExternal...
@@ -22,19 +26,21 @@ gpszlocalization?
 
 controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque chose qui permet déjà de s'en sortir?->tester en simu si le terme intégral est suffisant, mais il est souvent remis à 0...
 
-drone : pour suivre un vecteur, faire en sorte que l'orientation du drone aille progressivement dans le bon sens quand on le contrôle avec u et ul...
-
-logobstacle?
-
 Obstacle avoidance, loiter
-
-u_obs...
 
 support de 12 telem max dont config 8+2, GetTelemetersPololu(tableau)...?
 ouverture angulaire des sonars, rajouter param analoginputbeam?->un peu déjà géré par alpha_max_err mais suppose que tous les télémètres sont identiques...
 rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
 
-Faire en sorte que le drone reste en position par rapport aux obstacles (distancecontrol en u et ul)
+commande pour activer traitement kinectto2dlidar minheight maxheight minwidth maxwidth hbeam vbeam min_kinect_range max_kinect_range videoid
+rajouter mark/quality et/ou type (pour connaitre le capteur d'origine) pour chaque d_mes pour aider dans la fusion lidar, video(kinect), sonar?
+commande pour changer quels capteurs rentrent dans la fusion : sonarprocessing simulator seanet hokuyo rplidar pololu0 pololu1 pololu2 BlueView0 BlueView1 video0 video1 video2
+
+influence de sdir, alphashat à revoir dans la fusion, devrait être propre à chaque périphérique, ne devrait pas apparaître dans Contract()...?
+s'assurer que out of range correspond à oo pour tous les capteurs...
+d_mes vs d_all_mes : s'assurer que d_mes est le min...
+
+logobstacle?
 
 %waitareaconfig area.txt bIn procid id (execute procid quand on rentre dans la zone (bIn == 1) ou sort (bIn == 0))
 %
@@ -48,24 +54,24 @@ Faire en sorte que le drone reste en position par rapport aux obstacles (distanc
 %
 %disablegeofence id
 
-comment gérer le sonar vers le haut?->distance_above
 env obstacles interdit intérieur 
 
+drone : pour suivre un vecteur, faire en sorte que l'orientation du drone aille progressivement dans le bon sens quand on le contrôle avec u et ul...
+ajouter Kp_y, Kd_y, etc. pour ul control et aussi en x pour u control (distancecontrol...)
+brakecontrol sould be superseded by bLoiterControl...
+station vs bDistanceControl vs bGuidedControl vs bLoiterControl?
+Faire en sorte que le drone reste en position par rapport aux obstacles (distancecontrol en u et ul)->bLoiterControl?
 Composante latérale bluerov et ciscrea, brake si lateralthrust?
-bPositionControl proche de WaypointControl, touche T? un peu aussi comme brakecontrol ou même plutôt station...
 Si vr error grande, utiliser state eq, autrement n'utiliser que vr
-option brakecontrol/station pour qu'il fasse stabilisation x,y dès que u=0, éventuellement en utilisant ul si dispo...
 
-wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
-the control part of obstacle avoidance could be centralized to handle all the types of obstacles (punctual, line...), maybe using vector fields
 add vector field obstacle avoidance mission like visual obstacle, e.g using AIS and simulatedinternetswarmondevice
 Avoir un autre algo que le followme standard ou paramètres supplémentaires pour que buggy toujours entre base et robot, avec le buggy qui ne peut que passer par les traces du robot->footprintrelay
+meilleur geofencing ou similaire pour follow me
 Fuir le prédateur
-2.5D, plusieurs plans pour passer par des portes 3D...
 Obstacles liés au robot (antennes)
-Obstacles mobiles
+Obstacles mobiles, essayer d'estimer la vitesse de l'obstacle pour l'éviter plus vite si nécessaire?
+Essayer de monter en dernier recours si l'obstacle est trop près?
 Toujours tourner à droite si on ne peut pas suivre la direction voulue?
-Detected obstacles list added by LIDAR or other things+env
 Potential fields to compute wtheta that fuses geofence, obstacles, theta_star
 Obstacles statiques de toutes sortes à spécifier dans fichier de config
 Obstacles dynamique générés par lidar et kinect, juste de lignes avec rayon autour?
@@ -74,16 +80,10 @@ Se poser la question si obstacle est franchissable ou pas en fonction de taille 
 Prendre en compte obstacles statiques connus étroits si besoin de faire demi-tour, pour ne pas sortir des footprints à un endroit où on peut être coincé
 rajouter geofence 3D dans geofence.txt avec segments et cercles in et out, enable/disablegeofence coordinates/file command...
 Garder en mémoire une carte des obstacles en parallèle de l'env connu et statique et pouvoir le partager par réseau
-mélanger à quel niveau avec potential fields?
-Preparer sample évitement d'obstacle ball et wallavoidance en relatif
-simple reactive obstacle avoidance during line or waypoint following...
-meilleur geofencing ou similaire pour follow me
 minrange param, zone morte pour tous les sonar et echosondeurs...?
 rajouter params deadzone sonar/lidar?->dépend des missions, algos? dmin=d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight))...
-
-commande pour activer traitement kinectto2dlidar minheight maxheight minwidth maxwidth hbeam vbeam min_kinect_range max_kinect_range videoid
-rajouter mark/quality et/ou type (pour connaitre le capteur d'origine) pour chaque d_mes pour aider dans la fusion lidar, video(kinect), sonar?
-commande pour changer quels capteurs rentrent dans la fusion : sonarprocessing simulator seanet hokuyo rplidar pololu0 pololu1 pololu2 BlueView0 BlueView1 video0 video1 video2
+Preparer sample évitement d'obstacle ball et wallavoidance en relatif
+wallavoidance : on pourrait contourner l'obstacle par wall following à droite ou à gauche choisi intelligemment
 
 param extended menu pour choisir quels sonar/lidar sont affichés par $, sonarid (0 : Seanet, 1 : BlueView0, 2 : BlueView1, 3 : Hokuyo, 4 : RPLIDAR, 5 : sonars maestro, 6 : rngfnd mavlink, selon qu'ils soient disabled ou non l'id est inférieure ou égale) propre à chaque fenêtre...
 d, alpha, beta, rgbie, accuracy, xyz, sensor space, robot space, env
@@ -354,6 +354,8 @@ pouvoir se connecter à MAVLinkInterface via série et plusieurs TCP en même temps
 MAVLinkDevice : actuellement on ne peut controler que les canaux prévus par le firmware du coup faudrait aussi pouvoir changer la correspondance entre mes canaux et ceux de l'APM?
 save mavlink tlog for MAVLinkDevice?
 Mavlinkdevice add param PressureRef, WaterDensity?->pas sûr, c'est ardusub qui fournit directement l'altitude...
+param mp afterflytohere : 0 for do nothing, 1 stop, 2 loiter?
+fly to here écrasé si waypointslist en cours
 
 sonar, localisation, wf
 Prendre en compte le fait qu'on va voir le fond avec le sonar, surtout dans le cas de piscines à fond variable comme à l'IPN

@@ -24,6 +24,7 @@ inline void DisableAllHorizontalControls(void)
 	EnterCriticalSection(&StateVariablesCS);
 	bLineFollowingControl = FALSE;
 	bWaypointControl = FALSE;
+	bGuidedControl = FALSE;
 	bDistanceControl = FALSE;
 	bBrakeControl = FALSE;
 	bHeadingControl = FALSE;
@@ -47,8 +48,10 @@ inline void DisableAllControls(void)
 	bPingerTrackingControl = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 	bFollowMeTrackingControl = FALSE;
+	bObstacleAvoidanceControl = FALSE;
 	bLineFollowingControl = FALSE;
 	bWaypointControl = FALSE;
+	bGuidedControl = FALSE;
 	bDistanceControl = FALSE;
 	bBrakeControl = FALSE;
 	bHeadingControl = FALSE;
@@ -1288,6 +1291,7 @@ inline int Commands(char* line)
 			bBrakeControl = FALSE;
 			bLineFollowingControl = FALSE;
 			bWaypointControl = FALSE;
+			bGuidedControl = FALSE;
 			bHeadingControl = TRUE;
 			if (bCheckGNSSOK())
 			{
@@ -1472,6 +1476,7 @@ inline int Commands(char* line)
 		wx = dval1; wy = dval2;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1481,6 +1486,7 @@ inline int Commands(char* line)
 		wx = dval1; wy = dval2;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1513,6 +1519,7 @@ inline int Commands(char* line)
 		wx = Center(xhat)+dval1; wy = Center(yhat)+dval2;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1522,6 +1529,7 @@ inline int Commands(char* line)
 		wx = Center(xhat)+dval1; wy = Center(yhat)+dval2;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1554,6 +1562,7 @@ inline int Commands(char* line)
 		wx = opi_x; wy = opi_y;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1586,6 +1595,7 @@ inline int Commands(char* line)
 		wx = opi_x; wy = opi_y;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1595,6 +1605,7 @@ inline int Commands(char* line)
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wx, &wy, &dval);
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1604,6 +1615,7 @@ inline int Commands(char* line)
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wx, &wy, &dval);
 		bLineFollowingControl = FALSE;
 		bWaypointControl = TRUE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1636,6 +1648,7 @@ inline int Commands(char* line)
 		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1645,6 +1658,7 @@ inline int Commands(char* line)
 		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1678,6 +1692,7 @@ inline int Commands(char* line)
 		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1687,6 +1702,7 @@ inline int Commands(char* line)
 		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1721,6 +1737,7 @@ inline int Commands(char* line)
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval3, dval4, 0, &wxb, &wyb, &dval);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1731,6 +1748,7 @@ inline int Commands(char* line)
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval3, dval4, 0, &wxb, &wyb, &dval);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1766,6 +1784,7 @@ inline int Commands(char* line)
 		wxa = Center(xhat); wya = Center(yhat); wxb = dval1; wyb = dval2;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1781,6 +1800,7 @@ inline int Commands(char* line)
 				// Wait a little bit after reaching the waypoint.
 				bLineFollowingControl = FALSE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = FALSE;
 				StartChrono(&chrono_station);
 				for (;;)
@@ -1798,6 +1818,7 @@ inline int Commands(char* line)
 				wxa = Center(xhat); wya = Center(yhat);
 				bLineFollowingControl = TRUE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = TRUE;
 				LeaveCriticalSection(&StateVariablesCS);
 			}
@@ -1821,6 +1842,7 @@ inline int Commands(char* line)
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval3, dval4, 0, &wxb, &wyb, &dval);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -1831,6 +1853,7 @@ inline int Commands(char* line)
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval3, dval4, 0, &wxb, &wyb, &dval);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1867,6 +1890,7 @@ inline int Commands(char* line)
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxb, &wyb, &dval);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
@@ -1882,6 +1906,7 @@ inline int Commands(char* line)
 				// Wait a little bit after reaching the waypoint.
 				bLineFollowingControl = FALSE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = FALSE;
 				StartChrono(&chrono_station);
 				for (;;)
@@ -1899,6 +1924,7 @@ inline int Commands(char* line)
 				wxa = Center(xhat); wya = Center(yhat);
 				bLineFollowingControl = TRUE;
 				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
 				bHeadingControl = TRUE;
 				LeaveCriticalSection(&StateVariablesCS);
 			}
@@ -2149,6 +2175,7 @@ inline int Commands(char* line)
 		}
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		switch (robid)
 		{
@@ -2183,6 +2210,7 @@ inline int Commands(char* line)
 					// Wait a little bit after reaching the waypoint.
 					bLineFollowingControl = FALSE;
 					bWaypointControl = FALSE;
+					bGuidedControl = FALSE;
 					bHeadingControl = FALSE;
 					switch (robid)
 					{
@@ -2211,6 +2239,7 @@ inline int Commands(char* line)
 					wxa = Center(xhat); wya = Center(yhat);
 					bLineFollowingControl = TRUE;
 					bWaypointControl = FALSE;
+					bGuidedControl = FALSE;
 					bHeadingControl = TRUE;
 					switch (robid)
 					{
@@ -2269,6 +2298,14 @@ inline int Commands(char* line)
 		}
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "obstacleavoidance %d", &bval) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		bObstacleAvoidanceControl = bval;
+		if (bObstacleAvoidanceControl) printf("Obstacle avoidance control enabled.\n");
+		else printf("Obstacle avoidance control disabled.\n");
+		LeaveCriticalSection(&StateVariablesCS);
 	}
 #pragma endregion
 #pragma region DEVICES COMMANDS
@@ -3907,6 +3944,7 @@ inline int Commands(char* line)
 		wpsi = M_PI/2.0-dval*M_PI/180.0-angle_env;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -3916,6 +3954,7 @@ inline int Commands(char* line)
 		wpsi = Center(psihat)-dval*M_PI/180.0;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
@@ -3973,6 +4012,7 @@ inline int Commands(char* line)
 		uw = dval;
 		bLineFollowingControl = FALSE;
 		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
 		bHeadingControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}

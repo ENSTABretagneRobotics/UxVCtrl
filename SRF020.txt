@@ -25,6 +25,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 1
 % addr
 0x71
@@ -39,6 +43,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 2
 % addr
@@ -55,6 +63,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 3
 % addr
 0x73
@@ -69,6 +81,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 4
 % addr
@@ -85,6 +101,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 5
 % addr
 0x75
@@ -99,6 +119,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 6
 % addr
@@ -115,6 +139,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 7
 % addr
 0x77
@@ -129,6 +157,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 8
 % addr
@@ -145,6 +177,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 9
 % addr
 0x79
@@ -159,6 +195,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 10
 % addr
@@ -175,6 +215,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 11
 % addr
 0x7B
@@ -189,6 +233,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 12
 % addr
@@ -205,6 +253,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 13
 % addr
 0x7D
@@ -219,6 +271,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % Device 14
 % addr
@@ -235,6 +291,10 @@
 0
 % psi (in rad, in robot coordinate system)
 0
+% min
+0
+% max
+0
 % Device 15
 % addr
 0x7F
@@ -249,6 +309,10 @@
 % theta (in rad, in robot coordinate system)
 0
 % psi (in rad, in robot coordinate system)
+0
+% min
+0
+% max
 0
 % alpha_max_err (in rad)
 0.01

@@ -293,6 +293,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if (bEnableAltRCMode) u_ovrid = u_max_ovrid;
 					break;
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					if (bEnableAltRCMode) u_ovrid = u_max_ovrid;
 					uw_ovrid = 0;
@@ -320,6 +321,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bEnableAltRCMode) u = u_max;
 				break;
 			case BUBBLE_ROBID:
+			case TANK_SIMULATOR_ROBID:
 			case ETAS_WHEEL_ROBID:
 				if (bEnableAltRCMode) u = u_max;
 				if (!bHeadingControl) uw = 0;
@@ -351,6 +353,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if (bEnableAltRCMode) u_ovrid = -u_max_ovrid;
 					break;
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					if (bEnableAltRCMode) u_ovrid = -u_max_ovrid;
 					uw_ovrid = 0;
@@ -379,6 +382,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bEnableAltRCMode) u = -u_max;
 				break;
 			case BUBBLE_ROBID:
+			case TANK_SIMULATOR_ROBID:
 			case ETAS_WHEEL_ROBID:
 				if (bEnableAltRCMode) u = -u_max;
 				if (!bHeadingControl) uw = 0;
@@ -398,6 +402,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				switch (robid)
 				{
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					if (bEnableAltRCMode) uw_ovrid = uw_max_ovrid;
 					break;
@@ -419,6 +424,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				switch (robid)
 				{
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					if (bEnableAltRCMode) uw = uw_max;
 					break;
@@ -437,6 +443,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				switch (robid)
 				{
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					if (bEnableAltRCMode) uw_ovrid = -uw_max_ovrid;
 					break;
@@ -458,6 +465,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				switch (robid)
 				{
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					if (bEnableAltRCMode) uw = -uw_max;
 					break;
@@ -478,6 +486,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case BUGGY_SIMULATOR_ROBID:
 				case BUGGY_ROBID:
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					u_max_ovrid += 0.025;
 					u_max_ovrid = (u_max_ovrid > 1)? 1: u_max_ovrid;
@@ -497,6 +506,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 			case BUBBLE_ROBID:
+			case TANK_SIMULATOR_ROBID:
 			case ETAS_WHEEL_ROBID:
 				u_max += 0.025;
 				u_max = (u_max > 1)? 1: u_max;
@@ -529,6 +539,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case BUGGY_SIMULATOR_ROBID:
 				case BUGGY_ROBID:
 				case BUBBLE_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				case ETAS_WHEEL_ROBID:
 					u_max_ovrid -= 0.025;
 					u_max_ovrid = (u_max_ovrid < 0)? 0: u_max_ovrid;
@@ -548,6 +559,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BUGGY_SIMULATOR_ROBID:
 			case BUGGY_ROBID:
 			case BUBBLE_ROBID:
+			case TANK_SIMULATOR_ROBID:
 			case ETAS_WHEEL_ROBID:
 				u_max -= 0.025;
 				u_max = (u_max < 0)? 0: u_max;
@@ -799,6 +811,18 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			//if (bRollControl) printf("Roll control enabled.\n");
 			//else printf("Roll control disabled.\n");
+			break;
+		case 'T':
+			if (!bObstacleAvoidanceControl)
+			{
+				bObstacleAvoidanceControl = TRUE;
+			}
+			else
+			{
+				bObstacleAvoidanceControl = FALSE;
+			}
+			if (bObstacleAvoidanceControl) printf("Obstacle avoidance control enabled.\n");
+			else printf("Obstacle avoidance control disabled.\n");
 			break;
 		case 'w':
 			bBrakeControl = TRUE;
@@ -1665,7 +1689,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}
-			if (bWaypointControl)
+			if ((bWaypointControl)||(bGuidedControl))
 			{
 				if (bDispLLA)
 				{
@@ -1784,7 +1808,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							colormap, 1, 8, 0);
 					}
 					// Waypoint.
-					if (bWaypointControl)
+					if ((bWaypointControl)||(bGuidedControl))
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
@@ -1873,7 +1897,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							colormap, 1, 8, 0);
 					}
 					// Waypoint.
-					if (bWaypointControl)
+					if ((bWaypointControl)||(bGuidedControl))
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
@@ -1951,7 +1975,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							colormap, 2, 8, 0);
 					}
 					// Waypoint.
-					if (bWaypointControl)
+					if ((bWaypointControl)||(bGuidedControl))
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
@@ -2039,7 +2063,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							colormap, 2, 8, 0);
 					}
 					// Waypoint.
-					if (bWaypointControl)
+					if ((bWaypointControl)||(bGuidedControl))
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 

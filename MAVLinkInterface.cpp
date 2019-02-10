@@ -20,7 +20,9 @@ enum MAVLINKINTERFACE_PARAM_ID
 	DFLT_DIS_OVRID_PARAM_ID,
 	F_OVRID_IN_CH_PARAM_ID,
 	DFLT_F_OVRID_IN_PARAM_ID,
-	F_OVRID_IN_PARAM_ID
+	F_OVRID_IN_PARAM_ID,
+	WPNAV_RADIUS_PARAM_ID,
+	MAVLINKINTERFACE_PARAM_COUNT
 };
 typedef enum MAVLINKINTERFACE_PARAM_ID MAVLINKINTERFACE_PARAM_ID;
 
@@ -160,7 +162,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_command_ack_t command_ack;
 	//uint8_t result = MAV_RESULT_FAILED;
 	char Name[17];
-	int nbparams = 6;
+	int nbparams = MAVLINKINTERFACE_PARAM_COUNT;
 	BOOL bForceOverrideInputs_prev = bForceOverrideInputs;
 	uint16_t chan_tmp = 0;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0;
@@ -312,6 +314,12 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						else printf("Force override inputs disabled.\n");
 						LeaveCriticalSection(&StateVariablesCS);
 					}
+					else if (strncmp(param_set.param_id, "WPNAV_RADIUS", strlen("WPNAV_RADIUS")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						radius = (double)param_set.param_value/100.0;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
 					// No break for the case, to be able to send back updated parameters...
 				case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 				case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
@@ -434,6 +442,28 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					param_value.param_type = MAV_PARAM_TYPE_REAL32;
 					param_value.param_count = (uint16_t)nbparams;
 					param_value.param_index = (uint16_t)F_OVRID_IN_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "WPNAV_RADIUS");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)(radius*100);
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)WPNAV_RADIUS_PARAM_ID;// (uint16_t)(-1) to ignore...?
 					LeaveCriticalSection(&StateVariablesCS);
 					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
 					memset(sendbuf, 0, sizeof(sendbuf));
@@ -778,7 +808,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					{
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt, &wx, &wy, &wz);
 						bLineFollowingControl = FALSE;
-						bWaypointControl = TRUE;
+						bWaypointControl = FALSE;
+						bGuidedControl = TRUE;
 						bHeadingControl = TRUE;
 						bDepthControl = TRUE;
 						bAltitudeAGLControl = FALSE;
@@ -787,7 +818,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					{
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt+alt_home, &wx, &wy, &wz);
 						bLineFollowingControl = FALSE;
-						bWaypointControl = TRUE;
+						bWaypointControl = FALSE;
+						bGuidedControl = TRUE;
 						bHeadingControl = TRUE;
 						bDepthControl = TRUE;
 						bAltitudeAGLControl = FALSE;
@@ -796,7 +828,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					{
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, set_position_target.lat_int/10000000.0, set_position_target.lon_int/10000000.0, set_position_target.alt, &wx, &wy, &wagl);
 						bLineFollowingControl = FALSE;
-						bWaypointControl = TRUE;
+						bWaypointControl = FALSE;
+						bGuidedControl = TRUE;
 						bHeadingControl = TRUE;
 						bDepthControl = FALSE;
 						bAltitudeAGLControl = TRUE;
@@ -837,6 +870,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						EnterCriticalSection(&StateVariablesCS);
 						bLineFollowingControl = FALSE;
 						bWaypointControl = FALSE;
+						bGuidedControl = FALSE;
 						bHeadingControl = FALSE;
 						bDepthControl = FALSE;
 						bAltitudeAGLControl = FALSE;
@@ -848,6 +882,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						EnterCriticalSection(&StateVariablesCS);
 						bLineFollowingControl = FALSE;
 						bWaypointControl = FALSE;
+						bGuidedControl = FALSE;
 						bHeadingControl = FALSE;
 						bDepthControl = TRUE;
 						bAltitudeAGLControl = FALSE;
@@ -865,7 +900,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						EnterCriticalSection(&StateVariablesCS);
 						wx = Center(xhat); wy = Center(yhat); wz = Center(zhat); 
 						bLineFollowingControl = FALSE;
-						bWaypointControl = TRUE;
+						bWaypointControl = FALSE;
+						bGuidedControl = TRUE;
 						bHeadingControl = TRUE;
 						bDepthControl = TRUE;
 						bAltitudeAGLControl = FALSE;
@@ -895,7 +931,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						}
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, lat_home, long_home, alt_home, &wx, &wy, &wz);
 						bLineFollowingControl = FALSE;
-						bWaypointControl = TRUE;
+						bWaypointControl = FALSE;
+						bGuidedControl = TRUE;
 						bHeadingControl = TRUE;
 						bDepthControl = TRUE;
 						bAltitudeAGLControl = FALSE;
@@ -1238,6 +1275,7 @@ REQ_DATA_STREAM...
 							wpsi = Center(psihat)+M_PI/2.0-angle*M_PI/180.0-angle_env;
 							bLineFollowingControl = FALSE;
 							bWaypointControl = FALSE;
+							bGuidedControl = FALSE;
 							bHeadingControl = TRUE;
 						}
 						else
@@ -1246,6 +1284,7 @@ REQ_DATA_STREAM...
 							wpsi = M_PI/2.0-angle*M_PI/180.0-angle_env;
 							bLineFollowingControl = FALSE;
 							bWaypointControl = FALSE;
+							bGuidedControl = FALSE;
 							bHeadingControl = TRUE;
 						}
 						LeaveCriticalSection(&StateVariablesCS);
@@ -1272,7 +1311,8 @@ REQ_DATA_STREAM...
 							}
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, Lat, Lon, Alt, &wx, &wy, &wz);
 							bLineFollowingControl = FALSE;
-							bWaypointControl = TRUE;
+							bWaypointControl = FALSE;
+							bGuidedControl = TRUE;
 							bHeadingControl = TRUE;
 							bDepthControl = TRUE;
 							bAltitudeAGLControl = FALSE;
