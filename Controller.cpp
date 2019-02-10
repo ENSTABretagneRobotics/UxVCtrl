@@ -566,7 +566,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			ipsi = 0;
 		}
 
-		if ((bGuidedControl)&&((bObstacleAvoidanceControl)&&(!bHObstacleToAvoid)))
+		if ((bGuidedControl)&&!((bObstacleAvoidanceControl)&&(bHObstacleToAvoid)))
 		{
 			switch (robid)
 			{
@@ -589,7 +589,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			}
 		}
 
-		if ((bBrakeControl)&&(!(robid & SAILBOAT_CLASS_ROBID_MASK))&&((bObstacleAvoidanceControl)&&(!bHObstacleToAvoid)))
+		if ((bBrakeControl)&&(!(robid & SAILBOAT_CLASS_ROBID_MASK))&&!((bObstacleAvoidanceControl)&&(bHObstacleToAvoid)))
 		{
 			if (Center(vrxhat) > 0.05) u = -u_max;
 			else if (Center(vrxhat) < -0.05) u = u_max;

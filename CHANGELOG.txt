@@ -1,3 +1,6 @@
+297
+Corrected bGuidedControl and bBrakeControl conditions in Controller.cpp. 
+
 296
 Corrected sdir and alphashat handling.
 Added support to more telemeters in Pololu.
