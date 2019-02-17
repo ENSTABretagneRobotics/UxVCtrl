@@ -9,6 +9,37 @@
 
 #include "Controller.h"
 
+//version 1, problème : l'accumulation de points groupés influe trop sur le champ avoisinant et meme au delà
+//l_d : liste des distances du lidar
+//l_th : liste des angles du lidar
+void obscalc(vector<double>& l_d, vector<double>& l_th, double* pDist, double* pAngle)
+{
+	double u_dir = 0, v_dir = 0;
+	double dmin = 0.5; // valeur mini pour que la norma vale 1
+	double seuil = 5, amplitude = 5, etalement = 1.2;
+	double qx = 0, qy = 0; //q : liste de points répulsifs (lidar)
+	double mini = seuil;
+	for (int i = 0; i < (int)l_d.size(); i++)
+	{
+		qx = -l_d[i]*cos(l_th[i]);
+		qy = -l_d[i]*sin(l_th[i]);
+		if ((l_d[i] > 0.1)&&(l_d[i] < seuil)) //on évite la division par zéro
+		{
+			// la fonction répulsivité est en 1/distance
+			if (l_d[i] < mini) mini = l_d[i];
+			u_dir += amplitude*pow(qx/(sqr(qx)+sqr(qy)), etalement);
+			v_dir += amplitude*pow(qy/(sqr(qx)+sqr(qy)), etalement); 
+		}
+	}
+	*pAngle = atan2(v_dir, u_dir);
+	// lineaire
+	double a = 1/(dmin-seuil);
+	double b = -a*seuil;
+	*pDist = a*mini+b;
+	// exp decroissante
+	//*pDist = exp(-sqrt(mini-dmin));
+}
+
 int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* pul_obs, double* pwpsi_obs, double* pwagl_obs, double* pwz_obs, BOOL* pbHObstacleToAvoid, BOOL* pbVObstacleToAvoid)
 {
 	double u_obs = *pu_obs;
@@ -20,8 +51,7 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 	double wz_obs = *pwz_obs;
 	BOOL bHObstacleToAvoid = FALSE;
 	BOOL bVObstacleToAvoid = FALSE;
-	//double min_distance_around = d_max_err+2*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
-	double min_distance_above = d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth)+sqr(robheight));
+	double min_distance_above = d_max_err+0.5*robheight;
 	double min_altitude_AGL = min_distance_above;
 
 	/*
@@ -33,52 +63,80 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 	Should not change heading for robots that have lateral thrust...?
 
 	*/
-/*
+
 	// In robot coordinate system...
 	int i = 0, j = 0;
 	double vect_x = 0, vect_y = 0, wvect_x = 0, wvect_y = 0;
+	double qx = 0, qy = 0, d_mini = max_distance_around;
+
 	j = 0;
 	for (i = 0; i < (int)d_all_mes_vector.size(); i++)
 	{
 		// Might be infinity...
 		double d = Center(d_all_mes_vector[i][j]);
-		if ((d > 0)&&(d < min_distance_around))
+		if ((d > min_distance_around)&&(d < max_distance_around))
 		{
-			vect_x -= (min_distance_around-d)*cos(alpha_mes_vector[i])/min_distance_around;
-			vect_y -= (min_distance_around-d)*sin(alpha_mes_vector[i])/min_distance_around;
+			qx = -d*cos(alpha_mes_vector[i]);
+			qy = -d*sin(alpha_mes_vector[i]);
+			if (d < d_mini) d_mini = d;
+			vect_x += amplitude_avoid*pow(qx/(sqr(qx)+sqr(qy)), etalement_avoid);
+			vect_y += amplitude_avoid*pow(qy/(sqr(qx)+sqr(qy)), etalement_avoid);
+			//vect_x -= (max_distance_around-d)*cos(alpha_mes_vector[i])/max_distance_around;
+			//vect_y -= (max_distance_around-d)*sin(alpha_mes_vector[i])/max_distance_around;
 			bHObstacleToAvoid = TRUE;
 		}
 	}
 
 	if (bHObstacleToAvoid)
 	{
-		wvect_x = u_obs*cos(wpsi_obs-Center(psihat))-ul_obs*sin(wpsi_obs-Center(psihat));
-		wvect_y = u_obs*sin(wpsi_obs-Center(psihat))+ul_obs*cos(wpsi_obs-Center(psihat));
-		wvect_x = 0.5*(wvect_x+vect_x);
-		wvect_y = 0.5*(wvect_y+vect_y);
+		double norm_vect = 1;
+		if (min_distance_around_full_speed-max_distance_around > 0)
+		{
+			// lineaire
+			double a = 1/(min_distance_around_full_speed-max_distance_around);
+			double b = -a*max_distance_around;
+			norm_vect = a*d_mini+b;
+			// exp decroissante
+			//norm_vect = exp(-sqrt(min_distance_around_full_speed-min_distance_around_full_speed));
+		}
+
+		//wvect_x = 0.5*(u_obs*cos(wpsi_obs-Center(psihat))+vect_x);
+		//wvect_y = 0.5*(u_obs*sin(wpsi_obs-Center(psihat))+vect_y);
+		wvect_x = 0.5*(u_obs*cos(wpsi_obs-Center(psihat))-ul_obs*sin(wpsi_obs-Center(psihat))+vect_x);
+		wvect_y = 0.5*(u_obs*sin(wpsi_obs-Center(psihat))+ul_obs*cos(wpsi_obs-Center(psihat))+vect_y);
+		double wpsi_obs_tmp = atan2(wvect_y, wvect_x)+Center(psihat);
+		//double norm_obs_tmp = sqrt(sqr(wvect_x)+sqr(wvect_y));
 		switch (robid)
 		{
 		case SAILBOAT_SIMULATOR_ROBID:
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
 		case SAILBOAT2_ROBID:
-			wpsi_obs = atan2(wvect_y, wvect_x)+Center(psihat);
+			wpsi_obs = wpsi_obs_tmp;
 			break;
 		case CISCREA_ROBID:
 		case BLUEROV_ROBID:
 		case COPTER_ROBID:
 		case ARDUCOPTER_ROBID:
-			u_obs = sqrt(sqr(wvect_x)+sqr(wvect_y))*cos(atan2(wvect_y, wvect_x)+Center(psihat));
-			ul_obs = sqrt(sqr(wvect_x)+sqr(wvect_y))*sin(atan2(wvect_y, wvect_x)+Center(psihat));
-			//wpsi_obs = atan2(wvect_y, wvect_x)+Center(psihat);
+			if (bLat_avoid)
+			{
+				u_obs = u_obs*cos(wpsi_obs_tmp)-ul_obs*sin(wpsi_obs_tmp);
+				ul_obs = u_obs*sin(wpsi_obs_tmp)+ul_obs*cos(wpsi_obs_tmp);
+				//u_obs = norm_obs_tmp*cos(wpsi_obs_tmp)-ul_obs*sin(wpsi_obs_tmp);
+				//ul_obs = norm_obs_tmp*sin(wpsi_obs_tmp)+ul_obs*cos(wpsi_obs_tmp);
+			}
+			else 
+			{
+				wpsi_obs = wpsi_obs_tmp;
+			}
 			break;
 		default:
-			//u_obs = sqrt(sqr(wvect_x)+sqr(wvect_y));
-			wpsi_obs = atan2(wvect_y, wvect_x)+Center(psihat);
+			//u_obs = norm_obs_tmp;
+			wpsi_obs = wpsi_obs_tmp;
 			break;
 		}
 	}
-*/
+
 	// Should not trigger avoidance in z if landing, check wagl != 0...?
 	
 	// > 0 to check if data is valid...

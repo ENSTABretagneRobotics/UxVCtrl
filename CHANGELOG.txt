@@ -1,3 +1,8 @@
+298
+Added lights (extra2chan) and trunk (camtiltchan) control for ETAS WHEEL.
+Updated SRF02 and Pololu telemeters.
+Added/updated kinectto2dlidar, obstacleavoidance, regsettoheading, regsettox, regsettoz, regin commands.
+
 297
 Corrected bGuidedControl and bBrakeControl conditions in Controller.cpp. 
 

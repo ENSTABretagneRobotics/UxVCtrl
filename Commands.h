@@ -701,6 +701,7 @@ inline int Commands(char* line)
 	int ival6 = 0, ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
 		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0;
 	char cval = 0;
+	BOOL bval1 = FALSE, bval2 = FALSE;
 #endif // !DISABLE_OPENCV_SUPPORT
 	char str[MAX_BUF_LEN];
 	char str2[MAX_BUF_LEN];
@@ -2300,10 +2301,16 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "obstacleavoidance %d", &bval) == 1)
+	else if (sscanf(line, "obstacleavoidance %lf %lf %lf %lf %lf %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &bval1, &bval2) == 7)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		bObstacleAvoidanceControl = bval;
+		max_distance_around = dval1;
+		min_distance_around = dval2;
+		min_distance_around_full_speed = dval3;
+		amplitude_avoid = dval4;
+		etalement_avoid = dval5;
+		bLat_avoid = bval1;
+		bObstacleAvoidanceControl = bval2;
 		if (bObstacleAvoidanceControl) printf("Obstacle avoidance control enabled.\n");
 		else printf("Obstacle avoidance control disabled.\n");
 		LeaveCriticalSection(&StateVariablesCS);
@@ -2998,6 +3005,19 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (sscanf(line, "kinectto2dlidar %d %d %lf %lf %d %d %d", &ival1, &ival2, &dval1, &dval2, &ival, &bval1, &bval2) == 7)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_VIDEO))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			nbpixhborder = ival1; nbpixvborder = ival2; minkinectrange = dval1; maxkinectrange = dval2; kinect_depth_videoid = ival; bKinectTo2DLIDAR = bval1; debug_ground = bval2;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 #endif // !DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "showgetpositionmaestro %d %d", &ival, &ival1) == 2)
 	{
@@ -3655,6 +3675,58 @@ inline int Commands(char* line)
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
+	else if (sscanf(line, "regsettoheading %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = Center(psihat);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regsettox %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = Center(xhat);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regsettoy %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = Center(yhat);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regsettoz %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = Center(zhat);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
 	else if (sscanf(line, "regprint %d", &ival) == 1)
 	{
 		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
@@ -3722,6 +3794,35 @@ inline int Commands(char* line)
 				{
 					if (bEcho) printf("execute %d\n", ival4);
 					ExecuteProcedure(ival4);
+				}
+			}
+		}
+	}
+	else if (sscanf(line, "regin %d %d %d %d %d", &ival1, &ival2, &ival3, &ival4, &ival5) == 5)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS)||(ival3 < 0)||(ival3 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			bval = ((registers[ival1] >= registers[ival2])&&(registers[ival1] <= registers[ival3]));
+			LeaveCriticalSection(&RegistersCS);
+			if (bval)
+			{
+				if (ival4 != -1)
+				{
+					if (bEcho) printf("execute %d\n", ival4);
+					ExecuteProcedure(ival4);
+				}
+			}
+			else
+			{
+				if (ival5 != -1)
+				{
+					if (bEcho) printf("execute %d\n", ival5);
+					ExecuteProcedure(ival5);
 				}
 			}
 		}

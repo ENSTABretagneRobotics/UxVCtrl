@@ -99,6 +99,7 @@ struct VIDEO
 	int bFlip;
 	int HorizontalBeam;
 	int VerticalBeam;
+	double x, y, z, phi, theta, psi;
 	int nb_excluded_area_points;
 	CvPoint* excluded_area_points;
 };
@@ -867,6 +868,12 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		pVideo->bFlip = 0;
 		pVideo->HorizontalBeam = 70;
 		pVideo->VerticalBeam = 50;
+		pVideo->x = 0;
+		pVideo->y = 0;
+		pVideo->z = 0;
+		pVideo->phi = 0;
+		pVideo->theta = 0;
+		pVideo->psi = 0;
 		pVideo->nb_excluded_area_points = 0;
 		pVideo->excluded_area_points = NULL;
 
@@ -907,6 +914,18 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pVideo->HorizontalBeam) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->VerticalBeam) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->x) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->y) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->z) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->phi) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->theta) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%lf", &pVideo->psi) != 1) printf("Invalid configuration file.\n");
 
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->nb_excluded_area_points) != 1) printf("Invalid configuration file.\n");

@@ -73,6 +73,15 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 				}
 
 				LeaveCriticalSection(&OpenCVVideoCS);
+
+				EnterCriticalSection(&StateVariablesCS);
+
+				HorizontalBeamVideo[videoid] = video.HorizontalBeam;
+				VerticalBeamVideo[videoid] = video.VerticalBeam;
+				xVideo[videoid] = video.x; yVideo[videoid] = video.y; zVideo[videoid] = video.z; phiVideo[videoid] = video.phi; thetaVideo[videoid] = video.theta; psiVideo[videoid] = video.psi;
+
+				LeaveCriticalSection(&StateVariablesCS);
+
 				//mSleep(captureperiod);
 			}
 			else 

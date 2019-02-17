@@ -154,7 +154,7 @@
 %
 %waypointslist bGenerateLineToFirst bStation delay_wait_new t_station t (bGenerateLineToFirst : int [0,1] 0 to start directly to follow the first line (useful e.g. when we are already on it and we do not want to go back to its beginning) or 1 to generate a preliminary line from the current position to the beginning of the first line, bStation : int [0,1], delay_wait_new : double [0,oo[ time to wait when the list is probably being changed in s, t_station : double [0,oo[ time to wait when the last waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function waits for a waypoints list from OpenCPN (through NMEAInterface) and blocks until the timeout is reached or the last waypoint is reached with bStation set to 0)
 %
-%obstacleavoidance bEnable
+%obstacleavoidance max_distance_around min_distance_around min_distance_around_full_speed amplitude_avoid etalement_avoid bLat_avoid bEnable
 %
 % DEVICES COMMANDS
 %
@@ -213,6 +213,8 @@
 %im483iconfig IM483I.txt bPause
 %
 %videoconfig videoid Video.txt bPause
+%
+%kinectto2dlidar nbpixhborder nbpixvborder minkinectrange maxkinectrange videoid bEnable debug (minkinectrange, maxkinectrange in m, uses also Horizontal/VerticalBeamVideo and z from the selected Video)
 %
 %showgetpositionmaestro deviceid channel (channel : int [0,24])
 %
@@ -378,11 +380,21 @@
 %
 %regsetrand regid minvalue maxvalue (regid : int [0,32[, minvalue : double ]-oo,oo[, maxvalue : double ]-oo,oo[)
 %
+%regsettoheading regid (regid : int [0,32[)
+%
+%regsettox regid (regid : int [0,32[)
+%
+%regsettoy regid (regid : int [0,32[)
+%
+%regsettoz regid (regid : int [0,32[)
+%
 %regprint regid (regid : int [0,32[)
 %
 %regeq regid1 regid2 procid_true procid_false (regid1 : int [0,32[, regid2 : int [0,32[, procid_true : int [-1,256[ execute procid_true if regid1 == regid2, does nothing if -1, procid_false : int [-1,256[ execute procid_false if regid1 != regid2, does nothing if -1)
 %
 %reglt regid1 regid2 procid_true procid_false (regid1 : int [0,32[, regid2 : int [0,32[, procid_true : int [-1,256[ execute procid_true if regid1 < regid2, does nothing if -1, procid_false : int [-1,256[ execute procid_false if regid1 >= regid2, does nothing if -1)
+%
+%regin regid1 regid2 regid3 procid_true procid_false (regid1 : int [0,32[, regid2 : int [0,32[, regid3 : int [0,32[, procid_true : int [-1,256[ execute procid_true if regid1 in [regid2,regid3] does nothing if -1, procid_false : int [-1,256[ execute procid_false if regid1 not in [regid2,regid3], does nothing if -1)
 %
 %help
 %

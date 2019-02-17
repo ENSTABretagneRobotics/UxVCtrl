@@ -7,6 +7,10 @@ COM6
 1000
 % bSaveRawData
 1
+% RangingDelay (in ms)
+100
+% bMedianFilter
+0
 % PololuType (0 : Maestro, 1 : Jrk)
 0
 % DeviceNumber (default is 12 for Maestro, 11 for Jrk)

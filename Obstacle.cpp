@@ -9,87 +9,257 @@
 
 #include "Obstacle.h"
 
-/*
-void set_kinect_d_vectors()
+using namespace cv;
+using namespace std;
+
+vector< vector<double> > lidarDistanceAndAngle (Mat imgIn, 
+                                                double rangeMax, 
+                                                double verticalFOV, 
+                                                double horizontalFOV, 
+                                                double cameraHeight, 
+                                                int maxHorizontalChecking,
+                                                int maxVerticalChecking,
+												int debug_ground)
 {
-	int i = 0, j = 0, index = 0;
-	double* angles, double* distances, int nbhtelemeters, struct timeval tv;
 
-	int kinect_depth_videoid = 0;
+  Mat channels[3];
+  split(imgIn,channels);
+  Mat processed = channels[0];
 
-	IplImage* image = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+  
+
+  
+  if (maxHorizontalChecking > processed.cols/2)
+  {
+    maxHorizontalChecking = processed.cols/2;
+  }
+
+  vector<double> lidDist(maxHorizontalChecking*2,rangeMax);
+  vector<double> lidHorizontalAngle(maxHorizontalChecking*2,rangeMax);
+  vector<double> lidVerticalAngle;
+  vector< vector<double> > lidInfo;
+
+
+
+  // Geometry  length in cm, angles in rad
+  double h                       = cameraHeight;
+  double theta                   = verticalFOV*M_PI/180;
+  double alpha                   = (M_PI/2) - (theta/2); 
+  double hypMin                  = h / cos(alpha);
+  double xMin                    = hypMin * sin(alpha);
+  double hypMax                  = rangeMax;
+  double beta                    = acos(h/hypMax);
+  double xMax                    = sqrt((hypMax*hypMax)-(h*h));
+  double gamma                   = beta - alpha;
+  int verticalPixPerDeg          = (int)round(processed.cols/horizontalFOV);
+  int horizontalPixPerDeg        = (int)round(processed.rows/verticalFOV);
+  double depthScale              = rangeMax/ 255;
+
+
+  // Intialize necessary variables
+  double newAlphaStraight        = 0; 
+  double supposedDistStraight    = 0;
+  int supposedPixValue           = 0;
+  int actualPixValueLeft         = 0;
+  int actualPixValueRight        = 0;
+  double straightDistanceFromRov = 0;
+  double newAlphaRotated         = 0;
+  double rotatedDistanceFromRov  = 0;
+  double supposedDistRotated     = 0;
+  double minThetaDistLeft        = 10000;
+  double minThetaDistRight       = 10000;
+
+  // Debug variables
+  Mat imgLid2d;
+  Mat imgObstacles;
+  double minThetaLeft = 0;
+  double minThetaRight = 0;
+
+
+
+  
+  if(debug_ground)
+  {
+    // Initializing Debug Variables
+    imgLid2d     = processed.clone();
+    imgObstacles = processed.clone();
+    lidVerticalAngle.resize(processed.cols,rangeMax);
+    minThetaLeft            = 0;
+    minThetaRight           = 0;
+
+    // Print geometry calculations
+    cout << "theta deg: " << theta*180/M_PI <<  " alpha deg: " << alpha*180/M_PI << " beta deg: " << beta*180/M_PI << " gamma deg: " << gamma*180/M_PI << endl;
+    cout << "theta rad: " << theta <<  " alpha rad: " << alpha << " beta rad: " << beta << " gamma rad: " << gamma << endl;
+    cout << "hypMin: " << hypMin << "cm, hypMax: " << hypMax << "cm, xMin: "<< xMin << "cm, xMax: " << xMax << "cm"<< endl;
+    cout << "depthScale: " << depthScale << " vertical pix per deg: " << verticalPixPerDeg << " horizontal pix per deg: ";
+    cout << horizontalPixPerDeg << endl;
+  }
+
+
+
+  for (int j = 0; j < maxHorizontalChecking; j++)
+  {
+    minThetaDistLeft       = 10000;
+    minThetaDistRight      = 10000;
+    newAlphaRotated        = j * ((1*M_PI)/(horizontalPixPerDeg*180));
+    
+    for (int i = 0; i < maxVerticalChecking; i++)
+    {
+
+      newAlphaStraight        = alpha + i * ((1*M_PI)/(verticalPixPerDeg*180));
+      supposedDistStraight    = h / cos(newAlphaStraight);
+      straightDistanceFromRov = supposedDistStraight * sin(newAlphaStraight);
+      rotatedDistanceFromRov  = straightDistanceFromRov / cos(newAlphaRotated);
+      supposedDistRotated     = rotatedDistanceFromRov / sin(newAlphaStraight);
+      supposedPixValue        = (int)(255 + 2 - supposedDistRotated / depthScale);
+      actualPixValueLeft      = (int)processed.at<uchar>((processed.rows-1)-i,processed.cols/2 -1 - j);
+      actualPixValueRight     = (int)processed.at<uchar>((processed.rows-1)-i,processed.cols/2 + j);
+      
+      
+      // Checking if the pixel detected is the ground left side
+      if (abs(actualPixValueLeft - supposedPixValue) > 8)
+      {
+        if(debug_ground)
+        {
+        imgObstacles.at<uchar>((processed.rows-1)-i,processed.cols/2 -1 - j) = 255;
+        }
+
+        // If an obstacle, looking for the closest one
+        if ((255 -actualPixValueLeft)*depthScale < minThetaDistLeft)
+        {
+          minThetaDistLeft = (255 - actualPixValueLeft)*depthScale;
+          // Debug
+          if(debug_ground)
+          {
+            minThetaLeft     = -(M_PI/2 - newAlphaStraight);
+            imgLid2d.at<uchar>((processed.rows-1)-i,processed.cols/2 -1 - j) = 255;
+          }
+        }
+      }
+
+
+
+
+      
+
+      // Checking if the pixel detected is the ground left side
+      if (abs(actualPixValueRight- supposedPixValue) > 8)
+      {
+        if(debug_ground)
+        {
+          imgObstacles.at<uchar>((processed.rows-1)-i,processed.cols/2 + j) = 255;
+        }
+
+        //If an obstacle, looking for the closest one
+        if ((255 - actualPixValueRight)*depthScale < minThetaDistRight)
+        {
+          minThetaDistRight = (255 - actualPixValueRight)*depthScale;
+
+          if (debug_ground)
+          {
+            minThetaRight     = - ((M_PI/2) - newAlphaStraight);
+            imgLid2d.at<uchar>((processed.rows-1)-i,processed.cols/2 + j) = 255;
+          }
+
+        }
+      }
+
+
+    }
+    lidHorizontalAngle[processed.cols/2 -1 -j] = newAlphaRotated; 
+    lidHorizontalAngle[processed.cols/2 +j] = - newAlphaRotated;
+    lidDist[processed.cols/2 -1 -j] =  minThetaDistLeft;
+    lidDist[processed.cols/2 + j] = minThetaDistRight;
+
+    if(debug_ground)
+    {
+      lidVerticalAngle[processed.cols/2 -1 -j] = minThetaLeft;
+      lidVerticalAngle[processed.cols/2 + j] = minThetaRight;
+    }
+
+  }
+
+  
+  lidInfo.push_back(lidHorizontalAngle);
+  lidInfo.push_back(lidDist);
+
+  if(debug_ground)
+  {
+    lidInfo.push_back(lidVerticalAngle);
+    imwrite("result_lid2D.png", imgLid2d);
+    imwrite("result_obstacles.png", imgObstacles);
+  }
+
+
+  return(lidInfo);
+}
+
+void set_kinect_d_vectors_Video(int deviceid)
+{
+	int i = 0; //, j = 0, index = 0;
+	struct timeval tv;
+	vector< vector<double> > lidarInfo;
+	IplImage* image = NULL;
+
+	// Missing error checking...
 
 	// Get an image from the webcam or video.
-	EnterCriticalSection(&imgsCS[kinect_depth_videoid]);
-	CopyResizeScale(imgs[kinect_depth_videoid], image, bCropOnResize);
-	LeaveCriticalSection(&imgsCS[kinect_depth_videoid]);
+	EnterCriticalSection(&imgsCS[deviceid]);
+	image = cvCreateImage(cvSize(imgs[deviceid]->width, imgs[deviceid]->height), imgs[deviceid]->depth, imgs[deviceid]->nChannels);
+	cvCopy(imgs[deviceid], image, 0);
+	LeaveCriticalSection(&imgsCS[deviceid]);
 
-		// Convert image->imageData from char* to unsigned char* to work with color values in 0..255.
-		unsigned char* data = reinterpret_cast<unsigned char*>(image->imageData);
-
-		minheight = 0; // Change depending of desired field of view...
-		maxheight = image->height; // Change depending of desired field of view...
-		minwidth = 0; // Change depending of desired field of view...
-		maxwidth = image->width; // Change depending of desired field of view...
-
-		for (j = minwidth; j < maxwidth; j++)
-		{
-			angles[k] = j*anglecoef; // anglecoef to find
-			for (i = minheight; i < maxheight; i++)
-			{
-				index = 3*(j+image->width*i);
-				double b = data[0+index];// , g = data[1+index], r = data[2+index];
-
-				if (b > 0)
-				{
-					distances[k] = ;
-				}
-				else
-				{
-					distances[k] = max_kinect_range;
-				}
-			}
-		}
-
-
-
-
-
+	EnterCriticalSection(&StateVariablesCS);
+	//double rangeMax = 500; // In cm.
+	//double verticalFOV = 53.8;
+	//double horizontalFOV = 70.6;
+	//double cameraHeight = 31;
+	double rangeMax = maxkinectrange*100.0; // In cm.
+	double verticalFOV = VerticalBeamVideo[deviceid];
+	double horizontalFOV = HorizontalBeamVideo[deviceid];
+	double cameraHeight = zVideo[deviceid]*100; // In cm.
+	int maxHorizontalChecking = image->width/2-nbpixhborder;
+	int maxVerticalChecking = image->height/2-nbpixvborder;
+	LeaveCriticalSection(&StateVariablesCS);
+	lidarInfo = lidarDistanceAndAngle(cv::cvarrToMat(image), rangeMax, verticalFOV, horizontalFOV, cameraHeight, maxHorizontalChecking, maxVerticalChecking, debug_ground);
+	
 	cvReleaseImage(&image);
-
-
-	for (i = 0; i < nbhtelemeters; i++)
+	
+	if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+	
+	EnterCriticalSection(&StateVariablesCS);
+	for (i = 0; i < (int)lidarInfo.size(); i++)
 	{
-		alpha_mes = angles[i];
-		d_mes = distances[i];
+		alpha_mes_video[deviceid] = lidarInfo[0][i];
+		d_mes_video[deviceid] = lidarInfo[1][i];
 
 		// For compatibility with a Seanet...
+		d_all_mes_video[deviceid].clear();
+		d_all_mes_video[deviceid].push_back(d_mes_video[deviceid]);
 
-		d_all_mes.clear();
-		d_all_mes.push_back(d_mes);
-		alpha_mes_vector.push_back(alpha_mes);
-		d_mes_vector.push_back(d_mes);
-		d_all_mes_vector.push_back(d_all_mes);
-		t_history_vector.push_back(tv.tv_sec+0.000001*tv.tv_usec);
-		xhat_history_vector.push_back(xhat);
-		yhat_history_vector.push_back(yhat);
-		psihat_history_vector.push_back(psihat);
-		vrxhat_history_vector.push_back(vrxhat);
+		alpha_mes_video_vector[deviceid].push_back(alpha_mes_video[deviceid]);
+		d_mes_video_vector[deviceid].push_back(d_mes_video[deviceid]);
+		d_all_mes_video_vector[deviceid].push_back(d_all_mes_video[deviceid]);
+		t_video_history_vector[deviceid].push_back(tv.tv_sec+0.000001*tv.tv_usec);
+		xhat_video_history_vector[deviceid].push_back(xhat);
+		yhat_video_history_vector[deviceid].push_back(yhat);
+		psihat_video_history_vector[deviceid].push_back(psihat);
+		vrxhat_video_history_vector[deviceid].push_back(vrxhat);
 
-		if ((int)alpha_mes_vector.size() > nbhtelemeters)
+		if ((int)alpha_mes_video_vector[deviceid].size() > (int)lidarInfo.size())
 		{
-			alpha_mes_vector.pop_front();
-			d_mes_vector.pop_front();
-			d_all_mes_vector.pop_front();
-			t_history_vector.pop_front();
-			xhat_history_vector.pop_front();
-			yhat_history_vector.pop_front();
-			psihat_history_vector.pop_front();
-			vrxhat_history_vector.pop_front();
+			alpha_mes_video_vector[deviceid].pop_front();
+			d_mes_video_vector[deviceid].pop_front();
+			d_all_mes_video_vector[deviceid].pop_front();
+			t_video_history_vector[deviceid].pop_front();
+			xhat_video_history_vector[deviceid].pop_front();
+			yhat_video_history_vector[deviceid].pop_front();
+			psihat_video_history_vector[deviceid].pop_front();
+			vrxhat_video_history_vector[deviceid].pop_front();
 		}
 	}
+	LeaveCriticalSection(&StateVariablesCS);
 }
-*/
 
 #ifdef DEVEL_WAITAREA
 THREAD_PROC_RETURN_VALUE WaitAreaThread(void* pParam)
@@ -180,6 +350,25 @@ THREAD_PROC_RETURN_VALUE ObstacleThread(void* pParam)
 	for (;;)
 	{
 		mSleep(50);
+
+		if (bKinectTo2DLIDAR)
+		{
+			set_kinect_d_vectors_Video(kinect_depth_videoid);
+		}
+		else
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			alpha_mes_video_vector[kinect_depth_videoid].clear();
+			d_mes_video_vector[kinect_depth_videoid].clear();
+			d_all_mes_video_vector[kinect_depth_videoid].clear();
+			t_video_history_vector[kinect_depth_videoid].clear();
+			xhat_video_history_vector[kinect_depth_videoid].clear();
+			yhat_video_history_vector[kinect_depth_videoid].clear();
+			psihat_video_history_vector[kinect_depth_videoid].clear();
+			vrxhat_video_history_vector[kinect_depth_videoid].clear();
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+
 
 
 		if (bExit) break;

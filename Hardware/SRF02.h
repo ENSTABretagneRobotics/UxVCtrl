@@ -56,6 +56,8 @@ struct SRF02
 	int timeout;
 	BOOL bSaveRawData;
 	int RangingDelay;
+	BOOL bParallel;
+	BOOL bMedianFilter;
 	int nbdevices;
 	int addr[MAX_NB_DEVICES_SRF02];
 	double x[MAX_NB_DEVICES_SRF02];
@@ -70,6 +72,97 @@ struct SRF02
 	double d_max_err;
 };
 typedef struct SRF02 SRF02;
+
+inline int SendRangeRequestSRF02(SRF02* pSRF02, int device)
+{
+	unsigned char sendbuf[MAX_NB_BYTES_SRF02];
+	int sendbuflen = 0;
+
+	if ((device < 0)||(device >= MAX_NB_DEVICES_SRF02))
+	{
+		printf("Error reading data from a Seanet : Invalid parameter. \n");
+		return EXIT_INVALID_PARAMETER;
+	}
+
+	if (SetSlaveComputerI2CBus(&pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuf[0] = (unsigned char)COMMAND_REG_SRF02;
+	sendbuf[1] = (unsigned char)REAL_RNG_CM_CMD_SRF02;
+	sendbuflen = 2;
+
+	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSRF02->bSaveRawData)&&(pSRF02->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSRF02->pfSaveFile);
+		fflush(pSRF02->pfSaveFile);
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int RangeReplySRF02(SRF02* pSRF02, int device, double* pValue)
+{
+	unsigned char sendbuf[MAX_NB_BYTES_SRF02];
+	unsigned char recvbuf[MAX_NB_BYTES_SRF02];
+	int sendbuflen = 0;
+	int recvbuflen = 0;
+
+	if ((device < 0)||(device >= MAX_NB_DEVICES_SRF02))
+	{
+		printf("Error reading data from a Seanet : Invalid parameter. \n");
+		return EXIT_INVALID_PARAMETER;
+	}
+
+	if (SetSlaveComputerI2CBus(&pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuf[0] = (unsigned char)COMMAND_REG_SRF02;
+	sendbuflen = 1;
+
+	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSRF02->bSaveRawData)&&(pSRF02->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSRF02->pfSaveFile);
+		fflush(pSRF02->pfSaveFile);
+	}
+
+	// Prepare the buffer that should receive data from device.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 6;
+
+	if (ReadAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSRF02->bSaveRawData)&&(pSRF02->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pSRF02->pfSaveFile);
+		fflush(pSRF02->pfSaveFile);
+	}
+
+	// Display and analyze received data.
+	//printf("Received : \"%s\"\n", recvbuf);
+	*pValue = (recvbuf[3] + 256*recvbuf[2])/100.0; // Convert in m.
+
+	pSRF02->LastRanges[device] = *pValue;
+
+	return EXIT_SUCCESS;
+}
 
 inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 {
@@ -107,6 +200,21 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 
 	mSleep(pSRF02->RangingDelay);
 
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuf[0] = (unsigned char)COMMAND_REG_SRF02;
+	sendbuflen = 1;
+
+	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSRF02->bSaveRawData)&&(pSRF02->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSRF02->pfSaveFile);
+		fflush(pSRF02->pfSaveFile);
+	}
+
 	// Prepare the buffer that should receive data from device.
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 6;
@@ -130,13 +238,35 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 	return EXIT_SUCCESS;
 }
 
-inline int GetTelemetersSRF02(SRF02* pSRF02, double* pDist1, double* pDist2, double* pDist3, double* pDist4, double* pDist5)
+// delay in ms.
+inline int Get5TelemetersSRF02(SRF02* pSRF02, double* pDist1, double* pDist2, double* pDist3, double* pDist4, double* pDist5, int delay)
 {
 	if (GetRangeSRF02(pSRF02, 0, pDist1) != EXIT_SUCCESS) return EXIT_FAILURE;
+	mSleep(delay);
 	if (GetRangeSRF02(pSRF02, 1, pDist2) != EXIT_SUCCESS) return EXIT_FAILURE;
+	mSleep(delay);
 	if (GetRangeSRF02(pSRF02, 2, pDist3) != EXIT_SUCCESS) return EXIT_FAILURE;
+	mSleep(delay);
 	if (GetRangeSRF02(pSRF02, 3, pDist4) != EXIT_SUCCESS) return EXIT_FAILURE;
+	mSleep(delay);
 	if (GetRangeSRF02(pSRF02, 4, pDist5) != EXIT_SUCCESS) return EXIT_FAILURE;
+
+	return EXIT_SUCCESS;
+}
+
+inline int Get5TelemetersParallelSRF02(SRF02* pSRF02, double* pDist1, double* pDist2, double* pDist3, double* pDist4, double* pDist5)
+{
+	if (SendRangeRequestSRF02(pSRF02, 0) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (SendRangeRequestSRF02(pSRF02, 1) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (SendRangeRequestSRF02(pSRF02, 2) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (SendRangeRequestSRF02(pSRF02, 3) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (SendRangeRequestSRF02(pSRF02, 4) != EXIT_SUCCESS) return EXIT_FAILURE;
+	mSleep(pSRF02->RangingDelay);
+	if (RangeReplySRF02(pSRF02, 0, pDist1) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (RangeReplySRF02(pSRF02, 1, pDist2) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (RangeReplySRF02(pSRF02, 2, pDist3) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (RangeReplySRF02(pSRF02, 3, pDist4) != EXIT_SUCCESS) return EXIT_FAILURE;
+	if (RangeReplySRF02(pSRF02, 4, pDist5) != EXIT_SUCCESS) return EXIT_FAILURE;
 
 	return EXIT_SUCCESS;
 }
@@ -164,6 +294,8 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 		pSRF02->timeout = 1000;
 		pSRF02->bSaveRawData = 1;
 		pSRF02->RangingDelay = 66;
+		pSRF02->bParallel = 0;
+		pSRF02->bMedianFilter = 0;
 		pSRF02->nbdevices = 5;
 		for (device = 0; device < MAX_NB_DEVICES_SRF02; device++)
 		{
@@ -194,6 +326,10 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSRF02->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSRF02->RangingDelay) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSRF02->bParallel) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSRF02->bMedianFilter) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSRF02->nbdevices) != 1) printf("Invalid configuration file.\n");
 

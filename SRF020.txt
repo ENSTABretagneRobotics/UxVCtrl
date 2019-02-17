@@ -8,6 +8,10 @@
 1
 % RangingDelay (in ms)
 66
+% bParallel
+0
+% bMedianFilter
+0
 % nbdevices
 5
 % Device 0
@@ -314,6 +318,7 @@
 0
 % max
 0
+%
 % alpha_max_err (in rad)
 0.01
 % d_max_err (in m)

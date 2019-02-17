@@ -858,6 +858,21 @@ extern deque<interval> xhat_video_history_vector[MAX_NB_VIDEO];
 extern deque<interval> yhat_video_history_vector[MAX_NB_VIDEO];
 extern deque<interval> psihat_video_history_vector[MAX_NB_VIDEO];
 extern deque<interval> vrxhat_video_history_vector[MAX_NB_VIDEO];
+extern double HorizontalBeamVideo[MAX_NB_VIDEO];
+extern double VerticalBeamVideo[MAX_NB_VIDEO];
+extern double xVideo[MAX_NB_VIDEO];
+extern double yVideo[MAX_NB_VIDEO];
+extern double zVideo[MAX_NB_VIDEO];
+extern double phiVideo[MAX_NB_VIDEO];
+extern double thetaVideo[MAX_NB_VIDEO];
+extern double psiVideo[MAX_NB_VIDEO];
+extern int nbpixhborder;
+extern int nbpixvborder;
+extern double minkinectrange;
+extern double maxkinectrange;
+extern int kinect_depth_videoid;
+extern BOOL bKinectTo2DLIDAR;
+extern BOOL debug_ground;
 extern BOOL bPauseVideo[MAX_NB_VIDEO];
 extern BOOL bRestartVideo[MAX_NB_VIDEO];
 #pragma endregion
@@ -906,6 +921,11 @@ extern double ibat2_filtered;
 extern double vswitch;
 extern double vswitchcoef;
 extern double vswitchthreshold;
+extern double max_distance_around;
+extern double min_distance_around;
+extern double min_distance_around_full_speed;
+extern double amplitude_avoid, etalement_avoid;
+extern BOOL bLat_avoid;
 #ifndef DISABLE_OPENCV_SUPPORT
 extern CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -1279,6 +1299,9 @@ inline int InitGlobals(void)
 		imgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(imgs[i], CV_RGB(0, 0, 0), NULL);
 #endif // !DISABLE_OPENCV_SUPPORT
+		HorizontalBeamVideo[i] = 70;
+		VerticalBeamVideo[i] = 50;
+		xVideo[i] = 0; yVideo[i] = 0; zVideo[i] = 0; phiVideo[i] = 0; thetaVideo[i] = 0; psiVideo[i] = 0;
 		bPauseVideo[i] = FALSE;
 		bRestartVideo[i] = FALSE;
 		InitCriticalSection(&VideoRecordRequestsCS[i]);
@@ -1389,7 +1412,7 @@ inline int InitGlobals(void)
 #ifndef DISABLE_OPENCV_SUPPORT
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
-	colorsonarlidar = CV_RGB(0, 0, 255);
+	colorsonarlidar = CV_RGB(255, 255, 0);
 	fSeanetOverlayImg = SONAR_IMG_LEVER_ARMS|SONAR_IMG_ALL_DISTANCES|SONAR_IMG_NORMAL;
 #endif // !DISABLE_OPENCV_SUPPORT
 
@@ -1430,6 +1453,13 @@ inline int InitGlobals(void)
 	rudderminangle = -0.7;
 	ruddermidangle = 0.0;
 	ruddermaxangle = 0.7;
+
+	max_distance_around = d_max_err+4*sqrt(sqr(roblength)+sqr(robwidth));
+	min_distance_around = d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth));
+	min_distance_around_full_speed = 0.5;
+	amplitude_avoid = 5;
+	etalement_avoid = 1.2;
+	bLat_avoid = TRUE;
 
 	return EXIT_SUCCESS;
 }
@@ -1534,6 +1564,9 @@ inline int ReleaseGlobals(void)
 		DeleteCriticalSection(&VideoRecordRequestsCS[i]);
 		bRestartVideo[i] = FALSE;
 		bPauseVideo[i] = FALSE;
+		xVideo[i] = 0; yVideo[i] = 0; zVideo[i] = 0; phiVideo[i] = 0; thetaVideo[i] = 0; psiVideo[i] = 0;
+		VerticalBeamVideo[i]  = 50;
+		HorizontalBeamVideo[i] = 70;
 #ifndef DISABLE_OPENCV_SUPPORT
 		cvReleaseImage(&imgs[i]);
 #endif // !DISABLE_OPENCV_SUPPORT

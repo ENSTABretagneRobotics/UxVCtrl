@@ -108,10 +108,15 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	int counter = 0, counter_modulo = 0;
 	double x = 0, y = 0, z = 0;
 	struct timeval tv;
-	int nbhtelemeters = 0;
+	int nbhtelemeters = 0, nbvtelemeters = 0, nbtelemeters = 0;
 	double angles[MAX_NB_TELEMETERS_POLOLU];
 	double distances[MAX_NB_TELEMETERS_POLOLU];
+	double distances1[MAX_NB_TELEMETERS_POLOLU];
+	double distances2[MAX_NB_TELEMETERS_POLOLU];
+	CHRONO chrono_telem_pulse;
+	CHRONO chrono_get_telem;
 	int showgetposition = -1, setposition = -1;
+	double lights_prev = -1, cameratilt_prev = -1;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int deviceid = (intptr_t)pParam;
@@ -123,6 +128,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	sprintf(szCfgFilePath, "Pololu%d.txt", deviceid);
 
 	memset(&pololu, 0, sizeof(POLOLU));
+
+	StartChrono(&chrono_telem_pulse);
+	StartChrono(&chrono_get_telem);
 
 	StartChrono(&chrono_period);
 
@@ -167,6 +175,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
 				memset(distances, 0, sizeof(distances));
+				memset(distances1, 0, sizeof(distances1));
+				memset(distances2, 0, sizeof(distances2));
 
 				EnterCriticalSection(&StateVariablesCS);
 
@@ -183,6 +193,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				//showgetposition = -1;
 				//SetPositionMaestroPololu[deviceid] = -1;
 				//setposition = -1;
+
+				lights_prev = -1;
+				cameratilt_prev = -1;
 
 				LeaveCriticalSection(&StateVariablesCS);
 
@@ -587,8 +600,10 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				setposition = SetPositionMaestroPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				// Pulse to wake up telemeters.
-				if (pololu.extra1chan != -1)
+				if ((pololu.extra1chan != -1)&&(GetTimeElapsedChronoQuick(&chrono_telem_pulse) > pololu.RangingDelay))
 				{
+					StopChronoQuick(&chrono_telem_pulse);
+					StartChrono(&chrono_telem_pulse);
 					if (SetPulsePololu(&pololu, pololu.extra1chan, 10000) != EXIT_SUCCESS)
 					{
 						printf("Connection to a Pololu lost.\n");
@@ -597,6 +612,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						mSleep(50);
 						break;
 					}
+					//StopChronoQuick(&chrono_get_telem);
+					//StartChrono(&chrono_get_telem);
 					mSleep(10);
 				}
 				if (SetThrustersPololu(&pololu, thrust1, thrust2) != EXIT_SUCCESS)
@@ -610,10 +627,12 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				mSleep(10);
 				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
 					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1)&&
-					(pololu.telem9analoginputchan != -1)&&(pololu.telem10analoginputchan != -1))
+					(pololu.telem9analoginputchan != -1)&&(pololu.telem10analoginputchan != -1)&&(GetTimeElapsedChronoQuick(&chrono_get_telem) > pololu.RangingDelay))
 				{
+					StopChronoQuick(&chrono_get_telem);
+					StartChrono(&chrono_get_telem);
 					// Assume 8 planar+2 up vertical telemeters...
-					nbhtelemeters = 10;
+					nbhtelemeters = 8; nbvtelemeters = 2; nbtelemeters = nbhtelemeters+nbvtelemeters;
 					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], 
 						&distances[6], &distances[7], &distances[8], &distances[9], &distances[10], &distances[11]) != EXIT_SUCCESS)
 					{
@@ -625,6 +644,17 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					}
 					mSleep(10);
 					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+					if (pololu.bMedianFilter)
+					{
+						// Median filter with the 3 last values.
+						for (i = 0; i < nbtelemeters; i++)
+						{
+							double tab_values[3] = { distances[i], distances1[i], distances2[i] };
+							distances[i] = median(tab_values, 3);
+						}
+						memcpy(distances2, distances1, sizeof(distances));
+						memcpy(distances1, distances, sizeof(distances));
+					}
 					EnterCriticalSection(&StateVariablesCS);
 					i = pololu.telem1analoginputchan;
 					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
@@ -662,10 +692,12 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
-					(pololu.telem5analoginputchan != -1))
+					(pololu.telem5analoginputchan != -1)&&(GetTimeElapsedChronoQuick(&chrono_get_telem) > pololu.RangingDelay))
 				{
+					StopChronoQuick(&chrono_get_telem);
+					StartChrono(&chrono_get_telem);
 					// Assume 4 planar+1 up vertical telemeters...
-					nbhtelemeters = 4;
+					nbhtelemeters = 4; nbvtelemeters = 1; nbtelemeters = nbhtelemeters+nbvtelemeters;
 					if (GetTelemetersPololu(&pololu, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], &distances[5], 
 						&distances[6], &distances[7], &distances[8], &distances[9], &distances[10], &distances[11]) != EXIT_SUCCESS)
 					{
@@ -677,6 +709,17 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					}
 					mSleep(10);
 					if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+					if (pololu.bMedianFilter)
+					{
+						// Median filter with the 3 last values.
+						for (i = 0; i < nbtelemeters; i++)
+						{
+							double tab_values[3] = { distances[i], distances1[i], distances2[i] };
+							distances[i] = median(tab_values, 3);
+						}
+						memcpy(distances2, distances1, sizeof(distances));
+						memcpy(distances1, distances, sizeof(distances));
+					}
 					EnterCriticalSection(&StateVariablesCS);
 					i = pololu.telem1analoginputchan;
 					x = pololu.analoginputx[i]+distances[i]*cos(pololu.analoginputpsi[i]); y = pololu.analoginputy[i]+distances[i]*sin(pololu.analoginputpsi[i]);
@@ -700,6 +743,32 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
+				if ((pololu.extra2chan != -1)&&(lights != lights_prev))
+				{
+					if (SetPWMPololu(&pololu, pololu.extra2chan, DEFAULT_MIN_PW_POLOLU+(int)(lights*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU))) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					lights_prev = lights;
+				}
+				if ((pololu.camtiltchan != -1)&&(cameratilt != cameratilt_prev))
+				{
+					if (SetPWMPololu(&pololu, pololu.camtiltchan, DEFAULT_MID_PW_POLOLU+(int)(cameratilt*(DEFAULT_MAX_PW_POLOLU-DEFAULT_MIN_PW_POLOLU)/2.0)) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Pololu lost.\n");
+						bConnected = FALSE;
+						DisconnectPololu(&pololu);
+						mSleep(50);
+						break;
+					}
+					mSleep(10);
+					cameratilt_prev = cameratilt;
+				}
 				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			}
@@ -744,6 +813,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	}
 
 	StopChronoQuick(&chrono_period);
+
+	StopChronoQuick(&chrono_get_telem);
+	StopChronoQuick(&chrono_telem_pulse);
 
 	if (pololu.pfSaveFile != NULL)
 	{

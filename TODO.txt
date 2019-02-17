@@ -1,10 +1,9 @@
+Données LIDAR qui apparaissent à d=0?
+Vérifier interprétation out of range pour les télémètres...
 
 pour chaque lidar prévoir comme excluded_area_points dans video...
 
 Gotoopi opiid
-Regsettoheading
-Regsettox
-Regsettoz
 
 CorrectImageBordersRawBGR() : param nbpixborder devrait pas être hardcoded...
 
@@ -32,12 +31,10 @@ GetTelemetersPololu(tableau)...?
 ouverture angulaire des sonars, rajouter param analoginputbeam?->un peu déjà géré par alpha_max_err mais suppose que tous les télémètres sont identiques...
 rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
 
-commande pour activer traitement kinectto2dlidar minheight maxheight minwidth maxwidth hbeam vbeam min_kinect_range max_kinect_range videoid
 rajouter mark/quality et/ou type (pour connaitre le capteur d'origine) pour chaque d_mes pour aider dans la fusion lidar, video(kinect), sonar?
 commande pour changer quels capteurs rentrent dans la fusion : sonarprocessing simulator seanet hokuyo rplidar pololu0 pololu1 pololu2 BlueView0 BlueView1 video0 video1 video2
 
-s'assurer que out of range correspond à oo pour tous les capteurs...
-d_mes vs d_all_mes : s'assurer que d_mes est le min...
+d_mes vs d_all_mes : s'assurer que d_mes est le min et que dans d_all_mes, la 1ère doit être la plus petite...
 
 logobstacle?
 
@@ -55,7 +52,7 @@ logobstacle?
 
 env obstacles interdit intérieur 
 
-drone : pour suivre un vecteur, faire en sorte que l'orientation du drone aille progressivement dans le bon sens quand on le contrôle avec u et ul...
+drone : pour suivre un vecteur, faire en sorte que l'orientation du drone aille progressivement dans le bon sens quand on le contrôle avec u et ul...?
 ajouter Kp_y, Kd_y, etc. pour ul control et aussi en x pour u control (distancecontrol...)
 brakecontrol sould be superseded by bLoiterControl...
 station vs bDistanceControl vs bGuidedControl vs bLoiterControl?

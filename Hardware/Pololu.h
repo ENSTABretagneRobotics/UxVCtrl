@@ -86,6 +86,8 @@ struct POLOLU
 	int BaudRate;
 	int timeout;
 	BOOL bSaveRawData;
+	int RangingDelay;
+	BOOL bMedianFilter;
 	int PololuType;
 	int DeviceNumber;
 	int MinPWs[NB_CHANNELS_PWM_POLOLU];
@@ -919,6 +921,8 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 		pPololu->BaudRate = 115200;
 		pPololu->timeout = 1000;
 		pPololu->bSaveRawData = 1;
+		pPololu->RangingDelay = 1000;
+		pPololu->bMedianFilter = 0;
 		pPololu->PololuType = 0;
 		pPololu->DeviceNumber = DEFAULT_DEVICE_NUMBER_MAESTRO;
 		for (channel = 0; channel < NB_CHANNELS_PWM_POLOLU; channel++)
@@ -1001,6 +1005,10 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pPololu->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->RangingDelay) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->bMedianFilter) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->PololuType) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

@@ -33,6 +33,18 @@ test1.wmv
 70
 % VerticalBeam (in ]0..360] deg)
 50
+% x (in m, in robot coordinate system)
+0
+% y (in m, in robot coordinate system)
+0
+% z (in m, in robot coordinate system)
+0
+% phi (in rad, in robot coordinate system)
+0
+% theta (in rad, in robot coordinate system)
+0
+% psi (in rad, in robot coordinate system)
+0
 % nb_excluded_area_points
 0
 %3

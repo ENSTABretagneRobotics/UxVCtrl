@@ -51,9 +51,11 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 	SRF02 srf02;
 	double x = 0, y = 0, z = 0;
 	struct timeval tv;
-	int nbhtelemeters = 0;
+	int nbhtelemeters = 0, nbvtelemeters = 0, nbtelemeters = 0;
 	double angles[MAX_NB_DEVICES_SRF02];
 	double distances[MAX_NB_DEVICES_SRF02];
+	double distances1[MAX_NB_DEVICES_SRF02];
+	double distances2[MAX_NB_DEVICES_SRF02];
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	char szCfgFilePath[256];
@@ -110,6 +112,8 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
 				memset(distances, 0, sizeof(distances));
+				memset(distances1, 0, sizeof(distances1));
+				memset(distances2, 0, sizeof(distances2));
 
 				if (srf02.pfSaveFile != NULL)
 				{
@@ -153,17 +157,43 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 			//	(srf02.telem5chan != -1))
 			{
 				// Assume 4 planar+1 up vertical telemeters...
-				nbhtelemeters = 4;
-				if (GetTelemetersSRF02(&srf02, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4]) != EXIT_SUCCESS)
+				nbhtelemeters = 4; nbvtelemeters = 1; nbtelemeters = nbhtelemeters+nbvtelemeters;
+				if (srf02.bParallel)
 				{
-					printf("Connection to a SRF02 lost.\n");
-					bConnected = FALSE;
-					DisconnectSRF02(&srf02);
-					mSleep(50);
-					continue;
+					if (Get5TelemetersParallelSRF02(&srf02, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4]) != EXIT_SUCCESS)
+					{
+						printf("Connection to a SRF02 lost.\n");
+						bConnected = FALSE;
+						DisconnectSRF02(&srf02);
+						mSleep(50);
+						continue;
+					}
+					mSleep(20);
 				}
-				mSleep(10);
+				else
+				{
+					if (Get5TelemetersSRF02(&srf02, &distances[0], &distances[1], &distances[2], &distances[3], &distances[4], 10) != EXIT_SUCCESS)
+					{
+						printf("Connection to a SRF02 lost.\n");
+						bConnected = FALSE;
+						DisconnectSRF02(&srf02);
+						mSleep(50);
+						continue;
+					}
+					mSleep(10);
+				}
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+				if (srf02.bMedianFilter)
+				{
+					// Median filter with the 3 last values.
+					for (i = 0; i < nbtelemeters; i++)
+					{
+						double tab_values[3] = { distances[i], distances1[i], distances2[i] };					
+						distances[i] = median(tab_values, 3);
+					}
+					memcpy(distances2, distances1, sizeof(distances));
+					memcpy(distances1, distances, sizeof(distances));
+				}
 				EnterCriticalSection(&StateVariablesCS);
 				i = 0;
 				x = srf02.x[i]+distances[i]*cos(srf02.psi[i]); y = srf02.y[i]+distances[i]*sin(srf02.psi[i]);

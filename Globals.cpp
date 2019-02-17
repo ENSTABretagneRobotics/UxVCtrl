@@ -634,6 +634,21 @@ deque<interval> xhat_video_history_vector[MAX_NB_VIDEO];
 deque<interval> yhat_video_history_vector[MAX_NB_VIDEO];
 deque<interval> psihat_video_history_vector[MAX_NB_VIDEO];
 deque<interval> vrxhat_video_history_vector[MAX_NB_VIDEO];
+double HorizontalBeamVideo[MAX_NB_VIDEO];
+double VerticalBeamVideo[MAX_NB_VIDEO];
+double xVideo[MAX_NB_VIDEO];
+double yVideo[MAX_NB_VIDEO];
+double zVideo[MAX_NB_VIDEO];
+double phiVideo[MAX_NB_VIDEO];
+double thetaVideo[MAX_NB_VIDEO];
+double psiVideo[MAX_NB_VIDEO];
+int nbpixhborder = 0;
+int nbpixvborder = 0;
+double minkinectrange = 0;
+double maxkinectrange = 0;
+int kinect_depth_videoid = 0;
+BOOL bKinectTo2DLIDAR = FALSE;
+BOOL debug_ground = FALSE;
 BOOL bPauseVideo[MAX_NB_VIDEO];
 BOOL bRestartVideo[MAX_NB_VIDEO];
 #pragma endregion
@@ -682,6 +697,11 @@ double ibat2_filtered = 0;
 double vswitch = 0; 
 double vswitchcoef = 0; 
 double vswitchthreshold = 0; 
+double max_distance_around = 0;
+double min_distance_around = 0;
+double min_distance_around_full_speed = 0;
+double amplitude_avoid = 0, etalement_avoid = 0;
+BOOL bLat_avoid = FALSE;
 #ifndef DISABLE_OPENCV_SUPPORT
 CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
