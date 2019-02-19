@@ -390,8 +390,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		// Obstacles handling...
 
 		u_obs = u;
-		uw_obs = uw; // Useless?
-		uv_obs = uv; // Useless?
+		//uw_obs = uw; // ?
+		//uv_obs = uv; // ?
 		ul_obs = ul;
 		if (bLineFollowingControl||bWaypointControl||bGuidedControl||bHeadingControl)
 		{
@@ -406,11 +406,23 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		if (bAltitudeAGLControl) wagl_obs = wagl; else wagl_obs = altitude_AGL; // Useless?
 		if (bDepthControl) wz_obs = wz; else wz_obs = Center(zhat);
 
-		bHObstacleToAvoid = FALSE; bVObstacleToAvoid = FALSE;
 		if (bObstacleAvoidanceControl)
 		{
+			BOOL bHObstacleToAvoid_prev = bHObstacleToAvoid, bVObstacleToAvoid_prev = bVObstacleToAvoid;
 			// Should modify here u/ul/wpsi/wz_obs depending on obstacles without modifying u/ul/wpsi/wz...
 			ObstacleAvoidance(&u_obs, &uw_obs, &uv_obs, &ul_obs, &wpsi_obs, &wagl_obs, &wz_obs, &bHObstacleToAvoid, &bVObstacleToAvoid);
+			if (bHObstacleToAvoid != bHObstacleToAvoid_prev)
+			{
+				if (bHObstacleToAvoid) uw_obs = uw; else uw = uw_obs;
+			}
+			if (bVObstacleToAvoid != bVObstacleToAvoid_prev)
+			{
+				if (bVObstacleToAvoid) uv_obs = uv; else uv = uv_obs;
+			}
+		}
+		else
+		{
+			bHObstacleToAvoid = FALSE; bVObstacleToAvoid = FALSE;
 		}
 		
 		// All the code after that should use wpsi/wz_obs instead of just wpsi/wz...

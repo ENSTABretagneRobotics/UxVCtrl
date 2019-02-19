@@ -789,7 +789,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		printf("Invalid parameter : target_component.\n");
 		pMAVLinkDevice->target_component = 0;
 	}
-	if ((pMAVLinkDevice->overridechan < 1)||(pMAVLinkDevice->overridechan > 18))
+	if (pMAVLinkDevice->overridechan < 1)//||(pMAVLinkDevice->overridechan > 18))
 	{
 		printf("Invalid parameter : overridechan.\n");
 		pMAVLinkDevice->overridechan = 17;

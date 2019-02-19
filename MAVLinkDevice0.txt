@@ -45,7 +45,7 @@ COM12
 0
 % bDefaultDisablePWMOverride
 1
-% overridechan (RC input channel used to disable RC override, from 1 to 18)
+% overridechan (RC input channel used to disable RC override, from 1 to 18, set to higher if unused)
 6
 % channel 0
 % MinPW (in us)

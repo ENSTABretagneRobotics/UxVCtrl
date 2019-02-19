@@ -1,3 +1,7 @@
+300
+Updated obstacle avoidance.
+Corrected error message about overridechan too high if set to 19.
+
 299
 Updated obstacle avoidance.
 Updated SRF02 and Pololu telemeters.
