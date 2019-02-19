@@ -56,6 +56,7 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 	double distances[MAX_NB_DEVICES_SRF02];
 	double distances1[MAX_NB_DEVICES_SRF02];
 	double distances2[MAX_NB_DEVICES_SRF02];
+	double distances3[MAX_NB_DEVICES_SRF02];
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	char szCfgFilePath[256];
@@ -114,6 +115,7 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 				memset(distances, 0, sizeof(distances));
 				memset(distances1, 0, sizeof(distances1));
 				memset(distances2, 0, sizeof(distances2));
+				memset(distances3, 0, sizeof(distances3));
 
 				if (srf02.pfSaveFile != NULL)
 				{
@@ -186,14 +188,16 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 				if (srf02.bMedianFilter)
 				{
 					// Median filter with the 3 last values.
-					for (i = 0; i < nbtelemeters; i++)
-					{
-						double tab_values[3] = { distances[i], distances1[i], distances2[i] };					
-						distances[i] = median(tab_values, 3);
-					}
+					memcpy(distances3, distances2, sizeof(distances));
 					memcpy(distances2, distances1, sizeof(distances));
 					memcpy(distances1, distances, sizeof(distances));
+					for (i = 0; i < nbtelemeters; i++)
+					{
+						double tab_values[3] = { distances1[i], distances2[i], distances3[i] };					
+						distances[i] = median(tab_values, 3);
+					}
 				}
+				//printf("%f %f %f %f %f\n", distances[0], distances[1], distances[2], distances[3], distances[4]);
 				EnterCriticalSection(&StateVariablesCS);
 				i = 0;
 				x = srf02.x[i]+distances[i]*cos(srf02.psi[i]); y = srf02.y[i]+distances[i]*sin(srf02.psi[i]);

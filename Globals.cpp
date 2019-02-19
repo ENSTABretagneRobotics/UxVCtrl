@@ -219,6 +219,12 @@ double check_strategy_period = 0;
 double sail_update_period = 0;
 int sailboattacktype = 0;
 int sailformulatype = 0;
+double max_distance_around = 0;
+double min_distance_around = 0;
+double min_distance_around_full_speed = 0;
+double amplitude_avoid = 0;
+double etalement_avoid = 0;
+BOOL bLat_avoid = FALSE;
 int controllerperiod = 0;
 #pragma endregion
 #pragma region Observer parameters
@@ -697,11 +703,6 @@ double ibat2_filtered = 0;
 double vswitch = 0; 
 double vswitchcoef = 0; 
 double vswitchthreshold = 0; 
-double max_distance_around = 0;
-double min_distance_around = 0;
-double min_distance_around_full_speed = 0;
-double amplitude_avoid = 0, etalement_avoid = 0;
-BOOL bLat_avoid = FALSE;
 #ifndef DISABLE_OPENCV_SUPPORT
 CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -732,6 +733,7 @@ BOOL bGPSLocalization = FALSE;
 BOOL bDVLLocalization = FALSE;
 BOOL bDeleteRoute = FALSE;
 BOOL bWaypointsChanged = FALSE;
+BOOL bHObstacleToAvoid = FALSE, bVObstacleToAvoid = FALSE;
 CHRONO chrono_mission;
 char szAction[MAX_BUF_LEN];
 int labels[MAX_NB_LABELS];

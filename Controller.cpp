@@ -79,10 +79,8 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 			qx = -d*cos(alpha_mes_vector[i]);
 			qy = -d*sin(alpha_mes_vector[i]);
 			if (d < d_mini) d_mini = d;
-			vect_x += amplitude_avoid*pow(qx/(sqr(qx)+sqr(qy)), etalement_avoid);
-			vect_y += amplitude_avoid*pow(qy/(sqr(qx)+sqr(qy)), etalement_avoid);
-			//vect_x -= (max_distance_around-d)*cos(alpha_mes_vector[i])/max_distance_around;
-			//vect_y -= (max_distance_around-d)*sin(alpha_mes_vector[i])/max_distance_around;
+			vect_x += amplitude_avoid*qx/pow(sqr(qx)+sqr(qy), etalement_avoid);
+			vect_y += amplitude_avoid*qy/pow(sqr(qx)+sqr(qy), etalement_avoid);
 			bHObstacleToAvoid = TRUE;
 		}
 	}
@@ -90,6 +88,7 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 	if (bHObstacleToAvoid)
 	{
 		double norm_vect = 1;
+		double psi_vect = atan2(vect_y, vect_x);
 		if (min_distance_around_full_speed-max_distance_around > 0)
 		{
 			// lineaire
@@ -99,6 +98,9 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 			// exp decroissante
 			//norm_vect = exp(-sqrt(min_distance_around_full_speed-min_distance_around_full_speed));
 		}
+
+		vect_x = norm_vect*cos(psi_vect);
+		vect_y = norm_vect*sin(psi_vect);
 
 		//wvect_x = 0.5*(u_obs*cos(wpsi_obs-Center(psihat))+vect_x);
 		//wvect_y = 0.5*(u_obs*sin(wpsi_obs-Center(psihat))+vect_y);
@@ -135,6 +137,11 @@ int ObstacleAvoidance(double* pu_obs, double* puw_obs, double* puv_obs, double* 
 			wpsi_obs = wpsi_obs_tmp;
 			break;
 		}
+		
+
+		//printf("psi_vect = %f\n", fmod_360_pos_rad2deg(psi_vect));
+		//printf("wpsi_obs = %f\n", fmod_360_pos_rad2deg(wpsi_obs));
+
 	}
 
 	// Should not trigger avoidance in z if landing, check wagl != 0...?
@@ -182,7 +189,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	int counter = 0;
 	double norm_ba = 0, norm_ma = 0, norm_bm = 0, sinalpha = 0, phi = 0, e = 0; // For line following control.
 	double wxa_prev = 0, wya_prev = 0, wxb_prev = 0, wyb_prev = 0, wlata = 0, wlonga = 0, wlatb = 0, wlongb = 0, walt = 0; // For line following control.
-	BOOL bHObstacleToAvoid = FALSE, bVObstacleToAvoid = FALSE;
 	double u_obs = 0, uw_obs = 0, uv_obs = 0, ul_obs = 0, wpsi_obs = 0, wagl_obs = 0, wz_obs = 0;// , e_obs = 0; // For obstacle avoidance.
 	double delta_d = 0; // For distance control.
 	double delta_angle = 0; // For heading control.
@@ -400,10 +406,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		if (bAltitudeAGLControl) wagl_obs = wagl; else wagl_obs = altitude_AGL; // Useless?
 		if (bDepthControl) wz_obs = wz; else wz_obs = Center(zhat);
 
+		bHObstacleToAvoid = FALSE; bVObstacleToAvoid = FALSE;
 		if (bObstacleAvoidanceControl)
 		{
 			// Should modify here u/ul/wpsi/wz_obs depending on obstacles without modifying u/ul/wpsi/wz...
-			bHObstacleToAvoid = FALSE; bVObstacleToAvoid = FALSE;
 			ObstacleAvoidance(&u_obs, &uw_obs, &uv_obs, &ul_obs, &wpsi_obs, &wagl_obs, &wz_obs, &bHObstacleToAvoid, &bVObstacleToAvoid);
 		}
 		

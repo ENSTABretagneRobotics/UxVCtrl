@@ -1,4 +1,6 @@
+distances SRF02 dont la longueur de l'intervalle est parfois courte...?
 Données LIDAR qui apparaissent à d=0?
+pouvoir désactiver juste texte de l'OSD->on peut le faire avec les couleurs
 Vérifier interprétation out of range pour les télémètres...
 
 pour chaque lidar prévoir comme excluded_area_points dans video...

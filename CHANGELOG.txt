@@ -1,3 +1,7 @@
+299
+Updated obstacle avoidance.
+Updated SRF02 and Pololu telemeters.
+
 298
 Added lights (extra2chan) and trunk (camtiltchan) control for ETAS WHEEL.
 Updated SRF02 and Pololu telemeters.

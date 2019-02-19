@@ -820,6 +820,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else
 			{
 				bObstacleAvoidanceControl = FALSE;
+				DisableAllHorizontalControls();
 			}
 			if (bObstacleAvoidanceControl) printf("Obstacle avoidance control enabled.\n");
 			else printf("Obstacle avoidance control disabled.\n");
@@ -1746,6 +1747,30 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					sprintf(szText, "ETR:%02d:%02d:%02d", (int)(days*24+hours), minutes, seconds);
 					offset += 16;
 					cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
+				}
+			}
+			if (bObstacleAvoidanceControl)
+			{
+				if (bHObstacleToAvoid||bVObstacleToAvoid)
+				{
+					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48+12*cos(M_PI/4)), (int)(32+12*sin(M_PI/4))),
+						cvPoint((int)(opencvguiimgwidth[guiid]-48-12*cos(M_PI/4)), (int)(32-12*sin(M_PI/4))),
+						CV_RGB(255, 0, 0), 2, 8, 0);
+					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48-12*cos(M_PI/4)), (int)(32+12*sin(M_PI/4))),
+						cvPoint((int)(opencvguiimgwidth[guiid]-48+12*cos(M_PI/4)), (int)(32-12*sin(M_PI/4))),
+						CV_RGB(255, 0, 0), 2, 8, 0);
+				}
+				else
+				{
+					cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-48, 32-12),
+						cvPoint((int)(opencvguiimgwidth[guiid]-48+12), 32+12),
+						CV_RGB(0, 255, 0), 2, 8, 0);
+					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48+12), 32+12),
+						cvPoint((int)(opencvguiimgwidth[guiid]-48-12), 32+12),
+						CV_RGB(0, 255, 0), 2, 8, 0);
+					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48-12), 32+12),
+						cvPoint(opencvguiimgwidth[guiid]-48, 32-12),
+						CV_RGB(0, 255, 0), 2, 8, 0);
 				}
 			}
 			if (bOrientationCircle)

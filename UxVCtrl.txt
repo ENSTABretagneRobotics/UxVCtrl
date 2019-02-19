@@ -394,6 +394,18 @@ WMV2
 0
 % sailformulatype (0, 1 or 2, see Controller.cpp)
 0
+% max_distance_around
+1
+% min_distance_around 
+0.25
+% min_distance_around_full_speed
+0.5
+% amplitude_avoid
+5
+% etalement_avoid
+1
+% bLat_avoid
+1
 % controllerperiod (in ms)
 25
 % Observer parameters
@@ -652,13 +664,13 @@ WMV2
 0
 % Simulator physical parameters
 % x_max_rand_err (in m)
-3.0
+0.5
 % x_bias_err (in m)
-2.0
+0
 % y_max_rand_err (in m)
-3.0
+0.5
 % y_bias_err (in m)
--1.0
+0
 % z_max_rand_err (in m)
 0.05
 % z_bias_err (in m)
@@ -728,7 +740,7 @@ WMV2
 % omegas
 2.3562
 % outliers_ratio
-0.5
+0
 % bNoSimGNSSInsideObstacles
 0
 % bRawSimStateInMAVLinkInterface

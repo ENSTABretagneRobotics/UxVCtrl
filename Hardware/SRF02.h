@@ -84,7 +84,7 @@ inline int SendRangeRequestSRF02(SRF02* pSRF02, int device)
 		return EXIT_INVALID_PARAMETER;
 	}
 
-	if (SetSlaveComputerI2CBus(&pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
+	if (SetSlaveComputerI2CBus(pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -95,7 +95,7 @@ inline int SendRangeRequestSRF02(SRF02* pSRF02, int device)
 	sendbuf[1] = (unsigned char)REAL_RNG_CM_CMD_SRF02;
 	sendbuflen = 2;
 
-	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllComputerI2CBus(pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -121,7 +121,7 @@ inline int RangeReplySRF02(SRF02* pSRF02, int device, double* pValue)
 		return EXIT_INVALID_PARAMETER;
 	}
 
-	if (SetSlaveComputerI2CBus(&pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
+	if (SetSlaveComputerI2CBus(pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -131,7 +131,7 @@ inline int RangeReplySRF02(SRF02* pSRF02, int device, double* pValue)
 	sendbuf[0] = (unsigned char)COMMAND_REG_SRF02;
 	sendbuflen = 1;
 
-	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllComputerI2CBus(pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -145,7 +145,7 @@ inline int RangeReplySRF02(SRF02* pSRF02, int device, double* pValue)
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 6;
 
-	if (ReadAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (ReadAllComputerI2CBus(pSRF02->I2CBus, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -177,7 +177,7 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 		return EXIT_INVALID_PARAMETER;
 	}
 
-	if (SetSlaveComputerI2CBus(&pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
+	if (SetSlaveComputerI2CBus(pSRF02->I2CBus, pSRF02->addr[device], 0, 0, pSRF02->nbretries, pSRF02->timeout) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -188,7 +188,7 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 	sendbuf[1] = (unsigned char)REAL_RNG_CM_CMD_SRF02;
 	sendbuflen = 2;
 
-	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllComputerI2CBus(pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -205,7 +205,7 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 	sendbuf[0] = (unsigned char)COMMAND_REG_SRF02;
 	sendbuflen = 1;
 
-	if (WriteAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllComputerI2CBus(pSRF02->I2CBus, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -219,7 +219,7 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 6;
 
-	if (ReadAllComputerI2CBus(&pSRF02->I2CBus, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (ReadAllComputerI2CBus(pSRF02->I2CBus, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -420,7 +420,7 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 
 inline int DisconnectSRF02(SRF02* pSRF02)
 {
-	if (CloseComputerI2CBus(&pSRF02->I2CBus) != EXIT_SUCCESS)
+	if (CloseComputerI2CBus(pSRF02->I2CBus) != EXIT_SUCCESS)
 	{
 		printf("SRF02 disconnection failed.\n");
 		return EXIT_FAILURE;

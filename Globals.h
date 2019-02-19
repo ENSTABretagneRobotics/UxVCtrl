@@ -448,6 +448,12 @@ extern double check_strategy_period;
 extern double sail_update_period;
 extern int sailboattacktype;
 extern int sailformulatype;
+extern double max_distance_around;
+extern double min_distance_around;
+extern double min_distance_around_full_speed;
+extern double amplitude_avoid;
+extern double etalement_avoid;
+extern BOOL bLat_avoid;
 extern int controllerperiod;
 #pragma endregion
 #pragma region Observer parameters
@@ -921,11 +927,6 @@ extern double ibat2_filtered;
 extern double vswitch;
 extern double vswitchcoef;
 extern double vswitchthreshold;
-extern double max_distance_around;
-extern double min_distance_around;
-extern double min_distance_around_full_speed;
-extern double amplitude_avoid, etalement_avoid;
-extern BOOL bLat_avoid;
 #ifndef DISABLE_OPENCV_SUPPORT
 extern CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -956,6 +957,7 @@ extern BOOL bGPSLocalization;
 extern BOOL bDVLLocalization;
 extern BOOL bDeleteRoute;
 extern BOOL bWaypointsChanged;
+extern BOOL bHObstacleToAvoid, bVObstacleToAvoid;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 extern int labels[MAX_NB_LABELS];
@@ -1453,13 +1455,6 @@ inline int InitGlobals(void)
 	rudderminangle = -0.7;
 	ruddermidangle = 0.0;
 	ruddermaxangle = 0.7;
-
-	max_distance_around = d_max_err+4*sqrt(sqr(roblength)+sqr(robwidth));
-	min_distance_around = d_max_err+0.5*sqrt(sqr(roblength)+sqr(robwidth));
-	min_distance_around_full_speed = 0.5;
-	amplitude_avoid = 5;
-	etalement_avoid = 1.2;
-	bLat_avoid = TRUE;
 
 	return EXIT_SUCCESS;
 }

@@ -113,6 +113,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	double distances[MAX_NB_TELEMETERS_POLOLU];
 	double distances1[MAX_NB_TELEMETERS_POLOLU];
 	double distances2[MAX_NB_TELEMETERS_POLOLU];
+	double distances3[MAX_NB_TELEMETERS_POLOLU];
 	CHRONO chrono_telem_pulse;
 	CHRONO chrono_get_telem;
 	int showgetposition = -1, setposition = -1;
@@ -177,6 +178,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				memset(distances, 0, sizeof(distances));
 				memset(distances1, 0, sizeof(distances1));
 				memset(distances2, 0, sizeof(distances2));
+				memset(distances3, 0, sizeof(distances3));
 
 				EnterCriticalSection(&StateVariablesCS);
 
@@ -600,7 +602,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				setposition = SetPositionMaestroPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
 				// Pulse to wake up telemeters.
-				if ((pololu.extra1chan != -1)&&(GetTimeElapsedChronoQuick(&chrono_telem_pulse) > pololu.RangingDelay))
+				if ((pololu.extra1chan != -1)&&(GetTimeElapsedChronoQuick(&chrono_telem_pulse) > pololu.RangingDelay/1000.0))
 				{
 					StopChronoQuick(&chrono_telem_pulse);
 					StartChrono(&chrono_telem_pulse);
@@ -627,7 +629,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				mSleep(10);
 				if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
 					(pololu.telem5analoginputchan != -1)&&(pololu.telem6analoginputchan != -1)&&(pololu.telem7analoginputchan != -1)&&(pololu.telem8analoginputchan != -1)&&
-					(pololu.telem9analoginputchan != -1)&&(pololu.telem10analoginputchan != -1)&&(GetTimeElapsedChronoQuick(&chrono_get_telem) > pololu.RangingDelay))
+					(pololu.telem9analoginputchan != -1)&&(pololu.telem10analoginputchan != -1)&&(GetTimeElapsedChronoQuick(&chrono_get_telem) > pololu.RangingDelay/1000.0))
 				{
 					StopChronoQuick(&chrono_get_telem);
 					StartChrono(&chrono_get_telem);
@@ -647,13 +649,14 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					if (pololu.bMedianFilter)
 					{
 						// Median filter with the 3 last values.
-						for (i = 0; i < nbtelemeters; i++)
-						{
-							double tab_values[3] = { distances[i], distances1[i], distances2[i] };
-							distances[i] = median(tab_values, 3);
-						}
+						memcpy(distances3, distances2, sizeof(distances));
 						memcpy(distances2, distances1, sizeof(distances));
 						memcpy(distances1, distances, sizeof(distances));
+						for (i = 0; i < nbtelemeters; i++)
+						{
+							double tab_values[3] = { distances1[i], distances2[i], distances3[i] };
+							distances[i] = median(tab_values, 3);
+						}
 					}
 					EnterCriticalSection(&StateVariablesCS);
 					i = pololu.telem1analoginputchan;
@@ -692,7 +695,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else if ((pololu.telem1analoginputchan != -1)&&(pololu.telem2analoginputchan != -1)&&(pololu.telem3analoginputchan != -1)&&(pololu.telem4analoginputchan != -1)&&
-					(pololu.telem5analoginputchan != -1)&&(GetTimeElapsedChronoQuick(&chrono_get_telem) > pololu.RangingDelay))
+					(pololu.telem5analoginputchan != -1)&&(GetTimeElapsedChronoQuick(&chrono_get_telem) > pololu.RangingDelay/1000.0))
 				{
 					StopChronoQuick(&chrono_get_telem);
 					StartChrono(&chrono_get_telem);
@@ -712,13 +715,14 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					if (pololu.bMedianFilter)
 					{
 						// Median filter with the 3 last values.
-						for (i = 0; i < nbtelemeters; i++)
-						{
-							double tab_values[3] = { distances[i], distances1[i], distances2[i] };
-							distances[i] = median(tab_values, 3);
-						}
+						memcpy(distances3, distances2, sizeof(distances));
 						memcpy(distances2, distances1, sizeof(distances));
 						memcpy(distances1, distances, sizeof(distances));
+						for (i = 0; i < nbtelemeters; i++)
+						{
+							double tab_values[3] = { distances1[i], distances2[i], distances3[i] };
+							distances[i] = median(tab_values, 3);
+						}
 					}
 					EnterCriticalSection(&StateVariablesCS);
 					i = pololu.telem1analoginputchan;
