@@ -206,6 +206,8 @@ double vrxmax = 0;
 double omegazmax = 0;
 double Kp_z = 0, Kd_z = 0, Ki_z = 0, up_max_z = 0, ud_max_z = 0, ui_max_z = 0, 
 u_min_z = 0, u_max_z = 0, error_min_z = 0, error_max_z = 0, dz_max_z = 0;
+double Kp_y = 0, Kd_y = 0, Ki_y = 0, up_max_y = 0, ud_max_y = 0, ui_max_y = 0, 
+u_min_y = 0, u_max_y = 0, error_min_y = 0, error_max_y = 0, dy_max_y = 0;
 double Kp_wy = 0, Kd_wy = 0, Ki_wy = 0, up_max_wy = 0, ud_max_wy = 0, ui_max_wy = 0, 
 u_min_wy = 0, u_max_wy = 0, error_min_wy = 0, error_max_wy = 0, omega_max_wy = 0;
 double Kp_wx = 0, Kd_wx = 0, Ki_wx = 0, up_max_wx = 0, ud_max_wx = 0, ui_max_wx = 0, 
@@ -590,6 +592,13 @@ double setattitudetargetroll_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double setattitudetargetpitch_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double setattitudetargetyaw_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double setattitudetargetthrustMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+BOOL bTakeoffMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double takeoff_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+BOOL bLandMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double land_yawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double land_latitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double land_longitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double land_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];

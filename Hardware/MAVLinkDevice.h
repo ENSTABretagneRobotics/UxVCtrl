@@ -413,6 +413,62 @@ inline int HeartbeatMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice)
 	return EXIT_SUCCESS;
 }
 
+inline int TakeoffMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, double altitude)
+{
+	unsigned char sendbuf[256];
+	int sendbuflen = 0;
+	mavlink_message_t msg;
+	mavlink_command_long_t takeoff_command;
+
+	memset(&takeoff_command, 0, sizeof(takeoff_command));
+	takeoff_command.command = MAV_CMD_NAV_TAKEOFF;
+	takeoff_command.confirmation = 0;
+	takeoff_command.param7 = (float)altitude;
+	takeoff_command.target_system = (uint8_t)pMAVLinkDevice->target_system;
+	takeoff_command.target_component = (uint8_t)pMAVLinkDevice->target_component;
+	mavlink_msg_command_long_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &takeoff_command);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	return EXIT_SUCCESS;
+}
+
+// yaw, latitude, longitude in deg, altitude w.r.t. ground level in m...
+inline int LandMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, double yaw, double latitude, double longitude, double altitude)
+{
+	unsigned char sendbuf[256];
+	int sendbuflen = 0;
+	mavlink_message_t msg;
+	mavlink_command_long_t land_command;
+
+	memset(&land_command, 0, sizeof(land_command));
+	land_command.command = MAV_CMD_NAV_LAND;
+	land_command.confirmation = 0;
+	land_command.param4 = (float)yaw;
+	land_command.param5 = (float)latitude;
+	land_command.param6 = (float)longitude;
+	land_command.param7 = (float)altitude;
+	land_command.target_system = (uint8_t)pMAVLinkDevice->target_system;
+	land_command.target_component = (uint8_t)pMAVLinkDevice->target_component;
+	mavlink_msg_command_long_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &land_command);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);	
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	mSleep(50);
+
+	return EXIT_SUCCESS;
+}
+
 inline int SetAttitudeTargetMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, double roll, double pitch, double yaw,
 	double roll_rate, double pitch_rate, double yaw_rate, double thrust)
 {

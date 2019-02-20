@@ -1,3 +1,6 @@
+rajouter param ul_max->uy_max/min
+reset des termes intégral PID : utiliser fabs(différence) comme c'est des double?
+
 distances SRF02 dont la longueur de l'intervalle est parfois courte...?
 Données LIDAR qui apparaissent à d=0?
 pouvoir désactiver juste texte de l'OSD->on peut le faire avec les couleurs

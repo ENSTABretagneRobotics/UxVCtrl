@@ -2030,6 +2030,93 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
+	else if (sscanf(line, "waitzt %lf %lf %lf", &dval1, &dval2, &delay) == 3)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wz = dval1;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			if (fabs(wz-Center(zhat)) < dval2)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "waitztrelative %lf %lf %lf", &dval1, &dval2, &delay) == 3)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wz = Center(zhat)+dval1;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			if (fabs(wz-Center(zhat)) < dval2)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "waitztwgs %lf %lf %lf", &dval1, &dval2, &delay) == 3)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, lat_env, long_env, dval1, &wx, &wy, &wz);
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			if (fabs(wz-Center(zhat)) < dval2)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
 	else if (sscanf(line, "waitlinet %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -3106,6 +3193,37 @@ inline int Commands(char* line)
 			printf("Invalid parameter.\n");
 		}
 	}
+	else if (sscanf(line, "takeoffmavlinkdevice %d %lf", &ival, &dval1) == 2)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			bTakeoffMAVLinkDevice[ival] = TRUE;
+			takeoff_altitudeMAVLinkDevice[ival] = dval1;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
+	else if (sscanf(line, "landmavlinkdevice %d %lf %lf %lf %lf", &ival, &dval1, &dval2, &dval3, &dval4) == 5)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			bLandMAVLinkDevice[ival] = TRUE;
+			land_yawMAVLinkDevice[ival] = dval1;
+			land_latitudeMAVLinkDevice[ival] = dval2;
+			land_longitudeMAVLinkDevice[ival] = dval3;
+			land_altitudeMAVLinkDevice[ival] = dval4;
+			LeaveCriticalSection(&StateVariablesCS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 	else if (sscanf(line, "mavlinkdevicein %d %d", &ival, &ival1) == 2)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_MAVLINKDEVICE))
@@ -3959,6 +4077,14 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		Kp_z = dval1; Kd_z = dval2; Ki_z = dval3; up_max_z = dval4; ud_max_z = dval5; ui_max_z = dval6;
 		u_min_z = dval7; u_max_z = dval8; error_min_z = dval9; error_max_z = dval10; dz_max_z = dval11;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "ycontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11) == 11)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		Kp_y = dval1; Kd_y = dval2; Ki_y = dval3; up_max_y = dval4; ud_max_y = dval5; ui_max_y = dval6;
+		u_min_y = dval7; u_max_y = dval8; error_min_y = dval9; error_max_y = dval10; dy_max_y = dval11;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "wzcontrolconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",

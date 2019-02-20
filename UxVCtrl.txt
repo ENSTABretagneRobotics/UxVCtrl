@@ -332,6 +332,28 @@ WMV2
 0.05
 % dz_max_z (in m/s)
 0.25
+% Kp_y
+1
+% Kd_y
+0
+% Ki_y
+0
+% up_max_y
+1
+% ud_max_y
+0
+% ui_max_y
+0.1
+% u_min_y
+-1
+% u_max_y
+1
+% error_min_y (in m)
+-0.5
+% error_max_y (in m)
+0.5
+% dy_max_y (in m/s)
+5
 % Kp_wy
 1
 % Kd_wy
@@ -664,13 +686,13 @@ WMV2
 0
 % Simulator physical parameters
 % x_max_rand_err (in m)
-0.5
+3.0
 % x_bias_err (in m)
-0
+2.0
 % y_max_rand_err (in m)
-0.5
+3.0
 % y_bias_err (in m)
-0
+-1.0
 % z_max_rand_err (in m)
 0.05
 % z_bias_err (in m)
@@ -740,7 +762,7 @@ WMV2
 % omegas
 2.3562
 % outliers_ratio
-0
+0.5
 % bNoSimGNSSInsideObstacles
 0
 % bRawSimStateInMAVLinkInterface

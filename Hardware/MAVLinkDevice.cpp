@@ -23,6 +23,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	int custom_mode = -1, iArm = -1, setattitudetargetperiod = -1, setattitudetargettype = -1;
 	double setattitudetargetroll = 0, setattitudetargetpitch = 0, setattitudetargetyaw = 0, 
 		setattitudetargetroll_rate = 0, setattitudetargetpitch_rate = 0, setattitudetargetyaw_rate = 0, setattitudetargetthrust = 0;
+	BOOL bTakeoff = FALSE;
+	double takeoff_altitude = 0;
+	BOOL bLand = FALSE;
+	double land_yaw = 0, land_latitude = 0, land_longitude = 0, land_altitude = 0;
 	CHRONO chrono_GPSOK;
 	CHRONO chrono_heartbeat;
 	BOOL bConnected = FALSE;
@@ -110,6 +114,14 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				custom_mode = -1;
 				iArmMAVLinkDevice[deviceid] = -1;
 				iArm = -1;
+				bTakeoffMAVLinkDevice[deviceid] = FALSE;
+				bTakeoff = FALSE;
+				takeoff_altitudeMAVLinkDevice[deviceid] = 0;
+				takeoff_altitude = 0;
+				bLandMAVLinkDevice[deviceid] = FALSE;
+				bLand = FALSE;
+				land_yawMAVLinkDevice[deviceid] = 0; land_latitudeMAVLinkDevice[deviceid] = 0; land_longitudeMAVLinkDevice[deviceid] = 0; land_altitudeMAVLinkDevice[deviceid] = 0;
+				land_yaw = 0; land_latitude = 0; land_longitude = 0; land_altitude = 0;
 
 				LeaveCriticalSection(&StateVariablesCS);
 
@@ -429,6 +441,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 					setattitudetargetpitch_rate = setattitudetargetpitch_rateMAVLinkDevice[deviceid];
 					setattitudetargetyaw_rate = setattitudetargetyaw_rateMAVLinkDevice[deviceid];
 					setattitudetargetthrust = setattitudetargetthrustMAVLinkDevice[deviceid];
+					bTakeoff = bTakeoffMAVLinkDevice[deviceid];
+					takeoff_altitude = takeoff_altitudeMAVLinkDevice[deviceid];
+					bLand = bLandMAVLinkDevice[deviceid];
+					land_yaw = land_yawMAVLinkDevice[deviceid]; land_latitude = land_latitudeMAVLinkDevice[deviceid]; land_longitude = land_longitudeMAVLinkDevice[deviceid]; land_altitude = land_altitudeMAVLinkDevice[deviceid];
 #pragma endregion
 					LeaveCriticalSection(&StateVariablesCS);
 
@@ -519,6 +535,50 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						setattitudetargetperiodMAVLinkDevice[deviceid] = -1;
 						LeaveCriticalSection(&StateVariablesCS);
 						setattitudetargetperiod = -1;
+					}
+					if (bTakeoff)
+					{
+						if (TakeoffMAVLinkDevice(&mavlinkdevice, takeoff_altitude) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
+						mSleep(25);
+						EnterCriticalSection(&StateVariablesCS);
+						bTakeoffMAVLinkDevice[deviceid] = FALSE;
+						takeoff_altitudeMAVLinkDevice[deviceid] = 0;
+						LeaveCriticalSection(&StateVariablesCS);
+						bTakeoff = FALSE;
+						takeoff_altitude = 0;
+					}
+					if (bLand)
+					{
+						if (LandMAVLinkDevice(&mavlinkdevice, land_yaw, land_latitude, land_longitude, land_altitude) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							mSleep(50);
+							break;
+						}
+						mSleep(25);
+						EnterCriticalSection(&StateVariablesCS);
+						bLandMAVLinkDevice[deviceid] = FALSE;
+						land_yawMAVLinkDevice[deviceid] = 0;
+						land_latitudeMAVLinkDevice[deviceid] = 0;
+						land_longitudeMAVLinkDevice[deviceid] = 0;
+						land_altitudeMAVLinkDevice[deviceid] = 0;
+						LeaveCriticalSection(&StateVariablesCS);
+						bLand = FALSE;
+						land_yaw = 0;
+						land_latitude = 0;
+						land_longitude = 0;
+						land_altitude = 0;
 					}
 #pragma endregion
 #pragma region PWM

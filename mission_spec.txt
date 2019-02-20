@@ -144,6 +144,12 @@
 %
 %waitxytwgs lat long t (lat long : double ]-oo,oo[ position in decimal deg in WGS, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
 %
+%waitzt z acc t (z : double ]-oo,oo[ altitude in m in the environment coordinate system, acc : double ]0,oo[ accuracy in m, t : double [0,oo[ timeout in s, the function blocks until the destination altitude or the timeout is reached, without control)
+%
+%waitztrelative z acc t (z : double ]-oo,oo[ altitude in m from the current position in the environment coordinate system, acc : double ]0,oo[ accuracy in m, t : double [0,oo[ timeout in s, the function blocks until the destination altitude or the timeout is reached, without control)
+%
+%waitztwgs alt acc t (alt : double ]-oo,oo[ altitude in m in WGS, acc : double ]0,oo[ accuracy in m, t : double [0,oo[ timeout in s, the function blocks until the destination altitude or the timeout is reached, without control)
+%
 %waitlinet xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
 %
 %waitlinetrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
@@ -227,6 +233,10 @@
 %armmavlinkdevice deviceid bArm
 %
 %setattitudetargetmavlinkdevice deviceid period type roll pitch yaw roll_rate pitch_rate yaw_rate thrust (Copter needs to be in Guided mode for SET_ATTITUDE_TARGET MAVLink message, period = -1 disables sending, type = 0 sends directly the parameters to the autopilot, type = 1 uses keyboard)
+%
+%takeoffmavlinkdevice deviceid altitude (in m)
+%
+%landmavlinkdevice deviceid yaw latitude longitude altitude (in deg and m)
 %
 %mavlinkdevicein deviceid bEnable
 %
@@ -445,6 +455,8 @@
 %controlconfig u_max uw_max u_coef uw_coef (double [0,1])
 %
 %zcontrolconfig Kp_z Kd_z Ki_z up_max_z ud_max_z ui_max_z u_min_z u_max_z error_min_z error_max_z dz_max_z
+%
+%ycontrolconfig Kp_y Kd_y Ki_y up_max_y ud_max_y ui_max_y u_min_y u_max_y error_min_y error_max_y dy_max_y
 %
 %wzcontrolconfig Kp Kd1 Kd2 Ki uw_derivative_max uw_integral_max cosdelta_angle_threshold wdradius vrxmax omegazmax
 %

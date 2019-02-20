@@ -435,6 +435,8 @@ extern double vrxmax; // Max submarine speed in rad/s.
 extern double omegazmax; // Max submarine rotation speed in rad/s.
 extern double Kp_z, Kd_z, Ki_z, up_max_z, ud_max_z, ui_max_z, 
 u_min_z, u_max_z, error_min_z, error_max_z, dz_max_z;
+extern double Kp_y, Kd_y, Ki_y, up_max_y, ud_max_y, ui_max_y, 
+u_min_y, u_max_y, error_min_y, error_max_y, dy_max_y;
 extern double Kp_wy, Kd_wy, Ki_wy, up_max_wy, ud_max_wy, ui_max_wy, 
 u_min_wy, u_max_wy, error_min_wy, error_max_wy, omega_max_wy;
 extern double Kp_wx, Kd_wx, Ki_wx, up_max_wx, ud_max_wx, ui_max_wx, 
@@ -814,6 +816,13 @@ extern double setattitudetargetroll_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern double setattitudetargetpitch_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern double setattitudetargetyaw_rateMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern double setattitudetargetthrustMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern BOOL bTakeoffMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double takeoff_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern BOOL bLandMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double land_yawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double land_latitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double land_longitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double land_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -1281,6 +1290,13 @@ inline int InitGlobals(void)
 		setattitudetargetpitch_rateMAVLinkDevice[i] = 0;
 		setattitudetargetyaw_rateMAVLinkDevice[i] = 0;
 		setattitudetargetthrustMAVLinkDevice[i] = 0;
+		bTakeoffMAVLinkDevice[i] = FALSE;
+		takeoff_altitudeMAVLinkDevice[i] = 0;
+		bLandMAVLinkDevice[i] = FALSE;
+		land_yawMAVLinkDevice[i] = 0;
+		land_latitudeMAVLinkDevice[i] = 0;
+		land_longitudeMAVLinkDevice[i] = 0;
+		land_altitudeMAVLinkDevice[i] = 0;
 		GNSSqualityMAVLinkDevice[i] = 0;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bRestartMAVLinkDevice[i] = FALSE;
@@ -1581,6 +1597,13 @@ inline int ReleaseGlobals(void)
 		bRestartMAVLinkDevice[i] = FALSE;
 		bPauseMAVLinkDevice[i] = FALSE;
 		GNSSqualityMAVLinkDevice[i] = 0;
+		land_altitudeMAVLinkDevice[i] = 0;
+		land_longitudeMAVLinkDevice[i] = 0;
+		land_latitudeMAVLinkDevice[i] = 0;
+		land_yawMAVLinkDevice[i] = 0;
+		bLandMAVLinkDevice[i] = FALSE;
+		takeoff_altitudeMAVLinkDevice[i] = 0;
+		bTakeoffMAVLinkDevice[i] = FALSE;
 		setattitudetargetthrustMAVLinkDevice[i] = 0;
 		setattitudetargetyaw_rateMAVLinkDevice[i] = 0;
 		setattitudetargetpitch_rateMAVLinkDevice[i] = 0;

@@ -1,3 +1,6 @@
+301
+Added takeoffmavlinkdevice, landmavlinkdevice, waitzt, waitztrelative, waitztwgs, ycontrolconfig commands.
+
 300
 Updated obstacle avoidance.
 Corrected error message about overridechan too high if set to 19.
