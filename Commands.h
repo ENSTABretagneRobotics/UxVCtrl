@@ -4226,6 +4226,25 @@ inline int Commands(char* line)
 	{
 		bHeadingControl = FALSE;
 	}
+	else if (sscanf(line, "headingandlateralcontrolmode %d", &ival) == 1)
+	{
+		switch (ival)
+		{
+		case PURE_HEADING_CONTROL_MODE:
+			HeadingAndLateralControlMode = PURE_HEADING_CONTROL_MODE;
+			break;
+		case PURE_LATERAL_CONTROL_MODE:
+			HeadingAndLateralControlMode = PURE_LATERAL_CONTROL_MODE;
+			break;
+		case HEADING_AND_LATERAL_CONTROL_MODE:
+			HeadingAndLateralControlMode = HEADING_AND_LATERAL_CONTROL_MODE;
+			break;
+		default:
+			printf("Invalid parameter.\n");
+			HeadingAndLateralControlMode = PURE_HEADING_CONTROL_MODE;
+			break;
+		}
+	}
 	else if (sscanf(line, "thrust %lf", &dval) == 1)
 	{
 		EnterCriticalSection(&StateVariablesCS);

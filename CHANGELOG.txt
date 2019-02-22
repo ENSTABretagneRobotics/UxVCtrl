@@ -1,3 +1,6 @@
+302
+Added headingandlateralcontrolmode command.
+
 301
 Added takeoffmavlinkdevice, landmavlinkdevice, waitzt, waitztrelative, waitztwgs, ycontrolconfig commands.
 

@@ -602,7 +602,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case BLUEROV_ROBID:
 				case ARDUCOPTER_ROBID:
 					ul_ovrid += 0.1;
-					ul_ovrid = (ul_ovrid > 1)? 1: ul_ovrid;
+					ul_ovrid = (ul_ovrid > u_max_y)? u_max_y: ul_ovrid;
 					break;
 				case BUBBLE_ROBID:
 				case TANK_SIMULATOR_ROBID:
@@ -633,7 +633,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BLUEROV_ROBID:
 			case ARDUCOPTER_ROBID:
 				ul += 0.1;
-				ul = (ul > 1)? 1: ul;
+				ul = (ul > u_max_y)? u_max_y: ul;
 				break;
 			case BUBBLE_ROBID:
 			case TANK_SIMULATOR_ROBID:
@@ -666,7 +666,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case BLUEROV_ROBID:
 				case ARDUCOPTER_ROBID:
 					ul_ovrid -= 0.1;
-					ul_ovrid = (ul_ovrid < -1)? -1: ul_ovrid;
+					ul_ovrid = (ul_ovrid < u_min_y)? u_min_y: ul_ovrid;
 					break;
 				case BUBBLE_ROBID:
 				case TANK_SIMULATOR_ROBID:
@@ -697,7 +697,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case BLUEROV_ROBID:
 			case ARDUCOPTER_ROBID:
 				ul -= 0.1;
-				ul = (ul < -1)? -1: ul;
+				ul = (ul < u_min_y)? u_min_y: ul;
 				break;
 			case BUBBLE_ROBID:
 			case TANK_SIMULATOR_ROBID:

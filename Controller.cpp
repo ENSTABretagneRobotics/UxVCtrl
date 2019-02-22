@@ -572,6 +572,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		if ((bHeadingControl)||((bObstacleAvoidanceControl)&&(bHObstacleToAvoid)))
 		{
+			if ((HeadingAndLateralControlMode == PURE_HEADING_CONTROL_MODE)||(HeadingAndLateralControlMode == HEADING_AND_LATERAL_CONTROL_MODE))
+			{
 			if (wpsi_obs != wpsi_prev) ipsi = 0;
 
 			delta_angle = Center(psihat)-wpsi_obs;
@@ -593,7 +595,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					if (error > 0) uw = -Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*ipsi;
 					else uw = Kp*sqrt(abserror)-Kd1*derivative/(Kd2+abserror)-Ki*ipsi;
 				}
-				else if (robid == CISCREA_ROBID) 
+				else if (robid == CISCREA_ROBID)
 				{
 					//uw = -Kp*error
 					//	-(Kd1+Kd2*error*error*abserror)*Center(omegazhat)*(fabs(Center(omegazhat))>uw_derivative_max)
@@ -633,6 +635,14 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				}
 
 				ipsi = 0;
+			}
+			}
+
+			if ((HeadingAndLateralControlMode == PURE_LATERAL_CONTROL_MODE)||(HeadingAndLateralControlMode == HEADING_AND_LATERAL_CONTROL_MODE))
+			{
+				double normu = sqrt(pow(u, 2)+pow(ul, 2));
+				u = normu*cos(Center(psihat)-wpsi_obs);
+				ul = normu*sin(Center(psihat)-wpsi_obs);
 			}
 
 			wpsi_prev = wpsi_obs;
@@ -750,8 +760,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 		u = (u < -u_max)? -u_max: u;
 		uw = (uw > uw_max)? uw_max: uw;
 		uw = (uw < -uw_max)? -uw_max: uw;
-		ul = (ul > 1)? 1: ul;
-		ul = (ul < -1)? -1: ul;
+		ul = (ul > u_max_y)? u_max_y: ul;
+		ul = (ul < u_min_y)? u_min_y: ul;
 		up = (up > u_max_wy)? u_max_wy: up;
 		up = (up < u_min_wy)? u_min_wy: up;
 		ur = (ur > u_max_wx)? u_max_wx: ur;
@@ -766,8 +776,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			u_ovrid = (u_ovrid < -u_max_ovrid)? -u_max_ovrid: u_ovrid;
 			uw_ovrid = (uw_ovrid > uw_max_ovrid)? uw_max_ovrid: uw_ovrid;
 			uw_ovrid = (uw_ovrid < -uw_max_ovrid)? -uw_max_ovrid: uw_ovrid;
-			ul_ovrid = (ul_ovrid > 1)? 1: ul_ovrid;
-			ul_ovrid = (ul_ovrid < -1)? -1: ul_ovrid;
+			ul_ovrid = (ul_ovrid > u_max_y)? u_max_y: ul_ovrid;
+			ul_ovrid = (ul_ovrid < u_min_y)? u_min_y: ul_ovrid;
 			up_ovrid = (up_ovrid > u_max_wy)? u_max_wy: up_ovrid;
 			up_ovrid = (up_ovrid < u_min_wy)? u_min_wy: up_ovrid;
 			ur_ovrid = (ur_ovrid > u_max_wx)? u_max_wx: ur_ovrid;

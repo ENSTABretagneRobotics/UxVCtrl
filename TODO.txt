@@ -1,4 +1,8 @@
-rajouter param ul_max->uy_max/min
+pouvoir utiliser indépendamment bHeadingControl et bHeadingAndLateralControl pour se déplacer latéralement avec un autre cap, que l'on peut faire varier au cours du déplacement latéral, séparer wpsi_obs en plusieurs...?
+
+rajouter actions de logmission dans le KML
+
+simu de LIDAR ne marche qu'à l'intérieur des rectangles?
 reset des termes intégral PID : utiliser fabs(différence) comme c'est des double?
 
 distances SRF02 dont la longueur de l'intervalle est parfois courte...?
@@ -12,7 +16,6 @@ Gotoopi opiid
 
 CorrectImageBordersRawBGR() : param nbpixborder devrait pas être hardcoded...
 
-Pouvoir lancer un takeoff
 récupérer les entrées de la télécommande sur le MAVLinkDevice comme entrées et les corriger avec évitement doit être possible si on utilise setattitudetarget en guided, rajouter commande pour gérer cela...
 add a third MAVLinkDevice?
 pouvoir gérer followme avec nmeainterface, bExternal...

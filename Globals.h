@@ -195,6 +195,14 @@ typedef enum KEYS KEYS;
 #define SONAR_IMG_LEVER_ARMS_HIST_PSI     0x00000800
 #define SONAR_IMG_LEVER_ARMS_HIST_PSI_POS 0x00001000
 
+enum HEADING_AND_LATERAL_CONTROL_MODES
+{
+	PURE_HEADING_CONTROL_MODE,
+	PURE_LATERAL_CONTROL_MODE,
+	HEADING_AND_LATERAL_CONTROL_MODE
+};
+typedef enum HEADING_AND_LATERAL_CONTROL_MODES HEADING_AND_LATERAL_CONTROL_MODES;
+
 // Acoustic modem messages.
 enum ACOUSTIC_MODEM_MESSAGES
 {
@@ -967,6 +975,7 @@ extern BOOL bDVLLocalization;
 extern BOOL bDeleteRoute;
 extern BOOL bWaypointsChanged;
 extern BOOL bHObstacleToAvoid, bVObstacleToAvoid;
+extern int HeadingAndLateralControlMode;
 extern CHRONO chrono_mission;
 extern char szAction[MAX_BUF_LEN];
 extern int labels[MAX_NB_LABELS];
@@ -1471,6 +1480,18 @@ inline int InitGlobals(void)
 	rudderminangle = -0.7;
 	ruddermidangle = 0.0;
 	ruddermaxangle = 0.7;
+
+	switch (robid)
+	{
+	case QUADRO_SIMULATOR_ROBID:
+	case COPTER_ROBID:
+	case ARDUCOPTER_ROBID:
+		HeadingAndLateralControlMode = HEADING_AND_LATERAL_CONTROL_MODE;
+		break;
+	default:
+		HeadingAndLateralControlMode = PURE_HEADING_CONTROL_MODE;
+		break;
+	}
 
 	return EXIT_SUCCESS;
 }
