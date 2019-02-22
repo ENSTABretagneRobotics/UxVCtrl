@@ -642,8 +642,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			if ((HeadingAndLateralControlMode == PURE_LATERAL_CONTROL_MODE)||(HeadingAndLateralControlMode == HEADING_AND_LATERAL_CONTROL_MODE))
 			{
 				double normu = sqrt(pow(u, 2)+pow(ul, 2));
-				u = normu*cos(Center(psihat)-wpsi_obs);
-				ul = normu*sin(Center(psihat)-wpsi_obs);
+				u = normu*cos(wpsi_obs-Center(psihat));
+				ul = normu*sin(wpsi_obs-Center(psihat));
 			}
 
 			wpsi_prev = wpsi_obs;
@@ -751,11 +751,11 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			iz = 0;
 		}
 
-		if ((bObstacleAvoidanceControl)&&(bHObstacleToAvoid))
-		{
-			u = u_obs;
-			ul = ul_obs;
-		}
+		//if ((bObstacleAvoidanceControl)&&(bHObstacleToAvoid))
+		//{
+		//	u = u_obs;
+		//	ul = ul_obs;
+		//}
 
 		u = (u > u_max)? u_max: u;
 		u = (u < -u_max)? -u_max: u;

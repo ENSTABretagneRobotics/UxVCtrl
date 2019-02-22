@@ -80,9 +80,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	switch (robid)
 	{
-	case QUADRO_SIMULATOR_ROBID:
-	case COPTER_ROBID:
-	case ARDUCOPTER_ROBID:
+	//case QUADRO_SIMULATOR_ROBID:
+	//case COPTER_ROBID:
+	//case BLUEROV_ROBID:
+	//case ARDUCOPTER_ROBID:
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:
 	case MOTORBOAT_SIMULATOR_ROBID:
@@ -605,6 +606,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case ARDUCOPTER_ROBID:
 					ul_ovrid += 0.1;
 					ul_ovrid = (ul_ovrid > u_max_y)? u_max_y: ul_ovrid;
+					bZQSDPressed = TRUE;
 					break;
 				case BUBBLE_ROBID:
 				case TANK_SIMULATOR_ROBID:
@@ -636,6 +638,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case ARDUCOPTER_ROBID:
 				ul += 0.1;
 				ul = (ul > u_max_y)? u_max_y: ul;
+				bZQSDPressed = TRUE;
 				break;
 			case BUBBLE_ROBID:
 			case TANK_SIMULATOR_ROBID:
@@ -669,6 +672,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case ARDUCOPTER_ROBID:
 					ul_ovrid -= 0.1;
 					ul_ovrid = (ul_ovrid < u_min_y)? u_min_y: ul_ovrid;
+					bZQSDPressed = TRUE;
 					break;
 				case BUBBLE_ROBID:
 				case TANK_SIMULATOR_ROBID:
@@ -700,6 +704,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			case ARDUCOPTER_ROBID:
 				ul -= 0.1;
 				ul = (ul < u_min_y)? u_min_y: ul;
+				bZQSDPressed = TRUE;
 				break;
 			case BUBBLE_ROBID:
 			case TANK_SIMULATOR_ROBID:
@@ -1242,6 +1247,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						case BUGGY_ROBID:
 							u_ovrid = 0;
 							break;
+						case QUADRO_SIMULATOR_ROBID:
+						case COPTER_ROBID:
+						case BLUEROV_ROBID:
+						case ARDUCOPTER_ROBID:
+							u_ovrid = 0;
+							ul_ovrid = 0;
+							uw_ovrid = 0;
+							break;
 						default:
 							u_ovrid = 0;
 							uw_ovrid = 0;
@@ -1263,6 +1276,14 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					case BUGGY_SIMULATOR_ROBID:
 					case BUGGY_ROBID:
 						u = 0;
+						break;
+					case QUADRO_SIMULATOR_ROBID:
+					case COPTER_ROBID:
+					case BLUEROV_ROBID:
+					case ARDUCOPTER_ROBID:
+						u = 0;
+						ul = 0;
+						if (!bHeadingControl) uw = 0;
 						break;
 					default:
 						u = 0;
