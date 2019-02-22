@@ -1,3 +1,7 @@
+303
+bEnableAltRCMode to TRUE for ARDUCOPTER.
+Snapshot saves also enabled OpenCVGUI.
+
 302
 Added headingandlateralcontrolmode command.
 

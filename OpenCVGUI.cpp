@@ -58,6 +58,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bSonarDispOptionsExtendedMenu = FALSE;
 	BOOL bOSDDispOptionsExtendedMenu = FALSE;
 	BOOL bOtherOptionsExtendedMenu = FALSE;
+	BOOL bSnapshot = FALSE;
 	CvPoint PlaySymbolPoints[3];
 	int nbPlaySymbolPoints = sizeof(PlaySymbolPoints);
 	CvPoint PauseSymbolPoints[4];
@@ -79,10 +80,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	switch (robid)
 	{
+	case QUADRO_SIMULATOR_ROBID:
+	case COPTER_ROBID:
+	case ARDUCOPTER_ROBID:
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:
-		bEnableAltRCMode = TRUE;
-		break;
 	case MOTORBOAT_SIMULATOR_ROBID:
 	case MOTORBOAT_ROBID:
 	case BUGGY_SIMULATOR_ROBID:
@@ -966,8 +968,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			bDynamicSonarLocalization = !bDynamicSonarLocalization;
 			break;
 		case 'P':
-			Snapshot();
-			printf("Snapshot.\n");
+			bSnapshot = TRUE;
 			break;
 		case 'r':
 			if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
@@ -2252,6 +2253,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 		LeaveCriticalSection(&OpenCVGUICS);
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+
+		if (bSnapshot)
+		{
+			Snapshot();
+			bSnapshot = FALSE;
+			printf("Snapshot.\n");
+		}
 
 		if (bExit) break;
 	}

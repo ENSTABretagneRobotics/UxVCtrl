@@ -1,3 +1,4 @@
+
 pouvoir utiliser indépendamment bHeadingControl et bHeadingAndLateralControl pour se déplacer latéralement avec un autre cap, que l'on peut faire varier au cours du déplacement latéral, séparer wpsi_obs en plusieurs...?
 
 rajouter actions de logmission dans le KML

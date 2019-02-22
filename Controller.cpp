@@ -240,7 +240,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);psi (in rad);psiw (in rad);"
 			"latitude (in decimal degrees);longitude (in decimal degrees);x (in m);y (in m);ax (in m);ay (in m);bx (in m);by (in m);CurWP;"
 			"wpslat[CurWP] (in decimal degrees);wpslong[CurWP] (in decimal degrees);e (in m);norm_ma (in m);norm_bm (in m);state;"
-			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbat1 (in V);vbat2 (in V);vswitch (in V);\n"
+			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbat1 (in V);vbat2 (in V);vswitch (in V);"
+			"wpsi (w.o. obs);bHObstacleToAvoid;bVObstacleToAvoid;\n"
 		);
 		fflush(lognavfile);
 	}
@@ -956,13 +957,15 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				"%.3f;%.1f;%.3f;%.1f;%.3f;%.3f;%.3f;"
 				"%.8f;%.8f;%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;%d;"
 				"%.8f;%.8f;%.3f;%.3f;%.3f;%d;"
-				"%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;\n",
+				"%.3f;%.3f;%.3f;%.3f;%.3f;%.3f;"
+				"%.3f;%d;%d;\n",
 				counter, t, lat_env, long_env, fmod_2PI(Center(phihat)), fmod_2PI(Center(thetahat)), fmod_2PI(Center(psihat)+angle_env-M_PI/2.0),
 				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat),
 				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0,
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state,
-				(uw_f >= 0)? (ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): (ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)), u_f*q1, wpsi_obs, vbat1, vbat2, vswitch);
+				(uw_f >= 0)? (ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): (ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)), u_f*q1, wpsi_obs, vbat1, vbat2, vswitch, 
+				wpsi, bHObstacleToAvoid, bVObstacleToAvoid);
 			fflush(lognavfile);
 		}
 #pragma endregion
