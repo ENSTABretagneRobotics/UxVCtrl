@@ -1,0 +1,15 @@
+% Disable setattitudetarget
+setattitudetargetmavlinkdevice 0 -1 1 0 0 0 0 0 0 0
+wait 1
+% Guided necessary for takeoff
+setmodemavlinkdevice 0 4
+wait 1
+armmavlinkdevice 0 1
+wait 3
+takeoffmavlinkdevice 0 3.9
+wait 10
+%landmavlinkdevice 0 0 0 0 1
+setmodemavlinkdevice 0 9
+wait 1
+setmodemavlinkdevice 0 9
+wait 1

@@ -1,3 +1,14 @@
+Improve excludedpixelarea to draw polygons, do similar for lidars with angles intervals and distances...?
+
+rc mode, réguler course au lieu de heading...
+Set_global_pos_int?
+Parfois thrust et goto de mission.txt pas pris pour drone?->mission planner qui envoie 4 fois commandes, confirmation...
+
+Robid stabilized copter simulator, ou option pour choisir si on simule tout ou 2.5D
+Inject rtk via uxvctrl
+
+Option use find package cmake un peu comme autodownload
+
 gestion u_obs, ul_obs...?
 
 pouvoir utiliser indépendamment bHeadingControl et bHeadingAndLateralControl pour se déplacer latéralement avec un autre cap, que l'on peut faire varier au cours du déplacement latéral, séparer wpsi_obs en plusieurs...?

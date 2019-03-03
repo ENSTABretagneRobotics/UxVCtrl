@@ -1,0 +1,34 @@
+setmissionaction INIT
+wpfollowingconfig 1
+stop
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+startvideorecording 2
+wait 1
+%
+obstacleavoidance 3 0.6 1.5 5 1 0 1
+wait 1
+setmissionaction wp1
+wait 1
+thrust 0.5
+wait 1
+gotoxytwgs 37.20008400 -5.88106700 1200
+setmissionaction l0
+linefollowingtwgs 37.20008400 -5.88106700 37.20010200 -5.88127300 1200
+setmissionaction l1
+linefollowingtwgs 37.20010200 -5.88127300 37.19980700 -5.88115900 1200
+stop
+wait 1
+%
+setmissionaction END
+stop
+wait 1
+stopvideorecording 0
+wait 1
+stopvideorecording 1
+wait 1
+stopvideorecording 2
+wait 1
+generalstop

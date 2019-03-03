@@ -1,0 +1,58 @@
+setmissionaction INIT
+videoconfig 0 Video0_normal.txt 0
+ballconfig 20 220 75 240 75 150 1 0 0 255 0 0 0.01 0.01 0.01 0.01 1.0 0 0 220 0.05 1 0 0 1 0 0 1000 -1 0 0
+startballtracking 0
+wpfollowingconfig 1
+stop
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+startvideorecording 2
+wait 1
+%
+obstacleavoidance 4 0.6 1.5 5 1 0 1
+wait 1
+%
+%
+%waypoint 1
+setmissionaction wp1
+wait 1
+thrust 0.5
+wait 1
+gotoxytwgs 37.200084 -5.881067 1800
+stop
+wait 5
+%
+%
+% waypoint 2
+setmissionaction wp2
+obstacleavoidance 4 0.6 1.5 5 1 0 1
+wait 1
+thrust 0.5
+gotoxytwgs 37.200102 -5.881273 1800
+stop
+wait 5
+%
+%
+%waypoint 3
+setmissionaction wp3
+obstacleavoidance 4 0.6 1.5 5 1 0 1
+wait 1
+thrust 0.5
+gotoxytwgs 37.199807 -5.881159 1800
+stop
+wait 5
+%
+%
+%END
+setmissionaction END
+stop
+wait 1
+stopvideorecording 0
+wait 1
+stopvideorecording 1
+wait 1
+stopvideorecording 2
+wait 1
+generalstop

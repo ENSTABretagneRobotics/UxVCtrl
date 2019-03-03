@@ -1,0 +1,88 @@
+% Disable setattitudetarget
+setattitudetargetmavlinkdevice 0 -1 1 0 0 0 0 0 0 0
+wait 0.1
+setattitudetargetmavlinkdevice 0 -1 1 0 0 0 0 0 0 0
+wait 0.1
+setattitudetargetmavlinkdevice 0 -1 1 0 0 0 0 0 0 0
+wait 0.1
+setattitudetargetmavlinkdevice 0 -1 1 0 0 0 0 0 0 0
+wait 1
+% Guided necessary for takeoff
+setmodemavlinkdevice 0 4
+wait 0.1
+setmodemavlinkdevice 0 4
+wait 0.1
+setmodemavlinkdevice 0 4
+wait 0.1
+setmodemavlinkdevice 0 4
+wait 1
+armmavlinkdevice 0 1
+wait 0.1
+armmavlinkdevice 0 1
+wait 0.1
+armmavlinkdevice 0 1
+wait 0.1
+armmavlinkdevice 0 1
+wait 3
+takeoffmavlinkdevice 0 3
+wait 0.1
+takeoffmavlinkdevice 0 3
+wait 0.1
+takeoffmavlinkdevice 0 3
+wait 0.1
+takeoffmavlinkdevice 0 3
+wait 5
+verticalthrust 0.5
+wait 0.1
+% Guided_NoGPS
+%setmodemavlinkdevice 0 20
+%wait 0.1
+%setmodemavlinkdevice 0 20
+%wait 0.1
+%setmodemavlinkdevice 0 20
+%wait 0.1
+%setmodemavlinkdevice 0 20
+%wait 0.1
+% Enable setattitudetarget
+setattitudetargetmavlinkdevice 0 0 1 0 0 0 0 0 0 0
+wait 0.1
+setattitudetargetmavlinkdevice 0 0 1 0 0 0 0 0 0 0
+wait 0.1
+setattitudetargetmavlinkdevice 0 0 1 0 0 0 0 0 0 0
+wait 0.1
+setattitudetargetmavlinkdevice 0 0 1 0 0 0 0 0 0 0
+%
+wait 0.1
+obstacleavoidance 3 0.6 1.5 5 1 0 1
+%linefollowingconfig 5 1.22
+linefollowingconfig 3 1.3
+%headingandlateralcontrolmode 0
+%headingandlateralcontrolmode 1
+%headingandlateralcontrolmode 2
+wait 0.2
+thrust 0.15
+setmissionaction wpinit
+linefollowingtwgs 37.19986100 -5.88107900 37.20008400 -5.88106700 1200
+setmissionaction l0
+linefollowingtwgs 37.20008400 -5.88106700 37.20010200 -5.88127300 1200
+setmissionaction l1
+linefollowingtwgs 37.20010200 -5.88127300 37.19980700 -5.88115900 1200
+%setmissionaction l2
+%linefollowingtwgs 37.19980700 -5.88115900 37.19926700 -5.88109200 1200
+%setmissionaction l3
+%linefollowingtwgs 37.19926700 -5.88109200 37.19937400 -5.88097500 1200
+%setmissionaction l4
+%linefollowingtwgs 37.19937400 -5.88097500 37.19987300 -5.88103400 1200
+setmissionaction wpend
+linefollowingtwgs 37.19980700 -5.88115900 37.19985900 -5.88105700 1200
+stop
+wait 0.1
+%landmavlinkdevice 0 0 0 0 1
+setmodemavlinkdevice 0 9
+wait 0.1
+setmodemavlinkdevice 0 9
+wait 0.1
+setmodemavlinkdevice 0 9
+wait 0.1
+setmodemavlinkdevice 0 9
+wait 1

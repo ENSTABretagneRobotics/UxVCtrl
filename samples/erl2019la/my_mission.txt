@@ -1,0 +1,55 @@
+setmissionaction INIT
+wpfollowingconfig 1
+stop
+startvideorecording 0
+wait 1
+startvideorecording 1
+wait 1
+startvideorecording 2
+wait 1
+%
+obstacleavoidance 4 0.6 1.5 5 1 0 1
+wait 1
+%
+%
+%waypoint 1
+setmissionaction wp1
+wait 1
+thrust 0.5
+wait 1
+gotoxytwgs 37.199938 -5.880397 1800
+stop
+wait 5
+%
+%
+% waypoint 2
+setmissionaction wp2
+obstacleavoidance 4 0.6 1.5 5 1 0 1
+wait 1
+thrust 0.5
+gotoxytwgs 37.199893 -5.880291 1800
+stop
+wait 5
+%
+%
+%waypoint 3
+setmissionaction wp3
+obstacleavoidance 4 0.6 1.5 5 1 0 1
+wait 1
+thrust 0.5
+gotoxytwgs  37.199894 -5.880455 1800
+stop
+wait 5
+%
+%
+%END
+setmissionaction END
+stop
+wait 1
+stopvideorecording 0
+wait 1
+stopvideorecording 1
+wait 1
+stopvideorecording 2
+wait 1
+generalstop

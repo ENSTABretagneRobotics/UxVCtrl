@@ -1,0 +1,10 @@
+videoconfig 0 Video0_semi.txt 0
+wait 5
+ballconfig 90 130 50 240 50 150 0 0 0 0 0 255 0.01 0.01 0.01 0.01 1.0 0 0 220 0.05 1 0 0 0 0 0 1000 -1 0 0
+startballtracking 0
+wait 5
+stopballtracking 0
+stop
+headingrelativereg 0
+thrust 0.5
+wait 100

@@ -1,0 +1,4 @@
+videoconfig 0 Video0_semi.txt 0
+videoconfig 0 Video0_normal.txt 0
+call my_entrance.txt
+call my_color_detection.txt

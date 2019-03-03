@@ -1,0 +1,16 @@
+%red
+ballconfig 20 220 75 240 75 150 1 0 0 255 0 0 0.01 0.01 0.5 0.5 1.0 0 0 220 0.05 1 0 0 1 0 0 1000 -1 0 0
+startballtracking 0
+%blue
+ballconfig 135 165 75 240 75 150 0 0 0 255 0 0 0.01 0.01 0.01 0.01 1.0 0 0 220 0.05 1 0 0 1 0 0 1000 -1 0 0
+startballtracking 0
+%green
+ballconfig 90 130 50 240 50 150 0 0 0 255 0 0 0.03 0.07 0.5 0.5 1.0 0 0 220 0.05 1 0 0 1 0 0 1000 -1 0 0
+startballtracking 0
+
+
+%cut grass from image
+videoconfig 0 Video0_semi.txt 0
+stopballtracking 0
+
+
