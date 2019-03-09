@@ -1,6 +1,6 @@
 setmissionaction INIT
 videoconfig 0 Video0_normal.txt 0
-ballconfig 20 220 75 240 75 150 1 0 0 255 0 0 0.01 0.01 0.01 0.01 1.0 0 0 220 0.05 1 0 0 1 0 0 1000 -1 0 0
+ballconfig 20 220 75 240 75 150 1 0 0 255 0 0 0 0.01 0.01 0.01 0.01 1.0 0 0 220 0.05 1 0 0 1 0 0 1000 -1 0 0
 startballtracking 0
 wpfollowingconfig 1
 stop

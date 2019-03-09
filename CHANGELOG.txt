@@ -1,3 +1,6 @@
+306
+Added colormodel parameter to ballconfig and externalvisuallocalizationconfig.
+
 305
 Corrected bval1, bval2 not declared if DISABLE_OPENCV_SUPPORT.
 

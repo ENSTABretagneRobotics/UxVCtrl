@@ -84,7 +84,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 	//unsigned char rmin = 175, rmax = 255, gmin = 175, gmax = 255, bmin = 175, bmax = 255;
 	//unsigned char hmin = 25, hmax = 65, smin = 45, smax = 240, lmin = 65, lmax = 210;
 	//unsigned char hmin = 0, hmax = 25, smin = 75, smax = 240, lmin = 75, lmax = 210;
-	//unsigned char hmin_invalid = 49, hmax_invalid = 124, smin_invalid = 48, smax_invalid = 73, lmin_invalid = 61, lmax_invalid = 146;
+	//unsigned char hmin_invalid = 49, hmax_invalid = 124, smin_invalid = 48, smax_invalid = 73, vlmin_invalid = 61, vlmax_invalid = 146;
 	//unsigned char hmin_invalid = 70, hmax_invalid = 140, smin = 120, smax = 240, lmin = 80, lmax = 160;
 	//unsigned char hmin_invalid = 40, hmax_invalid = 140, smin = 100, smax = 240, lmin = 50, lmax = 190;
 
@@ -214,8 +214,13 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 			{
 				index = 3*(j+image->width*i);
 				double b = data[0+index], g = data[1+index], r = data[2+index];
-				double h = 0, s = 0, l = 0;
-				RGB2HSL_MSPaint(r, g, b, &h, &s, &l);
+				double h = 0, s = 0, vl = 0;
+				switch (colormodel_ball[id])
+				{
+				case 1: RGB2HSV_MSPaint_Fake(r, g, b, &h, &s, &vl); break;
+				case 2: h = r; s = g; vl = b; break;
+				default: RGB2HSL_MSPaint(r, g, b, &h, &s, &vl); break;
+				}
 				// Select the pixels with the right color.
 				if (
 					(((!bHExclusive_ball[id])&&((h >= hmin_ball[id])&&(h <= hmax_ball[id])))||
@@ -224,8 +229,8 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 					(((!bSExclusive_ball[id])&&((s >= smin_ball[id])&&(s <= smax_ball[id])))||
 					((bSExclusive_ball[id])&&((s < smin_ball[id])||(s > smax_ball[id]))))
 					&&
-					(((!bLExclusive_ball[id])&&((l >= lmin_ball[id])&&(l <= lmax_ball[id])))||
-					((bLExclusive_ball[id])&&((l < lmin_ball[id])||(l > lmax_ball[id]))))
+					(((!bVLExclusive_ball[id])&&((vl >= vlmin_ball[id])&&(vl <= vlmax_ball[id])))||
+					((bVLExclusive_ball[id])&&((vl < vlmin_ball[id])||(vl > vlmax_ball[id]))))
 					)
 				{
 					SelectedPixelsImage->imageData[index] = 1;

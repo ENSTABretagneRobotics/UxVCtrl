@@ -2,7 +2,7 @@ setmissionaction visualobstacle
 %setstateestimation 0 2 0 2 0 10000 0 10000 0 0.1 0 0.1
 %wait 2
 thrust 0.5
-ballconfig 0 240 0 240 200 240 0 0 0 255 0 0 0.125 0.07 0.5 0.5 1.0 0 0 220 0.05 1 0 0 0 0 0 1000 -1 1 0
+ballconfig 0 240 0 240 200 240 0 0 0 255 0 0 0 0.125 0.07 0.5 0.5 1.0 0 0 220 0.05 1 0 0 0 0 0 1000 -1 1 0
 startballtracking 0
 wait 600
 stopballtracking 0

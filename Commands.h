@@ -699,7 +699,7 @@ inline int Commands(char* line)
 	int i = 0, ival = 0, ival1 = 0, ival2 = 0, ival3 = 0, ival4 = 0, ival5 = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
 	int ival6 = 0, ival7 = 0, ival8 = 0, ival9 = 0, ival10 = 0, ival11 = 0, ival12 = 0, ival13 = 0, 
-		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0;
+		ival14 = 0, ival15 = 0, ival16 = 0, ival17 = 0, ival18 = 0, ival19 = 0, ival20 = 0;
 	char cval = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
 	char str[MAX_BUF_LEN];
@@ -796,29 +796,29 @@ inline int Commands(char* line)
 	else if (sscanf(line, "ballconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
-		"%lf %lf %lf %lf %lf "
+		"%d %lf %lf %lf %lf %lf "
 		"%lf %lf "
 		"%d %lf %d "
 		"%d %d %d %d %d %lf %d "
 		"%d %d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, &dval5, 
+		&ival13, &dval1, &dval2, &dval3, &dval4, &dval5, 
 		&dval6, &dval7, 
-		&ival13, &dval8, &ival14, 
-		&ival15, &ival16, &ival17, &ival18, &ival19, &dval9, &procid, 
+		&ival14, &dval8, &ival15, 
+		&ival16, &ival17, &ival18, &ival19, &ival20, &dval9, &procid, 
 		&videoid, &id
-		) == 31)
+		) == 32)
 	{
 		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
 			EnterCriticalSection(&BallCS[id]);
-			hmin_ball[id] = ival1; hmax_ball[id] = ival2; smin_ball[id] = ival3; smax_ball[id] = ival4; lmin_ball[id] = ival5; lmax_ball[id] = ival6;
-			bHExclusive_ball[id] = ival7; bSExclusive_ball[id] = ival8; bLExclusive_ball[id] = ival9; r_selpix_ball[id] = ival10; g_selpix_ball[id] = ival11; b_selpix_ball[id] = ival12;
-			objMinRadiusRatio_ball[id] = dval1; objRealRadius_ball[id] = dval2; objMinDetectionRatio_ball[id] = dval3; objDetectionRatioDuration_ball[id] = (dval4 <= 0)? captureperiod: dval4; d0_ball[id] = dval5;
+			hmin_ball[id] = ival1; hmax_ball[id] = ival2; smin_ball[id] = ival3; smax_ball[id] = ival4; vlmin_ball[id] = ival5; vlmax_ball[id] = ival6;
+			bHExclusive_ball[id] = ival7; bSExclusive_ball[id] = ival8; bVLExclusive_ball[id] = ival9; r_selpix_ball[id] = ival10; g_selpix_ball[id] = ival11; b_selpix_ball[id] = ival12;
+			colormodel_ball[id] = ival13; objMinRadiusRatio_ball[id] = dval1; objRealRadius_ball[id] = dval2; objMinDetectionRatio_ball[id] = dval3; objDetectionRatioDuration_ball[id] = (dval4 <= 0)? captureperiod: dval4; d0_ball[id] = dval5;
 			kh_ball[id] = dval6; kv_ball[id] = dval7;
-			lightMin_ball[id] = ival13; lightPixRatio_ball[id] = dval8; bAcoustic_ball[id] = ival14;
-			bDepth_ball[id] = ival15; camdir_ball[id] = ival16; bDisableControl_ball[id] = ival17; bBrake_ball[id] = ival18; objtype_ball[id] = ival19; mindistproc_ball[id] = dval9; procid_ball[id] = procid;
+			lightMin_ball[id] = ival14; lightPixRatio_ball[id] = dval8; bAcoustic_ball[id] = ival15;
+			bDepth_ball[id] = ival16; camdir_ball[id] = ival17; bDisableControl_ball[id] = ival18; bBrake_ball[id] = ival19; objtype_ball[id] = ival20; mindistproc_ball[id] = dval9; procid_ball[id] = procid;
 			if ((videoid >= 0)&&(videoid < MAX_NB_VIDEO)&&(!bDisableVideo[videoid]))
 			{
 				videoid_ball[id] = videoid;
@@ -1370,24 +1370,24 @@ inline int Commands(char* line)
 	else if (sscanf(line, "externalvisuallocalizationconfig "
 		"%d %d %d %d %d %d "
 		"%d %d %d %d %d %d "
-		"%lf %lf %lf %lf "
+		"%d %lf %lf %lf %lf "
 		"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
 		"%lf %lf "
 		"%lf %lf %lf %lf "
 		"%d", 
 		&ival1, &ival2, &ival3, &ival4, &ival5, &ival6,
 		&ival7, &ival8, &ival9, &ival10, &ival11, &ival12,
-		&dval1, &dval2, &dval3, &dval4, 
+		&ival13, &dval1, &dval2, &dval3, &dval4, 
 		&T11, &T21, &T31, &T41, &T12, &T22, &T32, &T42, &T13, &T23, &T33, &T43, &T14, &T24, &T34, &T44, 
 		&dval5, &dval6, 
 		&dval7, &dval8, &dval9, &dval10, 
 		&ival15
-		) == 39)
+		) == 40)
 	{
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
-		hmin_externalvisuallocalization = ival1; hmax_externalvisuallocalization = ival2; smin_externalvisuallocalization = ival3; smax_externalvisuallocalization = ival4; lmin_externalvisuallocalization = ival5; lmax_externalvisuallocalization = ival6; 
-		bHExclusive_externalvisuallocalization = ival7; bSExclusive_externalvisuallocalization = ival8; bLExclusive_externalvisuallocalization = ival9; r_selpix_externalvisuallocalization = ival10; g_selpix_externalvisuallocalization = ival11; b_selpix_externalvisuallocalization = ival12; 
-		objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionRatio_externalvisuallocalization = dval3; objDetectionRatioDuration_externalvisuallocalization = (dval4 <= 0)? captureperiod: dval4;
+		hmin_externalvisuallocalization = ival1; hmax_externalvisuallocalization = ival2; smin_externalvisuallocalization = ival3; smax_externalvisuallocalization = ival4; vlmin_externalvisuallocalization = ival5; vlmax_externalvisuallocalization = ival6; 
+		bHExclusive_externalvisuallocalization = ival7; bSExclusive_externalvisuallocalization = ival8; bVLExclusive_externalvisuallocalization = ival9; r_selpix_externalvisuallocalization = ival10; g_selpix_externalvisuallocalization = ival11; b_selpix_externalvisuallocalization = ival12; 
+		colormodel_externalvisuallocalization = ival13; objMinRadiusRatio_externalvisuallocalization = dval1; objRealRadius_externalvisuallocalization = dval2; objMinDetectionRatio_externalvisuallocalization = dval3; objDetectionRatioDuration_externalvisuallocalization = (dval4 <= 0)? captureperiod: dval4;
 		T_externalvisuallocalization = rmatrix(4,4);
 		T_externalvisuallocalization.SetVal(1,1,T11); T_externalvisuallocalization.SetVal(2,1,T21); T_externalvisuallocalization.SetVal(3,1,T31); T_externalvisuallocalization.SetVal(4,1,T41); 
 		T_externalvisuallocalization.SetVal(1,2,T12); T_externalvisuallocalization.SetVal(2,2,T22); T_externalvisuallocalization.SetVal(3,2,T32); T_externalvisuallocalization.SetVal(4,2,T42); 

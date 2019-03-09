@@ -11,7 +11,7 @@ setmissionaction init
 wait 1
 label 0
 setmissionaction L0
-ballconfig 25 230 100 240 75 210 1 0 0 255 0 0 0.02 1.0 0.5 1.5 3.0 0 0 256 1.0 0 0 0 0 0 0 1000 0 0
+ballconfig 25 230 100 240 75 210 1 0 0 255 0 0 0 0.02 1.0 0.5 1.5 3.0 0 0 256 1.0 0 0 0 0 0 0 1000 0 0
 startballtracking
 wait 360
 stopballtracking
