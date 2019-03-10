@@ -83,7 +83,7 @@ vector< vector<double> > lidarDistanceAndAngle (Mat imgIn,
     // Initializing Debug Variables
     imgLid2d     = processed.clone();
     imgObstacles = processed.clone();
-    lidVerticalAngle.resize(processed.cols,rangeMax);
+    lidVerticalAngle.resize(maxHorizontalChecking*2,rangeMax);
     minThetaLeft            = 0;
     minThetaRight           = 0;
 
@@ -166,15 +166,15 @@ vector< vector<double> > lidarDistanceAndAngle (Mat imgIn,
 
 
     }
-    lidHorizontalAngle[processed.cols/2 -1 -j] = newAlphaRotated; 
-    lidHorizontalAngle[processed.cols/2 +j] = - newAlphaRotated;
-    lidDist[processed.cols/2 -1 -j] =  minThetaDistLeft;
-    lidDist[processed.cols/2 + j] = minThetaDistRight;
+    lidHorizontalAngle[maxHorizontalChecking -1 -j] = newAlphaRotated; 
+    lidHorizontalAngle[maxHorizontalChecking +j] = - newAlphaRotated;
+    lidDist[maxHorizontalChecking -1 -j] =  minThetaDistLeft;
+    lidDist[maxHorizontalChecking + j] = minThetaDistRight;
 
     if(debug_ground)
     {
-      lidVerticalAngle[processed.cols/2 -1 -j] = minThetaLeft;
-      lidVerticalAngle[processed.cols/2 + j] = minThetaRight;
+      lidVerticalAngle[maxHorizontalChecking -1 -j] = minThetaLeft;
+      lidVerticalAngle[maxHorizontalChecking + j] = minThetaRight;
     }
 
   }
@@ -186,8 +186,8 @@ vector< vector<double> > lidarDistanceAndAngle (Mat imgIn,
   if(debug_ground)
   {
     lidInfo.push_back(lidVerticalAngle);
-    imwrite("result_lid2D.png", imgLid2d);
-    imwrite("result_obstacles.png", imgObstacles);
+    imwrite(PIC_FOLDER"result_lid2D.png", imgLid2d);
+    imwrite(PIC_FOLDER"result_obstacles.png", imgObstacles);
   }
 
 
@@ -228,10 +228,10 @@ void set_kinect_d_vectors_Video(int deviceid)
 	if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 	
 	EnterCriticalSection(&StateVariablesCS);
-	for (i = 0; i < (int)lidarInfo.size(); i++)
+	for (i = 0; i < (int)lidarInfo[0].size(); i++)
 	{
 		alpha_mes_video[deviceid] = lidarInfo[0][i];
-		d_mes_video[deviceid] = lidarInfo[1][i];
+		d_mes_video[deviceid] = lidarInfo[1][i]/100.0;
 
 		// For compatibility with a Seanet...
 		d_all_mes_video[deviceid].clear();
@@ -246,7 +246,7 @@ void set_kinect_d_vectors_Video(int deviceid)
 		psihat_video_history_vector[deviceid].push_back(psihat);
 		vrxhat_video_history_vector[deviceid].push_back(vrxhat);
 
-		if ((int)alpha_mes_video_vector[deviceid].size() > (int)lidarInfo.size())
+		if ((int)alpha_mes_video_vector[deviceid].size() > (int)lidarInfo[0].size())
 		{
 			alpha_mes_video_vector[deviceid].pop_front();
 			d_mes_video_vector[deviceid].pop_front();
