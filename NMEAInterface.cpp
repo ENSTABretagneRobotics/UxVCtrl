@@ -451,6 +451,19 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			return EXIT_FAILURE;
 		}
 	}
+	if (bEnable_NMEAInterface_HCHDM)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$HCHDM,%.2f,M", headinghat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
 	if (bEnable_NMEAInterface_HEHDT)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
@@ -521,6 +534,32 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$PRDID,%.2f,%.2f,%.2f", pitchhat, rollhat, headinghat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_PHTRO)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$PHTRO,%.2f,%c,%.2f,%c", pitchhat, 'M', rollhat, 'T');
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_PHTRH)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$PHTRH,%.2f,%c,%.2f,%c,%.2f,%c", pitchhat, 'M', rollhat, 'T', 0.0, 'O');
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);

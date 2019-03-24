@@ -1060,11 +1060,112 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	memset(&pSBG->LastSBGData, 0, sizeof(SBGDATA));
 
 #ifdef ENABLE_SBG_SUPPORT
+/*
+#ifndef DISABLE_SBG_TCP
+
+	char address[256];
+	char port[256];
+	char lport[256];
+	char* ptr = NULL;
+	char* ptr2 = NULL;
+
+
+
+	memset(address, 0, sizeof(address));
+	memset(port, 0, sizeof(port));
+	memset(lport, 0, sizeof(lport));
+
+
+	// 2nd UDP port, inet_addr() vs sbgIpAddr()...?
+	
+
+	// Try to determine whether it is a server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001), 
+	// server UDP port (udp:4001), client IP address and UDP port (e.g. udp://127.0.0.1:4001) or local RS232 port.
+	ptr = strchr(pSBG->szDevPath, ':');
+	if ((ptr != NULL)&&(strlen(ptr) >= 6)) ptr2 = strchr(ptr+1, ':');
+	if ((strlen(pSBG->szDevPath) >= 12)&&(strncmp(pSBG->szDevPath, "tcpsrv://", strlen("tcpsrv://")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		memcpy(address, pSBG->szDevPath+9, ptr2-(pSBG->szDevPath+9));
+		strcpy(port, ptr2+1);
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, true, 10000, true) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	else if ((strlen(pSBG->szDevPath) >= 9)&&(strncmp(pSBG->szDevPath, "tcp://", strlen("tcp://")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		memcpy(address, pSBG->szDevPath+6, ptr2-(pSBG->szDevPath+6));
+		strcpy(port, ptr2+1);
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), false, true, 10000, true) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	else if ((strlen(pSBG->szDevPath) >= 9)&&(strncmp(pSBG->szDevPath, "udp://", strlen("udp://")) == 0)&&(ptr2 != NULL)&&(ptr2[1] != 0))
+	{
+		memcpy(address, pSBG->szDevPath+6, ptr2-(pSBG->szDevPath+6));
+		strcpy(port, ptr2+1);
+	if (sbgInterfaceUdpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), atoi(lport)) != SBG_NO_ERROR)
+	{
+		printf("Unable to connect to a SBG : Unable to create the interface.\n");
+		return EXIT_FAILURE;
+	}
+	}
+	else if ((strlen(pSBG->szDevPath) >= 5)&&(strncmp(pSBG->szDevPath, "tcp:", strlen("tcp:")) == 0)&&(atoi(pSBG->szDevPath+4) > 0))
+	{
+		strcpy(port, pSBG->szDevPath+4);
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, true, 10000, true) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	else if ((strlen(pSBG->szDevPath) >= 5)&&(strncmp(pSBG->szDevPath, "udp:", strlen("udp:")) == 0)&&(atoi(pSBG->szDevPath+4) > 0))
+	{
+		strcpy(port, pSBG->szDevPath+4);
+		if (sbgInterfaceUdpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), atoi(lport)) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	else if ((pSBG->szDevPath[0] == ':')&&(atoi(pSBG->szDevPath+1) > 0))
+	{
+		strcpy(port, pSBG->szDevPath+1);
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, true, 10000, true) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	else if ((ptr != NULL)&&(ptr[1] != 0))
+	{
+		memcpy(address, pSBG->szDevPath, ptr-pSBG->szDevPath);
+		strcpy(port, ptr+1);
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), false, true, 10000, true) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	else
+	{
+		if (sbgInterfaceSerialCreate(&pSBG->sbgInterface, pSBG->szDevPath, pSBG->BaudRate) != SBG_NO_ERROR)
+		{
+			printf("Unable to connect to a SBG : Unable to create the interface.\n");
+			return EXIT_FAILURE;
+		}
+	}
+#else
+*/
 	if (sbgInterfaceSerialCreate(&pSBG->sbgInterface, pSBG->szDevPath, pSBG->BaudRate) != SBG_NO_ERROR)
 	{
 		printf("Unable to connect to a SBG : Unable to create the interface.\n");
 		return EXIT_FAILURE;
 	}
+/*#endif // DISABLE_SBG_TCP*/
 
 	if (sbgEComInit(&pSBG->comHandle, &pSBG->sbgInterface) != SBG_NO_ERROR)
 	{

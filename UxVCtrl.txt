@@ -142,6 +142,8 @@ WMV2
 0
 % bEnable_NMEAInterface_HCHDG
 1
+% bEnable_NMEAInterface_HCHDM
+0
 % bEnable_NMEAInterface_HEHDT
 0
 % bEnable_NMEAInterface_HEROT
@@ -153,6 +155,10 @@ WMV2
 % bEnable_NMEAInterface_WIMDA
 0
 % bEnable_NMEAInterface_PRDID
+0
+% bEnable_NMEAInterface_PHTRO
+0
+% bEnable_NMEAInterface_PHTRH
 0
 % bEnable_NMEAInterface_IIRSA
 1

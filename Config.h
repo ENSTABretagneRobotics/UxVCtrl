@@ -86,12 +86,15 @@ inline int LoadConfig(void)
 	bEnable_NMEAInterface_GPGLL = FALSE;
 	bEnable_NMEAInterface_GPVTG = FALSE;
 	bEnable_NMEAInterface_HCHDG = FALSE;
+	bEnable_NMEAInterface_HCHDM = FALSE;
 	bEnable_NMEAInterface_HEHDT = FALSE;
 	bEnable_NMEAInterface_HEROT = FALSE;
 	bEnable_NMEAInterface_WIMWV = FALSE;
 	bEnable_NMEAInterface_WIMWD = FALSE;
 	bEnable_NMEAInterface_WIMDA = FALSE;
 	bEnable_NMEAInterface_PRDID = FALSE;
+	bEnable_NMEAInterface_PHTRO = FALSE;
+	bEnable_NMEAInterface_PHTRH = FALSE;
 	bEnable_NMEAInterface_IIRSA = FALSE;
 	bEnable_NMEAInterface_SDDBT = FALSE;
 	NMEAInterfaceSendPeriod = 500;
@@ -468,6 +471,8 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_HCHDG) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEnable_NMEAInterface_HCHDM) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_HEHDT) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_HEROT) != 1) printf("Invalid configuration file.\n");
@@ -479,6 +484,10 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_WIMDA) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_PRDID) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEnable_NMEAInterface_PHTRO) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEnable_NMEAInterface_PHTRH) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_IIRSA) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1544,6 +1553,8 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_HCHDG) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_HCHDM) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_HEHDT) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_HEROT) < 0) printf("Error writing configuration file.\n");
@@ -1555,6 +1566,10 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_WIMDA) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_PRDID) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_PHTRO) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_PHTRH) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_IIRSA) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

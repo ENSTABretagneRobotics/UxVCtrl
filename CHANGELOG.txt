@@ -1,3 +1,6 @@
+308
+Added bEnable_NMEAInterface_HCHDM, bEnable_NMEAInterface_PHTRO, bEnable_NMEAInterface_PHTRH parameters.
+
 307
 Corrected kinectto2dlidar.
 

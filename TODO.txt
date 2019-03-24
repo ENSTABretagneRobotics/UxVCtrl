@@ -1,6 +1,37 @@
+
+$PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
+
+angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, $PHTRH...
+
+Commande ais qui met dans reg direction et vitesse pour pouvoir lancer procedure à un cap relatif pour éviter
+
+Faire simu de voilier dans la rade avec données d'un vrai ais et faire tourner longtemps et vérifier qu'à aucun moment il y a collision
+
+Params pour pouvoir changer config sbg
+Mieux retransmettre certaines info GPS dans NMEAInterface, true north vs mag north, latence...
+
+RDIInterface PD6 RDI DVL (SYSTEM ATTITUDE DATA), Rdiinterface dans nmea->peut-être separer quand même
+Aisinterface, rapport avec swarmondevice, followme...
+MESInterface
+
+SeanetInterface pour voir aussi données de LIDAR dans Seanet...
+voilier : pouvoir laisser la possibilité de contrôler la voile manuellement pendant un suivi de ligne (e.g. pour tester la stabilisation en roulis)...
+threshold servos : quand on est proche des valeurs neutres, min, max, mettre ces valeurs?
+params et commandes pour régler individuellement période des thread des devices
+code pour calibration de voile VAIMOS->rajouter params pour la période et commande pour les gérer
+longitude180handling?
+option pour définir sockets des serveurs comme non blocantes?
+Faire un .h hook pour sbg pour appeler RS232Port?
+param pour lancer un waypointslist au démarrage (vérifier que tous les params de waypointslist sont déjà dans UxVCtrl.txt) et pouvoir lancer des commandes ou missions en parallèle...->nécessire peut-être un thread spécifique
+Format fichier wp mp, surveiller s'il est changé (e.g. via FTP), voir pour home, renommer quand fini, minimiser le risque qu'un crash a l'écriture d'un fichier pose problème
+ais
+reprise du programme en cas de crash/arrêt du PC->utiliser les labels dans les missions comme resumepoint avec fichier CurLbl.txt, param bResumeMission
+Tcp sdk sbg, qu'est-ce qui manque? simuler une sbg->faudrait aussi TCP server SBG dans l'idéal...
+add to cmake option DISABLE_SBG_TCP
 retester sous rpiz pourquoi très bas fps avec videointerface, tester avec un écran...
-Send DISTANCE_MEASUREMENTS to px, http://ardupilot.org/dev/docs/code-overview-object-avoidance.html et tester avec SITL
+Send DISTANCE_MEASUREMENTS to px (add param to disable in config file and/or through a command), http://ardupilot.org/dev/docs/code-overview-object-avoidance.html et aussi pour altitude https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_RangeFinder/AP_RangeFinder_MAVLink.cpp et tester avec SITL
 Support px4f en i2c via rpiz...
+envoyer et recevoir des DISTANCE_MEASUREMENTS via MAVLinkInterface aussi
 
 params max nb ball lancés au démarrage, err msg please increase dans command correspondante
 faire en sorte que externalvisuallocalization utilise la position d'un ballid...
@@ -13,6 +44,8 @@ les d_max_err devraient pas être les mêmes selon les lidar...
 
 gérer très longs commentaires dans les commandes
 
+Update Hardware-CPP, MATLAB, Python (check structures), in particular mavlink messages...
+
 Improve excludedpixelarea to draw polygons, do similar for lidars with angles intervals and distances...?
 
 rc mode, réguler course au lieu de heading...
@@ -23,6 +56,9 @@ Robid stabilized copter simulator, ou option pour choisir si on simule tout ou 2
 Inject rtk via uxvctrl
 
 Option use find package cmake un peu comme autodownload
+USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
+Catch find_package error?
+Waitkey and namedWindow in main thread, focus decides for which windo the key is?
 
 gestion u_obs, ul_obs...?
 
@@ -197,6 +233,7 @@ udp : réfléchir à la logique des recvfrom, sendto que doit utiliser mavproxy (st
 rajouter commentaires qui indiquent qu'on peut faire udp://...
 1er datagramme perdu pour server...
 ne gère pas encore le multi-clients, faire une version tcp et une autre udp de handlecliThreadProc, mais est-ce que c'est vraiment possible de faire un multicliudpsrv suffisamment générique...?
+peut-être qu'il faudrait spécifier 2 ports, comme dans SDK SBG?
 bien envoyer ack quand je reçois des commandes mavlink?
 
 move recvhttpcontent, recvhtml, sendhttpreq, etc. in OSNet?
@@ -348,7 +385,7 @@ tester avec un nouveau mingw et linux, check inline and timegm in a small progra
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
 cross compilation with cmake, variable PREFIX pour dépendances...
 Compiler uxvctrl pour le pixhawk?
-Mac OS : pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative...
+Mac OS : pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative, voir aussi SBG SDK...
 
 logs
 Dashboard : rajouter image en fond, cap voulu en remontée au vent car depend de l'estimation de vent
@@ -567,6 +604,13 @@ Should be possible to remove NMEADevice now if necessary...
 send Razor calib params like ROS (param bSendCalib)?
 adapter NMEAProtocol.h pour gérer NMEA Nortek (without tags, otherwise > 80 characters...)
 Pourquoi le #ox#o1 de razor apparait dans le second log?->parce que le nouveau log n'est créé qu'après le connect...
+Streaming output - always at 5Hz to match Honeywell output
+NMEA 0183 message containing Pitch, Roll and Heading (30 chars):
+$PTNTHPR,ddd.d,N,abbbb,N,acccc,N,kk<cr><lf> where:
+abbbb is pitch bb(degrees)bb(minutes) a is '-' for bow down, nothing for bow up.
+acccc is roll cc(degrees)cc(minutes) a is '-' for port up, nothing for port down.
+ddd.d is heading in degrees
+checksum etc as standard NMEA.
 
 Altitude sonar, objects detection sonar
 Altitude from sonar : use qinter to allow outliers and take into account position of the sonar on the submarine as well as roll and pitch
@@ -653,6 +697,22 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+$PHTRO,x.xx,a,y.yy,b*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up checksum etc as standard NMEA. (25 - 29 chars variable).
+
+$HCHDM,hhh.h,M*kk<cr><lf>
+where: $HCHDM signifies magnetic compass, magnetic heading
+hhh.h is heading without leading zeroes
+M signifies relative to Magnetic North
+* is a '*' character
+kk is XOR checksum of all chars between $ and * exclusive
+
+$HEHDT,hhh.h,T*kk<cr><lf>
+where: $HEHDT signifies north seeking gyro, true heading
+hhh.h is heading without leading zeroes
+T signifies relative to True North
+* is a '*' character
+kk is XOR checksum of all chars between $ and * exclusive.
 
 messages rc_override ne peuvent être envoyés que juste au début si bOverridePWMAtStartup ou ManualControlMode==0 ou 2
 
