@@ -14,6 +14,7 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 {
 	IM483I im483i;
 	double angle = 0;
+	CHRONO chrono_sail_calibration;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int i = 0;
@@ -23,6 +24,8 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	memset(&im483i, 0, sizeof(IM483I));
+
+	StartChrono(&chrono_sail_calibration);
 
 	StartChrono(&chrono_period);
 
@@ -106,9 +109,21 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 			case SAILBOAT_ROBID: // For VSim compatibility...
 			case SAILBOAT2_ROBID: // For VSim compatibility...
 			case VAIMOS_ROBID:
-
-				// Add also periodic im483i calibration here...
-
+				if ((GetTimeElapsedChronoQuick(&chrono_sail_calibration) > sail_calibration_period)||
+					((bCalibrateSail)&&(!bSailCalibrated)))
+				{
+					StopChronoQuick(&chrono_sail_calibration);
+					bSailCalibrated = FALSE;
+					if (CalibrateMotorIM483I(&im483i) != EXIT_SUCCESS)
+					{
+						printf("Connection to a IM483I lost.\n");
+						bConnected = FALSE;
+						DisconnectIM483I(&im483i);
+						break;
+					}
+					bSailCalibrated = TRUE;
+					StartChrono(&chrono_sail_calibration);
+				}
 				EnterCriticalSection(&StateVariablesCS);
 				//angle = deltasmax;
 				if (u_f > 0) angle = u_f*(im483i.MaxAngle-im483i.MinAngle)+im483i.MinAngle; else u_f = 0;
@@ -131,6 +146,8 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 	}
 
 	StopChronoQuick(&chrono_period);
+
+	StopChronoQuick(&chrono_sail_calibration);
 
 	if (im483i.pfSaveFile != NULL)
 	{

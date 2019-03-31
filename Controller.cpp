@@ -9,6 +9,7 @@
 
 #include "Controller.h"
 
+// From Corentin JEGAT.
 //version 1, problème : l'accumulation de points groupés influe trop sur le champ avoisinant et meme au delà
 //l_d : liste des distances du lidar
 //l_th : liste des angles du lidar
@@ -919,7 +920,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					break;
 				}
 				printf("Rudder angle is %.1f deg.\n", (uw_f >= 0)? fmod_360_rad2deg(ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): fmod_360_rad2deg(ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)));
-				printf("Sail maximum angle is %.1f deg.\n", u_f*q1*180.0/M_PI);
+				printf("Sail maximum angle is %.1f deg%.32s.\n", u_f*q1*180.0/M_PI, ((robid == VAIMOS_ROBID)&&(!bSailCalibrated))? " (not calibrated)" : "");
 				printf("-------------------------------------------------------------------\n");
 				fflush(stdout);
 #pragma endregion

@@ -1,16 +1,21 @@
+commande pour calibration de voile VAIMOS, afficher bSailCalibrated dans GUI?
+si pas bCalibrateSail, le couple n'est pas réglé...
+add VAIMOS_WORKSPACE
+Prévoir option bExitOnError pour que la boucle des devices ne se reconnecte pas auto pour que le programme stoppe...
 
 $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
 
 angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, $PHTRH...
 
-Commande ais qui met dans reg direction et vitesse pour pouvoir lancer procedure à un cap relatif pour éviter
+Commande ais qui met dans reg direction et vitesse du plus proche bateau pour pouvoir lancer procedure à un cap relatif pour éviter
 
 Faire simu de voilier dans la rade avec données d'un vrai ais et faire tourner longtemps et vérifier qu'à aucun moment il y a collision
 
 Params pour pouvoir changer config sbg
 Mieux retransmettre certaines info GPS dans NMEAInterface, true north vs mag north, latence...
+pouvoir avoir plusieurs nmeainterface?
 
-RDIInterface PD6 RDI DVL (SYSTEM ATTITUDE DATA), Rdiinterface dans nmea->peut-être separer quand même
+RDIInterface PD6 RDI DVL (SYSTEM ATTITUDE DATA), Rdiinterface dans nmea->peut-être séparer quand même
 Aisinterface, rapport avec swarmondevice, followme...
 MESInterface
 
@@ -18,8 +23,7 @@ SeanetInterface pour voir aussi données de LIDAR dans Seanet...
 voilier : pouvoir laisser la possibilité de contrôler la voile manuellement pendant un suivi de ligne (e.g. pour tester la stabilisation en roulis)...
 threshold servos : quand on est proche des valeurs neutres, min, max, mettre ces valeurs?
 params et commandes pour régler individuellement période des thread des devices
-code pour calibration de voile VAIMOS->rajouter params pour la période et commande pour les gérer
-longitude180handling?
+Logique de def du repere local w.r.t. vaimos...
 option pour définir sockets des serveurs comme non blocantes?
 Faire un .h hook pour sbg pour appeler RS232Port?
 param pour lancer un waypointslist au démarrage (vérifier que tous les params de waypointslist sont déjà dans UxVCtrl.txt) et pouvoir lancer des commandes ou missions en parallèle...->nécessire peut-être un thread spécifique
@@ -32,6 +36,8 @@ retester sous rpiz pourquoi très bas fps avec videointerface, tester avec un écr
 Send DISTANCE_MEASUREMENTS to px (add param to disable in config file and/or through a command), http://ardupilot.org/dev/docs/code-overview-object-avoidance.html et aussi pour altitude https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_RangeFinder/AP_RangeFinder_MAVLink.cpp et tester avec SITL
 Support px4f en i2c via rpiz...
 envoyer et recevoir des DISTANCE_MEASUREMENTS via MAVLinkInterface aussi
+MAVLinkInterface : put something in heartbeat.custom_mode, NAV_CONTROLLER_OUTPUT, LOCAL_POSITION_NED, GLOBAL_POSITION_INT...?
+missions avec mavlink : vérifier si ThresholdPW explique la zone morte de thrust constatée pour SPIKY...
 
 params max nb ball lancés au démarrage, err msg please increase dans command correspondante
 faire en sorte que externalvisuallocalization utilise la position d'un ballid...
@@ -58,7 +64,7 @@ Inject rtk via uxvctrl
 Option use find package cmake un peu comme autodownload
 USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
 Catch find_package error?
-Waitkey and namedWindow in main thread, focus decides for which windo the key is?
+Waitkey and namedWindow in main thread, focus decides for which window the key is?
 
 gestion u_obs, ul_obs...?
 
@@ -227,6 +233,8 @@ waypointslist waypoints.csv comme ça attend qu'une autre app modifie via Iridium
 inspiré de VAIMOS, gestion de waypoints.csv et curwp.txt...?
 nb waypoints impairs, juste 1, reset CurWP, index qui démarre à 0 ou 1...
 show WPT(CurWP) on OpenCVGUI when waypointslist is in use?
+commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
+ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
 longitude180handling?
 
 udp : réfléchir à la logique des recvfrom, sendto que doit utiliser mavproxy (start mavproxy.exe --master=tcp:127.0.0.1:5760 --out=udp:127.0.0.1:14550) et mission planner pour comprendre pourquoi mavproxy binde sur un port random...->c'est peut-être moi qui doit faire bind sur 14550 et un recvfrom dessus pour récupérer le port utilisé par mavproxy...
@@ -533,8 +541,6 @@ pas de setmissionaction init et end : peut-être que j'ai fait un copier coller s
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 mission par sms : option /s check missions from sms.txt or sms folder...
 Pouvoir programmer avec les touches de la télécommande
-commande spéciale pour charger et surveiller un fichier Waypoints.csv comme VAIMOS pour pouvoir changer les waypoints uniquement par ftp
-ou plutôt voir sms, VAIMOS Iridium... faire fonction CheckMission() qui vérifie si mission.txt a changé?
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2... Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?->bForceOverrideInputs...
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
@@ -601,7 +607,6 @@ convert AIS to C code...
 auto magnetic calbration algo in plane and space, see Matlab code in ptrbrtz, add magnetic declination in AHRS config files (or use yaworientation parameter)?
 gérer gpsd (Linux only?)
 Should be possible to remove NMEADevice now if necessary...
-send Razor calib params like ROS (param bSendCalib)?
 adapter NMEAProtocol.h pour gérer NMEA Nortek (without tags, otherwise > 80 characters...)
 Pourquoi le #ox#o1 de razor apparait dans le second log?->parce que le nouveau log n'est créé qu'après le connect...
 Streaming output - always at 5Hz to match Honeywell output

@@ -12,6 +12,7 @@
 using namespace cv;
 using namespace std;
 
+// From Julien DAMERS.
 vector< vector<double> > lidarDistanceAndAngle (Mat imgIn, 
                                                 double rangeMax, 
                                                 double verticalFOV, 

@@ -167,6 +167,7 @@ int guiid_VideoInterface = -1;
 int videoid_VideoInterface = -1;
 int encodequality_VideoInterface = 0;
 BOOL bDisablelognav = FALSE;
+BOOL bStdOutDetailedInfo = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 #pragma endregion
@@ -224,6 +225,8 @@ double check_strategy_period = 0;
 double sail_update_period = 0;
 int sailboattacktype = 0;
 int sailformulatype = 0;
+BOOL bCalibrateSail = FALSE;
+double sail_calibration_period = 0;
 double max_distance_around = 0;
 double min_distance_around = 0;
 double min_distance_around_full_speed = 0;
@@ -722,7 +725,7 @@ CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
 char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;
-BOOL bStdOutDetailedInfo = FALSE;
+BOOL bSailCalibrated = FALSE;
 BOOL bDisableAllAlarms = FALSE;
 BOOL bForceOverrideInputs = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;

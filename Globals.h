@@ -404,6 +404,7 @@ extern int guiid_VideoInterface;
 extern int videoid_VideoInterface;
 extern int encodequality_VideoInterface;
 extern BOOL bDisablelognav;
+extern BOOL bStdOutDetailedInfo;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 #pragma endregion
@@ -461,6 +462,8 @@ extern double check_strategy_period;
 extern double sail_update_period;
 extern int sailboattacktype;
 extern int sailformulatype;
+extern BOOL bCalibrateSail;
+extern double sail_calibration_period;
 extern double max_distance_around;
 extern double min_distance_around;
 extern double min_distance_around_full_speed;
@@ -954,7 +957,7 @@ extern CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
 extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
-extern BOOL bStdOutDetailedInfo;
+extern BOOL bSailCalibrated;
 extern BOOL bDisableAllAlarms;
 extern BOOL bForceOverrideInputs;
 extern BOOL bDisableRollWindCorrectionSailboat;

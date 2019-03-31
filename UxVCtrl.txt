@@ -208,6 +208,8 @@ WMV2
 50
 % bDisablelognav
 0
+% bStdOutDetailedInfo
+0
 % bCommandPrompt
 1
 % bEcho
@@ -422,6 +424,10 @@ WMV2
 0
 % sailformulatype (0, 1 or 2, see Controller.cpp)
 0
+% bCalibrateSail (0 to disable or 1 to enable VAIMOS sail calibration at the beginning)
+1
+% sail_calibration_period (in s, for VAIMOS)
+43200
 % max_distance_around
 1
 % min_distance_around 
