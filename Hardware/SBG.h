@@ -1292,7 +1292,7 @@ inline int DisconnectSBG(SBG* pSBG)
 	DeleteCriticalSection(&pSBG->CallbackCS);
 	if (sbgEComClose(&pSBG->comHandle) != SBG_NO_ERROR)
 	{
-		printf("SBG disconnection failed.\n");
+		printf("Error while disconnecting a SBG.\n");
 		sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
 		return EXIT_FAILURE;
 	}

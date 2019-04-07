@@ -843,7 +843,7 @@ inline int DisconnectRPLIDAR(RPLIDAR* pRPLIDAR)
 {		
 	if (StopRequestRPLIDAR(pRPLIDAR) != EXIT_SUCCESS)
 	{
-		printf("RPLIDAR disconnection failed.\n");
+		printf("Error while disconnecting a RPLIDAR.\n");
 		SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0);
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
@@ -851,7 +851,7 @@ inline int DisconnectRPLIDAR(RPLIDAR* pRPLIDAR)
 
 	if (SetMotorPWMRequestRPLIDAR(pRPLIDAR, 0) != EXIT_SUCCESS)
 	{
-		printf("RPLIDAR disconnection failed.\n");
+		printf("Error while disconnecting a RPLIDAR.\n");
 		CloseRS232Port(&pRPLIDAR->RS232Port);
 		return EXIT_FAILURE;
 	}

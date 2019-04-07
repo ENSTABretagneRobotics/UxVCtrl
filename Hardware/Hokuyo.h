@@ -672,7 +672,7 @@ inline int DisconnectHokuyo(HOKUYO* pHokuyo)
 
 	if (WriteAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
-		printf("Hokuyo disconnection failed.\n");
+		printf("Error while disconnecting a Hokuyo.\n");
 		CloseRS232Port(&pHokuyo->RS232Port);
 		return EXIT_FAILURE;
 	}
@@ -683,7 +683,7 @@ inline int DisconnectHokuyo(HOKUYO* pHokuyo)
 
 	//if (ReadAllRS232Port(&pHokuyo->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	//{
-	//	printf("Hokuyo disconnection failed.\n");
+	//	printf("Error while disconnecting a Hokuyo.\n");
 	//	CloseRS232Port(&pHokuyo->RS232Port);
 	//	return EXIT_FAILURE;
 	//}
@@ -691,7 +691,7 @@ inline int DisconnectHokuyo(HOKUYO* pHokuyo)
 	//// Check response.
 	//if (strcmp(recvbuf, "QT\n00P\n\n") != 0)
 	//{
-	//	printf("Hokuyo disconnection failed.\n");
+	//	printf("Error while disconnecting a Hokuyo.\n");
 	//	CloseRS232Port(&pHokuyo->RS232Port);
 	//	return EXIT_FAILURE;
 	//}

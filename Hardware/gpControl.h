@@ -767,7 +767,7 @@ inline int DisconnectgpControl(GPCONTROL* pgpControl)
 	{
 		if (releasetcpcli(pgpControl->tcpsock) != EXIT_SUCCESS)
 		{
-			printf("gpControl disconnection failed.\n");
+			printf("Error while disconnecting a gpControl.\n");
 			CloseRS232Port(&pgpControl->RS232Port);
 			return EXIT_FAILURE;
 		}

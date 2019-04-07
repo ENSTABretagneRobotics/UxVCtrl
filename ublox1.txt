@@ -25,6 +25,14 @@ COM14
 0
 % fixedPosAcc (in m)
 10
+% bSendStartSentence
+0
+% szStartSentence
+$GPS_START
+% bSendStopSentence
+0
+% szStopSentence
+$GPS_STOP
 % bEnable_NMEA_GGA
 0
 % bEnable_NMEA_RMC

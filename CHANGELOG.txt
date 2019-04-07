@@ -1,3 +1,6 @@
+310
+Added bSendStartSentence, szStartSentence, bSendStopSentence, szStopSentence to ublox.
+
 309
 Changed order in MAVLink code to match better pymavlink equivalents.
 Added bStdOutDetailedInfo, bCalibrateSail, sail_calibration_period parameters for VAIMOS compatibility.
