@@ -135,6 +135,7 @@
     <ClCompile Include="OpenCVGUI.cpp" />
     <ClCompile Include="Pinger.cpp" />
     <ClCompile Include="RazorAHRSInterface.cpp" />
+    <ClCompile Include="SBGInterface.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="SonarAltitudeEstimation.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pinger.h" />
     <ClInclude Include="RazorAHRSInterface.h" />
+    <ClInclude Include="SBGInterface.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />
     <ClInclude Include="SonarAltitudeEstimation.h" />
@@ -312,6 +314,7 @@
     <Text Include="LIRMIA3.txt" />
     <Text Include="MAVLinkDevice0.txt" />
     <Text Include="MAVLinkDevice1.txt" />
+    <Text Include="MAVLinkDevice2.txt" />
     <Text Include="MS580314BA0.txt" />
     <Text Include="MS583730BA0.txt" />
     <Text Include="NMEADevice1.txt" />

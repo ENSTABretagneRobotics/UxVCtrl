@@ -264,6 +264,9 @@
     <ClCompile Include="Hardware\I2CBus.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="SBGInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -626,6 +629,9 @@
     <ClInclude Include="Hardware\I2CBus.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="SBGInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="UxVCtrl.txt">
@@ -754,6 +760,9 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="SRF020.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MAVLinkDevice2.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

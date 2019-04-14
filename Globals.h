@@ -140,7 +140,7 @@ typedef enum KEYS KEYS;
 #define MAX_NB_BLUEVIEW 2
 #define MAX_NB_NMEADEVICE 2
 #define MAX_NB_UBLOX 3
-#define MAX_NB_MAVLINKDEVICE 2
+#define MAX_NB_MAVLINKDEVICE 3
 #define MAX_NB_POLOLU 3
 
 #define MAX_NB_BALL 8
@@ -391,6 +391,10 @@ extern char szRazorAHRSInterfacePath[MAX_BUF_LEN];
 extern int RazorAHRSInterfaceBaudRate;
 extern int RazorAHRSInterfaceTimeout;
 extern BOOL bROSMode_RazorAHRSInterface;
+extern BOOL bSBGInterface;
+extern char szSBGInterfacePath[MAX_BUF_LEN];
+extern int SBGInterfaceBaudRate;
+extern int SBGInterfaceTimeout;
 extern BOOL bSSC32Interface;
 extern char szSSC32InterfacePath[MAX_BUF_LEN];
 extern int SSC32InterfaceBaudRate;

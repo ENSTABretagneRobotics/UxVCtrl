@@ -1,6 +1,6 @@
 % Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
-%127.0.0.1:5762
-COM13
+127.0.0.1:5763
+%COM13
 % BaudRate
 115200
 % Timeout (in ms)
@@ -8,7 +8,7 @@ COM13
 % bSaveRawData
 1
 % bExternal (0 if the data can be used for the state estimation, 1 otherwise and to enable Follow Me)
-0
+1
 % quality_threshold
 1
 % flow_comp_m_threshold
@@ -42,7 +42,7 @@ COM13
 % bForceDefaultMAVLink1 (0 to enable default MAVLink v2 protocol, 1 to force to default MAVLink v1)
 1
 % ManualControlMode (-1 to disable, 0 to send RC_OVERRIDE, 1 to send MANUAL_CONTROL, 2 to send RC_OVERRIDE+MANUAL_CONTROL (only joystick buttons), 3 to send SET_ATTITUDE_TARGET (Copter needs to be in Guided mode) MAVLink messages)
--1
+0
 % bDefaultDisablePWMOverride
 1
 % overridechan (RC input channel used to disable RC override, from 1 to 18, set to higher if unused)

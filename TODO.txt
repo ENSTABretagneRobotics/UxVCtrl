@@ -1,13 +1,13 @@
 
-Rajouter check gouvernail en même temps que calib voile?
+Rajouter check gouvernail en même temps que calib voile?->FirstSailCalbrationDelay to wait for rudder test to finish
 commande pour calibration de voile VAIMOS, afficher bSailCalibrated dans GUI?
 si pas bCalibrateSail, le couple n'est pas réglé...
 add VAIMOS_WORKSPACE
-Prévoir option bExitOnError pour que la boucle des devices ne se reconnecte pas auto pour que le programme stoppe...
+Prévoir option ExitOnErrorCount pour que la boucle des devices ne se reconnecte pas auto pour que le programme stoppe après un certain nombre d'erreurs...
 
 $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
 
-angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, surge, sway, peut-être le récupérer quand même, $PHTRH...
+angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, surge, sway, peut-être le récupérer quand même, rajouter colonnes correspondantes dans log SBG, $PHTRH...
 
 Commande ais qui met dans reg direction et vitesse du plus proche bateau pour pouvoir lancer procedure à un cap relatif pour éviter
 
@@ -20,20 +20,18 @@ pouvoir avoir plusieurs nmeainterface?
 RDIInterface PD6 RDI DVL (SYSTEM ATTITUDE DATA), Rdiinterface dans nmea->peut-être séparer quand même
 Aisinterface, rapport avec swarmondevice, followme...
 MESInterface
-
 SeanetInterface pour voir aussi données de LIDAR dans Seanet...
 voilier : pouvoir laisser la possibilité de contrôler la voile manuellement pendant un suivi de ligne (e.g. pour tester la stabilisation en roulis)...
 threshold servos : quand on est proche des valeurs neutres, min, max, mettre ces valeurs?
 params et commandes pour régler individuellement période des thread des devices
 Logique de def du repere local w.r.t. vaimos...
 option pour définir sockets des serveurs comme non blocantes?
-Faire un .h hook pour sbg pour appeler RS232Port?
 param pour lancer un waypointslist au démarrage (vérifier que tous les params de waypointslist sont déjà dans UxVCtrl.txt) et pouvoir lancer des commandes ou missions en parallèle...->nécessire peut-être un thread spécifique
 Format fichier wp mp, surveiller s'il est changé (e.g. via FTP), voir pour home, renommer quand fini, minimiser le risque qu'un crash a l'écriture d'un fichier pose problème
 ais
 reprise du programme en cas de crash/arrêt du PC->utiliser les labels dans les missions comme resumepoint avec fichier CurLbl.txt, param bResumeMission
+Faire un .h hook pour sbg pour appeler RS232Port?
 Tcp sdk sbg, qu'est-ce qui manque? simuler une sbg->faudrait aussi TCP server SBG dans l'idéal...
-add to cmake option DISABLE_SBG_TCP
 retester sous rpiz pourquoi très bas fps avec videointerface, tester avec un écran...
 Send DISTANCE_MEASUREMENTS to px (add param to disable in config file and/or through a command), http://ardupilot.org/dev/docs/code-overview-object-avoidance.html et aussi pour altitude https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_RangeFinder/AP_RangeFinder_MAVLink.cpp et tester avec SITL
 Support px4f en i2c via rpiz...
@@ -63,9 +61,6 @@ Parfois thrust et goto de mission.txt pas pris pour drone?->mission planner qui 
 Robid stabilized copter simulator, ou option pour choisir si on simule tout ou 2.5D
 Inject rtk via uxvctrl
 
-Option use find package cmake un peu comme autodownload
-USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
-Catch find_package error?
 Waitkey and namedWindow in main thread, focus decides for which window the key is?
 
 gestion u_obs, ul_obs...?
@@ -92,7 +87,6 @@ Gotoopi opiid
 CorrectImageBordersRawBGR() : param nbpixborder devrait pas être hardcoded...
 
 récupérer les entrées de la télécommande sur le MAVLinkDevice comme entrées et les corriger avec évitement doit être possible si on utilise setattitudetarget en guided, rajouter commande pour gérer cela...
-add a third MAVLinkDevice?
 pouvoir gérer followme avec nmeainterface, bExternal...
 rajouter support setekforigin
 
@@ -385,6 +379,9 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+Option use find package cmake un peu comme autodownload
+USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
+Catch find_package error?
 Tester Hardware-MATLAB MAVLink et SBG support : 
 export CMAKE_C_FLAGS=${CMAKE_C_FLAGS} -fPIC
 Pour compilation SBG MATLAB Linux et Mac OS
@@ -578,8 +575,7 @@ prévoir commande pour mettre en veille le PathfinderDVL (avec warning s'il est e
 Test piscine avec DVL+staticsonalocalization : mettre plus grande erreur sur boussole et faire du suivi de ligne avec effet intégral pour corriger les erreurs de cap...->non en fait le DVL n'aidera pas vraiment...
 mt, sbg : fixtype, numsat, hdop...
 Pour chaque GPS, option bdisableuse, qui empêche mise à jour x_gps, bGPSOK, etc. mais il faut quand même qu'il reçoive les corrections rtcm...
-récupérer accel de mavlink, mt, sbg, razor, vérifier quand elles sont valides...?
-SBG pas accessible par réseau...
+récupérer accel de mavlink, vérifier quand elles sont valides...?
 AHRS matrice de rotation, bras de levier...
 ublox : surveiller problèmes de pragma pack, taille de packet dans SetCfg()...
 gestion des corrections RTCM probablement mal faite (retards?)...->pas trop grave si on les injecte via VSPE...

@@ -1,3 +1,8 @@
+311
+Added a third MAVLinkDevice.
+Updated SBG.
+Beginning of SBGInterface integration.
+
 310
 Added bSendStartSentence, szStartSentence, bSendStopSentence, szStopSentence to ublox.
 

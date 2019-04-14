@@ -51,10 +51,8 @@
 #include "RazorAHRS.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "MT.h"
-#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-#ifdef ENABLE_SBG_SUPPORT
 #include "SBG.h"
-#endif // ENABLE_SBG_SUPPORT
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "NMEADevice.h"
 #include "ublox.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -82,6 +80,7 @@
 #include "NMEAInterface.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRSInterface.h"
+#include "SBGInterface.h"
 #include "SSC32Interface.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -153,10 +152,8 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER RazorAHRSThreadId;
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MTThreadId;
-#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-#ifdef ENABLE_SBG_SUPPORT
 	THREAD_IDENTIFIER SBGThreadId;
-#endif // ENABLE_SBG_SUPPORT
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER NMEADeviceThreadId[MAX_NB_NMEADEVICE];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER ubloxThreadId[MAX_NB_UBLOX];
@@ -184,6 +181,7 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER NMEAInterfaceThreadId;
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
+	THREAD_IDENTIFIER SBGInterfaceThreadId;
 	THREAD_IDENTIFIER SSC32InterfaceThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -295,10 +293,8 @@ int main(int argc, char* argv[])
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMT) CreateDefaultThread(MTThread, NULL, &MTThreadId);
-#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
-#ifdef ENABLE_SBG_SUPPORT
 	if (!bDisableSBG) CreateDefaultThread(SBGThread, NULL, &SBGThreadId);
-#endif // ENABLE_SBG_SUPPORT
+#endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	for (i = 0; i < MAX_NB_NMEADEVICE; i++)
 	{
 		if (!bDisableNMEADevice[i]) CreateDefaultThread(NMEADeviceThread, (void*)(intptr_t)i, &NMEADeviceThreadId[i]);
@@ -341,6 +337,8 @@ int main(int argc, char* argv[])
 	if (bNMEAInterface) DetachThread(NMEAInterfaceThreadId); // Not easy to stop it correctly...
 	if (bRazorAHRSInterface) CreateDefaultThread(RazorAHRSInterfaceThread, NULL, &RazorAHRSInterfaceThreadId);
 	if (bRazorAHRSInterface) DetachThread(RazorAHRSInterfaceThreadId); // Not easy to stop it correctly...
+	if (bSBGInterface) CreateDefaultThread(SBGInterfaceThread, NULL, &SBGInterfaceThreadId);
+	if (bSBGInterface) DetachThread(SBGInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSSC32Interface) CreateDefaultThread(SSC32InterfaceThread, NULL, &SSC32InterfaceThreadId);
 	if (bSSC32Interface) DetachThread(SSC32InterfaceThreadId); // Not easy to stop it correctly...
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -444,6 +442,9 @@ int main(int argc, char* argv[])
 	//if (bSSC32Interface) WaitForThread(SSC32InterfaceThreadId);
 	if (bSSC32Interface) mSleep(100);
 	// Not easy to stop it correctly...
+	//if (bSBGInterface) WaitForThread(SBGInterfaceThreadId);
+	if (bSBGInterface) mSleep(100);
+	// Not easy to stop it correctly...
 	//if (bRazorAHRSInterface) WaitForThread(RazorAHRSInterfaceThreadId);
 	if (bRazorAHRSInterface) mSleep(100);
 	// Not easy to stop it correctly...
@@ -488,10 +489,8 @@ int main(int argc, char* argv[])
 	{
 		if (!bDisableNMEADevice[i]) WaitForThread(NMEADeviceThreadId[i]);
 	}
-#ifdef ENABLE_SBG_SUPPORT
-	if (!bDisableSBG) WaitForThread(SBGThreadId);
-#endif // ENABLE_SBG_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+	if (!bDisableSBG) WaitForThread(SBGThreadId);
 	if (!bDisableMT) WaitForThread(MTThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);

@@ -288,6 +288,9 @@
     <ClCompile Include="Hardware\I2CBus.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
+    <ClCompile Include="SBGInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -656,55 +659,49 @@
     <ClInclude Include="Hardware\I2CBus.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="SBGInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
     <Text Include="mission_spec.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
-    <Text Include="BlueView0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="BlueView1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="PathfinderDVL0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="NortekDVL0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="LIRMIA3.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MS580314BA0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="MS583730BA0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="gpControl0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
     <Text Include="CMakeLists.txt" />
-    <Text Include="Pololu0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Pololu1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Pololu2.txt">
-      <Filter>Input Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
     <None Include="ResetWorkspace.sh" />
     <None Include="dummy.wmv" />
+    <None Include="restore\pic\ReadMe.txt">
+      <Filter>restore\pic</Filter>
+    </None>
+    <None Include="restore\aud\ReadMe.txt">
+      <Filter>restore\aud</Filter>
+    </None>
+    <None Include="restore\ReadMe.txt">
+      <Filter>restore</Filter>
+    </None>
+    <None Include="restore\vid\ReadMe.txt">
+      <Filter>restore\vid</Filter>
+    </None>
+    <None Include="restore\log\ReadMe.txt">
+      <Filter>restore\log</Filter>
+    </None>
+    <None Include="BlueView0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="BlueView1.txt">
+      <Filter>Input Files</Filter>
+    </None>
     <None Include="CISCREA.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="env.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="gpControl0.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="Hokuyo0.txt">
@@ -716,10 +713,16 @@
     <None Include="keys.txt">
       <Filter>Input Files</Filter>
     </None>
+    <None Include="LIRMIA3.txt">
+      <Filter>Input Files</Filter>
+    </None>
     <None Include="MAVLinkDevice0.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="MAVLinkDevice1.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MAVLinkDevice2.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="MDM0.txt">
@@ -734,6 +737,12 @@
     <None Include="mission.txt">
       <Filter>Input Files</Filter>
     </None>
+    <None Include="MS580314BA0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="MS583730BA0.txt">
+      <Filter>Input Files</Filter>
+    </None>
     <None Include="MT0.txt">
       <Filter>Input Files</Filter>
     </None>
@@ -743,7 +752,22 @@
     <None Include="NMEADevice1.txt">
       <Filter>Input Files</Filter>
     </None>
+    <None Include="NortekDVL0.txt">
+      <Filter>Input Files</Filter>
+    </None>
     <None Include="P33x0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="PathfinderDVL0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Pololu0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Pololu1.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Pololu2.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="RazorAHRS0.txt">
@@ -756,6 +780,9 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="Seanet0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="SRF020.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="SSC320.txt">
@@ -786,24 +813,6 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="Video2.txt">
-      <Filter>Input Files</Filter>
-    </None>
-    <None Include="restore\pic\ReadMe.txt">
-      <Filter>restore\pic</Filter>
-    </None>
-    <None Include="restore\aud\ReadMe.txt">
-      <Filter>restore\aud</Filter>
-    </None>
-    <None Include="restore\ReadMe.txt">
-      <Filter>restore</Filter>
-    </None>
-    <None Include="restore\vid\ReadMe.txt">
-      <Filter>restore\vid</Filter>
-    </None>
-    <None Include="restore\log\ReadMe.txt">
-      <Filter>restore\log</Filter>
-    </None>
-    <None Include="SRF020.txt">
       <Filter>Input Files</Filter>
     </None>
   </ItemGroup>

@@ -178,6 +178,14 @@ WMV2
 2000
 % bROSMode_RazorAHRSInterface
 0
+% bSBGInterface
+0
+% szSBGInterfacePath (server TCP port (e.g. :5007), client IP address and TCP port (e.g. 127.0.0.1:5007) or local RS232 port)
+:5007
+% SBGInterfaceBaudRate
+115200
+% SBGInterfaceTimeout (in ms)
+2000
 % bSSC32Interface
 1
 % szSSC32InterfacePath (server TCP port (e.g. :5004), client IP address and TCP port (e.g. 127.0.0.1:5004) or local RS232 port)
@@ -271,6 +279,8 @@ WMV2
 % bDisableMAVLinkDevice[0]
 1
 % bDisableMAVLinkDevice[1]
+1
+% bDisableMAVLinkDevice[2]
 1
 % bDisableSwarmonDevice
 1
