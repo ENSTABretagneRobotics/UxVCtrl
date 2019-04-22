@@ -63,14 +63,24 @@ int inithandlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 
 int handlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 {
+	uInt_SBG serial, hwRev, fwRev, calRev;
+	uShort_SBG calYear;
+	unsigned char calMonth = 0, calDay = 0;
+	uShort_SBG transferCmd;
+	uInt_SBG transferSize, transferOffset;
+	unsigned char cmdId = 0, classId = 0;
+	uShort_SBG errorCode;
 	uInt_SBG time_stamp, solution_status;
 	uShort_SBG imu_status;
-	uFloat_SBG roll, pitch, yaw, roll_acc, pitch_acc, yaw_acc;
+	uFloat_SBG roll, pitch, yaw;
+	uFloat_SBG q0, q1, q2, q3;
+	double qw = 0, qx = 0, qy = 0, qz = 0;
+	uFloat_SBG roll_acc, pitch_acc, yaw_acc;
 	uFloat_SBG accx, accy, accz, gyrx, gyry, gyrz, temp, delta_vel_x, delta_vel_y, delta_vel_z, delta_angle_x, delta_angle_y, delta_angle_z;
 	int sendbuflen = 0;
 	uint8 sendbuf[MAX_NB_BYTES_SBG];
-	unsigned char payload[32];
-	int len = 32;
+	unsigned char payload[256];
+	int len = 0;
 	int offset = 0;
 
 	EnterCriticalSection(&StateVariablesCS);
@@ -79,11 +89,14 @@ int handlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 	roll.v = (float)fmod_2PI(Center(phihat));
 	pitch.v = (float)fmod_2PI(-Center(thetahat));
 	yaw.v = (float)fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
+	euler2quaternion((double)roll.v, (double)pitch.v, (double)yaw.v, &qw, &qx, &qy, &qz);
+	q0.v = (float)qw; q1.v = (float)qx; q2.v = (float)qy; q3.v = (float)qz;
 	roll_acc.v = 0;
 	pitch_acc.v = 0;
 	yaw_acc.v = 0;
 	solution_status.v = SBG_ECOM_SOL_MODE_AHRS;
 
+	imu_status.v = (unsigned short)0xFFFF;
 	accx.v = (float)Center(accrxhat);
 	accy.v = (float)-Center(accryhat);
 	accz.v = (float)-Center(accrzhat);
@@ -99,6 +112,154 @@ int handlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 	delta_angle_z.v = 0;
 
 	LeaveCriticalSection(&StateVariablesCS);
+
+	serial.v = 45000000;
+	calYear.v = 2019; calMonth = 4, calDay = 22;
+	calRev.c[3] = 1; calRev.c[2] = 1;
+	hwRev.c[3] = 1; hwRev.c[2] = 1;
+	fwRev.c[3] = 1; fwRev.c[2] = 6;
+
+	memset(payload, 0, sizeof(payload));
+	strcpy((char*)payload, "ELLIPSE2-A-G4A3-B1");
+	offset = 32;
+	memcpy(payload+offset, serial.c, 4);
+	offset += 4;
+	memcpy(payload+offset, calRev.c, 4);
+	offset += 4;
+	memcpy(payload+offset, calYear.c, 2);
+	offset += 2;
+	memcpy(payload+offset, &calMonth, 1);
+	offset += 1;
+	memcpy(payload+offset, &calDay, 1);
+	offset += 1;
+	memcpy(payload+offset, hwRev.c, 4);
+	offset += 4;
+	memcpy(payload+offset, fwRev.c, 4);
+	offset += 4;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = 58;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_INFO, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	cmdId = SBG_ECOM_CMD_EXPORT_SETTINGS; classId = SBG_ECOM_CLASS_LOG_CMD_0;
+	errorCode.v = 0;
+
+	offset = 0;
+	memcpy(payload+offset, &cmdId, 1);
+	offset += 2;
+	memcpy(payload+offset, &classId, 1);
+	offset += 2;
+	memcpy(payload+offset, errorCode.c, 2);
+	offset += 2;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_ACK, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	transferCmd.v = 0x0000;
+	transferSize.v = 0;
+
+	offset = 0;
+	memcpy(payload+offset, transferCmd.c, 2);
+	offset += 2;
+	memcpy(payload+offset, transferSize.c, 4);
+	offset += 4;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_EXPORT_SETTINGS, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	cmdId = SBG_ECOM_CMD_EXPORT_SETTINGS; classId = SBG_ECOM_CLASS_LOG_CMD_0;
+	errorCode.v = 0;
+
+	offset = 0;
+	memcpy(payload+offset, &cmdId, 1);
+	offset += 2;
+	memcpy(payload+offset, &classId, 1);
+	offset += 2;
+	memcpy(payload+offset, errorCode.c, 2);
+	offset += 2;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_ACK, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	transferCmd.v = 0x0001;
+	transferOffset.v = 0;
+
+	offset = 0;
+	memcpy(payload+offset, transferCmd.c, 2);
+	offset += 2;
+	memcpy(payload+offset, transferOffset.c, 4);
+	offset += 4;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_EXPORT_SETTINGS, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	cmdId = SBG_ECOM_CMD_EXPORT_SETTINGS; classId = SBG_ECOM_CLASS_LOG_CMD_0;
+	errorCode.v = 0;
+
+	offset = 0;
+	memcpy(payload+offset, &cmdId, 1);
+	offset += 2;
+	memcpy(payload+offset, &classId, 1);
+	offset += 2;
+	memcpy(payload+offset, errorCode.c, 2);
+	offset += 2;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_ACK, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	transferCmd.v = 0x0002;
+
+	offset = 0;
+	memcpy(payload+offset, transferCmd.c, 2);
+	offset += 2;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_EXPORT_SETTINGS, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	cmdId = SBG_ECOM_CMD_EXPORT_SETTINGS; classId = SBG_ECOM_CLASS_LOG_CMD_0;
+	errorCode.v = 0;
+
+	offset = 0;
+	memcpy(payload+offset, &cmdId, 1);
+	offset += 2;
+	memcpy(payload+offset, &classId, 1);
+	offset += 2;
+	memcpy(payload+offset, errorCode.c, 2);
+	offset += 2;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = offset;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_CMD_ACK, SBG_ECOM_CLASS_LOG_CMD_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
 
 	offset = 0;
 	memcpy(payload+offset, time_stamp.c, 4);
@@ -118,7 +279,35 @@ int handlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 	memcpy(payload+offset, solution_status.c, 4);
 	offset += 4;
 	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = 32;
 	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_LOG_EKF_EULER, SBG_ECOM_CLASS_LOG_ECOM_0, payload, len);
+	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	offset = 0;
+	memcpy(payload+offset, time_stamp.c, 4);
+	offset += 4;
+	memcpy(payload+offset, q0.c, 4);
+	offset += 4;
+	memcpy(payload+offset, q1.c, 4);
+	offset += 4;
+	memcpy(payload+offset, q2.c, 4);
+	offset += 4;
+	memcpy(payload+offset, q3.c, 4);
+	offset += 4;
+	memcpy(payload+offset, roll_acc.c, 4);
+	offset += 4;
+	memcpy(payload+offset, pitch_acc.c, 4);
+	offset += 4;
+	memcpy(payload+offset, yaw_acc.c, 4);
+	offset += 4;
+	memcpy(payload+offset, solution_status.c, 4);
+	offset += 4;
+	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = 36;
+	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_LOG_EKF_QUAT, SBG_ECOM_CLASS_LOG_ECOM_0, payload, len);
 	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
@@ -156,6 +345,7 @@ int handlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 	memcpy(payload+offset, delta_angle_z.c, 4);
 	offset += 4;
 	//memset(sendbuf, 0, sizeof(sendbuf));
+	len = 58;
 	EncodeFrameSBG(sendbuf, &sendbuflen, SBG_ECOM_LOG_IMU_DATA, SBG_ECOM_CLASS_LOG_ECOM_0, payload, len);
 	if (WriteAllRS232Port(pSBGInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{

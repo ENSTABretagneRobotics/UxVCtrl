@@ -1,3 +1,6 @@
+312
+Continuation of SBGInterface integration.
+
 311
 Added a third MAVLinkDevice.
 Updated SBG.

@@ -18,7 +18,7 @@
 #endif // !DISABLE_SBGTHREAD
 
 // Temp...
-#define DISABLE_SBG_TCP
+//#define DISABLE_SBG_TCP
 //#undef ENABLE_SBG_SUPPORT
 
 #ifdef ENABLE_SBG_SUPPORT

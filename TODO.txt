@@ -1,3 +1,6 @@
+Check set_attitude_target guided mode absolute heading…
+
+Rajouter params code sonar et csv2v4log pour gérer sbp?
 
 Rajouter check gouvernail en même temps que calib voile?->FirstSailCalbrationDelay to wait for rudder test to finish
 commande pour calibration de voile VAIMOS, afficher bSailCalibrated dans GUI?

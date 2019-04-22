@@ -161,6 +161,7 @@ inline int LoadConfig(void)
 	bDisableublox[2] = TRUE;
 	bDisableMAVLinkDevice[0] = TRUE;
 	bDisableMAVLinkDevice[1] = TRUE;
+	bDisableMAVLinkDevice[2] = TRUE;
 	bDisableSwarmonDevice = TRUE;
 	bDisableUE9A = TRUE;
 	bDisableSSC32 = TRUE;
@@ -618,6 +619,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bDisableMAVLinkDevice[0]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableMAVLinkDevice[1]) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisableMAVLinkDevice[2]) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisableSwarmonDevice) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1714,6 +1717,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bDisableMAVLinkDevice[0]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableMAVLinkDevice[1]) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisableMAVLinkDevice[2]) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisableSwarmonDevice) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
