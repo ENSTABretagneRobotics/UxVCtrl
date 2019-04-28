@@ -129,6 +129,84 @@ typedef enum _SbgEComLog1MsgId
 	SBG_ECOM_LOG_ECOM_1_NUM_MESSAGES					/*!< Helper definition to know the number of ECom messages */
 } SbgEComLog1;
 
+typedef enum _SbgEComCmd
+{
+	/* Acknowledge */
+	SBG_ECOM_CMD_ACK			 			= 0,		/*!< Acknowledge */
+
+	/* Special settings commands */
+	SBG_ECOM_CMD_SETTINGS_ACTION 			= 1,		/*!< Performs various settings actions */
+	SBG_ECOM_CMD_IMPORT_SETTINGS 			= 2,		/*!< Imports a new settings structure to the sensor */
+	SBG_ECOM_CMD_EXPORT_SETTINGS 			= 3,		/*!< Export the whole configuration from the sensor */
+
+	/* Device info */
+	SBG_ECOM_CMD_INFO 						= 4,		/*!< Get basic device information */
+
+	/* Sensor parameters */
+	SBG_ECOM_CMD_INIT_PARAMETERS 			= 5,		/*!< Initial configuration */
+	SBG_ECOM_CMD_SET_MOTION_PROFILE 		= 6,		/*!< Set a new motion profile */
+	SBG_ECOM_CMD_MOTION_PROFILE_ID	 		= 7,		/*!< Get motion profile information */
+	SBG_ECOM_CMD_IMU_ALIGNMENT_LEVER_ARM	= 8,		/*!< Sensor alignment and lever arm on vehicle configuration */
+	SBG_ECOM_CMD_AIDING_ASSIGNMENT 			= 9,		/*!< Aiding assignments such as RTCM / GPS / Odometer configuration */
+
+	/* Magnetometer configuration */
+	SBG_ECOM_CMD_MAGNETOMETER_SET_MODEL 	= 10,		/*!< Set a new magnetometer error model */
+	SBG_ECOM_CMD_MAGNETOMETER_MODEL_ID	 	= 11,		/*!< Get magnetometer error model information */
+	SBG_ECOM_CMD_MAGNETOMETER_REJECT_MODE 	= 12,		/*!< Magnetometer aiding rejection mode */
+	SBG_ECOM_CMD_SET_MAG_CALIB 				= 13,		/*!< Set magnetic soft and hard Iron calibration data */
+
+	/* Magnetometer onboard calibration */
+	SBG_ECOM_CMD_START_MAG_CALIB			= 14,		/*!< Start / reset internal magnetic field logging for calibration. */
+	SBG_ECOM_CMD_COMPUTE_MAG_CALIB			= 15,		/*!< Compute a magnetic calibration based on previously logged data. */
+
+	/* GNSS configuration */
+	SBG_ECOM_CMD_GNSS_1_SET_MODEL 			= 16,		/*!< Set a new GNSS model */
+	SBG_ECOM_CMD_GNSS_1_MODEL_ID 			= 17,		/*!< Get GNSS model information */
+	SBG_ECOM_CMD_GNSS_1_LEVER_ARM_ALIGNMENT = 18,		/*!< GNSS installation configuration (lever arm, antenna alignments) */
+	SBG_ECOM_CMD_GNSS_1_REJECT_MODES 		= 19,		/*!< GNSS aiding rejection modes configuration. */
+
+	/* Odometer configuration */
+	SBG_ECOM_CMD_ODO_CONF 					= 20,		/*!< Odometer gain, direction configuration */
+	SBG_ECOM_CMD_ODO_LEVER_ARM 				= 21,		/*!< Odometer installation configuration (lever arm) */
+	SBG_ECOM_CMD_ODO_REJECT_MODE 			= 22,		/*!< Odometer aiding rejection mode configuration. */
+
+	/* Interfaces configuration */
+	SBG_ECOM_CMD_UART_CONF 					= 23,		/*!< UART interfaces configuration */
+	SBG_ECOM_CMD_CAN_BUS_CONF 				= 24,		/*!< CAN bus interface configuration */
+	SBG_ECOM_CMD_CAN_OUTPUT_CONF			= 25,		/*!< CAN identifiers configuration */
+		
+	/* Events configuration */
+	SBG_ECOM_CMD_SYNC_IN_CONF 				= 26,		/*!< Synchronization inputs configuration */
+	SBG_ECOM_CMD_SYNC_OUT_CONF 				= 27,		/*!< Synchronization outputs configuration */
+
+	/* Output configuration */
+	SBG_ECOM_CMD_NMEA_TALKER_ID 			= 29,		/*!< NMEA talker ID configuration */
+	SBG_ECOM_CMD_OUTPUT_CONF 				= 30,		/*!< Output configuration */
+	SBG_ECOM_CMD_LEGACY_CONT_OUTPUT_CONF 	= 31,		/*!< Legacy serial output mode configuration */
+
+	/* Avanced configuration */
+	SBG_ECOM_CMD_ADVANCED_CONF 				= 32,		/*!< Advanced settings configuration */
+
+	/* Features related commands */
+	SBG_ECOM_CMD_FEATURES					= 33,		/*!< Retrieve device features */
+
+	/* Licenses related commands */
+	SBG_ECOM_CMD_LICENSE_APPLY				= 34,		/*!< Upload and apply a new license */
+		
+	/* Message class output switch */
+	SBG_ECOM_CMD_OUTPUT_CLASS_ENABLE		= 35,		/*!< Enable/disable the output of an entire class */
+
+	/* Ethernet configuration */
+	SBG_ECOM_CMD_ETHERNET_CONF				= 36,		/*!< Set/get Ethernet configuration such as DHCP mode and IP address. */
+	SBG_ECOM_CMD_ETHERNET_INFO				= 37,		/*!< Return the current IP used by the device. */
+
+	/* Validity thresholds */
+	SBG_ECOM_CMD_VALIDITY_THRESHOLDS		= 38,		/*!< Set/get Validity flag thresholds for position, velocity, attitude and heading */
+
+	/* Misc. */
+	SBG_ECOM_LOG_ECOM_NUM_CMDS							/*!< Helper definition to know the number of commands */
+} SbgEComCmd;
+
 typedef enum _SbgEComSolutionMode
 {
 	SBG_ECOM_SOL_MODE_UNINITIALIZED			= 0,					/*!< The Kalman filter is not initialized and the returned data are all invalid. */
@@ -500,7 +578,7 @@ inline int AnalyzeFrameSBG(unsigned char* buf, int buflen, int* pmid, int* pmcla
 		*pnbBytesToRequest = *pframelen-buflen;
 		return EXIT_OUT_OF_MEMORY;
 	}
-	if (CalcCRCSBG(buf, (uint16)*pframelen) != ((buf[*pframelen-2]<<8)+buf[*pframelen-3]))
+	if (CalcCRCSBG(buf+2, (uint16)(*pframelen-5)) != ((buf[*pframelen-2]<<8)+buf[*pframelen-3]))
 	{ 
 		printf("Warning : SBG CRC error. \n");
 		*pnbBytesToDiscard = 2; // We are only sure that the 2 sync bytes can be discarded...
@@ -528,7 +606,7 @@ inline int FindFrameSBG(unsigned char* buf, int buflen, int* pmid, int* pmclass,
 
 	for (;;)
 	{
-		res = AnalyzeFrameSBG(*pFoundFrame, buflen-(*pnbBytesDiscarded), pmclass, pmid, pframelen, &nbBytesToRequest, &nbBytesToDiscard);
+		res = AnalyzeFrameSBG(*pFoundFrame, buflen-(*pnbBytesDiscarded), pmid, pmclass, pframelen, &nbBytesToRequest, &nbBytesToDiscard);
 		switch (res)
 		{
 		case EXIT_SUCCESS:
@@ -583,6 +661,35 @@ inline int ProcessFrameSBG(SBG* pSBG, unsigned char* frame, int framelen, int mi
 			roll = pSBGData->roll*M_PI/180.0;
 			pitch = pSBGData->pitch*M_PI/180.0;
 			yaw = pSBGData->yaw*M_PI/180.0;
+
+			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+			pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
+			pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
+			pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
+			break;
+		case SBG_ECOM_LOG_EKF_QUAT:
+			offset = FRAME_HEADER_LEN_SBG;
+			memcpy(uival.c, frame+offset, 4);
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q0 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q1 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q2 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q3 = fval.v;
+			offset += 4;
+			roll = atan2(2*pSBGData->q2*pSBGData->q3+2*pSBGData->q0*pSBGData->q1, 2*sqr(pSBGData->q0)+2*sqr(pSBGData->q3)-1);
+			pitch = -asin(constrain(2*pSBGData->q1*pSBGData->q3-2*pSBGData->q0*pSBGData->q2, -1, 1)); // Attempt to avoid potential NAN...
+			yaw = atan2(2*pSBGData->q1*pSBGData->q2+2*pSBGData->q0*pSBGData->q3, 2*sqr(pSBGData->q0)+2*sqr(pSBGData->q1)-1);
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pSBGData->roll = roll*180.0/M_PI;
+			pSBGData->pitch = pitch*180.0/M_PI;
+			pSBGData->yaw = yaw*180.0/M_PI;
 
 			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 			pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));

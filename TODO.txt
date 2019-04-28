@@ -1,3 +1,15 @@
+
+ENABLE_HIGHGUI_CPP_API auto define if cv4 detected?
+
+Cmake : 
+if(OpenCV_VERSION VERSION_LESS "3.0")
+# use 2.4 modules
+else()
+# use 3.x modules
+endif()
+
+n'avoir que le waitkey() dans main (avec critical_section pour protéger les fonctions GUI) et avoir une option qui choisit sur quelle fenêtre ira la touche récupérée...?
+
 Check set_attitude_target guided mode absolute heading…
 
 Rajouter params code sonar et csv2v4log pour gérer sbp?

@@ -285,10 +285,18 @@ inline modbus_t* ConnectCISCREA(char* szCfgFilePath)
 	}
 	timeout.tv_sec = 1;
 	timeout.tv_usec = 0;
+#if LIBMODBUS_VERSION_CHECK(3,1,2)
+	modbus_set_byte_timeout(mb, (uint32_t)timeout.tv_sec, (uint32_t)timeout.tv_usec);
+#else
 	modbus_set_byte_timeout(mb, &timeout);
+#endif // LIBMODBUS_VERSION_CHECK(3,1,2)
 	timeout.tv_sec = 1;
 	timeout.tv_usec = 0;
+#if LIBMODBUS_VERSION_CHECK(3,1,2)
+	modbus_set_response_timeout(mb, (uint32_t)timeout.tv_sec, (uint32_t)timeout.tv_usec);
+#else
 	modbus_set_response_timeout(mb, &timeout);
+#endif // LIBMODBUS_VERSION_CHECK(3,1,2)
 	if (modbus_connect(mb) != 0) 
 	{
 		printf("Modbus connection failed.\n");
