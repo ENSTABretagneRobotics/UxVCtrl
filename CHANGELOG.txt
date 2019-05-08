@@ -1,3 +1,6 @@
+314
+Improved compatibility with OpenCV 4.1.0.
+
 313
 Updated SBG.
 Improved compatibility with libmodbus 3.1.4.

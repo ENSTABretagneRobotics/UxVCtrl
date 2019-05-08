@@ -1095,13 +1095,23 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				return EXIT_FAILURE;
 			}
 
+#if (CV_MAJOR_VERSION < 3)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+#else
+			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
+			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+#endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
 			//if ((!pVideo->bForceSoftwareResize)&&
+//#if (CV_MAJOR_VERSION < 3)
 			//	((pVideo->pCapture->get(CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
 			//	(pVideo->pCapture->get(CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+//#else
+			//	((pVideo->pCapture->get(cv::CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+			//	(pVideo->pCapture->get(cv::CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+//#endif // (CV_MAJOR_VERSION < 3)
 			//{
 			//	printf("Unable to set desired video resolution.\n");
 			//	pVideo->pCapture->release();
@@ -1209,13 +1219,23 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				return EXIT_FAILURE;
 			}
 
+#if (CV_MAJOR_VERSION < 3)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+#else
+			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
+			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+#endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
 			//if ((!pVideo->bForceSoftwareResize)&&
+//#if (CV_MAJOR_VERSION < 3)
 			//	((pVideo->pCapture->get(CV_CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
 			//	(pVideo->pCapture->get(CV_CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+//#else
+			//	((pVideo->pCapture->get(cv::CAP_PROP_FRAME_WIDTH) != pVideo->videoimgwidth)||
+			//	(pVideo->pCapture->get(cv::CAP_PROP_FRAME_HEIGHT) != pVideo->videoimgheight)))
+//#endif // (CV_MAJOR_VERSION < 3)
 			//{
 			//	printf("Unable to set desired video resolution.\n");
 			//	pVideo->pCapture->release();

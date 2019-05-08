@@ -1,5 +1,4 @@
-
-ENABLE_HIGHGUI_CPP_API auto define if cv4 detected?
+print warning for mac about cv GUI, especially nbgui > 1
 
 Cmake : 
 if(OpenCV_VERSION VERSION_LESS "3.0")
@@ -7,6 +6,8 @@ if(OpenCV_VERSION VERSION_LESS "3.0")
 else()
 # use 3.x modules
 endif()
+set cmake var OpenCV_VERSION even when not using find, use vars set to 2413, 2.4.13 to be simplify for vs libs...?
+Prevent cmake find_package from returning error->see QUIET, REQUIRED...
 
 n'avoir que le waitkey() dans main (avec critical_section pour protéger les fonctions GUI) et avoir une option qui choisit sur quelle fenêtre ira la touche récupérée...?
 
