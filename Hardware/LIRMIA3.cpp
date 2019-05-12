@@ -16,6 +16,8 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 	double thrust1 = 0, thrust2 = 0, thrust3 = 0, thrust4 = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -31,7 +33,7 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		//mSleep(50);
+		uSleep(1000*threadperiod);
 
 		if (bPauseLIRMIA3) 
 		{
@@ -61,8 +63,9 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 		{
 			if (ConnectLIRMIA3(&lirmia3, "LIRMIA3.txt") == EXIT_SUCCESS) 
 			{
-				mSleep(50);
 				bConnected = TRUE; 
+				threadperiod = lirmia3.threadperiod;
+				uSleep(1000*threadperiod);
 
 				if (lirmia3.pfSaveFile != NULL)
 				{
@@ -114,11 +117,10 @@ THREAD_PROC_RETURN_VALUE LIRMIA3Thread(void* pParam)
 				bConnected = FALSE;
 				DisconnectLIRMIA3(&lirmia3);
 			}
-			mSleep(50);
 		}
 
 		//printf("LIRMIA3Thread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

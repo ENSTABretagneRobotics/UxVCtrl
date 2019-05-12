@@ -59,6 +59,7 @@ struct SSC32
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int MinPWs[NB_CHANNELS_PWM_SSC32];
 	int MidPWs[NB_CHANNELS_PWM_SSC32];
@@ -524,7 +525,7 @@ inline int SetRudderThrustersFluxSSC32(SSC32* pSSC32, double angle, double urt, 
 	return SetAllPWMsSSC32(pSSC32, selectedchannels, pws);
 }
 
-inline int CheckSSC32(SSC32* pSSC32)
+inline int CheckRudderSSC32(SSC32* pSSC32)
 {
 	if (SetRudderSSC32(pSSC32, -0.25) != EXIT_SUCCESS)
 	{
@@ -542,6 +543,11 @@ inline int CheckSSC32(SSC32* pSSC32)
 	}
 	mSleep(2000);
 
+	return EXIT_SUCCESS;
+}
+
+inline int CheckThrustersSSC32(SSC32* pSSC32)
+{
 	if (SetThrustersSSC32(pSSC32, -0.25, -0.25) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
@@ -587,6 +593,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		sprintf(pSSC32->szDevPath, "COM1");
 		pSSC32->BaudRate = 115200;
 		pSSC32->timeout = 1000;
+		pSSC32->threadperiod = 50;
 		pSSC32->bSaveRawData = 1;
 		for (channel = 0; channel < NB_CHANNELS_PWM_SSC32; channel++)
 		{
@@ -617,6 +624,8 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSSC32->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSSC32->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSSC32->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSSC32->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 
@@ -662,6 +671,12 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pSSC32->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pSSC32->threadperiod = 50;
 	}
 
 	for (channel = 0; channel < NB_CHANNELS_PWM_SSC32; channel++)

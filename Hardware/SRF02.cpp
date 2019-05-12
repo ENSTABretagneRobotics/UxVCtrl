@@ -59,6 +59,8 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 	double distances3[MAX_NB_DEVICES_SRF02];
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
@@ -77,7 +79,7 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		//mSleep(50);
+		//uSleep(1000*threadperiod);
 
 		if (bPauseSRF02) 
 		{
@@ -107,8 +109,9 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 		{
 			if (ConnectSRF02(&srf02, szCfgFilePath) == EXIT_SUCCESS) 
 			{
-				mSleep(50);
 				bConnected = TRUE; 
+				threadperiod = srf02.threadperiod;
+				uSleep(1000*threadperiod);
 
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
@@ -167,7 +170,7 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 						printf("Connection to a SRF02 lost.\n");
 						bConnected = FALSE;
 						DisconnectSRF02(&srf02);
-						mSleep(50);
+						uSleep(1000*threadperiod);
 						continue;
 					}
 					mSleep(20);
@@ -179,7 +182,7 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 						printf("Connection to a SRF02 lost.\n");
 						bConnected = FALSE;
 						DisconnectSRF02(&srf02);
-						mSleep(50);
+						uSleep(1000*threadperiod);
 						continue;
 					}
 					mSleep(10);
@@ -220,11 +223,11 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 				set_htelemeters_vectors_SRF02(angles, distances, nbhtelemeters, tv);
 				LeaveCriticalSection(&StateVariablesCS);
 			}
-			//else mSleep(50);
+			//else uSleep(1000*threadperiod);
 		}
 
 		//printf("SRF02Thread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 	

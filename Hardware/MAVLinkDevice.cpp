@@ -31,6 +31,8 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 	CHRONO chrono_heartbeat;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
@@ -52,7 +54,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		//mSleep(50);
+		//uSleep(1000*threadperiod);
 
 		if (bPauseMAVLinkDevice[deviceid])
 		{
@@ -84,8 +86,9 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 		{
 			if (ConnectMAVLinkDevice(&mavlinkdevice, szCfgFilePath) == EXIT_SUCCESS) 
 			{
-				mSleep(50);
 				bConnected = TRUE; 
+				threadperiod = mavlinkdevice.threadperiod;
+				uSleep(1000*threadperiod);
 
 				memset(&mavlinkdata, 0, sizeof(mavlinkdata));
 				StartChrono(&chrono_GPSOK);
@@ -200,7 +203,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 					LeaveCriticalSection(&StateVariablesCS);
 			
-					mSleep(25);
+					uSleep(1000*threadperiod/2);
 				}
 				else
 				{
@@ -448,7 +451,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 #pragma endregion
 					LeaveCriticalSection(&StateVariablesCS);
 
-					mSleep(25);
+					uSleep(1000*threadperiod/2);
 #pragma region HEARTBEAT
 					if ((!mavlinkdevice.bDisableSendHeartbeat)&&(GetTimeElapsedChronoQuick(&chrono_heartbeat) > mavlinkdevice.chrono_heartbeat_period))
 					{
@@ -458,12 +461,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 							bConnected = FALSE;
 							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
+							uSleep(1000*threadperiod);
 							break;
 						}
 						StopChronoQuick(&chrono_heartbeat);
 						StartChrono(&chrono_heartbeat);
-						//mSleep(25);
+						//uSleep(1000*threadperiod/2);
 					}
 #pragma endregion
 #pragma region COMMANDS
@@ -475,10 +478,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 							bConnected = FALSE;
 							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
+							uSleep(1000*threadperiod);
 							break;
 						}
-						mSleep(25);
+						uSleep(1000*threadperiod/2);
 						EnterCriticalSection(&StateVariablesCS);
 						iArmMAVLinkDevice[deviceid] = -1;
 						LeaveCriticalSection(&StateVariablesCS);
@@ -492,10 +495,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 							bConnected = FALSE;
 							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
+							uSleep(1000*threadperiod);
 							break;
 						}
-						mSleep(25);
+						uSleep(1000*threadperiod/2);
 						EnterCriticalSection(&StateVariablesCS);
 						custom_modeMAVLinkDevice[deviceid] = -1;
 						LeaveCriticalSection(&StateVariablesCS);
@@ -512,7 +515,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -524,7 +527,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -544,10 +547,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 							bConnected = FALSE;
 							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
+							uSleep(1000*threadperiod);
 							break;
 						}
-						mSleep(25);
+						uSleep(1000*threadperiod/2);
 						EnterCriticalSection(&StateVariablesCS);
 						bTakeoffMAVLinkDevice[deviceid] = FALSE;
 						takeoff_altitudeMAVLinkDevice[deviceid] = 0;
@@ -563,10 +566,10 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 							bConnected = FALSE;
 							DisconnectMAVLinkDevice(&mavlinkdevice);
-							mSleep(50);
+							uSleep(1000*threadperiod);
 							break;
 						}
-						mSleep(25);
+						uSleep(1000*threadperiod/2);
 						EnterCriticalSection(&StateVariablesCS);
 						bLandMAVLinkDevice[deviceid] = FALSE;
 						land_yawMAVLinkDevice[deviceid] = 0;
@@ -660,7 +663,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -684,7 +687,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -701,7 +704,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -779,7 +782,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -802,7 +805,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -819,7 +822,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 								GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 								bConnected = FALSE;
 								DisconnectMAVLinkDevice(&mavlinkdevice);
-								mSleep(50);
+								uSleep(1000*threadperiod);
 								break;
 							}
 						}
@@ -828,7 +831,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						break;
 					}
 #pragma endregion								
-					mSleep(25);
+					uSleep(1000*threadperiod/2);
 				}
 			
 				if (mavlinkdevice.bSaveRawData)
@@ -876,12 +879,12 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectMAVLinkDevice(&mavlinkdevice);
-				mSleep(50);
+				uSleep(1000*threadperiod);
 			}		
 		}
 
 		//printf("MavlinkDeviceThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

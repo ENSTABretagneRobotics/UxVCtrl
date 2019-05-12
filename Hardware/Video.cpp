@@ -16,6 +16,9 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	IplImage* img = NULL;
 	IplImage* imgtmp = NULL;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = captureperiod;
+	int errcount = 0;
 	int videoid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 
@@ -23,9 +26,14 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	
 	memset(&video, 0, sizeof(VIDEO));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		//mSleep(captureperiod);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		//uSleep(1000*threadperiod);
 
 		if (bPauseVideo[videoid])
 		{
@@ -61,6 +69,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 			if (ConnectVideo(&video, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = video.captureperiod;
 
 				if (img) cvReleaseImage(&img);
 				img = NULL;
@@ -82,7 +91,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 
 				LeaveCriticalSection(&StateVariablesCS);
 
-				//mSleep(captureperiod);
+				//uSleep(1000*threadperiod);
 			}
 			else 
 			{
@@ -115,12 +124,16 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 				EnterCriticalSection(&OpenCVVideoCS);
 				DisconnectVideo(&video);
 				LeaveCriticalSection(&OpenCVVideoCS);
-				mSleep(captureperiod);
+				uSleep(1000*threadperiod);
 			}		
 		}
 
+		//printf("VideoThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (img) cvReleaseImage(&img);
 	img = NULL;

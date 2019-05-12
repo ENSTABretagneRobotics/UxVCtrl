@@ -57,7 +57,7 @@ void set_htelemeters_vectors_Pololu(double* angles, double* distances, int nbhte
 	}
 }
 
-int showgetposition_setposition_Pololu(int& showgetposition, int& setposition, BOOL& bConnected, POLOLU& pololu, int deviceid)
+int showgetposition_setposition_Pololu(int& showgetposition, int& setposition, BOOL& bConnected, int threadperiod, POLOLU& pololu, int deviceid)
 {
 	int ivalue = 0;
 
@@ -68,7 +68,7 @@ int showgetposition_setposition_Pololu(int& showgetposition, int& setposition, B
 			printf("Connection to a Pololu lost.\n");
 			bConnected = FALSE;
 			DisconnectPololu(&pololu);
-			mSleep(50);
+			mSleep(threadperiod);
 			return EXIT_FAILURE;
 		}
 		mSleep(10);
@@ -85,7 +85,7 @@ int showgetposition_setposition_Pololu(int& showgetposition, int& setposition, B
 			printf("Connection to a Pololu lost.\n");
 			bConnected = FALSE;
 			DisconnectPololu(&pololu);
-			mSleep(50);
+			mSleep(threadperiod);
 			return EXIT_FAILURE;
 		}
 		mSleep(10);
@@ -120,6 +120,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	double lights_prev = -1, cameratilt_prev = -1;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
@@ -140,7 +142,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		//mSleep(50);
+		//mSleep(threadperiod);
 
 		if (bPausePololu[deviceid]) 
 		{
@@ -170,8 +172,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 		{
 			if (ConnectPololu(&pololu, szCfgFilePath) == EXIT_SUCCESS) 
 			{
-				mSleep(50);
 				bConnected = TRUE; 
+				threadperiod = pololu.threadperiod;
+				mSleep(threadperiod);
 
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
@@ -254,11 +257,11 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
-				mSleep(50);
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				mSleep(threadperiod);
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			case SAILBOAT_ROBID:
 				counter_modulo = 11;
@@ -274,7 +277,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
 				mSleep(10);
@@ -285,7 +288,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -309,7 +312,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -325,7 +328,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -334,7 +337,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
@@ -352,7 +355,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
 				mSleep(10);
@@ -363,7 +366,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -389,7 +392,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
 							DisconnectPololu(&pololu);
-							mSleep(50);
+							mSleep(threadperiod);
 							break;
 						}
 						mSleep(10);
@@ -409,7 +412,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
 							DisconnectPololu(&pololu);
-							mSleep(50);
+							mSleep(threadperiod);
 							break;
 						}
 						mSleep(10);
@@ -429,7 +432,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
 							DisconnectPololu(&pololu);
-							mSleep(50);
+							mSleep(threadperiod);
 							break;
 						}
 						mSleep(10);
@@ -449,7 +452,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
 							DisconnectPololu(&pololu);
-							mSleep(50);
+							mSleep(threadperiod);
 							break;
 						}
 						mSleep(10);
@@ -469,7 +472,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 							printf("Connection to a Pololu lost.\n");
 							bConnected = FALSE;
 							DisconnectPololu(&pololu);
-							mSleep(50);
+							mSleep(threadperiod);
 							break;
 						}
 						mSleep(10);
@@ -480,7 +483,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					else mSleep(20);
 				}
 				else mSleep(20);
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				counter++;
 				if (counter >= counter_modulo) counter = 0;
 				break;
@@ -496,11 +499,11 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
-				mSleep(50);
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				mSleep(threadperiod);
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
@@ -525,10 +528,10 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
-				mSleep(50);
+				mSleep(threadperiod);
 #else
 				UNREFERENCED_PARAMETER(flux);
 				EnterCriticalSection(&StateVariablesCS);
@@ -552,7 +555,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 				}
@@ -563,13 +566,13 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 				}
-				mSleep(50);
+				mSleep(threadperiod);
 #endif // USE_MOTORBOAT_WITH_FLUX
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			case COPTER_ROBID:
 			case SAUCISSE_ROBID:
@@ -586,11 +589,11 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
-				mSleep(50);
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				mSleep(threadperiod);
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
@@ -611,7 +614,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					//StopChronoQuick(&chrono_get_telem);
@@ -623,7 +626,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					printf("Connection to a Pololu lost.\n");
 					bConnected = FALSE;
 					DisconnectPololu(&pololu);
-					mSleep(50);
+					mSleep(threadperiod);
 					break;
 				}
 				mSleep(10);
@@ -641,7 +644,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -707,7 +710,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -754,7 +757,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
@@ -767,19 +770,19 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						printf("Connection to a Pololu lost.\n");
 						bConnected = FALSE;
 						DisconnectPololu(&pololu);
-						mSleep(50);
+						mSleep(threadperiod);
 						break;
 					}
 					mSleep(10);
 					cameratilt_prev = cameratilt;
 				}
-				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, pololu, deviceid) != EXIT_SUCCESS) break;
+				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			}
 		}
 
 		//printf("PololuThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 
@@ -787,7 +790,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	{
 	case BUGGY_ROBID:
 		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 		break;
 	case SAILBOAT_ROBID:
 	case SAILBOAT2_ROBID:
@@ -796,23 +799,23 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
 		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 #else
 		SetRudderThrusterPololu(&pololu, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 #endif // USE_MOTORBOAT_WITH_FLUX
 		break;
 	case COPTER_ROBID:
 	case SAUCISSE_ROBID:
 	case SARDINE_ROBID:
 		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 		break;
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:
 	default:
 		SetThrustersPololu(&pololu, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 		break;
 	}
 

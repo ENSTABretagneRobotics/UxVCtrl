@@ -178,6 +178,7 @@ struct SEANET
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int RangeScale; // In m.
 	int Gain; // In %.
@@ -1982,6 +1983,7 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 		sprintf(pSeanet->szDevPath, "COM1");
 		pSeanet->BaudRate = 115200;
 		pSeanet->timeout = 1500;
+		pSeanet->threadperiod = 100;
 		pSeanet->bSaveRawData = 1;
 		pSeanet->RangeScale = 30;
 		pSeanet->Gain = 50;
@@ -2011,6 +2013,8 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSeanet->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSeanet->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSeanet->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSeanet->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -2055,6 +2059,11 @@ inline int ConnectSeanet(SEANET* pSeanet, char* szCfgFilePath)
 		}
 	}
 
+	if (pSeanet->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pSeanet->threadperiod = 100;
+	}
 	if ((pSeanet->ScanDirection < 0)||(pSeanet->ScanDirection > 359))
 	{
 		printf("Invalid parameter : ScanDirection.\n");

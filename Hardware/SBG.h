@@ -319,6 +319,7 @@ struct SBG
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	double gpsaccuracythreshold;
 	double rollorientation;
@@ -894,6 +895,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 		sprintf(pSBG->szDevPath, "COM1");
 		pSBG->BaudRate = 115200;
 		pSBG->timeout = 1000;
+		pSBG->threadperiod = 50;
 		pSBG->bSaveRawData = 1;
 		pSBG->gpsaccuracythreshold = 10;
 		pSBG->rollorientation = 0;
@@ -916,6 +918,8 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSBG->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSBG->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSBG->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSBG->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -946,6 +950,11 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 		}
 	}
 
+	if (pSBG->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pSBG->threadperiod = 50;
+	}
 	if (pSBG->gpsaccuracythreshold < 0)
 	{
 		printf("Invalid parameter : gpsaccuracythreshold.\n");

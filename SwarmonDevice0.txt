@@ -3,3 +3,5 @@
 %http://haggis.ensta-bretagne.fr:3000/rt/lastposition/robotTest
 http://193.52.45.70:3000/rt/lastposition/robotTest
 %http://172.17.1.47:3000/rt/lastposition/robotTest
+% threadperiod (in ms, require associated thread)
+100

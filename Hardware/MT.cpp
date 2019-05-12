@@ -19,6 +19,8 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 	time_t tt = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -36,7 +38,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(50);
+		mSleep(threadperiod);
 
 		if (bPauseMT)
 		{
@@ -69,6 +71,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 			if (ConnectMT(&mt, "MT0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = mt.threadperiod;
 
 				memset(&tv, 0, sizeof(tv));
 				memset(&mtdata, 0, sizeof(mtdata));
@@ -196,7 +199,7 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 		}
 
 		//printf("MTThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

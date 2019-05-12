@@ -84,6 +84,7 @@ struct MAVLINKDEVICE
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bExternal;
 	int quality_threshold;
@@ -711,6 +712,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		sprintf(pMAVLinkDevice->szDevPath, "COM1");
 		pMAVLinkDevice->BaudRate = 115200;
 		pMAVLinkDevice->timeout = 1000;
+		pMAVLinkDevice->threadperiod = 50;
 		pMAVLinkDevice->bSaveRawData = 1;
 		pMAVLinkDevice->bExternal = 0;
 		pMAVLinkDevice->quality_threshold = 1;
@@ -753,6 +755,8 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 			if (sscanf(line, "%d", &pMAVLinkDevice->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMAVLinkDevice->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMAVLinkDevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -822,6 +826,11 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		}
 	}
 
+	if (pMAVLinkDevice->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pMAVLinkDevice->threadperiod = 50;
+	}
 	if ((pMAVLinkDevice->quality_threshold < 0)||(pMAVLinkDevice->quality_threshold >= 256))
 	{
 		printf("Invalid parameter : quality_threshold.\n");

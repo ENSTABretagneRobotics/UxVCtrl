@@ -37,6 +37,7 @@ struct HOKUYO
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bForceSCIP20;
 	BOOL bHS;
@@ -381,6 +382,7 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		sprintf(pHokuyo->szDevPath, "COM1");
 		pHokuyo->BaudRate = 115200;
 		pHokuyo->timeout = 1000;
+		pHokuyo->threadperiod = 100;
 		pHokuyo->bSaveRawData = 1;
 		pHokuyo->bForceSCIP20 = 0;
 		pHokuyo->bHS = 0;
@@ -404,6 +406,8 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pHokuyo->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pHokuyo->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pHokuyo->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pHokuyo->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -436,6 +440,11 @@ inline int ConnectHokuyo(HOKUYO* pHokuyo, char* szCfgFilePath)
 		}
 	}
 
+	if (pHokuyo->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pHokuyo->threadperiod = 100;
+	}
 	if (pHokuyo->SlitDivision <= 0)
 	{
 		printf("Invalid parameter : SlitDivision.\n");

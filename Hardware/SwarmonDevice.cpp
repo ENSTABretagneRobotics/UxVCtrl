@@ -15,14 +15,22 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 	SWARMONDEVICE swarmondevice;
 	SWARMONDATA swarmondata;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
 
 	memset(&swarmondevice, 0, sizeof(SWARMONDEVICE));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		mSleep(threadperiod);
 
 		if (bPauseSwarmonDevice)
 		{
@@ -53,6 +61,7 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			if (ConnectSwarmonDevice(&swarmondevice, "SwarmonDevice0.txt") == EXIT_SUCCESS)
 			{
 				bConnected = TRUE;
+				threadperiod = swarmondevice.threadperiod;
 
 				memset(&swarmondata, 0, sizeof(swarmondata));
 			}
@@ -82,8 +91,12 @@ THREAD_PROC_RETURN_VALUE SwarmonDeviceThread(void* pParam)
 			}
 		}
 
+		//printf("SwarmonDeviceThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (bConnected) DisconnectSwarmonDevice(&swarmondevice);
 

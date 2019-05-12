@@ -291,6 +291,7 @@ struct MT
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bLegacyMode;
 	double rollorientation;
@@ -1086,6 +1087,7 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 		sprintf(pMT->szDevPath, "COM1");
 		pMT->BaudRate = 115200;
 		pMT->timeout = 1000;
+		pMT->threadperiod = 50;
 		pMT->bSaveRawData = 1;
 		pMT->bLegacyMode = 1;
 		pMT->rollorientation = 0;
@@ -1108,6 +1110,8 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pMT->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMT->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMT->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMT->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1136,6 +1140,12 @@ inline int ConnectMT(MT* pMT, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pMT->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pMT->threadperiod = 50;
 	}
 
 	// Used to save raw data, should be handled specifically...

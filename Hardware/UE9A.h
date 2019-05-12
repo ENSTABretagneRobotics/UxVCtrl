@@ -38,6 +38,7 @@ struct UE9A
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
+	int threadperiod;
 	//int MinPWs[MAX_NB_TIMERS_UE9];
 	//int MidPWs[MAX_NB_TIMERS_UE9];
 	//int MaxPWs[MAX_NB_TIMERS_UE9];
@@ -86,6 +87,7 @@ inline int ConnectUE9A(UE9A* pUE9A, char* szCfgFilePath)
 		// Default values.
 		memset(pUE9A->szDevPath, 0, sizeof(pUE9A->szDevPath));
 		sprintf(pUE9A->szDevPath, "1");
+		pUE9A->threadperiod = 25;
 		pUE9A->rightthrusterpwm = 0;
 		pUE9A->leftthrusterpwm = 1;
 		pUE9A->bottomthrusterpwm = 2;
@@ -99,6 +101,8 @@ inline int ConnectUE9A(UE9A* pUE9A, char* szCfgFilePath)
 		{
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%255s", pUE9A->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pUE9A->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pUE9A->rightthrusterpwm) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -117,6 +121,12 @@ inline int ConnectUE9A(UE9A* pUE9A, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pUE9A->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pUE9A->threadperiod = 25;
 	}
 
 	if (OpenUE9(&pUE9A->hUE9, pUE9A->szDevPath) != EXIT_SUCCESS)

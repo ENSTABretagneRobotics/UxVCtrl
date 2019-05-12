@@ -16,6 +16,9 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 	NMEADATA nmeadata;
 	//double vrx = 0, vry = 0, vrz = 0, alt = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -24,9 +27,14 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 
 	memset(&pathfinderdvl, 0, sizeof(PATHFINDERDVL));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		//mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		//mSleep(threadperiod);
 
 		if (bPausePathfinderDVL)
 		{
@@ -57,6 +65,7 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 			if (ConnectPathfinderDVL(&pathfinderdvl, "PathfinderDVL0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = pathfinderdvl.threadperiod;
 
 				memset(&nmeadata, 0, sizeof(nmeadata));
 
@@ -150,12 +159,16 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 				printf("Connection to a PathfinderDVL lost.\n");
 				bConnected = FALSE;
 				DisconnectPathfinderDVL(&pathfinderdvl);
-				mSleep(100);
+				mSleep(threadperiod);
 			}
 		}
 
+		//printf("PathfinderDVLThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (pathfinderdvl.pfSaveFile != NULL)
 	{

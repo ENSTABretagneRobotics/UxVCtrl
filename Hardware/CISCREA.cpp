@@ -14,6 +14,8 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 {
 	int status = 0, depth = 0, heading = 0, voltage = 0;
 	int light_ciscrea = 0, tilt_ciscrea = 0;
+	int threadperiod = 20;
+	int errcount = 0;
 
 	//double error = 0;
 
@@ -47,7 +49,7 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(10);
+		//uSleep(1000*threadperiod);
 
 		if (bPauseCISCREA)
 		{
@@ -64,7 +66,7 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 		if (bRestartCISCREA)
 		{
-			if(bConnected)
+			if (bConnected)
 			{
 				printf("Restarting a CISCREA.\n");
 				bConnected = FALSE;
@@ -78,7 +80,7 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 			mb = ConnectCISCREA("CISCREA.txt");
 			if (mb != NULL)
 			{
-				bConnected = TRUE; 
+				bConnected = TRUE;
 
 				EnterCriticalSection(&StateVariablesCS);
 
@@ -102,7 +104,7 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 
 			if (!bError&&(CheckAlarmsStatusAndGetHeadingAndDepthAndVoltageCISCREA(mb, &status, &depth, &heading, &voltage) != EXIT_SUCCESS)) bError = TRUE;
 
-			mSleep(10);
+			uSleep(1000*threadperiod/2);
 
 			if (!bError)
 			{
@@ -144,10 +146,12 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 				value_reg[0], value_reg[1], value_reg[2], value_reg[3], value_reg[4], 
 				light_ciscrea, tilt_ciscrea) != EXIT_SUCCESS)) bError = TRUE;
 
+			uSleep(1000*threadperiod/2);
+
 			if (bOSDButtonPressedCISCREA)
 			{
-				mSleep(10);
 				if (!bError&&(OSDControlCISCREA(mb, OSDButtonCISCREA) != EXIT_SUCCESS)) bError = TRUE;
+				uSleep(1000*threadperiod/2);
 				bOSDButtonPressedCISCREA = FALSE;
 			}
 
@@ -156,11 +160,12 @@ THREAD_PROC_RETURN_VALUE CISCREAThread(void* pParam)
 				printf("Connection to a CISCREA lost.\n");
 				bConnected = FALSE;
 				DisconnectCISCREA(mb);
+				uSleep(1000*threadperiod);
 			}	
 		}
 
 		//printf("CISCREAThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

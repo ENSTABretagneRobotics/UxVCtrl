@@ -54,6 +54,7 @@ struct SRF02
 	char szDevPath[256];
 	int nbretries;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int RangingDelay;
 	BOOL bParallel;
@@ -292,6 +293,7 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 		sprintf(pSRF02->szDevPath, "/dev/i2c-1");
 		pSRF02->nbretries = 2;
 		pSRF02->timeout = 1000;
+		pSRF02->threadperiod = 50;
 		pSRF02->bSaveRawData = 1;
 		pSRF02->RangingDelay = 66;
 		pSRF02->bParallel = 0;
@@ -322,6 +324,8 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSRF02->nbretries) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSRF02->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSRF02->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSRF02->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -366,6 +370,12 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pSRF02->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pSRF02->threadperiod = 50;
 	}
 
 	if (pSRF02->RangingDelay < 0)

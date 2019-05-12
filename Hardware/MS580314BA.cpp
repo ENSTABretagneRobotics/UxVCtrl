@@ -18,6 +18,8 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 	CHRONO chrono_filter;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -35,7 +37,7 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(100);
+		mSleep(threadperiod);
 
 		if (bPauseMS580314BA)
 		{
@@ -66,6 +68,7 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 			if (ConnectMS580314BA(&ms580314ba, "MS580314BA0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = ms580314ba.threadperiod;
 
 				StopChronoQuick(&chrono_filter);
 				StartChrono(&chrono_filter);
@@ -155,7 +158,7 @@ THREAD_PROC_RETURN_VALUE MS580314BAThread(void* pParam)
 		}
 
 		//printf("MS580314BAThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

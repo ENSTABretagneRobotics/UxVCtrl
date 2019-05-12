@@ -58,6 +58,13 @@ inline int LoadConfig(void)
 	opencvguiimgheight[3] = 240;
 	opencvguiimgheight[4] = 240;
 	opencvguiperiod = 100;
+	ExitOnErrorCount = 0;
+	bDisablelognav = FALSE;
+	bStdOutDetailedInfo = FALSE;
+	bCommandPrompt = TRUE;
+	bEcho = TRUE;
+#pragma endregion
+#pragma region Interfaces parameters
 	bMAVLinkInterface = TRUE;
 	memset(szMAVLinkInterfacePath, 0, sizeof(szMAVLinkInterfacePath));
 	sprintf(szMAVLinkInterfacePath, ":5760");
@@ -126,10 +133,6 @@ inline int LoadConfig(void)
 	guiid_VideoInterface = -1;
 	videoid_VideoInterface = -1;
 	encodequality_VideoInterface = 0;
-	bDisablelognav = FALSE;
-	bStdOutDetailedInfo = FALSE;
-	bCommandPrompt = TRUE;
-	bEcho = TRUE;
 #pragma endregion
 #pragma region Devices parameters
 	bDisableVideo[0] = TRUE;
@@ -239,6 +242,7 @@ inline int LoadConfig(void)
 	sail_update_period = 20;
 	sailboattacktype = 0;
 	sailformulatype = 0;
+	bCheckRudder = TRUE;
 	bCalibrateSail = TRUE;
 	sail_calibration_period = 43200;
 	max_distance_around = 1;
@@ -428,6 +432,18 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &opencvguiperiod) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &ExitOnErrorCount) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDisablelognav) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bStdOutDetailedInfo) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
+#pragma endregion
+#pragma region Interfaces parameters
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bMAVLinkInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%[^\r\n]255s", szMAVLinkInterfacePath) != 1) printf("Invalid configuration file.\n");
@@ -551,14 +567,6 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &videoid_VideoInterface) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &encodequality_VideoInterface) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bDisablelognav) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bStdOutDetailedInfo) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
 #pragma region Devices parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -778,6 +786,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &sailboattacktype) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &sailformulatype) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bCheckRudder) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bCalibrateSail) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1526,6 +1536,18 @@ inline int SaveConfig(void)
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", opencvguiperiod) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", ExitOnErrorCount) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDisablelognav) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bStdOutDetailedInfo) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bCommandPrompt) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bEcho) < 0) printf("Error writing configuration file.\n");
+#pragma endregion
+#pragma region Interfaces parameters
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bMAVLinkInterface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%.255s\n", szMAVLinkInterfacePath) < 0) printf("Error writing configuration file.\n");
@@ -1649,14 +1671,6 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", videoid_VideoInterface) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", encodequality_VideoInterface) < 0) printf("Error writing configuration file.\n");
-	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%d\n", bDisablelognav) < 0) printf("Error writing configuration file.\n");
-	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%d\n", bStdOutDetailedInfo) < 0) printf("Error writing configuration file.\n");
-	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%d\n", bCommandPrompt) < 0) printf("Error writing configuration file.\n");
-	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-	if (fprintf(fileout, "%d\n", bEcho) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 #pragma region Devices parameters
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1876,6 +1890,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", sailboattacktype) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", sailformulatype) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bCheckRudder) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bCalibrateSail) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

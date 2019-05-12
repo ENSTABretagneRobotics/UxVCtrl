@@ -154,6 +154,7 @@ struct NORTEKDVL
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bEnable_PD6_SA;
 	BOOL bEnable_PD6_TS;
@@ -465,6 +466,7 @@ inline int ConnectNortekDVL(NORTEKDVL* pNortekDVL, char* szCfgFilePath)
 		sprintf(pNortekDVL->szDevPath, "COM1");
 		pNortekDVL->BaudRate = 9600;
 		pNortekDVL->timeout = 1500;
+		pNortekDVL->threadperiod = 100;
 		pNortekDVL->bSaveRawData = 1;
 		pNortekDVL->bEnable_PD6_SA = 0;
 		pNortekDVL->bEnable_PD6_TS = 0;
@@ -483,6 +485,8 @@ inline int ConnectNortekDVL(NORTEKDVL* pNortekDVL, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pNortekDVL->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNortekDVL->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNortekDVL->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNortekDVL->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -503,6 +507,12 @@ inline int ConnectNortekDVL(NORTEKDVL* pNortekDVL, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pNortekDVL->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pNortekDVL->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

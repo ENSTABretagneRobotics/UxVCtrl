@@ -1,5 +1,7 @@
 % address
 1
+% threadperiod (in ms, require associated thread)
+25
 % rightthrusterpwm
 1
 % leftthrusterpwm

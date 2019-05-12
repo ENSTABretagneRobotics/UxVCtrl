@@ -17,6 +17,8 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 	RAZORAHRSDATA razorahrsdata;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -32,7 +34,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(50);
+		mSleep(threadperiod);
 
 		if (bPauseRazorAHRS) 
 		{ 
@@ -63,6 +65,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 			if (ConnectRazorAHRS(&razorahrs, "RazorAHRS0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = razorahrs.threadperiod;
 
 				memset(&tv, 0, sizeof(tv));
 				memset(&razorahrsdata, 0, sizeof(razorahrsdata));
@@ -138,7 +141,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 		}
 
 		//printf("RazorAHRSThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

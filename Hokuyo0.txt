@@ -5,7 +5,9 @@ COM9
 115200
 % Timeout (in ms)
 1000
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+100
+% bSaveRawData (require associated thread)
 1
 % bForceSCIP20
 0

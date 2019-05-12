@@ -80,6 +80,7 @@ struct PATHFINDERDVL
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int StartupDelay;
 	BOOL bSendBreak;
@@ -771,6 +772,7 @@ inline int ConnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, char* szCfgFilePa
 		sprintf(pPathfinderDVL->szDevPath, "COM1");
 		pPathfinderDVL->BaudRate = 115200;
 		pPathfinderDVL->timeout = 1500;
+		pPathfinderDVL->threadperiod = 100;
 		pPathfinderDVL->bSaveRawData = 1;
 		pPathfinderDVL->StartupDelay = 4000;
 		pPathfinderDVL->bSendBreak = 1;
@@ -806,6 +808,8 @@ inline int ConnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, char* szCfgFilePa
 			if (sscanf(line, "%d", &pPathfinderDVL->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPathfinderDVL->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPathfinderDVL->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPathfinderDVL->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -862,6 +866,11 @@ inline int ConnectPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, char* szCfgFilePa
 		}
 	}
 	
+	if (pPathfinderDVL->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pPathfinderDVL->threadperiod = 100;
+	}
 	if (pPathfinderDVL->BreakDuration < 0)
 	{
 		printf("Invalid parameter : BreakDuration.\n");

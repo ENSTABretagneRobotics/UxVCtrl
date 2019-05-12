@@ -5,7 +5,9 @@
 115200
 % Timeout (in ms)
 1500
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+50
+% bSaveRawData (require associated thread)
 1
 % bExternal (0 if the data can be used for the state estimation, 1 otherwise and to enable Follow Me)
 1

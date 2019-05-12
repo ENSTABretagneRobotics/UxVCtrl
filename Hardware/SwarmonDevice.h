@@ -45,6 +45,7 @@ struct SWARMONDEVICE
 	char szCfgFilePath[256];
 	// Parameters.
 	char szRequest[256];
+	int threadperiod;
 };
 typedef struct SWARMONDEVICE SWARMONDEVICE;
 
@@ -212,6 +213,7 @@ inline int ConnectSwarmonDevice(SWARMONDEVICE* pSwarmonDevice, char* szCfgFilePa
 		// Default values.
 		memset(pSwarmonDevice->szRequest, 0, sizeof(pSwarmonDevice->szRequest));
 		sprintf(pSwarmonDevice->szRequest, "http://193.52.45.70:3000/rt/lastposition/robotTest");
+		pSwarmonDevice->threadperiod = 100;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -219,12 +221,20 @@ inline int ConnectSwarmonDevice(SWARMONDEVICE* pSwarmonDevice, char* szCfgFilePa
 		{
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%255s", pSwarmonDevice->szRequest) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSwarmonDevice->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pSwarmonDevice->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pSwarmonDevice->threadperiod = 100;
 	}
 
 	memset(&pSwarmonDevice->LastSwarmonData, 0, sizeof(SWARMONDATA));

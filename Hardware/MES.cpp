@@ -15,6 +15,9 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 	MES mes;
 	double distance = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -23,9 +26,14 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 
 	memset(&mes, 0, sizeof(MES));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		mSleep(threadperiod);
 
 		if (bPauseMES)
 		{
@@ -56,6 +64,7 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 			if (ConnectMES(&mes, "MES0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = mes.threadperiod;
 
 				if (mes.pfSaveFile != NULL)
 				{
@@ -111,8 +120,12 @@ THREAD_PROC_RETURN_VALUE MESThread(void* pParam)
 			}
 		}
 
+		//printf("MESThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (mes.pfSaveFile != NULL)
 	{

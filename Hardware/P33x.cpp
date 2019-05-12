@@ -17,6 +17,8 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 	double pressure = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -32,7 +34,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(100);
+		mSleep(threadperiod);
 
 		if (bPauseP33x)
 		{
@@ -63,6 +65,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 			if (ConnectP33x(&p33x, "P33x0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = p33x.threadperiod;
 
 				if (p33x.pfSaveFile != NULL)
 				{
@@ -128,7 +131,7 @@ THREAD_PROC_RETURN_VALUE P33xThread(void* pParam)
 		}
 
 		//printf("P33xThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

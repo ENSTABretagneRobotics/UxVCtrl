@@ -19,6 +19,8 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 	time_t tt = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -37,7 +39,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 		StartChrono(&chrono_period);
 
 #ifdef ENABLE_SBG_SUPPORT
-		mSleep(50);
+		mSleep(threadperiod);
 #endif // ENABLE_SBG_SUPPORT
 
 		if (bPauseSBG)
@@ -71,6 +73,7 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 			if (ConnectSBG(&sbg, "SBG0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = sbg.threadperiod;
 
 				memset(&tv, 0, sizeof(tv));
 				memset(&sbgdata, 0, sizeof(sbgdata));
@@ -201,13 +204,13 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				bConnected = FALSE;
 				DisconnectSBG(&sbg);
 #ifndef ENABLE_SBG_SUPPORT
-				mSleep(50);
+				mSleep(threadperiod);
 #endif // !ENABLE_SBG_SUPPORT
 			}
 		}
 
 		//printf("SBGThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

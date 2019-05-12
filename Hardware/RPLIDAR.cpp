@@ -23,6 +23,9 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 	int quality = 0;
 	int nbprev = 0, nb = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0, j = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -31,9 +34,14 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 
 	memset(&rplidar, 0, sizeof(RPLIDAR));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		//mSleep(50);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		//mSleep(threadperiod);
 
 		if (bPauseRPLIDAR) 
 		{
@@ -64,6 +72,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 			if (ConnectRPLIDAR(&rplidar, "RPLIDAR0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = rplidar.threadperiod;
 
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
@@ -277,7 +286,7 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					printf("Connection to a RPLIDAR lost.\n");
 					bConnected = FALSE;
 					DisconnectRPLIDAR(&rplidar);
-					mSleep(100);
+					mSleep(threadperiod);
 				}
 				break;
 			case SCAN_MODE_RPLIDAR:
@@ -418,14 +427,18 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 					printf("Connection to a RPLIDAR lost.\n");
 					bConnected = FALSE;
 					DisconnectRPLIDAR(&rplidar);
-					mSleep(100);
+					mSleep(threadperiod);
 				}
 				break;
 			}
 		}
 
+		//printf("RPLIDARThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (rplidar.pfSaveFile != NULL)
 	{

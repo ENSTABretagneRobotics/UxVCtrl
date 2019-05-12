@@ -17,14 +17,22 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 	double pulseWidths[4];
 	double pwm0 = 0, pwm1 = 0, pwm2 = 0, pwm3 = 0;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 25;
+	int errcount = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
 
 	memset(&ue9a, 0, sizeof(UE9A));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		mSleep(25);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		uSleep(1000*threadperiod);
 
 		if (bPauseUE9A) 
 		{
@@ -55,6 +63,7 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 			if (ConnectUE9A(&ue9a, "UE9A0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = ue9a.threadperiod;
 
 				memset(pulseWidths, 0, sizeof(pulseWidths));
 			}
@@ -89,8 +98,12 @@ THREAD_PROC_RETURN_VALUE UE9AThread(void* pParam)
 			}		
 		}
 
+		//printf("UE9AThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (bConnected) DisconnectUE9A(&ue9a);
 

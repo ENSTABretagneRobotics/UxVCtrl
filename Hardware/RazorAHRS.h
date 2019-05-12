@@ -40,6 +40,7 @@ struct RAZORAHRS
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bROSMode;
 	BOOL bSendCalibration;
@@ -287,6 +288,7 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		sprintf(pRazorAHRS->szDevPath, "COM1");
 		pRazorAHRS->BaudRate = 57600;
 		pRazorAHRS->timeout = 2000;
+		pRazorAHRS->threadperiod = 50;
 		pRazorAHRS->bSaveRawData = 1;
 		pRazorAHRS->bROSMode = 1;
 		pRazorAHRS->bSendCalibration = 0;
@@ -322,6 +324,8 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pRazorAHRS->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRazorAHRS->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRazorAHRS->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRazorAHRS->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -415,6 +419,12 @@ inline int ConnectRazorAHRS(RAZORAHRS* pRazorAHRS, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pRazorAHRS->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pRazorAHRS->threadperiod = 50;
 	}
 
 	// Used to save raw data, should be handled specifically...

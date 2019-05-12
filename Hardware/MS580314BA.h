@@ -33,6 +33,7 @@ struct MS580314BA
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	double PressureRef;
 	double WaterDensity;
@@ -308,6 +309,7 @@ inline int ConnectMS580314BA(MS580314BA* pMS580314BA, char* szCfgFilePath)
 		sprintf(pMS580314BA->szDevPath, "COM1");
 		pMS580314BA->BaudRate = 9600;
 		pMS580314BA->timeout = 1000;
+		pMS580314BA->threadperiod = 100;
 		pMS580314BA->bSaveRawData = 1;
 		pMS580314BA->PressureRef = 1;
 		pMS580314BA->WaterDensity = 1000;
@@ -323,6 +325,8 @@ inline int ConnectMS580314BA(MS580314BA* pMS580314BA, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMS580314BA->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMS580314BA->threadperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMS580314BA->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pMS580314BA->PressureRef) != 1) printf("Invalid configuration file.\n");
@@ -334,6 +338,12 @@ inline int ConnectMS580314BA(MS580314BA* pMS580314BA, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pMS580314BA->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pMS580314BA->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

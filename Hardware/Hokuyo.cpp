@@ -18,6 +18,9 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 	double angles[MAX_SLITDIVISION_HOKUYO];
 	double distances[MAX_SLITDIVISION_HOKUYO];
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -26,9 +29,14 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 
 	memset(&hokuyo, 0, sizeof(HOKUYO));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		//mSleep(50);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		//mSleep(threadperiod);
 
 		if (bPauseHokuyo) 
 		{
@@ -59,6 +67,7 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 			if (ConnectHokuyo(&hokuyo, "Hokuyo0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = hokuyo.threadperiod;
 
 				memset(&tv, 0, sizeof(tv));
 				memset(angles, 0, sizeof(angles));
@@ -165,12 +174,16 @@ THREAD_PROC_RETURN_VALUE HokuyoThread(void* pParam)
 				printf("Connection to a Hokuyo lost.\n");
 				bConnected = FALSE;
 				DisconnectHokuyo(&hokuyo);
-				mSleep(100);
+				mSleep(threadperiod);
 			}
 		}
 
+		//printf("HokuyoThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (hokuyo.pfSaveFile != NULL)
 	{

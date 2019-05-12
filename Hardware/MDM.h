@@ -199,6 +199,7 @@ struct MDM
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int MessageLen;
 	int InternalBufferSize;
@@ -681,6 +682,7 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 		sprintf(pMDM->szDevPath, "COM1");
 		pMDM->BaudRate = 9600;
 		pMDM->timeout = 8000;
+		pMDM->threadperiod = 100;
 		pMDM->bSaveRawData = 1;
 		pMDM->MessageLen = 4;
 		pMDM->InternalBufferSize = 256;
@@ -698,6 +700,8 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMDM->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMDM->threadperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMDM->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMDM->MessageLen) != 1) printf("Invalid configuration file.\n");
@@ -713,6 +717,12 @@ inline int ConnectMDM(MDM* pMDM, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pMDM->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pMDM->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

@@ -16,6 +16,8 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 	int res = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
@@ -33,7 +35,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		//mSleep(100);
+		//mSleep(threadperiod);
 
 		if (bPauseBlueView[deviceid])
 		{
@@ -64,6 +66,7 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 			if (ConnectBlueView(&blueview, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = blueview.threadperiod;
 
 				if (strlen(blueview.szSaveFile) > 0)
 				{
@@ -115,12 +118,12 @@ THREAD_PROC_RETURN_VALUE BlueViewThread(void* pParam)
 				printf("Connection to a BlueView lost.\n");
 				bConnected = FALSE;
 				DisconnectBlueView(&blueview);
-				mSleep(100);
+				mSleep(threadperiod);
 			}		
 		}
 
 		//printf("BlueViewThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

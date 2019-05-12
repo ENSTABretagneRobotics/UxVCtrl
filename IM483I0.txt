@@ -5,7 +5,9 @@
 4800
 % Timeout (in ms)
 1000
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+50
+% bSaveRawData (require associated thread)
 1
 % CalibrationSpeed
 2000

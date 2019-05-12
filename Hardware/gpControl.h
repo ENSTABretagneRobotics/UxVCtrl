@@ -32,6 +32,7 @@ struct GPCONTROL
 	char szDevPath[256];
 	//int BaudRate;
 	//int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bDisableHTTPPersistent;
 	BOOL bDisableStreamingSettings;
@@ -519,6 +520,7 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		sprintf(pgpControl->szDevPath, "udp://10.5.5.9:8554");
 		//pgpControl->BaudRate = 9600;
 		//pgpControl->timeout = 1000;
+		pgpControl->threadperiod = 100;
 		pgpControl->bSaveRawData = 0; // Not a parameter at the moment...
 		pgpControl->bDisableHTTPPersistent = 0;
 		pgpControl->bDisableStreamingSettings = 0;
@@ -546,6 +548,8 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 			//if (sscanf(line, "%d", &pgpControl->BaudRate) != 1) printf("Invalid configuration file.\n");
 			//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			//if (sscanf(line, "%d", &pgpControl->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pgpControl->threadperiod) != 1) printf("Invalid configuration file.\n");
 			//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			//if (sscanf(line, "%d", &pgpControl->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -574,6 +578,12 @@ inline int ConnectgpControl(GPCONTROL* pgpControl, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pgpControl->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pgpControl->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

@@ -42,6 +42,7 @@ struct P33X
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	double PressureRef;
 	double WaterDensity;
@@ -261,6 +262,7 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 		sprintf(pP33x->szDevPath, "COM1");
 		pP33x->BaudRate = 9600;
 		pP33x->timeout = 1000;
+		pP33x->threadperiod = 100;
 		pP33x->bSaveRawData = 1;
 		pP33x->PressureRef = 1;
 		pP33x->WaterDensity = 1000;
@@ -276,6 +278,8 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pP33x->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pP33x->threadperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pP33x->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &pP33x->PressureRef) != 1) printf("Invalid configuration file.\n");
@@ -287,6 +291,12 @@ inline int ConnectP33x(P33X* pP33x, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pP33x->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pP33x->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

@@ -53,6 +53,7 @@ struct NMEADEVICE
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	BOOL bEnableGPGGA;
 	BOOL bEnableGPRMC;
@@ -633,6 +634,7 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 		sprintf(pNMEADevice->szDevPath, "COM1");
 		pNMEADevice->BaudRate = 4800;
 		pNMEADevice->timeout = 1000;
+		pNMEADevice->threadperiod = 100;
 		pNMEADevice->bSaveRawData = 1;
 		pNMEADevice->bEnableGPGGA = 1;
 		pNMEADevice->bEnableGPRMC = 0;
@@ -655,6 +657,8 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pNMEADevice->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pNMEADevice->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pNMEADevice->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -683,6 +687,12 @@ inline int ConnectNMEADevice(NMEADEVICE* pNMEADevice, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pNMEADevice->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pNMEADevice->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

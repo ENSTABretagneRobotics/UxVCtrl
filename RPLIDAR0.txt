@@ -5,7 +5,9 @@ COM9
 115200
 % Timeout (in ms)
 1000
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+50
+% bSaveRawData (require associated thread)
 1
 % ScanMode (0 : SCAN, 1 : EXPRESS_SCAN, 2 : FORCE_SCAN)
 1

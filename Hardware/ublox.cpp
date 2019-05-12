@@ -23,6 +23,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	int res = 0;
 	CHRONO chrono_svin;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
@@ -41,9 +44,14 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 	StartChrono(&chrono_svin);
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		//mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		//mSleep(threadperiod);
 
 		if (bPauseublox[deviceid])
 		{
@@ -76,6 +84,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 			if (Connectublox(&ublox, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = ublox.threadperiod;
 
 				memset(&nmeadata, 0, sizeof(nmeadata));
 				memset(&ubxdata, 0, sizeof(ubxdata));
@@ -538,12 +547,16 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 				bConnected = FALSE;
 				Disconnectublox(&ublox);
-				mSleep(100);
+				mSleep(threadperiod);
 			}		
 		}
 
+		//printf("ubloxThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	StopChronoQuick(&chrono_svin);
 

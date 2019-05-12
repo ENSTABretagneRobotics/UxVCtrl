@@ -216,6 +216,7 @@ inline modbus_t* ConnectCISCREA(char* szCfgFilePath)
 	memset(port, 0, sizeof(port));
 	sprintf(port, "502");
 	BaudRate = 38400;
+	//pCISCREA->threadperiod = 20;
 	//pCISCREA->yawsign = 1;
 	//pCISCREA->yaworientation = 0;
 	//pCISCREA->yawp1 = 0;
@@ -228,6 +229,8 @@ inline modbus_t* ConnectCISCREA(char* szCfgFilePath)
 		if (sscanf(line, "%255s", szDevice) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &BaudRate) != 1) printf("Invalid configuration file.\n");
+		//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		//if (sscanf(line, "%d", &pCISCREA->threadperiod) != 1) printf("Invalid configuration file.\n");
 		//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		//if (sscanf(line, "%d", &pCISCREA->yawsign) != 1) printf("Invalid configuration file.\n");
 		//if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -242,6 +245,12 @@ inline modbus_t* ConnectCISCREA(char* szCfgFilePath)
 	{
 		printf("Configuration file not found.\n");
 	}
+
+	//if (pCISCREA->threadperiod < 0)
+	//{
+	//	printf("Invalid parameter : threadperiod.\n");
+	//	pCISCREA->threadperiod = 20;
+	//}
 
 	// Try to determine whether it is an IP address and TCP port or a local RS232 port.
 	ptr = strchr(szDevice, ':');

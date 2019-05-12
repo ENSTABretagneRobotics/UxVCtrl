@@ -90,6 +90,17 @@ WMV2
 240
 % opencvguiperiod (in ms)
 100
+% ExitOnErrorCount (0 to never exit)
+0
+% bDisablelognav
+0
+% bStdOutDetailedInfo
+0
+% bCommandPrompt
+1
+% bEcho
+1
+% Interfaces parameters
 % bMAVLinkInterface
 1
 % szMAVLinkInterfacePath (server TCP port (e.g. :5760), client IP address and TCP port (e.g. 127.0.0.1:5760) or local RS232 port)
@@ -214,14 +225,7 @@ WMV2
 0
 % encodequality_VideoInterface (JPEG : in [0,100], the higher is the better quality, but uses more CPU and bandwidth)
 50
-% bDisablelognav
-0
-% bStdOutDetailedInfo
-0
-% bCommandPrompt
-1
-% bEcho
-1
+% Devices parameters
 % bDisableVideo[0]
 0
 % bDisableVideo[1]
@@ -434,6 +438,8 @@ WMV2
 0
 % sailformulatype (0, 1 or 2, see Controller.cpp)
 0
+% bCheckRudder (0 to disable or 1 to enable VAIMOS rudder check at the beginning)
+1
 % bCalibrateSail (0 to disable or 1 to enable VAIMOS sail calibration at the beginning)
 1
 % sail_calibration_period (in s, for VAIMOS)

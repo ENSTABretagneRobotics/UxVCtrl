@@ -7,6 +7,8 @@ COM8
 % BaudRate
 38400
 %%%%%%%%%%%%%%%%%%%%%%% NOT HANDLED %%%%%%%%%%%%%%%%%%%%%%%
+% threadperiod (in ms, require associated thread)
+20
 % Compass calibration
 % yawsign (1 or -1)
 1

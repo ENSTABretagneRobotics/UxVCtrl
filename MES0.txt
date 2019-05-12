@@ -5,5 +5,7 @@ COM11
 9600
 % Timeout (in ms)
 500
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+100
+% bSaveRawData (require associated thread)
 1

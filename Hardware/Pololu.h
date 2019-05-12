@@ -85,6 +85,7 @@ struct POLOLU
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int RangingDelay;
 	BOOL bMedianFilter;
@@ -920,6 +921,7 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 		sprintf(pPololu->szDevPath, "COM1");
 		pPololu->BaudRate = 115200;
 		pPololu->timeout = 1000;
+		pPololu->threadperiod = 50;
 		pPololu->bSaveRawData = 1;
 		pPololu->RangingDelay = 1000;
 		pPololu->bMedianFilter = 0;
@@ -1003,6 +1005,8 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pPololu->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pPololu->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pPololu->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1156,6 +1160,11 @@ inline int ConnectPololu(POLOLU* pPololu, char* szCfgFilePath)
 		}
 	}
 
+	if (pPololu->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pPololu->threadperiod = 50;
+	}
 	if ((pPololu->DeviceNumber < 0)||(pPololu->DeviceNumber > 255))
 	{
 		printf("Invalid parameter : DeviceNumber.\n");

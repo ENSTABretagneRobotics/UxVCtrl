@@ -108,6 +108,7 @@ struct RPLIDAR
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int ScanMode;
 	int motordelay;
@@ -668,6 +669,7 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		sprintf(pRPLIDAR->szDevPath, "COM1");
 		pRPLIDAR->BaudRate = 115200;
 		pRPLIDAR->timeout = 1000;
+		pRPLIDAR->threadperiod = 50;
 		pRPLIDAR->bSaveRawData = 1;
 		pRPLIDAR->ScanMode = SCAN_MODE_RPLIDAR;
 		pRPLIDAR->motordelay = 500;
@@ -685,6 +687,8 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pRPLIDAR->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRPLIDAR->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRPLIDAR->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pRPLIDAR->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -705,6 +709,11 @@ inline int ConnectRPLIDAR(RPLIDAR* pRPLIDAR, char* szCfgFilePath)
 		}
 	}
 
+	if (pRPLIDAR->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pRPLIDAR->threadperiod = 50;
+	}
 	if (pRPLIDAR->ScanMode < 0)
 	{
 		printf("Invalid parameter : ScanMode.\n");

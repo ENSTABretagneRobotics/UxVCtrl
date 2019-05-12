@@ -1,3 +1,8 @@
+315
+Added threadperiod parameter for most of the devices.
+Added bCheckRudder and ExitOnErrorCount parameters.
+Updated SSC32 and IM483I to synchronize VAIMOS rudder check with sail calibration.
+
 314
 Improved compatibility with OpenCV 4.1.0.
 

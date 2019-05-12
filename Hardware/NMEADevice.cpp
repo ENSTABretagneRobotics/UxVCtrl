@@ -19,6 +19,9 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 	struct timeval tv;
 	struct tm* timeptr = NULL;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int deviceid = (intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
@@ -31,9 +34,14 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 
 	GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		mSleep(threadperiod);
 
 		if (bPauseNMEADevice[deviceid])
 		{
@@ -66,6 +74,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			if (ConnectNMEADevice(&nmeadevice, szCfgFilePath) == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = nmeadevice.threadperiod;
 
 				memset(&nmeadata, 0, sizeof(nmeadata));
 
@@ -200,8 +209,12 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 			}		
 		}
 
+		//printf("NMEADeviceThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	GNSSqualityNMEADevice[deviceid] = GNSS_NO_FIX;
 

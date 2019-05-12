@@ -59,6 +59,7 @@ struct LIRMIA3
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int MinPWs[NB_CHANNELS_PWM_LIRMIA3];
 	int MidPWs[NB_CHANNELS_PWM_LIRMIA3];
@@ -241,6 +242,7 @@ inline int ConnectLIRMIA3(LIRMIA3* pLIRMIA3, char* szCfgFilePath)
 		sprintf(pLIRMIA3->szDevPath, "COM1");
 		pLIRMIA3->BaudRate = 115200;
 		pLIRMIA3->timeout = 1000;
+		pLIRMIA3->threadperiod = 50;
 		pLIRMIA3->bSaveRawData = 1;
 		for (channel = 0; channel < NB_CHANNELS_PWM_LIRMIA3; channel++)
 		{
@@ -267,6 +269,8 @@ inline int ConnectLIRMIA3(LIRMIA3* pLIRMIA3, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pLIRMIA3->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pLIRMIA3->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pLIRMIA3->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pLIRMIA3->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 
@@ -303,6 +307,12 @@ inline int ConnectLIRMIA3(LIRMIA3* pLIRMIA3, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pLIRMIA3->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pLIRMIA3->threadperiod = 50;
 	}
 
 	for (channel = 0; channel < NB_CHANNELS_PWM_LIRMIA3; channel++)

@@ -4,7 +4,9 @@
 2
 % Timeout (in ms)
 2000
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+50
+% bSaveRawData (require associated thread)
 1
 % RangingDelay (in ms)
 66

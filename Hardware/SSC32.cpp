@@ -26,8 +26,11 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 	SSC32 ssc32;
 	double rudder = 0, thrust = 0, flux = 0;
 	double thrust1 = 0, thrust2 = 0;
+	BOOL bRudderChecked = FALSE;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -43,7 +46,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(50);
+		mSleep(threadperiod);
 
 		if (bPauseSSC32) 
 		{
@@ -74,6 +77,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			if (ConnectSSC32(&ssc32, "SSC320.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = ssc32.threadperiod;
 
 				if (ssc32.pfSaveFile != NULL)
 				{
@@ -132,6 +136,17 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}
 				break;
 			case VAIMOS_ROBID:
+				if ((bCheckRudder)&&(!bRudderChecked))
+				{
+					if (CheckRudderSSC32(&ssc32) != EXIT_SUCCESS)
+					{
+						printf("Connection to a SSC32 lost.\n");
+						bConnected = FALSE;
+						DisconnectSSC32(&ssc32);
+						break;
+					}
+					bRudderChecked = TRUE;
+				}
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
 				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
@@ -206,7 +221,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 		}
 
 		//printf("SSC32Thread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 
@@ -214,7 +229,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 	{
 	case BUGGY_ROBID:
 		SetRudderThrustersFluxSSC32(&ssc32, 0, 0, 0, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 		break;
 	case SAILBOAT_ROBID:
 	case SAILBOAT2_ROBID:
@@ -223,17 +238,17 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 	case MOTORBOAT_ROBID:
 #ifdef USE_MOTORBOAT_WITH_FLUX
 		SetRudderThrustersFluxSSC32(&ssc32, 0, 0, 0, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 #else
 		SetRudderThrusterSSC32(&ssc32, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 #endif // USE_MOTORBOAT_WITH_FLUX
 		break;
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:
 	default:
 		SetThrustersSSC32(&ssc32, 0, 0);
-		mSleep(50);
+		mSleep(threadperiod);
 		break;
 	}
 

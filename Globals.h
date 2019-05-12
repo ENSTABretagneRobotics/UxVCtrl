@@ -347,6 +347,13 @@ extern BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
 extern int opencvguiimgwidth[MAX_NB_OPENCVGUI];
 extern int opencvguiimgheight[MAX_NB_OPENCVGUI];
 extern int opencvguiperiod;
+extern int ExitOnErrorCount;
+extern BOOL bDisablelognav;
+extern BOOL bStdOutDetailedInfo;
+extern BOOL bCommandPrompt;
+extern BOOL bEcho;
+#pragma endregion
+#pragma region Interfaces parameters
 extern BOOL bMAVLinkInterface;
 extern char szMAVLinkInterfacePath[MAX_BUF_LEN];
 extern int MAVLinkInterfaceBaudRate;
@@ -407,10 +414,6 @@ extern BOOL bUDP_VideoInterface;
 extern int guiid_VideoInterface;
 extern int videoid_VideoInterface;
 extern int encodequality_VideoInterface;
-extern BOOL bDisablelognav;
-extern BOOL bStdOutDetailedInfo;
-extern BOOL bCommandPrompt;
-extern BOOL bEcho;
 #pragma endregion
 #pragma region Devices parameters
 extern BOOL bDisableVideo[MAX_NB_VIDEO];
@@ -466,6 +469,7 @@ extern double check_strategy_period;
 extern double sail_update_period;
 extern int sailboattacktype;
 extern int sailformulatype;
+extern BOOL bCheckRudder;
 extern BOOL bCalibrateSail;
 extern double sail_calibration_period;
 extern double max_distance_around;

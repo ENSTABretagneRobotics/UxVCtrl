@@ -42,6 +42,7 @@ struct BLUEVIEW
 	// Parameters.
 	char szDevPath[256];
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int head_num;
 	double MinRange;
@@ -347,6 +348,8 @@ inline int ConnectBlueView(BLUEVIEW* pBlueView, char* szCfgFilePath)
 		memset(pBlueView->szDevPath, 0, sizeof(pBlueView->szDevPath));
 		sprintf(pBlueView->szDevPath, "192.168.1.45");
 		pBlueView->timeout = 1000;
+		pBlueView->threadperiod = 100;
+		pBlueView->bSaveRawData = 1;
 		pBlueView->head_num = 0;
 		pBlueView->MinRange = 1;
 		pBlueView->MaxRange = 10;
@@ -363,6 +366,8 @@ inline int ConnectBlueView(BLUEVIEW* pBlueView, char* szCfgFilePath)
 			if (sscanf(line, "%255s", pBlueView->szDevPath) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pBlueView->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pBlueView->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pBlueView->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -385,6 +390,12 @@ inline int ConnectBlueView(BLUEVIEW* pBlueView, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pBlueView->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pBlueView->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

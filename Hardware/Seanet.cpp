@@ -22,6 +22,9 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 	int nbauxbytes = 0; // For daisy-chained device.
 	double distance = 0; // For daisy-chained echosounder.
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -30,9 +33,14 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 
 	memset(&seanet, 0, sizeof(SEANET));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		//mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		//mSleep(threadperiod);
 
 		if (bPauseSeanet) 
 		{
@@ -63,6 +71,7 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 			if (ConnectSeanet(&seanet, "Seanet0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = seanet.threadperiod;
 
 				memset(&tv, 0, sizeof(tv));
 				angle = 0;
@@ -247,12 +256,16 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 				printf("Connection to a Seanet lost.\n");
 				bConnected = FALSE;
 				DisconnectSeanet(&seanet);
-				mSleep(100);
+				mSleep(threadperiod);
 			}
 		}
 
+		//printf("SeanetThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (seanet.pfSaveFile != NULL)
 	{

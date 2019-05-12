@@ -77,6 +77,9 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 	//int msgcounter = 0;
 	BOOL bError = FALSE;
 	BOOL bConnected = FALSE;
+	CHRONO chrono_period;
+	int threadperiod = 100;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -92,9 +95,14 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 	memset(&recvxy2, 0, sizeof(recvxy2));
 	//memset(&recvxy3, 0, sizeof(recvxy3));
 
+	StartChrono(&chrono_period);
+
 	for (;;)
 	{
-		mSleep(100);
+		StopChronoQuick(&chrono_period);
+		StartChrono(&chrono_period);
+
+		mSleep(threadperiod);
 
 		if (bPauseMDM)
 		{
@@ -125,6 +133,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 			if (ConnectMDM(&mdm, "MDM0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = mdm.threadperiod;
 
 				if (mdm.pfSaveFile != NULL)
 				{
@@ -231,7 +240,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						fflush(mdm.pfSaveFile);
 					}
 					if (bExit||!AcousticCommandMDM) break;
-					mSleep(100);
+					mSleep(threadperiod);
 					if (PurgeDataAndWaitNsMDM(&mdm, &bError, 3) != EXIT_SUCCESS) break;
 					receivedbytes = 0;
 					memset(buf, 0, sizeof(buf));
@@ -554,7 +563,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						fflush(mdm.pfSaveFile);
 					}
 					if (bExit||!AcousticCommandMDM) break;
-					mSleep(100);
+					mSleep(threadperiod);
 					if (PurgeDataAndWaitNsMDM(&mdm, &bError, 3) != EXIT_SUCCESS) break;
 					receivedbytes = 0;
 					memset(buf, 0, sizeof(buf));
@@ -619,8 +628,12 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 			}	
 		}
 
+		//printf("MDMThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
+
+	StopChronoQuick(&chrono_period);
 
 	if (mdm.pfSaveFile != NULL)
 	{

@@ -110,6 +110,13 @@ BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
 int opencvguiimgwidth[MAX_NB_OPENCVGUI];
 int opencvguiimgheight[MAX_NB_OPENCVGUI];
 int opencvguiperiod = 0;
+int ExitOnErrorCount = 0;
+BOOL bDisablelognav = FALSE;
+BOOL bStdOutDetailedInfo = FALSE;
+BOOL bCommandPrompt = FALSE;
+BOOL bEcho = FALSE;
+#pragma endregion
+#pragma region Interfaces parameters
 BOOL bMAVLinkInterface = FALSE;
 char szMAVLinkInterfacePath[MAX_BUF_LEN];
 int MAVLinkInterfaceBaudRate = 0;
@@ -170,10 +177,6 @@ BOOL bUDP_VideoInterface = FALSE;
 int guiid_VideoInterface = -1;
 int videoid_VideoInterface = -1;
 int encodequality_VideoInterface = 0;
-BOOL bDisablelognav = FALSE;
-BOOL bStdOutDetailedInfo = FALSE;
-BOOL bCommandPrompt = FALSE;
-BOOL bEcho = FALSE;
 #pragma endregion
 #pragma region Devices parameters
 BOOL bDisableVideo[MAX_NB_VIDEO];
@@ -229,6 +232,7 @@ double check_strategy_period = 0;
 double sail_update_period = 0;
 int sailboattacktype = 0;
 int sailformulatype = 0;
+BOOL bCheckRudder = FALSE;
 BOOL bCalibrateSail = FALSE;
 double sail_calibration_period = 0;
 double max_distance_around = 0;

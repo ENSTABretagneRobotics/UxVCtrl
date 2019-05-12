@@ -33,6 +33,7 @@ struct MES
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 };
 typedef struct MES MES;
@@ -240,6 +241,7 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 		sprintf(pMES->szDevPath, "COM1");
 		pMES->BaudRate = 115200;
 		pMES->timeout = 500;
+		pMES->threadperiod = 100;
 		pMES->bSaveRawData = 1;
 
 		// Load data from a file.
@@ -253,6 +255,8 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMES->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMES->threadperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMES->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
@@ -260,6 +264,12 @@ inline int ConnectMES(MES* pMES, char* szCfgFilePath)
 		{
 			printf("Configuration file not found.\n");
 		}
+	}
+
+	if (pMES->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pMES->threadperiod = 100;
 	}
 
 	// Used to save raw data, should be handled specifically...

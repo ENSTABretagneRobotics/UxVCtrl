@@ -28,6 +28,8 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 	double thrust1 = 0, thrust2 = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
+	int threadperiod = 50;
+	int errcount = 0;
 	int i = 0;
 	char szSaveFilePath[256];
 	char szTemp[256];
@@ -43,7 +45,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(50);
+		mSleep(threadperiod);
 
 		if (bPauseMiniSSC) 
 		{
@@ -74,6 +76,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 			if (ConnectMiniSSC(&minissc, "MiniSSC0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
+				threadperiod = minissc.threadperiod;
 
 				if (minissc.pfSaveFile != NULL)
 				{
@@ -133,7 +136,7 @@ THREAD_PROC_RETURN_VALUE MiniSSCThread(void* pParam)
 		}
 
 		//printf("MiniSSCThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
-
+		if (!bConnected) { errcount++; if ((ExitOnErrorCount > 0)&&(errcount >= ExitOnErrorCount)) bExit = TRUE; }
 		if (bExit) break;
 	}
 

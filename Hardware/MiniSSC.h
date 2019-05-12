@@ -76,6 +76,7 @@ struct MINISSC
 	char szDevPath[256];
 	int BaudRate;
 	int timeout;
+	int threadperiod;
 	BOOL bSaveRawData;
 	int DeviceNumber;
 	int MinPWs[NB_CHANNELS_PWM_MINISSC];
@@ -480,6 +481,7 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 		sprintf(pMiniSSC->szDevPath, "COM1");
 		pMiniSSC->BaudRate = 115200;
 		pMiniSSC->timeout = 1000;
+		pMiniSSC->threadperiod = 50;
 		pMiniSSC->bSaveRawData = 1;
 		pMiniSSC->DeviceNumber = DEFAULT_DEVICE_NUMBER_MINISSC;
 		for (channel = 0; channel < NB_CHANNELS_PWM_MINISSC; channel++)
@@ -511,6 +513,8 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pMiniSSC->BaudRate) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMiniSSC->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pMiniSSC->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pMiniSSC->bSaveRawData) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -560,6 +564,11 @@ inline int ConnectMiniSSC(MINISSC* pMiniSSC, char* szCfgFilePath)
 		}
 	}
 
+	if (pMiniSSC->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pMiniSSC->threadperiod = 50;
+	}
 	if ((pMiniSSC->DeviceNumber < 0)||(pMiniSSC->DeviceNumber > 255))
 	{
 		printf("Invalid parameter : DeviceNumber.\n");

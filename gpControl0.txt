@@ -1,5 +1,7 @@
 % Device IP address
 udp://10.5.5.9:8554
+% threadperiod (in ms, require associated thread)
+100
 % bDisableHTTPPersistent
 1
 % bDisableStreamingSettings

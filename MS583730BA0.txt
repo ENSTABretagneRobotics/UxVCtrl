@@ -5,7 +5,9 @@ COM4
 9600
 % Timeout (in ms)
 1000
-% bSaveRawData
+% threadperiod (in ms, require associated thread)
+50
+% bSaveRawData (require associated thread)
 1
 % PressureRef (pressure at the surface in bar, used as reference)
 0.80890
