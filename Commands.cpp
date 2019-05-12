@@ -127,3 +127,9 @@ THREAD_PROC_RETURN_VALUE MissionLogThread(void* pParam)
 
 	return 0;
 }
+
+THREAD_PROC_RETURN_VALUE MissionArgThread(void* pParam)
+{
+	CallMission((char*)pParam);
+	return 0;
+}

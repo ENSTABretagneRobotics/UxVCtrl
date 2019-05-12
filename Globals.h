@@ -352,6 +352,7 @@ extern BOOL bDisablelognav;
 extern BOOL bStdOutDetailedInfo;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
+extern BOOL bDetachCommandsThread;
 #pragma endregion
 #pragma region Interfaces parameters
 extern BOOL bMAVLinkInterface;
@@ -960,6 +961,8 @@ extern double ibat2_filtered;
 extern double vswitch;
 extern double vswitchcoef;
 extern double vswitchthreshold;
+extern int opencvguikey;
+extern int opencvguikeytargetid;
 #ifndef DISABLE_OPENCV_SUPPORT
 extern CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -1514,6 +1517,9 @@ inline int InitGlobals(void)
 	InitCriticalSection(&RegistersCS);
 
 	InitCriticalSection(&strtimeCS);
+
+	opencvguikey = -1;
+	opencvguikeytargetid = -1;
 
 	StartChrono(&chrono_mission);
 	StopChronoQuick(&chrono_mission);

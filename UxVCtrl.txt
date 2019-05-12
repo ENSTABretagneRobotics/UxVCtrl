@@ -100,6 +100,8 @@ WMV2
 1
 % bEcho
 1
+% bDetachCommandsThread
+1
 % Interfaces parameters
 % bMAVLinkInterface
 1

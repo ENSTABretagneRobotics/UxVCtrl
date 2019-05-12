@@ -336,15 +336,17 @@
 %
 %showswitchinfo
 %
-%enableopencvgui videoid (int)
+%enableopencvgui guiid (int)
 %
-%disableopencvgui videoid (int)
+%disableopencvgui guiid (int)
 %
 %startvideorecording videoid (int)
 %
 %stopvideorecording videoid (int)
 %
 %snapshot
+%
+%setopencvguikeytargetid guiid (int, only available if ENABLE_SHARED_WAITKEY_OPENCVGUI to select the window that will respond to keys)
 %
 %cameratiltup
 %

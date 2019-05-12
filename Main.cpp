@@ -195,6 +195,9 @@ int main(int argc, char* argv[])
 #ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER OpenCVGUIThreadId[MAX_NB_VIDEO];
 #endif // !DISABLE_OPENCV_SUPPORT
+#ifndef DISABLE_MISSIONARG_THREAD
+	THREAD_IDENTIFIER MissionArgThreadId;
+#endif // !DISABLE_MISSIONARG_THREAD
 
 	INIT_DEBUG;
 
@@ -353,6 +356,8 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(MissionThread, NULL, &MissionThreadId);
 	CreateDefaultThread(MissionLogThread, NULL, &MissionLogThreadId);
 	if (bCommandPrompt) CreateDefaultThread(CommandsThread, NULL, &CommandsThreadId);
+	if (bCommandPrompt) if (bDetachCommandsThread) DetachThread(CommandsThreadId); // Not easy to stop it correctly...
+#ifdef DISABLE_MISSIONARG_THREAD
 #ifndef DISABLE_OPENCV_SUPPORT
 #ifndef FORCE_SINGLE_THREAD_OPENCVGUI
 	for (i = 0; i < nbopencvgui; i++)
@@ -361,28 +366,49 @@ int main(int argc, char* argv[])
 	}
 #endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 #endif // !DISABLE_OPENCV_SUPPORT
+#endif // DISABLE_MISSIONARG_THREAD
 
 	// Launch a mission file if specified as argument.
-	if (argc == 2) CallMission(argv[1]);
-	if (argc > 2) printf(
-		"Usage : \n"
-		"\t%s mission.txt\n"
-		"\t\tor\n"
-		"\t%s\n",
-		argv[0], argv[0]);
-	if ((argc < 2)&&(!bCommandPrompt))
+	if (argc == 2)
+	{
+#ifndef DISABLE_MISSIONARG_THREAD
+		CreateDefaultThread(MissionArgThread, (void*)(argv[1]), &MissionArgThreadId);
+#else
+		CallMission(argv[1]);
+#endif // !DISABLE_MISSIONARG_THREAD
+	}
+	else if (argc > 2) {
+		printf(
+			"Usage : \n"
+			"\t%s mission.txt\n"
+			"\t\tor\n"
+			"\t%s\n",
+			argv[0], argv[0]);
+	}
+	else
 	{
 		bGUIAvailable = FALSE;
 		for (i = 0; i < nbopencvgui; i++)
 		{
 			bGUIAvailable = bGUIAvailable||bEnableOpenCVGUIs[i];
 		}
-		if (!bGUIAvailable)
+		if ((!bCommandPrompt)&&(!bGUIAvailable))
 		{
 			printf("No mission file specified as argument, command prompt disabled, no video GUI : will stop.\n");
 			bExit = TRUE;
 		}
 	}
+
+#ifndef DISABLE_MISSIONARG_THREAD
+#ifndef DISABLE_OPENCV_SUPPORT
+#ifndef FORCE_SINGLE_THREAD_OPENCVGUI
+	for (i = 0; i < nbopencvgui; i++)
+	{
+		CreateDefaultThread(OpenCVGUIThread, (void*)(intptr_t)i, &OpenCVGUIThreadId[i]);
+	}
+#endif // !FORCE_SINGLE_THREAD_OPENCVGUI
+#endif // !DISABLE_OPENCV_SUPPORT
+#endif // !DISABLE_MISSIONARG_THREAD
 
 #ifndef DISABLE_OPENCV_SUPPORT
 #ifndef FORCE_SINGLE_THREAD_OPENCVGUI
@@ -391,9 +417,48 @@ int main(int argc, char* argv[])
 		WaitForThread(OpenCVGUIThreadId[i]);
 	}
 #else
+#ifdef ENABLE_SHARED_WAITKEY_OPENCVGUI
+	for (i = 0; i < nbopencvgui; i++)
+	{
+		CreateDefaultThread(OpenCVGUIThread, (void*)(intptr_t)i, &OpenCVGUIThreadId[i]);
+	}
+	for (;;)
+	{
+		int c = 0;
+
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+		EnterCriticalSection(&OpenCVGUICS);
+#endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+		c = cvWaitKey(opencvguiperiod);
+#else
+		c = cv::waitKey(opencvguiperiod);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+		LeaveCriticalSection(&OpenCVGUICS);
+#endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+
+		EnterCriticalSection(&OpenCVGUICS);
+		opencvguikey = c;
+		LeaveCriticalSection(&OpenCVGUICS);
+
+		if ((char)c == 27) // ESC
+			bExit = TRUE;
+
+		if (bExit) break;
+	}
+	for (i = nbopencvgui-1; i >= 0; i--)
+	{
+		WaitForThread(OpenCVGUIThreadId[i]);
+	}
+#else
 	if (nbopencvgui == 1) OpenCVGUIThread((void*)(intptr_t)0);
+#endif // ENABLE_SHARED_WAITKEY_OPENCVGUI
 #endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 #endif // !DISABLE_OPENCV_SUPPORT
+#ifndef DISABLE_MISSIONARG_THREAD
+	if (argc == 2) WaitForThread(MissionArgThreadId);
+#endif // !DISABLE_MISSIONARG_THREAD
 	if (bCommandPrompt)
 	{
 		if (bExit)
@@ -423,7 +488,8 @@ int main(int argc, char* argv[])
 //			mSleep(1000);
 //#endif // ENABLE_CANCEL_THREAD
 		}
-		WaitForThread(CommandsThreadId);
+		// Not easy to stop it correctly...
+		if (!bDetachCommandsThread) WaitForThread(CommandsThreadId);
 	}
 	WaitForThread(MissionLogThreadId);
 	WaitForThread(MissionThreadId);

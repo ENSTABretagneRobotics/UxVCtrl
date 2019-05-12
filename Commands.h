@@ -19,6 +19,8 @@ THREAD_PROC_RETURN_VALUE MissionThread(void* pParam);
 
 THREAD_PROC_RETURN_VALUE MissionLogThread(void* pParam);
 
+THREAD_PROC_RETURN_VALUE MissionArgThread(void* pParam);
+
 inline void DisableAllHorizontalControls(void)
 {
 	EnterCriticalSection(&StateVariablesCS);
@@ -3634,6 +3636,19 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		Snapshot();
 		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "setopencvguikeytargetid %d", &ival) == 1)
+	{
+		if ((ival >= 0)&&(ival < nbopencvgui))
+		{
+			EnterCriticalSection(&OpenCVGUICS);
+			opencvguikeytargetid = ival;
+			LeaveCriticalSection(&OpenCVGUICS);
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
 	}
 	else if (strncmp(line, "cameratiltup", strlen("cameratiltup")) == 0)
 	{

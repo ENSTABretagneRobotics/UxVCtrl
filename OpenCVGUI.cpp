@@ -113,13 +113,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	StartChrono(&chrono_epu);
 
 	// Sometimes needed on Linux to get windows-related functions working properly in multiple threads, sometimes not...
-	//EnterCriticalSection(&OpenCVGUICS);
+#ifdef ENABLE_OPENCV_HIGHGUI_STARTWINDOWTHREAD
+	EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
-	//cvStartWindowThread();
+	cvStartWindowThread();
 #else
-	//cv::startWindowThread();
+	cv::startWindowThread();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-	//LeaveCriticalSection(&OpenCVGUICS);
+	LeaveCriticalSection(&OpenCVGUICS);
+#endif // ENABLE_OPENCV_HIGHGUI_STARTWINDOWTHREAD
 
 	dispsource = 0;
 
@@ -134,22 +136,25 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	{
 		if (windowname[0] != 0)
 		{
-#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+#ifdef ENABLE_SHARED_WAITKEY_OPENCVGUI
+			mSleep(opencvguiperiod);
 			EnterCriticalSection(&OpenCVGUICS);
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-			c = cvWaitKey(opencvguiperiod);
-#else
-			c = cv::waitKey(opencvguiperiod);
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
+			if ((opencvguikeytargetid < 0)||(opencvguikeytargetid >= nbopencvgui)||(opencvguikeytargetid == guiid)) c = opencvguikey;
 			LeaveCriticalSection(&OpenCVGUICS);
 #else
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+			EnterCriticalSection(&OpenCVGUICS);
+#endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 			c = cvWaitKey(opencvguiperiod);
 #else
 			c = cv::waitKey(opencvguiperiod);
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+#ifdef ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
+			LeaveCriticalSection(&OpenCVGUICS);
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
-	}
+#endif // ENABLE_SHARED_WAITKEY_OPENCVGUI
+		}
 		else mSleep(opencvguiperiod);
 
 		if (bExit) break;

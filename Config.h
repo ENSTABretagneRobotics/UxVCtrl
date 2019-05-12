@@ -63,6 +63,7 @@ inline int LoadConfig(void)
 	bStdOutDetailedInfo = FALSE;
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
+	bDetachCommandsThread = TRUE;
 #pragma endregion
 #pragma region Interfaces parameters
 	bMAVLinkInterface = TRUE;
@@ -441,6 +442,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bCommandPrompt) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bDetachCommandsThread) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
 #pragma region Interfaces parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1209,11 +1212,19 @@ inline int LoadConfig(void)
 		nbopencvgui = 1;
 	}
 #else
+#ifdef ENABLE_SHARED_WAITKEY_OPENCVGUI
+	if ((nbopencvgui < 0)||(nbopencvgui > MAX_NB_OPENCVGUI))
+	{
+		printf("Invalid parameter : nbopencvgui.\n");
+		nbopencvgui = 1;
+	}
+#else
 	if ((nbopencvgui < 0)||(nbopencvgui > 1))
 	{
 		printf("Invalid parameter : nbopencvgui (only 1 OpenCVGUI can be used if FORCE_SINGLE_THREAD_OPENCVGUI is defined).\n");
 		nbopencvgui = 1;
 	}
+#endif // ENABLE_SHARED_WAITKEY_OPENCVGUI
 #endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 	if (videoimgwidth <= 0)
 	{
@@ -1545,6 +1556,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bCommandPrompt) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bEcho) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bDetachCommandsThread) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 #pragma region Interfaces parameters
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

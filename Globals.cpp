@@ -115,6 +115,7 @@ BOOL bDisablelognav = FALSE;
 BOOL bStdOutDetailedInfo = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
+BOOL bDetachCommandsThread = FALSE;
 #pragma endregion
 #pragma region Interfaces parameters
 BOOL bMAVLinkInterface = FALSE;
@@ -728,6 +729,8 @@ double ibat2_filtered = 0;
 double vswitch = 0; 
 double vswitchcoef = 0; 
 double vswitchthreshold = 0; 
+int opencvguikey = 0;
+int opencvguikeytargetid = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
 CvScalar colorsonarlidar;
 #endif // !DISABLE_OPENCV_SUPPORT
