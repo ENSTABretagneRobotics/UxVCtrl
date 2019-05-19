@@ -1,16 +1,18 @@
+replace Invalid configuration file by Invalid parameter : XXX...
+améliorer simu de GPS bruité...
 
 quitte pas toujours sans taper ENTER si ESC sur opencvgui?->en debug OK, pas en release?
 
 check uSleep()
 
-SBG (check, continue interface...)
+SBG (check, continue interface...)->SDK TCP blocking or non-blocking does not work, but works with ellipseMinimal...->problably because never returns SBG_NOT_READY...
 
 Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\2018-2019\UV 4.1\TD4\KinectWebcamOpenCV410
 class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
 class VideoCaptureKinect : VideoCapture {grab();retrieve();}
 VideoCaptureKinect::read() ???
 
-if ENABLE_SHARED_WAITKEY_OPENCVGUI, the other highgui functions probably need to be called from the main thread, suggests setopencvguikeytargetid...
+if ENABLE_SHARED_WAITKEY_OPENCVGUI, the other highgui functions probably need to be called from the main thread, suggest setopencvguikeytargetid...
 should display message if nbopencvgui > 0 with cv disabled...
 
 set cmake var OpenCV_VERSION even when not using find, use vars set to 2413, 2.4.13 to simplify for vs libs...?
@@ -231,7 +233,6 @@ Maestrosleeptime=10+10*(vbat1chan!=-1?1:0)+10*(ibat1chan!=-1?1:0)+10*(vbat2chan!
 
 abort fait des trucs bizarres quand on est dans waypointslist?
 check critical sections in interfaces...
-PololuInterfaceType
 missing BOATBOT robid...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
 wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
@@ -681,9 +682,9 @@ rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
 simu
-Simu voilier : mettre equations motorboat et voilier, PololuInterface
+Simu voilier : mettre equations motorboat et voilier
 add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
-UxVSim : faire motorboat qui a du vy, émuler SBG, mettre des options bDisableDevice, rajouter biais des actionneurs en params
+UxVSim : faire motorboat qui a du vy, mettre des options bDisableDevice, rajouter biais des actionneurs en params
 reprendre VSim et le renommer en UxVSim et y rajouter des devices et équations pour d'autres robots, et/ou intégrer les devices simulés et équations de robots dans UxVCtrl?->au moins les équations, il y a déjà des robid prévus pour différents simulateurs...
 Intégrer modèles simu drone, char, buggy, avion, voilier de MATLAB...->ou alors faire dans un programme séparé avec le simulateur de voilier, voir aussi ardupilot_simulator...?
 

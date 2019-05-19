@@ -1043,11 +1043,13 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &publox->fixedPosAcc) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bSendStartSentence) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			// Need fgets4() because of '$'...
+			if (fgets4(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%255s", publox->szStartSentence) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bSendStopSentence) != 1) printf("Invalid configuration file.\n");
-			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			// Need fgets4() because of '$'...
+			if (fgets4(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%255s", publox->szStopSentence) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_NMEA_GGA) != 1) printf("Invalid configuration file.\n");

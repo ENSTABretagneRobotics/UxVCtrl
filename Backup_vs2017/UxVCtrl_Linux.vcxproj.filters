@@ -291,6 +291,9 @@
     <ClCompile Include="SBGInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PololuInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -660,6 +663,9 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="SBGInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PololuInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

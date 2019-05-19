@@ -719,7 +719,7 @@ endif()
 
 if(ENABLE_BUILD_OPTIMIZATION_SAILBOAT)
 else()
- target_sources(UxVCtrl PUBLIC SSC32Interface.cpp SonarLocalization.cpp SonarAltitudeEstimation.cpp Simulator.cpp SeanetProcessing.cpp SBGInterface.cpp RazorAHRSInterface.cpp FollowMe.cpp ExternalProgramTrigger.cpp Hardware/SwarmonDevice.cpp Hardware/SSC32.cpp Hardware/SRF02.cpp Hardware/Seanet.cpp Hardware/SBG.cpp Hardware/RPLIDAR.cpp Hardware/PathfinderDVL.cpp Hardware/P33x.cpp Hardware/NortekDVL.cpp Hardware/MT.cpp Hardware/MS583730BA.cpp Hardware/MS580314BA.cpp Hardware/MiniSSC.cpp Hardware/MES.cpp Hardware/MDM.cpp Hardware/LIRMIA3.cpp Hardware/Hokuyo.cpp Hardware/IM483I.cpp)
+ target_sources(UxVCtrl PUBLIC SSC32Interface.cpp SonarLocalization.cpp SonarAltitudeEstimation.cpp Simulator.cpp SeanetProcessing.cpp SBGInterface.cpp RazorAHRSInterface.cpp PololuInterface.cpp FollowMe.cpp ExternalProgramTrigger.cpp Hardware/SwarmonDevice.cpp Hardware/SSC32.cpp Hardware/SRF02.cpp Hardware/Seanet.cpp Hardware/SBG.cpp Hardware/RPLIDAR.cpp Hardware/PathfinderDVL.cpp Hardware/P33x.cpp Hardware/NortekDVL.cpp Hardware/MT.cpp Hardware/MS583730BA.cpp Hardware/MS580314BA.cpp Hardware/MiniSSC.cpp Hardware/MES.cpp Hardware/MDM.cpp Hardware/LIRMIA3.cpp Hardware/Hokuyo.cpp Hardware/IM483I.cpp)
 endif()
 
 if(USE_OPENCV_HIGHGUI_CPP_API)

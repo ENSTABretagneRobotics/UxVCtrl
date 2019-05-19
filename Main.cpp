@@ -82,6 +82,7 @@
 #include "RazorAHRSInterface.h"
 #include "SBGInterface.h"
 #include "SSC32Interface.h"
+#include "PololuInterface.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
 #include "VideoInterface.h"
@@ -183,6 +184,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
 	THREAD_IDENTIFIER SBGInterfaceThreadId;
 	THREAD_IDENTIFIER SSC32InterfaceThreadId;
+	THREAD_IDENTIFIER PololuInterfaceThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
 	THREAD_IDENTIFIER VideoInterfaceThreadId;
@@ -344,6 +346,8 @@ int main(int argc, char* argv[])
 	if (bSBGInterface) DetachThread(SBGInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSSC32Interface) CreateDefaultThread(SSC32InterfaceThread, NULL, &SSC32InterfaceThreadId);
 	if (bSSC32Interface) DetachThread(SSC32InterfaceThreadId); // Not easy to stop it correctly...
+	if (bPololuInterface) CreateDefaultThread(PololuInterfaceThread, NULL, &PololuInterfaceThreadId);
+	if (bPololuInterface) DetachThread(PololuInterfaceThreadId); // Not easy to stop it correctly...
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
 	if (bVideoInterface) CreateDefaultThread(VideoInterfaceThread, NULL, &VideoInterfaceThreadId);
@@ -489,7 +493,7 @@ int main(int argc, char* argv[])
 //#endif // ENABLE_CANCEL_THREAD
 		}
 		// Not easy to stop it correctly...
-		if (!bDetachCommandsThread) WaitForThread(CommandsThreadId);
+		if (!bDetachCommandsThread) WaitForThread(CommandsThreadId); else mSleep(100);
 	}
 	WaitForThread(MissionLogThreadId);
 	WaitForThread(MissionThreadId);
@@ -504,6 +508,9 @@ int main(int argc, char* argv[])
 	if (bVideoInterface) mSleep(100);
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+	// Not easy to stop it correctly...
+	//if (bPololuInterface) WaitForThread(PololuInterfaceThreadId);
+	if (bPololuInterface) mSleep(100);
 	// Not easy to stop it correctly...
 	//if (bSSC32Interface) WaitForThread(SSC32InterfaceThreadId);
 	if (bSSC32Interface) mSleep(100);

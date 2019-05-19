@@ -105,6 +105,7 @@
     <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="OpenCVGUI.cpp" />
     <ClCompile Include="Pinger.cpp" />
+    <ClCompile Include="PololuInterface.cpp" />
     <ClCompile Include="RazorAHRSInterface.cpp" />
     <ClCompile Include="SBGInterface.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
@@ -205,6 +206,7 @@
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="OpenCVGUI.h" />
     <ClInclude Include="Pinger.h" />
+    <ClInclude Include="PololuInterface.h" />
     <ClInclude Include="RazorAHRSInterface.h" />
     <ClInclude Include="SBGInterface.h" />
     <ClInclude Include="SeanetProcessing.h" />

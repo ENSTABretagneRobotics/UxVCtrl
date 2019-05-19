@@ -207,6 +207,18 @@ WMV2
 9600
 % SSC32InterfaceTimeout (in ms)
 1000
+% bPololuInterface
+0
+% szPololuInterfacePath (server TCP port (e.g. :5004), client IP address and TCP port (e.g. 127.0.0.1:5004) or local RS232 port)
+:5004
+% PololuInterfaceBaudRate
+115200
+% PololuInterfaceTimeout (in ms)
+1000
+% PololuType_PololuInterface (0 : Maestro (not implemented), 1 : Jrk)
+1
+% DeviceNumber_PololuInterface (default is 12 for Maestro (not implemented), 11 for Jrk)
+11
 % bVideoInterface
 1
 % VideoInterfacePort (server TCP port (e.g. :4014))
