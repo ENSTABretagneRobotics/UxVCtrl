@@ -1,3 +1,6 @@
+317
+Updated SBG.
+
 316
 Added bDetachCommandsThread parameter.
 Added setopencvguikeytargetid command (preliminary).

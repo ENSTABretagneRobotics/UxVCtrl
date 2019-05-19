@@ -296,7 +296,7 @@ struct SBGDATA
 	unsigned char gpsRawData[4086];
 	unsigned int gpsRawDataSize;
 	unsigned char Status;
-	unsigned short TS; 
+	unsigned int TS; 
 	struct UTC_Time_SBG UTCTime;
 	double Roll, Pitch, Yaw; // In rad.
 };
@@ -357,7 +357,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 	{
 	case SBG_ECOM_LOG_UTC_TIME:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->utcData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->utcData.timeStamp;
 		pSBG->LastSBGData.UTCTime.Year = pLogData->utcData.year;
 		pSBG->LastSBGData.UTCTime.Month = pLogData->utcData.month;
 		pSBG->LastSBGData.UTCTime.Day = pLogData->utcData.day;
@@ -370,7 +370,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_IMU_DATA:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->imuData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->imuData.timeStamp;
 		pSBG->LastSBGData.gyrX = pLogData->imuData.gyroscopes[0];
 		pSBG->LastSBGData.gyrY = pLogData->imuData.gyroscopes[1];
 		pSBG->LastSBGData.gyrZ = pLogData->imuData.gyroscopes[2];
@@ -382,7 +382,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_MAG:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->magData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->magData.timeStamp;
 		pSBG->LastSBGData.magX = pLogData->magData.magnetometers[0];
 		pSBG->LastSBGData.magY = pLogData->magData.magnetometers[1];
 		pSBG->LastSBGData.magZ = pLogData->magData.magnetometers[2];
@@ -390,7 +390,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_EKF_EULER:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->ekfEulerData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->ekfEulerData.timeStamp;
 		pSBG->LastSBGData.roll = sbgRadToDegF(pLogData->ekfEulerData.euler[0]);
 		pSBG->LastSBGData.pitch = sbgRadToDegF(pLogData->ekfEulerData.euler[1]);
 		pSBG->LastSBGData.yaw = sbgRadToDegF(pLogData->ekfEulerData.euler[2]);
@@ -409,7 +409,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_EKF_QUAT:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->ekfQuatData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->ekfQuatData.timeStamp;
 		pSBG->LastSBGData.q0 = pLogData->ekfQuatData.quaternion[0];
 		pSBG->LastSBGData.q1 = pLogData->ekfQuatData.quaternion[1];
 		pSBG->LastSBGData.q2 = pLogData->ekfQuatData.quaternion[2];
@@ -434,7 +434,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_EKF_NAV:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->ekfNavData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->ekfNavData.timeStamp;
 		pSBG->LastSBGData.Lat = pLogData->ekfNavData.position[0];
 		pSBG->LastSBGData.Long = pLogData->ekfNavData.position[1];
 		pSBG->LastSBGData.Alt = pLogData->ekfNavData.position[2];
@@ -451,7 +451,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_SHIP_MOTION:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->shipMotionData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->shipMotionData.timeStamp;
 		pSBG->LastSBGData.heave_period = pLogData->shipMotionData.mainHeavePeriod;
 		pSBG->LastSBGData.surge = pLogData->shipMotionData.shipMotion[0];
 		pSBG->LastSBGData.sway = pLogData->shipMotionData.shipMotion[1];
@@ -466,7 +466,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		break;
 	case SBG_ECOM_LOG_ODO_VEL:
 		EnterCriticalSection(&pSBG->CallbackCS);
-		pSBG->LastSBGData.TS = (unsigned short)pLogData->odometerData.timeStamp;
+		pSBG->LastSBGData.TS = pLogData->odometerData.timeStamp;
 		pSBG->LastSBGData.odometerVelocity = pLogData->odometerData.velocity;
 		LeaveCriticalSection(&pSBG->CallbackCS);	
 		break;
@@ -632,9 +632,11 @@ inline int FindFrameSBG(unsigned char* buf, int buflen, int* pmid, int* pmclass,
 inline int ProcessFrameSBG(SBG* pSBG, unsigned char* frame, int framelen, int mid, int mclass, SBGDATA* pSBGData)
 {
 	int offset = 0;
+	unsigned char ucval = 0;
 	uShort_SBG usval;
 	uInt_SBG uival;
 	uFloat_SBG fval;
+	uDouble_SBG dval;
 	double roll = 0, pitch = 0, yaw = 0;
 
 	UNREFERENCED_PARAMETER(framelen);
@@ -646,60 +648,65 @@ inline int ProcessFrameSBG(SBG* pSBG, unsigned char* frame, int framelen, int mi
 	case SBG_ECOM_CLASS_LOG_ECOM_0:
 		switch (mid)
 		{
-		case SBG_ECOM_LOG_EKF_NAV:
+		case SBG_ECOM_LOG_UTC_TIME:
 			offset = FRAME_HEADER_LEN_SBG;
 			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
 			offset += 4;
-			memcpy(fval.c, frame+offset, 4);
-			pSBGData->roll = fval.v*180.0/M_PI;
+			memcpy(usval.c, frame+offset, 2);
+			pSBGData->UTCTime.Valid = (unsigned char)((usval.v&0x03C0)>>6);
+			offset += 2;
+			memcpy(usval.c, frame+offset, 2);
+			pSBGData->UTCTime.Year = usval.v;
+			offset += 2;
+			memcpy(&ucval, frame+offset, 1);
+			pSBGData->UTCTime.Month = ucval;
+			offset += 1;
+			memcpy(&ucval, frame+offset, 1);
+			pSBGData->UTCTime.Day = ucval;
+			offset += 1;
+			memcpy(&ucval, frame+offset, 1);
+			pSBGData->UTCTime.Hour = ucval;
+			offset += 1;
+			memcpy(&ucval, frame+offset, 1);
+			pSBGData->UTCTime.Minute = ucval;
+			offset += 1;
+			memcpy(&ucval, frame+offset, 1);
+			pSBGData->UTCTime.Seconds = ucval;
+			offset += 1;
+			memcpy(uival.c, frame+offset, 4);
+			pSBGData->UTCTime.Nanoseconds = uival.v;
 			offset += 4;
-			memcpy(fval.c, frame+offset, 4);
-			pSBGData->pitch = fval.v*180.0/M_PI;
+			memcpy(uival.c, frame+offset, 4);
 			offset += 4;
-			memcpy(fval.c, frame+offset, 4);
-			pSBGData->yaw = fval.v*180.0/M_PI;
-			offset += 4;
-			roll = pSBGData->roll*M_PI/180.0;
-			pitch = pSBGData->pitch*M_PI/180.0;
-			yaw = pSBGData->yaw*M_PI/180.0;
-
-			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
-			pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
-			pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
-			pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
 			break;
-		case SBG_ECOM_LOG_EKF_QUAT:
+		case SBG_ECOM_LOG_MAG:
 			offset = FRAME_HEADER_LEN_SBG;
 			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
+			offset += 4;
+			memcpy(usval.c, frame+offset, 2);
+			offset += 2;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->magX = fval.v;
 			offset += 4;
 			memcpy(fval.c, frame+offset, 4);
-			pSBGData->q0 = fval.v;
+			pSBGData->magY = fval.v;
 			offset += 4;
 			memcpy(fval.c, frame+offset, 4);
-			pSBGData->q1 = fval.v;
+			pSBGData->magZ = fval.v;
 			offset += 4;
 			memcpy(fval.c, frame+offset, 4);
-			pSBGData->q2 = fval.v;
 			offset += 4;
 			memcpy(fval.c, frame+offset, 4);
-			pSBGData->q3 = fval.v;
 			offset += 4;
-			roll = atan2(2*pSBGData->q2*pSBGData->q3+2*pSBGData->q0*pSBGData->q1, 2*sqr(pSBGData->q0)+2*sqr(pSBGData->q3)-1);
-			pitch = -asin(constrain(2*pSBGData->q1*pSBGData->q3-2*pSBGData->q0*pSBGData->q2, -1, 1)); // Attempt to avoid potential NAN...
-			yaw = atan2(2*pSBGData->q1*pSBGData->q2+2*pSBGData->q0*pSBGData->q3, 2*sqr(pSBGData->q0)+2*sqr(pSBGData->q1)-1);
-			// If raw Euler angles were not sent, ensure that they would still be in the log file.
-			pSBGData->roll = roll*180.0/M_PI;
-			pSBGData->pitch = pitch*180.0/M_PI;
-			pSBGData->yaw = yaw*180.0/M_PI;
-
-			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
-			pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
-			pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
-			pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
+			memcpy(fval.c, frame+offset, 4);
+			offset += 4;
 			break;
 		case SBG_ECOM_LOG_IMU_DATA:
 			offset = FRAME_HEADER_LEN_SBG;
 			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
 			offset += 4;
 			memcpy(usval.c, frame+offset, 2);
 			offset += 2;
@@ -723,6 +730,176 @@ inline int ProcessFrameSBG(SBG* pSBG, unsigned char* frame, int framelen, int mi
 			offset += 4;
 			memcpy(fval.c, frame+offset, 4);
 			pSBGData->temp = fval.v;
+			offset += 4;
+			break;
+		case SBG_ECOM_LOG_EKF_EULER:
+			offset = FRAME_HEADER_LEN_SBG;
+			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->roll = fval.v*180.0/M_PI;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->pitch = fval.v*180.0/M_PI;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->yaw = fval.v*180.0/M_PI;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->eulerStdDev[0] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->eulerStdDev[1] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->eulerStdDev[2] = fval.v;
+			offset += 4;
+			memcpy(uival.c, frame+offset, 4);
+			offset += 4;
+			roll = pSBGData->roll*M_PI/180.0;
+			pitch = pSBGData->pitch*M_PI/180.0;
+			yaw = pSBGData->yaw*M_PI/180.0;
+
+			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+			pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
+			pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
+			pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
+			break;
+		case SBG_ECOM_LOG_EKF_QUAT:
+			offset = FRAME_HEADER_LEN_SBG;
+			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q0 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q1 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q2 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->q3 = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->eulerStdDev[0] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->eulerStdDev[1] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->eulerStdDev[2] = fval.v;
+			offset += 4;
+			memcpy(uival.c, frame+offset, 4);
+			offset += 4;
+			roll = atan2(2*pSBGData->q2*pSBGData->q3+2*pSBGData->q0*pSBGData->q1, 2*sqr(pSBGData->q0)+2*sqr(pSBGData->q3)-1);
+			pitch = -asin(constrain(2*pSBGData->q1*pSBGData->q3-2*pSBGData->q0*pSBGData->q2, -1, 1)); // Attempt to avoid potential NAN...
+			yaw = atan2(2*pSBGData->q1*pSBGData->q2+2*pSBGData->q0*pSBGData->q3, 2*sqr(pSBGData->q0)+2*sqr(pSBGData->q1)-1);
+			// If raw Euler angles were not sent, ensure that they would still be in the log file.
+			pSBGData->roll = roll*180.0/M_PI;
+			pSBGData->pitch = pitch*180.0/M_PI;
+			pSBGData->yaw = yaw*180.0/M_PI;
+
+			// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
+			pSBGData->Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
+			pSBGData->Pitch = fmod_2PI(pitch+pSBG->pitchorientation+pSBG->pitchp1*cos(pitch+pSBG->pitchp2));
+			pSBGData->Yaw = fmod_2PI(yaw+pSBG->yaworientation+pSBG->yawp1*cos(yaw+pSBG->yawp2));
+			break;
+		case SBG_ECOM_LOG_EKF_NAV:
+			offset = FRAME_HEADER_LEN_SBG;
+			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->Vel_X = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->Vel_Y = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->Vel_Z = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->velocityStdDev[0] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->velocityStdDev[1] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->velocityStdDev[2] = fval.v;
+			offset += 4;
+			memcpy(dval.c, frame+offset, 8);
+			pSBGData->Lat = dval.v;
+			offset += 8;
+			memcpy(dval.c, frame+offset, 8);
+			pSBGData->Long = dval.v;
+			offset += 8;
+			memcpy(dval.c, frame+offset, 8);
+			pSBGData->Alt = dval.v;
+			offset += 8;
+			memcpy(fval.c, frame+offset, 4);
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->positionStdDev[0] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->positionStdDev[1] = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->positionStdDev[2] = fval.v;
+			offset += 4;
+			memcpy(uival.c, frame+offset, 4);
+			offset += 4;
+			break;
+		case SBG_ECOM_LOG_SHIP_MOTION:
+			offset = FRAME_HEADER_LEN_SBG;
+			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->heave_period = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->surge = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->sway = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->heave = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->surge_accel = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->sway_accel = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->heave_accel = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->surge_vel = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->sway_vel = fval.v;
+			offset += 4;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->heave_vel = fval.v;
+			offset += 4;
+			memcpy(usval.c, frame+offset, 2);
+			offset += 2;
+			break;
+		case SBG_ECOM_LOG_ODO_VEL:
+			offset = FRAME_HEADER_LEN_SBG;
+			memcpy(uival.c, frame+offset, 4);
+			pSBGData->TS = uival.v;
+			offset += 4;
+			memcpy(usval.c, frame+offset, 2);
+			offset += 2;
+			memcpy(fval.c, frame+offset, 4);
+			pSBGData->odometerVelocity = fval.v;
 			offset += 4;
 			break;
 		default:

@@ -1,7 +1,9 @@
 
+quitte pas toujours sans taper ENTER si ESC sur opencvgui?->en debug OK, pas en release?
+
 check uSleep()
 
-SBG (read magneto data without SDK, check euler and quat, put in hardware-cpp, etc.)
+SBG (check, continue interface...)
 
 Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\2018-2019\UV 4.1\TD4\KinectWebcamOpenCV410
 class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
@@ -11,7 +13,7 @@ VideoCaptureKinect::read() ???
 if ENABLE_SHARED_WAITKEY_OPENCVGUI, the other highgui functions probably need to be called from the main thread, suggests setopencvguikeytargetid...
 should display message if nbopencvgui > 0 with cv disabled...
 
-set cmake var OpenCV_VERSION even when not using find, use vars set to 2413, 2.4.13 to be simplify for vs libs...?
+set cmake var OpenCV_VERSION even when not using find, use vars set to 2413, 2.4.13 to simplify for vs libs...?
 find_package for windows and libmodbus (maybe not for SBG since it is modified, or should change version number of the modified version to be able to disable TCP automatically if needed...)...
 
 Check set_attitude_target guided mode absolute heading...
@@ -19,7 +21,7 @@ Check set_attitude_target guided mode absolute heading...
 Rajouter params code sonar et csv2v4log pour gérer sbp, regarder fichiers de données et capture de la com...
 commande pour calibration de voile VAIMOS, afficher bSailCalibrated dans GUI?
 si pas bCalibrateSail, le couple n'est pas réglé...
-add VAIMOS_WORKSPACE
+reglages neutre et max ssc and im483
 VPower?
 
 $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
