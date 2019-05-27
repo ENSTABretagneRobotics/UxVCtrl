@@ -1015,7 +1015,7 @@ inline int GetFrameSBG(SBG* pSBG, SBGDATA* pSBGData)
 #ifdef ENABLE_SBG_SUPPORT
 inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 {
-	SbgErrorCode errorCode = SBG_ERROR;
+	SbgErrorCode errorCode = SBG_ERROR, prevErrorCode = SBG_ERROR;
 	CHRONO chrono;
 
 	StartChrono(&chrono);
@@ -1023,6 +1023,7 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 	// Loop to discard old data...
 	do
 	{
+		prevErrorCode = errorCode;
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_SBG)
 		{
 			printf("Error reading data from a SBG : Message timeout. \n");
@@ -1031,9 +1032,16 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 		}
 		// Try to read and parse one frame.
 		errorCode = sbgEComHandleOneLog(&pSBG->comHandle);
-	} while (errorCode != SBG_NOT_READY);
-		
+	} while (errorCode == SBG_NO_ERROR);
+
 	StopChronoQuick(&chrono);
+
+	if (errorCode != SBG_NOT_READY)//||((errorCode == SBG_NOT_READY)&&(prevErrorCode != SBG_NO_ERROR)))
+	{
+		printf("Error reading data from a SBG. \n");
+		StopChronoQuick(&chrono);
+		return EXIT_TIMEOUT;
+	}
 
 	EnterCriticalSection(&pSBG->CallbackCS);
 	*pSBGData = pSBG->LastSBGData;
@@ -1159,7 +1167,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	{
 		memcpy(address, pSBG->szDevPath+9, ptr2-(pSBG->szDevPath+9));
 		strcpy(port, ptr2+1);
-		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, true, 10000, true) != SBG_NO_ERROR)
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, false, 10000, true) != SBG_NO_ERROR)
 		{
 			printf("Unable to connect to a SBG : Unable to create the interface.\n");
 			return EXIT_FAILURE;
@@ -1169,7 +1177,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	{
 		memcpy(address, pSBG->szDevPath+6, ptr2-(pSBG->szDevPath+6));
 		strcpy(port, ptr2+1);
-		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), false, true, 10000, true) != SBG_NO_ERROR)
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), false, false, 10000, true) != SBG_NO_ERROR)
 		{
 			printf("Unable to connect to a SBG : Unable to create the interface.\n");
 			return EXIT_FAILURE;
@@ -1188,7 +1196,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	else if ((strlen(pSBG->szDevPath) >= 5)&&(strncmp(pSBG->szDevPath, "tcp:", strlen("tcp:")) == 0)&&(atoi(pSBG->szDevPath+4) > 0))
 	{
 		strcpy(port, pSBG->szDevPath+4);
-		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, true, 10000, true) != SBG_NO_ERROR)
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, false, 10000, true) != SBG_NO_ERROR)
 		{
 			printf("Unable to connect to a SBG : Unable to create the interface.\n");
 			return EXIT_FAILURE;
@@ -1197,7 +1205,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	else if ((pSBG->szDevPath[0] == ':')&&(atoi(pSBG->szDevPath+1) > 0))
 	{
 		strcpy(port, pSBG->szDevPath+1);
-		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, true, 10000, true) != SBG_NO_ERROR)
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, sbgIpAddr(0, 0, 0, 0), atoi(port), true, false, 10000, true) != SBG_NO_ERROR)
 		{
 			printf("Unable to connect to a SBG : Unable to create the interface.\n");
 			return EXIT_FAILURE;
@@ -1207,7 +1215,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	{
 		memcpy(address, pSBG->szDevPath, ptr-pSBG->szDevPath);
 		strcpy(port, ptr+1);
-		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), false, true, 10000, true) != SBG_NO_ERROR)
+		if (sbgInterfaceTcpCreate(&pSBG->sbgInterface, inet_addr(address), atoi(port), false, false, 10000, true) != SBG_NO_ERROR)
 		{
 			printf("Unable to connect to a SBG : Unable to create the interface.\n");
 			return EXIT_FAILURE;

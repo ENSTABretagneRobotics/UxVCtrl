@@ -32,6 +32,7 @@
 
 # Common Linux files
 *.sh eol=lf
+*.bash eol=lf
 Makefile eol=lf
 
 # Common Visual Studio files
@@ -59,6 +60,10 @@ Makefile eol=lf
 # MOOS
 # Might contain binary data but should try to be displayed as text...
 *.alog -text
+
+# ROS
+*.launch eol=lf
+*.yaml eol=lf
 
 #
 *.kml eol=crlf
