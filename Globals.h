@@ -353,6 +353,9 @@ extern BOOL bStdOutDetailedInfo;
 extern BOOL bCommandPrompt;
 extern BOOL bEcho;
 extern BOOL bDetachCommandsThread;
+extern int WaitForGNSSLevel;
+extern int WaitForGNSSTimeout;
+extern BOOL bSetEnvOriginFromGNSS;
 #pragma endregion
 #pragma region Interfaces parameters
 extern BOOL bMAVLinkInterface;

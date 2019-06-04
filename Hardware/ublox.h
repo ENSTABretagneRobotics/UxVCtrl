@@ -68,6 +68,8 @@ struct UBLOX
 	double fixedLon;
 	double fixedAlt;
 	double fixedPosAcc;
+	BOOL bSaveCfg;
+	BOOL bDisableRTCMTransfer;
 	BOOL bSendStartSentence;
 	char szStartSentence[256];
 	BOOL bSendStopSentence;
@@ -717,6 +719,46 @@ inline int RevertToDefaultCfgublox(UBLOX* publox)
 	return EXIT_SUCCESS;
 }
 
+inline int SaveCfgublox(UBLOX* publox)
+{
+	unsigned char sendbuf[32];
+	int sendbuflen = 0;
+	struct CFG_CFG_PL_UBX cfg_cfg_pl;
+
+	memset(&cfg_cfg_pl, 0, sizeof(cfg_cfg_pl));	
+	cfg_cfg_pl.saveMask.ioPort = 1;
+	cfg_cfg_pl.saveMask.msgConf = 1;
+	cfg_cfg_pl.saveMask.infMsg = 1;
+	cfg_cfg_pl.saveMask.navConf = 1;
+	cfg_cfg_pl.saveMask.rxmConf = 1;
+	cfg_cfg_pl.saveMask.senConf = 1;
+	cfg_cfg_pl.saveMask.rinvConf = 1;
+	cfg_cfg_pl.saveMask.antConf = 1;
+	cfg_cfg_pl.saveMask.logConf = 1;
+	cfg_cfg_pl.saveMask.ftsConf = 1;
+	cfg_cfg_pl.deviceMask.devBBR = 1;
+	cfg_cfg_pl.deviceMask.devFlash = 1;
+	cfg_cfg_pl.deviceMask.devEEPROM = 1;
+	cfg_cfg_pl.deviceMask.devSpiFlash = 1;
+	EncodePacketUBX(sendbuf, &sendbuflen, CFG_CLASS_UBX, CFG_CFG_ID_UBX, (unsigned char*)&cfg_cfg_pl, LEN_CFG_CFG_PL_UBX);
+	//EncodePacketUBX(sendbuf, &sendbuflen, CFG_CLASS_UBX, CFG_CFG_ID_UBX, (unsigned char*)&cfg_cfg_pl, sizeof(cfg_cfg_pl));
+
+	if (WriteAllRS232Port(&publox->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a ublox. \n");
+		return EXIT_FAILURE;
+	}
+	if ((publox->bSaveRawData)&&(publox->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, publox->pfSaveFile);
+		fflush(publox->pfSaveFile);
+	}
+
+	// Should check ACK...
+
+	return EXIT_SUCCESS;
+}
+
 inline int SetBaseCfgublox(UBLOX* publox)
 {
 	unsigned char sendbuf[512];
@@ -978,6 +1020,8 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->fixedLon = 0;
 		publox->fixedAlt = 0;
 		publox->fixedPosAcc = 10;
+		publox->bSaveCfg = 0;
+		publox->bDisableRTCMTransfer = 0;
 		publox->bSendStartSentence = 0;
 		memset(publox->szStartSentence, 0, sizeof(publox->szStartSentence));
 		sprintf(publox->szStartSentence, "$GPS_START");
@@ -1041,6 +1085,10 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (sscanf(line, "%lf", &publox->fixedAlt) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%lf", &publox->fixedPosAcc) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bSaveCfg) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bDisableRTCMTransfer) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bSendStartSentence) != 1) printf("Invalid configuration file.\n");
 			// Need fgets4() because of '$'...
@@ -1188,6 +1236,17 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 	case KEEP_CURRENT_CFG_UBX:
 	default:
 		break;
+	}
+
+	if (publox->bSaveCfg)
+	{
+		if (SaveCfgublox(publox) != EXIT_SUCCESS)
+		{
+			printf("Unable to configure a ublox.\n");
+			CloseRS232Port(&publox->RS232Port);
+			return EXIT_FAILURE;
+		}
+		mSleep(250);
 	}
 
 	if (publox->bSendStartSentence)

@@ -64,6 +64,9 @@ inline int LoadConfig(void)
 	bCommandPrompt = TRUE;
 	bEcho = TRUE;
 	bDetachCommandsThread = TRUE;
+	WaitForGNSSLevel = 0;
+	WaitForGNSSTimeout = 0;
+	bSetEnvOriginFromGNSS = FALSE;
 #pragma endregion
 #pragma region Interfaces parameters
 	bMAVLinkInterface = TRUE;
@@ -451,6 +454,12 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEcho) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDetachCommandsThread) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &WaitForGNSSLevel) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &WaitForGNSSTimeout) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bSetEnvOriginFromGNSS) != 1) printf("Invalid configuration file.\n");
 #pragma endregion
 #pragma region Interfaces parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1295,6 +1304,11 @@ inline int LoadConfig(void)
 		printf("Invalid parameter : bEnableOpenCVGUIs[4].\n");
 		bEnableOpenCVGUIs[4] = FALSE;
 	}
+	if ((WaitForGNSSLevel < 0)||(WaitForGNSSLevel >= 8))
+	{
+		printf("Invalid parameter : WaitForGNSSLevel.\n");
+		WaitForGNSSLevel = 0;
+	}
 	if ((MAVLinkInterface_system_id < 0)||(MAVLinkInterface_system_id >= 256))
 	{
 		printf("Invalid parameter : MAVLinkInterface_system_id.\n");
@@ -1577,6 +1591,12 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bEcho) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDetachCommandsThread) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", WaitForGNSSLevel) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", WaitForGNSSTimeout) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bSetEnvOriginFromGNSS) < 0) printf("Error writing configuration file.\n");
 #pragma endregion
 #pragma region Interfaces parameters
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

@@ -1,3 +1,7 @@
+320
+Added WaitForGNSSLevel, WaitForGNSSTimeout, bSetEnvOriginFromGNSS parameters.
+Added bSaveCfg, bDisableRTCMTransfer parameters to ublox.
+
 319
 Updated SBG.
 

@@ -116,6 +116,9 @@ BOOL bStdOutDetailedInfo = FALSE;
 BOOL bCommandPrompt = FALSE;
 BOOL bEcho = FALSE;
 BOOL bDetachCommandsThread = FALSE;
+int WaitForGNSSLevel = 0;
+int WaitForGNSSTimeout = 0;
+BOOL bSetEnvOriginFromGNSS = FALSE;
 #pragma endregion
 #pragma region Interfaces parameters
 BOOL bMAVLinkInterface = FALSE;

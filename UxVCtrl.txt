@@ -102,6 +102,12 @@ WMV2
 1
 % bDetachCommandsThread
 1
+% WaitForGNSSLevel (see GNSS accuracy levels in Globals.h (e.g. 4 for a good GPS fix))
+0
+% WaitForGNSSTimeout (in ms)
+0
+% bSetEnvOriginFromGNSS
+0
 % Interfaces parameters
 % bMAVLinkInterface
 1

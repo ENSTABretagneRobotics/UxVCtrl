@@ -27,6 +27,10 @@ COM14
 0
 % fixedPosAcc (in m)
 10
+% bSaveCfg
+0
+% bDisableRTCMTransfer
+0
 % bSendStartSentence
 0
 % szStartSentence

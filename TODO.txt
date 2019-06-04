@@ -1,5 +1,7 @@
-ublox : add param to disable TransferToublox()... 
-Simulate cog and sog
+env sous MP
+ublox : add param UBX-CFG-RATE measurement period to set to e.g. to 200-500 ms, check bandwidth...
+purgeserial marche pas avec nouveau driver ublox et autres problèmes...
+Simulate cog and sog like UxVSim
 
 Serveraliveinterval... test opencpn, ssc32, via telnet...
 
@@ -9,11 +11,15 @@ replace Invalid configuration file by Invalid parameter : XXX...
 améliorer simu de GPS bruité...
 
 quitte pas toujours sans taper ENTER si ESC sur opencvgui?->en debug OK, pas en release?->Terminate commands thread in the end after some time in release, or change some timings...?
+https://stackoverflow.com/questions/21123499/how-to-break-out-of-fgets
 
 check uSleep()
 
 SBG (check, continue interface...)->SDK TCP blocking or non-blocking does not work, but works with ellipseMinimal...->problably because never returns SBG_NOT_READY...->disconnects not handled correctly in Serial and TCP (sbgEComHandleOneLog() returns SBG_NOT_READY, as usual...)...
 update rate SBG?->compare with and without SDK...
+Add sleep at end connect sbg and try in serial with condition on not_ready and prev errcode error to try to be able to detect disconnect in tcp
+Tcp non block sample SBG
+Check more errcode recv sdk tcp
 
 update rate OpenCVGUI thread?
 
@@ -41,7 +47,6 @@ $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' 
 angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, surge, sway, peut-être le récupérer quand même, rajouter colonnes correspondantes dans log SBG, $PHTRH...
 
 Commande ais qui met dans reg direction et vitesse du plus proche bateau pour pouvoir lancer procedure à un cap relatif pour éviter
-
 Faire simu de voilier dans la rade avec données d'un vrai ais et faire tourner longtemps et vérifier qu'à aucun moment il y a collision
 
 Params pour pouvoir changer config sbg
@@ -55,7 +60,6 @@ SeanetInterface pour voir aussi données de LIDAR dans Seanet...
 voilier : pouvoir laisser la possibilité de contrôler la voile manuellement pendant un suivi de ligne (e.g. pour tester la stabilisation en roulis)...
 threshold servos : quand on est proche des valeurs neutres, min, max, mettre ces valeurs?
 params et commandes pour régler individuellement période des thread des devices
-Logique de def du repere local w.r.t. vaimos...->param pour changer repère dès qu'on capte gps, avant de lancer les threads observer, etc.?
 option pour définir sockets des serveurs comme non blocantes?
 param pour lancer un waypointslist au démarrage (vérifier que tous les params de waypointslist sont déjà dans UxVCtrl.txt) et pouvoir lancer des commandes ou missions en parallèle...->nécessite peut-être un thread spécifique
 Format fichier wp mp, surveiller s'il est changé (e.g. via FTP), voir pour home, renommer quand fini, minimiser le risque qu'un crash a l'écriture d'un fichier pose problème
@@ -353,6 +357,7 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+manque StopChrono() dans handlemavlinkinterface() et peut-être ailleurs...
 VC_Linux internal bug : remote current build directory does not correspond to the directory containing .vcxproj file, see https://github.com/Microsoft/VSLinux/issues/325
 UxVCtrl_MacOS a été compilé avec un vieux mavlink...
 sometimes the program stays blocked forever in the interfaces in select() in waitforclifortcpsrv(), lots of mem leaked if MAVLinkInterface was connected...
@@ -729,6 +734,7 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+Logique de def du repere local w.r.t. vaimos...->param pour changer repère dès qu'on capte gps, avant de lancer les threads observer, etc.?
 Rajouter check gouvernail en même temps que calib voile?->FirstSailCalibrationDelay to wait for rudder test to finish, or in main() add an optional sleep (ruddercalibtime) if robid==VAIMOS
 
 $PHTRO,x.xx,a,y.yy,b*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up checksum etc as standard NMEA. (25 - 29 chars variable).

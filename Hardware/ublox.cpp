@@ -179,7 +179,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				}
 				LeaveCriticalSection(&StateVariablesCS);
 
-				if (rtcmdatalen > 0) res = TransferToublox(&ublox, rtcmdata, rtcmdatalen); else res = EXIT_SUCCESS;
+				if ((rtcmdatalen > 0)&&(!ublox.bDisableRTCMTransfer)) res = TransferToublox(&ublox, rtcmdata, rtcmdatalen); else res = EXIT_SUCCESS;
 
 				if (res == EXIT_SUCCESS) 
 				{

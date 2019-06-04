@@ -276,12 +276,11 @@ inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 		}
 		if (PurgeComputerRS232Port(pRS232Port->hDev) != EXIT_SUCCESS)
 		{
-			PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
+			PRINT_DEBUG_WARNING_RS232PORT(("OpenRS232Port warning (%s) : %s"
 				"(szDevPath=%s)\n",
 				strtime_m(),
 				"PurgeComputerRS232Port failed. ",
 				szDevPath));
-			return EXIT_FAILURE;
 		}
 		break;
 	default:
@@ -389,13 +388,12 @@ inline int SetOptionsRS232Port(RS232PORT* pRS232Port, UINT BaudRate, BYTE Parity
 		}
 		if (PurgeComputerRS232Port(pRS232Port->hDev) != EXIT_SUCCESS)
 		{
-			PRINT_DEBUG_ERROR_RS232PORT(("SetOptionsRS232Port error (%s) : %s"
+			PRINT_DEBUG_WARNING_RS232PORT(("SetOptionsRS232Port warning (%s) : %s"
 				"(pRS232Port=%#x, BaudRate=%u, ParityMode=%u, bCheckParity=%u, "
 				"nbDataBits=%u, StopBitsMode=%u, timeout=%u)\n", 
 				strtime_m(), 
 				"PurgeComputerRS232Port failed. ", 
 				pRS232Port, BaudRate, (UINT)ParityMode, (UINT)bCheckParity, (UINT)nbDataBits, (UINT)StopBitsMode, timeout));
-			return EXIT_FAILURE;
 		}
 		break;
 	default:

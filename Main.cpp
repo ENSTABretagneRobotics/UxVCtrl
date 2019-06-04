@@ -200,6 +200,7 @@ int main(int argc, char* argv[])
 #ifndef DISABLE_MISSIONARG_THREAD
 	THREAD_IDENTIFIER MissionArgThreadId;
 #endif // !DISABLE_MISSIONARG_THREAD
+	CHRONO chrono_GNSS;
 
 	INIT_DEBUG;
 
@@ -333,6 +334,35 @@ int main(int argc, char* argv[])
 #endif // ENABLE_LIBMODBUS_SUPPORT
 	if (robid == LIRMIA3_ROBID) CreateDefaultThread(LIRMIA3Thread, NULL, &LIRMIA3ThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
+
+	if ((WaitForGNSSLevel > 0)&&(WaitForGNSSTimeout > 0))
+	{
+		StartChrono(&chrono_GNSS);
+		printf("Waiting for GNSS...\n");
+		while (GetGNSSlevel() < WaitForGNSSLevel)
+		{
+			if (GetTimeElapsedChronoQuick(&chrono_GNSS) > WaitForGNSSTimeout/1000.0)
+			{
+				printf("Timeout waiting for GNSS.\n");
+				break;
+			}
+			mSleep(100);
+		}
+		StopChronoQuick(&chrono_GNSS);
+	}
+	if (bSetEnvOriginFromGNSS)
+	{
+		if (bCheckGNSSOK())
+		{
+			EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(x_gps), Center(y_gps), Center(z_gps), &lat_home, &long_home, &alt_home);
+			lat_env = lat_home; long_env = long_home; alt_env = alt_home;
+		}
+		else
+		{
+			printf("Unable to set environment origin from GNSS.\n");
+		}
+	}
+
 #ifdef ENABLE_MAVLINK_SUPPORT
 	if (bMAVLinkInterface) CreateDefaultThread(MAVLinkInterfaceThread, NULL, &MAVLinkInterfaceThreadId);
 	if (bMAVLinkInterface) DetachThread(MAVLinkInterfaceThreadId); // Not easy to stop it correctly...
