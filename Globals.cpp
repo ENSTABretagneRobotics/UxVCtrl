@@ -725,6 +725,7 @@ CRITICAL_SECTION OpenCVVideoRecordCS;
 CRITICAL_SECTION RegistersCS;
 CRITICAL_SECTION strtimeCS;
 STATE state = INVALID_STATE;
+double sailangle = 0;
 double vbat1 = 0; 
 double vbat1_filtered = 0; 
 double vbat1_threshold = 0; 

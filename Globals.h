@@ -957,6 +957,7 @@ extern CRITICAL_SECTION OpenCVVideoRecordCS;
 extern CRITICAL_SECTION RegistersCS;
 extern CRITICAL_SECTION strtimeCS;
 extern STATE state;
+extern double sailangle;
 extern double vbat1;
 extern double vbat1_filtered;
 extern double vbat1_threshold;

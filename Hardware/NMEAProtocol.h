@@ -52,7 +52,8 @@
 #define MIN_NB_BYTES_END_NMEA 1
 
 // Maximum number of characters of a NMEA sentence (including the line terminators CR and LF).
-#define MAX_NB_BYTES_SENTENCE_NMEA 82
+// Should be increased to at least 92 and probably more
+//#define MAX_NB_BYTES_SENTENCE_NMEA 82
 #define MIN_NB_BYTES_SENTENCE_NMEA (1+MIN_NB_BYTES_ADDRESS_NMEA+MIN_NB_BYTES_END_NMEA)
 #pragma endregion
 
@@ -648,7 +649,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		{
 			pNMEAData->hour = (int)pNMEAData->utc/10000;
 			pNMEAData->minute = (int)pNMEAData->utc/100-pNMEAData->hour*100;
-			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000)-pNMEAData->minute*100;
+			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000.0)-pNMEAData->minute*100.0;
 		}
 
 		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
@@ -707,7 +708,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		{
 			pNMEAData->hour = (int)pNMEAData->utc/10000;
 			pNMEAData->minute = (int)pNMEAData->utc/100-pNMEAData->hour*100;
-			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000)-pNMEAData->minute*100;
+			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000.0)-pNMEAData->minute*100.0;
 		}
 
 		if ((strlen(pNMEAData->szlatdeg) > 0)&&(strlen(pNMEAData->szlongdeg) > 0))
@@ -768,7 +769,7 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		{
 			pNMEAData->hour = (int)pNMEAData->utc/10000;
 			pNMEAData->minute = (int)pNMEAData->utc/100-pNMEAData->hour*100;
-			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000)-pNMEAData->minute*100;
+			pNMEAData->second = (pNMEAData->utc-pNMEAData->hour*10000.0)-pNMEAData->minute*100.0;
 		}
 	}
 

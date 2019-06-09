@@ -1,19 +1,32 @@
-env sous MP
+utc, date, sog, cog might be incorrect if the rmc or vtg are incomplete...?
+before setting x,y_gps and maybe other variables (e.g. sog, cog), should check if we are more accurate than the other potential providers...
+For all GNSSqualityublox[], if (GNSSquality[i] > GNSSqualityublox[deviceid]) check if i has already set some variables...
+SOG, COG GPS vs DVL? Ideally, should use GPS when its GNSSquality > MED, otherwise DVL...
+psi_gps maybe should be renamed cog, also misleading difference between heading from a dual antenna GPS and COG...
+GPS_min_sat_signal not used?
+
+Script powershell d'update ou pour commandes : appelé par schtasks pour updates ou par script 4G/Iridium UxVCtrl, doit vérifier si fichier avec nom du PC et vérifier l'ID de l'update pour pas la faire plusieurs fois
+
+If read timeout retry until sentence timeout
+Dans RS232Port.h dans le cas TCP, on devrait appeler setsocktimeout lors du setrs232options()...?
+RS232Port.h : add non-blocking support...
+
+add GPHDT to NMEAInterface
 ublox : add param UBX-CFG-RATE measurement period to set to e.g. to 200-500 ms, check bandwidth...
-purgeserial marche pas avec nouveau driver ublox et autres problèmes...
+Nouveau driver ublox : faut sans doute attendre avant de faire read()...?->problème seulement sur P70?
+
 Simulate cog and sog like UxVSim
+
+Opencvgui : Rajouter horizon artificielle sur bord de boussole
 
 Serveraliveinterval... test opencpn, ssc32, via telnet...
 
 Replace mSleep() by uSleep() in remotecam, for short delays...
 
 replace Invalid configuration file by Invalid parameter : XXX...
-améliorer simu de GPS bruité...
 
 quitte pas toujours sans taper ENTER si ESC sur opencvgui?->en debug OK, pas en release?->Terminate commands thread in the end after some time in release, or change some timings...?
 https://stackoverflow.com/questions/21123499/how-to-break-out-of-fgets
-
-check uSleep()
 
 SBG (check, continue interface...)->SDK TCP blocking or non-blocking does not work, but works with ellipseMinimal...->problably because never returns SBG_NOT_READY...->disconnects not handled correctly in Serial and TCP (sbgEComHandleOneLog() returns SBG_NOT_READY, as usual...)...
 update rate SBG?->compare with and without SDK...
@@ -39,15 +52,12 @@ Check set_attitude_target guided mode absolute heading...
 Rajouter params code sonar et csv2v4log pour gérer sbp, regarder fichiers de données et capture de la com...
 commande pour calibration de voile VAIMOS, afficher bSailCalibrated dans GUI?
 si pas bCalibrateSail, le couple n'est pas réglé...
-reglages neutre et max ssc and im483
-VPower?
 
 $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
 
 angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, surge, sway, peut-être le récupérer quand même, rajouter colonnes correspondantes dans log SBG, $PHTRH...
 
 Commande ais qui met dans reg direction et vitesse du plus proche bateau pour pouvoir lancer procedure à un cap relatif pour éviter
-Faire simu de voilier dans la rade avec données d'un vrai ais et faire tourner longtemps et vérifier qu'à aucun moment il y a collision
 
 Params pour pouvoir changer config sbg
 Mieux retransmettre certaines info GPS dans NMEAInterface, true north vs mag north, latence...
@@ -95,8 +105,6 @@ Parfois thrust et goto de mission.txt pas pris pour drone?->mission planner qui 
 
 Robid stabilized copter simulator, ou option pour choisir si on simule tout ou 2.5D
 Inject rtk via uxvctrl
-
-Waitkey and namedWindow in main thread, focus decides for which window the key is?
 
 gestion u_obs, ul_obs...?
 
@@ -573,6 +581,7 @@ pas de setmissionaction init et end : peut-être que j'ai fait un copier coller s
 comment attendre la détection de ball OU un message acoustique dans les scripts?
 mission par sms : option /s check missions from sms.txt or sms folder...
 Pouvoir programmer avec les touches de la télécommande
+Infinite timeout if < 0 wplist, linefollowing, etc.?
 command watchdog t bExit qui interrompt la mission au bout d'un certain temps et en option quitte le programme (si le programme a été lancé dans un script batch, il peut alors être ensuite lancé avec une autre mission...)
 Touche pause qui relance la ligne courante? Ou qui arrête le robot à des cancellation points (quand bWaiting) sans modifier les variables liées aux missions (arrêt bas niveau un peu comme quand on passe en manuel avec multiplexer), il faudrait pour ça que tous les actionneurs utilisent u1,u2, etc. au lieu de u, uw, etc. pour pouvoir agir directement sur u1, u2... Pause ne sauvegarderait/restaurerait que les variables liées aux régulations bas niveau, juste pour que ça marche pour le suivi de ligne et waypoints, utiliser touche p pour faire pause au lieu d'interrompre mission...?->bForceOverrideInputs...
 resume file indicating at which line the mission should restart in case the program stopped (as well as an initialization script, or we should design the script so that all the needed initialization steps are correctly specified on the resume line)
@@ -698,6 +707,13 @@ rajouter device qui lit un fichier csv, qui attend le bon temps et avant de lire
 ce serait bien aussi de pouvoir charger un fichier qui donne des données en fonction du temps et de la position...
 
 simu
+Créer git UxVSim et voir si simu VAIMOS marche avec SOG...
+P:\Robotics data\Competitions or robots specific data\ASVs\2011-2012\VAIMOS
+P:\Robotics data\Competitions or robots specific data\ASVs\Latest\Sailboat 2\Share\UxVSim
+BOATBOT sim
+Faire simu de voilier dans la rade avec données d'un vrai ais et faire tourner longtemps et vérifier qu'à aucun moment il y a collision
+améliorer simu de GPS bruité...
+Simu vaimos : valeurs de roulis un peu extrêmes...
 Simu voilier : mettre equations motorboat et voilier
 add alphafvry, alphaomegax, m, Jx, Jy, Jz, l, L, h parameters
 UxVSim : faire motorboat qui a du vy, mettre des options bDisableDevice, rajouter biais des actionneurs en params

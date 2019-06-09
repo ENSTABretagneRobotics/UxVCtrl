@@ -279,15 +279,18 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 								break;
 							}
 						}
-
-						// Should use GSV data and only provide the number of satellites that are above GPS_min_sat_signal...
-
-						// Position accuracy depending on the GNSS quality...
-						ComputeGNSSPosition(nmeadata.Latitude, nmeadata.Longitude, nmeadata.Altitude, GNSSqualityublox[deviceid], nmeadata.nbsat, nmeadata.hdop);
 						
 						if ((GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX)||
 							(GNSSqualityublox[deviceid] == RTK_FIXED)||(GNSSqualityublox[deviceid] == RTK_FLOAT))
 						{
+							if ((ublox.bEnable_NMEA_GGA)||(ublox.bEnable_NMEA_RMC)||(ublox.bEnable_NMEA_GLL))
+							{
+
+								// Should use GSV data and only provide the number of satellites that are above GPS_min_sat_signal...?
+
+								// Position accuracy depending on the GNSS quality...
+								ComputeGNSSPosition(nmeadata.Latitude, nmeadata.Longitude, nmeadata.Altitude, GNSSqualityublox[deviceid], nmeadata.nbsat, nmeadata.hdop);
+							}
 							if (ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_VTG)
 							{
 								sog = nmeadata.SOG;
@@ -318,11 +321,12 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 								utc = tt*1000.0+nmeadata.second*1000.0;
 							}
 						}
-						
+
 						if (ublox.bEnable_NMEA_HDG||ublox.bEnable_NMEA_HDT)
 						{
 							// For VAIMOS, it is the sail angle...
 							if (robid != VAIMOS_ROBID) psi_ahrs = fmod_2PI(M_PI/2.0-nmeadata.Heading-angle_env)+interval(-psi_ahrs_acc, psi_ahrs_acc);
+							else sailangle = nmeadata.Heading;
 						}
 						
 						if (ublox.bEnable_NMEA_ROT)
@@ -500,25 +504,28 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						{
 							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_POSLLH)
 							{
+
+								// Should only provide the number of satellites that are above GPS_min_sat_signal...?
+
 								// Position accuracy depending on the GNSS quality...
 								ComputeGNSSPosition(ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, GNSSqualityublox[deviceid], ubxdata.nav_pvt_pl.numSV, 0);
-								if ((ublox.bEnable_UBX_NAV_PVT)&&(Width(x_gps)/2 < ubxdata.nav_pvt_pl.hAcc*1000))
+								if ((ublox.bEnable_UBX_NAV_PVT)&&(Width(x_gps)/2 < ubxdata.nav_pvt_pl.hAcc*1000.0))
 								{
 									// We were too optimistic...
 									double x = 0, y = 0, z = 0;
 									GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, &x, &y, &z);
-									x_gps = interval(x-ubxdata.nav_pvt_pl.hAcc*1000, x+ubxdata.nav_pvt_pl.hAcc*1000);
-									y_gps = interval(y-ubxdata.nav_pvt_pl.hAcc*1000, y+ubxdata.nav_pvt_pl.hAcc*1000);
-									z_gps = interval(z-ubxdata.nav_pvt_pl.vAcc*1000, z+ubxdata.nav_pvt_pl.vAcc*1000);
+									x_gps = interval(x-ubxdata.nav_pvt_pl.hAcc*1000.0, x+ubxdata.nav_pvt_pl.hAcc*1000.0);
+									y_gps = interval(y-ubxdata.nav_pvt_pl.hAcc*1000.0, y+ubxdata.nav_pvt_pl.hAcc*1000.0);
+									z_gps = interval(z-ubxdata.nav_pvt_pl.vAcc*1000.0, z+ubxdata.nav_pvt_pl.vAcc*1000.0);
 								}
-								else if ((ublox.bEnable_UBX_NAV_POSLLH)&&(Width(x_gps)/2 < ubxdata.nav_posllh_pl.hAcc*1000))
+								else if ((ublox.bEnable_UBX_NAV_POSLLH)&&(Width(x_gps)/2 < ubxdata.nav_posllh_pl.hAcc*1000.0))
 								{
 									// We were too optimistic...
 									double x = 0, y = 0, z = 0;
 									GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, &x, &y, &z);
-									x_gps = interval(x-ubxdata.nav_posllh_pl.hAcc*1000, x+ubxdata.nav_posllh_pl.hAcc*1000);
-									y_gps = interval(y-ubxdata.nav_posllh_pl.hAcc*1000, y+ubxdata.nav_posllh_pl.hAcc*1000);
-									z_gps = interval(z-ubxdata.nav_posllh_pl.vAcc*1000, z+ubxdata.nav_posllh_pl.vAcc*1000);
+									x_gps = interval(x-ubxdata.nav_posllh_pl.hAcc*1000.0, x+ubxdata.nav_posllh_pl.hAcc*1000.0);
+									y_gps = interval(y-ubxdata.nav_posllh_pl.hAcc*1000.0, y+ubxdata.nav_posllh_pl.hAcc*1000.0);
+									z_gps = interval(z-ubxdata.nav_posllh_pl.vAcc*1000.0, z+ubxdata.nav_posllh_pl.vAcc*1000.0);
 								}
 							}
 							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)

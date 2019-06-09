@@ -893,6 +893,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					(int)fmod_360_rad2deg(-Center(psihat)-angle_env), (int)fmod_360_rad2deg(-Center(thetahat)), (int)fmod_360_rad2deg(Center(phihat)));
 				printf("Wind direction w.r.t. North is %.1f deg (filtered %.1f deg), "
 					"wind speed is %.1f m/s or %.1f kn (filtered %.1f m/s or %.1f kn), "
+					"sail angle w.r.t. North is %.1f deg, "
 					"heading w.r.t. North is %.1f deg.\n", 
 					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
@@ -900,9 +901,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
 					(robid == SAILBOAT_ROBID)? vawind: vtwind, (robid == SAILBOAT_ROBID)? vawind*1.94: vtwind*1.94, 
 					Center(vtwindhat), Center(vtwindhat)*1.94, 
+					sailangle*180.0/M_PI, 
 					(fmod_2PI(-angle_env-Center(psihat)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
 				printf("Position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", Center(xhat), Center(yhat), latitude, longitude);
-				printf("Waypoint position (x,y) is (%.2f,%.2f), GPS position (%.7f,%.7f).\n", wxb, wyb, wlatb, wlongb);
+				printf("Waypoint is %d, position (x,y) (%.2f,%.2f), GPS position (%.7f,%.7f).\n", CurWP, wxb, wyb, wlatb, wlongb);
 				printf("Distance to the waypoint is %.2f m, distance to the line is %.2f m.\n", norm_bm, e);
 				switch (state)
 				{
@@ -962,8 +964,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				"%.3f;%d;%d;\n",
 				counter, t, lat_env, long_env, fmod_2PI(Center(phihat)), fmod_2PI(Center(thetahat)), fmod_2PI(Center(psihat)+angle_env-M_PI/2.0),
 				// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
-				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), 0.0, Center(psihat), Center(psitwindhat),
-				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, 0,
+				(robid == SAILBOAT_ROBID)? fmod_2PI(-psiawind+M_PI+M_PI)+M_PI: fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI, (robid == SAILBOAT_ROBID)? vawind: vtwind, fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI, Center(vtwindhat), sailangle, Center(psihat), Center(psitwindhat),
+				latitude, longitude, Center(xhat), Center(yhat), wxa, wya, wxb, wyb, CurWP,
 				wlatb, wlongb, e, norm_ma, norm_bm, (int)state,
 				(uw_f >= 0)? (ruddermidangle+uw_f*(rudderminangle-ruddermidangle)): (ruddermidangle+uw_f*(ruddermidangle-ruddermaxangle)), u_f*q1, wpsi_obs, vbat1, vbat2, vswitch, 
 				wpsi, bHObstacleToAvoid, bVObstacleToAvoid);

@@ -533,7 +533,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$PRDID,%.2f,%.2f,%.2f", pitchhat, rollhat, headinghat);
+		sprintf(tmpbuf, "$PRDID,%+07.2f,%+07.2f,%06.2f", pitchhat, rollhat, headinghat);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
