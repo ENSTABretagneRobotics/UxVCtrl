@@ -185,6 +185,34 @@ inline int SetMaxAngleIM483I(IM483I* pIM483I, double angle)
 	return EXIT_SUCCESS;
 }
 
+inline int SetMotorRelativeIM483I(IM483I* pIM483I, int val)
+{
+	char sendbuf[MAX_NB_BYTES_IM483I];
+	int sendbuflen = 0;
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "R%d\r", val);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteAllRS232Port(&pIM483I->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pIM483I->bSaveRawData)&&(pIM483I->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pIM483I->pfSaveFile);
+		fflush(pIM483I->pfSaveFile);
+	}
+
+	mSleep(20);
+
+	// Update last known value.
+	pIM483I->LastRval = val;
+
+	return EXIT_SUCCESS;
+}
+
 inline int CalibrateMotorIM483I(IM483I* pIM483I)
 {
 	if (SetMotorTorqueIM483I(pIM483I, pIM483I->CalibrationTorque) != EXIT_SUCCESS)

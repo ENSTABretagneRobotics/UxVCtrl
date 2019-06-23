@@ -107,7 +107,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			psihat = (sog >= GPS_SOG_for_valid_COG)? psi_dvl: psi_ahrs; // Temp...
 			break;
 		case 1:
-			psihat = (sog >= GPS_SOG_for_valid_COG)? psi_gps: psi_ahrs;
+			psihat = (sog >= GPS_SOG_for_valid_COG)? cog_gps: psi_ahrs;
 			break;
 		case 0:
 		default:
@@ -374,7 +374,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 		headinghat = fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
-		coghat = fmod_360_pos_rad2deg(-angle_env-Center(psi_gps)+M_PI/2.0);
+		coghat = fmod_360_pos_rad2deg(-angle_env-Center(cog_gps)+M_PI/2.0);
 
 		// Should be different if V and I are measured...
 

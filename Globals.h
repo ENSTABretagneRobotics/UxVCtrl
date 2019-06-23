@@ -277,7 +277,7 @@ extern double wpsalt[MAX_NB_WP];
 extern int nbWPs, CurWP;
 
 // Measurements.
-extern interval x_gps, y_gps, z_gps, psi_gps;
+extern interval x_gps, y_gps, z_gps, cog_gps;
 extern interval phi_ahrs, theta_ahrs, psi_ahrs, omegax_ahrs, omegay_ahrs, omegaz_ahrs, accrx_ahrs, accry_ahrs, accrz_ahrs;
 extern interval psi_dvl, vrx_dvl, vry_dvl, vrz_dvl;
 extern interval vrx_of, vry_of, vrz_of;

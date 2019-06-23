@@ -1,3 +1,8 @@
+322
+Corrected bug in roll wind correction.
+Added regadd, regmul, regpow commands.
+Renamed phi as phil to avoid ambiguity with roll in Controller.cpp.
+
 321
 Improved compatibility with VNav.
 Updated ublox.

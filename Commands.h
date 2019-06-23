@@ -3872,6 +3872,45 @@ inline int Commands(char* line)
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
+	else if (sscanf(line, "regadd %d %d", &ival1, &ival2) == 2)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival1] = registers[ival1]+registers[ival2];
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regmul %d %d", &ival1, &ival2) == 2)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival1] = registers[ival1]*registers[ival2];
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regpow %d %d", &ival1, &ival2) == 2)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival1] = pow(registers[ival1],registers[ival2]);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
 	else if (sscanf(line, "regeq %d %d %d %d", &ival1, &ival2, &ival3, &ival4) == 4)
 	{
 		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))

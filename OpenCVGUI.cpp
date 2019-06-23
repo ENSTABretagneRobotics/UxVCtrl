@@ -1682,7 +1682,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				sprintf(szText, "SOG:%.2f", sog);
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
-				sprintf(szText, "COG:%.2f", fmod_360_pos_rad2deg(-angle_env-Center(psi_gps)+M_PI/2.0));
+				sprintf(szText, "COG:%.2f", fmod_360_pos_rad2deg(-angle_env-Center(cog_gps)+M_PI/2.0));
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, colortext);
 			}

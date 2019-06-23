@@ -346,7 +346,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			break;
 		}
 		nmeadata.sog = sog*1.94;
-		nmeadata.cog = fmod_360_pos_rad2deg(-angle_env-Center(psi_gps)+M_PI/2.0);
+		nmeadata.cog = fmod_360_pos_rad2deg(-angle_env-Center(cog_gps)+M_PI/2.0);
 	}
 	else
 	{

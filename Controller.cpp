@@ -188,7 +188,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	CHRONO chrono;
 	double dt = 0, t = 0, t0 = 0;
 	int counter = 0;
-	double norm_ba = 0, norm_ma = 0, norm_bm = 0, sinalpha = 0, phi = 0, e = 0; // For line following control.
+	double norm_ba = 0, norm_ma = 0, norm_bm = 0, sinalpha = 0, phil = 0, e = 0; // For line following control.
 	double wxa_prev = 0, wya_prev = 0, wxb_prev = 0, wyb_prev = 0, wlata = 0, wlonga = 0, wlatb = 0, wlongb = 0, walt = 0; // For line following control.
 	double u_obs = 0, uw_obs = 0, uv_obs = 0, ul_obs = 0, wpsi_obs = 0, wagl_obs = 0, wz_obs = 0;// , e_obs = 0; // For obstacle avoidance.
 	double delta_d = 0; // For distance control.
@@ -241,7 +241,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			"winddir (in rad);windspeed (in m/s);filteredwinddir (in rad);filteredwindspeed (in m/s);sailangle (in rad);psi (in rad);psiw (in rad);"
 			"latitude (in decimal degrees);longitude (in decimal degrees);x (in m);y (in m);ax (in m);ay (in m);bx (in m);by (in m);CurWP;"
 			"wpslat[CurWP] (in decimal degrees);wpslong[CurWP] (in decimal degrees);e (in m);norm_ma (in m);norm_bm (in m);state;"
-			"deltag (in rad);deltavmax (in rad);phi+gammabar (in rad);vbat1 (in V);vbat2 (in V);vswitch (in V);"
+			"deltag (in rad);deltavmax (in rad);phil+gammabar (in rad);vbat1 (in V);vbat2 (in V);vswitch (in V);"
 			"wpsi (w.o. obs);bHObstacleToAvoid;bVObstacleToAvoid;\n"
 		);
 		fflush(lognavfile);
@@ -285,7 +285,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxa, wya, wz, &wlata, &wlonga, &walt); // GPS coordinates of a.
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, wxb, wyb, wz, &wlatb, &wlongb, &walt); // GPS coordinates of b.
 				norm_ba = sqrt(pow(wxb-wxa, 2)+pow(wyb-wya, 2)); // Length of the line (norm of b-a).
-				phi = atan2(wyb-wya, wxb-wxa); // Angle of the line.
+				phil = atan2(wyb-wya, wxb-wxa); // Angle of the line.
 #pragma region Sailboat supervisor
 				bForceCheckStrategy = 1;
 				bForceSailUpdate = 1;
@@ -304,7 +304,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 			xte = e; // XTE as in GPS...
 
-			wpsi = LineFollowing(phi, e, gamma_infinite, radius);
+			wpsi = LineFollowing(phil, e, gamma_infinite, radius);
 
 			wxa_prev = wxa; wya_prev = wya; wxb_prev = wxb; wyb_prev = wyb; 
 		}
@@ -372,7 +372,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				{
 					wxa = ???; wya = ???; 
 					wxb = wx; wyb = wy;
-					phi = 
+					phil = 
 					e = 
 					//bFakeLineFollowingControl = TRUE;
 					// Validation condition???
@@ -381,7 +381,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				{
 					wxa = ???; wya = ???; 
 					wxb = ???; wyb = ???;
-					phi = 
+					phil = 
 					e = 
 					//bFakeLineFollowingControl = TRUE;
 				}
@@ -457,7 +457,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					prevstate = state;
 #ifndef ALT_SAILBOAT_CONTROLLER
 					if ((cos(psiw-theta_star)+cos(zeta) < 0)||
-						((cos(psiw-phi)+cos(zeta) < 0)&&(fabs(e) < radius)))
+						((cos(psiw-phil)+cos(zeta) < 0)&&(fabs(e) < radius)))
 #else
 					if (cos(psiw-psi)+cos(zeta) < 0)
 #endif // !ALT_SAILBOAT_CONTROLLER

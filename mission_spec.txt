@@ -402,6 +402,12 @@
 %
 %regprint regid (regid : int [0,32[)
 %
+%regadd regid1 regid2 (regid1 : int [0,32[, regid2 : int [0,32[, set regid1 to regid1+regid2)
+%
+%regmul regid1 regid2 (regid1 : int [0,32[, regid2 : int [0,32[, set regid1 to regid1*regid2)
+%
+%regpow regid1 regid2 (regid1 : int [0,32[, regid2 : int [0,32[, set regid1 to regid1^regid2)
+%
 %regeq regid1 regid2 procid_true procid_false (regid1 : int [0,32[, regid2 : int [0,32[, procid_true : int [-1,256[ execute procid_true if regid1 == regid2, does nothing if -1, procid_false : int [-1,256[ execute procid_false if regid1 != regid2, does nothing if -1)
 %
 %reglt regid1 regid2 procid_true procid_false (regid1 : int [0,32[, regid2 : int [0,32[, procid_true : int [-1,256[ execute procid_true if regid1 < regid2, does nothing if -1, procid_false : int [-1,256[ execute procid_false if regid1 >= regid2, does nothing if -1)

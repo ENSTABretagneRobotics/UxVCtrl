@@ -161,7 +161,7 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 				if ((nmeadevice.bEnableGPRMC&&(nmeadata.status == 'A'))||nmeadevice.bEnableGPVTG)
 				{
 					sog = nmeadata.SOG;
-					psi_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
+					cog_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 				}
 
 				if (nmeadevice.bEnableGPRMC&&(nmeadata.status == 'A'))
@@ -188,7 +188,13 @@ THREAD_PROC_RETURN_VALUE NMEADeviceThread(void* pParam)
 					if (bDisableRollWindCorrectionSailboat)
 						psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
 					else
-						psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(psi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
+					{
+						psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(phi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
+						if ((vawind > 0)&&(sog >= GPS_SOG_for_valid_COG))
+						{
+							psitwind = fmod_2PI(atan2(vawind*sin(psitwind)+sog*sin(Center(cog_gps)),vawind*cos(psitwind))+sog*cos(Center(cog_gps))); // With speed correction...
+						}
+					}
 				}
 
 				if (nmeadevice.bEnableWIMWD||nmeadevice.bEnableWIMDA)

@@ -294,7 +294,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_VTG)
 							{
 								sog = nmeadata.SOG;
-								psi_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
+								cog_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 							}
 							if ((!ublox.bEnable_NMEA_RMC)&&(ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_GLL))
 							{
@@ -343,7 +343,13 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (bDisableRollWindCorrectionSailboat)
 								psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
 							else
-								psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(psi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
+							{
+								psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(phi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
+								if ((vawind > 0)&&(sog >= GPS_SOG_for_valid_COG))
+								{
+									psitwind = fmod_2PI(atan2(vawind*sin(psitwind)+sog*sin(Center(cog_gps)),vawind*cos(psitwind))+sog*cos(Center(cog_gps))); // With speed correction...
+								}
+							}
 						}
 
 						if (ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA)
@@ -381,7 +387,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (nmeadata.vstatus_earth == 'A')
 							{
 								sog = nmeadata.SOG;
-								psi_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
+								cog_gps = fmod_2PI(M_PI/2.0-nmeadata.COG-angle_env)+interval(-M_PI,M_PI);
 							}
 						}
 
@@ -531,7 +537,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_VELNED)
 							{
 								sog = ubxdata.SOG;
-								psi_gps = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env)+interval(-M_PI,M_PI);
+								cog_gps = fmod_2PI(M_PI/2.0-ubxdata.COG-angle_env)+interval(-M_PI,M_PI);
 							}
 							if (ublox.bEnable_UBX_NAV_PVT)
 							{
