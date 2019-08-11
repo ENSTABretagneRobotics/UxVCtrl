@@ -9,7 +9,7 @@ test1.wmv
 240
 % captureperiod (in ms)
 100
-% timeout for remote mode (in ms)
+% timeout for remote mode, otherwise estimation of delay due to computations (in ms)
 5
 % bForceSoftwareResize
 1

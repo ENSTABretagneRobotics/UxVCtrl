@@ -201,12 +201,12 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 			}
 
 		if (bExit) break;
-		}
+	}
 
 	free(databuf);
 
 	return EXIT_SUCCESS;
-	}
+}
 
 THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 {

@@ -680,12 +680,8 @@ inline int recvdecode(VIDEO* pVideo)
 	return EXIT_SUCCESS;
 }
 
-inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
+inline IplImage* GetRawImgPtrVideo(VIDEO* pVideo)
 {	
-	double m[6]; // For rotation...
-	CvMat M = cvMat(2, 3, CV_64F, m); // For rotation...
-	double hcenter = 0, vcenter = 0, hshift = 0, vshift = 0;
-
 	switch (pVideo->DevType)
 	{
 	case REMOTE_TYPE_VIDEO:
@@ -722,7 +718,7 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 			{
 			case SOCKET_ERROR:
 				printf("Error reading an image from a video.\n");
-				return EXIT_FAILURE;
+				return NULL;
 			case 0:
 				// The timeout on select() occured.
 				break;
@@ -730,54 +726,52 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 				if (recvdecode(pVideo) != EXIT_SUCCESS)
 				{
 					printf("Error reading an image from a video.\n");
-					return EXIT_FAILURE;
+					return NULL;
 				}
 				break;
 			}
 			break;
 		}
 	case LOCAL_TYPE_VIDEO:
-		mSleep(pVideo->captureperiod);
-
+		uSleep(1000*max(0, pVideo->captureperiod-pVideo->timeout)); // Assume pVideo->timeout ms of delay due to computations, etc.
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		pVideo->frame = cvQueryFrame(pVideo->pCapture);
 		if (!pVideo->frame)
 		{
 			printf("Error reading an image from a video.\n");
-			return EXIT_FAILURE;
+			return NULL;
 		}
 #else
 		if (!pVideo->pCapture->read(*pVideo->pframemat))
 		{
 			printf("Error reading an image from a video.\n");
-			return EXIT_FAILURE;
+			return NULL;
 		}
 		pVideo->frameipl = (IplImage)*pVideo->pframemat;
 		pVideo->frame = &pVideo->frameipl;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		break;
 	case FILE_TYPE_VIDEO:
+		uSleep(1000*max(0, pVideo->captureperiod-pVideo->timeout)); // Assume pVideo->timeout ms of delay due to computations, etc.
 #ifdef USE_FFMPEG_VIDEO
-		mSleep(pVideo->captureperiod);
 		if (ffmpegread(pVideo) != EXIT_SUCCESS)
 		{
 			printf("Error reading an image from a video.\n");
-			return EXIT_FAILURE;
+			return NULL;
 		}
 #else
-		mSleep(pVideo->captureperiod);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		pVideo->frame = cvQueryFrame(pVideo->pCapture);
 		if (!pVideo->frame)
 		{
 			printf("Error reading an image from a video.\n");
-			return EXIT_FAILURE;
+			return NULL;
 		}
 #else
 		if (!pVideo->pCapture->read(*pVideo->pframemat))
 		{
 			printf("Error reading an image from a video.\n");
-			return EXIT_FAILURE;
+			return NULL;
 		}
 		pVideo->frameipl = (IplImage)*pVideo->pframemat;
 		pVideo->frame = &pVideo->frameipl;
@@ -787,8 +781,21 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 	default:
 		mSleep(pVideo->captureperiod);
 		printf("Video : Invalid device type.\n");
-		return EXIT_FAILURE;
+		return NULL;
 	}
+
+	return pVideo->frame;
+}
+
+inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
+{	
+	double m[6]; // For rotation...
+	CvMat M = cvMat(2, 3, CV_64F, m); // For rotation...
+	double hcenter = 0, vcenter = 0, hshift = 0, vshift = 0;
+
+	if (!GetRawImgPtrVideo(pVideo)) return EXIT_FAILURE;
+
+	// At this point pVideo->frame should be updated...
 
 	if (pVideo->bForceSoftwareResize) cvResize(pVideo->frame, pVideo->resizedframe, CV_INTER_LINEAR);
 	else pVideo->resizedframe = pVideo->frame;
@@ -1045,6 +1052,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			if (pVideo->captureperiod) cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
 			//if ((!pVideo->bForceSoftwareResize)&&
@@ -1098,9 +1106,11 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 #if (CV_MAJOR_VERSION < 3)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #else
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
@@ -1169,6 +1179,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			if (pVideo->captureperiod) cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
 			//if ((!pVideo->bForceSoftwareResize)&&
@@ -1222,9 +1233,11 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 #if (CV_MAJOR_VERSION < 3)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #else
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
+			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...

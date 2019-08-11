@@ -266,82 +266,76 @@ inline int SetCurrentWaypointEx(char* szFilePath, int CurWP)
 	return EXIT_SUCCESS;
 }
 
+inline int GetCurrentLabelEx(char* szFilePath, int* pCurLbl)
+{
+
+	// Should use an interprocess semaphore...
+
+	FILE* file = NULL;
+
+	*pCurLbl = 0;
+
+	file = fopen(szFilePath, "r");
+	if (file == NULL)
+	{
+		printf("Current label file not found.\n");
+		return EXIT_FAILURE;
+	}
+	if (fscanf(file, "%d", pCurLbl) != 1) 
+	{
+		// Wait and retry in case the file was being modified.
+		mSleep(75);
+		rewind(file);
+		if (fscanf(file, "%d", pCurLbl) != 1) 
+		{
+			printf("Error reading current label file.\n");
+			*pCurLbl = 0;
+			fclose(file);
+			return EXIT_FAILURE;
+		}
+	}
+	if (fclose(file) != EXIT_SUCCESS) 
+	{
+		printf("Error closing current label file.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+inline int SetCurrentLabelEx(char* szFilePath, int CurLbl)
+{
+
+	// Should use an interprocess semaphore...
+
+	FILE* file = NULL;
+
+	file = fopen(szFilePath, "w");
+	if (file == NULL)
+	{
+		printf("Unable to create current label file.\n");
+		return EXIT_FAILURE;
+	}
+	if (fprintf(file, "%d", CurLbl) <= 0)
+	{
+		printf("Error writing current label file.\n");
+		fclose(file);
+		return EXIT_FAILURE;
+	}
+	if (fclose(file) != EXIT_SUCCESS) 
+	{
+		printf("Error closing current label file.\n");
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
 #pragma warning(default : 4459) 
 #endif // _MSC_VER
 #pragma endregion
-inline void CallMission(char* str)
-{
-	EnterCriticalSection(&MissionFilesCS);
-	if (!bMissionRunning)
-	{
-		memset(labels, 0, sizeof(labels));
-		memset(procdefineaddrs, 0, sizeof(procdefineaddrs));
-		memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
-		memset(procstackids, 0, sizeof(procstackids));
-		procstack = 0;
-		missionfile = fopen(str, "r");
-		if (missionfile == NULL)
-		{
-			printf("Mission file not found.\n");
-		}
-		else
-		{
-			EnterCriticalSection(&strtimeCS);
-			sprintf(logmissionfilename, LOG_FOLDER"logmission_%.64s.csv", strtimeex_fns());
-			LeaveCriticalSection(&strtimeCS);
-			logmissionfile = fopen(logmissionfilename, "w");
-			if (logmissionfile == NULL)
-			{
-				printf("Unable to create log file.\n");
-			}
-			else
-			{
-				fprintf(logmissionfile, 
-					"%% Time (in s); Lat (in deg); Long (in deg); Depth (in m); Action;\n"
-					); 
-				fflush(logmissionfile);
-			}
-			StartChrono(&chrono_mission);
-			printf("Mission started.\n");
-			bMissionRunning = TRUE;
-		}
-	}
-	else
-	{
-		printf("A mission is already running.\n");
-	}
-	LeaveCriticalSection(&MissionFilesCS);
-}
-
-inline void AbortMission(void)
-{
-	bWaiting = FALSE;
-	EnterCriticalSection(&MissionFilesCS);
-	if (bMissionRunning)
-	{
-		bMissionRunning = FALSE;
-		printf("Mission stopped.\n");
-		StopChronoQuick(&chrono_mission);
-		if ((logmissionfile != NULL)&&(fclose(logmissionfile) != EXIT_SUCCESS))
-		{
-			printf("Error closing log file.\n");
-		}
-		if (fclose(missionfile) != EXIT_SUCCESS) 
-		{
-			printf("Error closing mission file.\n");
-		}
-		procstack = 0;
-		memset(procstackids, 0, sizeof(procstackids));
-		memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
-		memset(procdefineaddrs, 0, sizeof(procdefineaddrs));
-		memset(labels, 0, sizeof(labels));
-	}
-	LeaveCriticalSection(&MissionFilesCS);
-	DisableAllControls();
-}
-
 inline void JumpMission(int linenumber)
 {
 	EnterCriticalSection(&MissionFilesCS);
@@ -369,7 +363,7 @@ inline void JumpMission(int linenumber)
 inline void LabelMission(int id)
 {
 	EnterCriticalSection(&MissionFilesCS);
-	if (!bMissionRunning)
+	if ((!bMissionRunning)&&(!missionfile))
 	{
 		printf("Cannot use label outside a mission file.\n");
 		LeaveCriticalSection(&MissionFilesCS);
@@ -398,6 +392,7 @@ inline void LabelMission(int id)
 		}
 	}
 	LeaveCriticalSection(&MissionFilesCS);
+	SetCurrentLabelEx(LOG_FOLDER"CurLbl.txt", id);
 }
 
 inline void GotoMission(int id)
@@ -407,7 +402,7 @@ inline void GotoMission(int id)
 	char line[MAX_BUF_LEN];
 
 	EnterCriticalSection(&MissionFilesCS);
-	if (!bMissionRunning)
+	if ((!bMissionRunning)&&(!missionfile))
 	{
 		printf("Cannot use goto outside a mission file.\n");
 		LeaveCriticalSection(&MissionFilesCS);
@@ -473,6 +468,90 @@ inline void GotoMission(int id)
 		}
 	}
 	LeaveCriticalSection(&MissionFilesCS);
+}
+
+inline void CallMission(char* str)
+{
+	int CurLbl = -1;
+
+	EnterCriticalSection(&MissionFilesCS);
+	if (!bMissionRunning)
+	{
+		memset(labels, 0, sizeof(labels));
+		memset(procdefineaddrs, 0, sizeof(procdefineaddrs));
+		memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
+		memset(procstackids, 0, sizeof(procstackids));
+		procstack = 0;
+		missionfile = fopen(str, "r");
+		if (missionfile == NULL)
+		{
+			printf("Mission file not found.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&strtimeCS);
+			sprintf(logmissionfilename, LOG_FOLDER"logmission_%.64s.csv", strtimeex_fns());
+			LeaveCriticalSection(&strtimeCS);
+			logmissionfile = fopen(logmissionfilename, "w");
+			if (logmissionfile == NULL)
+			{
+				printf("Unable to create log file.\n");
+			}
+			else
+			{
+				fprintf(logmissionfile, 
+					"%% Time (in s); Lat (in deg); Long (in deg); Depth (in m); Action;\n"
+					); 
+				fflush(logmissionfile);
+			}
+			if ((bMissionPaused)||(AutoResumeMissionMode == MISSION_RESUME_NEXT)||((AutoResumeMissionMode == MISSION_RESUME_STARTUP)&&(bMissionAtStartup)))
+			{
+				if ((fopen(LOG_FOLDER"CurLbl.txt", "r"))&&(GetCurrentLabelEx(LOG_FOLDER"CurLbl.txt", &CurLbl) == EXIT_SUCCESS))
+				{
+					printf("Resuming mission...\n");
+					GotoMission(CurLbl);
+				}
+			}
+			StartChrono(&chrono_mission);
+			printf("Mission started.\n");
+			bMissionRunning = TRUE;
+		}
+	}
+	else
+	{
+		printf("A mission is already running.\n");
+	}
+	bMissionPaused = FALSE;
+	LeaveCriticalSection(&MissionFilesCS);
+}
+
+inline void AbortMission(void)
+{
+	bWaiting = FALSE;
+	EnterCriticalSection(&MissionFilesCS);
+	if (bMissionRunning)
+	{
+		bMissionRunning = FALSE;
+		printf("Mission stopped.\n");
+		StopChronoQuick(&chrono_mission);
+		if ((logmissionfile != NULL)&&(fclose(logmissionfile) != EXIT_SUCCESS))
+		{
+			printf("Error closing log file.\n");
+		}
+		if (fclose(missionfile) != EXIT_SUCCESS) 
+		{
+			printf("Error closing mission file.\n");
+		}
+		missionfile = NULL;
+		procstack = 0;
+		memset(procstackids, 0, sizeof(procstackids));
+		memset(procreturnaddrs, 0, sizeof(procreturnaddrs));
+		memset(procdefineaddrs, 0, sizeof(procdefineaddrs));
+		memset(labels, 0, sizeof(labels));
+		if (!bMissionPaused) bMissionAtStartup = FALSE; // To indicate that potential next missions were not launched at startup...
+	}
+	LeaveCriticalSection(&MissionFilesCS);
+	DisableAllControls();
 }
 
 inline void DefineProcedure(int id)
@@ -706,6 +785,7 @@ inline int Commands(char* line)
 #endif // !DISABLE_OPENCV_SUPPORT
 	char str[MAX_BUF_LEN];
 	char str2[MAX_BUF_LEN];
+	char szMissionFilePath[1024];
 	unsigned char* buf = NULL;
 	size_t bytes = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
@@ -717,7 +797,10 @@ inline int Commands(char* line)
 	double u_prev = 0;
 	CHRONO chrono, chrono_station;
 
-	memset(str, 0, sizeof(str));
+	str[0] = 0;
+	str[sizeof(str)-1] = 0;
+	szMissionFilePath[0] = 0;
+	szMissionFilePath[sizeof(szMissionFilePath)-1] = 0;
 
 	if (bEcho) printf("%.255s", line);
 
@@ -1025,36 +1108,36 @@ inline int Commands(char* line)
 			EnterCriticalSection(&WaitAreaCS[ival]);
 			memset(WaitAreaFileName[ival], 0, MAX_BUF_LEN);
 			strcpy(WaitAreaFileName[ival], str);
-		bIn_waitarea[ival] = (ival1 != 0)? TRUE: FALSE; procid_waitarea[ival] = procid;
+			bIn_waitarea[ival] = (ival1 != 0)? TRUE: FALSE; procid_waitarea[ival] = procid;
 			bWaitAreaDetected[ival] = FALSE;
 
 
-		FILE* farea = NULL;
-	char larea[MAX_BUF_LEN];
-	memset(larea, 0, sizeof(larea));
-	//nb_polygons = 0;
-	nb_points_area = 0;
-	points_area_x.clear();
-	points_area_y.clear();
+			FILE* farea = NULL;
+			char larea[MAX_BUF_LEN];
+			memset(larea, 0, sizeof(larea));
+			//nb_polygons = 0;
+			nb_points_area = 0;
+			points_area_x.clear();
+			points_area_y.clear();
 
-	farea = fopen(str, "r");
-	if (farea != NULL)
-	{
-		if (fgets3(farea, larea, sizeof(larea)) == NULL) printf("Invalid area file.\n");
-		if (sscanf(larea, "%d", &nb_points_area) != 1) printf("Invalid area file.\n");
-		for (i = 0; i < nb_points; i++)
-		{
-			if (fgets3(farea, larea, sizeof(larea)) == NULL) printf("Invalid area file.\n");
-			if (sscanf(larea, "%lf %lf", &dval1, &dval2) != 2) printf("Invalid area file.\n");
-			points_area_x.push_back(dval1);
-			points_area_y.push_back(dval2);
-		}
-		if (fclose(farea) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Area file not found.\n");
-	}
+			farea = fopen(str, "r");
+			if (farea != NULL)
+			{
+				if (fgets3(farea, larea, sizeof(larea)) == NULL) printf("Invalid area file.\n");
+				if (sscanf(larea, "%d", &nb_points_area) != 1) printf("Invalid area file.\n");
+				for (i = 0; i < nb_points; i++)
+				{
+					if (fgets3(farea, larea, sizeof(larea)) == NULL) printf("Invalid area file.\n");
+					if (sscanf(larea, "%lf %lf", &dval1, &dval2) != 2) printf("Invalid area file.\n");
+					points_area_x.push_back(dval1);
+					points_area_y.push_back(dval2);
+				}
+				if (fclose(farea) != EXIT_SUCCESS) printf("fclose() failed.\n");
+			}
+			else
+			{
+				printf("Area file not found.\n");
+			}
 
 
 			LeaveCriticalSection(&WaitAreaCS[ival]);
@@ -3745,13 +3828,31 @@ inline int Commands(char* line)
 		}
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	else if (sscanf(line, "call %[^\r\n]255s", str) == 1)
+	else if (sscanf(line, "call %[^\r\n]1023s", szMissionFilePath) == 1)
 	{
-		CallMission(str);
+		bMissionPaused = FALSE;
+		CallMission(szMissionFilePath);
 	}
 	else if (strncmp(line, "abort", strlen("abort")) == 0)
 	{
+		bMissionPaused = FALSE;
 		AbortMission();
+		unlink(LOG_FOLDER"CurLbl.txt");
+		unlink(LOG_FOLDER"CurWp.txt");
+	}
+	else if (strncmp(line, "pause", strlen("pause")) == 0)
+	{
+		if (bMissionRunning)
+		{
+			//printf("Pause mission.\n");
+			bMissionPaused = TRUE;
+			AbortMission();
+		}
+	}
+	else if (strncmp(line, "resume", strlen("resume")) == 0)
+	{
+		//printf("Resume mission.\n");
+		if (strlen(szMissionFilePath) > 0) CallMission(szMissionFilePath); else CallMission("mission.txt");
 	}
 	else if (sscanf(line, "jump %d", &ival) == 1)
 	{
@@ -3780,6 +3881,7 @@ inline int Commands(char* line)
 	else if (strncmp(line, "exit", strlen("exit")) == 0)
 	{
 		bExit = TRUE;
+		ExitCode = EXIT_SUCCESS;
 	}
 	else if (sscanf(line, "regset %d %lf", &ival, &dval) == 2)
 	{

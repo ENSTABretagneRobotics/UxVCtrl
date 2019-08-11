@@ -1211,24 +1211,12 @@ REQ_DATA_STREAM...
 					case MAV_CMD_MISSION_START:
 						mavlink_msg_command_long_decode(&msg, &command);
 						EnterCriticalSection(&StateVariablesCS);
+						bMissionPaused = FALSE; // Force to restart from beginning...
 						if (bMissionRunning)
 						{
 							AbortMission();
-
-							//if (bMissionPaused)
-							//{
-							//	bMissionPaused = FALSE;
-							//	ResumeMission();
-							//	bDispPauseSymbol = FALSE;
-							//}
-							//else
-							//{
-							//	bMissionPaused = TRUE;
-							//	PauseMission();
-							//	bDispPauseSymbol = TRUE;
-							//	StartChrono(&chrono_pausing);
-							//}
-
+							unlink(LOG_FOLDER"CurLbl.txt");
+							unlink(LOG_FOLDER"CurWp.txt");
 						}
 						else
 						{

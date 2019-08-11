@@ -20,8 +20,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	time_t tt = 0;
 	struct timeval tv;
 	struct tm* timeptr = NULL;
-	int res = 0;
 	CHRONO chrono_svin;
+	int res = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int threadperiod = 100;

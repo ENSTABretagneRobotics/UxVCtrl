@@ -213,6 +213,19 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
+	// Will launch a mission file if specified as argument.
+	if (argc == 2) bMissionAtStartup = TRUE;
+	else if (argc > 2) {
+		printf(
+			"Usage : \n"
+			"\t%s mission.txt\n"
+			"\t\tor\n"
+			"\t%s\n",
+			argv[0], argv[0]);
+		return EXIT_INVALID_PARAMETER;
+	}
+	else bMissionAtStartup = FALSE;
+
 	InitNet();
 
 	LoadConfig();
@@ -403,21 +416,13 @@ int main(int argc, char* argv[])
 #endif // DISABLE_MISSIONARG_THREAD
 
 	// Launch a mission file if specified as argument.
-	if (argc == 2)
+	if (bMissionAtStartup)
 	{
 #ifndef DISABLE_MISSIONARG_THREAD
 		CreateDefaultThread(MissionArgThread, (void*)(argv[1]), &MissionArgThreadId);
 #else
 		CallMission(argv[1]);
 #endif // !DISABLE_MISSIONARG_THREAD
-	}
-	else if (argc > 2) {
-		printf(
-			"Usage : \n"
-			"\t%s mission.txt\n"
-			"\t\tor\n"
-			"\t%s\n",
-			argv[0], argv[0]);
 	}
 	else
 	{
@@ -430,6 +435,7 @@ int main(int argc, char* argv[])
 		{
 			printf("No mission file specified as argument, command prompt disabled, no video GUI : will stop.\n");
 			bExit = TRUE;
+			ExitCode = EXIT_INVALID_PARAMETER;
 		}
 	}
 
@@ -477,7 +483,10 @@ int main(int argc, char* argv[])
 		LeaveCriticalSection(&OpenCVGUICS);
 
 		if ((char)c == 27) // ESC
-			bExit = TRUE;
+		{
+			bExit = TRUE; 
+			ExitCode = EXIT_SUCCESS;
+		}
 
 		if (bExit) break;
 	}
@@ -491,7 +500,7 @@ int main(int argc, char* argv[])
 #endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef DISABLE_MISSIONARG_THREAD
-	if (argc == 2) WaitForThread(MissionArgThreadId);
+	if (bMissionAtStartup) WaitForThread(MissionArgThreadId);
 #endif // !DISABLE_MISSIONARG_THREAD
 	if (bCommandPrompt)
 	{
@@ -659,5 +668,11 @@ int main(int argc, char* argv[])
 	ReleaseGlobals();
 	UnloadEnv();
 
-	return EXIT_SUCCESS;
+	if (ExitCode == EXIT_SUCCESS)
+	{
+		unlink(LOG_FOLDER"CurLbl.txt");
+		unlink(LOG_FOLDER"CurWp.txt");
+	}
+
+	return ExitCode;
 }

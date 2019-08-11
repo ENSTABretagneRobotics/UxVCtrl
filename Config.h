@@ -15,7 +15,7 @@
 inline int LoadConfig(void)
 {
 	FILE* file = NULL;
-	char line[MAX_BUF_LEN];
+	char line[1024];
 	double d0 = 0, d1 = 0;
 
 	// Missing error checking...
@@ -34,6 +34,7 @@ inline int LoadConfig(void)
 	captureperiod = 100;
 	HorizontalBeam = 70;
 	VerticalBeam = 50;
+	bUseRawImgPtrVideo = FALSE;
 	bCropOnResize = FALSE;
 	memset(szVideoRecordCodec, 0, sizeof(szVideoRecordCodec));
 	sprintf(szVideoRecordCodec, "WMV2");
@@ -59,6 +60,7 @@ inline int LoadConfig(void)
 	opencvguiimgheight[4] = 240;
 	opencvguiperiod = 100;
 	ExitOnErrorCount = 0;
+	AutoResumeMissionMode = 0;
 	bDisablelognav = FALSE;
 	bStdOutDetailedInfo = FALSE;
 	bCommandPrompt = TRUE;
@@ -397,6 +399,8 @@ inline int LoadConfig(void)
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &VerticalBeam) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &bUseRawImgPtrVideo) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bCropOnResize) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%[^\r\n]4s", szVideoRecordCodec) != 1) printf("Invalid configuration file.\n");
@@ -444,6 +448,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &opencvguiperiod) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &ExitOnErrorCount) != 1) printf("Invalid configuration file.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+		if (sscanf(line, "%d", &AutoResumeMissionMode) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 		if (sscanf(line, "%d", &bDisablelognav) != 1) printf("Invalid configuration file.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1492,7 +1498,7 @@ inline int SaveConfig(void)
 {
 	FILE* filein = NULL;
 	FILE* fileout = NULL;
-	char line[MAX_BUF_LEN];
+	char line[1024];
 
 	// Missing error checking...
 
@@ -1533,6 +1539,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", HorizontalBeam) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", VerticalBeam) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", bUseRawImgPtrVideo) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bCropOnResize) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1581,6 +1589,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", opencvguiperiod) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", ExitOnErrorCount) < 0) printf("Error writing configuration file.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+	if (fprintf(fileout, "%d\n", AutoResumeMissionMode) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 	if (fprintf(fileout, "%d\n", bDisablelognav) < 0) printf("Error writing configuration file.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -2343,7 +2353,7 @@ inline int SaveConfig(void)
 inline int LoadEnv(void)
 {
 	FILE* file = NULL;
-	char line[MAX_BUF_LEN];
+	char line[1024];
 	int i = 0;
 	double d0 = 0, d1 = 0, d2 = 0, d3 = 0;
 
@@ -2483,7 +2493,7 @@ inline int SaveEnv(void)
 {
 	FILE* filein = NULL;
 	FILE* fileout = NULL;
-	char line[MAX_BUF_LEN];
+	char line[1024];
 	int i = 0;
 
 	// Missing error checking...
@@ -2605,7 +2615,7 @@ inline int UnloadEnv(void)
 inline int LoadKeys(void)
 {
 	FILE* file = NULL;
-	char line[MAX_BUF_LEN];
+	char line[1024];
 	int i = 0, j = 0;
 
 	// Missing error checking...

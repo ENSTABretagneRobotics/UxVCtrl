@@ -15,6 +15,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	VIDEO video;
 	IplImage* img = NULL;
 	IplImage* imgtmp = NULL;
+	int res = 0;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int threadperiod = captureperiod;
@@ -102,22 +103,42 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 		}
 		else
 		{
-			if (GetImgVideo(&video, img) == EXIT_SUCCESS)
+			res = EXIT_SUCCESS;
+			//EnterCriticalSection(&imgsCS[videoid]);
+			if (bUseRawImgPtrVideo)//&&(img->width == imgs[videoid]->width)&&(img->height == imgs[videoid]->height))
 			{
-				EnterCriticalSection(&imgsCS[videoid]);
-				if ((img->width != imgs[videoid]->width)||(img->height != imgs[videoid]->height))
+				//LeaveCriticalSection(&imgsCS[videoid]);
+				imgtmp = GetRawImgPtrVideo(&video);
+				if (imgtmp)
 				{
-					imgtmp = cvCreateImage(cvSize(img->width, img->height), img->depth, img->nChannels);
-					if (imgtmp)
-					{
-						cvReleaseImage(&imgs[videoid]);
-						imgs[videoid] = imgtmp;
-					}
+					EnterCriticalSection(&imgsCS[videoid]);
+					imgs[videoid] = imgtmp;
+					LeaveCriticalSection(&imgsCS[videoid]);
+					res = EXIT_SUCCESS;
 				}
-				cvCopy(img, imgs[videoid], 0);
-				LeaveCriticalSection(&imgsCS[videoid]);
+				else res = EXIT_FAILURE;
 			}
 			else
+			{
+				//LeaveCriticalSection(&imgsCS[videoid]);
+				res = GetImgVideo(&video, img);
+				if (res == EXIT_SUCCESS)
+				{
+					EnterCriticalSection(&imgsCS[videoid]);
+					if ((img->width != imgs[videoid]->width)||(img->height != imgs[videoid]->height))
+					{
+						imgtmp = cvCreateImage(cvSize(img->width, img->height), img->depth, img->nChannels);
+						if (imgtmp)
+						{
+							cvReleaseImage(&imgs[videoid]);
+							imgs[videoid] = imgtmp;
+						}
+					}
+					cvCopy(img, imgs[videoid], 0);
+					LeaveCriticalSection(&imgsCS[videoid]);
+				}
+			}
+			if (res != EXIT_SUCCESS)
 			{
 				printf("Connection to a camera lost or no more picture in a video file.\n");
 				bConnected = FALSE;

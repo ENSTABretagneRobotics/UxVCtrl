@@ -186,7 +186,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						//VideoRecordRequests[videoid] = 0; // Force recording to stop.
 						LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-						bDispRecordSymbol = FALSE;
+						//bDispRecordSymbol = FALSE;
 					}
 					else
 					{
@@ -196,11 +196,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				if (bMissionRunning)
 				{
 					//AbortMission();
-					bDispPlaySymbol = FALSE;
-					//if (bMissionPaused)
-					//{	
-					//	bDispPauseSymbol = FALSE;
-					//}
+					//bDispPlaySymbol = FALSE;
+					bDispPlaySymbol = TRUE;
+				}				
+				else if (bMissionPaused)
+				{	
+					bDispPauseSymbol = TRUE;
 				}
 				EnterCriticalSection(&OpenCVGUICS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -1002,33 +1003,29 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'p':
 			if (bMissionRunning)
 			{
+				//printf("Pause mission.\n");
+				bMissionPaused = TRUE;
 				AbortMission();
 				bDispPlaySymbol = FALSE;
-
-				//if (bMissionPaused)
-				//{
-				//	bMissionPaused = FALSE;
-				//	ResumeMission();
-				//	bDispPauseSymbol = FALSE;
-				//}
-				//else
-				//{
-				//	bMissionPaused = TRUE;
-				//	PauseMission();
-				//	bDispPauseSymbol = TRUE;
-				//	StartChrono(&chrono_pausing);
-				//}
-
+				bDispPauseSymbol = TRUE;
+				StartChrono(&chrono_pausing);
 			}
 			else
 			{
+				//printf("Resume mission.\n");
 				CallMission("mission.txt");
 				bDispPlaySymbol = TRUE;
 				StartChrono(&chrono_playing);
+				bDispPauseSymbol = FALSE;
 			}
 			break;
 		case 'x':
+			bMissionPaused = FALSE;
 			AbortMission();
+			unlink(LOG_FOLDER"CurLbl.txt");
+			unlink(LOG_FOLDER"CurWp.txt");
+			bDispPlaySymbol = FALSE;
+			bDispPauseSymbol = FALSE;
 			break;
 		case 'h': DisplayHelp(); break;
 		case '!':
@@ -1229,6 +1226,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #pragma endregion
 		case 27: // ESC
 			bExit = TRUE;
+			ExitCode = EXIT_SUCCESS;
 			break;
 		default:
 			if (bZQSDPressed)
@@ -2192,12 +2190,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			if (bMissionRunning)
 			{
-				if (GetTimeElapsedChronoQuick(&chrono_playing) > 0.5)
-				{
-					StopChronoQuick(&chrono_playing);
-					bDispPlaySymbol = !bDispPlaySymbol;
-					StartChrono(&chrono_playing);
-				}
 				if (bDispPlaySymbol) 
 				{
 					nbPlaySymbolPoints = 3;
@@ -2206,12 +2198,15 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PlaySymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-18, 8);
 					cvFillConvexPoly(dispimgs[guiid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
 				}
-				//if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
-				//{
-				//	StopChronoQuick(&chrono_pausing);
-				//	bDispPauseSymbol = !bDispPauseSymbol;
-				//	StartChrono(&chrono_pausing);
-				//}
+				if (GetTimeElapsedChronoQuick(&chrono_playing) > 0.5)
+				{
+					StopChronoQuick(&chrono_playing);
+					bDispPlaySymbol = !bDispPlaySymbol;
+					StartChrono(&chrono_playing);
+				}
+			}
+			else if (bMissionPaused)
+			{
 				if (bDispPauseSymbol) 
 				{
 					nbPauseSymbolPoints = 4;
@@ -2226,6 +2221,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PauseSymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-18, 8+5);
 					PauseSymbolPoints[3] = cvPoint(opencvguiimgwidth[guiid]-18, 8-5);
 					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+				}
+				if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
+				{
+					StopChronoQuick(&chrono_pausing);
+					bDispPauseSymbol = !bDispPauseSymbol;
+					StartChrono(&chrono_pausing);
 				}
 			}
 			if (!bDisableAllAlarms)
@@ -2297,22 +2298,16 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		{
 			//VideoRecordRequests[videoid] = 0; // Force recording to stop.
 			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
-			bDispRecordSymbol = FALSE;
+			//bDispRecordSymbol = FALSE;
 		}
 		else
 		{
 			LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 		}
 	}
-	if (bMissionRunning)
-	{
-		//AbortMission();
-		bDispPlaySymbol = FALSE;
-		//if (bMissionPaused)
-		//{	
-		//	bDispPauseSymbol = FALSE;
-		//}
-	}
+	//AbortMission();
+	bDispPlaySymbol = FALSE;
+	bDispPauseSymbol = FALSE;
 	if (windowname[0] != 0)
 	{
 		EnterCriticalSection(&OpenCVGUICS);

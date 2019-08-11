@@ -1,3 +1,9 @@
+323
+Reduced sleep time in Video since the read() is likely to be blocking.
+FPS property is now set from captureperiod.
+Added bUseRawImgPtrVideo parameter to try to avoid extra copies if the dimensions of the webcams images can be the same as the global ones.
+Added AutoResumeMissionMode parameter as well as pause and resume commands.
+
 322
 Corrected bug in roll wind correction.
 Added regadd, regmul, regpow commands.

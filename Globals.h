@@ -150,6 +150,10 @@ typedef enum KEYS KEYS;
 
 #define MAX_CFGFILE_SIZE 16384
 
+#define MISSION_RESUME_DISABLED 0
+#define MISSION_RESUME_NEXT 1
+#define MISSION_RESUME_STARTUP 2
+
 #define OBJTYPE_BALL 0
 #define OBJTYPE_PIPELINE 1
 #define OBJTYPE_PINGER 2
@@ -340,6 +344,7 @@ extern double Energy_electronics, Energy_actuators;
 extern int robid;
 extern double roblength, robwidth, robheight;
 extern int nbopencvgui, videoimgwidth, videoimgheight, captureperiod, HorizontalBeam, VerticalBeam; 
+extern BOOL bUseRawImgPtrVideo;
 extern BOOL bCropOnResize;
 extern char szVideoRecordCodec[5];
 extern BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
@@ -348,6 +353,7 @@ extern int opencvguiimgwidth[MAX_NB_OPENCVGUI];
 extern int opencvguiimgheight[MAX_NB_OPENCVGUI];
 extern int opencvguiperiod;
 extern int ExitOnErrorCount;
+extern int AutoResumeMissionMode;
 extern BOOL bDisablelognav;
 extern BOOL bStdOutDetailedInfo;
 extern BOOL bCommandPrompt;
@@ -896,6 +902,7 @@ extern BOOL bPauseIM483I, bRestartIM483I;
 extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* imgs[MAX_NB_VIDEO];
+extern IplImage* imgsbak[MAX_NB_VIDEO];
 #endif // !DISABLE_OPENCV_SUPPORT
 extern double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
 extern vector<interval> d_all_mes_video[MAX_NB_VIDEO];
@@ -984,8 +991,11 @@ extern BOOL bForceOverrideInputs;
 extern BOOL bDisableRollWindCorrectionSailboat;
 extern BOOL bEnableBackwardsMotorboat;
 extern BOOL bExit;
+extern int ExitCode;
 extern BOOL bWaiting;
 extern BOOL bMissionRunning;
+extern BOOL bMissionAtStartup;
+extern BOOL bMissionPaused;
 extern BOOL bObstacleAvoidanceControl;
 extern BOOL bLineFollowingControl;
 extern BOOL bWaypointControl;
@@ -1397,6 +1407,7 @@ inline int InitGlobals(void)
 #ifndef DISABLE_OPENCV_SUPPORT
 		imgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
 		cvSet(imgs[i], CV_RGB(0, 0, 0), NULL);
+		if (bUseRawImgPtrVideo) imgsbak[i] = imgs[i]; // To be able to release memory later if imgs is overwritten...
 #endif // !DISABLE_OPENCV_SUPPORT
 		HorizontalBeamVideo[i] = 70;
 		VerticalBeamVideo[i] = 50;
@@ -1676,7 +1687,7 @@ inline int ReleaseGlobals(void)
 		VerticalBeamVideo[i]  = 50;
 		HorizontalBeamVideo[i] = 70;
 #ifndef DISABLE_OPENCV_SUPPORT
-		cvReleaseImage(&imgs[i]);
+		if (!bUseRawImgPtrVideo) cvReleaseImage(&imgs[i]); else cvReleaseImage(&imgsbak[i]); // imgsbak has been kept in case imgs was overwritten...
 #endif // !DISABLE_OPENCV_SUPPORT
 		DeleteCriticalSection(&imgsCS[i]);
 	}

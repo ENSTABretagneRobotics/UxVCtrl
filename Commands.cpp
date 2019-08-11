@@ -18,18 +18,18 @@ THREAD_PROC_RETURN_VALUE CommandsThread(void* pParam)
 	printf("Type a command or exit to terminate the program.\n");
 
 	// Read and execute commands from stdin.
-	for (;;) 
+	for (;;)
 	{
 		// fgets() should be a blocking call.
 		// How to cancel it properly?
 
 		memset(line, 0, sizeof(line));
-		if (fgets3(stdin, line, sizeof(line)) != NULL) 
+		if (fgets3(stdin, line, sizeof(line)) != NULL)
 		{
 			if (bExit) break;
-			Commands(line); 
+			Commands(line);
 		}
-		else 
+		else
 		{
 			if (bExit) break;
 			printf("Invalid command or stdin failure.\n");
@@ -48,29 +48,31 @@ THREAD_PROC_RETURN_VALUE MissionThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
-	for (;;) 
+	for (;;)
 	{
 		EnterCriticalSection(&MissionFilesCS);
 		if (bMissionRunning)
 		{
 			memset(line, 0, sizeof(line));
-			if (fgets3(missionfile, line, sizeof(line)) != NULL) 
+			if (fgets3(missionfile, line, sizeof(line)) != NULL)
 			{
 				LeaveCriticalSection(&MissionFilesCS);
-				Commands(line); 
+				Commands(line);
 			}
-			else 
+			else
 			{
-				if (ferror(missionfile)) 
+				if (ferror(missionfile))
 				{
 					LeaveCriticalSection(&MissionFilesCS);
 					printf("File error.\n");
 					AbortMission();
 				}
-				else if (feof(missionfile)) 
+				else if (feof(missionfile))
 				{
 					LeaveCriticalSection(&MissionFilesCS);
 					AbortMission();
+					unlink(LOG_FOLDER"CurLbl.txt");
+					unlink(LOG_FOLDER"CurWp.txt");
 				}
 				else
 				{
@@ -89,6 +91,7 @@ THREAD_PROC_RETURN_VALUE MissionThread(void* pParam)
 		if (bExit) break;
 	}
 
+	bMissionPaused = FALSE;
 	AbortMission();
 
 	return 0;
@@ -115,9 +118,9 @@ THREAD_PROC_RETURN_VALUE MissionLogThread(void* pParam)
 			// szAction is not protected and might be temporarily invalid when it is changing, 
 			// but this should not cause a crash...
 
-			fprintf(logmissionfile, "%f;%f;%f;%f;%s;\n", 
+			fprintf(logmissionfile, "%f;%f;%f;%f;%s;\n",
 				GetTimeElapsedChronoQuick(&chrono_mission), lathat, longhat, depthhat, szAction
-				);
+			);
 			fflush(logmissionfile);
 		}
 		LeaveCriticalSection(&MissionFilesCS);

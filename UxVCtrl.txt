@@ -44,6 +44,8 @@
 70
 % VerticalBeam (in ]0..360] deg)
 50
+% bUseRawImgPtrVideo
+0
 % bCropOnResize
 0
 % szVideoRecordCodec (WMV2, MJPG, HFYU, DIVX, XVID, etc., see OpenCV FOURCC codecs)
@@ -91,6 +93,8 @@ WMV2
 % opencvguiperiod (in ms)
 100
 % ExitOnErrorCount (0 to never exit)
+0
+% AutoResumeMissionMode (0 : disabled, 1 : if the program did not exit successfully during a mission or the mission was not aborted explicitely, the next time it will resume to the latest label command (that should be stored in CurLbl.txt), 2 : same as 1 except it will resume only if the mission is launched at program startup)
 0
 % bDisablelognav
 0
