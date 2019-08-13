@@ -961,6 +961,7 @@ extern CRITICAL_SECTION MissionFilesCS;
 extern CRITICAL_SECTION OpenCVGUICS;
 extern CRITICAL_SECTION OpenCVVideoCS;
 extern CRITICAL_SECTION OpenCVVideoRecordCS;
+extern CRITICAL_SECTION idsCS;
 extern CRITICAL_SECTION RegistersCS;
 extern CRITICAL_SECTION strtimeCS;
 extern STATE state;
@@ -1535,6 +1536,8 @@ inline int InitGlobals(void)
 	InitCriticalSection(&OpenCVVideoCS);
 	InitCriticalSection(&OpenCVVideoRecordCS);
 
+	InitCriticalSection(&idsCS);
+
 	InitCriticalSection(&RegistersCS);
 
 	InitCriticalSection(&strtimeCS);
@@ -1602,6 +1605,8 @@ inline int ReleaseGlobals(void)
 	DeleteCriticalSection(&strtimeCS);
 
 	DeleteCriticalSection(&RegistersCS);
+
+	DeleteCriticalSection(&idsCS);
 
 	DeleteCriticalSection(&OpenCVVideoRecordCS);
 	DeleteCriticalSection(&OpenCVVideoCS);

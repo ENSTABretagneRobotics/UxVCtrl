@@ -104,15 +104,15 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 		else
 		{
 			res = EXIT_SUCCESS;
-			//EnterCriticalSection(&imgsCS[videoid]);
-			if (bUseRawImgPtrVideo)//&&(img->width == imgs[videoid]->width)&&(img->height == imgs[videoid]->height))
+			if (bUseRawImgPtrVideo)
 			{
-				//LeaveCriticalSection(&imgsCS[videoid]);
 				imgtmp = GetRawImgPtrVideo(&video);
 				if (imgtmp)
 				{
 					EnterCriticalSection(&imgsCS[videoid]);
-					imgs[videoid] = imgtmp;
+					if ((imgtmp->width != imgs[videoid]->width)||(imgtmp->height != imgs[videoid]->height))
+						CopyResizeScale(imgtmp, imgs[videoid], bCropOnResize);
+					else imgs[videoid] = imgtmp;
 					LeaveCriticalSection(&imgsCS[videoid]);
 					res = EXIT_SUCCESS;
 				}
@@ -120,7 +120,6 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 			}
 			else
 			{
-				//LeaveCriticalSection(&imgsCS[videoid]);
 				res = GetImgVideo(&video, img);
 				if (res == EXIT_SUCCESS)
 				{

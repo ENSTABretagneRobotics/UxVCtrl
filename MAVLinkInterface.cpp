@@ -22,6 +22,8 @@ enum MAVLINKINTERFACE_PARAM_ID
 	DFLT_F_OVRID_IN_PARAM_ID,
 	F_OVRID_IN_PARAM_ID,
 	WPNAV_RADIUS_PARAM_ID,
+	GUIID_VID_IF_PARAM_ID,
+	VIDID_VID_IF_PARAM_ID,
 	MAVLINKINTERFACE_PARAM_COUNT
 };
 typedef enum MAVLINKINTERFACE_PARAM_ID MAVLINKINTERFACE_PARAM_ID;
@@ -321,6 +323,18 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						radius = (double)param_set.param_value/100.0;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
+					else if (strncmp(param_set.param_id, "GUIID_VID_IF_PARAM_ID", strlen("GUIID_VID_IF_PARAM_ID")) == 0)
+					{
+						EnterCriticalSection(&idsCS);
+						guiid_VideoInterface = (int)param_set.param_value;
+						LeaveCriticalSection(&idsCS);
+					}
+					else if (strncmp(param_set.param_id, "VIDID_VID_IF_PARAM_ID", strlen("VIDID_VID_IF_PARAM_ID")) == 0)
+					{
+						EnterCriticalSection(&idsCS);
+						videoid_VideoInterface = (int)param_set.param_value;
+						LeaveCriticalSection(&idsCS);
+					}
 					// No break for the case, to be able to send back updated parameters...
 				case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 				case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
@@ -466,6 +480,50 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					param_value.param_count = (uint16_t)nbparams;
 					param_value.param_index = (uint16_t)WPNAV_RADIUS_PARAM_ID;// (uint16_t)(-1) to ignore...?
 					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&idsCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "GUIID_VID_IF_PARAM_ID");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)guiid_VideoInterface;
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)GUIID_VID_IF_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&idsCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&idsCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "VIDID_VID_IF_PARAM_ID");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)videoid_VideoInterface;
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)VIDID_VID_IF_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&idsCS);
 					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
 					memset(sendbuf, 0, sizeof(sendbuf));
 					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);

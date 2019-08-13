@@ -4194,7 +4194,9 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "setvideointerfacesource %d %d", &guiid, &videoid) == 2)
 	{
+		EnterCriticalSection(&idsCS);
 		guiid_VideoInterface = guiid; videoid_VideoInterface = videoid;
+		LeaveCriticalSection(&idsCS);
 	}
 	else if (sscanf(line, "simulatedgps %d", &ival) == 1)
 	{

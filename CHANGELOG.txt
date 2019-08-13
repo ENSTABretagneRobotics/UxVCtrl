@@ -1,3 +1,7 @@
+324
+Removed extra memcpy() and memset() in VideoInterface.
+Added GUIID_VID_IF_PARAM_ID and VIDID_VID_IF_PARAM_ID MAVLinkInterface parameters.
+
 323
 Reduced sleep time in Video since the read() is likely to be blocking.
 FPS property is now set from captureperiod.

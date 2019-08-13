@@ -16,6 +16,7 @@ int encodeparams_VideoInterface[2];
 std::vector<int> encodeparams_VideoInterface;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 IplImage* image_VideoInterface = NULL;
+IplImage* imagebak_VideoInterface = NULL;
 
 int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 {
@@ -23,9 +24,9 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 	//BOOL bForceSendFullImg = TRUE; 
 	BOOL bInitDone = FALSE;
 	char httpbuf[2048];
-	char* databuf = NULL;
-	int databuflen = videoimgwidth_VideoInterface*videoimgheight_VideoInterface+3*sizeof(unsigned int);
-	int nbBytes = 0;
+	//char* databuf = NULL;
+	//int databuflen = videoimgwidth_VideoInterface*videoimgheight_VideoInterface+3*sizeof(unsigned int);
+	//int nbBytes = 0;
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 	CvMat* mat = NULL;
 #else
@@ -35,12 +36,12 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
-	databuf = (char*)calloc(databuflen, sizeof(char));
-	if (!databuf)
-	{
-		printf("calloc() failed.\n");
-		return EXIT_FAILURE;
-	}
+	//databuf = (char*)calloc(databuflen, sizeof(char));
+	//if (!databuf)
+	//{
+	//	printf("calloc() failed.\n");
+	//	return EXIT_FAILURE;
+	//}
 
 	for (;;)
 	{
@@ -65,7 +66,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 		switch (iResult)
 		{
 		case SOCKET_ERROR:
-			free(databuf);
+			//free(databuf);
 			return EXIT_FAILURE;
 		case 0:
 			// The timeout on select() occured.
@@ -78,14 +79,14 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 				tv.tv_usec = (long)((VideoInterfaceTimeout%1000)*1000);
 				if (waitforsocket(sockcli, tv) == EXIT_SUCCESS)
 				{
-					memset(httpbuf, 0, sizeof(httpbuf));
+					//memset(httpbuf, 0, sizeof(httpbuf));
 					if (recv(sockcli, httpbuf, sizeof(httpbuf), 0) <= 0)
 					{
 						printf("recv() failed.\n");
-						free(databuf);
+						//free(databuf);
 						return EXIT_FAILURE;
 					}
-					memset(httpbuf, 0, sizeof(httpbuf));
+					//memset(httpbuf, 0, sizeof(httpbuf));
 					sprintf(httpbuf,
 						"HTTP/1.1 200 OK\r\n"
 						"Server: RemoteWebcamMultiSrv\r\n"
@@ -99,111 +100,147 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 						"\r\n");
 					if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
 					{
-						free(databuf);
+						//free(databuf);
 						return EXIT_FAILURE;
 					}
 				}
 				bInitDone = TRUE;
 			}
 
+			EnterCriticalSection(&idsCS);
 			if ((guiid_VideoInterface >= 0)&&(guiid_VideoInterface < nbopencvgui))
 			{
-				EnterCriticalSection(&dispimgsCS[videoid_VideoInterface]);
-				CopyResizeScale(dispimgs[guiid_VideoInterface], image_VideoInterface, bCropOnResize);
-				LeaveCriticalSection(&dispimgsCS[videoid_VideoInterface]);
-			}
-			else if ((videoid_VideoInterface >= 0)&&(videoid_VideoInterface < MAX_NB_VIDEO)&&(!bDisableVideo[videoid_VideoInterface]))
-			{
-				EnterCriticalSection(&imgsCS[videoid_VideoInterface]);
-				CopyResizeScale(imgs[videoid_VideoInterface], image_VideoInterface, bCropOnResize);
-				LeaveCriticalSection(&imgsCS[videoid_VideoInterface]);
+				EnterCriticalSection(&dispimgsCS[guiid_VideoInterface]);
+				if ((bUseRawImgPtrVideo)&&(image_VideoInterface->width == dispimgs[guiid_VideoInterface]->width)&&(image_VideoInterface->height == dispimgs[guiid_VideoInterface]->height))
+					image_VideoInterface = dispimgs[guiid_VideoInterface];
+				else CopyResizeScale(dispimgs[guiid_VideoInterface], image_VideoInterface, bCropOnResize);
+				LeaveCriticalSection(&dispimgsCS[guiid_VideoInterface]);
 			}
 			else
 			{
-				cvSet(image_VideoInterface, CV_RGB(0, 0, 0), NULL);
+				if ((videoid_VideoInterface >= 0)&&(videoid_VideoInterface < MAX_NB_VIDEO)&&(!bDisableVideo[videoid_VideoInterface]))
+				{
+					EnterCriticalSection(&imgsCS[videoid_VideoInterface]);
+					if ((bUseRawImgPtrVideo)&&(image_VideoInterface->width == imgs[videoid_VideoInterface]->width)&&(image_VideoInterface->height == imgs[videoid_VideoInterface]->height))
+						image_VideoInterface = imgs[videoid_VideoInterface];
+					else CopyResizeScale(imgs[videoid_VideoInterface], image_VideoInterface, bCropOnResize);
+					LeaveCriticalSection(&imgsCS[videoid_VideoInterface]);
+				}
+				else
+				{
+					cvSet(image_VideoInterface, CV_RGB(0, 0, 0), NULL);
+				}
 			}
+			LeaveCriticalSection(&idsCS);
 
-			nbBytes = 0;
+			//nbBytes = 0;
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 			mat = cvEncodeImage(encodetype_VideoInterface, image_VideoInterface, encodeparams_VideoInterface);
 			if (mat == NULL)
 			{
 				printf("cvEncodeImage() failed.\n");
-				free(databuf);
+				//free(databuf);
 				return EXIT_FAILURE;
 			}
-			memset(httpbuf, 0, sizeof(httpbuf));
+			//memset(httpbuf, 0, sizeof(httpbuf));
 			sprintf(httpbuf,
 				"--boundary\r\n"
 				"Content-Type: image/jpeg\r\n"
 				"Content-Length: %d\r\n"
 				"\r\n", mat->rows*mat->cols);
-			if (databuflen < (int)(mat->rows*mat->cols+strlen(httpbuf)))
+			if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
 			{
-				free(databuf);
-				databuflen = 2*mat->rows*mat->cols+strlen(httpbuf); // More than the mininum in case next images are bigger...
-				databuf = (char*)calloc(databuflen, sizeof(char));
-				if (!databuf)
-				{
-					printf("calloc() failed.\n");
-					return EXIT_FAILURE;
-				}
+				//free(databuf);
+				return EXIT_FAILURE;
 			}
-			memcpy(databuf+nbBytes, httpbuf, strlen(httpbuf));
-			nbBytes += strlen(httpbuf);
+			//if (databuflen < (int)(mat->rows*mat->cols+strlen(httpbuf)))
+			//{
+			//	free(databuf);
+			//	databuflen = 2*mat->rows*mat->cols+strlen(httpbuf); // More than the mininum in case next images are bigger...
+			//	databuf = (char*)calloc(databuflen, sizeof(char));
+			//	if (!databuf)
+			//	{
+			//		printf("calloc() failed.\n");
+			//		return EXIT_FAILURE;
+			//	}
+			//}
+			//memcpy(databuf+nbBytes, httpbuf, strlen(httpbuf));
+			//nbBytes += strlen(httpbuf);
 			// Full image data (with static compression).
-			memcpy(databuf+nbBytes, mat->data.ptr, (size_t)(mat->rows*mat->cols));
-			nbBytes += (mat->rows*mat->cols);
-			cvReleaseMat(&mat);
+			//memcpy(databuf+nbBytes, mat->data.ptr, (size_t)(mat->rows*mat->cols));
+			//nbBytes += (mat->rows*mat->cols);
+			//cvReleaseMat(&mat);
 #else
 			if (!cv::imencode(encodetype_VideoInterface, cv::cvarrToMat(image_VideoInterface), bufmatvector, encodeparams_VideoInterface))
 			{
 				printf("cv::imencode() failed.\n");
-				free(databuf);
+				//free(databuf);
 				return EXIT_FAILURE;
 			}
-			memset(httpbuf, 0, sizeof(httpbuf));
+			//memset(httpbuf, 0, sizeof(httpbuf));
 			sprintf(httpbuf,
 				"--boundary\r\n"
 				"Content-Type: image/jpeg\r\n"
 				"Content-Length: %d\r\n"
 				"\r\n", (int)bufmatvector.size());
-			if (databuflen < (int)bufmatvector.size()+(int)strlen(httpbuf))
+			if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
 			{
-				free(databuf);
-				databuflen = 2*bufmatvector.size()+strlen(httpbuf); // More than the mininum in case next images are bigger...
-				databuf = (char*)calloc(databuflen, sizeof(char));
-				if (!databuf)
-				{
-					printf("calloc() failed.\n");
-					return EXIT_FAILURE;
-				}
-			}
-			memcpy(databuf+nbBytes, httpbuf, strlen(httpbuf));
-			nbBytes += strlen(httpbuf);
-			// Full image data (with static compression).
-			i = bufmatvector.size();
-			while (i--)
-			{
-				databuf[nbBytes+i] = (char)bufmatvector[i];
-			}
-			nbBytes += (int)bufmatvector.size();
-			bufmatvector.clear();
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
-
-			if (sendall(sockcli, databuf, nbBytes) != EXIT_SUCCESS)
-			{
-				free(databuf);
+				//free(databuf);
 				return EXIT_FAILURE;
 			}
+			//if (databuflen < (int)bufmatvector.size()+(int)strlen(httpbuf))
+			//{
+			//	free(databuf);
+			//	databuflen = 2*bufmatvector.size()+strlen(httpbuf); // More than the mininum in case next images are bigger...
+			//	databuf = (char*)calloc(databuflen, sizeof(char));
+			//	if (!databuf)
+			//	{
+			//		printf("calloc() failed.\n");
+			//		return EXIT_FAILURE;
+			//	}
+			//}
+			//memcpy(databuf+nbBytes, httpbuf, strlen(httpbuf));
+			//nbBytes += strlen(httpbuf);
+			// Full image data (with static compression).
+			//i = bufmatvector.size();
+			//while (i--)
+			//{
+			//	databuf[nbBytes+i] = (char)bufmatvector[i];
+			//}
+			//nbBytes += (int)bufmatvector.size();
+			//bufmatvector.clear();
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+
+			//if (sendall(sockcli, databuf, nbBytes) != EXIT_SUCCESS)
+			//{
+			//	free(databuf);
+			//	return EXIT_FAILURE;
+			//}
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+			if (sendall(sockcli, (char*)mat->data.ptr, mat->rows*mat->cols) != EXIT_SUCCESS)
+			{
+				cvReleaseMat(&mat);
+				//free(databuf);
+				return EXIT_FAILURE;
+			}
+			cvReleaseMat(&mat);
+#else
+			if (sendall(sockcli, (char*)&bufmatvector[0], (int)bufmatvector.size()) != EXIT_SUCCESS)
+			{
+				bufmatvector.clear();
+				//free(databuf);
+				return EXIT_FAILURE;
+			}
+			bufmatvector.clear();
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			mSleep(captureperiod_VideoInterface);
 			break;
-			}
+		}
 
 		if (bExit) break;
 	}
 
-	free(databuf);
+	//free(databuf);
 
 	return EXIT_SUCCESS;
 }
@@ -253,6 +290,7 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
+	if (bUseRawImgPtrVideo) imagebak_VideoInterface = image_VideoInterface; // To be able to release memory later if image_VideoInterface is overwritten...
 
 	if (bUDP_VideoInterface)
 	{
@@ -273,7 +311,7 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		}
 	}
 
-	cvReleaseImage(&image_VideoInterface);
+	if (!bUseRawImgPtrVideo) cvReleaseImage(&image_VideoInterface); else cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...
 
 #ifdef USE_OPENCV_HIGHGUI_CPP_API
 	encodeparams_VideoInterface.clear();
