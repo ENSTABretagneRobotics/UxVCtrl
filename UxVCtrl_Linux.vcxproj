@@ -592,7 +592,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -610,7 +610,7 @@
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -628,7 +628,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -646,7 +646,7 @@
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>

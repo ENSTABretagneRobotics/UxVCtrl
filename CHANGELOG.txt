@@ -1,3 +1,9 @@
+325
+Corrected some warnings on Linux.
+Corrected the name of GUIID_VID_IF and VIDID_VID_IF MAVLinkInterface parameters.
+Corrected cast error in PololuInterface.
+Added GetAddrPortTypeFromDevPath().
+
 324
 Removed extra memcpy() and memset() in VideoInterface.
 Added GUIID_VID_IF_PARAM_ID and VIDID_VID_IF_PARAM_ID MAVLinkInterface parameters.

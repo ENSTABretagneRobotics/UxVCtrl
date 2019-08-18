@@ -495,7 +495,8 @@ int main(int argc, char* argv[])
 		WaitForThread(OpenCVGUIThreadId[i]);
 	}
 #else
-	if (nbopencvgui == 1) OpenCVGUIThread((void*)(intptr_t)0);
+	UNREFERENCED_PARAMETER(OpenCVGUIThreadId);
+	if (nbopencvgui >= 1) OpenCVGUIThread((void*)(intptr_t)0);
 #endif // ENABLE_SHARED_WAITKEY_OPENCVGUI
 #endif // !FORCE_SINGLE_THREAD_OPENCVGUI
 #endif // !DISABLE_OPENCV_SUPPORT

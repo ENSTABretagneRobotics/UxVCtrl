@@ -21,6 +21,16 @@
 #pragma warning(disable : 4005) 
 #endif // _MSC_VER
 
+// Only happens with some arm cross compilers...?
+#ifdef __GNUC__
+#ifdef MIN
+#undef MIN
+#endif // MIN
+#ifdef MAX
+#undef MAX
+#endif // MAX
+#endif // __GNUC__
+
 #include <modbus/modbus.h>
 
 #ifdef _MSC_VER

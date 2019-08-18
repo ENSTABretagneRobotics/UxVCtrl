@@ -323,19 +323,20 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						radius = (double)param_set.param_value/100.0;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
-					else if (strncmp(param_set.param_id, "GUIID_VID_IF_PARAM_ID", strlen("GUIID_VID_IF_PARAM_ID")) == 0)
+					else if (strncmp(param_set.param_id, "GUIID_VID_IF", strlen("GUIID_VID_IF")) == 0)
 					{
 						EnterCriticalSection(&idsCS);
 						guiid_VideoInterface = (int)param_set.param_value;
 						LeaveCriticalSection(&idsCS);
 					}
-					else if (strncmp(param_set.param_id, "VIDID_VID_IF_PARAM_ID", strlen("VIDID_VID_IF_PARAM_ID")) == 0)
+					else if (strncmp(param_set.param_id, "VIDID_VID_IF", strlen("VIDID_VID_IF")) == 0)
 					{
 						EnterCriticalSection(&idsCS);
 						videoid_VideoInterface = (int)param_set.param_value;
 						LeaveCriticalSection(&idsCS);
 					}
-					// No break for the case, to be able to send back updated parameters...
+					// No break for the case, to be able to send back updated parameters (next comment is read by GCC 7)...
+					// Fall through.
 				case MAVLINK_MSG_ID_PARAM_REQUEST_LIST:
 				case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
 					EnterCriticalSection(&StateVariablesCS);
@@ -495,7 +496,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					EnterCriticalSection(&idsCS);
 					memset(Name, 0, sizeof(Name));
 					memset(&param_value, 0, sizeof(mavlink_param_value_t));
-					sprintf(Name, "GUIID_VID_IF_PARAM_ID");
+					sprintf(Name, "GUIID_VID_IF");
 					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
 					param_value.param_value = (float)guiid_VideoInterface;
 					param_value.param_type = MAV_PARAM_TYPE_REAL32;
@@ -517,7 +518,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					EnterCriticalSection(&idsCS);
 					memset(Name, 0, sizeof(Name));
 					memset(&param_value, 0, sizeof(mavlink_param_value_t));
-					sprintf(Name, "VIDID_VID_IF_PARAM_ID");
+					sprintf(Name, "VIDID_VID_IF");
 					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
 					param_value.param_value = (float)videoid_VideoInterface;
 					param_value.param_type = MAV_PARAM_TYPE_REAL32;

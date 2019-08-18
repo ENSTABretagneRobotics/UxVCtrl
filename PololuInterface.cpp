@@ -63,7 +63,7 @@ int inithandlepololuinterface(RS232PORT* pPololuInterfacePseudoRS232Port)
 
 int handlepololuinterface(RS232PORT* pPololuInterfacePseudoRS232Port)
 {
-	char recvbuf[MAX_NB_BYTES_POLOLU];
+	unsigned char recvbuf[MAX_NB_BYTES_POLOLU];
 	int Bytes = 0, target = 0, pw = 0;
 	//double angle = 0.0;
 

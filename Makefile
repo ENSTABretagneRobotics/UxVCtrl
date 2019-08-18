@@ -13,8 +13,8 @@ CC = gcc
 CXX = g++
 
 # Raspberry Pi Zero cross compilation...
-#CC = /opt/tools-master/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc -I/mnt/rootfs/usr/include/arm-linux-gnueabihf -I/mnt/rootfs/usr/include -I/mnt/rootfs/usr/local/include -L/mnt/rootfs/opt/vc/lib -L/mnt/rootfs/lib/arm-linux-gnueabihf -L/mnt/rootfs/usr/lib/arm-linux-gnueabihf -L/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -L/mnt/rootfs/lib -L/mnt/rootfs/usr/lib -L/mnt/rootfs/usr/local/lib -Wl,-rpath-link,/mnt/rootfs/opt/vc/lib -Wl,-rpath-link,/mnt/rootfs/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/lib -Wl,-rpath-link,/mnt/rootfs/usr/lib -Wl,-rpath-link,/mnt/rootfs/usr/local/lib
-#CXX = /opt/tools-master/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-g++ -I/mnt/rootfs/usr/include/arm-linux-gnueabihf -I/mnt/rootfs/usr/include -I/mnt/rootfs/usr/local/include -L/mnt/rootfs/opt/vc/lib -L/mnt/rootfs/lib/arm-linux-gnueabihf -L/mnt/rootfs/usr/lib/arm-linux-gnueabihf -L/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -L/mnt/rootfs/lib -L/mnt/rootfs/usr/lib -L/mnt/rootfs/usr/local/lib -Wl,-rpath-link,/mnt/rootfs/opt/vc/lib -Wl,-rpath-link,/mnt/rootfs/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/lib -Wl,-rpath-link,/mnt/rootfs/usr/lib -Wl,-rpath-link,/mnt/rootfs/usr/local/lib
+#CC = /opt/cross-pi-gcc-8.3.0-0/bin/arm-linux-gnueabihf-gcc -I/mnt/rootfs/usr/local/include -I/mnt/rootfs/usr/include -I/mnt/rootfs/usr/include/arm-linux-gnueabihf -L/mnt/rootfs/opt/vc/lib -Wl,-rpath-link,/mnt/rootfs/opt/vc/lib -L/mnt/rootfs/usr/local/lib -Wl,-rpath-link,/mnt/rootfs/usr/local/lib -L/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -L/mnt/rootfs/usr/lib -Wl,-rpath-link,/mnt/rootfs/usr/lib -L/mnt/rootfs/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/lib/arm-linux-gnueabihf -L/mnt/rootfs/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/lib/arm-linux-gnueabihf -L/mnt/rootfs/lib -Wl,-rpath-link,/mnt/rootfs/lib
+#CXX = /opt/cross-pi-gcc-8.3.0-0/bin/arm-linux-gnueabihf-g++ -I/mnt/rootfs/usr/local/include -I/mnt/rootfs/usr/include -I/mnt/rootfs/usr/include/arm-linux-gnueabihf -L/mnt/rootfs/opt/vc/lib -Wl,-rpath-link,/mnt/rootfs/opt/vc/lib -L/mnt/rootfs/usr/local/lib -Wl,-rpath-link,/mnt/rootfs/usr/local/lib -L/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/local/lib/arm-linux-gnueabihf -L/mnt/rootfs/usr/lib -Wl,-rpath-link,/mnt/rootfs/usr/lib -L/mnt/rootfs/usr/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/usr/lib/arm-linux-gnueabihf -L/mnt/rootfs/lib/arm-linux-gnueabihf -Wl,-rpath-link,/mnt/rootfs/lib/arm-linux-gnueabihf -L/mnt/rootfs/lib -Wl,-rpath-link,/mnt/rootfs/lib
 
 #CFLAGS += -g
 CFLAGS += -O3
@@ -27,7 +27,6 @@ CFLAGS += -Wall -Wno-unknown-pragmas -Wno-unused-parameter -Wextra
 CFLAGS += -D OPENCV2413
 #CFLAGS += -D OPENCV320
 #CFLAGS += -D OPENCV410
-#CFLAGS += -std=c++11
 #CFLAGS += -D USE_FFMPEG_VIDEO
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 #CFLAGS += -D ENABLE_OPENCV_HIGHGUI_STARTWINDOWTHREAD
@@ -59,7 +58,10 @@ CFLAGS += -I./Hardware
 CFLAGS += -I. -I..
 CFLAGS += -I/usr/local/include/sbgECom/src -I/usr/local/include/sbgECom/common 
 
-CXXFLAGS += $(CFLAGS) -fpermissive
+CXXFLAGS += $(CFLAGS) -fpermissive -Wno-psabi
+
+# Might be necessary for recent OpenCV versions...
+#CXXFLAGS += -std=c++11
 
 # For Linux, if static needed...
 #LDFLAGS += -static-libgcc -static-libstdc++ -static

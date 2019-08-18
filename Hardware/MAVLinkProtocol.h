@@ -19,6 +19,7 @@
 #endif // __GNUC__
 #endif // inline
 #endif // !__cplusplus
+
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
 #pragma warning(disable : 4201) 
@@ -26,9 +27,32 @@
 #pragma warning(disable : 4459) 
 #pragma warning(disable : 4214) 
 #endif // _MSC_VER
+
+#ifdef __GNUC__
+// Disable some GCC warnings.
+#if (__GNUC__ >= 9)
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
+#endif // (__GNUC__ >= 9)
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic push
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // __GNUC__
+
 #include "mavlink/common/mavlink.h"
 #include "mavlink/ardupilotmega/mavlink_msg_rangefinder.h"
 #include "mavlink/ardupilotmega/mavlink_msg_hwstatus.h"
+
+#ifdef __GNUC__
+// Restore the GCC warnings previously disabled.
+#if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#pragma GCC diagnostic pop
+#else
+//#if (__GNUC__ >= 9)
+//#pragma GCC diagnostic warning "-Waddress-of-packed-member"
+//#endif // (__GNUC__ >= 9)
+#endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
+#endif // __GNUC__
+
 #ifdef _MSC_VER
 // Restore the Visual Studio warnings previously disabled.
 #pragma warning(default : 4214) 
@@ -36,6 +60,7 @@
 #pragma warning(default : 4244) 
 #pragma warning(default : 4201) 
 #endif // _MSC_VER
+
 #ifndef __cplusplus
 #ifndef inline
 #ifdef __GNUC__

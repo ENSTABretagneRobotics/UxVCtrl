@@ -37,7 +37,9 @@ inline void DisableAllHorizontalControls(void)
 
 inline void DisableAllControls(void)
 {
+#ifndef DISABLE_OPENCV_SUPPORT
 	int i = 0;
+#endif // !DISABLE_OPENCV_SUPPORT
 
 	EnterCriticalSection(&StateVariablesCS);
 #ifndef DISABLE_OPENCV_SUPPORT
