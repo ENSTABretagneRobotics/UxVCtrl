@@ -110,9 +110,10 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 				if (imgtmp)
 				{
 					EnterCriticalSection(&imgsCS[videoid]);
-					if ((imgtmp->width != imgs[videoid]->width)||(imgtmp->height != imgs[videoid]->height))
-						CopyResizeScale(imgtmp, imgs[videoid], bCropOnResize);
-					else imgs[videoid] = imgtmp;
+					//if ((imgtmp->width != imgs[videoid]->width)||(imgtmp->height != imgs[videoid]->height))
+					//	CopyResizeScale(imgtmp, imgs[videoid], bCropOnResize);
+					//else imgs[videoid] = imgtmp;
+					imgs[videoid] = imgtmp;
 					LeaveCriticalSection(&imgsCS[videoid]);
 					res = EXIT_SUCCESS;
 				}

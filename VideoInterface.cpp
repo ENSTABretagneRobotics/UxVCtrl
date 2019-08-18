@@ -31,8 +31,9 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 	CvMat* mat = NULL;
 #else
 	std::vector<uchar> bufmatvector;
-	unsigned int i = 0;
+	//unsigned int i = 0;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
+	IplImage* imgtmp = NULL;
 
 	UNREFERENCED_PARAMETER(pParam);
 
@@ -111,26 +112,58 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 			if ((guiid_VideoInterface >= 0)&&(guiid_VideoInterface < nbopencvgui))
 			{
 				EnterCriticalSection(&dispimgsCS[guiid_VideoInterface]);
-				if ((bUseRawImgPtrVideo)&&(image_VideoInterface->width == dispimgs[guiid_VideoInterface]->width)&&(image_VideoInterface->height == dispimgs[guiid_VideoInterface]->height))
-					image_VideoInterface = dispimgs[guiid_VideoInterface];
-				else CopyResizeScale(dispimgs[guiid_VideoInterface], image_VideoInterface, bCropOnResize);
+				//if ((bUseRawImgPtrVideo)&&(image_VideoInterface->width == dispimgs[guiid_VideoInterface]->width)&&(image_VideoInterface->height == dispimgs[guiid_VideoInterface]->height))
+				//	image_VideoInterface = dispimgs[guiid_VideoInterface];
+				//else CopyResizeScale(dispimgs[guiid_VideoInterface], image_VideoInterface, bCropOnResize);
+				if (bUseRawImgPtrVideo)
+				{
+					if ((bForceSoftwareResizeScale_VideoInterface)&&((image_VideoInterface->width != dispimgs[guiid_VideoInterface]->width)||(image_VideoInterface->height != dispimgs[guiid_VideoInterface]->height)))
+						CopyResizeScale(dispimgs[guiid_VideoInterface], image_VideoInterface, bCropOnResize);
+					else image_VideoInterface = dispimgs[guiid_VideoInterface];
+				}
+				else 
+				{
+					if ((!bForceSoftwareResizeScale_VideoInterface)&&((image_VideoInterface->width != dispimgs[guiid_VideoInterface]->width)||(image_VideoInterface->height != dispimgs[guiid_VideoInterface]->height)))
+					{
+						imgtmp = cvCreateImage(cvSize(dispimgs[guiid_VideoInterface]->width, dispimgs[guiid_VideoInterface]->height), dispimgs[guiid_VideoInterface]->depth, dispimgs[guiid_VideoInterface]->nChannels);
+						if (imgtmp)
+						{
+							cvReleaseImage(&image_VideoInterface);
+							image_VideoInterface = imgtmp;
+						}
+					}
+					CopyResizeScale(dispimgs[guiid_VideoInterface], image_VideoInterface, bCropOnResize);
+				}
 				LeaveCriticalSection(&dispimgsCS[guiid_VideoInterface]);
 			}
-			else
+			else if ((videoid_VideoInterface >= 0)&&(videoid_VideoInterface < MAX_NB_VIDEO)&&(!bDisableVideo[videoid_VideoInterface]))
 			{
-				if ((videoid_VideoInterface >= 0)&&(videoid_VideoInterface < MAX_NB_VIDEO)&&(!bDisableVideo[videoid_VideoInterface]))
+				EnterCriticalSection(&imgsCS[videoid_VideoInterface]);
+				//if ((bUseRawImgPtrVideo)&&(image_VideoInterface->width == imgs[videoid_VideoInterface]->width)&&(image_VideoInterface->height == imgs[videoid_VideoInterface]->height))
+				//	image_VideoInterface = imgs[videoid_VideoInterface];
+				//else CopyResizeScale(imgs[videoid_VideoInterface], image_VideoInterface, bCropOnResize);
+				if (bUseRawImgPtrVideo)
 				{
-					EnterCriticalSection(&imgsCS[videoid_VideoInterface]);
-					if ((bUseRawImgPtrVideo)&&(image_VideoInterface->width == imgs[videoid_VideoInterface]->width)&&(image_VideoInterface->height == imgs[videoid_VideoInterface]->height))
-						image_VideoInterface = imgs[videoid_VideoInterface];
-					else CopyResizeScale(imgs[videoid_VideoInterface], image_VideoInterface, bCropOnResize);
-					LeaveCriticalSection(&imgsCS[videoid_VideoInterface]);
+					if ((bForceSoftwareResizeScale_VideoInterface)&&((image_VideoInterface->width != imgs[videoid_VideoInterface]->width)||(image_VideoInterface->height != imgs[videoid_VideoInterface]->height)))
+						CopyResizeScale(imgs[videoid_VideoInterface], image_VideoInterface, bCropOnResize);
+					else image_VideoInterface = imgs[videoid_VideoInterface];
 				}
 				else
 				{
-					cvSet(image_VideoInterface, CV_RGB(0, 0, 0), NULL);
+					if ((!bForceSoftwareResizeScale_VideoInterface)&&((image_VideoInterface->width != imgs[videoid_VideoInterface]->width)||(image_VideoInterface->height != imgs[videoid_VideoInterface]->height)))
+					{
+						imgtmp = cvCreateImage(cvSize(imgs[videoid_VideoInterface]->width, imgs[videoid_VideoInterface]->height), imgs[videoid_VideoInterface]->depth, imgs[videoid_VideoInterface]->nChannels);
+						if (imgtmp)
+						{
+							cvReleaseImage(&image_VideoInterface);
+							image_VideoInterface = imgtmp;
+						}
+					}
+					CopyResizeScale(imgs[videoid_VideoInterface], image_VideoInterface, bCropOnResize);
 				}
+				LeaveCriticalSection(&imgsCS[videoid_VideoInterface]);
 			}
+			else cvSet(image_VideoInterface, CV_RGB(0, 0, 0), NULL);
 			LeaveCriticalSection(&idsCS);
 
 			//nbBytes = 0;
@@ -247,6 +280,11 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 
 THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 {
+	char address[256];
+	char port[256];
+	int DevType = 0;
+	SOCKET sockcli = INVALID_SOCKET;
+
 	UNREFERENCED_PARAMETER(pParam);
 	   
 	if (strncmp(encodetype_VideoInterface, ".JPEG", min(strlen(encodetype_VideoInterface), strlen(".JPEG"))+1) == 0)
@@ -292,23 +330,95 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 	}
 	if (bUseRawImgPtrVideo) imagebak_VideoInterface = image_VideoInterface; // To be able to release memory later if image_VideoInterface is overwritten...
 
-	if (bUDP_VideoInterface)
+	memset(address, 0, sizeof(address));
+	memset(port, 0, sizeof(port));
+	DevType = -1;
+
+	if (GetAddrPortTypeFromDevPath(szVideoInterfacePath, address, sizeof(address), port, sizeof(port), &DevType) != EXIT_SUCCESS)
 	{
-		while (LaunchUDPSrv(VideoInterfacePort+1, handlevideointerfacecli, NULL) != EXIT_SUCCESS)
+		printf("Error launching the VideoInterface server : Invalid szVideoInterfacePath.\n");
+		if (!bUseRawImgPtrVideo) cvReleaseImage(&image_VideoInterface); else cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...
+#ifdef USE_OPENCV_HIGHGUI_CPP_API
+		encodeparams_VideoInterface.clear();
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
+		return 0;
+	}
+
+	if (DevType == TCP_SERVER_DEV_TYPE_OSNET)
+	{
+		while (LaunchMultiCliTCPSrv(port, handlevideointerfacecli, NULL) != EXIT_SUCCESS)
 		{
 			printf("Error launching the VideoInterface server.\n");
 			mSleep(4000);
 			if (bExit) break;
 		}
 	}
-	else
+	else if (DevType == UDP_SERVER_DEV_TYPE_OSNET)
 	{
-		while (LaunchMultiCliTCPSrv(VideoInterfacePort+1, handlevideointerfacecli, NULL) != EXIT_SUCCESS)
+		while (LaunchUDPSrv(port, handlevideointerfacecli, NULL) != EXIT_SUCCESS)
 		{
 			printf("Error launching the VideoInterface server.\n");
 			mSleep(4000);
 			if (bExit) break;
 		}
+	}
+	else if (DevType == TCP_CLIENT_DEV_TYPE_OSNET)
+	{
+		for (;;)
+		{
+			if (inittcpcli(&sockcli, address, port) == EXIT_SUCCESS)
+			{
+				mSleep(50);
+				for (;;)
+				{
+					if (handlevideointerfacecli(sockcli, NULL) != EXIT_SUCCESS)
+					{
+						printf("Connection to a VideoInterface lost.\n");
+						break;
+					}
+					if (bExit) break;
+				}
+				releasetcpcli(sockcli);
+				mSleep(50);
+			}
+			else
+			{
+				mSleep(1000);
+			}
+			if (bExit) break;
+		}
+	}
+	else if (DevType == UDP_CLIENT_DEV_TYPE_OSNET)
+	{
+		for (;;)
+		{
+			if (initudpcli(&sockcli, address, port) == EXIT_SUCCESS)
+			{
+				mSleep(50);
+				for (;;)
+				{
+					if (handlevideointerfacecli(sockcli, NULL) != EXIT_SUCCESS)
+					{
+						printf("Connection to a VideoInterface lost.\n");
+						break;
+					}
+					if (bExit) break;
+				}
+				releaseudpcli(sockcli);
+				mSleep(50);
+			}
+			else
+			{
+				mSleep(1000);
+			}
+			if (bExit) break;
+		}
+	}
+	else
+	{
+		printf("Error launching the VideoInterface server : Invalid szVideoInterfacePath.\n");
+		if (!bExit) bExit = TRUE; // Unexpected program exit...
 	}
 
 	if (!bUseRawImgPtrVideo) cvReleaseImage(&image_VideoInterface); else cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...

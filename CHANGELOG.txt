@@ -1,3 +1,9 @@
+326
+Added bForceSoftwareResizeScale_VideoInterface parameter in place of bUDP_VideoInterface.
+Renamed VideoInterfacePort to szVideoInterfacePath.
+Updated Video and VideoInterface.
+Improved error messages for UxVCtrl.txt.
+
 325
 Corrected some warnings on Linux.
 Corrected the name of GUIID_VID_IF and VIDID_VID_IF MAVLinkInterface parameters.

@@ -231,7 +231,7 @@ WMV2
 11
 % bVideoInterface
 1
-% VideoInterfacePort (server TCP port (e.g. :4014))
+% szVideoInterfacePath (server TCP port (e.g. :4014))
 :4014
 % videoimgwidth_VideoInterface
 320
@@ -241,7 +241,7 @@ WMV2
 40
 % VideoInterfaceTimeout (in ms)
 5
-% bUDP_VideoInterface
+% bForceSoftwareResizeScale_VideoInterface
 0
 % guiid_VideoInterface (-1 to disable)
 -1

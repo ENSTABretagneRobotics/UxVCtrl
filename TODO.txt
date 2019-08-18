@@ -1,21 +1,44 @@
+
+Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
+
+Error reading parameter : ${paramname}.\\n");\r\n\t\tif (sscanf(line, ${paramformat}, &${paramname}) != 1) printf("Invalid parameter : ${paramname}
+
+
+Invalid configuration file.\\n\"\);\s?\r?\n\s?if \(fprintf\(fileout, (?<paramformat>.*), (?<paramname>.*)\) < 0\) printf\(\"Error writing configuration file
+
+Invalid parameter : ${paramname}.\\n");\r\n\tif (fprintf(fileout, ${paramformat}, ${paramname}) < 0) printf("Error writing parameter : ${paramname}
+
+
+voir plus précisément où désactiver -Wno-deprecated-copy (gcc9) -Wno-class-memaccess (gcc8)
+
 ErrorCount dans les threads de Commands.cpp, voir aussi d'autres éventuels threads oubliés...
 
 add param defaultthreadperiod for threads...
 rajouter un nloop%((1000/threadperiod)*2) pour les printf de threadperiod
 mettre char line[1024] pour les fichiers de config des devices (s'ils ne sont pas lus trop souvent)...
 
+Pouvoir passer gstreamer command UxVCtrl, rajouter param supplémentaire pour passer CAP_GSTREAMER ou variable avec un code pour dire d'utiliser v4l2, voir aussi update ./gopro vlc.sdp
+Comment dire à libavformat d'utiliser omxh264dec?->omxcv?
+UxVCtrl : rajouter support de v4l2 en h264 ou autre et l'envoi en UDP, TCP ou un pipe de ce qui vient de la caméra, besoin d'avoir une var imgcompressed en parallèle de img pour qu'elle puisse être utilisée par VideoInterface
 mettre dans extensions les éventuels fichiers de l'omx
 Éviter les png UxVCtrl sur rpi, sauvegarder en brut en option, option ppm, bmp, png, jpg pour chaque type de données?
-Video/MAVLinkDevice/Interface : voir comment leur faire gérer UDP comme il faut...
-VideoInterface : pouvoir envoyer les données brutes sans requêtes http, notamment via UDP
-VideoInterfacePort à renommer en VideoInterfacePath et pour l'UDP doit être address:port, et c'est plus un initudpcli() qui doit être appelé, et il faut une nouvelle fonction spécifique handleudp() qui fait que des send()
+VideoInterface : pouvoir envoyer les données brutes compressées sans requêtes http, notamment via UDP
+nouvelle fonction spécifique handleudp() qui fait que des send(), ou rajouter options correspondantes...?
 Pour MAVLinkInterface il faudrait que ce soit similaire et mieux regarder les ack...
+inithandlemavlinkinterface pas appelé dans le cas server TCP?
+voir comment harmoniser les connectinterface, initinterface, handleinterface pour que ça marche avec RS232Port et multiclisrv, voir aussi rapport avec les device...
+Manque peut-être des mSleep() dans LaunchTCPSrv/LaunchUDPSrv?
+
+Mission Planner MJPEG marche plus?->problème avec version 1.3.68, OK avec 1.3.63 et précédents mais seulement pour remotewebcam... Résolution trop importante?
 
 Creer fichier CurLbl.txt, supprimé si mission stop ou abort, ne pas supprimer si le programme quitte suite à une erreur, mis à jour de manière atomique a chaque commande label, lu à chaque démarrage, rajouter param pour l'ignorer
 
 ExitCode à utiliser plus souvent pour retourner un code d'erreur plus précis...
 
+UxVCtrl prend trop de processeur pi0w (10%) même avec observer, controller ralentis, pas de GUI, pas de device, peut-être à cause des threads inutilisés de détection...
+Tester options de compilation -O3 UXVCtrl...
 params max nb ball lancés au démarrage, err msg please increase dans command correspondante
+rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
 
 convert v4log to update for sbp
 enable 2 seanet...
@@ -55,8 +78,6 @@ Simulate cog and sog like UxVSim
 Opencvgui : Rajouter horizon artificielle sur bord de boussole
 
 Replace mSleep() by uSleep() in remotecam, for short delays...
-
-replace Invalid configuration file by Invalid parameter : XXX...
 
 quitte pas toujours sans taper ENTER si ESC sur opencvgui?->en debug OK, pas en release?->Terminate commands thread in the end after some time in release, or change some timings...?
 https://stackoverflow.com/questions/21123499/how-to-break-out-of-fgets
@@ -477,6 +498,7 @@ add specific columns for raw GPS data in log file?->maybe not necessary since al
 Log update values in accrx, accry, accrz hat/err...
 
 MAVLink
+Liaison udp pour controler le robot à distance sans problèmes de déconnexion/reconnection...
 pouvoir faire un exit (ExitCode=EXIT_SUCCESS) à partir de Mission Planner...->mais je vois pas quel bouton utiliser...
 NMEA2MAVLink bridge (and reverse) for BOATBOT OpenCPN, Mission Planner compatibility->voir aussi le menu caché de Mission Planner...
 envoyer global_position_int pour gérer le fait que qgc n'affiche pas position GPS si pas de fix? revérifier apmp, qgc sitl si no gps lock...

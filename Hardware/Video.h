@@ -47,6 +47,17 @@ extern "C" {
 #include "OSThread.h"
 #endif // !DISABLE_VIDEOTHREAD
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 #define LOCAL_TYPE_VIDEO 0
 #define REMOTE_TYPE_VIDEO 1
 #define FILE_TYPE_VIDEO 2
@@ -1005,9 +1016,9 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	memset(pVideo->address, 0, sizeof(pVideo->address));
 	memset(pVideo->port, 0, sizeof(pVideo->port));
 
-	// Try to determine whether it is an IP address and TCP port, a filename or a local camera.
+	// Try to determine whether it is an IP address and TCP port (e.g. 127.0.0.1:4001), a filename or a local camera (single digit).
 	ptr = strchr(pVideo->szDevPath, ':');
-	if ((ptr != NULL)&&(ptr[1] != '/'))
+	if ((ptr != NULL)&&(atoi(ptr+1) > 0)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
 	{
 		memcpy(pVideo->address, pVideo->szDevPath, ptr-pVideo->szDevPath);
 		strcpy(pVideo->port, ptr+1);
@@ -1106,11 +1117,11 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 #if (CV_MAJOR_VERSION < 3)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
-			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (pVideo->captureperiod) pVideo->pCapture->set(CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #else
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
-			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (pVideo->captureperiod) pVideo->pCapture->set(cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
@@ -1233,11 +1244,11 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 #if (CV_MAJOR_VERSION < 3)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
-			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (pVideo->captureperiod) pVideo->pCapture->set(CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #else
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
-			if (pVideo->captureperiod) pVideo->pCapture->set(pVideo->pCapture, cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (pVideo->captureperiod) pVideo->pCapture->set(cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
 #endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
@@ -1434,5 +1445,15 @@ inline int DisconnectVideo(VIDEO* pVideo)
 #ifndef DISABLE_VIDEOTHREAD
 THREAD_PROC_RETURN_VALUE VideoThread(void* pParam);
 #endif // !DISABLE_VIDEOTHREAD
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER
 
 #endif // !VIDEO_H
