@@ -203,6 +203,9 @@ NMEADevice.o: ./Hardware/NMEADevice.cpp ./Hardware/NMEADevice.h ./Hardware/NMEAP
 NortekDVL.o: ./Hardware/NortekDVL.cpp ./Hardware/NortekDVL.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+Ontrak.o: ./Hardware/Ontrak.cpp ./Hardware/Ontrak.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 P33x.o: ./Hardware/P33x.cpp ./Hardware/P33x.h
 	$(CXX) $(CXXFLAGS) -c $<
 
@@ -213,6 +216,9 @@ Pololu.o: ./Hardware/Pololu.cpp ./Hardware/Pololu.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 RazorAHRS.o: ./Hardware/RazorAHRS.cpp ./Hardware/RazorAHRS.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+Roboteq.o: ./Hardware/Roboteq.cpp ./Hardware/Roboteq.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 RPLIDAR.o: ./Hardware/RPLIDAR.cpp ./Hardware/RPLIDAR.h
@@ -331,7 +337,7 @@ VideoRecord.o: VideoRecord.cpp VideoRecord.h
 Wall.o: Wall.cpp Wall.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VideoRecord.o VideoInterface.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o SBGInterface.o RazorAHRSInterface.o PololuInterface.o Pinger.o OpenCVGUI.o Obstacle.o Observer.o NortekDVL.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o ExternalProgramTrigger.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o SRF02.o Seanet.o SBG.o RS232Port.o RPLIDAR.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o I2CBus.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o OSComputerI2CBus.o
+UxVCtrl: Wall.o VideoRecord.o VideoInterface.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o SBGInterface.o RazorAHRSInterface.o PololuInterface.o Pinger.o OpenCVGUI.o Obstacle.o Observer.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o ExternalProgramTrigger.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o SRF02.o Seanet.o SBG.o RS232Port.o RPLIDAR.o Roboteq.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o Ontrak.o NortekDVL.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o I2CBus.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o OSComputerI2CBus.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

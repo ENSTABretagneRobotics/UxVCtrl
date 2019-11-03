@@ -1,3 +1,10 @@
+327
+Increased the max number of labels.
+Added sailcalibration command.
+Added '?' in OpenCVGUI when the sail is not calibrated for VAIMOS.
+Corrected potential bugs when stopping and starting back chronos for periodic tasks.
+Beginning of Ontrak and Roboteq integration.
+
 326
 Added bForceSoftwareResizeScale_VideoInterface parameter in place of bUDP_VideoInterface.
 Renamed VideoInterfacePort to szVideoInterfacePath.

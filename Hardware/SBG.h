@@ -1039,7 +1039,6 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 	if (errorCode != SBG_NOT_READY)//||((errorCode == SBG_NOT_READY)&&(prevErrorCode != SBG_NO_ERROR)))
 	{
 		printf("Error reading data from a SBG. \n");
-		StopChronoQuick(&chrono);
 		return EXIT_TIMEOUT;
 	}
 

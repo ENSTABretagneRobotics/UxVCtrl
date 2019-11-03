@@ -14,7 +14,6 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 {
 	IM483I im483i;
 	double angle = 0;
-	BOOL bFirstSailCalibration = TRUE;
 	CHRONO chrono_sail_calibration;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
@@ -114,15 +113,14 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 			case SAILBOAT2_ROBID: // For VSim compatibility...
 			case VAIMOS_ROBID:
 				if ((GetTimeElapsedChronoQuick(&chrono_sail_calibration) > sail_calibration_period)||
-					((bCalibrateSail)&&(!bSailCalibrated)))
+					((bCalibrateSail)&&(!bSailCalibrated))||
+					(bForceSailCalibration))
 				{
-					StopChronoQuick(&chrono_sail_calibration);
-					bSailCalibrated = FALSE;
-					if (bFirstSailCalibration)
+					if ((bCalibrateSail)&&(!bSailCalibrated))
 					{
 						if (bCheckRudder) mSleep(7000); // Wait for the rudder check...
-						bFirstSailCalibration = FALSE;
 					}
+					bSailCalibrated = FALSE;
 					if (CalibrateMotorIM483I(&im483i) != EXIT_SUCCESS)
 					{
 						printf("Connection to a IM483I lost.\n");
@@ -131,6 +129,8 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 						break;
 					}
 					bSailCalibrated = TRUE;
+					bForceSailCalibration = FALSE;
+					StopChronoQuick(&chrono_sail_calibration);
 					StartChrono(&chrono_sail_calibration);
 				}
 				EnterCriticalSection(&StateVariablesCS);

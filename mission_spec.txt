@@ -216,7 +216,11 @@
 %
 %minisscconfig MiniSSC.txt bPause
 %
+%roboteqconfig deviceid Roboteq.txt bPause
+%
 %im483iconfig IM483I.txt bPause
+%
+%ontrakconfig Ontrak.txt bPause
 %
 %videoconfig videoid Video.txt bPause
 %
@@ -239,6 +243,8 @@
 %landmavlinkdevice deviceid yaw latitude longitude altitude (in deg and m)
 %
 %mavlinkdevicein deviceid bEnable
+%
+%sailcalibration
 %
 % ACOUSTIC COMMANDS
 %
@@ -378,9 +384,9 @@
 %
 %jump linenumber (int > 0, only used inside a mission file)
 %
-%label id (int [0,256[, only used inside a mission file)
+%label id (int [0,1024[, only used inside a mission file)
 %
-%goto id (int [0,256[, only used inside a mission file)
+%goto id (int [0,1024[, only used inside a mission file)
 %
 %procedure id (int [0,256[, only used inside a mission file)
 %
@@ -500,7 +506,7 @@
 %
 %disablealtreg (alias for disabledepthreg)
 %
-%enableaglhreg
+%enableaglreg
 %
 %disableaglreg
 %

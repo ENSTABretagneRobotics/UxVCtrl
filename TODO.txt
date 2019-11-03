@@ -13,6 +13,8 @@ voir plus précisément où désactiver -Wno-deprecated-copy (gcc9) -Wno-class-memac
 
 ErrorCount dans les threads de Commands.cpp, voir aussi d'autres éventuels threads oubliés...
 
+Ontrak, roboteq serial...
+
 add param defaultthreadperiod for threads...
 rajouter un nloop%((1000/threadperiod)*2) pour les printf de threadperiod
 mettre char line[1024] pour les fichiers de config des devices (s'ils ne sont pas lus trop souvent)...
@@ -21,6 +23,7 @@ Pouvoir passer gstreamer command UxVCtrl, rajouter param supplémentaire pour pas
 Comment dire à libavformat d'utiliser omxh264dec?->omxcv?
 UxVCtrl : rajouter support de v4l2 en h264 ou autre et l'envoi en UDP, TCP ou un pipe de ce qui vient de la caméra, besoin d'avoir une var imgcompressed en parallèle de img pour qu'elle puisse être utilisée par VideoInterface
 mettre dans extensions les éventuels fichiers de l'omx
+add param bUseHWaccel to choose to enable omx JPEG and H264 for pi
 Éviter les png UxVCtrl sur rpi, sauvegarder en brut en option, option ppm, bmp, png, jpg pour chaque type de données?
 VideoInterface : pouvoir envoyer les données brutes compressées sans requêtes http, notamment via UDP
 nouvelle fonction spécifique handleudp() qui fait que des send(), ou rajouter options correspondantes...?
@@ -42,8 +45,6 @@ rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
 
 convert v4log to update for sbp
 enable 2 seanet...
-
-Ontrak in VAIMOS folder...
 
 param pour le calcul vent vrai, apparent, etc., voir plus bas...
 
@@ -104,7 +105,6 @@ find_package for windows and libmodbus (maybe not for SBG since it is modified, 
 Check set_attitude_target guided mode absolute heading...
 
 Rajouter params code sonar et csv2v4log pour gérer sbp, regarder fichiers de données et capture de la com...
-commande pour calibration de voile VAIMOS, afficher bSailCalibrated dans GUI?
 si pas bCalibrateSail, le couple n'est pas réglé...
 
 $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
@@ -289,8 +289,6 @@ waypointslist 3D, gestion de l'altitude dans fly to here, w.r.t. home...
 accéder aux rcin avant override?->peut-être pas possible, utiliser set_attitude_target à la place de rc_override...?->vérifier rc_channels vs rc_channels_raw pour confirmer...
 
 menu dispsource (0 : default, 1 : AHRS, 2 : GPS, 3 : DVL)...
-
-roboteq serial
 
 Check observer omegazhat for submarines
 initpws n'est pas vraiment utilisé->il serait de toute façon tout de suite écrasé à cause de u, du coup c'est plutôt un u_0, uw_0, etc. qu'il faudrait?
@@ -589,6 +587,7 @@ opencv cherche toujours à ouvrir la meme cam s'il n'y en a qu'une et qu'on veut 
 Mettre en var globale les périphériques?
 détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
 intercepter 1er CTRL+C pour faire bExit puis ne plus les intercepter?
+multiple gpcontrol...->not easy because of its static IP address...
 Appli gps qui affiche sog à partir des logs?
 Faire programme pour aider à la mag calib
 fournir simple couche d'adaptation pour pouvoir traiter webcam sans opencv
@@ -799,6 +798,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+afficher bSailCalibrated dans GUI?->mettre en rouge le uvoile?->mis '?'
 
 La conversion de BGR vers I420 avec cvtColor prend pi4 cpu 30% en 1280x720@25...
 De même, imwrite() : 

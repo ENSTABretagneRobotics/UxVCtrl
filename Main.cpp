@@ -68,7 +68,9 @@
 #include "Pololu.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "MiniSSC.h"
+#include "Roboteq.h"
 #include "IM483I.h"
+#include "Ontrak.h"
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 #include "CISCREA.h"
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -170,7 +172,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER PololuThreadId[MAX_NB_POLOLU];
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER MiniSSCThreadId;
+	THREAD_IDENTIFIER RoboteqThreadId[MAX_NB_ROBOTEQ];
 	THREAD_IDENTIFIER IM483IThreadId;
+	THREAD_IDENTIFIER OntrakThreadId;
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	THREAD_IDENTIFIER CISCREAThreadId;
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -341,7 +345,12 @@ int main(int argc, char* argv[])
 	}
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableMiniSSC) CreateDefaultThread(MiniSSCThread, NULL, &MiniSSCThreadId);
+	for (i = 0; i < MAX_NB_ROBOTEQ; i++)
+	{
+		if (!bDisableRoboteq[i]) CreateDefaultThread(RoboteqThread, (void*)(intptr_t)i, &RoboteqThreadId[i]);
+	}
 	if (!bDisableIM483I) CreateDefaultThread(IM483IThread, NULL, &IM483IThreadId);
+	if (!bDisableOntrak) CreateDefaultThread(OntrakThread, NULL, &OntrakThreadId);
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid == CISCREA_ROBID) CreateDefaultThread(CISCREAThread, NULL, &CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
@@ -574,7 +583,12 @@ int main(int argc, char* argv[])
 #ifdef ENABLE_LIBMODBUS_SUPPORT
 	if (robid == CISCREA_ROBID) WaitForThread(CISCREAThreadId);
 #endif // ENABLE_LIBMODBUS_SUPPORT
+	if (!bDisableOntrak) WaitForThread(OntrakThreadId);
 	if (!bDisableIM483I) WaitForThread(IM483IThreadId);
+	for (i = MAX_NB_ROBOTEQ-1; i >= 0; i--)
+	{
+		if (!bDisableRoboteq[i]) WaitForThread(RoboteqThreadId[i]);
+	}
 	if (!bDisableMiniSSC) WaitForThread(MiniSSCThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	for (i = MAX_NB_POLOLU-1; i >= 0; i--)

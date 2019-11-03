@@ -452,8 +452,6 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				// Check regularly if the strategy needs to be changed.
 				if ((GetTimeElapsedChronoQuick(&chrono_check_strategy) > check_strategy_period)||bForceCheckStrategy)
 				{
-					StopChronoQuick(&chrono_check_strategy);
-					bForceCheckStrategy = 0;
 					prevstate = state;
 #ifndef ALT_SAILBOAT_CONTROLLER
 					if ((cos(psiw-theta_star)+cos(zeta) < 0)||
@@ -526,6 +524,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 							break;
 						}
 					}
+					bForceCheckStrategy = 0;
+					StopChronoQuick(&chrono_check_strategy);
 					StartChrono(&chrono_check_strategy);
 				}
 
@@ -561,10 +561,10 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 				if ((GetTimeElapsedChronoQuick(&chrono_sail_update) > sail_update_period)||bForceSailUpdate)
 				{
-					StopChronoQuick(&chrono_sail_update);
-					bForceSailUpdate = 0;
 					if (bStdOutDetailedInfo) printf("Sail update.\n");
 					u = deltasmax/q1;
+					bForceSailUpdate = 0;
+					StopChronoQuick(&chrono_sail_update);
 					StartChrono(&chrono_sail_update);
 				}
 			}

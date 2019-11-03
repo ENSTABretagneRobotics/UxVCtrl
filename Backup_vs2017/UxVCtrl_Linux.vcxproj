@@ -92,8 +92,10 @@
     <ClCompile Include="Hardware\MS580314BA.cpp" />
     <ClCompile Include="Hardware\MS583730BA.cpp" />
     <ClCompile Include="Hardware\NortekDVL.cpp" />
+    <ClCompile Include="Hardware\Ontrak.cpp" />
     <ClCompile Include="Hardware\PathfinderDVL.cpp" />
     <ClCompile Include="Hardware\Pololu.cpp" />
+    <ClCompile Include="Hardware\Roboteq.cpp" />
     <ClCompile Include="Hardware\RPLIDAR.cpp" />
     <ClCompile Include="Hardware\SBG.cpp" />
     <ClCompile Include="Hardware\SRF02.cpp" />
@@ -191,8 +193,10 @@
     <ClInclude Include="Hardware\MS583730BA.h" />
     <ClInclude Include="Hardware\NMEAProtocol.h" />
     <ClInclude Include="Hardware\NortekDVL.h" />
+    <ClInclude Include="Hardware\Ontrak.h" />
     <ClInclude Include="Hardware\PathfinderDVL.h" />
     <ClInclude Include="Hardware\Pololu.h" />
+    <ClInclude Include="Hardware\Roboteq.h" />
     <ClInclude Include="Hardware\RPLIDAR.h" />
     <ClInclude Include="Hardware\RTCM2Protocol.h" />
     <ClInclude Include="Hardware\RTCM3Protocol.h" />
@@ -592,7 +596,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -610,7 +614,7 @@
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -628,7 +632,7 @@
       <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>
@@ -646,7 +650,7 @@
       <AdditionalIncludeDirectories>$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
-      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
     <Link>
       <LibraryDependencies>opencv_core;opencv_imgproc;opencv_highgui;modbus;sbgECom;bvtsdk;pthread;rt;m</LibraryDependencies>

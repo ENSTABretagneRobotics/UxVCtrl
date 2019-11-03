@@ -185,7 +185,10 @@ inline int LoadConfig(void)
 	bDisablePololu[1] = TRUE;
 	bDisablePololu[2] = TRUE;
 	bDisableMiniSSC = TRUE;
+	bDisableRoboteq[0] = TRUE;
+	bDisableRoboteq[1] = TRUE;
 	bDisableIM483I = TRUE;
+	bDisableOntrak = TRUE;
 #pragma endregion
 #pragma region Controller parameters
 	u_max = 1;
@@ -680,8 +683,14 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bDisablePololu[2]) != 1) printf("Invalid parameter : bDisablePololu[2].\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableMiniSSC.\n");
 		if (sscanf(line, "%d", &bDisableMiniSSC) != 1) printf("Invalid parameter : bDisableMiniSSC.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableRoboteq[0].\n");
+		if (sscanf(line, "%d", &bDisableRoboteq[0]) != 1) printf("Invalid parameter : bDisableRoboteq[0].\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableRoboteq[1].\n");
+		if (sscanf(line, "%d", &bDisableRoboteq[1]) != 1) printf("Invalid parameter : bDisableRoboteq[1].\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableIM483I.\n");
 		if (sscanf(line, "%d", &bDisableIM483I) != 1) printf("Invalid parameter : bDisableIM483I.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableOntrak.\n");
+		if (sscanf(line, "%d", &bDisableOntrak) != 1) printf("Invalid parameter : bDisableOntrak.\n");
 #pragma endregion
 #pragma region Controller parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : u_max.\n");
@@ -1821,8 +1830,14 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bDisablePololu[2]) < 0) printf("Error writing parameter : bDisablePololu[2].\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableMiniSSC.\n");
 	if (fprintf(fileout, "%d\n", bDisableMiniSSC) < 0) printf("Error writing parameter : bDisableMiniSSC.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableRoboteq[0].\n");
+	if (fprintf(fileout, "%d\n", bDisableRoboteq[0]) < 0) printf("Error writing parameter : bDisableRoboteq[0].\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableRoboteq[1].\n");
+	if (fprintf(fileout, "%d\n", bDisableRoboteq[1]) < 0) printf("Error writing parameter : bDisableRoboteq[1].\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableIM483I.\n");
 	if (fprintf(fileout, "%d\n", bDisableIM483I) < 0) printf("Error writing parameter : bDisableIM483I.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableOntrak.\n");
+	if (fprintf(fileout, "%d\n", bDisableOntrak) < 0) printf("Error writing parameter : bDisableOntrak.\n");
 #pragma endregion
 #pragma region Controller parameters
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : u_max.\n");

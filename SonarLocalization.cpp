@@ -83,7 +83,6 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 
 		if (bDynamicSonarLocalization&&(GetTimeElapsedChronoQuick(&chrono_dynamicsonarlocalization) > dynamicsonarlocalization_period))
 		{
-			StopChronoQuick(&chrono_dynamicsonarlocalization);
 
 			// What if there is no sonar connected...?
 
@@ -132,6 +131,7 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 			yhat = P[2];
 			LeaveCriticalSection(&StateVariablesCS);
 
+			StopChronoQuick(&chrono_dynamicsonarlocalization);
 			StartChrono(&chrono_dynamicsonarlocalization);
 		}
 

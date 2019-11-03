@@ -1500,8 +1500,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case PORT_TACK_TRAJECTORY: s = 'P'; break;
 				default: s = 'I'; break;
 				}
-				sprintf(szText, "%c %c %d%% %d%% VBAT1:%.1fV",
-					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), vbat1);
+				sprintf(szText, "%c %c %d%% %d%%%s VBAT1:%.1fV",
+					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), ((robid == VAIMOS_ROBID)&&(!bSailCalibrated))? "?" : "", vbat1);
 				break;
 			case LIRMIA3_ROBID:
 				sprintf(szText, "%+04d%% %+04d%% %d%% %d%% %d%% %d%%", (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), (int)floor(u4*100.0+0.05), (int)floor(u3*100.0+0.05), (int)floor(u2*100.0+0.05), (int)floor(u1*100.0+0.05));
@@ -1708,8 +1708,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else
 				{
-					StopChronoQuick(&chrono_epu);
 					sprintf(szText, "VBAT1:%.1fV, VBAT2:%.1fV", vbat1, vbat2);
+					StopChronoQuick(&chrono_epu);
 					StartChrono(&chrono_epu);
 				}
 				offset += 16;
@@ -2177,8 +2177,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					LeaveCriticalSection(&VideoRecordRequestsCS[videoid]);
 					if (GetTimeElapsedChronoQuick(&chrono_recording) > 0.5)
 					{
-						StopChronoQuick(&chrono_recording);
 						bDispRecordSymbol = !bDispRecordSymbol;
+						StopChronoQuick(&chrono_recording);
 						StartChrono(&chrono_recording);
 					}
 					if (bDispRecordSymbol) cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
@@ -2200,8 +2200,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				if (GetTimeElapsedChronoQuick(&chrono_playing) > 0.5)
 				{
-					StopChronoQuick(&chrono_playing);
 					bDispPlaySymbol = !bDispPlaySymbol;
+					StopChronoQuick(&chrono_playing);
 					StartChrono(&chrono_playing);
 				}
 			}
@@ -2224,8 +2224,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
 				{
-					StopChronoQuick(&chrono_pausing);
 					bDispPauseSymbol = !bDispPauseSymbol;
+					StopChronoQuick(&chrono_pausing);
 					StartChrono(&chrono_pausing);
 				}
 			}

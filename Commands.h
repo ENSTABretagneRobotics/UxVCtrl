@@ -771,6 +771,30 @@ inline void ReturnProcedure(void)
 	}
 	LeaveCriticalSection(&MissionFilesCS);
 }
+
+inline void _fcopydeviceconfig(char* str, char* str2)
+{
+	unsigned char* buf = NULL;
+	size_t bytes = 0;
+
+	if (strncmp(str, str2, strlen(str2)) != 0)
+	{
+		buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char));
+		if (buf)
+		{
+			if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
+			{
+				printf("Unable to copy file.\n");
+			}
+			free(buf);
+		}
+		else
+		{
+			printf("Unable to allocate data.\n");
+		}
+	}
+	mSleep(500);
+}
 #pragma endregion
 // See mission_spec.txt.
 inline int Commands(char* line)
@@ -788,8 +812,6 @@ inline int Commands(char* line)
 	char str[MAX_BUF_LEN];
 	char str2[MAX_BUF_LEN];
 	char szMissionFilePath[1024];
-	unsigned char* buf = NULL;
-	size_t bytes = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -2509,177 +2531,65 @@ inline int Commands(char* line)
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
 #endif // __GNUC__
 	{
-		if (strncmp(str, "CISCREA0.txt", strlen("CISCREA0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "CISCREA0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "CISCREA0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartCISCREA = TRUE;
 		bPauseCISCREA = ival1;
 	}
 	else if (sscanf(line, "lirmia3config %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "LIRMIA3.txt", strlen("LIRMIA3.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "LIRMIA3.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "LIRMIA3.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartLIRMIA3 = TRUE;
 		bPauseLIRMIA3 = ival1;
 	}
 	else if (sscanf(line, "gpcontrolconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "gpControl0.txt", strlen("gpControl0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "gpControl0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "gpControl0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartgpControl = TRUE;
 		bPausegpControl = ival1;
 	}
 	else if (sscanf(line, "pathfinderconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "PathfinderDVL0.txt", strlen("PathfinderDVL0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "PathfinderDVL0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "PathfinderDVL0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartPathfinderDVL = TRUE;
 		bPausePathfinderDVL = ival1;
 	}
 	else if (sscanf(line, "nortekconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "NortekDVL0.txt", strlen("NortekDVL0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "NortekDVL0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "NortekDVL0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartNortekDVL = TRUE;
 		bPauseNortekDVL = ival1;
 	}
 	else if (sscanf(line, "mesconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MES0.txt", strlen("MES0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "MES0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "MES0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartMES = TRUE;
 		bPauseMES = ival1;
 	}
 	else if (sscanf(line, "mdmconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MDM0.txt", strlen("MDM0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "MDM0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "MDM0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartMDM = TRUE;
 		bPauseMDM = ival1;
 	}
 	else if (sscanf(line, "seanetconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "Seanet0.txt", strlen("Seanet0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "Seanet0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "Seanet0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartSeanet = TRUE;
 		bPauseSeanet = ival1;
 	}
@@ -2689,23 +2599,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "BlueView%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)) != 0)
-			{
-				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-				if (buf)
-				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-					{
-						printf("Unable to copy file.\n");
-					}
-					free(buf);
-				}
-				else
-				{
-					printf("Unable to allocate data.\n");
-				}
-			}
-			mSleep(500);
+			_fcopydeviceconfig(str, str2);
 			if (!ival1) bRestartBlueView[ival] = TRUE;
 			bPauseBlueView[ival] = ival1;
 		}
@@ -2716,199 +2610,73 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "hokuyoconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "Hokuyo0.txt", strlen("Hokuyo0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "Hokuyo0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "Hokuyo0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartHokuyo = TRUE;
 		bPauseHokuyo = ival1;
 	}
 	else if (sscanf(line, "rplidarconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "RPLIDAR0.txt", strlen("RPLIDAR0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "RPLIDAR0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "RPLIDAR0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartRPLIDAR = TRUE;
 		bPauseRPLIDAR = ival1;
 	}
 	else if (sscanf(line, "srf02config %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "SRF020.txt", strlen("SRF020.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "SRF020.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "SRF020.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartSRF02 = TRUE;
 		bPauseSRF02 = ival1;
 	}
 	else if (sscanf(line, "ms580314baconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MS580314BA0.txt", strlen("MS580314BA0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "MS580314BA0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "MS580314BA0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartMS580314BA = TRUE;
 		bPauseMS580314BA = ival1;
 	}
 	else if (sscanf(line, "ms583730baconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MS583730BA0.txt", strlen("MS583730BA0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "MS583730BA0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "MS583730BA0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartMS583730BA = TRUE;
 		bPauseMS583730BA = ival1;
 	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "P33x0.txt", strlen("P33x0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "P33x0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "P33x0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartP33x = TRUE;
 		bPauseP33x = ival1;
 	}
 	else if (sscanf(line, "razorahrsconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "RazorAHRS0.txt", strlen("RazorAHRS0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "RazorAHRS0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "RazorAHRS0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartRazorAHRS = TRUE;
 		bPauseRazorAHRS = ival1;
 	}
 	else if (sscanf(line, "mtconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MT0.txt", strlen("MT0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "MT0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "MT0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartMT = TRUE;
 		bPauseMT = ival1;
 	}
 	else if (sscanf(line, "sbgconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "SBG0.txt", strlen("SBG0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "SBG0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "SBG0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartSBG = TRUE;
 		bPauseSBG = ival1;
 	}
@@ -2918,23 +2686,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "NMEADevice%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)) != 0)
-			{
-				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-				if (buf)
-				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-					{
-						printf("Unable to copy file.\n");
-					}
-					free(buf);
-				}
-				else
-				{
-					printf("Unable to allocate data.\n");
-				}
-			}
-			mSleep(500);
+			_fcopydeviceconfig(str, str2);
 			if (!ival1) bRestartNMEADevice[ival] = TRUE;
 			bPauseNMEADevice[ival] = ival1;
 		}
@@ -2949,23 +2701,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "ublox%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)) != 0)
-			{
-				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-				if (buf)
-				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-					{
-						printf("Unable to copy file.\n");
-					}
-					free(buf);
-				}
-				else
-				{
-					printf("Unable to allocate data.\n");
-				}
-			}
-			mSleep(500);
+			_fcopydeviceconfig(str, str2);
 			if (!ival1) bRestartublox[ival] = TRUE;
 			bPauseublox[ival] = ival1;
 		}
@@ -2980,23 +2716,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "MAVLinkDevice%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)) != 0)
-			{
-				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-				if (buf)
-				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-					{
-						printf("Unable to copy file.\n");
-					}
-					free(buf);
-				}
-				else
-				{
-					printf("Unable to allocate data.\n");
-				}
-			}
-			mSleep(500);
+			_fcopydeviceconfig(str, str2);
 			if (!ival1) bRestartMAVLinkDevice[ival] = TRUE;
 			bPauseMAVLinkDevice[ival] = ival1;
 		}
@@ -3007,67 +2727,25 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "swarmondeviceconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "SwarmonDevice0.txt", strlen("SwarmonDevice0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "SwarmonDevice0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "SwarmonDevice0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartSwarmonDevice = TRUE;
 		bPauseSwarmonDevice = ival1;
 	}
 	else if (sscanf(line, "ue9aconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "UE9A0.txt", strlen("UE9A0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "UE9A0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "UE9A0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartUE9A = TRUE;
 		bPauseUE9A = ival1;
 	}
 	else if (sscanf(line, "ssc32config %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "SSC320.txt", strlen("SSC320.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "SSC320.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "SSC320.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartSSC32 = TRUE;
 		bPauseSSC32 = ival1;
 	}
@@ -3077,23 +2755,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "Pololu%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)) != 0)
-			{
-				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-				if (buf)
-				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-					{
-						printf("Unable to copy file.\n");
-					}
-					free(buf);
-				}
-				else
-				{
-					printf("Unable to allocate data.\n");
-				}
-			}
-			mSleep(500);
+			_fcopydeviceconfig(str, str2);
 			if (!ival1) bRestartPololu[ival] = TRUE;
 			bPausePololu[ival] = ival1;
 		}
@@ -3104,47 +2766,42 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "minisscconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "MiniSSC0.txt", strlen("MiniSSC0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "MiniSSC0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "MiniSSC0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartMiniSSC = TRUE;
 		bPauseMiniSSC = ival1;
 	}
+	else if (sscanf(line, "roboteqconfig %d %255s %d", &ival, str, &ival1) == 3)
+	{
+		if ((ival >= 0)&&(ival < MAX_NB_ROBOTEQ))
+		{
+			memset(str2, 0, sizeof(str2));
+			sprintf(str2, "Roboteq%d.txt", ival);
+			_fcopydeviceconfig(str, str2);
+			if (!ival1) bRestartRoboteq[ival] = TRUE;
+			bPauseRoboteq[ival] = ival1;
+		}
+		else
+		{
+			printf("Invalid parameter.\n");
+		}
+	}
 	else if (sscanf(line, "im483iconfig %255s %d", str, &ival1) == 2)
 	{
-		if (strncmp(str, "IM483I0.txt", strlen("IM483I0.txt")) != 0)
-		{
-			buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-			if (buf)
-			{
-				if (fcopyload(str, "IM483I0.txt", buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-				{
-					printf("Unable to copy file.\n");
-				}
-				free(buf);
-			}
-			else
-			{
-				printf("Unable to allocate data.\n");
-			}
-		}
-		mSleep(500);
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "IM483I0.txt");
+		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartIM483I = TRUE;
 		bPauseIM483I = ival1;
+	}
+	else if (sscanf(line, "ontrakconfig %255s %d", str, &ival1) == 2)
+	{
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "Ontrak0.txt");
+		_fcopydeviceconfig(str, str2);
+		if (!ival1) bRestartOntrak = TRUE;
+		bPauseOntrak = ival1;
 	}
 #ifndef DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "videoconfig %d %255s %d", &ival, str, &ival1) == 3)
@@ -3153,23 +2810,7 @@ inline int Commands(char* line)
 		{
 			memset(str2, 0, sizeof(str2));
 			sprintf(str2, "Video%d.txt", ival);
-			if (strncmp(str, str2, strlen(str2)) != 0)
-			{
-				buf = (unsigned char*)calloc(MAX_CFGFILE_SIZE, sizeof(unsigned char)); 
-				if (buf)
-				{
-					if (fcopyload(str, str2, buf, sizeof(unsigned char), MAX_CFGFILE_SIZE, &bytes) != EXIT_SUCCESS)
-					{
-						printf("Unable to copy file.\n");
-					}
-					free(buf);
-				}
-				else
-				{
-					printf("Unable to allocate data.\n");
-				}
-			}
-			mSleep(500);
+			_fcopydeviceconfig(str, str2);
 			if (!ival1) bRestartVideo[ival] = TRUE;
 			bPauseVideo[ival] = ival1;
 		}
@@ -3322,6 +2963,10 @@ inline int Commands(char* line)
 		{
 			printf("Invalid parameter.\n");
 		}
+	}
+	else if (strncmp(line, "sailcalibration", strlen("sailcalibration")) == 0)
+	{
+		bForceSailCalibration = TRUE;
 	}
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS

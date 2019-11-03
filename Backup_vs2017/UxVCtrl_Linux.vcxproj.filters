@@ -294,6 +294,12 @@
     <ClCompile Include="PololuInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Hardware\Ontrak.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\Roboteq.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -667,6 +673,12 @@
     </ClInclude>
     <ClInclude Include="PololuInterface.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\Ontrak.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\Roboteq.h">
+      <Filter>Hardware</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

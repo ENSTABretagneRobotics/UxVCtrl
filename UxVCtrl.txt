@@ -324,7 +324,13 @@ WMV2
 1
 % bDisableMiniSSC
 1
+% bDisableRoboteq[0]
+1
+% bDisableRoboteq[1]
+1
 % bDisableIM483I
+1
+% bDisableOntrak
 1
 % Controller parameters
 % u_max (in [0;1])

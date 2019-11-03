@@ -130,7 +130,7 @@ typedef enum KEYS KEYS;
 
 #define MAX_UNCERTAINTY 10000
 
-#define MAX_NB_LABELS 256
+#define MAX_NB_LABELS 1024
 #define MAX_NB_PROCEDURES 256
 #define MAX_NB_REGISTERS 32
 
@@ -142,6 +142,7 @@ typedef enum KEYS KEYS;
 #define MAX_NB_UBLOX 3
 #define MAX_NB_MAVLINKDEVICE 3
 #define MAX_NB_POLOLU 3
+#define MAX_NB_ROBOTEQ 2
 
 #define MAX_NB_BALL 8
 #define MAX_NB_EXTERNALPROGRAMTRIGGER 8
@@ -457,7 +458,9 @@ extern BOOL bDisableUE9A;
 extern BOOL bDisableSSC32;
 extern BOOL bDisablePololu[MAX_NB_POLOLU];
 extern BOOL bDisableMiniSSC;
+extern BOOL bDisableRoboteq[MAX_NB_ROBOTEQ];
 extern BOOL bDisableIM483I;
+extern BOOL bDisableOntrak;
 #pragma endregion
 #pragma region Controller parameters
 extern double u_max, uw_max, u_coef, uw_coef;
@@ -895,8 +898,15 @@ extern BOOL bRestartPololu[MAX_NB_POLOLU];
 // MiniSSC variables.
 extern BOOL bPauseMiniSSC, bRestartMiniSSC;
 
+// Roboteq variables.
+extern BOOL bPauseRoboteq[MAX_NB_ROBOTEQ];
+extern BOOL bRestartRoboteq[MAX_NB_ROBOTEQ];
+
 // IM483I variables.
 extern BOOL bPauseIM483I, bRestartIM483I;
+
+// Ontrak variables.
+extern BOOL bPauseOntrak, bRestartOntrak;
 
 // Video variables.
 extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
@@ -987,6 +997,7 @@ extern CvScalar colorsonarlidar;
 extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
 extern BOOL bSailCalibrated;
+extern BOOL bForceSailCalibration;
 extern BOOL bDisableAllAlarms;
 extern BOOL bForceOverrideInputs;
 extern BOOL bDisableRollWindCorrectionSailboat;
@@ -1402,6 +1413,12 @@ inline int InitGlobals(void)
 		bRestartPololu[i] = FALSE;
 	}
 
+	for (i = 0; i < MAX_NB_ROBOTEQ; i++)
+	{
+		bPauseRoboteq[i] = FALSE;
+		bRestartRoboteq[i] = FALSE;
+	}
+
 	for (i = 0; i < MAX_NB_VIDEO; i++)
 	{
 		InitCriticalSection(&imgsCS[i]);
@@ -1703,6 +1720,12 @@ inline int ReleaseGlobals(void)
 		bPausePololu[i] = FALSE;
 		SetPositionMaestroPololu[i] = -1;
 		ShowGetPositionMaestroPololu[i] = -1;
+	}
+
+	for (i = MAX_NB_ROBOTEQ-1; i >= 0; i--)
+	{
+		bRestartRoboteq[i] = FALSE;
+		bPauseRoboteq[i] = FALSE;
 	}
 
 	for (i = MAX_NB_MAVLINKDEVICE-1; i >= 0; i--)

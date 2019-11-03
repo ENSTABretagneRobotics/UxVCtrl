@@ -216,7 +216,9 @@ BOOL bDisableUE9A = FALSE;
 BOOL bDisableSSC32 = FALSE;
 BOOL bDisablePololu[MAX_NB_POLOLU];
 BOOL bDisableMiniSSC = FALSE;
+BOOL bDisableRoboteq[MAX_NB_ROBOTEQ];
 BOOL bDisableIM483I = FALSE;
+BOOL bDisableOntrak = FALSE;
 #pragma endregion
 #pragma region Controller parameters
 double u_max = 0, uw_max = 0, u_coef = 0, uw_coef = 0;
@@ -659,8 +661,15 @@ BOOL bRestartPololu[MAX_NB_POLOLU];
 // MiniSSC variables.
 BOOL bPauseMiniSSC = FALSE, bRestartMiniSSC = FALSE;
 
+// Roboteq variables.
+BOOL bPauseRoboteq[MAX_NB_ROBOTEQ];
+BOOL bRestartRoboteq[MAX_NB_ROBOTEQ];
+
 // IM483I variables.
 BOOL bPauseIM483I = FALSE, bRestartIM483I = FALSE;
+
+// Ontrak variables.
+BOOL bPauseOntrak = FALSE, bRestartOntrak = FALSE;
 
 // Video variables.
 CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
@@ -751,6 +760,7 @@ CvScalar colorsonarlidar;
 char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;
 BOOL bSailCalibrated = FALSE;
+BOOL bForceSailCalibration = FALSE;
 BOOL bDisableAllAlarms = FALSE;
 BOOL bForceOverrideInputs = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;
