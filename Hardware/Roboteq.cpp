@@ -68,15 +68,12 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 				bConnected = TRUE; 
 				threadperiod = roboteq.threadperiod;
 
-				if (strlen(roboteq.szSaveFile) > 0)
+				if (roboteq.pfSaveFile != NULL)
 				{
-
-
-
-
-					memset(roboteq.szSaveFile, 0, sizeof(roboteq.szSaveFile));
+					fclose(roboteq.pfSaveFile); 
+					roboteq.pfSaveFile = NULL;
 				}
-				if ((roboteq.bSaveRawData)&&(strlen(roboteq.szSaveFile) == 0)) 
+				if ((roboteq.bSaveRawData)&&(roboteq.pfSaveFile == NULL)) 
 				{
 					if (strlen(roboteq.szCfgFilePath) > 0)
 					{
@@ -91,22 +88,14 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);
-					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.son", szTemp, strtimeex_fns());
+					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
-					
-
-					/*
-
-					if ((BVTSonar_CreateFile(roboteq.file, szSaveFilePath, roboteq.sonar, "") != BVT_SUCCESS)||
-						(BVTSonar_GetHead(roboteq.sonar, roboteq.head_num, &roboteq.file_head) != BVT_SUCCESS))
+					roboteq.pfSaveFile = fopen(szSaveFilePath, "wb");
+					if (roboteq.pfSaveFile == NULL) 
 					{
 						printf("Unable to create Roboteq data file.\n");
-						memset(roboteq.szSaveFile, 0, sizeof(roboteq.szSaveFile));
 						break;
 					}
-					
-					
-					*/
 				}
 			}
 			else 
@@ -139,9 +128,10 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 
 	StopChronoQuick(&chrono_period);
 
-	if (strlen(roboteq.szSaveFile) > 0)
+	if (roboteq.pfSaveFile != NULL)
 	{
-		memset(roboteq.szSaveFile, 0, sizeof(roboteq.szSaveFile));
+		fclose(roboteq.pfSaveFile); 
+		roboteq.pfSaveFile = NULL;
 	}
 
 	if (bConnected) DisconnectRoboteq(&roboteq);

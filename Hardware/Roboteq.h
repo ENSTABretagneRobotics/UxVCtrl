@@ -36,11 +36,12 @@
 
 struct ROBOTEQ
 {
-	//FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
-	char szSaveFile[256]; // Used to save raw data, should be handled specifically...
+	RS232PORT RS232Port;
+	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
+	int BaudRate;
 	int timeout;
 	int threadperiod;
 	BOOL bSaveRawData;
@@ -50,20 +51,87 @@ typedef struct ROBOTEQ ROBOTEQ;
 inline int ConnectRoboteq(ROBOTEQ* pRoboteq, char* szCfgFilePath)
 {
 	FILE* file = NULL;
+	char line[256];
 
 	memset(pRoboteq->szCfgFilePath, 0, sizeof(pRoboteq->szCfgFilePath));
 	sprintf(pRoboteq->szCfgFilePath, "%.255s", szCfgFilePath);
 
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
+	{
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pRoboteq->szDevPath, 0, sizeof(pRoboteq->szDevPath));
+		sprintf(pRoboteq->szDevPath, "COM1");
+		pRoboteq->BaudRate = 9600;
+		pRoboteq->timeout = 1000;
+		pRoboteq->threadperiod = 100;
+		pRoboteq->bSaveRawData = 1;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pRoboteq->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRoboteq->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRoboteq->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRoboteq->threadperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pRoboteq->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
+	}
+
+	if (pRoboteq->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pRoboteq->threadperiod = 100;
+	}
+
+	// Used to save raw data, should be handled specifically...
+	//pRoboteq->pfSaveFile = NULL;
+
+	//memset(&pRoboteq->LastRoboteqData, 0, sizeof(ROBOTEQDATA));
+
+	if (OpenRS232Port(&pRoboteq->RS232Port, pRoboteq->szDevPath) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a Roboteq.\n");
+		return EXIT_FAILURE;
+	}
+
+	if (SetOptionsRS232Port(&pRoboteq->RS232Port, pRoboteq->BaudRate, NOPARITY, FALSE, 8, 
+		ONESTOPBIT, (UINT)pRoboteq->timeout) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a Roboteq.\n");
+		CloseRS232Port(&pRoboteq->RS232Port);
+		return EXIT_FAILURE;
+	}
 
 
-
-
+	printf("Roboteq connected.\n");
 
 	return EXIT_SUCCESS;
 }
 
 inline int DisconnectRoboteq(ROBOTEQ* pRoboteq)
 {
+	if (CloseRS232Port(&pRoboteq->RS232Port) != EXIT_SUCCESS)
+	{
+		printf("Roboteq disconnection failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	printf("Roboteq disconnected.\n");
 
 	return EXIT_SUCCESS;
 }

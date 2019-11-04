@@ -325,10 +325,13 @@
     <Text Include="MS583730BA0.txt" />
     <Text Include="NMEADevice1.txt" />
     <Text Include="NortekDVL0.txt" />
+    <Text Include="Ontrak0.txt" />
     <Text Include="PathfinderDVL0.txt" />
     <Text Include="Pololu0.txt" />
     <Text Include="Pololu1.txt" />
     <Text Include="Pololu2.txt" />
+    <Text Include="Roboteq0.txt" />
+    <Text Include="Roboteq1.txt" />
     <Text Include="RPLIDAR0.txt" />
     <Text Include="SBG0.txt" />
     <Text Include="SRF020.txt" />

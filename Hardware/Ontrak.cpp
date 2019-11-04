@@ -13,6 +13,7 @@
 THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 {
 	ONTRAK ontrak;
+	struct timeval tv;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int threadperiod = 50;
@@ -34,7 +35,7 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 
 		mSleep(threadperiod);
 
-		if (bPauseOntrak) 
+		if (bPauseOntrak)
 		{
 			if (bConnected)
 			{
@@ -47,7 +48,7 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 			continue;
 		}
 
-		if (bRestartOntrak) 
+		if (bRestartOntrak)
 		{
 			if (bConnected)
 			{
@@ -60,17 +61,19 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 
 		if (!bConnected)
 		{
-			if (ConnectOntrak(&ontrak, "Ontrak0.txt") == EXIT_SUCCESS) 
+			if (ConnectOntrak(&ontrak, "Ontrak0.txt") == EXIT_SUCCESS)
 			{
-				bConnected = TRUE; 
+				bConnected = TRUE;
 				threadperiod = ontrak.threadperiod;
+
+				memset(&tv, 0, sizeof(tv));
 
 				if (ontrak.pfSaveFile != NULL)
 				{
-					fclose(ontrak.pfSaveFile); 
+					fclose(ontrak.pfSaveFile);
 					ontrak.pfSaveFile = NULL;
 				}
-				if ((ontrak.bSaveRawData)&&(ontrak.pfSaveFile == NULL)) 
+				if ((ontrak.bSaveRawData)&&(ontrak.pfSaveFile == NULL))
 				{
 					if (strlen(ontrak.szCfgFilePath) > 0)
 					{
@@ -88,14 +91,14 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					ontrak.pfSaveFile = fopen(szSaveFilePath, "wb");
-					if (ontrak.pfSaveFile == NULL) 
+					if (ontrak.pfSaveFile == NULL)
 					{
 						printf("Unable to create Ontrak data file.\n");
 						break;
 					}
 				}
 			}
-			else 
+			else
 			{
 				bConnected = FALSE;
 				mSleep(1000);
@@ -124,7 +127,7 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 
 	if (ontrak.pfSaveFile != NULL)
 	{
-		fclose(ontrak.pfSaveFile); 
+		fclose(ontrak.pfSaveFile);
 		ontrak.pfSaveFile = NULL;
 	}
 

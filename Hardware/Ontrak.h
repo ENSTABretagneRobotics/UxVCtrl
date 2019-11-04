@@ -30,44 +30,30 @@
 
 //#define TIMEOUT_MESSAGE_ONTRAK 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
-#define MAX_NB_BYTES_ONTRAK 512
-
-
-
-
-
-
-
-
-
-
-
-
-#define IP_ADDR_ONTRAK "172.20.5.4"
-#define TCP_PORT_ONTRAK "4002"
+#define MAX_NB_BYTES_ONTRAK 64
 
 // ADR2000 (address 0 in daisy chain).
 // Analog inputs.
-#define CURRENT_GENERATION_CHANNEL 0
-#define CURRENT_CONSUMPTION_CHANNEL 1
-#define BATTERY_VOLTAGE_CHANNEL 2
+#define CURRENT_GENERATION_CHANNEL_ONTRAK 0
+#define CURRENT_CONSUMPTION_CHANNEL_ONTRAK 1
+#define BATTERY_VOLTAGE_CHANNEL_ONTRAK 2
 // Digital port.
-#define IRIDIUM_CHANNEL 6
-#define SAIL_MOTOR_CHANNEL 7
+#define IRIDIUM_CHANNEL_ONTRAK 6
+#define SAIL_MOTOR_CHANNEL_ONTRAK 7
 
 // ADR2205 (address 1 in daisy chain).
 // Relays.
-#define ARMADEUS_CHANNEL 0 // Connected to an active-low relay.
-#define BOTTOM_PUMP_CHANNEL 1
-#define SURFACE_PUMP_CHANNEL 2
-#define WIFI_CHANNEL 3 // Connected to an active-low relay.
-#define PROBE_CHANNEL 4
+#define ARMADEUS_CHANNEL_ONTRAK 0 // Connected to an active-low relay.
+#define BOTTOM_PUMP_CHANNEL_ONTRAK 1
+#define SURFACE_PUMP_CHANNEL_ONTRAK 2
+#define WIFI_CHANNEL_ONTRAK 3 // Connected to an active-low relay.
+#define PROBE_CHANNEL_ONTRAK 4
 // Digital inputs.
-#define WATER_INGRESS0_CHANNEL 0
-#define WATER_INGRESS1_CHANNEL 1
+#define WATER_INGRESS0_CHANNEL_ONTRAK 0
+#define WATER_INGRESS1_CHANNEL_ONTRAK 1
 
-#define ANALOG_INPUT2CURRENT(value) (((double)value/4095.0)*5.0)
-#define ANALOG_INPUT2VOLTAGE(value) (((double)value/4095.0)*5.0*15.0)
+#define ANALOG_INPUT2CURRENT_ONTRAK(value) (((double)value/4095.0)*5.0)
+#define ANALOG_INPUT2VOLTAGE_ONTRAK(value) (((double)value/4095.0)*5.0*15.0)
 
 struct ONTRAK
 {
@@ -80,94 +66,15 @@ struct ONTRAK
 	int timeout;
 	int threadperiod;
 	BOOL bSaveRawData;
-
-	
-
-
-
-	SOCKET s;
-	char address[MAX_BUF_LEN];
-	char port[MAX_BUF_LEN];
 };
 typedef struct ONTRAK ONTRAK;
 
-
-// ONTRAK must be initialized to 0 before (e.g. ONTRAK ontrak; memset(&ontrak, 0, sizeof(ONTRAK));)!
-inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
-{
-	FILE* file = NULL;
-	char line[256];
-
-	char sendbuf[MAX_BUF_LEN];
-	int sendbuflen = 0;
-
-	memset(pOntrak->szCfgFilePath, 0, sizeof(pOntrak->szCfgFilePath));
-	sprintf(pOntrak->szCfgFilePath, "%.255s", szCfgFilePath);
-	
-
-	// Default values.
-	memset(line, 0, sizeof(line));
-	memset(pOntrak->address, 0, sizeof(pOntrak->address));
-	sprintf(pOntrak->address, IP_ADDR_ONTRAK);
-	memset(pOntrak->port, 0, sizeof(pOntrak->port));
-	sprintf(pOntrak->port, TCP_PORT_ONTRAK);
-
-	// Load data from a file.
-	file = fopen("Ontrak.txt", "r");
-	if (file != NULL)
-	{
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%32s", pOntrak->address) != 1) printf("Invalid configuration file.\n");
-		if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-		if (sscanf(line, "%32s", pOntrak->port) != 1) printf("Invalid configuration file.\n");
-		if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
-	}
-	else
-	{
-		printf("Configuration file not found.\n");
-	}
-
-	// Connect to server.
-	if (inittcpcli(&pOntrak->s, pOntrak->address, pOntrak->port) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-
-	// Reset the digital port to avoid the relays turning on unexpectedly when the port is configured.
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sprintf(sendbuf, "0SPA00000000\r");
-	sendbuflen = (int)strlen(sendbuf);
-
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		releasetcpcli(pOntrak->s);
-		return EXIT_FAILURE;
-	}
-
-	mSleep(50);
-
-	// Configuration of the digital port as output.
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sprintf(sendbuf, "0CPA00000000\r");
-	sendbuflen = (int)strlen(sendbuf);
-
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		releasetcpcli(pOntrak->s);
-		return EXIT_FAILURE;
-	}
-
-	mSleep(50);
-
-	return EXIT_SUCCESS;
-}
-
 inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 {
-	char sendbuf[MAX_BUF_LEN];
+	char sendbuf[MAX_NB_BYTES_ONTRAK];
 	int sendbuflen = 0;
 #ifdef CHECK_STATE_ONTRAK
-	char recvbuf[MAX_BUF_LEN];
+	char recvbuf[MAX_NB_BYTES_ONTRAK];
 	int recvbuflen = 0;
 	int state = 0;
 #endif // CHECK_STATE_ONTRAK
@@ -184,9 +91,14 @@ inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 	}
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	mSleep(25);
@@ -199,18 +111,28 @@ inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 	sprintf(sendbuf, "1RPK%d\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Prepare the buffer that should receive data from the server.
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 2; // The last character must be a 0 to be a valid string for sscanf.
 
-	if (recvall(pOntrak->s, recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (ReadAllRS232Port(&pOntrak->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Display and analyze received data.
@@ -233,10 +155,10 @@ inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 
 inline int SetDigitalRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 {
-	char sendbuf[MAX_BUF_LEN];
+	char sendbuf[MAX_NB_BYTES_ONTRAK];
 	int sendbuflen = 0;
 #ifdef CHECK_STATE_ONTRAK
-	char recvbuf[MAX_BUF_LEN];
+	char recvbuf[MAX_NB_BYTES_ONTRAK];
 	int recvbuflen = 0;
 	int state = 0;
 #endif // CHECK_STATE_ONTRAK
@@ -253,9 +175,14 @@ inline int SetDigitalRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 	}
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	mSleep(25);
@@ -268,18 +195,28 @@ inline int SetDigitalRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 	sprintf(sendbuf, "0RPA%d\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Prepare the buffer that should receive data from the server.
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 2; // The last character must be a 0 to be a valid string for sscanf.
 
-	if (recvall(pOntrak->s, recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (ReadAllRS232Port(&pOntrak->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Display and analyze received data.
@@ -302,9 +239,9 @@ inline int SetDigitalRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 
 inline int GetAnalogInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 {
-	char sendbuf[MAX_BUF_LEN];
+	char sendbuf[MAX_NB_BYTES_ONTRAK];
 	int sendbuflen = 0;
-	char recvbuf[MAX_BUF_LEN];
+	char recvbuf[MAX_NB_BYTES_ONTRAK];
 	int recvbuflen = 0;
 
 	// Prepare data to send to server.
@@ -312,18 +249,28 @@ inline int GetAnalogInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 	sprintf(sendbuf, "0RD%d\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Prepare the buffer that should receive data from the server.
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 5; // The last character must be a 0 to be a valid string for sscanf.
 
-	if (recvall(pOntrak->s, recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (ReadAllRS232Port(&pOntrak->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Display and analyze received data.
@@ -339,9 +286,9 @@ inline int GetAnalogInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 
 inline int GetDigitalInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 {
-	char sendbuf[MAX_BUF_LEN];
+	char sendbuf[MAX_NB_BYTES_ONTRAK];
 	int sendbuflen = 0;
-	char recvbuf[MAX_BUF_LEN];
+	char recvbuf[MAX_NB_BYTES_ONTRAK];
 	int recvbuflen = 0;
 
 	// Prepare data to send to server.
@@ -349,18 +296,28 @@ inline int GetDigitalInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 	sprintf(sendbuf, "1RPA%d\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (sendall(pOntrak->s, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Prepare the buffer that should receive data from the server.
 	memset(recvbuf, 0, sizeof(recvbuf));
 	recvbuflen = 2; // The last character must be a 0 to be a valid string for sscanf.
 
-	if (recvall(pOntrak->s, recvbuf, recvbuflen) != EXIT_SUCCESS)
+	if (ReadAllRS232Port(&pOntrak->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
 	}
 
 	// Display and analyze received data.
@@ -374,13 +331,124 @@ inline int GetDigitalInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 	return EXIT_SUCCESS;
 }
 
-inline int DisconnectOntrak(ONTRAK* pOntrak)
+// ONTRAK must be initialized to 0 before (e.g. ONTRAK ontrak; memset(&ontrak, 0, sizeof(ONTRAK));)!
+inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 {
-	// Disconnect from server.
-	if (releasetcpcli(pOntrak->s) != EXIT_SUCCESS)
+	FILE* file = NULL;
+	char line[256];
+	char sendbuf[MAX_NB_BYTES_ONTRAK];
+	int sendbuflen = 0;
+
+	memset(pOntrak->szCfgFilePath, 0, sizeof(pOntrak->szCfgFilePath));
+	sprintf(pOntrak->szCfgFilePath, "%.255s", szCfgFilePath);
+
+	// If szCfgFilePath starts with "hardcoded://", parameters are assumed to be already set in the structure, 
+	// otherwise it should be loaded from a configuration file.
+	if (strncmp(szCfgFilePath, "hardcoded://", strlen("hardcoded://")) != 0)
 	{
+		memset(line, 0, sizeof(line));
+
+		// Default values.
+		memset(pOntrak->szDevPath, 0, sizeof(pOntrak->szDevPath));
+		sprintf(pOntrak->szDevPath, "COM1");
+		pOntrak->BaudRate = 57600;
+		pOntrak->timeout = 2000;
+		pOntrak->threadperiod = 50;
+		pOntrak->bSaveRawData = 1;
+
+		// Load data from a file.
+		file = fopen(szCfgFilePath, "r");
+		if (file != NULL)
+		{
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%255s", pOntrak->szDevPath) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->BaudRate) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->timeout) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->threadperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
+		}
+		else
+		{
+			printf("Configuration file not found.\n");
+		}
+	}
+
+	if (pOntrak->threadperiod < 0)
+	{
+		printf("Invalid parameter : threadperiod.\n");
+		pOntrak->threadperiod = 50;
+	}
+
+	// Used to save raw data, should be handled specifically...
+	//pOntrak->pfSaveFile = NULL;
+
+	//memset(&pOntrak->LastOntrakData, 0, sizeof(ONTRAKDATA));
+
+	if (OpenRS232Port(&pOntrak->RS232Port, pOntrak->szDevPath) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a Ontrak.\n");
 		return EXIT_FAILURE;
 	}
+
+	if (SetOptionsRS232Port(&pOntrak->RS232Port, pOntrak->BaudRate, NOPARITY, FALSE, 8, 
+		TWOSTOPBITS, (UINT)pOntrak->timeout) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a Ontrak.\n");
+		CloseRS232Port(&pOntrak->RS232Port);
+		return EXIT_FAILURE;
+	}
+	
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "0SPA00000000\r");
+	sendbuflen = (int)strlen(sendbuf);
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a Ontrak : Failed to reset the digital port to avoid the relays turning on unexpectedly when the port is configured.\n");
+		CloseRS232Port(&pOntrak->RS232Port);
+		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
+	}
+	mSleep(50);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "0CPA00000000\r");
+	sendbuflen = (int)strlen(sendbuf);
+	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		printf("Unable to connect to a RazorAHRS : Failed to configure the digital port as output.\n");
+		CloseRS232Port(&pOntrak->RS232Port);
+		return EXIT_FAILURE;
+	}
+	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+		fflush(pOntrak->pfSaveFile);
+	}
+	mSleep(50);
+
+	printf("Ontrak connected.\n");
+
+	return EXIT_SUCCESS;
+}
+
+inline int DisconnectOntrak(ONTRAK* pOntrak)
+{
+	if (CloseRS232Port(&pOntrak->RS232Port) != EXIT_SUCCESS)
+	{
+		printf("Ontrak disconnection failed.\n");
+		return EXIT_FAILURE;
+	}
+
+	printf("Ontrak disconnected.\n");
 
 	return EXIT_SUCCESS;
 }

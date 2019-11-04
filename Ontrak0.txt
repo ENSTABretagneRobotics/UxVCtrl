@@ -1,0 +1,11 @@
+% Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
+127.0.0.1:4002
+%COM8
+% BaudRate
+9600
+% Timeout (in ms)
+1000
+% threadperiod (in ms, require associated thread)
+50
+% bSaveRawData (require associated thread)
+1

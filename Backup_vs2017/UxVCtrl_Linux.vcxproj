@@ -456,6 +456,12 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
+    <None Include="Ontrak0.txt">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+    </None>
     <Text Include="ReadMe.txt" />
     <None Include="restore\aud\ReadMe.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
@@ -518,6 +524,18 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
     <None Include="SwarmonDevice0.txt">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+    </None>
+    <None Include="Roboteq0.txt">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+    </None>
+    <None Include="Roboteq1.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
