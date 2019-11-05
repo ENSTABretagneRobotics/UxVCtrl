@@ -6,6 +6,8 @@
 % Timeout (in ms)
 1000
 % threadperiod (in ms, require associated thread)
-50
+100
 % bSaveRawData (require associated thread)
 1
+% disp_period (in s)
+30

@@ -10,6 +10,17 @@
 #include "Config.h"
 #include "Roboteq.h"
 
+// Need to be undefined at the end of the file...
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif // !max
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif // !min
+#endif // !_MSC_VER
+
 THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 {
 	ROBOTEQ roboteq;
@@ -35,7 +46,7 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		//mSleep(threadperiod);
+		mSleep(threadperiod);
 
 		if (bPauseRoboteq[deviceid])
 		{
@@ -63,17 +74,17 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 
 		if (!bConnected)
 		{
-			if (ConnectRoboteq(&roboteq, szCfgFilePath) == EXIT_SUCCESS) 
+			if (ConnectRoboteq(&roboteq, szCfgFilePath) == EXIT_SUCCESS)
 			{
-				bConnected = TRUE; 
+				bConnected = TRUE;
 				threadperiod = roboteq.threadperiod;
 
 				if (roboteq.pfSaveFile != NULL)
 				{
-					fclose(roboteq.pfSaveFile); 
+					fclose(roboteq.pfSaveFile);
 					roboteq.pfSaveFile = NULL;
 				}
-				if ((roboteq.bSaveRawData)&&(roboteq.pfSaveFile == NULL)) 
+				if ((roboteq.bSaveRawData)&&(roboteq.pfSaveFile == NULL))
 				{
 					if (strlen(roboteq.szCfgFilePath) > 0)
 					{
@@ -91,14 +102,14 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 					sprintf(szSaveFilePath, LOG_FOLDER"%.127s_%.64s.txt", szTemp, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					roboteq.pfSaveFile = fopen(szSaveFilePath, "wb");
-					if (roboteq.pfSaveFile == NULL) 
+					if (roboteq.pfSaveFile == NULL)
 					{
 						printf("Unable to create Roboteq data file.\n");
 						break;
 					}
 				}
 			}
-			else 
+			else
 			{
 				bConnected = FALSE;
 				mSleep(1000);
@@ -108,17 +119,23 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 		{
 			res = EXIT_SUCCESS;
 
+			switch (robid)
+			{
+			case SAILBOAT_ROBID: // For VSim compatibility...
+			case SAILBOAT2_ROBID: // For VSim compatibility...
+			case VAIMOS_ROBID:
 
-
-
+				break;
+			default:
+				break;
+			}
 
 			if (res != EXIT_SUCCESS)
 			{
 				printf("Connection to a Roboteq lost.\n");
 				bConnected = FALSE;
 				DisconnectRoboteq(&roboteq);
-				mSleep(threadperiod);
-			}		
+			}
 		}
 
 		//printf("RoboteqThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
@@ -126,11 +143,23 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 		if (bExit) break;
 	}
 
+	switch (robid)
+	{
+	case SAILBOAT_ROBID:
+	case SAILBOAT2_ROBID:
+	case VAIMOS_ROBID:
+		// Should set safe values...?
+		mSleep(threadperiod);
+		break;
+	default:
+		break;
+	}
+
 	StopChronoQuick(&chrono_period);
 
 	if (roboteq.pfSaveFile != NULL)
 	{
-		fclose(roboteq.pfSaveFile); 
+		fclose(roboteq.pfSaveFile);
 		roboteq.pfSaveFile = NULL;
 	}
 
@@ -140,3 +169,13 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 
 	return 0;
 }
+
+// min and max might cause incompatibilities with GCC...
+#ifndef _MSC_VER
+#ifdef max
+#undef max
+#endif // max
+#ifdef min
+#undef min
+#endif // min
+#endif // !_MSC_VER

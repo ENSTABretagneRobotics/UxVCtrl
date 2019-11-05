@@ -66,6 +66,7 @@ struct ONTRAK
 	int timeout;
 	int threadperiod;
 	BOOL bSaveRawData;
+	int disp_period;
 };
 typedef struct ONTRAK ONTRAK;
 
@@ -353,8 +354,9 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 		sprintf(pOntrak->szDevPath, "COM1");
 		pOntrak->BaudRate = 57600;
 		pOntrak->timeout = 2000;
-		pOntrak->threadperiod = 50;
+		pOntrak->threadperiod = 100;
 		pOntrak->bSaveRawData = 1;
+		pOntrak->disp_period = 30;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -370,6 +372,8 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pOntrak->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pOntrak->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->disp_period) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else
@@ -395,14 +399,14 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 		return EXIT_FAILURE;
 	}
 
-	if (SetOptionsRS232Port(&pOntrak->RS232Port, pOntrak->BaudRate, NOPARITY, FALSE, 8, 
+	if (SetOptionsRS232Port(&pOntrak->RS232Port, pOntrak->BaudRate, NOPARITY, FALSE, 8,
 		TWOSTOPBITS, (UINT)pOntrak->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a Ontrak.\n");
 		CloseRS232Port(&pOntrak->RS232Port);
 		return EXIT_FAILURE;
 	}
-	
+
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "0SPA00000000\r");
 	sendbuflen = (int)strlen(sendbuf);

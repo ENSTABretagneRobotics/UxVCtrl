@@ -109,7 +109,7 @@ inline int ConnectRoboteq(ROBOTEQ* pRoboteq, char* szCfgFilePath)
 		return EXIT_FAILURE;
 	}
 
-	if (SetOptionsRS232Port(&pRoboteq->RS232Port, pRoboteq->BaudRate, NOPARITY, FALSE, 8, 
+	if (SetOptionsRS232Port(&pRoboteq->RS232Port, pRoboteq->BaudRate, NOPARITY, FALSE, 8,
 		ONESTOPBIT, (UINT)pRoboteq->timeout) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a Roboteq.\n");
