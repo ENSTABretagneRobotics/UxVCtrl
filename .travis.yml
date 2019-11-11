@@ -9,9 +9,9 @@ jobs:
    - os: linux
      dist: bionic
      compiler: gcc
-	 before_install: 
-	   - sudo apt-get -q update
-	   - sudo apt-get -y install libopencv-dev libmodbus-dev
+     before_install: 
+       - sudo apt-get -q update
+       - sudo apt-get -y install libopencv-dev libmodbus-dev
      script : cmake -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
  
 #   - os: linux
