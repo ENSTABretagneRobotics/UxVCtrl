@@ -1,0 +1,10 @@
+language: cpp
+jobs:
+  include:
+   - os: linux
+     dist: bionic
+     compiler: gcc
+     script : cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+
+   - os: windows
+     script : cmake -G "Visual Studio 15" . &  msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Debug & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Debug\UxVCtrl.exe < run_test.txt & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt 
