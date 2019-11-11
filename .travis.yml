@@ -4,28 +4,30 @@ jobs:
 #   - os: linux
 #     dist: bionic
 #     compiler: gcc
-#     script : cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+#     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - os: linux
      dist: bionic
      compiler: gcc
+     services: xvfb
      before_install: 
        - sudo apt-get -q update
        - sudo apt-get -y install libopencv-dev libmodbus-dev
-     script : cmake -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: xvfb-run && cmake -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
  
 #   - os: linux
 #     dist: xenial
 #     compiler: gcc
-#     script : cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+#     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
  
 #   - os: osx
-#     script : cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+#     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - os: windows
-     install: PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
-     script : cmake -G "Visual Studio 15" . && msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Debug && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./Debug/UxVCtrl.exe && msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./Release/UxVCtrl.exe
-
-#   - os: windows
-#     install: PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
-#     script : cmd /c 'cmake -G "Visual Studio 15" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Debug & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Debug\UxVCtrl.exe < run_test.txt & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt'
+     env:
+       - MSBUILD_PATH="c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin"
+     install: 
+       - PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
+     script: 
+       - export PATH=$MSBUILD_PATH:$PATH
+       - cmd //c 'cmake -G "Visual Studio 15" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Debug & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Debug\UxVCtrl.exe < run_test.txt & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt'
