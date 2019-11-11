@@ -42,7 +42,7 @@ jobs:
        - PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
      script: 
        - export PATH=$MSBUILD_PATH:$PATH
-       - cmd //c "cmake -G "Visual Studio 15" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "Visual Studio 15" -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
 
 # Missing api-ms-win-core-delayload-l1-1-0.dll...?
-# -DENABLE_BLUEVIEW_SUPPORT=ON
+# -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON -DENABLE_BLUEVIEW_SUPPORT=ON
