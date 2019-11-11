@@ -1,5 +1,4 @@
-faire script de test cmake pour tous les compiler et avec différentes versions de cv et sans et qui vérifie si .exe existe, travis...
-
+cmake blueview linux...?
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
 

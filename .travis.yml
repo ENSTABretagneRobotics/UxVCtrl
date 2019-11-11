@@ -7,10 +7,10 @@ jobs:
      services: xvfb
      before_install: 
        - sudo apt-get -q update
-       - sudo apt-get -y install libopencv-dev libmodbus-dev
-     script: cmake -DENABLE_BLUEVIEW_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+#       - sudo apt-get -y install libopencv-dev libmodbus-dev
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_LIBMODBUS_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
-# -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON 
+# -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON
 
 #   - os: linux
 #     dist: bionic
@@ -38,12 +38,16 @@ jobs:
 #     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - os: windows
+     script: 
+       - cmake -G "MSYS Makefiles" . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+
+   - os: windows
      env:
        - MSBUILD_PATH="c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin"
      install: 
        - PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
      script: 
        - export PATH=$MSBUILD_PATH:$PATH
-       - cmd //c "cmake -G "Visual Studio 15" . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "Visual Studio 15" -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
 
-# -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON
+# -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON
