@@ -2,7 +2,7 @@
 %127.0.0.1:4004
 COM6
 % BaudRate
-9600
+115200
 % Timeout (in ms)
 1000
 % threadperiod (in ms, require associated thread)

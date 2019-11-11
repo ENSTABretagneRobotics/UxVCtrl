@@ -1,3 +1,5 @@
+faire script de test cmake pour tous les compiler et avec différentes versions de cv et sans et qui vérifie si .exe existe, travis...
+
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
 
@@ -656,7 +658,7 @@ trim/offset, min max facilement réglables dans interface, certains paramètres re
 quantification des actionneurs centrée en 0, empêcher aussi de passer d'une valeur extrême à une autre (e.g. gouvernail quand waypoint opposé...), rudderupdate period?
 voiliers : pouvoir mettre la voile à autre chose que 0 au démarrage (pas trop important car la télécommande peut faire le nécessaire...)->utiliser InitPW?->mais écrasé par u dans le thread...
 vérifier la bonne utilisation d'InitPW...
-Ontrak : rendre la gestion de l'énergie plus compatible avec le reste d'UxVCtrl...
+Ontrak : rendre la gestion de l'énergie plus compatible avec le reste d'UxVCtrl et pour être configurable pour d'autres robots, rajouter param bVPowerMode un peu comme dans IridiumComm, et s'inspirer de Pololu pour les autres params...
 
 GPS, NMEA, waypoints, AHRS, DVL
 why it is possible to get the read responses right after the commands in PathfinderDVL raw data...?
@@ -799,6 +801,32 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+in sources\modules\core\include\opencv2\core\cvdef.h
+replace
+#      define CV_XADD(addr, delta) (int)__sync_fetch_and_add((unsigned*)(addr), (unsigned)(delta))
+with
+#      if defined(_WIN32) && !defined(__ATOMIC_ACQ_REL) && !defined __clang__
+         // __sync_fetch_and_add() definition might be missing in old MinGW versions...
+         CV_INLINE unsigned __CV_XADD(unsigned* addr, unsigned delta) { unsigned tmp = *addr; *addr += delta; return tmp; }
+#        define CV_XADD(addr, delta) (int)__CV_XADD((unsigned*)(addr), (unsigned)(delta))
+#      else
+#        define CV_XADD(addr, delta) (int)__sync_fetch_and_add((unsigned*)(addr), (unsigned)(delta))
+#      endif
+and use this new cvdef.h in the final include folder...
+
+#ifndef DISABLE_MINGW_MISSING_ATOMIC_WORKAROUND
+// To try to solve a problem with old MinGW versions...
+#if defined(__GNUC__) && defined(_WIN32) && !defined(__ATOMIC_ACQ_REL)
+// See https://gcc.gnu.org/onlinedocs/gcc-4.4.7/gcc/Atomic-Builtins.html, cvdef.h...
+unsigned __sync_fetch_and_add(unsigned* addr, unsigned delta) { unsigned tmp = *addr; *addr += delta; return tmp; }
+#endif // defined(__GNUC__) && defined(_WIN32) && !defined(__ATOMIC_ACQ_REL)
+#endif // !DISABLE_MINGW_MISSING_ATOMIC_WORKAROUND
+->integrated in mingw cv320 include and libraries...
+
+vs2010-2012 Obstacle.cpp(55): error C3861: 'round': identifier not found mais OK pour vs2008?
+
+cmake : remove .lib for target_link_libraries vs?
 
 afficher bSailCalibrated dans GUI?->mettre en rouge le uvoile?->mis '?'
 

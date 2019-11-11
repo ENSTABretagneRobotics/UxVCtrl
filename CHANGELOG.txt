@@ -1,3 +1,7 @@
+330
+Improved compatibility with MinGW.
+Removed the use of round(), which is not available in Visual Studio 2012.
+
 329
 Continuation of Ontrak integration and merge with VPower.
 

@@ -67,7 +67,7 @@ CXXFLAGS += $(CFLAGS) -fpermissive -Wno-psabi
 #LDFLAGS += -static-libgcc -static-libstdc++ -static
 
 LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
-#LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
+#LDFLAGS += -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
 LDFLAGS += -lmodbus
 LDFLAGS += -lsbgECom
 LDFLAGS += -lbvtsdk

@@ -52,8 +52,8 @@ vector< vector<double> > lidarDistanceAndAngle (Mat imgIn,
   double beta                    = acos(h/hypMax);
   double xMax                    = sqrt((hypMax*hypMax)-(h*h));
   double gamma                   = beta - alpha;
-  int verticalPixPerDeg          = (int)round(processed.cols/horizontalFOV);
-  int horizontalPixPerDeg        = (int)round(processed.rows/verticalFOV);
+  int verticalPixPerDeg          = (int)(processed.cols/horizontalFOV);
+  int horizontalPixPerDeg        = (int)(processed.rows/verticalFOV);
   double depthScale              = rangeMax/ 255;
 
 
