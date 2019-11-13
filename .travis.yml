@@ -1,48 +1,60 @@
 language: cpp
 jobs:
   include:
-   - os: linux
+#   - name: "Ubuntu 18.04 Default"
+#     os: linux
+#     dist: bionic
+#     compiler: gcc
+#     script: cmake . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+
+   - name: "Ubuntu 18.04 Full"
+     os: linux
      dist: bionic
      compiler: gcc
      services: xvfb
      before_install: 
        - sudo apt-get -q update
-         # An unknown version of OpenCV seems to be detected by find_package, so we need to override it...
-       - sudo apt-get -y install libopencv-dev
-     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
-# Unzipping issues...?
-# -DENABLE_BLUEVIEW_SUPPORT=ON
-
-#   - os: linux
-#     dist: bionic
-#     compiler: gcc
-#     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
-
-#   - os: linux
+#   - name: "Ubuntu 16.04 with OpenCV 2.4"
+#     os: linux
 #     dist: xenial
 #     compiler: gcc
-#     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
-
-   - os: osx
-     script: cmake -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+#     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
  
-#   - os: osx
-#     script: cmake . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+#   - name: "Mac OS Default"
+#     os: osx
+#     script: cmake . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
-# Need to set paths...
-#   - os: windows
-#     script: 
-#       - cmake -G "MSYS Makefiles" . && make && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+#   - name: "Mac OS with MAVLink, SBG"
+#     os: osx
+#     script: cmake -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
-   - os: windows
-     env:
-       - MSBUILD_PATH="c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin"
+   - name: "Windows MinGW"
+     os: windows
+     compiler: gcc
+#     env:
+#       - make=mingw32-make
+#     install: 
+#	    - choco install -y make
+     script: 
+       - cmake -G "MinGW Makefiles" . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+
+   - name: "Windows x86 vc15"
+     os: windows
+#     env:
+#       - MSBUILD_PATH="c:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin"
      install: 
        - PowerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - powershell -Command "Install-WindowsFeature NET-Framework-Features"
+       - powershell -Command "Install-WindowsFeature NET-Framework-Core"
+       - choco install -y vcredist-all
      script: 
        - export PATH=$MSBUILD_PATH:$PATH
-       - cmd //c "cmake -G "Visual Studio 15" -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . & msbuild UxVCtrl.vcxproj /m /t:Rebuild /p:Configuration=Release & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "Visual Studio 15" -A Win32 -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
 
 # Missing api-ms-win-core-delayload-l1-1-0.dll...?
 # -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV410=ON -DENABLE_BLUEVIEW_SUPPORT=ON
+
+#@call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\Tools\VsDevCmd.bat" -host_arch=amd64 -arch=amd64

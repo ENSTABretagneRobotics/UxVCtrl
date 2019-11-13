@@ -58,7 +58,10 @@ CFLAGS += -I./Hardware
 CFLAGS += -I. -I..
 CFLAGS += -I/usr/local/include/sbgECom/src -I/usr/local/include/sbgECom/common 
 
-CXXFLAGS += $(CFLAGS) -fpermissive -Wno-psabi
+CXXFLAGS += $(CFLAGS) -fpermissive
+
+# Might be necessary for recent GCC versions...
+#CXXFLAGS += -Wno-psabi
 
 # Might be necessary for recent OpenCV versions...
 #CXXFLAGS += -std=c++11

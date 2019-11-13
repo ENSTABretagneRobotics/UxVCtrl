@@ -1,4 +1,4 @@
-cmake blueview linux...?
+
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
 

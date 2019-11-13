@@ -1,3 +1,7 @@
+331
+Removed -Wno-psabi for compatibility with old GCC.
+Updated CMakeLists.txt and .travis.yml.
+
 330
 Improved compatibility with MinGW.
 Removed the use of round(), which is not available in Visual Studio 2012.
