@@ -1,3 +1,6 @@
+cmake check better gcc vrsion
+Travis with make, different opencv versions, vc64, mingw32 cv320...
+Modbus pas compilé pour mingw
 
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
@@ -471,6 +474,7 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package windows?
 USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
 Tester Hardware-MATLAB MAVLink et SBG support : 
 export CMAKE_C_FLAGS=${CMAKE_C_FLAGS} -fPIC
@@ -478,9 +482,11 @@ Pour compilation SBG MATLAB Linux et Mac OS
 cmake : faire copier ce qu'il faut du dossier source dans build si différents...?
 cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
 cmake options static (attention cv342...), xp toolset visual studio?
-tester avec un nouveau mingw et linux, check inline and timegm in a small program
+check inline and timegm in a small program
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
 cross compilation with cmake, variable PREFIX pour dépendances...
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP FALSE)
+set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 Compiler uxvctrl pour le pixhawk?
 Mac OS : pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative, voir aussi SBG SDK...
 
@@ -800,6 +806,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Faire vm Windows Server Core? 2016, version 1803 comme travis->2019 v1809, install_choco.ps1, "%programfiles%\git\git-bash"...
 
 in sources\modules\core\include\opencv2\core\cvdef.h
 replace

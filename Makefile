@@ -24,9 +24,9 @@ CFLAGS += -Wall -Wno-unknown-pragmas -Wno-unused-parameter -Wextra
 #CFLAGS += -D _DEBUG -D _DEBUG_DISPLAY 
 #CFLAGS += -D _DEBUG_MESSAGES 
 #CFLAGS += -D ENABLE_VALGRIND_DEBUG 
-CFLAGS += -D OPENCV2413
-#CFLAGS += -D OPENCV320
-#CFLAGS += -D OPENCV410
+#CFLAGS += -D OPENCV2413
+CFLAGS += -D OPENCV320
+#CFLAGS += -D OPENCV412
 #CFLAGS += -D USE_FFMPEG_VIDEO
 CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 #CFLAGS += -D ENABLE_OPENCV_HIGHGUI_STARTWINDOWTHREAD
@@ -69,8 +69,8 @@ CXXFLAGS += $(CFLAGS) -fpermissive
 # For Linux, if static needed...
 #LDFLAGS += -static-libgcc -static-libstdc++ -static
 
-LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
-#LDFLAGS += -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
+#LDFLAGS += -lopencv_core -lopencv_imgproc -lopencv_highgui
+LDFLAGS += -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
 LDFLAGS += -lmodbus
 LDFLAGS += -lsbgECom
 LDFLAGS += -lbvtsdk

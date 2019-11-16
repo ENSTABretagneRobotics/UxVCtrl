@@ -33,6 +33,9 @@
 #if (__GNUC__ >= 9)
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 #endif // (__GNUC__ >= 9)
+#if (__GNUC__ >= 8)
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
+#endif // (__GNUC__ >= 8)
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic push
 #endif // (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
@@ -47,6 +50,9 @@
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4))
 #pragma GCC diagnostic pop
 #else
+//#if (__GNUC__ >= 8)
+//#pragma GCC diagnostic warning "-Wignored-qualifiers"
+//#endif // (__GNUC__ >= 8)
 //#if (__GNUC__ >= 9)
 //#pragma GCC diagnostic warning "-Waddress-of-packed-member"
 //#endif // (__GNUC__ >= 9)

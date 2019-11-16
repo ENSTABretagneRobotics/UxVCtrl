@@ -31,7 +31,7 @@ _ ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt , 
 _ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 *** DEVELOPER ***
 _ Visual Studio 2017
-_ OpenCV 2.4.13 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv2413.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
+_ OpenCV 3.2.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
 _ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 _ SBG Systems Inertial SDK v3.5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 _ ..\OSUtils : Windows/Linux abstraction layer (threads, network, serial port, time management...) as well as other useful functions
