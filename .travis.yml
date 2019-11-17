@@ -11,7 +11,8 @@ jobs:
      os: windows
      script: 
        - cmd //c "cmake . & cmake --build . --config Release --target UxVCtrl --parallel & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
-
+   
+     # Virtual memory exhausted with --parallel...?
    - name: "Ubuntu 18.04 with OpenCV 3.2.0 and all"
      os: linux
      dist: bionic
@@ -19,8 +20,9 @@ jobs:
      services: xvfb
      before_install: 
        - sudo apt-get -q update
-     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
+     # Virtual memory exhausted with --parallel...?
    - name: "Ubuntu 16.04 with OpenCV 2.4 and all"
      os: linux
      dist: xenial
@@ -28,14 +30,16 @@ jobs:
      services: xvfb
      before_install: 
        - sudo apt-get -q update
-     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
  
    - name: "Mac OS"
      os: osx
+     osx_image: xcode10.1
      script: cmake . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Mac OS with cv4 and all without bv"
      os: osx
+     osx_image: xcode10.1
      script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows MinGW 8.1.0 x64"
