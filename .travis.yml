@@ -50,18 +50,37 @@ jobs:
      script: 
        - cmake -G "MSYS Makefiles" . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
-# Need to build OpenCV, libmodbus, SBG in 64 bit or install MinGW 32 bit...
-#   - name: "Windows MinGW with OpenCV 3.2.0"
-#     os: windows
-#     compiler: gcc
-#     install: 
-#       - choco install -y make
-#          # For OpenCV
-#       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-#     script: 
-#       - cmake -G "MSYS Makefiles" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DOPENCV412=OFF -DENABLE_MAVLINK_SUPPORT=ON . && cmake --build . --parallel && wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate && 7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y && cmd //c refreshenv.cmd && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+# Install MinGW 32 bit...?
 
-   - name: "Windows vc15 x64 cv412 and all without modbus, bv"
+#choco uninstall -y mingw 
+#choco install -y mingw --version=5.3.0 --allow-downgrade
+#choco uninstall -y cmake
+#wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate
+#cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
+##cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as "\"C:\\Program Files \(x86\)\\CMake\"""
+#qtcreator, qtenv2.bat...
+
+# cv320 needs VFW...?
+
+   - name: "Windows MinGW 8.1.0 x64 cv412 and all without LabJack, SBG, bv"
+     os: windows
+     compiler: gcc
+     install: 
+       - choco install -y make
+         # For OpenCV
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+#         # Lighter version of OpenCV, instead of the one that would be downloaded automatically by CMakeLists.txt...
+#       - wget http://www.ensta-bretagne.fr/lebars/Share/OpenCV3.2.0_mini.zip --no-check-certificate -nv
+#       - cmd //c "7z x OpenCV3.2.0_mini.zip -o"%SystemDrive%" -y"
+#       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate
+#       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
+#       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as "%SystemDrive%\OpenCV3.2.0\x64\mingw8\bin""
+     script: 
+       - cmd //c "cmake -G "MSYS Makefiles" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+
+   - name: "Windows vc15 x64 cv412 and all without LabJack, bv"
      os: windows
      install: 
 #       - powerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
@@ -69,8 +88,10 @@ jobs:
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
 #       - powershell -Command "Install-WindowsFeature NET-Framework-Features"
 #       - powershell -Command "Install-WindowsFeature NET-Framework-Core"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
          # For BlueView
        - choco install -y vcredist2010
 #       - choco install -y vcredist-all
      script: 
-       - cmd //c "cmake -G "Visual Studio 15" -A x64 -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate & 7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "Visual Studio 15" -A x64 -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
