@@ -1,3 +1,6 @@
+333
+Improved compatibility with Mac OS and updated .travis.yml.
+
 332
 Updated project files to use OpenCV 3.2.0 as default and added support of OpenCV 4.1.2.
 

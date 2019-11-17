@@ -1,46 +1,53 @@
 language: cpp
 jobs:
   include:
-#   - name: "Ubuntu 18.04"
-#     os: linux
-#     dist: bionic
-#     compiler: gcc
-#     script: cmake . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+   - name: "Ubuntu 18.04"
+     os: linux
+     dist: bionic
+     compiler: gcc
+     script: cmake . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
-#   - name: "Ubuntu 18.04 Full"
-#     os: linux
-#     dist: bionic
-#     compiler: gcc
-#     services: xvfb
-#     before_install: 
-#       - sudo apt-get -q update
-#     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+   - name: "Windows"
+     os: windows
+     script: 
+       - cmd //c "cmake . & cmake --build . --config Release --target UxVCtrl --parallel & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
 
-#   - name: "Ubuntu 16.04 with OpenCV 2.4"
-#     os: linux
-#     dist: xenial
-#     compiler: gcc
-#     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+   - name: "Ubuntu 18.04 with OpenCV 3.2.0 and all"
+     os: linux
+     dist: bionic
+     compiler: gcc
+     services: xvfb
+     before_install: 
+       - sudo apt-get -q update
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+
+   - name: "Ubuntu 16.04 with OpenCV 2.4 and all"
+     os: linux
+     dist: xenial
+     compiler: gcc
+     services: xvfb
+     before_install: 
+       - sudo apt-get -q update
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
  
-#   - name: "Mac OS"
-#     os: osx
-#     script: cmake . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
-
-   - name: "Mac OS with MAVLink, SBG"
+   - name: "Mac OS"
      os: osx
-     script: cmake -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+
+   - name: "Mac OS with cv4 and all without bv"
+     os: osx
+     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows MinGW 8.1.0 x64"
      os: windows
      compiler: gcc
-#     env:
-#       - CMAKE_MAKE_PROGRAM=mingw32-make
      install: 
        - choco install -y make
      script: 
-       - cmake -G "MSYS Makefiles" . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+       - cmake -G "MSYS Makefiles" . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
-#   - name: "Windows MinGW cv320"
+# Need to build OpenCV, libmodbus, SBG in 64 bit or install MinGW 32 bit...
+#   - name: "Windows MinGW with OpenCV 3.2.0"
 #     os: windows
 #     compiler: gcc
 #     install: 
@@ -48,9 +55,9 @@ jobs:
 #          # For OpenCV
 #       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
 #     script: 
-#       - cmake -G "MSYS Makefiles" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DOPENCV412=OFF -DENABLE_MAVLINK_SUPPORT=ON . && cmake --build . && wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate && 7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y && cmd //c refreshenv.cmd && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+#       - cmake -G "MSYS Makefiles" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=ON -DOPENCV412=OFF -DENABLE_MAVLINK_SUPPORT=ON . && cmake --build . --parallel && wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate && 7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y && cmd //c refreshenv.cmd && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
-   - name: "Windows vc15 x86 cv412 Full"
+   - name: "Windows vc15 x64 cv412 and all without modbus, bv"
      os: windows
      install: 
 #       - powerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
@@ -62,4 +69,4 @@ jobs:
        - choco install -y vcredist2010
 #       - choco install -y vcredist-all
      script: 
-       - cmd //c "cmake -G "Visual Studio 15" -A Win32 -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate & 7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "Visual Studio 15" -A x64 -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate & 7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
