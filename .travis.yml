@@ -58,7 +58,7 @@ jobs:
 #wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate
 #cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
 ##cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as "\"C:\\Program Files \(x86\)\\CMake\"""
-#qtcreator, qtenv2.bat...
+#qtcreator online installer, qtenv2.bat...
 
 # cv320 needs VFW...?
 

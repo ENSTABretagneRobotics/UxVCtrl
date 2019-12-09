@@ -1,4 +1,3 @@
-SBG mingw8 x64, mingw/mingw5/7 x86...
 
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
@@ -78,7 +77,7 @@ Nouveau driver ublox : faut sans doute attendre avant de faire read()...?->probl
 
 Simulate cog and sog like UxVSim
 
-Opencvgui : Rajouter horizon artificielle sur bord de boussole
+OpenCVGUI : Rajouter horizon artificielle sur bord de boussole
 
 Replace mSleep() by uSleep() in remotecam, for short delays...
 
@@ -472,6 +471,7 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+SBG mingw8 x64, mingw/mingw5/7 x86...
 cmake check better gcc version, compatibility with cross compilation...
 Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package windows?
 USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
