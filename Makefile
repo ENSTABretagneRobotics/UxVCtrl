@@ -1,4 +1,4 @@
-# Makefile for Linux, designed for Ubuntu 18.04. 
+# Designed for Ubuntu 18.04. 
 # You might need to install C/C++ development tools by typing :
 #    sudo apt-get install build-essential
 # in a terminal.
@@ -77,7 +77,13 @@ LDFLAGS += -lsbgECom
 LDFLAGS += -lbvtsdk
 #LDFLAGS += -lusb-1.0
 
-# Might need to remove -lrt for Mac OS...
+# For MinGW
+#LDFLAGS += -lWinMM -lws2_32 -lpthread -lm
+
+# For Mac OS
+#LDFLAGS += -lpthread -lm
+
+# For Linux
 LDFLAGS += -lpthread -lrt -lm
 
 default: $(PROGS)

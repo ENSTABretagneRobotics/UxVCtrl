@@ -155,7 +155,18 @@ struct POLOLU
 };
 typedef struct POLOLU POLOLU;
 
-// If analog input, voltage = value*5.0/1023.0 V. If digital input, bit = (value == 1023)? 1: 0. If digital output, bit = (value < 6000)? 0: 1. If servo, pw = value/4 us.
+/*
+Get a channel value.
+If the channel is configured as analog input in Maestro Control Center, voltage = value*5.0/1023.0 V. If it is a digital 
+input, bit = (value == 1023)? 1: 0. If it is a digital output, bit = (value < 6000)? 0: 1. If it is a servo output, 
+pw = value/4 us.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+int channel : (IN) Channel number.
+int* pValue : (INOUT) Valid pointer that will receive the value.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int GetValuePololu(POLOLU* pPololu, int channel, int* pValue)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
@@ -205,7 +216,21 @@ inline int GetValuePololu(POLOLU* pPololu, int channel, int* pValue)
 	return EXIT_SUCCESS;
 }
 
-// int selectedchannels[NB_CHANNELS_AI_POLOLU], int ais[NB_CHANNELS_AI_POLOLU]
+/*
+Get selected channels value.
+For example, if the value of channel 2 needs to be retrieved, set selectedchannels[2] to 1 and check ais[2]. If 
+the channel is configured as analog input in Maestro Control Center, voltage = ais[2]*5.0/1023.0 V. If it is a digital 
+input, bit = (ais[2] == 1023)? 1: 0. If it is a digital output, bit = (ais[2] < 6000)? 0: 1. If it is a servo output, 
+pw = ais[2]/4 us.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+int* selectedchannels : (IN) Valid pointer to a table of NB_CHANNELS_AI_POLOLU elements to indicate which channels 
+should be considered in ais (0 to ignore the channel or 1 to select it).
+int* ais : (IN) Valid pointer to a table of NB_CHANNELS_AI_POLOLU elements that will receive the value for each 
+channel.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int GetAllValuesPololu(POLOLU* pPololu, int* selectedchannels, int* ais)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
@@ -287,8 +312,18 @@ inline int GetAllValuesPololu(POLOLU* pPololu, int* selectedchannels, int* ais)
 	return EXIT_SUCCESS;
 }
 
-// If digital output, bit = (pw >= 1500)? 1 : 0;.
-// pw in us. 
+/*
+Set a PWM channel.
+The channel needs to be configured as servo output in Maestro Control Center. If it is configured as digital output, 
+bit = (pw >= 1500)? 1 : 0;.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+int channel : (IN) Channel number (from 0 to NB_CHANNELS_PWM_POLOLU-1).
+int pw : (IN) Desired pulse width (in us). For example, if a servomotor is connected, 
+pass 1500 to put it at a neutral state, 1000 in one side or 2000 in the other side.
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetPWMPololu(POLOLU* pPololu, int channel, int pw)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
@@ -343,9 +378,20 @@ inline int SetPWMPololu(POLOLU* pPololu, int channel, int pw)
 	return EXIT_SUCCESS;
 }
 
-// If digital output, bit = (pw >= 1500)? 1 : 0;.
-// pw in us.
-// int selectedchannels[NB_CHANNELS_PWM_POLOLU], int pws[NB_CHANNELS_PWM_POLOLU]
+/*
+Set selected PWM channels.
+For example, if a servomotor is connected to channel 2, set pws[2] to 1500 to put it at a neutral state, 1000 in 
+one side or 2000 in the other side, and set selectedchannels[2] to 1. The channel needs to be configured as servo 
+output in Maestro Control Center. If it is configured as digital output, bit = (pws[2] >= 1500)? 1 : 0;.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+int* selectedchannels : (IN) Valid pointer to a table of NB_CHANNELS_PWM_POLOLU elements to indicate which channels 
+should be considered in pws (0 to ignore the channel or 1 to select it).
+int* pws : (IN) Valid pointer to a table of NB_CHANNELS_PWM_POLOLU elements with the desired pulse width for each 
+channel (in us).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetAllPWMsPololu(POLOLU* pPololu, int* selectedchannels, int* pws)
 {
 	unsigned char sendbuf[MAX_NB_BYTES_POLOLU];
@@ -564,7 +610,15 @@ inline int SetPWMJrkPololu(POLOLU* pPololu, int pw)
 	return EXIT_SUCCESS;
 }
 
-// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
+/*
+Set rudderchan PWM channel as a rudder angle.
+The channel needs to be configured as servo output in Maestro Control Center.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+double angle : (IN) Desired rudder angle (in rad, should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetRudderPololu(POLOLU* pPololu, double angle)
 {
 	int pw = 0;
@@ -592,7 +646,16 @@ inline int SetRudderPololu(POLOLU* pPololu, double angle)
 	return SetPWMPololu(pPololu, pPololu->rudderchan, pw);
 }
 
-// u should be in [-1;1].
+/*
+Set rightthrusterchan and leftthrusterchan PWM channels as thrusters inputs.
+The channels need to be configured as servo output in Maestro Control Center.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+double urt : (IN) Desired right thruster input (in [-1;1]).
+double ult : (IN) Desired left thruster input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetThrustersPololu(POLOLU* pPololu, double urt, double ult)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
@@ -614,8 +677,16 @@ inline int SetThrustersPololu(POLOLU* pPololu, double urt, double ult)
 	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
 }
 
-// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
-// u should be in [-1;1].
+/*
+Set rudderchan PWM channel as a rudder angle and rightthrusterchan PWM channel as a thruster input.
+The channels need to be configured as servo output in Maestro Control Center.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+double angle : (IN) Desired rudder angle (in rad, should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))]).
+double urt : (IN) Desired thruster input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetRudderThrusterPololu(POLOLU* pPololu, double angle, double urt)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
@@ -653,8 +724,17 @@ inline int SetRudderThrusterPololu(POLOLU* pPololu, double angle, double urt)
 	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
 }
 
-// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
-// u should be in [-1;1].
+/*
+Set rudderchan PWM channel as a rudder angle, rightthrusterchan and leftthrusterchan PWM channels as thrusters inputs.
+The channels need to be configured as servo output in Maestro Control Center.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+double angle : (IN) Desired rudder angle (in rad, should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))]).
+double urt : (IN) Desired right thruster input (in [-1;1]).
+double ult : (IN) Desired left thruster input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetRudderThrustersPololu(POLOLU* pPololu, double angle, double urt, double ult)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];
@@ -695,8 +775,20 @@ inline int SetRudderThrustersPololu(POLOLU* pPololu, double angle, double urt, d
 	return SetAllPWMsPololu(pPololu, selectedchannels, pws);
 }
 
-// angle should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))].
-// u should be in [-1;1].
+/*
+Set rudderchan PWM channel as a rudder angle, rightthrusterchan and leftthrusterchan PWM channels as thrusters inputs,
+rightfluxchan and leftfluxchan as flux direction inputs.
+The channels need to be configured as servo output in Maestro Control Center.
+
+POLOLU* pPololu : (INOUT) Valid pointer to a structure corresponding to a Pololu Maestro.
+double angle : (IN) Desired rudder angle (in rad, should be in [-max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle))]).
+double urt : (IN) Desired right thruster input (in [-1;1]).
+double ult : (IN) Desired left thruster input (in [-1;1]).
+double urf : (IN) Desired right flux direction input (in [-1;1]).
+double ulf : (IN) Desired left flux direction input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
 inline int SetRudderThrustersFluxPololu(POLOLU* pPololu, double angle, double urt, double ult, double urf, double ulf)
 {
 	int selectedchannels[NB_CHANNELS_PWM_POLOLU];

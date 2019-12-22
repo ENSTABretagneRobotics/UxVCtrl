@@ -1,3 +1,13 @@
+Initialisation de t, très grand dt initial vs dt de 0...?
+
+Pour éviter le target_sources cmake 2.8, utiliser add_executable plus bas dans le code?
+
+release size multiplied by 10 because of cv320? Compare with cv412...
+
+Parse files "param=" or " \t  \t  param \t  \t  =" a bit like commands, to be more compatible between different versions of the program, prepare unused code for that?
+Attention aux params un peu spéciaux dans env.txt, Video0.txt...
+New config parsing : essayer de pouvoir remplacer le code existant automatiquement...
+En profiter pour changer la logique bDisable/bEnableDevice...
 
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
@@ -24,7 +34,7 @@ Pouvoir passer gstreamer command UxVCtrl, rajouter param supplémentaire pour pas
 Comment dire à libavformat d'utiliser omxh264dec?->omxcv?
 UxVCtrl : rajouter support de v4l2 en h264 ou autre et l'envoi en UDP, TCP ou un pipe de ce qui vient de la caméra, besoin d'avoir une var imgcompressed en parallèle de img pour qu'elle puisse être utilisée par VideoInterface
 mettre dans extensions les éventuels fichiers de l'omx
-add param bUseHWaccel to choose to enable omx JPEG and H264 for pi
+add param bUseHWaccel to choose to enable omx JPEG and H264 for pi->define USE_HW_ACCEL because there are specific compilation options
 Éviter les png UxVCtrl sur rpi, sauvegarder en brut en option, option ppm, bmp, png, jpg pour chaque type de données?
 VideoInterface : pouvoir envoyer les données brutes compressées sans requêtes http, notamment via UDP
 nouvelle fonction spécifique handleudp() qui fait que des send(), ou rajouter options correspondantes...?
@@ -415,6 +425,8 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+si exception dans un thread (e.g. avec push_back()), tenter bExit = TRUE...?
+"Error launching the RazorAHRSInterface server" and for other interfaces sometimes on 18.04, rebooting solves the problem...?->conflict with other programs using temporarily the same ports?
 manque StopChrono() dans handlemavlinkinterface() et peut-être ailleurs...
 VC_Linux internal bug : remote current build directory does not correspond to the directory containing .vcxproj file, see https://github.com/Microsoft/VSLinux/issues/325
 VC_Linux limitation : does not work from a network drive?
@@ -471,6 +483,7 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+Update makefile fileconversions->remplacer par des cmakelists.txt?->peut-être pas prioritaire
 SBG mingw8 x64, mingw/mingw5/7 x86...
 cmake check better gcc version, compatibility with cross compilation...
 Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package windows?
@@ -805,6 +818,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Qt5.12 mingw730 64 problème compil chrono hardware-cpp->32 also, 5.3.0...->problem with inline in C mode depending on the version of gcc...?->force include of _mingw.h or similar before #define inline?
 
 Faire vm Windows Server Core? 2016, version 1803 comme travis->2019 v1809, install_choco.ps1, "%programfiles%\git\git-bash"...
 

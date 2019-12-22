@@ -5,7 +5,7 @@ jobs:
      os: linux
      dist: bionic
      compiler: gcc
-     script: cmake . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows"
      os: windows
@@ -20,7 +20,7 @@ jobs:
      services: xvfb
      before_install: 
        - sudo apt-get -q update
-     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
      # Virtual memory exhausted with --parallel...?
    - name: "Ubuntu 16.04 with OpenCV 2.4 and all"
@@ -30,17 +30,17 @@ jobs:
      services: xvfb
      before_install: 
        - sudo apt-get -q update
-     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON -DENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
  
    - name: "Mac OS"
      os: osx
      osx_image: xcode10.1
-     script: cmake . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Mac OS with cv4 and all without bv"
      os: osx
      osx_image: xcode10.1
-     script: cmake -DDISABLE_OPENCV_SUPPORT=OFF -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LABJACK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows MinGW 8.1.0 x64"
      os: windows
@@ -48,19 +48,7 @@ jobs:
      install: 
        - choco install -y make
      script: 
-       - cmake -G "MSYS Makefiles" . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
-
-# Install MinGW 32 bit...?
-
-#choco uninstall -y mingw 
-#choco install -y mingw --version=5.3.0 --allow-downgrade
-#choco uninstall -y cmake
-#wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate
-#cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
-##cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as "\"C:\\Program Files \(x86\)\\CMake\"""
-#qtcreator online installer, qtenv2.bat...
-
-# cv320 needs VFW...?
+       - cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
    - name: "Windows MinGW 8.1.0 x64 cv412 and all without LabJack, SBG, bv"
      os: windows
@@ -69,29 +57,93 @@ jobs:
        - choco install -y make
          # For OpenCV
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
 #         # Lighter version of OpenCV, instead of the one that would be downloaded automatically by CMakeLists.txt...
 #       - wget http://www.ensta-bretagne.fr/lebars/Share/OpenCV3.2.0_mini.zip --no-check-certificate -nv
 #       - cmd //c "7z x OpenCV3.2.0_mini.zip -o"%SystemDrive%" -y"
-#       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate
+#         # PATH
+#       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
 #       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
-#       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as "%SystemDrive%\OpenCV3.2.0\x64\mingw8\bin""
+#       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV3.2.0\x64\mingw8\bin"
      script: 
-       - cmd //c "cmake -G "MSYS Makefiles" -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
 
    - name: "Windows vc15 x64 cv412 and all without LabJack, bv"
      os: windows
      install: 
-#       - powerShell -Command 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned'
+#       - powerShell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned"
          # For OpenCV
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-#       - powershell -Command "Install-WindowsFeature NET-Framework-Features"
-#       - powershell -Command "Install-WindowsFeature NET-Framework-Core"
-       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate
+#       - powerShell -Command "Add-WindowsCapability -Online -Name NetFX3*"
+#       - powerShell -Command "Add-WindowsCapability -Online -Name Tools.Graphics.DirectX*"
+#       - powerShell -Command "Add-WindowsCapability -Online -Name Media.WindowsMediaPlayer*"
+#       - powerShell -Command "Add-WindowsCapability -Online -Name Browser.InternetExplorer*"
+#       #- powershell -Command "Install-WindowsFeature NET-Framework-Features"
+#       #- powershell -Command "Install-WindowsFeature NET-Framework-Core"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
          # For BlueView
        - choco install -y vcredist2010
 #       - choco install -y vcredist-all
      script: 
-       - cmd //c "cmake -G "Visual Studio 15" -A x64 -DDISABLE_OPENCV_SUPPORT=OFF -DOPENCV2413=OFF -DOPENCV320=OFF -DOPENCV412=ON -DENABLE_MAVLINK_SUPPORT=ON -DENABLE_LIBMODBUS_SUPPORT=ON -DENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake -G "Visual Studio 15" -A x64 -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+
+   - name: "Windows Qt 2010.05 MinGW 4.4.0 x86 cv2413 and all without LabJack, SBG, bv"
+     os: windows
+     install: 
+         # Take 2 min...
+       - choco uninstall -y mingw
+#       - choco install -y mingw --version=5.3.0 --allow-downgrade
+       - choco install -y make
+       - choco uninstall -y cmake cmake.install
+       - wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate -nv
+       - cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/qt-sdk-win-opensource-2010.05.exe --no-check-certificate -nv
+       - cmd //c "move /Y qt-sdk-win-opensource-2010.05.exe %SystemDrive%\ "
+         # Take several min...
+       - cmd //c "%SystemDrive%\qt-sdk-win-opensource-2010.05.exe /S"
+       - cmd //c "del /f /q %SystemDrive%\qt-sdk-win-opensource-2010.05.exe"
+         # For OpenCV
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # PATH
+       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
+       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin;C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin"
+     script: 
+       - cmd //c "refreshenv.cmd & set PATH=C:\Progra~2\CMake\bin;C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+
+   - name: "Windows Qt 5.12.6 MinGW 7.3.0 x86 cv320 and all without LabJack, SBG, bv"
+     os: windows
+     install: 
+         # Take 2 min...
+       - choco uninstall -y mingw
+       - choco install -y make
+       - wget http://download.qt.io/archive/qt/5.12/5.12.6/qt-opensource-windows-x86-5.12.6.exe --no-check-certificate -nv
+       - cmd //c "move /Y qt-opensource-windows-x86-5.12.6.exe %SystemDrive%\ "
+       - wget http://www.ensta-bretagne.fr/lebars/Share/qt-installer-5.12.6-mingw73_32.qs --no-check-certificate -nv
+       - cmd //c "move /Y qt-installer-5.12.6-mingw73_32.qs %SystemDrive%\ "
+         # Take several min...
+       - cmd //c "%SystemDrive%\qt-opensource-windows-x86-5.12.6.exe --script %SystemDrive%\qt-installer-5.12.6-mingw73_32.qs"
+       - cmd //c "del /f /q %SystemDrive%\qt-opensource-windows-x86-5.12.6.exe"
+         # For OpenCV
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # PATH
+       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
+       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin"
+     script: 
+       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+
+#   - name: "Ubuntu 12.04 with OpenCV 2 and all"
+#     os: linux
+#     dist: precise
+#     compiler: gcc
+#     services: xvfb
+#     before_install: 
+#       - sudo apt-get -q update
+#     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
