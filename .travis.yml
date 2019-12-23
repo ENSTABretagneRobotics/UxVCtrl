@@ -19,7 +19,8 @@ jobs:
      compiler: gcc
      services: xvfb
      before_install: 
-       - sudo apt-get -q update
+         # Allowed to fail...
+       - sudo apt-get -q update || true
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
      # Virtual memory exhausted with --parallel...?
@@ -29,7 +30,8 @@ jobs:
      compiler: gcc
      services: xvfb
      before_install: 
-       - sudo apt-get -q update
+         # Allowed to fail...
+       - sudo apt-get -q update || true
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
  
    - name: "Mac OS"
@@ -49,6 +51,30 @@ jobs:
        - choco install -y make
      script: 
        - cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+
+   - name: "Ubuntu 12.04 with OpenCV 2 and all"
+     os: linux
+     dist: precise
+     compiler: gcc
+     services: xvfb
+     before_install: 
+       - sudo apt-get -q update
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+
+   - name: "Ubuntu 16.04 static without cv, modbus, bv"
+     os: linux
+     dist: xenial
+     compiler: gcc
+     services: xvfb
+     before_install: 
+         # Allowed to fail...
+       - sudo apt-get -q update || true
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+
+   - name: "Mac OS static without cv, modbus, bv"
+     os: osx
+     osx_image: xcode10.1
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows MinGW 8.1.0 x64 cv412 and all without LabJack, SBG, bv"
      os: windows
@@ -143,21 +169,3 @@ jobs:
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin"
      script: 
        - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
-
-   - name: "Ubuntu 12.04 with OpenCV 2 and all"
-     os: linux
-     dist: precise
-     compiler: gcc
-     services: xvfb
-     before_install: 
-       - sudo apt-get -q update
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
-
-   - name: "Ubuntu 16.04 static without cv, modbus, bv"
-     os: linux
-     dist: xenial
-     compiler: gcc
-     services: xvfb
-     before_install: 
-       - sudo apt-get -q update
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
