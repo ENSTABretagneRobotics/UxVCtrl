@@ -1,4 +1,20 @@
 language: cpp
+
+if: tag IS blank
+
+env:
+    - TRAVIS_TAG="autotagname"
+
+deploy: &deploy_base
+    provider: releases
+    tag_name: ${TRAVIS_TAG}
+    api_key:
+        secure: XswJJhiDn1DDUMmivWdj/Mfz6IzHexWRgMZoVmcM2gEB9/P8XUgHPL5dpmo+Ep81ILM4Niug7XBE4+EmAMAV/5pPclxfLM47jhBXciG0UQA6BgANI0s630qqVP3/KWh8cxeA3YV87jyf5fvEPwo8KaiNfOIxnVeHraeOjfGPYXPWSHXzTvcz99ZeJMIyk3006PSGPNEhMUbKm6k/eYnJsfQnUIgq6nICRMiGxfhDrh5mVwW9xIDKDqc3vpm6d00pCMmrjbG9c6rh8UD0lfXHV4vs8gDJh1+sK+D2EnPIYKOmjRqb4m8RAnAkd/NBoBenLYPWJgazOziID8P58fcElxttBouMPz3bYbsOize4gPk1KZniKbHVtn+aqQ5fOIiDOv7TyyZRS5Barln8xfOPZje1R/EgdiSj0PabvyhSf/hemRJMCi0yJ7tUklLvIZqPCz76uN9uPAzmWtwisGYiYeJXV5ZffLZeY7Yo4xxVir00mSWZWO3qPnwZlku4T3rLFST5emx4kxsFCfGaicaMjn/YQ4m+ZWXpL5dxgR6IHSKEROK50TqZWA1vb+YH58Zg5xkrd5+4bFALrlE5pA61LDET06nM+m5IjIFurALodi6uHKISfD8yiynCQMFbcNFf+mVroJf1ATlk32GFDakgmXbgtSlmVwUOAYDUtIqMqi8=
+    skip_cleanup: true
+    overwrite: true
+    draft: true
+    prerelease: true
+
 jobs:
   include:
    - name: "Ubuntu 18.04"
@@ -21,7 +37,10 @@ jobs:
      before_install: 
          # Allowed to fail...
        - sudo apt-get -q update || true
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_Ubuntu64
 
      # Virtual memory exhausted with --parallel...?
    - name: "Ubuntu 16.04 with OpenCV 2.4 and all"
@@ -58,7 +77,7 @@ jobs:
      compiler: gcc
      services: xvfb
      before_install: 
-       - sudo apt-get -q update
+       - sudo apt-get -q update || true
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
    - name: "Ubuntu 16.04 static without cv, modbus, bv"
@@ -69,12 +88,18 @@ jobs:
      before_install: 
          # Allowed to fail...
        - sudo apt-get -q update || true
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64_static
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_Ubuntu64_static
 
    - name: "Mac OS static without cv, modbus, bv"
      os: osx
      osx_image: xcode10.1
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_MacOS
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_MacOS
 
    - name: "Windows MinGW 8.1.0 x64 cv412 and all without LabJack, SBG, bv"
      os: windows
@@ -94,6 +119,18 @@ jobs:
 #       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV3.2.0\x64\mingw8\bin"
      script: 
        - cmd //c "cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+
+   - name: "Windows vc15 x86 cv412 and all without LabJack"
+     os: windows
+     install: 
+         # For OpenCV
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # For BlueView
+       - choco install -y vcredist2010
+     script: 
+       - cmd //c "cmake -G "Visual Studio 15" -A x86 -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
 
    - name: "Windows vc15 x64 cv412 and all without LabJack, bv"
      os: windows
