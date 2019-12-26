@@ -175,7 +175,7 @@ jobs:
        - cmd //c "copy /Y %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
        - cmd //c "del /s /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
 #       - choco install -y vcredist-all
-  script: 
+     script: 
        - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
 
    - name: "Windows Qt 2010.05 MinGW 4.4.0 x86 cv2413 and all without kinect, cleye, lj, sbg"
