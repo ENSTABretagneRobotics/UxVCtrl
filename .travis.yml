@@ -41,17 +41,6 @@ jobs:
      deploy:
        <<: *deploy_base
        file: UxVCtrl_Ubuntu64
-
-     # Virtual memory exhausted with --parallel...?
-   - name: "Ubuntu 16.04 with OpenCV 2.4 and all"
-     os: linux
-     dist: xenial
-     compiler: gcc
-     services: xvfb
-     before_install: 
-         # Allowed to fail...
-       - sudo apt-get -q update || true
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
  
    - name: "Mac OS"
      os: osx
@@ -93,7 +82,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_Ubuntu64_static
 
-   - name: "Mac OS static without cv, modbus, bv"
+   - name: "Mac OS without cv, modbus, bv"
      os: osx
      osx_image: xcode10.1
      script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_MacOS
@@ -123,6 +112,34 @@ jobs:
    - name: "Windows compat"
      os: windows
      install: 
+       - choco uninstall -y cmake.install
+       - wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate -nv
+       - cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
+         # For OpenCV
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # For LabJack
+         # https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
+       - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
+         # For XP support
+       - wget "https://aka.ms/vs/15/release/vs_buildtools.exe" -O vs_buildtools.exe
+       - ./vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
+         # PATH
+       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
+       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
+     script: 
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_compat.exe"
+     deploy:
+       <<: *deploy_base
+       file: Release\UxVCtrl_compat.exe
+
+   - name: "Windows vc15 x86 static cv412 and all without cleye"
+     os: windows
+     install: 
 #       - powerShell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned"
        - choco uninstall -y cmake.install
 #       - choco uninstall -y cmake cmake.install
@@ -147,18 +164,27 @@ jobs:
 #       - powershell -Command "Install-WindowsFeature NET-Framework-Core"
 #       - cmd //c "DISM /online /enable-feature /featurename:NetFx3 /all"
 #       - choco install -y dotnet3.5 
+         # For Kinect v2
+       - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
+       - 7z x KinectSDK-v2.0.zip -o/C/ -y
+       - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
+       - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
+       - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
+       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
+       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
+       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+#       - choco install -y vcredist-all
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
      script: 
-         #  -T v141_xp...
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_compat.exe"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
      deploy:
        <<: *deploy_base
-       file: Release\UxVCtrl_compat.exe
+       file: Release\UxVCtrl.exe
 
-   - name: "Windows vc15 x64 cv412 and all without kinect, cleye, lj, bv"
+   - name: "Windows vc15 x64 static cv412 and all without cleye, lj, bv"
      os: windows
      install: 
          # For OpenCV
@@ -171,19 +197,19 @@ jobs:
        - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
        - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
        - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
-       - cmd //c "copy /Y %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
-       - cmd //c "copy /Y %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
-       - cmd //c "del /s /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
-#       - choco install -y vcredist-all
+       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
+       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
+       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
      script: 
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
+     deploy:
+       <<: *deploy_base
+       file: Release\UxVCtrl_x64.exe
 
    - name: "Windows Qt 2010.05 MinGW 4.4.0 x86 cv2413 and all without kinect, cleye, lj, sbg"
      os: windows
      install: 
-         # Take 2 min...
        - choco uninstall -y mingw
-#       - choco install -y mingw --version=5.3.0 --allow-downgrade
        - choco install -y make
        - wget http://www.ensta-bretagne.fr/lebars/Share/qt-sdk-win-opensource-2010.05.exe --no-check-certificate -nv
        - cmd //c "move /Y qt-sdk-win-opensource-2010.05.exe %SystemDrive%\ "
@@ -203,11 +229,12 @@ jobs:
      script: 
        - cmd //c "refreshenv.cmd & set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
 
-   - name: "Windows Qt 5.12.6 MinGW 7.3.0 x86 cv320 and all without kinect, cleye, lj, sbg"
+   - name: "Windows Qt 5.12.6 MinGW 7.3.0 x86 cv412 and all without kinect, cleye, lj, sbg"
      os: windows
      install: 
          # Take 2 min...
        - choco uninstall -y mingw
+#       - choco install -y mingw --version=5.3.0 --allow-downgrade
        - choco install -y make
        - wget http://download.qt.io/archive/qt/5.12/5.12.6/qt-opensource-windows-x86-5.12.6.exe --no-check-certificate -nv
        - cmd //c "move /Y qt-opensource-windows-x86-5.12.6.exe %SystemDrive%\ "
@@ -227,4 +254,4 @@ jobs:
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin"
      script: 
-       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"

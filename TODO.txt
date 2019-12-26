@@ -1,7 +1,6 @@
 
 Initialisation de t, très grand dt initial vs dt de 0...?
 
-release size multiplied by 10 because of cv320? Compare with cv412...
 
 Parse files "param=" or " \t  \t  param \t  \t  =" a bit like commands, to be more compatible between different versions of the program, prepare unused code for that?
 Attention aux params un peu spéciaux dans env.txt, Video0.txt...
@@ -815,6 +814,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+release size multiplied by 10 because of cv320? Compare with cv412...->same...
 
 static config vs (crt?, cv, modbus, SBG)
 Install lj in cmake (add Certificates.reg to existing zip)->Lj needs dotnet2, sleep...
