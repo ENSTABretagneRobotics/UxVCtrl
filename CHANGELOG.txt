@@ -1,3 +1,6 @@
+342
+Updated .travis.yml.
+
 341
 Updated CMakeLists.txt and .travis.yml.
 

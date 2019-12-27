@@ -37,6 +37,7 @@ jobs:
      before_install: 
          # Allowed to fail...
        - sudo apt-get -q update || true
+       - df
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
      deploy:
        <<: *deploy_base
@@ -50,6 +51,8 @@ jobs:
    - name: "Mac OS with cv4 and all without bv"
      os: osx
      osx_image: xcode10.1
+     install:
+       - df
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows MinGW 8.1.0 x64"
@@ -125,8 +128,8 @@ jobs:
        - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
        - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
          # For XP support
-       - wget "https://aka.ms/vs/15/release/vs_buildtools.exe" -O vs_buildtools.exe
-       - ./vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
+#       - wget "https://aka.ms/vs/15/release/vs_buildtools.exe" -O vs_buildtools.exe
+#       - ./vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
@@ -178,6 +181,7 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
+       - df
      script: 
        - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
      deploy:
@@ -200,6 +204,7 @@ jobs:
        - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
        - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
        - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+       - df
      script: 
        - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
      deploy:
@@ -226,15 +231,20 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin"
+       - df
      script: 
        - cmd //c "refreshenv.cmd & set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
 
    - name: "Windows Qt 5.12.6 MinGW 7.3.0 x86 cv412 and all without kinect, cleye, lj, sbg"
      os: windows
      install: 
-         # Take 2 min...
        - choco uninstall -y mingw
 #       - choco install -y mingw --version=5.3.0 --allow-downgrade
+         # Need to free up disk space...
+#       - choco uninstall -y visualstudio2017-workload-webbuildtools visualstudio2017-workload-netcorebuildtools visualstudio2017-workload-vctools microsoft-build-tools
+#       - wget "https://aka.ms/vs/15/release/vs_buildtools.exe" -O vs_buildtools.exe
+#       - ./vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --passive --norestart --wait --remove Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --remove Microsoft.VisualStudio.Component.WinXP --remove Microsoft.VisualStudio.Component.VC.CLI.Support
+       - rm -Rf "/C/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools"
        - choco install -y make
        - wget http://download.qt.io/archive/qt/5.12/5.12.6/qt-opensource-windows-x86-5.12.6.exe --no-check-certificate -nv
        - cmd //c "move /Y qt-opensource-windows-x86-5.12.6.exe %SystemDrive%\ "
@@ -253,5 +263,6 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin"
+       - df
      script: 
        - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:/Qt/Qt5.12.6/Tools/mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
