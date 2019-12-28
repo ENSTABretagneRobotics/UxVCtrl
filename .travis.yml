@@ -16,7 +16,48 @@ deploy: &deploy_base
     prerelease: true
 
 jobs:
-  include:
+  include: 
+   - name: "Ubuntu 16.04 i386 docker static without cv, modbus, bv"
+     os: linux
+     dist: xenial
+     compiler: gcc
+     services:
+       - docker
+     script: 
+       - "docker run -i -v \"${PWD}:/repo\" i386/ubuntu:xenial /bin/bash -c \"linux32 --32bit i386 uname -a && cd /repo && apt-get -q update && apt-get -y install lsb-release build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu_static \""
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_Ubuntu_static
+
+   - name: "pi docker static without cv, modbus, bv"
+     os: linux
+     dist: bionic
+     compiler: gcc
+     services:
+       - docker
+     before_install: 
+       - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+     script: 
+       - "docker run -i -v \"${PWD}:/repo\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd /repo && apt-get -q update && apt-get -y install lsb-release build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi_static \""
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_pi_static
+ 
+   - name: "pi docker without bv"
+     os: linux
+     dist: bionic
+     compiler: gcc
+     services:
+       - xvfb
+       - docker
+     before_install: 
+       - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+     script: 
+       - "docker run -i -v \"${PWD}:/repo\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd /repo && apt-get -q update && apt-get -y install lsb-release xvfb xauth build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_pi
+ 
    - name: "Ubuntu 18.04"
      os: linux
      dist: bionic
@@ -29,13 +70,12 @@ jobs:
        - cmd //c "cmake . & cmake --build . --config Release --target UxVCtrl --parallel & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
    
      # Virtual memory exhausted with --parallel...?
-   - name: "Ubuntu 18.04 with OpenCV 3.2.0 and all"
+   - name: "Ubuntu 18.04 cv320 and all"
      os: linux
      dist: bionic
      compiler: gcc
      services: xvfb
      before_install: 
-         # Allowed to fail...
        - sudo apt-get -q update || true
        - df
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
@@ -63,12 +103,13 @@ jobs:
      script: 
        - cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
-   - name: "Ubuntu 12.04 with OpenCV 2 and all"
+   - name: "Ubuntu 12.04 cv230 and all"
      os: linux
      dist: precise
      compiler: gcc
      services: xvfb
      before_install: 
+         # Allowed to fail...
        - sudo apt-get -q update || true
      script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
 
@@ -78,7 +119,6 @@ jobs:
      compiler: gcc
      services: xvfb
      before_install: 
-         # Allowed to fail...
        - sudo apt-get -q update || true
      script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64_static
      deploy:
