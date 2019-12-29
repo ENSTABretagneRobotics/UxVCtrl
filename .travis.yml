@@ -29,7 +29,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_Ubuntu_static
 
-   - name: "pi docker static without cv, modbus, bv"
+   - name: "Raspbian Buster pi docker static without cv, modbus, bv"
      os: linux
      dist: bionic
      compiler: gcc
@@ -43,7 +43,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_pi_static
  
-   - name: "pi docker without bv"
+   - name: "Raspbian Buster pi docker without bv"
      os: linux
      dist: bionic
      compiler: gcc
@@ -53,7 +53,7 @@ jobs:
      before_install: 
        - docker run --rm --privileged multiarch/qemu-user-static:register --reset
      script: 
-       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget xvfb xauth build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget xvfb xauth build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
      deploy:
        <<: *deploy_base
        file: UxVCtrl_pi
@@ -284,7 +284,13 @@ jobs:
 #       - choco uninstall -y visualstudio2017-workload-webbuildtools visualstudio2017-workload-netcorebuildtools visualstudio2017-workload-vctools microsoft-build-tools
 #       - wget "https://aka.ms/vs/15/release/vs_buildtools.exe" -O vs_buildtools.exe
 #       - ./vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --passive --norestart --wait --remove Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --remove Microsoft.VisualStudio.Component.WinXP --remove Microsoft.VisualStudio.Component.VC.CLI.Support
-       - rm -Rf "/C/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools"
+       - df
+       - rm -Rf "/C/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools" || true
+       - df
+       - rm -Rf "/C/Program Files (x86)/Windows Kits" || true
+       - df
+       - rm -Rf "/C/Windows/SoftwareDistribution" || true
+       - df
        - choco install -y make
        - wget http://download.qt.io/archive/qt/5.12/5.12.6/qt-opensource-windows-x86-5.12.6.exe --no-check-certificate -nv
        - cmd //c "move /Y qt-opensource-windows-x86-5.12.6.exe %SystemDrive%\ "
