@@ -24,7 +24,7 @@ jobs:
      services:
        - docker
      script: 
-       - "docker run -i -v \"${PWD}:${PWD}\" i386/ubuntu:xenial /bin/bash -c \"linux32 --32bit i386 uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu_static \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" i386/ubuntu:xenial /bin/bash -c \"linux32 --32bit i386 uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu_static \""
      deploy:
        <<: *deploy_base
        file: UxVCtrl_Ubuntu_static
@@ -38,7 +38,7 @@ jobs:
      before_install: 
        - docker run --rm --privileged multiarch/qemu-user-static:register --reset
      script: 
-       - "docker run -i -v \"${PWD}:${PWD}\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi_static \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi_static \""
      deploy:
        <<: *deploy_base
        file: UxVCtrl_pi_static
@@ -53,7 +53,7 @@ jobs:
      before_install: 
        - docker run --rm --privileged multiarch/qemu-user-static:register --reset
      script: 
-       - "docker run -i -v \"${PWD}:${PWD}\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget xvfb xauth build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget xvfb xauth build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
      deploy:
        <<: *deploy_base
        file: UxVCtrl_pi
