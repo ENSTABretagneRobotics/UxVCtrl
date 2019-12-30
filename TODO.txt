@@ -483,7 +483,7 @@ Maestro bloquée si on ne récupère pas en continu les données envoyées par la Raz
 build and install
 SBG build for mingw8 x64, mingw/mingw5/7 x86...
 cmake check better gcc version, compatibility with cross compilation, PREFIX variable for dependencies...
-Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package windows?
+Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package Windows?
 USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed
 Tester Hardware-MATLAB MAVLink et SBG support : 
 export CMAKE_C_FLAGS=${CMAKE_C_FLAGS} -fPIC
@@ -493,9 +493,10 @@ cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, 
 Update makefile fileconversions->remplacer par des cmakelists.txt?->peut-être pas prioritaire
 check inline and timegm in a small program
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
+Add .travis.yml to .sln?
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP FALSE)
 set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
-Compiler uxvctrl pour le pixhawk?
+Compiler pour le pixhawk?
 Mac OS : pas de CLOCK_MONOTONIC, clock_gettime(), librt (OSTime, Timer, Ev, Sem) mais il y a e.g. clock_get_time comme alternative, voir aussi SBG SDK...
 
 logs

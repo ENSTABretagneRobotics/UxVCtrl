@@ -16,7 +16,8 @@ endif()
 project(UxVCtrl)
 
 if(NOT(PROJECT_BINARY_DIR STREQUAL PROJECT_SOURCE_DIR))
-	message(WARNING "Please set the CMake build folder to the same as the source folder...")
+	message(WARNING "Please set the CMake build folder to the same as the source folder if possible...")
+	message(WARNING "Ensure also the working directory at runtime is UxVCtrl folder...")
 endif()
 
 # Used below to set VCX value for MinGW...
