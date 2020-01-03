@@ -25,7 +25,7 @@ _ Microsoft .NET Framework 4.7 (see http://go.microsoft.com/fwlink/?LinkId=82530
 [_ MinGW and MSYS]
 [_ GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
 [_ Look@LAN (lalsetup250)]
-_ LabJack UD driver v3.15/v3.2X (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.exe.zip , can be disabled using Compat_vs20XX.bat script or cmake)]
+_ LabJack UD driver (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.zip , can be disabled using Compat_vs20XX.bat script or cmake)]
 [_ MT SDK 2.7/3.3/4.2.1/4.3 (recommended if using a Xsens MTi device)]
 [_ Maestro Control Center (recommended if using a Pololu Maestro device)]
 [_ Jrk Configuration Utility (recommended if using a Pololu Jrk device)]

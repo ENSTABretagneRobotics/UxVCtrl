@@ -37,11 +37,8 @@ jobs:
      before_install: 
        - sudo apt-get -q update || true
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl
        # Virtual memory exhausted with --parallel...?
-     deploy:
-       <<: *deploy_base
-       file: UxVCtrl_Ubuntu64
  
    - name: "Mac OS"
      os: osx
@@ -62,10 +59,10 @@ jobs:
      services:
        - docker
      script: 
-       - "docker run -i -v \"${PWD}/..:${PWD}/..\" i386/ubuntu:xenial /bin/bash -c \"linux32 --32bit i386 uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu32_static \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" i386/ubuntu:xenial /bin/bash -c \"linux32 --32bit i386 uname -a && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_Ubuntu32 \""
      deploy:
        <<: *deploy_base
-       file: UxVCtrl_Ubuntu32_static
+       file: UxVCtrl_compat_Ubuntu32
 
    - name: "Raspbian Buster pi Docker static without OpenCV, libmodbus, BlueView, Kinect v2, CLEye support"
      os: linux
@@ -76,12 +73,12 @@ jobs:
      before_install: 
        - docker run --rm --privileged multiarch/qemu-user-static:register --reset
      script: 
-       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi_static \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster /bin/bash -c \"uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_pi \""
      deploy:
        <<: *deploy_base
-       file: UxVCtrl_pi_static
+       file: UxVCtrl_compat_pi
  
-   - name: "Raspbian Buster pi Docker with OpenCV 4.1.0 without BlueView, Kinect v2, CLEye support"
+   - name: "Raspbian Buster pi Docker static with OpenCV 4.1.2 without BlueView, Kinect v2, CLEye support"
      os: linux
      dist: bionic
      compiler: gcc
@@ -91,7 +88,7 @@ jobs:
      before_install: 
        - docker run --rm --privileged multiarch/qemu-user-static:register --reset
      script: 
-       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster-cv410 /bin/bash -c \"uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget xvfb xauth build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
+       - "docker run -i -v \"${PWD}/..:${PWD}/..\" lebarsfa/pi:buster-cv412-static /bin/bash -c \"uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update && apt-get -y install xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi \""
      deploy:
        <<: *deploy_base
        file: UxVCtrl_pi
@@ -123,18 +120,35 @@ jobs:
      services: xvfb
      before_install: 
        - sudo apt-get -q update || true
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64_static
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_Ubuntu64
      deploy:
        <<: *deploy_base
-       file: UxVCtrl_Ubuntu64_static
+       file: UxVCtrl_compat_Ubuntu64
+   
+   - name: "Ubuntu 18.04 amd64 static with OpenCV 4.1.2 without Kinect v2, CLEye support"
+     os: linux
+     arch: amd64
+     dist: bionic
+     compiler: gcc
+     services: xvfb
+     before_install: 
+       - sudo apt-get -q update || true
+       - sudo apt install -y libopencv-dev libgtk2.0
+       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus*
+       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.1.2-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.1.2-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV*
+       - df
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_Ubuntu64
 
    - name: "Mac OS Xcode 10.1 without OpenCV, libmodbus, BlueView, Kinect v2, CLEye support"
      os: osx
      osx_image: xcode10.1
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_MacOS
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_MacOS
      deploy:
        <<: *deploy_base
-       file: UxVCtrl_MacOS
+       file: UxVCtrl_compat_MacOS
 
    - name: "Windows MinGW 8.1.0 x64 cv412 and all without kinect, cleye, lj, sbg, bv"
      os: windows
@@ -231,13 +245,18 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl.exe
 
-   - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.1.2 without LabJack, BlueView, CLEye support"
+   - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.1.2 without BlueView, CLEye support"
      os: windows
      install: 
          # For OpenCV
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # For LabJack
+         # https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
+       - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
          # For Kinect v2
        - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
        - 7z x KinectSDK-v2.0.zip -o/C/ -y
@@ -249,7 +268,7 @@ jobs:
        - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
        - df
      script: 
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
      deploy:
        <<: *deploy_base
        file: Release\UxVCtrl_x64.exe
