@@ -45,7 +45,7 @@ jobs:
      osx_image: xcode10.1
      script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
-   - name: "Mac OS Xcode 10.1 with latest OpenCV without BlueView, Kinect v2, CLEye support"
+   - name: "Mac OS Xcode 10.1 with latest OpenCV 3 without BlueView, Kinect v2, CLEye support"
      os: osx
      osx_image: xcode10.1
      install:
@@ -134,8 +134,8 @@ jobs:
      before_install: 
        - sudo apt-get -q update || true
        - sudo apt install -y libopencv-dev libgtk2.0
-       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus*
-       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.1.2-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.1.2-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV*
+       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-Ubuntu64-static.zip
+       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.1.2-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.1.2-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.1.2-Ubuntu64-static.tar.gz
        - df
      script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
      deploy:
