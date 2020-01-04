@@ -21,12 +21,12 @@ jobs:
      os: linux
      dist: bionic
      compiler: gcc
-     script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Windows"
      os: windows
      script: 
-       - cmd //c "cmake . & cmake --build . --config Release --target UxVCtrl --parallel & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "cmake . & cmake --build . --config Release --target UxVCtrl & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
    
    - name: "Ubuntu 18.04 amd64 with default OpenCV 3.2.0 without Kinect v2, CLEye support"
      os: linux
@@ -43,14 +43,14 @@ jobs:
    - name: "Mac OS"
      os: osx
      osx_image: xcode10.1
-     script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
-   - name: "Mac OS Xcode 10.1 with latest OpenCV 3 without BlueView, Kinect v2, CLEye support"
+   - name: "Mac OS Xcode 10.1 with latest OpenCV without BlueView, Kinect v2, CLEye support"
      os: osx
      osx_image: xcode10.1
      install:
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
    - name: "Ubuntu 16.04 i386 Docker static without OpenCV, libmodbus, BlueView, Kinect v2, CLEye support"
      os: linux
@@ -99,7 +99,7 @@ jobs:
      install: 
        - choco install -y make
      script: 
-       - cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+       - cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
    - name: "Ubuntu 12.04 amd64 with default OpenCV 2.3.1 without Kinect v2, CLEye support"
      os: linux
@@ -142,15 +142,27 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_Ubuntu64
 
-   - name: "Mac OS Xcode 10.1 without OpenCV, libmodbus, BlueView, Kinect v2, CLEye support"
+   - name: "Mac OS Xcode 10.1 static without OpenCV, libmodbus, BlueView, Kinect v2, CLEye support"
      os: osx
      osx_image: xcode10.1
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . --parallel && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_MacOS
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_MacOS
      deploy:
        <<: *deploy_base
        file: UxVCtrl_compat_MacOS
 
-   - name: "Windows MinGW 8.1.0 x64 cv412 and all without kinect, cleye, lj, sbg, bv"
+   - name: "Mac OS Xcode 10.1 static with OpenCV 4.1.2 without BlueView, Kinect v2, CLEye support"
+     os: osx
+     osx_image: xcode10.1
+     install:
+       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
+       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.1.2-mac-static.tar.gz && tar xfz OpenCV-4.1.2-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.1.2-mac-static.tar.gz
+       - df
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl  && cp ./UxVCtrl ./UxVCtrl_MacOS
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_MacOS
+
+   - name: "Windows MinGW 8.1.0 x64 with OpenCV 4.1.2 without LabJack, SBG, BlueView, Kinect v2, CLEye support"
      os: windows
      compiler: gcc
      install: 
@@ -172,6 +184,7 @@ jobs:
    - name: "Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without BlueView, Kinect v2, CLEye support"
      os: windows
      install: 
+         # Test alternate CMake version...
        - choco uninstall -y cmake.install
        - wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate -nv
        - cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
@@ -192,7 +205,7 @@ jobs:
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
      script: 
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_compat.exe"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_compat.exe"
      deploy:
        <<: *deploy_base
        file: Release\UxVCtrl_compat.exe
@@ -201,6 +214,9 @@ jobs:
      os: windows
      install: 
 #       - powerShell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned"
+         # Need to free up disk space...
+       - choco uninstall -y mingw
+         # Test alternate CMake version...
        - choco uninstall -y cmake.install
 #       - choco uninstall -y cmake cmake.install
        - wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate -nv
@@ -240,7 +256,7 @@ jobs:
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
        - df
      script: 
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
      deploy:
        <<: *deploy_base
        file: Release\UxVCtrl.exe
@@ -248,6 +264,8 @@ jobs:
    - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.1.2 without BlueView, CLEye support"
      os: windows
      install: 
+         # Need to free up disk space...
+       - choco uninstall -y mingw
          # For OpenCV
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
@@ -268,7 +286,7 @@ jobs:
        - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
        - df
      script: 
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl --parallel & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV412=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
      deploy:
        <<: *deploy_base
        file: Release\UxVCtrl_x64.exe

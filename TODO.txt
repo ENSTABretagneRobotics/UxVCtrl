@@ -816,6 +816,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 OLD
 
+Docker mac?->pas directement possible...
+
 release size multiplied by 10 because of cv320? Compare with cv412...->same...
 
 static config vs (crt?, cv, modbus, SBG)
