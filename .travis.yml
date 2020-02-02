@@ -150,19 +150,19 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_compat_MacOS
 
-   - name: "Mac OS Xcode 10.1 static with OpenCV 4.1.2 without BlueView, Kinect v2, CLEye support"
-     os: osx
-     osx_image: xcode10.1
-     install:
-       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
-       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.1.2-mac-static.tar.gz && tar xfz OpenCV-4.1.2-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.1.2-mac-static.tar.gz
-       - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl  && cp ./UxVCtrl ./UxVCtrl_MacOS
-     deploy:
-       <<: *deploy_base
-       file: UxVCtrl_MacOS
+#   - name: "Mac OS Xcode 10.1 static with OpenCV 4.1.2 without BlueView, Kinect v2, CLEye support"
+#     os: osx
+#     osx_image: xcode10.1
+#     install:
+#       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
+#       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.1.2-mac-static.tar.gz && tar xfz OpenCV-4.1.2-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.1.2-mac-static.tar.gz
+#       - df
+#     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl  && cp ./UxVCtrl ./UxVCtrl_MacOS
+#     deploy:
+#       <<: *deploy_base
+#       file: UxVCtrl_MacOS
 
-   - name: "Windows MinGW 8.1.0 x64 with OpenCV 4.1.2 without LabJack, SBG, BlueView, Kinect v2, CLEye support"
+   - name: "Windows MinGW 8.1.0 x64 with OpenCV 4.1.2 (Kinect v2, CLEye currently incompatible) without LabJack, SBG, BlueView, Kinect v2, CLEye support"
      os: windows
      compiler: gcc
      install: 
@@ -210,7 +210,7 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl_compat.exe
 
-   - name: "Windows Visual Studio 2017 x86 static with OpenCV 4.1.2 without CLEye support"
+   - name: "Windows Visual Studio 2017 x86 static with OpenCV 4.1.2 (Kinect v2, CLEye currently incompatible) without CLEye support"
      os: windows
      install: 
 #       - powerShell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned"
@@ -241,6 +241,7 @@ jobs:
 #       - cmd //c "DISM /online /enable-feature /featurename:NetFx3 /all"
 #       - choco install -y dotnet3.5 
          # For Kinect v2
+       - choco install -y vcredist2012
        - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
        - 7z x KinectSDK-v2.0.zip -o/C/ -y
        - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
@@ -261,7 +262,47 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl.exe
 
-   - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.1.2 without BlueView, CLEye support"
+   - name: "Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without CLEye support"
+     os: windows
+     install: 
+         # Need to free up disk space...
+       - choco uninstall -y mingw
+         # Test alternate CMake version...
+       - choco uninstall -y cmake.install
+#       - choco uninstall -y cmake cmake.install
+       - wget https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi --no-check-certificate -nv
+       - cmd //c "cmake-3.15.5-win32-x86.msi /qb-! /norestart ALLUSERS=1"
+         # For OpenCV
+       - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # For LabJack
+         # https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
+       - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
+         # For Kinect v2
+       - choco install -y vcredist2012
+       - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
+       - 7z x KinectSDK-v2.0.zip -o/C/ -y
+       - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
+       - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
+       - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
+       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
+       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
+       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+         # PATH
+       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
+       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
+       - df
+     script: 
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV412=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_cv2413.exe"
+     deploy:
+       <<: *deploy_base
+       file: Release\UxVCtrl_cv2413.exe
+
+   - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.1.2 (Kinect v2, CLEye currently incompatible) without BlueView, CLEye support"
      os: windows
      install: 
          # Need to free up disk space...
@@ -276,6 +317,7 @@ jobs:
        - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
        - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
          # For Kinect v2
+       - choco install -y vcredist2012
        - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
        - 7z x KinectSDK-v2.0.zip -o/C/ -y
        - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
