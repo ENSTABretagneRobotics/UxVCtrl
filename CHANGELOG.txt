@@ -1,3 +1,6 @@
+349
+Added support of OpenCV 4.2.0.
+
 348
 Corrected CMakeLists.txt.
 

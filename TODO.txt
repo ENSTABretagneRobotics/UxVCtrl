@@ -1,4 +1,8 @@
 
+Pouvoir envoyer des trames à une sbg (e.g. gps time), voire n'importe quel périphérique un peu comme les corrections rtk
+
+Hardware-MATLAB/Python : if ENABLE_SBG_SUPPORT disabled, SBG MATLAB and Python functions should not be disabled...
+
 Ideally, if cv_version < 4 iplimage and mat enabled else disable iplimage...
 Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\Latest\UE 4.3\Robotique pratique\TD4\KinectWebcamOpenCV412
 class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
@@ -817,6 +821,9 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+mingw7/8 renamed to mingw for cv420
+increase travis timeout to 20 min for Qt...?->maybe just add --verbose...->probably not necessary...
 
 cv2413 semblait plus fiable en C que cv320...
 
