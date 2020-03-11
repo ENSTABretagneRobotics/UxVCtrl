@@ -1,4 +1,6 @@
 
+Pi internal PWM, with dedicated boards, with ADC...
+
 Pouvoir envoyer des trames à une sbg (e.g. gps time), voire n'importe quel périphérique un peu comme les corrections rtk
 
 Hardware-MATLAB/Python : if ENABLE_SBG_SUPPORT disabled, SBG MATLAB and Python functions should not be disabled...
@@ -10,7 +12,6 @@ class VideoCaptureKinect : VideoCapture {grab();retrieve();}
 VideoCaptureKinect::read() ???
 
 Initialisation de t, très grand dt initial vs dt de 0...?
-Pi internal PWM, with dedicated boards, with ADC...
 
 
 Parse files "param=" or " \t  \t  param \t  \t  =" a bit like commands, to be more compatible between different versions of the program, prepare unused code for that?
@@ -485,7 +486,7 @@ Maestro bloquée si on ne récupère pas en continu les données envoyées par la Raz
 
 build and install
 OPENCV/BLUEVIEW/FFMPEG_PKG_PREFIX... (also for -L...)
-SBG build for mingw8 x64, mingw/mingw5/7 x86...
+SBG build for mingw(8) x64, mingw/mingw5/7 x86...
 cmake check better gcc version, compatibility with cross compilation, PREFIX variable for dependencies...
 Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package Windows?
 USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed (maybe not for SBG since it is modified, or should change version number of the modified version to be able to disable TCP automatically if needed...)

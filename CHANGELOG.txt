@@ -1,3 +1,6 @@
+350
+Updated CMakeLists.txt and .travis.yml.
+
 349
 Added support of OpenCV 4.2.0.
 

@@ -177,7 +177,7 @@ jobs:
 #         # PATH
 #       - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
 #       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
-#       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV3.2.0\x64\mingw8\bin"
+#       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV3.2.0\x64\mingw\bin"
      script: 
        - cmd //c "cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
 
