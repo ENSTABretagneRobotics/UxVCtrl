@@ -347,6 +347,10 @@ BOOL bExternalVisualLocalization = FALSE;
 CRITICAL_SECTION ExternalVisualLocalizationCS;
 CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
 IplImage* ExternalVisualLocalizationOverlayImg = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat ExternalVisualLocalizationOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 int hmin_externalvisuallocalization = 0, hmax_externalvisuallocalization = 0, smin_externalvisuallocalization = 0, smax_externalvisuallocalization = 0, vlmin_externalvisuallocalization = 0, vlmax_externalvisuallocalization = 0;
 BOOL bHExclusive_externalvisuallocalization = 0, bSExclusive_externalvisuallocalization = 0, bVLExclusive_externalvisuallocalization = 0;
 int r_selpix_externalvisuallocalization = 0, g_selpix_externalvisuallocalization = 0, b_selpix_externalvisuallocalization = 0; 
@@ -373,6 +377,10 @@ BOOL bWallAvoidanceControl = FALSE;
 CRITICAL_SECTION WallCS;
 CRITICAL_SECTION WallOverlayImgCS;
 IplImage* WallOverlayImg = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat WallOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 double d0_wall = 0, beta_wall = 0, delta_wall = 0, dmin_wall = 0, dmax_wall = 0, gamma_infinite_wall = 0, r_wall = 0;
 int bLat_wall = 0;
 int bBrake_wall = 0;
@@ -384,6 +392,10 @@ BOOL bBallTrackingControl[MAX_NB_BALL];
 CRITICAL_SECTION BallCS[MAX_NB_BALL];
 CRITICAL_SECTION BallOverlayImgCS[MAX_NB_BALL];
 IplImage* BallOverlayImg[MAX_NB_BALL];
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat BallOverlayImgMat[MAX_NB_BALL];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 int hmin_ball[MAX_NB_BALL], hmax_ball[MAX_NB_BALL], smin_ball[MAX_NB_BALL], smax_ball[MAX_NB_BALL], vlmin_ball[MAX_NB_BALL], vlmax_ball[MAX_NB_BALL];
 BOOL bHExclusive_ball[MAX_NB_BALL], bSExclusive_ball[MAX_NB_BALL], bVLExclusive_ball[MAX_NB_BALL];
 int r_selpix_ball[MAX_NB_BALL], g_selpix_ball[MAX_NB_BALL], b_selpix_ball[MAX_NB_BALL]; 
@@ -416,6 +428,10 @@ BOOL bSurfaceVisualObstacleAvoidanceControl = FALSE;
 CRITICAL_SECTION SurfaceVisualObstacleCS;
 CRITICAL_SECTION SurfaceVisualObstacleOverlayImgCS;
 IplImage* SurfaceVisualObstacleOverlayImg = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat SurfaceVisualObstacleOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 char weather_surfacevisualobstacle = 0; 
 int boatsize_surfacevisualobstacle = 0; 
 double obsMinDetectionRatio_surfacevisualobstacle = 0, obsDetectionRatioDuration_surfacevisualobstacle = 0;
@@ -429,12 +445,20 @@ double detectratio_surfacevisualobstacle = 0;
 CRITICAL_SECTION ObstacleCS;
 CRITICAL_SECTION ObstacleOverlayImgCS;
 IplImage* ObstacleOverlayImg = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat ObstacleOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 // Pinger variables.
 BOOL bPingerTrackingControl = FALSE;
 CRITICAL_SECTION PingerCS;
 CRITICAL_SECTION PingerOverlayImgCS;
 IplImage* PingerOverlayImg = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat PingerOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 double pulsefreq_pinger = 0, pulselen_pinger = 0, pulsepersec_pinger = 0, hyddist_pinger = 0, hydorient_pinger = 0, preferreddir_pinger = 0; 
 int bUseFile_pinger = 0;
 double u_pinger = 0;
@@ -507,6 +531,10 @@ int fSeanetOverlayImg = 0;
 CRITICAL_SECTION SeanetOverlayImgCS;
 #ifndef DISABLE_OPENCV_SUPPORT
 IplImage* SeanetOverlayImg = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat SeanetOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 double alpha_mes_seanet, d_mes_seanet;
 vector<interval> d_all_mes_seanet;
@@ -552,6 +580,10 @@ BOOL bPauseHokuyo = FALSE, bRestartHokuyo = FALSE;
 //CRITICAL_SECTION RPLIDAROverlayImgCS;
 //#ifndef DISABLE_OPENCV_SUPPORT
 //IplImage* RPLIDAROverlayImg = NULL;
+//#ifndef USE_OPENCV_HIGHGUI_CPP_API
+//#else
+//cv::Mat RPLIDAROverlayImgMat;
+//#endif // !USE_OPENCV_HIGHGUI_CPP_API
 //#endif // !DISABLE_OPENCV_SUPPORT
 double alpha_mes_rplidar, d_mes_rplidar;
 vector<interval> d_all_mes_rplidar;
@@ -676,6 +708,11 @@ CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 #ifndef DISABLE_OPENCV_SUPPORT
 IplImage* imgs[MAX_NB_VIDEO];
 IplImage* imgsbak[MAX_NB_VIDEO];
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat imgmats[MAX_NB_VIDEO];
+cv::Mat imgmatsbak[MAX_NB_VIDEO];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
 vector<interval> d_all_mes_video[MAX_NB_VIDEO];
@@ -725,6 +762,10 @@ int videorecordwidth[MAX_NB_VIDEO], videorecordheight[MAX_NB_VIDEO];
 // Other.
 #ifndef DISABLE_OPENCV_SUPPORT
 IplImage* dispimgs[MAX_NB_OPENCVGUI];
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat dispimgmats[MAX_NB_OPENCVGUI];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 CRITICAL_SECTION dispimgsCS[MAX_NB_OPENCVGUI];
 CRITICAL_SECTION SeanetConnectingCS;
@@ -755,7 +796,11 @@ double vswitchthreshold = 0;
 int opencvguikey = 0;
 int opencvguikeytargetid = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 CvScalar colorsonarlidar;
+#else
+cv::Scalar colorsonarlidar;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 char OSDButtonCISCREA = 0;
 BOOL bOSDButtonPressedCISCREA = FALSE;

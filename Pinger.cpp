@@ -27,7 +27,13 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 	// Missing error checking...
 	IplImage* overlayimage = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+	cv::Mat overlayimagemat;
+	overlayimagemat = cv::cvarrToMat(overlayimage);
+	overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	CvFont font;
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
@@ -57,7 +63,11 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 		if (bExit) break;
 		if (!bPingerTrackingControl) continue;
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+		overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 		EnterCriticalSection(&PingerCS);
 		

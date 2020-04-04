@@ -69,8 +69,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	int colortextid = 0;
 	int colorsonarlidarid = 0;
 	int colormapid = 0;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	CvScalar colortext;
 	CvScalar colormap;
+#else
+	cv::Scalar colortext;
+	cv::Scalar colormap;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	CvFont font;
 	CHRONO chrono_recording;
 	CHRONO chrono_playing;
@@ -127,10 +132,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0, 1.0, 0.0, 1, 8);
 	colortextid = 0;
-	colortext = CV_RGB(0, 255, 128);
+	colortext = CV_RGB_CvScalar(0, 255, 128);
 	colorsonarlidarid = 0;
 	colormapid = 0;
-	colormap = CV_RGB(0, 255, 0);
+	colormap = CV_RGB_CvScalar(0, 255, 0);
 
 	for (;;)
 	{
@@ -229,7 +234,12 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		}
 		else
 		{
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 			cvSet(dispimgs[guiid], CV_RGB(0, 0, 0), NULL);
+#else
+			dispimgmats[guiid] = cv::cvarrToMat(dispimgs[guiid]);
+			dispimgmats[guiid] = cv::Mat::zeros(dispimgmats[guiid].size(), dispimgmats[guiid].type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		}
 		if (bShowSonar)
 		{
@@ -1063,7 +1073,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 #pragma region EXTENDED MENU
 		case '1':
-			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB(0, 255, 128));
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+			if (bColorsExtendedMenu) CvCycleColors(&colortextid, &colortext, CV_RGB_CvScalar(0, 255, 128));
+#else
+			if (bColorsExtendedMenu) CycleColorsMat(colortextid, colortext, CV_RGB(0, 255, 128));
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			else if (bCISCREAOSDExtendedMenu) {}
 			else if (bMAVLinkOSDExtendedMenu)
 			{
@@ -1088,7 +1102,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else if (bExtendedMenu) bColorsExtendedMenu = TRUE;
 			break;
 		case '2':
-			if (bColorsExtendedMenu) CvCycleColors(&colorsonarlidarid, &colorsonarlidar, CV_RGB(0, 0, 255));
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+			if (bColorsExtendedMenu) CvCycleColors(&colorsonarlidarid, &colorsonarlidar, CV_RGB_CvScalar(0, 0, 255));
+#else
+			if (bColorsExtendedMenu) CycleColorsMat(colorsonarlidarid, colorsonarlidar, CV_RGB(0, 0, 255));
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			else if (bCISCREAOSDExtendedMenu) { OSDButtonCISCREA = 'D'; bOSDButtonPressedCISCREA = TRUE; }
 			else if (bMAVLinkOSDExtendedMenu)
 			{
@@ -1112,7 +1130,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			else if (bExtendedMenu) bCISCREAOSDExtendedMenu = TRUE;
 			break;
 		case '3':
-			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB(0, 255, 0));
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+			if (bColorsExtendedMenu) CvCycleColors(&colormapid, &colormap, CV_RGB_CvScalar(0, 255, 0));
+#else
+			if (bColorsExtendedMenu) CycleColorsMat(colormapid, colormap, CV_RGB(0, 255, 0));
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			else if (bCISCREAOSDExtendedMenu) {}
 			else if (bMAVLinkOSDExtendedMenu)
 			{
@@ -1632,7 +1654,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					else
 					{
 						sprintf(szText, "DVL LOC N/A");
-						cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB_CvScalar(255, 0, 0));
 					}
 				}
 			}
@@ -1651,7 +1673,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					break;
 				case GNSS_ACC_LEVEL_RTK_UNREL:
 					if (bGPSLocalization) strcpy(szText, "RTK ? (IN USE)"); else strcpy(szText, "RTK ?");
-					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB_CvScalar(255, 128, 0));
 					break;
 				case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
 					if (bGPSLocalization) strcpy(szText, "GPS HIGH (IN USE)"); else strcpy(szText, "GPS HIGH");
@@ -1667,11 +1689,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					break;
 				case GNSS_ACC_LEVEL_GNSS_FIX_UNREL:
 					if (bGPSLocalization) strcpy(szText, "GPS ? (IN USE)"); else strcpy(szText, "GPS ?");
-					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 128, 0));
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB_CvScalar(255, 128, 0));
 					break;
 				default:
 					strcpy(szText, "NO FIX");
-					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB(255, 0, 0));
+					cvPutText(dispimgs[guiid], szText, cvPoint(0, offset), &font, CV_RGB_CvScalar(255, 0, 0));
 					break;
 				}
 			}
@@ -1780,45 +1802,45 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				{
 					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48+12*cos(M_PI/4)), (int)(32+12*sin(M_PI/4))),
 						cvPoint((int)(opencvguiimgwidth[guiid]-48-12*cos(M_PI/4)), (int)(32-12*sin(M_PI/4))),
-						CV_RGB(255, 0, 0), 2, 8, 0);
+						CV_RGB_CvScalar(255, 0, 0), 2, 8, 0);
 					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48-12*cos(M_PI/4)), (int)(32+12*sin(M_PI/4))),
 						cvPoint((int)(opencvguiimgwidth[guiid]-48+12*cos(M_PI/4)), (int)(32-12*sin(M_PI/4))),
-						CV_RGB(255, 0, 0), 2, 8, 0);
+						CV_RGB_CvScalar(255, 0, 0), 2, 8, 0);
 				}
 				else
 				{
 					cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-48, 32-12),
 						cvPoint((int)(opencvguiimgwidth[guiid]-48+12), 32+12),
-						CV_RGB(0, 255, 0), 2, 8, 0);
+						CV_RGB_CvScalar(0, 255, 0), 2, 8, 0);
 					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48+12), 32+12),
 						cvPoint((int)(opencvguiimgwidth[guiid]-48-12), 32+12),
-						CV_RGB(0, 255, 0), 2, 8, 0);
+						CV_RGB_CvScalar(0, 255, 0), 2, 8, 0);
 					cvLine(dispimgs[guiid], cvPoint((int)(opencvguiimgwidth[guiid]-48-12), 32+12),
 						cvPoint(opencvguiimgwidth[guiid]-48, 32-12),
-						CV_RGB(0, 255, 0), 2, 8, 0);
+						CV_RGB_CvScalar(0, 255, 0), 2, 8, 0);
 				}
 			}
 			if (bOrientationCircle)
 			{
-				cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 12, CV_RGB(255, 0, 0), 2, 8, 0);
+				cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 12, CV_RGB_CvScalar(255, 0, 0), 2, 8, 0);
 				if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 				{
 					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(psihat);
 					cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 
 						cvPoint((int)(opencvguiimgwidth[guiid]-16+12*cos(angle)), (int)(32-12*sin(angle))), 
-						CV_RGB(0, 255, 255), 2, 8, 0);
+						CV_RGB_CvScalar(0, 255, 255), 2, 8, 0);
 				}
 				if (bHeadingControl) 
 				{
 					angle = M_PI/2.0+wpsi-Center(psihat);
 					cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 
 						cvPoint((int)(opencvguiimgwidth[guiid]-16+12*cos(angle)), (int)(32-12*sin(angle))), 
-						CV_RGB(0, 255, 0), 2, 8, 0);
+						CV_RGB_CvScalar(0, 255, 0), 2, 8, 0);
 				}
 				angle = M_PI-angle_env-Center(psihat);
 				cvLine(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 
 					cvPoint((int)(opencvguiimgwidth[guiid]-16+12*cos(angle)), (int)(32-12*sin(angle))), 
-					CV_RGB(0, 0, 255), 2, 8, 0);
+					CV_RGB_CvScalar(0, 0, 255), 2, 8, 0);
 			}
 			if (bMap)
 			{
@@ -1827,10 +1849,10 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				InitCS2ImgEx(&csMap2FullImg, &csMap, detailswidth, detailsheight, BEST_RATIO_COORDSYSTEM2IMG);
 				cvRectangle(dispimgs[guiid], 
 					cvPoint(detailsj+detailswidth, detailsi+detailsheight), cvPoint(detailsj-1, detailsi-1), 
-					CV_RGB(255, 255, 255), 1, 8, 0);
+					CV_RGB_CvScalar(255, 255, 255), 1, 8, 0);
 				cvRectangle(dispimgs[guiid], 
 					cvPoint(detailsj+detailswidth-1, detailsi+detailsheight-1), cvPoint(detailsj, detailsi), 
-					CV_RGB(0, 0, 0), 1, 8, 0);
+					CV_RGB_CvScalar(0, 0, 0), 1, 8, 0);
 				if (bRotatingMap)
 				{
 					// Environment circles.
@@ -1865,13 +1887,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
@@ -1884,7 +1906,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							CV_RGB(255, 255, 255), 2, 8, 0);
+							CV_RGB_CvScalar(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
@@ -1894,19 +1916,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							CV_RGB(0, 0, 255), 1, 8, 0);
+							CV_RGB_CvScalar(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							detailsj+XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							detailsi+YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
 					switch (robid)
@@ -1921,11 +1943,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, -0.4)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
-							CV_RGB(255, 128, 128), 4, 8, 0);
+							CV_RGB_CvScalar(255, 128, 128), 4, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.0)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, 0), detailsi+YCS2IImg(&csMap2FullImg, 0.4)), 
-							CV_RGB(0, 255, 0), 4, 8, 0);
+							CV_RGB_CvScalar(0, 255, 0), 4, 8, 0);
 						break;
 					}
 				}
@@ -1951,27 +1973,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wx), detailsi+YCS2IImg(&csMap2FullImg, wy)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxa), detailsi+YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
-							CV_RGB(255, 255, 255), 2, 8, 0);
+							CV_RGB_CvScalar(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxa), detailsi+YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
-							CV_RGB(0, 0, 255), 1, 8, 0);
+							CV_RGB_CvScalar(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, wxb), detailsi+YCS2IImg(&csMap2FullImg, wyb)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
 					switch (robid)
@@ -1986,11 +2008,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(psihat)))), 
-							CV_RGB(255, 128, 0), 4, 8, 0);
+							CV_RGB_CvScalar(255, 128, 0), 4, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(psihat)))), 
 							cvPoint(detailsj+XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(psihat))), detailsi+YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(psihat)))), 
-							CV_RGB(0, 255, 0), 4, 8, 0);
+							CV_RGB_CvScalar(0, 255, 0), 4, 8, 0);
 						break;
 					}
 				}
@@ -2032,13 +2054,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wx-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wy-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wx-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wy-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
@@ -2050,7 +2072,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							CV_RGB(255, 255, 255), 2, 8, 0);
+							CV_RGB_CvScalar(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxa-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wya-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
@@ -2060,19 +2082,19 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							CV_RGB(0, 0, 255), 1, 8, 0);
+							CV_RGB_CvScalar(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(
 							XCS2JImg(&csMap2FullImg, (wxb-Center(xhat))*cos(M_PI/2.0-Center(psihat))-(wyb-Center(yhat))*sin(M_PI/2.0-Center(psihat))), 
 							YCS2IImg(&csMap2FullImg, (wxb-Center(xhat))*sin(M_PI/2.0-Center(psihat))+(wyb-Center(yhat))*cos(M_PI/2.0-Center(psihat)))
 							), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
 					switch (robid)
@@ -2087,11 +2109,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.4)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.0)), 
-							CV_RGB(255, 128, 0), 8, 8, 0);
+							CV_RGB_CvScalar(255, 128, 0), 8, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, -0.0)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, 0), YCS2IImg(&csMap2FullImg, 0.4)), 
-							CV_RGB(0, 255, 0), 8, 8, 0);
+							CV_RGB_CvScalar(0, 255, 0), 8, 8, 0);
 						break;
 					}
 				}
@@ -2117,27 +2139,27 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					{
 						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wx), YCS2IImg(&csMap2FullImg, wy)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					if (bLineFollowingControl)
 					{
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxa), YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
-							CV_RGB(255, 255, 255), 2, 8, 0);
+							CV_RGB_CvScalar(255, 255, 255), 2, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxa), YCS2IImg(&csMap2FullImg, wya)), 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
-							CV_RGB(0, 0, 255), 1, 8, 0);
+							CV_RGB_CvScalar(0, 0, 255), 1, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(255, 255, 255), 8, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(255, 255, 255), 8, 8, 0);
 						cvCircle(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, wxb), YCS2IImg(&csMap2FullImg, wyb)), 
-							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB(0, 0, 255), 4, 8, 0);
+							(int)(0.8*csMap2FullImg.JXRatio), CV_RGB_CvScalar(0, 0, 255), 4, 8, 0);
 					}
 					// Robot.
 					switch (robid)
@@ -2148,8 +2170,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 							//CvPoint pts[10]; int npts = sizeof(pts); int contours = 0;
 							//pts[0] = cvPoint(opencvguiimgwidth[guiid]-28, 8-5);
 						
-							////cvPolyLine(dispimgs[guiid], &pts, &npts, contours, 1, CV_RGB(0, 255, 0), 1, 8, 0);
-							//cvFillConvexPoly(dispimgs[guiid], pts, npts, CV_RGB(0, 255, 0), 8, 0);
+							////cvPolyLine(dispimgs[guiid], &pts, &npts, contours, 1, CV_RGB_CvScalar(0, 255, 0), 1, 8, 0);
+							//cvFillConvexPoly(dispimgs[guiid], pts, npts, CV_RGB_CvScalar(0, 255, 0), 8, 0);
 							//break;
 						}
 					case BUBBLE_ROBID:
@@ -2160,11 +2182,11 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.4*sin(Center(psihat)))), 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.0*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.0*sin(Center(psihat)))), 
-							CV_RGB(255, 128, 0), 8, 8, 0);
+							CV_RGB_CvScalar(255, 128, 0), 8, 8, 0);
 						cvLine(dispimgs[guiid], 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)-0.0*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)-0.0*sin(Center(psihat)))), 
 							cvPoint(XCS2JImg(&csMap2FullImg, Center(xhat)+0.4*cos(Center(psihat))), YCS2IImg(&csMap2FullImg, Center(yhat)+0.4*sin(Center(psihat)))), 
-							CV_RGB(0, 255, 0), 8, 8, 0);
+							CV_RGB_CvScalar(0, 255, 0), 8, 8, 0);
 						break;
 					}
 				}
@@ -2181,7 +2203,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 						StopChronoQuick(&chrono_recording);
 						StartChrono(&chrono_recording);
 					}
-					if (bDispRecordSymbol) cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-8, 8), 6, CV_RGB(255, 0, 0), CV_FILLED, 8, 0);
+					if (bDispRecordSymbol) cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-8, 8), 6, CV_RGB_CvScalar(255, 0, 0), CV_FILLED, 8, 0);
 				}
 				else
 				{
@@ -2196,7 +2218,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PlaySymbolPoints[0] = cvPoint(opencvguiimgwidth[guiid]-28, 8-5);
 					PlaySymbolPoints[1] = cvPoint(opencvguiimgwidth[guiid]-28, 8+5);
 					PlaySymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-18, 8);
-					cvFillConvexPoly(dispimgs[guiid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					cvFillConvexPoly(dispimgs[guiid], PlaySymbolPoints, nbPlaySymbolPoints, CV_RGB_CvScalar(0, 255, 0), 8, 0);
 				}
 				if (GetTimeElapsedChronoQuick(&chrono_playing) > 0.5)
 				{
@@ -2214,13 +2236,13 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					PauseSymbolPoints[1] = cvPoint(opencvguiimgwidth[guiid]-28, 8+5);
 					PauseSymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-25, 8+5);
 					PauseSymbolPoints[3] = cvPoint(opencvguiimgwidth[guiid]-25, 8-5);
-					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB_CvScalar(0, 255, 0), 8, 0);
 					nbPauseSymbolPoints = 4;
 					PauseSymbolPoints[0] = cvPoint(opencvguiimgwidth[guiid]-21, 8-5);
 					PauseSymbolPoints[1] = cvPoint(opencvguiimgwidth[guiid]-21, 8+5);
 					PauseSymbolPoints[2] = cvPoint(opencvguiimgwidth[guiid]-18, 8+5);
 					PauseSymbolPoints[3] = cvPoint(opencvguiimgwidth[guiid]-18, 8-5);
-					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB(0, 255, 0), 8, 0);
+					cvFillConvexPoly(dispimgs[guiid], PauseSymbolPoints, nbPauseSymbolPoints, CV_RGB_CvScalar(0, 255, 0), 8, 0);
 				}
 				if (GetTimeElapsedChronoQuick(&chrono_pausing) > 0.5)
 				{
@@ -2239,7 +2261,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat1_threshold > 0.01)&&(vbat1_filtered < vbat1_threshold))
 					{
 						strcpy(szText, "BAT1 ALARM");
-						cvPutText(dispimgs[guiid], szText, cvPoint(opencvguiimgwidth[guiid]-16*8, opencvguiimgheight[guiid]-8-3*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(opencvguiimgwidth[guiid]-16*8, opencvguiimgheight[guiid]-8-3*16), &font, CV_RGB_CvScalar(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 3.0)
@@ -2247,7 +2269,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 					if ((vbat2_threshold > 0.01)&&(vbat2_filtered < vbat2_threshold))
 					{
 						strcpy(szText, "BAT2 ALARM");
-						cvPutText(dispimgs[guiid], szText, cvPoint(opencvguiimgwidth[guiid]-16*8, opencvguiimgheight[guiid]-8-3*16), &font, CV_RGB(255, 0, 0));
+						cvPutText(dispimgs[guiid], szText, cvPoint(opencvguiimgwidth[guiid]-16*8, opencvguiimgheight[guiid]-8-3*16), &font, CV_RGB_CvScalar(255, 0, 0));
 					}
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_alarms) < 4.0)

@@ -77,6 +77,11 @@ struct VIDEO
 	int DevType;
 	IplImage* frame;
 	IplImage* resizedframe;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+	cv::Mat framemat;
+	cv::Mat resizedframemat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	char* databuf;
 #ifdef USE_FFMPEG_VIDEO
 	AVFormatContext   *pFormatCtx;
@@ -91,7 +96,11 @@ struct VIDEO
 	uint8_t           *buffer;
 	struct SwsContext *sws_ctx;
 #endif // USE_FFMPEG_VIDEO
-	//IplImage* Lastimg;
+	//IplImage* LastImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+	//cv::Mat LastImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	char szCfgFilePath[256];
 	// Parameters.
 	char szDevPath[256];
@@ -839,8 +848,13 @@ inline int GetImgVideo(VIDEO* pVideo, IplImage* img)
 
 	if (pVideo->nb_excluded_area_points > 0) cvFillConvexPoly(img, pVideo->excluded_area_points, pVideo->nb_excluded_area_points, cvScalarAll(0), 8, 0);
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	////cvSet(pVideo->LastImg, CV_RGB(0, 0, 0), NULL);
 	//cvCopy(img, pVideo->LastImg, 0);
+#else
+	////pVideo->LastImgMat = cv::Mat::zeros(pVideo->LastImgMat.size(), pVideo->LastImgMat.type());
+	//imgmat.copy(pVideo->LastImg);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	return EXIT_SUCCESS;
 }
@@ -1030,6 +1044,10 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			printf("cvCreateImage() failed.\n");
 			return EXIT_FAILURE;
 		}
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+		pVideo->framemat = cv::cvarrToMat(pVideo->frame);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 		pVideo->databuf = (char*)calloc(pVideo->frame->imageSize+3*sizeof(unsigned int), sizeof(char));
 		if (!pVideo->databuf)	
@@ -1173,6 +1191,10 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				printf("cvCreateImage() failed.\n");
 				return EXIT_FAILURE;
 			}
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+			pVideo->framemat = cv::cvarrToMat(pVideo->frame);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 			if (ffmpegopen(pVideo) != EXIT_SUCCESS) 
 			{
 				printf("Unable to connect to a local/remote camera or open a video file.\n");
@@ -1330,6 +1352,10 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 				return EXIT_FAILURE;
 			}
 		}
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+		pVideo->resizedframemat = cv::cvarrToMat(pVideo->resizedframe);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	}
 	else pVideo->resizedframe = pVideo->frame;
 
@@ -1375,6 +1401,10 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	//		return EXIT_FAILURE;
 	//	}
 	//}
+	//#ifndef USE_OPENCV_HIGHGUI_CPP_API
+	//#else
+	//	pVideo->LastImgMat = cv::cvarrToMat(pVideo->LastImg);
+	//#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	printf("Camera connected or video file opened.\n");
 

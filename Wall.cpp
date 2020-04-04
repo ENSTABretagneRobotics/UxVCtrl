@@ -35,7 +35,13 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 	// Missing error checking...
 	IplImage* overlayimage = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+	cv::Mat overlayimagemat;
+	overlayimagemat = cv::cvarrToMat(overlayimage);
+	overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	InitCS2ImgEx(&csMap2FullImg, &csMap, overlayimage->width, overlayimage->height, BEST_RATIO_COORDSYSTEM2IMG);
 
@@ -67,7 +73,11 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 		if (bExit) break;
 		if ((!bWallDetection)&&(!bWallTrackingControl)&&(!bWallAvoidanceControl)) continue;
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+		overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 		EnterCriticalSection(&WallCS);
 
@@ -118,7 +128,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 			//
 			cvCircle(overlayimage, 
 				cvPoint(XCS2JImg(&csMap2FullImg, p.x), YCS2IImg(&csMap2FullImg, p.y)), 
-				4, CV_RGB(255, 0, 128), CV_FILLED, 8, 0);
+				4, CV_RGB_CvScalar(255, 0, 128), CV_FILLED, 8, 0);
 			//
 
 		}
@@ -135,7 +145,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 		cvLine(overlayimage, 
 			cvPoint(XCS2JImg(&csMap2FullImg, x0-100*vx), YCS2IImg(&csMap2FullImg, y0-100*vy)), 
 			cvPoint(XCS2JImg(&csMap2FullImg, x0+100*vx), YCS2IImg(&csMap2FullImg, y0+100*vy)), 
-			CV_RGB(255, 128, 192), 1, 1, 0);
+			CV_RGB_CvScalar(255, 128, 192), 1, 1, 0);
 		//
 
 		// Distance of the origin to the line.
@@ -153,7 +163,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 		char szText[256];
 		sprintf(szText, "RNG=%.2fm,ORN=%ddeg", distance, (int)((fmod_2PI(-angle_env-(Center(psihat)+phi)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI));
-		cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
+		cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB_CvScalar(255,0,128));
 
 		fprintf(logwallfile, "%f;%f;%f;\n", GetTimeElapsedChronoQuick(&chrono), distance, Center(psihat)+phi);
 		fflush(logwallfile);

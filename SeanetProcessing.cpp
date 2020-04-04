@@ -41,7 +41,13 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 #ifndef DISABLE_OPENCV_SUPPORT
 	// Missing error checking...
 	IplImage* overlayimage = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+	cv::Mat overlayimagemat;
+	overlayimagemat = cv::cvarrToMat(overlayimage);
+	overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 
 	tvstsort = (struct timeval*)calloc(MAX_NUMBER_OF_STEPS_SEANET, sizeof(struct timeval));
@@ -71,7 +77,11 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 		mSleep(50);
 
 #ifndef DISABLE_OPENCV_SUPPORT
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+		overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 
 		if (!bDisableSeanet)
@@ -202,22 +212,22 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				switch (fSeanetOverlayImg & SONAR_IMG_CORRECTIONS_MASK)
 				{
 				case SONAR_IMG_LEVER_ARMS:
-					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
+					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB_CvScalar(255, 255, 255), CV_FILLED, 8, 0);
 					break;
 				case SONAR_IMG_LEVER_ARMS_PSI:
-					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
+					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB_CvScalar(255, 255, 255), CV_FILLED, 8, 0);
 					break;
 				case SONAR_IMG_LEVER_ARMS_PSI_POS:
-					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, Center(xhat)), YCS2IImg(&csMap2Img, Center(yhat))), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
+					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, Center(xhat)), YCS2IImg(&csMap2Img, Center(yhat))), 4, CV_RGB_CvScalar(255, 255, 255), CV_FILLED, 8, 0);
 					break;
 				case SONAR_IMG_LEVER_ARMS_HIST_PSI:
-					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
+					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB_CvScalar(255, 255, 255), CV_FILLED, 8, 0);
 					break;
 				case SONAR_IMG_LEVER_ARMS_HIST_PSI_POS:
-					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, Center(xhat)), YCS2IImg(&csMap2Img, Center(yhat))), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
+					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, Center(xhat)), YCS2IImg(&csMap2Img, Center(yhat))), 4, CV_RGB_CvScalar(255, 255, 255), CV_FILLED, 8, 0);
 					break;
 				default:
-					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB(255, 255, 255), CV_FILLED, 8, 0);
+					cvCircle(overlayimage, cvPoint(XCS2JImg(&csMap2Img, 0), YCS2IImg(&csMap2Img, 0)), 4, CV_RGB_CvScalar(255, 255, 255), CV_FILLED, 8, 0);
 					break;
 				}
 				break;

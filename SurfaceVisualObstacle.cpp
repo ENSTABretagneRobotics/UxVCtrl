@@ -412,7 +412,6 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
-	cv::Mat frame;
 	cv::Point2f result;
 
 	// Missing error checking...
@@ -426,8 +425,12 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 	// Missing error checking...
 	IplImage* image = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+	cv::Mat imagemat;
+	imagemat = cv::cvarrToMat(image);
 	IplImage* overlayimage = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
-	cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+	cv::Mat overlayimagemat;
+	overlayimagemat = cv::cvarrToMat(overlayimage);
+	overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
 
 	CvFont font;
 	cvInitFont(&font, CV_FONT_HERSHEY_PLAIN, 1.0f, 1.0f);
@@ -473,7 +476,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 		bCleanUp = TRUE;
 
-		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+		overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
 
 		EnterCriticalSection(&SurfaceVisualObstacleCS);
 
@@ -489,12 +492,10 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		// Correction of bad lines on the borders of the video...
 		//CorrectImageBordersRawBGR(data, videoimgwidth, videoimgheight, 2, 0, 0, 0);
 
-		frame = cv::cvarrToMat(image);
-
 		result = cv::Point2f(-1, 0);
 		try 
 		{
-			result = detectObstacle(frame, weather_surfacevisualobstacle, boatsize_surfacevisualobstacle);
+			result = detectObstacle(imagemat, weather_surfacevisualobstacle, boatsize_surfacevisualobstacle);
 		}
 		catch (...) 
 		{  
@@ -515,10 +516,10 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 		{
 #pragma region Actions
 			if (result.x == 2)
-				cvPutText(overlayimage, "Obstacle detected on the left", cvPoint(10,videoimgheight-20), &font, CV_RGB(0,255,0));
+				cvPutText(overlayimage, "Obstacle detected on the left", cvPoint(10,videoimgheight-20), &font, CV_RGB_CvScalar(0,255,0));
 			else
-				cvPutText(overlayimage, "Obstacle detected on the right", cvPoint(10,videoimgheight-20), &font, CV_RGB(0,255,0));
-			//cvRectangle(overlayimage, cvPoint((int)obsj-50,(int)obsi-50), cvPoint((int)obsj+50,(int)obsi+50), CV_RGB(0,255,0));
+				cvPutText(overlayimage, "Obstacle detected on the right", cvPoint(10,videoimgheight-20), &font, CV_RGB_CvScalar(0,255,0));
+			//cvRectangle(overlayimage, cvPoint((int)obsj-50,(int)obsi-50), cvPoint((int)obsj+50,(int)obsi+50), CV_RGB_CvScalar(0,255,0));
 
 			if (bSurfaceVisualObstacleDetection)
 			{
@@ -528,20 +529,12 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 				strcpy(strtime_pic, strtimeex_fns());
 				LeaveCriticalSection(&strtimeCS);
 				sprintf(picfilename, PIC_FOLDER"pic_%.64s.jpg", strtime_pic);
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-				if (!cvSaveImage(picfilename, image, 0))
-#else
-				if (!cv::imwrite(picfilename, cv::cvarrToMat(image)))
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
+				if (!cv::imwrite(picfilename, imagemat))
 				{
 					printf("Error saving a picture file.\n");
 				}
 				sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-				if (!cvSaveImage(picfilename, overlayimage, 0))
-#else
-				if (!cv::imwrite(picfilename, cv::cvarrToMat(overlayimage)))
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
+				if (!cv::imwrite(picfilename, overlayimagemat))
 				{
 					printf("Error saving a picture file.\n");
 				}
@@ -575,20 +568,12 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 					strcpy(strtime_pic, strtimeex_fns());
 					LeaveCriticalSection(&strtimeCS);
 					sprintf(picfilename, PIC_FOLDER"pic_%.64s.jpg", strtime_pic);
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-					if (!cvSaveImage(picfilename, image, 0))
-#else
-					if (!cv::imwrite(picfilename, cv::cvarrToMat(image)))
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
+					if (!cv::imwrite(picfilename, imagemat))
 					{
 						printf("Error saving a picture file.\n");
 					}
 					sprintf(picfilename, PIC_FOLDER"pic_%.64s.png", strtime_pic);
-#ifndef USE_OPENCV_HIGHGUI_CPP_API
-					if (!cvSaveImage(picfilename, overlayimage, 0))
-#else
-					if (!cv::imwrite(picfilename, cv::cvarrToMat(overlayimage)))
-#endif // !USE_OPENCV_HIGHGUI_CPP_API
+					if (!cv::imwrite(picfilename, overlayimagemat))
 					{
 						printf("Error saving a picture file.\n");
 					}

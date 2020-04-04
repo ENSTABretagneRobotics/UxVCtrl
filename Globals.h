@@ -17,7 +17,6 @@
 #include "RS232Port.h"
 #include "CoordSystem2Img.h"
 #ifndef DISABLE_OPENCV_SUPPORT
-#include "CvDraw.h"
 #include "CvProc.h"
 #ifdef ENABLE_CVKINECT2SDKHOOK
 #ifndef INCLUDE_HEADERS_OUTSIDE_CVKINECT2SDKHOOK
@@ -589,6 +588,10 @@ extern BOOL bExternalVisualLocalization;
 extern CRITICAL_SECTION ExternalVisualLocalizationCS;
 extern CRITICAL_SECTION ExternalVisualLocalizationOverlayImgCS;
 extern IplImage* ExternalVisualLocalizationOverlayImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat ExternalVisualLocalizationOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 extern int hmin_externalvisuallocalization, hmax_externalvisuallocalization, smin_externalvisuallocalization, smax_externalvisuallocalization, vlmin_externalvisuallocalization, vlmax_externalvisuallocalization;
 extern BOOL bHExclusive_externalvisuallocalization, bSExclusive_externalvisuallocalization, bVLExclusive_externalvisuallocalization;
 extern int r_selpix_externalvisuallocalization, g_selpix_externalvisuallocalization, b_selpix_externalvisuallocalization; 
@@ -615,6 +618,10 @@ extern BOOL bWallAvoidanceControl;
 extern CRITICAL_SECTION WallCS;
 extern CRITICAL_SECTION WallOverlayImgCS;
 extern IplImage* WallOverlayImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat WallOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 extern double d0_wall, beta_wall, delta_wall, dmin_wall, dmax_wall, gamma_infinite_wall, r_wall;
 extern int bLat_wall;
 extern int bBrake_wall;
@@ -626,6 +633,10 @@ extern BOOL bBallTrackingControl[MAX_NB_BALL];
 extern CRITICAL_SECTION BallCS[MAX_NB_BALL];
 extern CRITICAL_SECTION BallOverlayImgCS[MAX_NB_BALL];
 extern IplImage* BallOverlayImg[MAX_NB_BALL];
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat BallOverlayImgMat[MAX_NB_BALL];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 extern int hmin_ball[MAX_NB_BALL], hmax_ball[MAX_NB_BALL], smin_ball[MAX_NB_BALL], smax_ball[MAX_NB_BALL], vlmin_ball[MAX_NB_BALL], vlmax_ball[MAX_NB_BALL];
 extern BOOL bHExclusive_ball[MAX_NB_BALL], bSExclusive_ball[MAX_NB_BALL], bVLExclusive_ball[MAX_NB_BALL];
 extern int r_selpix_ball[MAX_NB_BALL], g_selpix_ball[MAX_NB_BALL], b_selpix_ball[MAX_NB_BALL];
@@ -658,6 +669,10 @@ extern BOOL bSurfaceVisualObstacleAvoidanceControl;
 extern CRITICAL_SECTION SurfaceVisualObstacleCS;
 extern CRITICAL_SECTION SurfaceVisualObstacleOverlayImgCS;
 extern IplImage* SurfaceVisualObstacleOverlayImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat SurfaceVisualObstacleOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 extern char weather_surfacevisualobstacle; 
 extern int boatsize_surfacevisualobstacle;
 extern double obsMinDetectionRatio_surfacevisualobstacle, obsDetectionRatioDuration_surfacevisualobstacle;
@@ -671,12 +686,20 @@ extern double detectratio_surfacevisualobstacle;
 extern CRITICAL_SECTION ObstacleCS;
 extern CRITICAL_SECTION ObstacleOverlayImgCS;
 extern IplImage* ObstacleOverlayImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat ObstacleOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 // Pinger variables.
 extern BOOL bPingerTrackingControl;
 extern CRITICAL_SECTION PingerCS;
 extern CRITICAL_SECTION PingerOverlayImgCS;
 extern IplImage* PingerOverlayImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat PingerOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 extern double pulsefreq_pinger, pulselen_pinger, pulsepersec_pinger, hyddist_pinger, hydorient_pinger, preferreddir_pinger; 
 extern int bUseFile_pinger;
 extern double u_pinger;
@@ -749,6 +772,10 @@ extern int fSeanetOverlayImg;
 extern CRITICAL_SECTION SeanetOverlayImgCS;
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* SeanetOverlayImg;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat SeanetOverlayImgMat;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 extern double alpha_mes_seanet, d_mes_seanet;
 extern vector<interval> d_all_mes_seanet;
@@ -913,6 +940,11 @@ extern CRITICAL_SECTION imgsCS[MAX_NB_VIDEO];
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* imgs[MAX_NB_VIDEO];
 extern IplImage* imgsbak[MAX_NB_VIDEO];
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat imgmats[MAX_NB_VIDEO];
+extern cv::Mat imgmatsbak[MAX_NB_VIDEO];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 extern double alpha_mes_video[MAX_NB_VIDEO], d_mes_video[MAX_NB_VIDEO];
 extern vector<interval> d_all_mes_video[MAX_NB_VIDEO];
@@ -962,6 +994,10 @@ extern int videorecordwidth[MAX_NB_VIDEO], videorecordheight[MAX_NB_VIDEO];
 // Other.
 #ifndef DISABLE_OPENCV_SUPPORT
 extern IplImage* dispimgs[MAX_NB_OPENCVGUI];
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+extern cv::Mat dispimgmats[MAX_NB_OPENCVGUI];
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 extern CRITICAL_SECTION dispimgsCS[MAX_NB_OPENCVGUI];
 extern CRITICAL_SECTION SeanetConnectingCS;
@@ -992,7 +1028,11 @@ extern double vswitchthreshold;
 extern int opencvguikey;
 extern int opencvguikeytargetid;
 #ifndef DISABLE_OPENCV_SUPPORT
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 extern CvScalar colorsonarlidar;
+#else
+extern cv::Scalar colorsonarlidar;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 extern char OSDButtonCISCREA;
 extern BOOL bOSDButtonPressedCISCREA;
@@ -1424,7 +1464,12 @@ inline int InitGlobals(void)
 		InitCriticalSection(&imgsCS[i]);
 #ifndef DISABLE_OPENCV_SUPPORT
 		imgs[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(imgs[i], CV_RGB(0, 0, 0), NULL);
+#else
+		imgmats[i] = cv::cvarrToMat(imgs[i]);
+		imgmats[i] = cv::Mat::zeros(imgmats[i].size(), imgmats[i].type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		if (bUseRawImgPtrVideo) imgsbak[i] = imgs[i]; // To be able to release memory later if imgs is overwritten...
 #endif // !DISABLE_OPENCV_SUPPORT
 		HorizontalBeamVideo[i] = 70;
@@ -1452,7 +1497,12 @@ inline int InitGlobals(void)
 		InitCriticalSection(&dispimgsCS[i]);
 #ifndef DISABLE_OPENCV_SUPPORT
 		dispimgs[i] = cvCreateImage(cvSize(opencvguiimgwidth[i], opencvguiimgheight[i]), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(dispimgs[i], CV_RGB(0, 0, 0), NULL);
+#else
+		dispimgmats[i] = cv::cvarrToMat(dispimgs[i]);
+		dispimgmats[i] = cv::Mat::zeros(dispimgmats[i].size(), dispimgmats[i].type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 	}
 
@@ -1462,12 +1512,22 @@ inline int InitGlobals(void)
 	InitCriticalSection(&ExternalVisualLocalizationCS);
 	InitCriticalSection(&ExternalVisualLocalizationOverlayImgCS);
 	ExternalVisualLocalizationOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(ExternalVisualLocalizationOverlayImg, CV_RGB(0, 0, 0), NULL);
+#else
+	ExternalVisualLocalizationOverlayImgMat = cv::cvarrToMat(ExternalVisualLocalizationOverlayImg);
+	ExternalVisualLocalizationOverlayImgMat = cv::Mat::zeros(ExternalVisualLocalizationOverlayImgMat.size(), ExternalVisualLocalizationOverlayImgMat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	InitCriticalSection(&WallCS);
 	InitCriticalSection(&WallOverlayImgCS);
 	WallOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(WallOverlayImg, CV_RGB(0, 0, 0), NULL);
+#else
+	WallOverlayImgMat = cv::cvarrToMat(WallOverlayImg);
+	WallOverlayImgMat = cv::Mat::zeros(WallOverlayImgMat.size(), WallOverlayImgMat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	for (i = 0; i < MAX_NB_BALL; i++)
 	{
@@ -1475,7 +1535,12 @@ inline int InitGlobals(void)
 		InitCriticalSection(&BallCS[i]);
 		InitCriticalSection(&BallOverlayImgCS[i]);
 		BallOverlayImg[i] = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(BallOverlayImg[i], CV_RGB(0, 0, 0), NULL);
+#else
+		BallOverlayImgMat[i] = cv::cvarrToMat(BallOverlayImg[i]);
+		BallOverlayImgMat[i] = cv::Mat::zeros(BallOverlayImgMat[i].size(), BallOverlayImgMat[i].type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 		hmin_ball[i] = 0; hmax_ball[i] = 0; smin_ball[i] = 0; smax_ball[i] = 0; vlmin_ball[i] = 0; vlmax_ball[i] = 0;
 		bHExclusive_ball[i] = FALSE; bSExclusive_ball[i] = FALSE; bVLExclusive_ball[i] = FALSE;
 		r_selpix_ball[i] = 0, g_selpix_ball[i] = 0, b_selpix_ball[i] = 0;
@@ -1506,17 +1571,32 @@ inline int InitGlobals(void)
 	InitCriticalSection(&SurfaceVisualObstacleCS);
 	InitCriticalSection(&SurfaceVisualObstacleOverlayImgCS);
 	SurfaceVisualObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(SurfaceVisualObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
+#else
+	SurfaceVisualObstacleOverlayImgMat = cv::cvarrToMat(SurfaceVisualObstacleOverlayImg);
+	SurfaceVisualObstacleOverlayImgMat = cv::Mat::zeros(SurfaceVisualObstacleOverlayImgMat.size(), SurfaceVisualObstacleOverlayImgMat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	InitCriticalSection(&ObstacleCS);
 	InitCriticalSection(&ObstacleOverlayImgCS);
 	ObstacleOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(ObstacleOverlayImg, CV_RGB(0, 0, 0), NULL);
+#else
+	ObstacleOverlayImgMat = cv::cvarrToMat(ObstacleOverlayImg);
+	ObstacleOverlayImgMat = cv::Mat::zeros(ObstacleOverlayImgMat.size(), ObstacleOverlayImgMat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 	InitCriticalSection(&PingerCS);
 	InitCriticalSection(&PingerOverlayImgCS);
 	PingerOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(PingerOverlayImg, CV_RGB(0, 0, 0), NULL);
+#else
+	PingerOverlayImgMat = cv::cvarrToMat(PingerOverlayImg);
+	PingerOverlayImgMat = cv::Mat::zeros(PingerOverlayImgMat.size(), PingerOverlayImgMat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 #endif // !DISABLE_OPENCV_SUPPORT
 
 	for (i = 0; i < MAX_NB_EXTERNALPROGRAMTRIGGER; i++)
@@ -1540,7 +1620,12 @@ inline int InitGlobals(void)
 	InitCriticalSection(&SeanetDataCS);
 #ifndef DISABLE_OPENCV_SUPPORT
 	SeanetOverlayImg = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(SeanetOverlayImg, CV_RGB(0, 0, 0), NULL);
+#else
+	SeanetOverlayImgMat = cv::cvarrToMat(SeanetOverlayImg);
+	SeanetOverlayImgMat = cv::Mat::zeros(SeanetOverlayImgMat.size(), SeanetOverlayImgMat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	colorsonarlidar = CV_RGB(255, 255, 0);
 	fSeanetOverlayImg = SONAR_IMG_LEVER_ARMS|SONAR_IMG_ALL_DISTANCES|SONAR_IMG_NORMAL;
 #endif // !DISABLE_OPENCV_SUPPORT

@@ -16,7 +16,15 @@ int encodeparams_VideoInterface[2];
 std::vector<int> encodeparams_VideoInterface;
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 IplImage* image_VideoInterface = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat imagemat_VideoInterface;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 IplImage* imagebak_VideoInterface = NULL;
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+cv::Mat imagematbak_VideoInterface;
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 {
@@ -163,7 +171,14 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 				}
 				LeaveCriticalSection(&imgsCS[videoid_VideoInterface]);
 			}
-			else cvSet(image_VideoInterface, CV_RGB(0, 0, 0), NULL);
+			else 
+			{ 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+				cvSet(image_VideoInterface, CV_RGB(0, 0, 0), NULL);
+#else
+				imagemat_VideoInterface = cv::Mat::zeros(imagemat_VideoInterface.size(), imagemat_VideoInterface.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+			}
 			LeaveCriticalSection(&idsCS);
 
 			//nbBytes = 0;
@@ -204,7 +219,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 			//nbBytes += (mat->rows*mat->cols);
 			//cvReleaseMat(&mat);
 #else
-			if (!cv::imencode(encodetype_VideoInterface, cv::cvarrToMat(image_VideoInterface), bufmatvector, encodeparams_VideoInterface))
+			if (!cv::imencode(encodetype_VideoInterface, imagemat_VideoInterface, bufmatvector, encodeparams_VideoInterface))
 			{
 				printf("cv::imencode() failed.\n");
 				//free(databuf);
@@ -328,7 +343,18 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 		return 0;
 	}
-	if (bUseRawImgPtrVideo) imagebak_VideoInterface = image_VideoInterface; // To be able to release memory later if image_VideoInterface is overwritten...
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+	imagemat_VideoInterface = cv::cvarrToMat(image_VideoInterface);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+	if (bUseRawImgPtrVideo)
+	{
+		imagebak_VideoInterface = image_VideoInterface; // To be able to release memory later if image_VideoInterface is overwritten...
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+		imagematbak_VideoInterface = cv::cvarrToMat(imagebak_VideoInterface);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+	}
 
 	memset(address, 0, sizeof(address));
 	memset(port, 0, sizeof(port));
@@ -337,7 +363,14 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 	if (GetAddrPortTypeFromDevPath(szVideoInterfacePath, address, sizeof(address), port, sizeof(port), &DevType) != EXIT_SUCCESS)
 	{
 		printf("Error launching the VideoInterface server : Invalid szVideoInterfacePath.\n");
-		if (!bUseRawImgPtrVideo) cvReleaseImage(&image_VideoInterface); else cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...
+		if (!bUseRawImgPtrVideo)
+		{
+			cvReleaseImage(&image_VideoInterface);
+		}
+		else
+		{
+			cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...
+		}
 #ifdef USE_OPENCV_HIGHGUI_CPP_API
 		encodeparams_VideoInterface.clear();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
@@ -421,7 +454,14 @@ THREAD_PROC_RETURN_VALUE VideoInterfaceThread(void* pParam)
 		if (!bExit) bExit = TRUE; // Unexpected program exit...
 	}
 
-	if (!bUseRawImgPtrVideo) cvReleaseImage(&image_VideoInterface); else cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...
+	if (!bUseRawImgPtrVideo)
+	{
+		cvReleaseImage(&image_VideoInterface);
+	}
+	else
+	{
+		cvReleaseImage(&imagebak_VideoInterface); // imagebak_VideoInterface has been kept in case image_VideoInterface was overwritten...
+	}
 
 #ifdef USE_OPENCV_HIGHGUI_CPP_API
 	encodeparams_VideoInterface.clear();

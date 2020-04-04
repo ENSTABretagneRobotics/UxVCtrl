@@ -27,6 +27,11 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double deltas = 0, phidot = 0;
 	double V = 6;
 
+	// Simulated sonar...
+	double t_last_stepangles = 0;
+	// Temporary...
+	double stepangles = (simulatorperiod/1000.0)*omegas;// 0.6;
+
 	double lat = 0, lon = 0, alt = 0, hdg = 0;
 
 	UNREFERENCED_PARAMETER(pParam);
@@ -60,6 +65,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	alpha_mes_simulator = alpha_0; d_sim = d_0;
 
 	StartChrono(&chrono);
+	GetTimeElapsedChrono(&chrono, &t);
+
+	t_last_stepangles = t;
 
 	for (;;)
 	{
@@ -197,7 +205,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			double deltasmaxreal = 1.20;
 			double alphaw = 100.0;
 			double beta = 0.01;
-			
+
 			double deltar = alphaomegaz*uw;
 			double deltasmaxsimu = deltasminreal+u*(deltasmaxreal-deltasminreal);
 
@@ -305,7 +313,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 		else if (robid == QUADRO_SIMULATOR_ROBID)
 		{
-			
+
 			//double m = 10, b = 2, delt = 1, l = 1;
 
 			//box sqrtuquadro = box(4);
@@ -362,7 +370,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			//omegax_sim = Center(Wr[1]);
 			//omegay_sim = Center(Wr[2]);
 			//omegaz_sim = Center(Wr[3]);
-			
+
 			// Not fully implemented...
 
 			// Simulated state evolution.
@@ -403,6 +411,15 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 
 		// Sonar.
+		//for (;;)
+		{
+		//if (t-t_last_stepangles <= stepangles/omegas) break;
+
+		// nsteps == 2*M_PI/stepangles
+		// Previously, stepangles == (simulatorperiod/1000.0)*omegas
+		
+		t_last_stepangles += stepangles/omegas;
+		//alpha_mes_simulator = alpha_mes_simulator+stepangles;
 		alpha_mes_simulator = alpha_mes_simulator+(simulatorperiod/1000.0)*omegas;
 		if (alpha_mes_simulator > 2*M_PI+alpha_0)
 		{
@@ -426,13 +443,13 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 		// For compatibility with a Seanet...
 		d_all_mes_simulator.clear();
-		/*		
+		/*
 		// Outlier before the wall.
 		d_all_mes_simulator.push_back(d_mes_simulator*(double)rand()/(double)RAND_MAX);
 		*/
 		// Wall (or sometimes also an outlier...).
 		d_all_mes_simulator.push_back(d_mes_simulator);
-		/*		
+		/*
 		// Outlier after the wall.
 		d_all_mes_simulator.push_back(d_mes_simulator+(rangescale-d_mes_simulator)*(double)rand()/(double)RAND_MAX);
 		*/
@@ -457,7 +474,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			psihat_simulator_history_vector.pop_front();
 			vrxhat_simulator_history_vector.pop_front();
 		}
-		
+		}
+
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat, &lon, &alt);
 		hdg = (fmod_2PI(-angle_env-psi_sim+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 

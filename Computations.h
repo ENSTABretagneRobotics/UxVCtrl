@@ -932,7 +932,7 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 				cvPoint(
 				XCS2JImg(&csMap2FullImg, Center(P[1])+0.5*Width(P[1])), 
 				YCS2IImg(&csMap2FullImg, Center(P[2])+0.5*Width(P[2]))), 
-				CV_RGB(0, 128, 128), CV_FILLED, 8, 0);
+				CV_RGB_CvScalar(0, 128, 128), CV_FILLED, 8, 0);
 				cvRectangle(img, 
 				cvPoint(
 				XCS2JImg(&csMap2FullImg, Center(P[1])-0.5*Width(P[1])), 
@@ -940,7 +940,7 @@ inline box SIVIA(box P0, deque< vector<interval> >& d_all_mes_vector, deque<doub
 				cvPoint(
 				XCS2JImg(&csMap2FullImg, Center(P[1])+0.5*Width(P[1])), 
 				YCS2IImg(&csMap2FullImg, Center(P[2])+0.5*Width(P[2]))), 
-				CV_RGB(0, 255, 255), 1, 8, 0);
+				CV_RGB_CvScalar(0, 255, 255), 1, 8, 0);
 				*/				//
 
 				Result.push_back(P);
@@ -1004,7 +1004,7 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 				cvPoint(
 				XCS2JImg(&csMap2FullImg, Center(P[1])+0.5*Width(P[1])), 
 				YCS2IImg(&csMap2FullImg, Center(P[2])+0.5*Width(P[2]))), 
-				CV_RGB(0, 128, 128), CV_FILLED, 8, 0);
+				CV_RGB_CvScalar(0, 128, 128), CV_FILLED, 8, 0);
 				cvRectangle(img, 
 				cvPoint(
 				XCS2JImg(&csMap2FullImg, Center(P[1])-0.5*Width(P[1])), 
@@ -1012,7 +1012,7 @@ inline box SIVIA_dyn(box P0, deque< vector<interval> >& d_all_mes_vector, deque<
 				cvPoint(
 				XCS2JImg(&csMap2FullImg, Center(P[1])+0.5*Width(P[1])), 
 				YCS2IImg(&csMap2FullImg, Center(P[2])+0.5*Width(P[2]))), 
-				CV_RGB(0, 255, 255), 1, 8, 0);
+				CV_RGB_CvScalar(0, 255, 255), 1, 8, 0);
 				*/				//
 
 				Result.push_back(P);

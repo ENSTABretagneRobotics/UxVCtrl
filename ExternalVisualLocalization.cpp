@@ -79,8 +79,22 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 	// Missing error checking...
 	IplImage* image = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+	cv::Mat imagemat;
+	imagemat = cv::cvarrToMat(image);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	IplImage* overlayimage = cvCreateImage(cvSize(videoimgwidth, videoimgheight), IPL_DEPTH_8U, 3);
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
+#else
+	cv::Mat overlayimagemat;
+	overlayimagemat = cv::cvarrToMat(overlayimage);
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 	cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+	overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 	int i = 0, j = 0, index = 0;
 
 	CvFont font;
@@ -113,7 +127,11 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		if (bExit) break;
 		if (!bExternalVisualLocalization) continue;
 
+#ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvSet(overlayimage, CV_RGB(0, 0, 0), NULL);
+#else
+		overlayimagemat = cv::Mat::zeros(overlayimagemat.size(), overlayimagemat.type());
+#endif // !USE_OPENCV_HIGHGUI_CPP_API
 
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 #pragma region Object detection
@@ -173,7 +191,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 		//if (((int)(10*GetTimeElapsedChronoQuick(&chrono)))%50 < 10) 
 		//	if (((int)(10*GetTimeElapsedChronoQuick(&chrono)))%10 < 5) 
-		//		cvFillPoly(image, pts, npts, 1, CV_RGB(255,0,0));
+		//		cvFillPoly(image, pts, npts, 1, CV_RGB_CvScalar(255,0,0));
 #pragma endregion
 
 #pragma region Color selection
@@ -279,7 +297,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 		objBoundWidth = j1-j0;
 		objBoundHeight = i1-i0;
 
-		cvRectangle(overlayimage, cvPoint(j0,i0), cvPoint(j1,i1), CV_RGB(128,0,255));
+		cvRectangle(overlayimage, cvPoint(j0,i0), cvPoint(j1,i1), CV_RGB_CvScalar(128,0,255));
 #pragma endregion
 		if (objRadius > objMinRadius)
 		{
@@ -288,11 +306,11 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			obji = obji/(double)nbSelectedPixels;
 			objj = objj/(double)nbSelectedPixels;
 
-			//cvPutText(overlayimage, "Object detected", cvPoint(10,20), &font, CV_RGB(0,255,0));
+			//cvPutText(overlayimage, "Object detected", cvPoint(10,20), &font, CV_RGB_CvScalar(0,255,0));
 			cvRectangle(overlayimage, 
 				cvPoint((int)objj-objRadius,(int)obji-objRadius), 
 				cvPoint((int)objj+objRadius,(int)obji+objRadius), 
-				CV_RGB(0,0,255));
+				CV_RGB_CvScalar(0,0,255));
 
 			objDistance = objRealRadius_externalvisuallocalization/tan(objRadius*pixelAngleSize);
 			objBearing = -(objj-image->width/2.0)*pixelAngleSize;
@@ -305,12 +323,12 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			cvLine(overlayimage, 
 				cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 				cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
-				CV_RGB(0,255,0));
+				CV_RGB_CvScalar(0,255,0));
 
 			cvLine(overlayimage, 
 				cvPoint((int)(objj-objRadius*cos(objAngle+3.14/2.0)),(int)(obji+objRadius*sin(objAngle+3.14/2.0))), 
 				cvPoint((int)(objj+objRadius*cos(objAngle+3.14/2.0)),(int)(obji-objRadius*sin(objAngle+3.14/2.0))), 
-				CV_RGB(0,255,0));
+				CV_RGB_CvScalar(0,255,0));
 #endif // FIRST_METHOD
 
 #ifdef SECOND_METHOD
@@ -327,12 +345,12 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 			cvLine(overlayimage, 
 				cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 				cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
-				CV_RGB(0,255,0));
+				CV_RGB_CvScalar(0,255,0));
 
 			cvLine(overlayimage, 
 				cvPoint((int)(objj-objRadius*cos(objAngle+3.14/2.0)),(int)(obji+objRadius*sin(objAngle+3.14/2.0))), 
 				cvPoint((int)(objj+objRadius*cos(objAngle+3.14/2.0)),(int)(obji-objRadius*sin(objAngle+3.14/2.0))), 
-				CV_RGB(0,255,0));
+				CV_RGB_CvScalar(0,255,0));
 #endif // SECOND_METHOD
 
 #ifdef THIRD_METHOD
@@ -398,7 +416,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
-					CV_RGB(255,255,0));
+					CV_RGB_CvScalar(255,255,0));
 			}
 			else
 			{
@@ -406,7 +424,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 				cvLine(overlayimage, 
 					cvPoint((int)(objj-objRadius*cos(objAngle)),(int)(obji+objRadius*sin(objAngle))), 
 					cvPoint((int)(objj+objRadius*cos(objAngle)),(int)(obji-objRadius*sin(objAngle))), 
-					CV_RGB(255,0,255));
+					CV_RGB_CvScalar(255,0,255));
 			}					
 #endif // THIRD_METHOD
 #pragma endregion
@@ -414,7 +432,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 #pragma region Actions
 			char szText[256];
 			sprintf(szText, "RNG=%.2fm,BRG=%ddeg,ELV=%ddeg", objDistance, (int)(objBearing*180.0/M_PI), (int)(objElevation*180.0/M_PI));
-			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB(255,0,128));
+			cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB_CvScalar(255,0,128));
 
 			if (pic_counter > (int)(1000/captureperiod))
 			{
