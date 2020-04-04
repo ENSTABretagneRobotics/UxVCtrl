@@ -84,7 +84,7 @@ inline int InitLIRMIA3(LIRMIA3* pLIRMIA3)
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuf[0] = (unsigned char)0x5A; // start configuration
 	sendbuf[1] = (unsigned char)0x02; // iss mode
-	sendbuf[2] = (unsigned char)0x61; // I2C_S_100KHZ + Serial
+	sendbuf[2] = (unsigned char)0x61; // I2C_H_100KHZ (0x60) + SERIAL (0x01) = 0x61
 	sendbuf[3] = (unsigned char)0x00; // (115200)
 	sendbuf[4] = (unsigned char)0x19; // Baudrate
 	sendbuflen = 5;

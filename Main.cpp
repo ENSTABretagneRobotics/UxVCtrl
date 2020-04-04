@@ -44,8 +44,9 @@
 #include "Hokuyo.h"
 #include "RPLIDAR.h"
 #include "SRF02.h"
+#include "ArduinoPressureSensor.h"
 #include "MS580314BA.h"
-#include "MS583730BA.h"
+#include "MS5837.h"
 #include "P33x.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRS.h"
@@ -148,8 +149,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER HokuyoThreadId;
 	THREAD_IDENTIFIER RPLIDARThreadId;
 	THREAD_IDENTIFIER SRF02ThreadId;
+	THREAD_IDENTIFIER ArduinoPressureSensorThreadId;
 	THREAD_IDENTIFIER MS580314BAThreadId;
-	THREAD_IDENTIFIER MS583730BAThreadId;
+	THREAD_IDENTIFIER MS5837ThreadId;
 	THREAD_IDENTIFIER P33xThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER RazorAHRSThreadId;
@@ -309,8 +311,9 @@ int main(int argc, char* argv[])
 	if (!bDisableHokuyo) CreateDefaultThread(HokuyoThread, NULL, &HokuyoThreadId);
 	if (!bDisableRPLIDAR) CreateDefaultThread(RPLIDARThread, NULL, &RPLIDARThreadId);
 	if (!bDisableSRF02) CreateDefaultThread(SRF02Thread, NULL, &SRF02ThreadId);
+	if (!bDisableArduinoPressureSensor) CreateDefaultThread(ArduinoPressureSensorThread, NULL, &ArduinoPressureSensorThreadId);
 	if (!bDisableMS580314BA) CreateDefaultThread(MS580314BAThread, NULL, &MS580314BAThreadId);
-	if (!bDisableMS583730BA) CreateDefaultThread(MS583730BAThread, NULL, &MS583730BAThreadId);
+	if (!bDisableMS5837) CreateDefaultThread(MS5837Thread, NULL, &MS5837ThreadId);
 	if (!bDisableP33x) CreateDefaultThread(P33xThread, NULL, &P33xThreadId);
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableRazorAHRS) CreateDefaultThread(RazorAHRSThread, NULL, &RazorAHRSThreadId);
@@ -623,8 +626,9 @@ int main(int argc, char* argv[])
 	if (!bDisableRazorAHRS) WaitForThread(RazorAHRSThreadId);
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	if (!bDisableP33x) WaitForThread(P33xThreadId);
-	if (!bDisableMS583730BA) WaitForThread(MS583730BAThreadId);
+	if (!bDisableMS5837) WaitForThread(MS5837ThreadId);
 	if (!bDisableMS580314BA) WaitForThread(MS580314BAThreadId);
+	if (!bDisableArduinoPressureSensor) WaitForThread(ArduinoPressureSensorThreadId);
 	if (!bDisableSRF02) WaitForThread(SRF02ThreadId);
 	if (!bDisableRPLIDAR) WaitForThread(RPLIDARThreadId);
 	if (!bDisableHokuyo) WaitForThread(HokuyoThreadId);

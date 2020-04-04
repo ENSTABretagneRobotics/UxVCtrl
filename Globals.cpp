@@ -202,8 +202,9 @@ BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 BOOL bDisableHokuyo = FALSE;
 BOOL bDisableRPLIDAR = FALSE;
 BOOL bDisableSRF02 = FALSE;
+BOOL bDisableArduinoPressureSensor = FALSE;
 BOOL bDisableMS580314BA = FALSE;
-BOOL bDisableMS583730BA = FALSE;
+BOOL bDisableMS5837 = FALSE;
 BOOL bDisableP33x = FALSE;
 BOOL bDisableRazorAHRS = FALSE;
 BOOL bDisableMT = FALSE;
@@ -610,11 +611,14 @@ deque<interval> psihat_srf02_history_vector;
 deque<interval> vrxhat_srf02_history_vector;
 BOOL bPauseSRF02 = FALSE, bRestartSRF02 = FALSE;
 
+// ArduinoPressureSensor variables.
+BOOL bPauseArduinoPressureSensor = FALSE, bRestartArduinoPressureSensor = FALSE;
+
 // MS580314BA variables.
 BOOL bPauseMS580314BA = FALSE, bRestartMS580314BA = FALSE;
 
-// MS583730BA variables.
-BOOL bPauseMS583730BA = FALSE, bRestartMS583730BA = FALSE;
+// MS5837 variables.
+BOOL bPauseMS5837 = FALSE, bRestartMS5837 = FALSE;
 
 // P33x variables.
 BOOL bPauseP33x = FALSE, bRestartP33x = FALSE;

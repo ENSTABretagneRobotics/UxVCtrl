@@ -443,8 +443,9 @@ extern BOOL bDisableBlueView[MAX_NB_BLUEVIEW];
 extern BOOL bDisableHokuyo;
 extern BOOL bDisableRPLIDAR;
 extern BOOL bDisableSRF02;
+extern BOOL bDisableArduinoPressureSensor;
 extern BOOL bDisableMS580314BA;
-extern BOOL bDisableMS583730BA;
+extern BOOL bDisableMS5837;
 extern BOOL bDisableP33x;
 extern BOOL bDisableRazorAHRS;
 extern BOOL bDisableMT;
@@ -842,11 +843,14 @@ extern deque<interval> psihat_srf02_history_vector;
 extern deque<interval> vrxhat_srf02_history_vector;
 extern BOOL bPauseSRF02, bRestartSRF02;
 
+// ArduinoPressureSensor variables.
+extern BOOL bPauseArduinoPressureSensor, bRestartArduinoPressureSensor;
+
 // MS580314BA variables.
 extern BOOL bPauseMS580314BA, bRestartMS580314BA;
 
-// MS583730BA variables.
-extern BOOL bPauseMS583730BA, bRestartMS583730BA;
+// MS5837 variables.
+extern BOOL bPauseMS5837, bRestartMS5837;
 
 // P33x variables.
 extern BOOL bPauseP33x, bRestartP33x;

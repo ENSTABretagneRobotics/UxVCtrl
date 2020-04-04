@@ -1,3 +1,7 @@
+352
+Updated I2CBus.
+Renamed MS583730BA to ArduinoPressureSensor and added temporary MS5837.
+
 351
 Improved support of OpenCV 4.2.0.
 
@@ -531,7 +535,7 @@ Updated OpenCVGUI.
 Beginning of BLUEROV integration.
 
 210
-Added MS583730BA.
+Added ArduinoPressureSensor.
 Corrections in LIRMIA3 integration.
 
 209

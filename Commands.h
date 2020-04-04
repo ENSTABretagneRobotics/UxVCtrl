@@ -2632,6 +2632,14 @@ inline int Commands(char* line)
 		if (!ival1) bRestartSRF02 = TRUE;
 		bPauseSRF02 = ival1;
 	}
+	else if (sscanf(line, "arduinopressuresensorconfig %255s %d", str, &ival1) == 2)
+	{
+		memset(str2, 0, sizeof(str2));
+		strcpy(str2, "ArduinoPressureSensor0.txt");
+		_fcopydeviceconfig(str, str2);
+		if (!ival1) bRestartArduinoPressureSensor = TRUE;
+		bPauseArduinoPressureSensor = ival1;
+	}
 	else if (sscanf(line, "ms580314baconfig %255s %d", str, &ival1) == 2)
 	{
 		memset(str2, 0, sizeof(str2));
@@ -2640,13 +2648,13 @@ inline int Commands(char* line)
 		if (!ival1) bRestartMS580314BA = TRUE;
 		bPauseMS580314BA = ival1;
 	}
-	else if (sscanf(line, "ms583730baconfig %255s %d", str, &ival1) == 2)
+	else if (sscanf(line, "ms5837config %255s %d", str, &ival1) == 2)
 	{
 		memset(str2, 0, sizeof(str2));
-		strcpy(str2, "MS583730BA0.txt");
+		strcpy(str2, "MS58370.txt");
 		_fcopydeviceconfig(str, str2);
-		if (!ival1) bRestartMS583730BA = TRUE;
-		bPauseMS583730BA = ival1;
+		if (!ival1) bRestartMS5837 = TRUE;
+		bPauseMS5837 = ival1;
 	}
 	else if (sscanf(line, "p33xconfig %255s %d", str, &ival1) == 2)
 	{

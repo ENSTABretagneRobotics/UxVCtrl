@@ -202,10 +202,13 @@ MES.o: ./Hardware/MES.cpp ./Hardware/MES.h
 MiniSSC.o: ./Hardware/MiniSSC.cpp ./Hardware/MiniSSC.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+ArduinoPressureSensor.o: ./Hardware/ArduinoPressureSensor.cpp ./Hardware/ArduinoPressureSensor.h
+	$(CXX) $(CXXFLAGS) -c $<
+
 MS580314BA.o: ./Hardware/MS580314BA.cpp ./Hardware/MS580314BA.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-MS583730BA.o: ./Hardware/MS583730BA.cpp ./Hardware/MS583730BA.h
+MS5837.o: ./Hardware/MS5837.cpp ./Hardware/MS5837.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 MT.o: ./Hardware/MT.cpp ./Hardware/MT.h
@@ -351,7 +354,7 @@ VideoRecord.o: VideoRecord.cpp VideoRecord.h
 Wall.o: Wall.cpp Wall.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-UxVCtrl: Wall.o VideoRecord.o VideoInterface.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o SBGInterface.o RazorAHRSInterface.o PololuInterface.o Pinger.o OpenCVGUI.o Obstacle.o Observer.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o ExternalProgramTrigger.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o SRF02.o Seanet.o SBG.o RS232Port.o RPLIDAR.o Roboteq.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o Ontrak.o NortekDVL.o NMEADevice.o MT.o MS583730BA.o MS580314BA.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o I2CBus.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o OSComputerI2CBus.o
+UxVCtrl: Wall.o VideoRecord.o VideoInterface.o SurfaceVisualObstacle.o SSC32Interface.o SonarLocalization.o SonarAltitudeEstimation.o Simulator.o SeanetProcessing.o SBGInterface.o RazorAHRSInterface.o PololuInterface.o Pinger.o OpenCVGUI.o Obstacle.o Observer.o NMEAInterface.o MAVLinkInterface.o Main.o Globals.o FollowMe.o ExternalVisualLocalization.o ExternalProgramTrigger.o Controller.o Config.o Computations.o Commands.o Ball.o Video.o UE9A.o ublox.o SwarmonDevice.o SSC32.o SRF02.o Seanet.o SBG.o RS232Port.o RPLIDAR.o Roboteq.o RazorAHRS.o Pololu.o PathfinderDVL.o P33x.o Ontrak.o NortekDVL.o NMEADevice.o MT.o ArduinoPressureSensor.o MS580314BA.o MS5837.o MiniSSC.o MES.o MDM.o MAVLinkDevice.o LIRMIA3.o IM483I.o I2CBus.o Hokuyo.o gpControl.o CISCREA.o BlueView.o imatrix.o rmatrix.o box.o interval.o iboolean.o UE9Cfg.o UE9Core.o ue9.o labjackusb.o OSTimer.o OSTime.o OSThread.o OSSem.o OSNet.o OSMisc.o OSEv.o OSCriticalSection.o OSCore.o OSComputerRS232Port.o OSComputerI2CBus.o
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:

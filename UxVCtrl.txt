@@ -282,9 +282,11 @@ WMV2
 1
 % bDisableSRF02
 1
+% bDisableArduinoPressureSensor
+1
 % bDisableMS580314BA
 1
-% bDisableMS583730BA
+% bDisableMS5837
 1
 % bDisableP33x
 1

@@ -188,9 +188,11 @@
 %
 %srf02config SRF02.txt bPause
 %
+%arduinopressuresensorconfig ArduinoPressureSensor.txt bPause
+%
 %ms580314baconfig MS580314BA.txt bPause
 %
-%ms583730baconfig MS583730BA.txt bPause
+%ms5837config MS5837.txt bPause
 %
 %p33xconfig P33x.txt bPause
 %

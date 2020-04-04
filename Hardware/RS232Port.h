@@ -90,7 +90,7 @@ corresponding to a RS232 port.
 char* szDevPath : (IN) Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001), 
 server UDP port (udp:4001), client IP address and UDP port (e.g. udp://127.0.0.1:4001) or local RS232 port.
 
-Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+Return : EXIT_SUCCESS, EXIT_INVALID_PARAMETER or EXIT_FAILURE if there is an error.
 */
 inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 {
@@ -108,9 +108,9 @@ inline int OpenRS232Port(RS232PORT* pRS232Port, char* szDevPath)
 		PRINT_DEBUG_ERROR_RS232PORT(("OpenRS232Port error (%s) : %s"
 			"(szDevPath=%s)\n",
 			strtime_m(),
-			"GetAddrPortTypeFromDevPath failed. ",
+			szOSUtilsErrMsgs[EXIT_INVALID_PARAMETER],
 			szDevPath));
-		return EXIT_FAILURE;
+		return EXIT_INVALID_PARAMETER;
 	}
 
 	switch (pRS232Port->DevType)
@@ -310,7 +310,7 @@ BOOL bCheckParity : (IN) If TRUE, enable input parity checking.
 BYTE nbDataBits : (IN) Number of bits of the data bytes.
 BYTE StopBitsMode : (IN) Stop bits mode. Should be either ONESTOPBIT or TWOSTOPBITS.
 UINT timeout : (IN) Time to wait to get at least 1 byte in ms (near 1000 ms for example, max is 
-MAX_RRS232PORT_TIMEOUT).
+MAX_RS232PORT_TIMEOUT).
 
 Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */

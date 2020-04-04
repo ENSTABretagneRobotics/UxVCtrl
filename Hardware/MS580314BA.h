@@ -52,7 +52,7 @@ inline int InitMS580314BA(MS580314BA* pMS580314BA)
 	// Sequence for I2c and serial communication
 	writebuf[0] = (uint8)0x5A; // start configuration
 	writebuf[1] = (uint8)0x02; // iss mode
-	writebuf[2] = (uint8)0x20; // I2C_S_100KHZ + Serial 0x61
+	writebuf[2] = (uint8)0x20; // I2C_S_20KHZ
 	writebuf[3] = (uint8)0x00; // (115200)
 	writebuf[4] = (uint8)0x19; // Baudrate
 
@@ -364,6 +364,8 @@ inline int ConnectMS580314BA(MS580314BA* pMS580314BA, char* szCfgFilePath)
 		CloseRS232Port(&pMS580314BA->RS232Port);
 		return EXIT_FAILURE;
 	}
+
+	// Why InitMS580314BA() was not called before...?
 
 	if (CalibrateMS580314BA(pMS580314BA) != EXIT_SUCCESS)
 	{
