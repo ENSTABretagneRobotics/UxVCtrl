@@ -58,8 +58,8 @@ Debug macros specific to RS232Port.
 #	define PRINT_DEBUG_ERROR_RS232PORT(params)
 #endif // _DEBUG_ERRORS_RS232PORT
 
-#define MAX_RS232PORT_TIMEOUT 25500
-#define MAX_RS232PORT_NAME_LENGTH (128-8)
+#define MAX_TIMEOUT_RS232PORT 25500
+#define MAX_NAME_LENGTH_RS232PORT (128-8)
 
 #define LOCAL_TYPE_RS232PORT OTHER_DEV_TYPE_OSNET
 #define TCP_CLIENT_TYPE_RS232PORT TCP_CLIENT_DEV_TYPE_OSNET
@@ -310,7 +310,7 @@ BOOL bCheckParity : (IN) If TRUE, enable input parity checking.
 BYTE nbDataBits : (IN) Number of bits of the data bytes.
 BYTE StopBitsMode : (IN) Stop bits mode. Should be either ONESTOPBIT or TWOSTOPBITS.
 UINT timeout : (IN) Time to wait to get at least 1 byte in ms (near 1000 ms for example, max is 
-MAX_RS232PORT_TIMEOUT).
+MAX_TIMEOUT_RS232PORT).
 
 Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */

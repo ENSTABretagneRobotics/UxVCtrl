@@ -1,15 +1,30 @@
-% Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
+% Local I2C bus or USB-ISS through server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
 %127.0.0.1:55555
-COM4
+/dev/i2c-1
+%COM4
+% usbissoperatingmode
+0x61
 % BaudRate
 9600
+% nbretries
+2
 % Timeout (in ms)
 1000
 % threadperiod (in ms, require associated thread)
 50
 % bSaveRawData (require associated thread)
 1
+% bMedianFilter
+1
+% addr
+0x76
+% a (y=ax+b correction)
+1
+% b (y=ax+b correction)
+0
+% ms5837_resolution_osr (set to 0 for 256, 1 for 512, 2 for 1024, 3 for 2048, 4 for 4096, 5 for 8192)
+5
 % PressureRef (pressure at the surface in bar, used as reference)
-0.80890
+1
 % WaterDensity (in kg/m3)
 1000

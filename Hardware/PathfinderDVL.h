@@ -131,7 +131,7 @@ inline int SendBreakPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int mode, int b
 		}
 		break;
 	case SOFT_BREAK_MODE_PATHFINDERDVL:
-		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, strlen(softbreakbuf)) != EXIT_SUCCESS)
+		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, (int)strlen(softbreakbuf)) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a PathfinderDVL. \n");
 			return EXIT_FAILURE;
@@ -157,7 +157,7 @@ inline int SendBreakPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int mode, int b
 		{
 			//printf("Cannot send a Hard Break to a PathfinderDVL through Ethernet. \n");
 		}
-		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, strlen(softbreakbuf)) != EXIT_SUCCESS)
+		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, (int)strlen(softbreakbuf)) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a PathfinderDVL. \n");
 			return EXIT_FAILURE;
@@ -197,7 +197,7 @@ inline int SendBreakPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int mode, int b
 		}
 		break;
 	case DOUBLE_SOFT_BREAK_MODE_PATHFINDERDVL:
-		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, strlen(softbreakbuf)) != EXIT_SUCCESS)
+		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, (int)strlen(softbreakbuf)) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a PathfinderDVL. \n");
 			return EXIT_FAILURE;
@@ -208,7 +208,7 @@ inline int SendBreakPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int mode, int b
 			fflush(pPathfinderDVL->pfSaveFile);
 		}
 		mSleep(breakduration);
-		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, strlen(softbreakbuf)) != EXIT_SUCCESS)
+		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, (int)strlen(softbreakbuf)) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a PathfinderDVL. \n");
 			return EXIT_FAILURE;
@@ -246,7 +246,7 @@ inline int SendBreakPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int mode, int b
 		{
 			//printf("Cannot send a Hard Break to a PathfinderDVL through Ethernet. \n");
 		}
-		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, strlen(softbreakbuf)) != EXIT_SUCCESS)
+		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, (int)strlen(softbreakbuf)) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a PathfinderDVL. \n");
 			return EXIT_FAILURE;
@@ -257,7 +257,7 @@ inline int SendBreakPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int mode, int b
 			fflush(pPathfinderDVL->pfSaveFile);
 		}
 		mSleep(breakduration);
-		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, strlen(softbreakbuf)) != EXIT_SUCCESS)
+		if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)softbreakbuf, (int)strlen(softbreakbuf)) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a PathfinderDVL. \n");
 			return EXIT_FAILURE;
@@ -281,7 +281,7 @@ inline int RetrieveParametersPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int pa
 	
 	sprintf(buf, "CR%d\r", parameters);
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -302,7 +302,7 @@ inline int SetHeadingAlignmentPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, doubl
 	
 	sprintf(buf, "EA%+06d\r", (int)(100*angle));
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -323,7 +323,7 @@ inline int SetRollPitchMisalignmentPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, 
 	
 	sprintf(buf, "#EI%+06d\r", (int)(100*roll));
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -336,7 +336,7 @@ inline int SetRollPitchMisalignmentPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, 
 	
 	sprintf(buf, "#EJ%+06d\r", (int)(100*pitch));
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -356,7 +356,7 @@ inline int SetUpDownOrientationPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, BOOL
 
 	sprintf(buf, "EU%d\r", bUpOrientation? 1: 0);
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -377,7 +377,7 @@ inline int SelectDataStreamPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, int data
 	
 	sprintf(buf, "PD%d\r", dataformat);
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -397,7 +397,7 @@ inline int SetTurnkeyPathfinderDVL(PATHFINDERDVL* pPathfinderDVL, BOOL bEnableAu
 
 	sprintf(buf, "CT%d\r", bEnableAutoPing? 1: 0);
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -415,7 +415,7 @@ inline int KeepAsUserDefaultsPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 {
 	char* buf = "CK\r";
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -433,7 +433,7 @@ inline int StartPingingPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 {
 	char* buf = "CS\r";
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -456,7 +456,7 @@ inline int PowerDownPathfinderDVL(PATHFINDERDVL* pPathfinderDVL)
 	//	printf("Warning : a PathfinderDVL will need to be power cycled to wake up. \n");
 	//}
 
-	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, strlen(buf)) != EXIT_SUCCESS)
+	if (WriteAllRS232Port(&pPathfinderDVL->RS232Port, (uint8*)buf, (int)strlen(buf)) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a PathfinderDVL. \n");
 		return EXIT_FAILURE;
@@ -508,7 +508,7 @@ inline int AnalyzePathfinderDVLMessage(char* str, int len)
 inline char* FindPathfinderDVLMessage(char* str)
 {
 	char* foundstr = str;
-	int len = strlen(str);
+	int len = (int)strlen(str);
 
 	while (AnalyzePathfinderDVLMessage(foundstr, len) != EXIT_SUCCESS)
 	{

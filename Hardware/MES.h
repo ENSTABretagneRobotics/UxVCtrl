@@ -75,7 +75,7 @@ inline int AnalyzeMESMessage(char* str, int len)
 inline char* FindMESMessage(char* str)
 {
 	char* foundstr = str;
-	int len = strlen(str);
+	int len = (int)strlen(str);
 
 	while (AnalyzeMESMessage(foundstr, len) != EXIT_SUCCESS)
 	{

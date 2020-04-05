@@ -81,6 +81,7 @@
     <ClCompile Include="ExternalVisualLocalization.cpp" />
     <ClCompile Include="FollowMe.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hardware\ArduinoPressureSensor.cpp" />
     <ClCompile Include="Hardware\BlueView.cpp" />
     <ClCompile Include="Hardware\gpControl.cpp" />
     <ClCompile Include="Hardware\Hokuyo.cpp" />
@@ -90,7 +91,7 @@
     <ClCompile Include="Hardware\MiniSSC.cpp" />
     <ClCompile Include="Hardware\IM483I.cpp" />
     <ClCompile Include="Hardware\MS580314BA.cpp" />
-    <ClCompile Include="Hardware\MS583730BA.cpp" />
+    <ClCompile Include="Hardware\MS5837.cpp" />
     <ClCompile Include="Hardware\NortekDVL.cpp" />
     <ClCompile Include="Hardware\Ontrak.cpp" />
     <ClCompile Include="Hardware\PathfinderDVL.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="FollowMe.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Hardware\AIS.h" />
+    <ClInclude Include="Hardware\ArduinoPressureSensor.h" />
     <ClInclude Include="Hardware\BlueView.h" />
     <ClInclude Include="Hardware\gpControl.h" />
     <ClInclude Include="Hardware\Hokuyo.h" />
@@ -190,7 +192,7 @@
     <ClInclude Include="Hardware\MiniSSC.h" />
     <ClInclude Include="Hardware\IM483I.h" />
     <ClInclude Include="Hardware\MS580314BA.h" />
-    <ClInclude Include="Hardware\MS583730BA.h" />
+    <ClInclude Include="Hardware\MS5837.h" />
     <ClInclude Include="Hardware\NMEAProtocol.h" />
     <ClInclude Include="Hardware\NortekDVL.h" />
     <ClInclude Include="Hardware\Ontrak.h" />
@@ -297,6 +299,12 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
+    <None Include="ArduinoPressureSensor.txt">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+    </None>
     <Text Include="CHANGELOG.txt" />
     <None Include="CISCREA.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
@@ -390,12 +398,6 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
-    <None Include="MS583730BA0.txt">
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
-      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
-    </None>
     <None Include="MT0.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
@@ -457,6 +459,12 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
     <None Include="Ontrak0.txt">
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
+      <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
+    </None>
+    <None Include="MS58370.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>

@@ -261,9 +261,6 @@
     <ClCompile Include="Hardware\MS580314BA.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="Hardware\MS583730BA.cpp">
-      <Filter>Hardware</Filter>
-    </ClCompile>
     <ClCompile Include="Hardware\gpControl.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
@@ -298,6 +295,12 @@
       <Filter>Hardware</Filter>
     </ClCompile>
     <ClCompile Include="Hardware\Roboteq.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MS5837.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\ArduinoPressureSensor.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
   </ItemGroup>
@@ -620,9 +623,6 @@
     <ClInclude Include="..\Extensions\Img\CvCLEyeSDKHook.h">
       <Filter>Extensions\Img</Filter>
     </ClInclude>
-    <ClInclude Include="Hardware\MS583730BA.h">
-      <Filter>Hardware</Filter>
-    </ClInclude>
     <ClInclude Include="Hardware\gpControl.h">
       <Filter>Hardware</Filter>
     </ClInclude>
@@ -680,6 +680,12 @@
     <ClInclude Include="Hardware\Roboteq.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Hardware\MS5837.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\ArduinoPressureSensor.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />
@@ -687,15 +693,6 @@
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
     <Text Include="CMakeLists.txt" />
-    <Text Include="Ontrak0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Roboteq0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="Roboteq1.txt">
-      <Filter>Input Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -715,6 +712,9 @@
     </None>
     <None Include="restore\log\ReadMe.txt">
       <Filter>restore\log</Filter>
+    </None>
+    <None Include="ArduinoPressureSensor.txt">
+      <Filter>Input Files</Filter>
     </None>
     <None Include="BlueView0.txt">
       <Filter>Input Files</Filter>
@@ -764,10 +764,10 @@
     <None Include="mission.txt">
       <Filter>Input Files</Filter>
     </None>
-    <None Include="MS580314BA0.txt">
+    <None Include="MS58370.txt">
       <Filter>Input Files</Filter>
     </None>
-    <None Include="MS583730BA0.txt">
+    <None Include="MS580314BA0.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="MT0.txt">
@@ -780,6 +780,9 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="NortekDVL0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Ontrak0.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="P33x0.txt">
@@ -798,6 +801,12 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="RazorAHRS0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Roboteq0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Roboteq1.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="RPLIDAR0.txt">

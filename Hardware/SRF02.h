@@ -60,7 +60,7 @@ struct SRF02
 	BOOL bParallel;
 	BOOL bMedianFilter;
 	int nbdevices;
-	int addr[MAX_NB_DEVICES_SRF02];
+	unsigned int addr[MAX_NB_DEVICES_SRF02];
 	double x[MAX_NB_DEVICES_SRF02];
 	double y[MAX_NB_DEVICES_SRF02];
 	double z[MAX_NB_DEVICES_SRF02];
@@ -81,7 +81,7 @@ inline int SendRangeRequestSRF02(SRF02* pSRF02, int device)
 
 	if ((device < 0)||(device >= MAX_NB_DEVICES_SRF02))
 	{
-		printf("Error reading data from a Seanet : Invalid parameter. \n");
+		printf("Error reading data from a SRF02 : Invalid parameter. \n");
 		return EXIT_INVALID_PARAMETER;
 	}
 
@@ -118,7 +118,7 @@ inline int RangeReplySRF02(SRF02* pSRF02, int device, double* pValue)
 
 	if ((device < 0)||(device >= MAX_NB_DEVICES_SRF02))
 	{
-		printf("Error reading data from a Seanet : Invalid parameter. \n");
+		printf("Error reading data from a SRF02 : Invalid parameter. \n");
 		return EXIT_INVALID_PARAMETER;
 	}
 
@@ -174,7 +174,7 @@ inline int GetRangeSRF02(SRF02* pSRF02, int device, double* pValue)
 
 	if ((device < 0)||(device >= MAX_NB_DEVICES_SRF02))
 	{
-		printf("Error reading data from a Seanet : Invalid parameter. \n");
+		printf("Error reading data from a SRF02 : Invalid parameter. \n");
 		return EXIT_INVALID_PARAMETER;
 	}
 
@@ -340,7 +340,7 @@ inline int ConnectSRF02(SRF02* pSRF02, char* szCfgFilePath)
 			for (device = 0; device < MAX_NB_DEVICES_SRF02; device++)
 			{
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-				if (sscanf(line, "%i", &pSRF02->addr[device]) != 1) printf("Invalid configuration file.\n");
+				if (sscanf(line, "%u", &pSRF02->addr[device]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 				if (sscanf(line, "%lf", &pSRF02->x[device]) != 1) printf("Invalid configuration file.\n");
 				if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

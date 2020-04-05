@@ -693,12 +693,6 @@
     <Text Include="ReadMe.txt" />
     <Text Include="TODO.txt" />
     <Text Include="CMakeLists.txt" />
-    <Text Include="MS58370.txt">
-      <Filter>Input Files</Filter>
-    </Text>
-    <Text Include="ArduinoPressureSensor.txt">
-      <Filter>Input Files</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
@@ -718,6 +712,9 @@
     </None>
     <None Include="restore\log\ReadMe.txt">
       <Filter>restore\log</Filter>
+    </None>
+    <None Include="ArduinoPressureSensor.txt">
+      <Filter>Input Files</Filter>
     </None>
     <None Include="BlueView0.txt">
       <Filter>Input Files</Filter>
@@ -767,6 +764,9 @@
     <None Include="mission.txt">
       <Filter>Input Files</Filter>
     </None>
+    <None Include="MS58370.txt">
+      <Filter>Input Files</Filter>
+    </None>
     <None Include="MS580314BA0.txt">
       <Filter>Input Files</Filter>
     </None>
@@ -780,6 +780,9 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="NortekDVL0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Ontrak0.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="P33x0.txt">
@@ -798,6 +801,12 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="RazorAHRS0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Roboteq0.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="Roboteq1.txt">
       <Filter>Input Files</Filter>
     </None>
     <None Include="RPLIDAR0.txt">
@@ -840,15 +849,6 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="Video2.txt">
-      <Filter>Input Files</Filter>
-    </None>
-    <None Include="Ontrak0.txt">
-      <Filter>Input Files</Filter>
-    </None>
-    <None Include="Roboteq0.txt">
-      <Filter>Input Files</Filter>
-    </None>
-    <None Include="Roboteq1.txt">
       <Filter>Input Files</Filter>
     </None>
   </ItemGroup>

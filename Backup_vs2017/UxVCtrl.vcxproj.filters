@@ -237,9 +237,6 @@
     <ClCompile Include="Hardware\MS580314BA.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
-    <ClCompile Include="Hardware\MS583730BA.cpp">
-      <Filter>Hardware</Filter>
-    </ClCompile>
     <ClCompile Include="Hardware\gpControl.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
@@ -274,6 +271,12 @@
       <Filter>Hardware</Filter>
     </ClCompile>
     <ClCompile Include="Hardware\Roboteq.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\MS5837.cpp">
+      <Filter>Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\ArduinoPressureSensor.cpp">
       <Filter>Hardware</Filter>
     </ClCompile>
   </ItemGroup>
@@ -590,9 +593,6 @@
     <ClInclude Include="..\Extensions\Img\CvCLEyeSDKHook.h">
       <Filter>Extensions\Img</Filter>
     </ClInclude>
-    <ClInclude Include="Hardware\MS583730BA.h">
-      <Filter>Hardware</Filter>
-    </ClInclude>
     <ClInclude Include="Hardware\gpControl.h">
       <Filter>Hardware</Filter>
     </ClInclude>
@@ -648,6 +648,12 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="Hardware\Roboteq.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\MS5837.h">
+      <Filter>Hardware</Filter>
+    </ClInclude>
+    <ClInclude Include="Hardware\ArduinoPressureSensor.h">
       <Filter>Hardware</Filter>
     </ClInclude>
   </ItemGroup>
@@ -761,9 +767,6 @@
     <Text Include="LIRMIA3.txt">
       <Filter>Input Files</Filter>
     </Text>
-    <Text Include="MS583730BA0.txt">
-      <Filter>Input Files</Filter>
-    </Text>
     <Text Include="gpControl0.txt">
       <Filter>Input Files</Filter>
     </Text>
@@ -790,6 +793,12 @@
       <Filter>Input Files</Filter>
     </Text>
     <Text Include="Roboteq1.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="MS58370.txt">
+      <Filter>Input Files</Filter>
+    </Text>
+    <Text Include="ArduinoPressureSensor.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

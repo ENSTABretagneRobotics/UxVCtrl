@@ -190,14 +190,15 @@ Warning : this function has no effect for a local I2C bus as these options are v
 
 I2CBUS* pI2CBus : (INOUT) Valid pointer to a structure corresponding to 
 an I2C bus.
-uint8 usbissmode : (IN) See https://www.robot-electronics.co.uk/htm/usb_iss_tech.htm.
-UINT BaudRate : (IN) Baud rate at which the device connected to the RS232 port operates.
+UINT usbissoperatingmode : (IN) See https://www.robot-electronics.co.uk/htm/usb_iss_tech.htm, e.g. 0x61.
+UINT BaudRate : (IN) See https://www.robot-electronics.co.uk/htm/usb_iss_tech.htm, baud rate at which 
+the device connected to the RS232 port operates, e.g. 115200.
 UINT timeout : (IN) Time to wait to get at least 1 byte in ms (near 1000 ms for example, max is 
-MAX_RS232PORT_TIMEOUT).
+MAX_TIMEOUT_RS232PORT).
 
 Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
 */
-inline int SetOptionsI2CBus(I2CBUS* pI2CBus, uint8 usbissmode, UINT BaudRate, UINT timeout)
+inline int SetOptionsI2CBus(I2CBUS* pI2CBus, UINT usbissoperatingmode, UINT BaudRate, UINT timeout)
 {
 	uint8 usbisswritebuf[6];
 	UINT usbisswritebuflen = 0;
@@ -215,59 +216,59 @@ inline int SetOptionsI2CBus(I2CBUS* pI2CBus, uint8 usbissmode, UINT BaudRate, UI
 		if (SetOptionsComputerRS232Port(pI2CBus->hDev, BaudRate, pI2CBus->ParityMode, pI2CBus->bCheckParity, pI2CBus->nbDataBits, pI2CBus->StopBitsMode, timeout) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_ERROR_I2CBUS(("SetOptionsI2CBus error (%s) : %s"
-				"(pI2CBus=%#x, BaudRate=%u, timeout=%u)\n", 
+				"(pI2CBus=%#x, usbissoperatingmode=%#x, BaudRate=%u, timeout=%u)\n", 
 				strtime_m(), 
 				"SetOptionsComputerRS232Port failed. ", 
-				pI2CBus, BaudRate, timeout));
+				pI2CBus, usbissoperatingmode, BaudRate, timeout));
 			return EXIT_FAILURE;
 		}
 		usbisswritebuf[0] = (uint8)0x5A; // USB-ISS setup.
 		usbisswritebuf[1] = (uint8)0x02; // ISS_MODE.
-		usbisswritebuf[2] = (uint8)usbissmode;
+		usbisswritebuf[2] = (uint8)usbissoperatingmode;
 		usbisswritebuf[3] = (uint8)usbissbaudratedivhigh;
 		usbisswritebuf[4] = (uint8)usbissbaudratedivlow;
 		usbisswritebuflen = 5;
 		if (WriteAllRS232Port(&pI2CBus->RS232Port, usbisswritebuf, usbisswritebuflen) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_WARNING_I2CBUS(("SetOptionsI2CBus error (%s) : %s",
-				"(pI2CBus=%#x, BaudRate=%u, timeout=%u)\n",
+				"(pI2CBus=%#x, usbissoperatingmode=%#x, BaudRate=%u, timeout=%u)\n",
 				strtime_m(),
 				"WriteAllRS232Port failed. ",
-				pI2CBus, BaudRate, timeout));
+				pI2CBus, usbissoperatingmode, BaudRate, timeout));
 			return EXIT_FAILURE;
 		}
 		if (ReadAllRS232Port(&pI2CBus->RS232Port, usbissreadbuf, usbissreadbuflen) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_WARNING_I2CBUS(("SetOptionsI2CBus error (%s) : %s",
-				"(pI2CBus=%#x, BaudRate=%u, timeout=%u)\n",
+				"(pI2CBus=%#x, usbissoperatingmode=%#x, BaudRate=%u, timeout=%u)\n",
 				strtime_m(),
 				"ReadAllRS232Port failed. ",
-				pI2CBus, BaudRate, timeout));
+				pI2CBus, usbissoperatingmode, BaudRate, timeout));
 			return EXIT_FAILURE;
 		}
 		if ((usbissreadbuf[0] != 0xFF)||(usbissreadbuf[1] != 0x00))
 		{
 			PRINT_DEBUG_WARNING_I2CBUS(("SetOptionsI2CBus error (%s) : %s",
-				"(pI2CBus=%#x, BaudRate=%u, timeout=%u)\n",
+				"(pI2CBus=%#x, usbissoperatingmode=%#x, BaudRate=%u, timeout=%u)\n",
 				strtime_m(),
 				"USB-ISS error. ",
-				pI2CBus, BaudRate, timeout));
+				pI2CBus, usbissoperatingmode, BaudRate, timeout));
 			return EXIT_FAILURE;
 		}
 		break;
 	case LOCAL_TYPE_I2CBUS:
 		PRINT_DEBUG_WARNING_I2CBUS(("SetOptionsI2CBus warning (%s) : %s"
-			"(pI2CBus=%#x, BaudRate=%u, timeout=%u)\n", 
+			"(pI2CBus=%#x, usbissoperatingmode=%#x, BaudRate=%u, timeout=%u)\n", 
 			strtime_m(), 
 			"Please check the specific configuration of the computer. ", 
-			pI2CBus, BaudRate, timeout));
+			pI2CBus, usbissoperatingmode, BaudRate, timeout));
 		break;
 	default:
 		PRINT_DEBUG_ERROR_I2CBUS(("SetOptionsI2CBus error (%s) : %s"
-			"(pI2CBus=%#x, BaudRate=%u, timeout=%u)\n", 
+			"(pI2CBus=%#x, usbissoperatingmode=%#x, BaudRate=%u, timeout=%u)\n", 
 			strtime_m(), 
 			"Invalid device type. ", 
-			pI2CBus, BaudRate, timeout));
+			pI2CBus, usbissoperatingmode, BaudRate, timeout));
 		return EXIT_FAILURE;
 	}
 
@@ -295,7 +296,7 @@ inline int SetSlaveI2CBus(I2CBUS* pI2CBus, UINT addr, BOOL bTenBit, BOOL bPEC, U
 	case LOCAL_TYPE_I2CBUS:
 		return SetSlaveComputerI2CBus(pI2CBus->hDev, addr, bTenBit, bPEC, nbretries, timeout);
 	case USBISS_TYPE_I2CBUS:
-#ifndef SETSLAVE_NO_TIMEOUT_UPDATE_USBISS_I2CBUS
+#ifndef NO_TIMEOUT_UPDATE_USBISS_SET_SLAVE_I2CBUS
 		if (SetOptionsRS232Port(&pI2CBus->RS232Port, pI2CBus->BaudRate, pI2CBus->ParityMode, pI2CBus->bCheckParity, pI2CBus->nbDataBits, pI2CBus->StopBitsMode, timeout) != EXIT_SUCCESS)
 		{
 			PRINT_DEBUG_ERROR_I2CBUS(("SetSlaveI2CBus error (%s) : %s"
@@ -305,7 +306,7 @@ inline int SetSlaveI2CBus(I2CBUS* pI2CBus, UINT addr, BOOL bTenBit, BOOL bPEC, U
 				pI2CBus, addr, bTenBit, bPEC, nbretries, timeout));
 			return EXIT_FAILURE;
 		}
-#endif // SETSLAVE_NO_TIMEOUT_UPDATE_USBISS_I2CBUS
+#endif // NO_TIMEOUT_UPDATE_USBISS_SET_SLAVE_I2CBUS
 		break;
 	default:
 		PRINT_DEBUG_ERROR_I2CBUS(("SetSlaveI2CBus error (%s) : %s"
@@ -315,6 +316,8 @@ inline int SetSlaveI2CBus(I2CBUS* pI2CBus, UINT addr, BOOL bTenBit, BOOL bPEC, U
 			pI2CBus, addr, bTenBit, bPEC, nbretries, timeout));
 		return EXIT_FAILURE;
 	}
+
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -429,6 +432,8 @@ inline int WriteI2CBus(I2CBUS* pI2CBus, uint8* writebuf, UINT writebuflen, int* 
 			pI2CBus, writebuf, writebuflen));
 		return EXIT_FAILURE;
 	}
+
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -496,6 +501,8 @@ inline int ReadI2CBus(I2CBUS* pI2CBus, uint8* readbuf, UINT readbuflen, int* pRe
 			pI2CBus, readbuf, readbuflen));
 		return EXIT_FAILURE;
 	}
+
+	return EXIT_SUCCESS;
 }
 
 /*
@@ -605,6 +612,8 @@ inline int ReadAllI2CBus(I2CBUS* pI2CBus, uint8* readbuf, UINT readbuflen)
 			pI2CBus, readbuf, readbuflen));
 		return EXIT_FAILURE;
 	}
+
+	return EXIT_SUCCESS;
 }
 
 #endif // !I2CBUS_H
