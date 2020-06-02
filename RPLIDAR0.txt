@@ -4,7 +4,7 @@ COM9
 % BaudRate
 115200
 % Timeout (in ms)
-1000
+2500
 % threadperiod (in ms, require associated thread)
 50
 % bSaveRawData (require associated thread)

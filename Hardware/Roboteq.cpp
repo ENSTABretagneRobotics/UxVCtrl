@@ -24,7 +24,9 @@
 THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 {
 	ROBOTEQ roboteq;
-	int res = 0;
+	double thrust1 = 0, thrust2 = 0;
+	//int counter = 0, counter_modulo = 0;
+	int res = EXIT_SUCCESS;
 	BOOL bConnected = FALSE;
 	CHRONO chrono_period;
 	int threadperiod = 100;
@@ -79,6 +81,19 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 				bConnected = TRUE;
 				threadperiod = roboteq.threadperiod;
 
+				EnterCriticalSection(&StateVariablesCS);
+
+				if (roboteq.vbat1analoginputchan != -1) vbat1_filtered = roboteq.analoginputthreshold[roboteq.vbat1analoginputchan]; else vbat1_filtered = 0;
+				if (roboteq.vbat1analoginputchan != -1) vbat1_threshold = roboteq.analoginputthreshold[roboteq.vbat1analoginputchan]; else vbat1_threshold = 0;
+				if (roboteq.ibat1analoginputchan != -1) ibat1_filtered = roboteq.analoginputthreshold[roboteq.ibat1analoginputchan]; else ibat1_filtered = 0;
+				if (roboteq.vbat2analoginputchan != -1) vbat2_filtered = roboteq.analoginputthreshold[roboteq.vbat2analoginputchan]; else vbat2_filtered = 0;
+				if (roboteq.vbat2analoginputchan != -1) vbat2_threshold = roboteq.analoginputthreshold[roboteq.vbat2analoginputchan]; else vbat2_threshold = 0;
+				if (roboteq.ibat2analoginputchan != -1) ibat2_filtered = roboteq.analoginputthreshold[roboteq.ibat2analoginputchan]; else ibat2_filtered = 0;
+				vswitchcoef = roboteq.analoginputcoef[roboteq.switchanaloginputchan];
+				vswitchthreshold = roboteq.analoginputthreshold[roboteq.switchanaloginputchan];
+
+				LeaveCriticalSection(&StateVariablesCS);
+
 				if (roboteq.pfSaveFile != NULL)
 				{
 					fclose(roboteq.pfSaveFile);
@@ -121,12 +136,14 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 
 			switch (robid)
 			{
-			case SAILBOAT_ROBID: // For VSim compatibility...
-			case SAILBOAT2_ROBID: // For VSim compatibility...
-			case VAIMOS_ROBID:
-
-				break;
+			case BUBBLE_ROBID:
+			case ETAS_WHEEL_ROBID:
 			default:
+				EnterCriticalSection(&StateVariablesCS);
+				thrust1 = u1;
+				thrust2 = u2;
+				LeaveCriticalSection(&StateVariablesCS);
+				res = SetThrustersRoboteq(&roboteq, thrust1, thrust2);
 				break;
 			}
 
@@ -145,13 +162,11 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 
 	switch (robid)
 	{
-	case SAILBOAT_ROBID:
-	case SAILBOAT2_ROBID:
-	case VAIMOS_ROBID:
-		// Should set safe values...?
-		mSleep(threadperiod);
-		break;
+	case BUBBLE_ROBID:
+	case ETAS_WHEEL_ROBID:
 	default:
+		SetThrustersRoboteq(&roboteq, 0, 0);
+		mSleep(threadperiod);
 		break;
 	}
 

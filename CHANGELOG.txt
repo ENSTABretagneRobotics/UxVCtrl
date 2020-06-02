@@ -1,3 +1,6 @@
+354
+Improved RPLIDAR A3 support and added Roboteq support.
+
 353
 Updated MS5837 (preliminary).
 

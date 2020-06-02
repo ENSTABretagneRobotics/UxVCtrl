@@ -543,6 +543,13 @@ inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 		return EXIT_FAILURE;	
 	}
 
+	// The first data response might take some time to come, see https://github.com/ENSTABretagneRobotics/Hardware-MATLAB/issues/2...
+	if (WaitForRS232Port(&pRPLIDAR->RS232Port, 1500, 5) != EXIT_SUCCESS)
+	{
+		printf("A RPLIDAR is not responding correctly. \n");
+		return EXIT_FAILURE;
+	}
+
 	// Receive the first data response (2 data responses needed for angles computation...).
 	memset(pRPLIDAR->esdata_prev, 0, sizeof(pRPLIDAR->esdata_prev));
 	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, pRPLIDAR->esdata_prev, sizeof(pRPLIDAR->esdata_prev)) != EXIT_SUCCESS)
