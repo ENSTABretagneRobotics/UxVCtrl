@@ -1,4 +1,22 @@
+
+#define inline static __inline__in MAVLinkProtocol.h, should be updated with what is in OSCore.h...?
+
+UE9a semble compiler et exécuter avec mingw7, tester avec servos
+Modify kinect headers for mingw7 if needed?
+
+cv420
+16:45:08: Starting C:\tmp\tests\build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug\UxVCtrl.exe ...
+Type a command or exit to terminate the program.
+OpenCV Error: Assertion failed (0 <= d && d <= CV_MAX_DIM && _sizes) in create, file c:/tmp/gen_x86_mingw_lib/sources/modules/core/src/matrix.cpp, line 387
+terminate called after throwing an instance of 'cv::Exception'
+  what():  c:/tmp/gen_x86_mingw_lib/sources/modules/core/src/matrix.cpp:387: error: (-215) 0 <= d && d <= CV_MAX_DIM && _sizes in function create
+
+16:45:10: C:/tmp/tests/build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug/UxVCtrl.exe exited with code 3
+
 Add to device struct lastdata, bexitdevice and other necessary variables for MATLAB
+add Roboteq to MATLAB and Python and optionally support Roboteq SDK...
+Travis hardware-python to test with UxVCtrl or UxVSim...
+Travis UxVSim to be able to quickly check it after minor updates...
 
 SRF02 gérer usb iss rs232 et i2c rpi
 MS5837.cpp : il faut sans doute faire des read/writebyte/word au lieu des read/write normaux, distinction 32BA et 02BA, gérer jusqu'à 2 capteurs (sur 2 bus différents car adresse peut pas être changée) et pouvoir choisir lequel a la pression à utiliser par défaut et lequel mesure une pression de référence...
@@ -8,6 +26,8 @@ uInt, uint32, etc. should be more correctly defined for all platforms...->should
 SPI...
 
 travis : add test of old versions of vsbuildtools, e.g. vc9, 10, 11, ubuntu focal...
+
+Add params to wallfollowing, see obstacleavoidance notes…
 
 wait -1->infinite, and related commands...
 
@@ -20,6 +40,7 @@ Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\Lates
 class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
 class VideoCaptureKinect : VideoCapture {grab();retrieve();}
 VideoCaptureKinect::read() ???
+remplacer cvSize() par cv::Size()?
 
 Initialisation de t, très grand dt initial vs dt de 0...?
 
@@ -512,7 +533,6 @@ Update makefile fileconversions->remplacer par des cmakelists.txt?->peut-être pa
 Repo opencv travis cmake --build --target package notamment en static et avec contrib pour vc15, vc16, mingw, Ubuntu, mac, pi, x86, x64...
 check inline and timegm in a small program
 unit tests : vérifier que la plupart des commandes ne retournent pas une erreur, vérifier le temps de détection sur des vidéos connues...
-Add .travis.yml to .sln?
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP FALSE)
 set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 Compiler pour le pixhawk?
@@ -833,6 +853,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+UxVCtrl opencv_ffmpeg_cv420.dll
 
 mingw7/8 renamed to mingw for cv420
 increase travis timeout to 20 min for Qt...?->maybe just add --verbose...->probably not necessary...

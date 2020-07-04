@@ -1,19 +1,24 @@
 % Server TCP port (e.g. :4001), client IP address and TCP port (e.g. 127.0.0.1:4001) or local RS232 port
 %127.0.0.1:55555
 COM9
+%/dev/ttyUSB0
+%/dev/cu.SLAB_USBtoUART
 % BaudRate
 115200
+%256000
 % Timeout (in ms)
 2500
 % threadperiod (in ms, require associated thread)
 50
 % bSaveRawData (require associated thread)
 1
+% bStartScanModeAtStartup
+1
 % ScanMode (0 : SCAN, 1 : EXPRESS_SCAN, 2 : FORCE_SCAN)
 1
 % motordelay (in ms)
-500
-% maxhist (0 : try to automatically remove old data, around 180 : advised for SCAN mode, around 360 : advised for EXPRESS_SCAN mode)
+2000
+% maxhist (0 : try to automatically remove old data, around 180 : advised for SCAN mode, around 360 : advised for EXPRESS_SCAN mode, require associated thread)
 0
 % alpha_max_err (in rad)
 0.01

@@ -1,3 +1,6 @@
+355
+Added RPLIDAR SDK support.
+
 354
 Improved RPLIDAR A3 support and added Roboteq support.
 

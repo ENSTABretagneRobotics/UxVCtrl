@@ -39,7 +39,8 @@ CFLAGS += -D ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 CFLAGS += -D ENABLE_MAVLINK_SUPPORT
 CFLAGS += -D ENABLE_LABJACK_SUPPORT
 CFLAGS += -D ENABLE_LIBMODBUS_SUPPORT
-CFLAGS += -D ENABLE_SBG_SUPPORT
+CFLAGS += -D ENABLE_SBG_SDK_SUPPORT
+CFLAGS += -D ENABLE_RPLIDAR_SDK_SUPPORT
 CFLAGS += -D ENABLE_BLUEVIEW_SUPPORT
 CFLAGS += -D ENABLE_COMPUTERI2CBUS_SUPPORT
 CFLAGS += -D ENABLE_CANCEL_THREAD -D ENABLE_KILL_THREAD 
@@ -61,6 +62,7 @@ CFLAGS += -I../interval -I../matrix_lib
 CFLAGS += -I./Hardware 
 CFLAGS += -I. -I..
 CFLAGS += -I/usr/local/include/sbgECom/src -I/usr/local/include/sbgECom/common 
+CFLAGS += -I/usr/local/include/rplidar_sdk/sdk/sdk/include -I/usr/local/include/rplidar_sdk/sdk/sdk/src 
 
 CXXFLAGS += $(CFLAGS) -fpermissive
 
@@ -78,6 +80,7 @@ CXXFLAGS += $(CFLAGS) -fpermissive
 LDFLAGS += -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_imgproc -lopencv_core
 LDFLAGS += -lmodbus
 LDFLAGS += -lsbgECom
+LDFLAGS += -lrplidar_sdk
 LDFLAGS += -lbvtsdk
 #LDFLAGS += -lusb-1.0
 

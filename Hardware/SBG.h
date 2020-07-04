@@ -19,12 +19,12 @@
 
 // Temp...
 //#define DISABLE_SBG_TCP
-//#undef ENABLE_SBG_SUPPORT
+//#undef ENABLE_SBG_SDK_SUPPORT
 
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 #include "OSCriticalSection.h"
 #include "sbgEComLib.h"
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 
 // Need to be undefined at the end of the file...
 // min and max might cause incompatibilities with GCC...
@@ -52,7 +52,7 @@
 #define SYNC2_SBG 0x5A
 #define ETX_SBG 0x33
 
-#ifndef ENABLE_SBG_SUPPORT
+#ifndef ENABLE_SBG_SDK_SUPPORT
 typedef enum _SbgEComClass
 {
 	SBG_ECOM_CLASS_LOG_ECOM_0			= 0x00,			/*!< Class that contains sbgECom protocol input/output log messages. */
@@ -215,7 +215,7 @@ typedef enum _SbgEComSolutionMode
 	SBG_ECOM_SOL_MODE_NAV_VELOCITY			= 3,					/*!< The Kalman filter computes orientation and velocity. Position is freely integrated from velocity estimation. */
 	SBG_ECOM_SOL_MODE_NAV_POSITION			= 4						/*!< Nominal mode, the Kalman filter computes all parameters (attitude, velocity, position). Absolute position is provided. */
 } SbgEComSolutionMode;
-#endif // !ENABLE_SBG_SUPPORT
+#endif // !ENABLE_SBG_SDK_SUPPORT
 
 union usShort_SBG
 {
@@ -304,14 +304,14 @@ typedef struct SBGDATA SBGDATA;
 
 struct SBG
 {
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 	SbgInterface sbgInterface;
 	SbgEComHandle comHandle;
 	SbgEComDeviceInfo deviceInfo;
 	CRITICAL_SECTION CallbackCS;
 #else
 	RS232PORT RS232Port;
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 	FILE* pfSaveFile; // Used to save raw data, should be handled specifically...
 	SBGDATA LastSBGData;
 	char szCfgFilePath[256];
@@ -334,7 +334,7 @@ struct SBG
 };
 typedef struct SBG SBG;
 
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 /*!
  *	Callback definition called each time a new log is received.
  *	\param[in]	pHandle									Valid handle on the sbgECom instance that has called this callback.
@@ -482,7 +482,7 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 	
 	return SBG_NO_ERROR;
 }
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 
 /*
 Compute a CRC for a specified buffer.
@@ -915,7 +915,7 @@ inline int ProcessFrameSBG(SBG* pSBG, unsigned char* frame, int framelen, int mi
 	return EXIT_SUCCESS;
 }
 
-#ifndef ENABLE_SBG_SUPPORT
+#ifndef ENABLE_SBG_SDK_SUPPORT
 inline int GetFrameSBG(SBG* pSBG, SBGDATA* pSBGData)
 {
 	unsigned char recvbuf[MAX_NB_BYTES_SBG];
@@ -1010,9 +1010,9 @@ inline int GetFrameSBG(SBG* pSBG, SBGDATA* pSBGData)
 
 	return EXIT_SUCCESS;
 }
-#endif // !ENABLE_SBG_SUPPORT
+#endif // !ENABLE_SBG_SDK_SUPPORT
 
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 {
 	SbgErrorCode errorCode = SBG_ERROR, prevErrorCode = SBG_ERROR;
@@ -1048,14 +1048,14 @@ inline int GetLatestDataSBG(SBG* pSBG, SBGDATA* pSBGData)
 
 	return EXIT_SUCCESS;
 }
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 
 // SBG must be initialized to 0 before (e.g. SBG sbg; memset(&sbg, 0, sizeof(SBG));)!
 inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 {
 	FILE* file = NULL;
 	char line[256];
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 	char address[256];
 	int iport = 0, ilport = 0;
 #ifndef DISABLE_SBG_TCP
@@ -1063,7 +1063,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 #endif // DISABLE_SBG_TCP
 	char* ptr = NULL;
 	char* ptr2 = NULL;
-#endif //ENABLE_SBG_SUPPORT
+#endif //ENABLE_SBG_SDK_SUPPORT
 
 	memset(pSBG->szCfgFilePath, 0, sizeof(pSBG->szCfgFilePath));
 	sprintf(pSBG->szCfgFilePath, "%.255s", szCfgFilePath);
@@ -1150,7 +1150,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 
 	memset(&pSBG->LastSBGData, 0, sizeof(SBGDATA));
 
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 	memset(address, 0, sizeof(address));
 
 	// inet_addr() vs sbgIpAddr()...?
@@ -1434,7 +1434,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 		CloseRS232Port(&pSBG->RS232Port);
 		return EXIT_FAILURE;
 	}
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 
 	printf("SBG connected.\n");
 
@@ -1443,7 +1443,7 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 
 inline int DisconnectSBG(SBG* pSBG)
 {
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 	DeleteCriticalSection(&pSBG->CallbackCS);
 	if (sbgEComClose(&pSBG->comHandle) != SBG_NO_ERROR)
 	{
@@ -1544,7 +1544,7 @@ inline int DisconnectSBG(SBG* pSBG)
 		printf("SBG disconnection failed.\n");
 		return EXIT_FAILURE;
 	}
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 
 	printf("SBG disconnected.\n");
 

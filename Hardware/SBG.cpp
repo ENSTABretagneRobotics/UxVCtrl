@@ -38,9 +38,9 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 		mSleep(threadperiod);
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 
 		if (bPauseSBG)
 		{
@@ -130,11 +130,11 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 		}
 		else
 		{
-#ifdef ENABLE_SBG_SUPPORT
+#ifdef ENABLE_SBG_SDK_SUPPORT
 			if (GetLatestDataSBG(&sbg, &sbgdata) == EXIT_SUCCESS)
 #else
 			if (GetFrameSBG(&sbg, &sbgdata) == EXIT_SUCCESS)
-#endif // ENABLE_SBG_SUPPORT
+#endif // ENABLE_SBG_SDK_SUPPORT
 			{
 				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 
@@ -203,9 +203,9 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 				GNSSqualitySBG = GNSS_NO_FIX;
 				bConnected = FALSE;
 				DisconnectSBG(&sbg);
-#ifndef ENABLE_SBG_SUPPORT
+#ifndef ENABLE_SBG_SDK_SUPPORT
 				mSleep(threadperiod);
-#endif // !ENABLE_SBG_SUPPORT
+#endif // !ENABLE_SBG_SDK_SUPPORT
 			}
 		}
 

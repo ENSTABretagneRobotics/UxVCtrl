@@ -54,8 +54,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV3.2.0\include;$(KINECTSDK20_DIR)\inc;$(CLEYESDK_DIR)\Include;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV320;BVTSDK_VERSION=4;ENABLE_CVKINECT2SDKHOOK;ENABLE_CVCLEYESDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV3.2.0\include;$(KINECTSDK20_DIR)\inc;$(CLEYESDK_DIR)\Include;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(RPLIDAR_SDK_DIR)\sdk\include;$(RPLIDAR_SDK_DIR)\sdk\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;OPENCV320;BVTSDK_VERSION=4;ENABLE_CVKINECT2SDKHOOK;ENABLE_CVCLEYESDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
@@ -66,8 +66,8 @@
       </DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgEComd.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;CLEyeMulticam.lib;opencv_world320d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV3.2.0\x86\vc15\lib;$(KINECTSDK20_DIR)\Lib\x86;$(CLEYESDK_DIR)\Lib;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\lib;$(SBG_SDK_DIR)\x86\vc15\lib;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgEComd.lib;rplidar_driver.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;CLEyeMulticam.lib;opencv_world320d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV3.2.0\x86\vc15\lib;$(KINECTSDK20_DIR)\Lib\x86;$(CLEYESDK_DIR)\Lib;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\lib;$(SBG_SDK_DIR)\x86\vc15\lib;$(RPLIDAR_SDK_DIR)\output\win32\Debug;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -78,8 +78,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV3.2.0\include;$(KINECTSDK20_DIR)\inc;$(CLEYESDK_DIR)\Include;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV320;BVTSDK_VERSION=4;ENABLE_CVKINECT2SDKHOOK;ENABLE_CVCLEYESDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV3.2.0\include;$(KINECTSDK20_DIR)\inc;$(CLEYESDK_DIR)\Include;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(RPLIDAR_SDK_DIR)\sdk\include;$(RPLIDAR_SDK_DIR)\sdk\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;OPENCV320;BVTSDK_VERSION=4;ENABLE_CVKINECT2SDKHOOK;ENABLE_CVCLEYESDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
@@ -88,8 +88,8 @@
       </DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgECom.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;CLEyeMulticam.lib;opencv_world320.lib;libwebp.lib;ippicvmt.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV3.2.0\x86\vc15\staticlib;$(KINECTSDK20_DIR)\Lib\x86;$(CLEYESDK_DIR)\Lib;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\staticlib;$(SBG_SDK_DIR)\x86\vc15\staticlib;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgECom.lib;rplidar_driver.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;CLEyeMulticam.lib;opencv_world320.lib;libwebp.lib;ippicvmt.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV3.2.0\x86\vc15\staticlib;$(KINECTSDK20_DIR)\Lib\x86;$(CLEYESDK_DIR)\Lib;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\staticlib;$(SBG_SDK_DIR)\x86\vc15\staticlib;$(RPLIDAR_SDK_DIR)\output\win32\Release;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

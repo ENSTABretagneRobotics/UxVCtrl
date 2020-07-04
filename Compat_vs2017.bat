@@ -8,7 +8,8 @@
 @set /P DISABLE_MAVLINK="Disable MAVLink (0, 1) : "
 @set /P DISABLE_LABJACK="Disable LabJack (0, 1) : "
 @set /P DISABLE_LIBMODBUS="Disable libmodbus (0, 1) : "
-@set /P DISABLE_SBG="Disable SBG (0, 1) : "
+@set /P DISABLE_SBG_SDK="Disable SBG SDK (0, 1) : "
+@set /P DISABLE_RPLIDAR_SDK="Disable RPLIDAR SDK (0, 1) : "
 @set /P DISABLE_OPENCV="Disable OpenCV (0, 1) : "
 @set /P ENABLE_FFMPEG="Enable avcodec/ffmpeg (0 (recommended), 1) : "
 @set /P ENABLE_XP="Enable XP Platform Toolset (0, 1) : "
@@ -157,11 +158,11 @@
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 )
 
-@if "%DISABLE_SBG%"=="1" (
+@if "%DISABLE_SBG_SDK%"=="1" (
 
-@echo Disabling SBG 
+@echo Disabling SBG SDK 
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_SBG_SUPPORT" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_SBG_SDK_SUPPORT" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src" /replacestr ""
@@ -178,12 +179,35 @@
 
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";sbgECom.lib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+)
 
-@rem replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClCompile Include=""Hardware\SBG.cpp"" />" /replacestr "<ClCompile Include=""Hardware\SBG.cpp""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClCompile>"
-@rem copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+@if "%DISABLE_RPLIDAR_SDK%"=="1" (
 
-@rem replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClInclude Include=""Hardware\SBG.h"" />" /replacestr "<ClInclude Include=""Hardware\SBG.h""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClInclude>"
-@rem copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+@echo Disabling RPLIDAR SDK
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";ENABLE_RPLIDAR_SDK_SUPPORT" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_sdk\sdk\sdk\include;rplidar_sdk\sdk\sdk\src;$(ProgramFiles)\rplidar_sdk\sdk\sdk\include;$(ProgramFiles)\rplidar_sdk\sdk\sdk\src" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_sdk\sdk\output\win32\Debug;$(ProgramFiles)\rplidar_sdk\sdk\output\win32\Debug" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_sdk\sdk\output\win32\Release;$(ProgramFiles)\rplidar_sdk\sdk\output\win32\Release" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_sdk\sdk\output\win64\Debug;$(ProgramFiles)\rplidar_sdk\sdk\output\win64\Debug" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_sdk\sdk\output\win64\Release;$(ProgramFiles)\rplidar_sdk\sdk\output\win64\Release" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_driver.lib" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
+
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";rplidar_driver.lib" /replacestr ""
+@copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 )
 
 @if "%DISABLE_OPENCV%"=="1" (
