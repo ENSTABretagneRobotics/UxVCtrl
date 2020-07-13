@@ -196,6 +196,7 @@
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
     <ClInclude Include="..\Extensions\Img\CvProc.h" />
     <ClInclude Include="..\Extensions\Img\CvUtils.h" />
+    <ClInclude Include="..\Extensions\Misc\httpUtils.h" />
     <ClInclude Include="..\Extensions\Misc\Misc.h" />
     <ClInclude Include="..\OSUtils\OSComputerI2CBus.h" />
     <ClInclude Include="Ball.h" />

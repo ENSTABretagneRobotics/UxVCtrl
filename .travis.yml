@@ -50,7 +50,10 @@ jobs:
      osx_image: xcode10.1
      before_install:
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_MacOS
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_MacOS
 
    - name: "Ubuntu 16.04 i386 Docker static without OpenCV, libmodbus, BlueView, Kinect v2, CLEye support"
      os: linux
@@ -157,7 +160,7 @@ jobs:
 #       - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
 #       - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-mac-static.tar.gz && tar xfz OpenCV-4.2.0-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-mac-static.tar.gz
 #       - df
-#     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl  && cp ./UxVCtrl ./UxVCtrl_MacOS
+#     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_MacOS
 #     deploy:
 #       <<: *deploy_base
 #       file: UxVCtrl_MacOS

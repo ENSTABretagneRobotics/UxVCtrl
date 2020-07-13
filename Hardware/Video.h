@@ -10,8 +10,7 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include "OSMisc.h"
-#include "OSNet.h"
+#include "httpUtils.h"
 #include "CvInc.h"
 
 #ifdef USE_FFMPEG_VIDEO
@@ -75,6 +74,7 @@ struct VIDEO
 	char address[256];
 	char port[256];
 	int DevType;
+	BOOL bSingleJPEGURL;
 	IplImage* frame;
 	IplImage* resizedframe;
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
@@ -518,7 +518,9 @@ inline int recvdecode(VIDEO* pVideo)
 			pVideo->databuf = databufnew;
 		}
 	}
-	else if (strncmp((char*)header, "--boundary\r\n", 3*sizeof(unsigned int)) == 0)
+	else if (
+		(strncmp((char*)header, "--boundary\r\n", 3*sizeof(unsigned int)) == 0)||
+		(strncmp((char*)header, ": no-cache\r\n", 3*sizeof(unsigned int)) == 0))
 	{
 		// MJPEG.
 
@@ -709,6 +711,25 @@ inline IplImage* GetRawImgPtrVideo(VIDEO* pVideo)
 			fd_set sock_set;
 			int iResult = SOCKET_ERROR;
 			struct timeval tv;
+
+			if (pVideo->bSingleJPEGURL)
+			{
+				char url[256+8];
+				char recvbuf[512+1];
+				int BytesReceived = 0;
+
+				sprintf(url, "http://%.255s", pVideo->szDevPath);
+				if (sendsimplehttpgetreq(pVideo->s, url) != EXIT_SUCCESS)
+				{
+					printf("Error reading an image from a video.\n");
+					return NULL;
+				}
+				if (recvuntilstr(pVideo->s, recvbuf, "Cache-control", 512, &BytesReceived) != EXIT_SUCCESS)
+				{
+					printf("Error reading an image from a video.\n");
+					return NULL;
+				}
+			}
 
 			tv.tv_sec = (long)(pVideo->timeout/1000);
 			tv.tv_usec = (long)((pVideo->timeout%1000)*1000);
@@ -1027,16 +1048,21 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		pVideo->nb_excluded_area_points = 0;
 	}
 
+	pVideo->DevType = LOCAL_TYPE_VIDEO;
+	pVideo->bSingleJPEGURL = FALSE;
 	memset(pVideo->address, 0, sizeof(pVideo->address));
 	memset(pVideo->port, 0, sizeof(pVideo->port));
 
-	// Try to determine whether it is an IP address and TCP port (e.g. 127.0.0.1:4001), a filename or a local camera (single digit).
+	// Try to determine whether it is an IP address and TCP port (e.g. 127.0.0.1:4001), a filename or a local camera (single digit or 2 digits).
 	ptr = strchr(pVideo->szDevPath, ':');
 	if ((ptr != NULL)&&(atoi(ptr+1) > 0)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
 	{
 		memcpy(pVideo->address, pVideo->szDevPath, ptr-pVideo->szDevPath);
-		strcpy(pVideo->port, ptr+1);
+		//strcpy(pVideo->port, ptr+1);
+		sprintf(pVideo->port, "%d", atoi(ptr+1)); // Other non-digit characters may follow the port...
 		pVideo->DevType = REMOTE_TYPE_VIDEO;
+
+		if (strlen(pVideo->port) < strlen(ptr+1)) pVideo->bSingleJPEGURL = TRUE;
 
 		pVideo->frame = cvCreateImage(cvSize(pVideo->videoimgwidth, pVideo->videoimgheight), IPL_DEPTH_8U, 3);
 		if (pVideo->frame == NULL)
@@ -1067,7 +1093,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	}
 	else 
 	{
-		if ((strlen(pVideo->szDevPath) == 1)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
+		if ((strlen(pVideo->szDevPath) >= 1)&&(strlen(pVideo->szDevPath) <= 2)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
 		{
 			pVideo->DevType = LOCAL_TYPE_VIDEO;
 

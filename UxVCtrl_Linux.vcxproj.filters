@@ -686,6 +686,9 @@
     <ClInclude Include="Hardware\ArduinoPressureSensor.h">
       <Filter>Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="..\Extensions\Misc\httpUtils.h">
+      <Filter>Extensions\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="CHANGELOG.txt" />

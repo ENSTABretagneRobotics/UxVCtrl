@@ -1,3 +1,6 @@
+356
+Improved RPLIDAR A3 support and updated Video to support http requests of a JPEG image.
+
 355
 Added RPLIDAR SDK support.
 

@@ -1,3 +1,4 @@
+add param bShowSonar (maybe only for gui0), to be able to display its data easily...?
 
 #define inline static __inline__in MAVLinkProtocol.h, should be updated with what is in OSCore.h...?
 
@@ -27,7 +28,7 @@ SPI...
 
 travis : add test of old versions of vsbuildtools, e.g. vc9, 10, 11, ubuntu focal...
 
-Add params to wallfollowing, see obstacleavoidance notes…
+Add params to wallfollowing, see obstacleavoidance notes...
 
 wait -1->infinite, and related commands...
 
@@ -460,6 +461,7 @@ Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'uti
 
 bugs
 Kinect/CLEye support and USE_OPENCV_HIGHGUI_CPP_API?->Kinect/CLEye currently incompatible with OpenCV 4 due to that...
+waitforclifortcpsrv message () : select timed out. (socksrv=15, timeout=10000) : time inside the parenthesis is missing sometimes?
 si exception dans un thread (e.g. avec push_back()), tenter bExit = TRUE...?
 "Error launching the RazorAHRSInterface server" and for other interfaces sometimes on 18.04, rebooting solves the problem...?->conflict with other programs using temporarily the same ports?
 manque StopChrono() dans handlemavlinkinterface() et peut-être ailleurs...
@@ -853,6 +855,12 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Image lidar mac presque n'importe quoi avec sdk (Matlab et python), sans SDK pleins d'erreurs bad bit...->simple_grabber /dev/cu.SLAB_USBtoUART 256000 n'affiche pas des données cohérentes alors que sous Windows c'est bon...
+Mac sans sdk problème baudrate ou peut-être dtr, tous les read fail?->on a parfois get_info avec version qui est OK donc baudrate probablement OK...->on dirait que par moment la liaison série ne marche plus, ultra_simple /dev/cu.SLAB_USBtoUART 256000 marche souvent mais pas toujours non plus...
+On dirait qu'il faut que le 1er read fasse un timeout pour débloquer la liaison série...
+
+https://stackoverflow.com/questions/27086145/what-is-the-default-build-configuration-of-cmake
 
 UxVCtrl opencv_ffmpeg_cv420.dll
 
