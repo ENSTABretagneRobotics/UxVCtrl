@@ -1,3 +1,4 @@
+3 RPLIDAR, hokuyo, seanet, params deadzone, position, orientation, voir srf02, pololu...
 add param bShowSonar (maybe only for gui0), to be able to display its data easily...?
 
 #define inline static __inline__in MAVLinkProtocol.h, should be updated with what is in OSCore.h...?
@@ -855,6 +856,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Patch cv4 to get C types and functions inline?->better to use previous OpenCV...
 
 Image lidar mac presque n'importe quoi avec sdk (Matlab et python), sans SDK pleins d'erreurs bad bit...->simple_grabber /dev/cu.SLAB_USBtoUART 256000 n'affiche pas des données cohérentes alors que sous Windows c'est bon...
 Mac sans sdk problème baudrate ou peut-être dtr, tous les read fail?->on a parfois get_info avec version qui est OK donc baudrate probablement OK...->on dirait que par moment la liaison série ne marche plus, ultra_simple /dev/cu.SLAB_USBtoUART 256000 marche souvent mais pas toujours non plus...

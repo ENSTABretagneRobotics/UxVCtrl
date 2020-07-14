@@ -58,6 +58,9 @@
     <Filter Include="restore\aud">
       <UniqueIdentifier>{0e2d2eed-d208-4dcf-814e-93bfa0ffa8e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extensions\Net">
+      <UniqueIdentifier>{bb78c83d-a7fb-4a10-8231-d020e0292c70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ball.cpp">
@@ -687,7 +690,7 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="..\Extensions\Misc\httpUtils.h">
-      <Filter>Extensions\Misc</Filter>
+      <Filter>Extensions\Net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

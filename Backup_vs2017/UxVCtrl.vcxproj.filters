@@ -40,6 +40,9 @@
     <Filter Include="Extensions\Misc">
       <UniqueIdentifier>{deaeaca4-251b-4641-a946-595b0c0b637f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Extensions\Net">
+      <UniqueIdentifier>{fa9cfbaf-eacb-43b7-b3f6-67268b4efd46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Ball.cpp">
@@ -657,7 +660,7 @@
       <Filter>Hardware</Filter>
     </ClInclude>
     <ClInclude Include="..\Extensions\Misc\httpUtils.h">
-      <Filter>Extensions\Misc</Filter>
+      <Filter>Extensions\Net</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

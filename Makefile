@@ -51,13 +51,15 @@ CFLAGS += -D SIMULATED_INTERNET_SWARMONDEVICE
 #CFLAGS += -D ENABLE_GETTIMEOFDAY_WIN32 -D DISABLE_TIMEZONE_STRUCT_REDEFINITION
 
 # Depending on your OS (old Linux or Mac OS)...
-#CFLAGS += -DUSE_OLD_CHRONO
+#CFLAGS += -D USE_OLD_CHRONO
 
 CFLAGS += -I../OSUtils 
 CFLAGS += -I../Extensions/Devices/LabjackUtils/liblabjackusb
 CFLAGS += -I../Extensions/Devices/LabjackUtils/U3Utils
 CFLAGS += -I../Extensions/Devices/LabjackUtils/UE9Utils
 CFLAGS += -I../Extensions/Img
+CFLAGS += -I../Extensions/Misc
+CFLAGS += -I../Extensions/Net
 CFLAGS += -I../interval -I../matrix_lib 
 CFLAGS += -I./Hardware 
 CFLAGS += -I. -I..
@@ -85,7 +87,7 @@ LDFLAGS += -lbvtsdk
 #LDFLAGS += -lusb-1.0
 
 # For MinGW
-#LDFLAGS += -lWinMM -lws2_32 -lpthread -lm
+#LDFLAGS += -lWinMM -lws2_32 -lm
 
 # For Mac OS
 #LDFLAGS += -lpthread -lm

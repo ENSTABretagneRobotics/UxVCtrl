@@ -1,3 +1,6 @@
+357
+Updated CMakeLists.txt and added Travis build with ffmpeg.
+
 356
 Improved RPLIDAR A3 support and updated Video to support http requests of a JPEG image.
 
