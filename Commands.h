@@ -2532,7 +2532,7 @@ inline int Commands(char* line)
 #endif // __GNUC__
 	{
 		memset(str2, 0, sizeof(str2));
-		strcpy(str2, "CISCREA0.txt");
+		strcpy(str2, "CISCREA.txt");
 		_fcopydeviceconfig(str, str2);
 		if (!ival1) bRestartCISCREA = TRUE;
 		bPauseCISCREA = ival1;

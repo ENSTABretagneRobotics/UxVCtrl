@@ -43,7 +43,6 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 	BOOL bMap = TRUE;
 	BOOL bFullMap = FALSE;
 	BOOL bRotatingMap = FALSE;
-	BOOL bShowSonar = FALSE;
 	BOOL bShowOtherOverlays = TRUE;
 	COORDSYSTEM2IMG csMap2FullImg;
 	BOOL bDispRecordSymbol = FALSE;
@@ -241,7 +240,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			dispimgmats[guiid] = cv::Mat::zeros(dispimgmats[guiid].size(), dispimgmats[guiid].type());
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
 		}
-		if (bShowSonar)
+		if (bShowSonarOpenCVGUIs[guiid])
 		{
 			EnterCriticalSection(&SeanetOverlayImgCS);
 			CopyResizeScaleOverlay(SeanetOverlayImg, dispimgs[guiid], bCropOnResize);
@@ -891,9 +890,9 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		case 'i': bShowVideoOpenCVGUIs[guiid] = !bShowVideoOpenCVGUIs[guiid]; break;
 		case '$': 
 
-			// Should cycle between different display modes...
+			// Should cycle between different display modes...?
 
-			bShowSonar = !bShowSonar; 
+			bShowSonarOpenCVGUIs[guiid] = !bShowSonarOpenCVGUIs[guiid]; 
 			break;
 		case ';': bShowOtherOverlays = !bShowOtherOverlays; break;
 		case '+':

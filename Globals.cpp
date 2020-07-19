@@ -108,6 +108,7 @@ BOOL bCropOnResize = FALSE;
 char szVideoRecordCodec[5];
 BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
 BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
+BOOL bShowSonarOpenCVGUIs[MAX_NB_OPENCVGUI];
 int opencvguiimgwidth[MAX_NB_OPENCVGUI];
 int opencvguiimgheight[MAX_NB_OPENCVGUI];
 int opencvguiperiod = 0;

@@ -169,8 +169,8 @@
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
     <ClInclude Include="..\Extensions\Img\CvProc.h" />
     <ClInclude Include="..\Extensions\Img\CvUtils.h" />
-    <ClInclude Include="..\Extensions\Misc\httpUtils.h" />
     <ClInclude Include="..\Extensions\Misc\Misc.h" />
+    <ClInclude Include="..\Extensions\Net\httpUtils.h" />
     <ClInclude Include="..\OSUtils\OSComputerI2CBus.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Commands.h" />
@@ -300,7 +300,7 @@
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</RemoteCopyFile>
     </None>
-    <None Include="ArduinoPressureSensor.txt">
+    <None Include="ArduinoPressureSensor0.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</RemoteCopyFile>

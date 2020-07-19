@@ -222,6 +222,7 @@ inline int AnalyzeResponseDescriptorRPLIDAR(unsigned char* buf, int buflen, int*
 	}
 	if ((buf[0] != START_FLAG1_RPLIDAR)||(buf[1] != START_FLAG2_RPLIDAR))
 	{
+		printf("Warning : RPLIDAR bad start flag. \n");
 		*pnbBytesToDiscard = 1; // We are only sure that the first start flag byte can be discarded...
 		return EXIT_FAILURE;
 	}
@@ -328,6 +329,229 @@ inline int GetResponseDescriptorRPLIDAR(RPLIDAR* pRPLIDAR, int* pDataResponseLen
 	{
 		printf("Warning getting data from a RPLIDAR : Unexpected data after a response descriptor. \n");
 	}
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Return : EXIT_SUCCESS if the beginning of buf contains a valid data response (there might be other data at the end),
+EXIT_OUT_OF_MEMORY if the data response is incomplete (check *pnbBytesToRequest to know how many additional bytes
+should be requested, -1 if unknown) or EXIT_FAILURE if there is an error (check *pnbBytesToDiscard to know how
+many bytes can be safely discarded).
+*/
+inline int AnalyzeScanDataResponseRPLIDAR(unsigned char* buf, int buflen, BOOL* pbNewScan, int* pQuality, double* pAngle, double* pDistance,
+	int* pnbBytesToRequest, int* pnbBytesToDiscard)
+{
+	unsigned short angle_q6 = 0;
+	unsigned short distance_q2 = 0;
+
+	*pnbBytesToRequest = -1;
+	*pnbBytesToDiscard = 0;
+	if (buflen < NB_BYTES_SCAN_DATA_RESPONSE_RPLIDAR)
+	{
+		*pnbBytesToRequest = NB_BYTES_SCAN_DATA_RESPONSE_RPLIDAR-buflen;
+		return EXIT_OUT_OF_MEMORY;
+	}
+	*pbNewScan = (buf[0] & START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR);
+	if (*pbNewScan == ((buf[0] & INVERTED_START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR) >> 1))
+	{
+		printf("Warning : RPLIDAR bad inversed start bit. \n");
+		*pnbBytesToDiscard = 1; // We are only sure that the first byte can be discarded...
+		return EXIT_FAILURE;
+	}
+	if ((buf[1] & CHECK_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR) != 1)
+	{
+		printf("Warning : RPLIDAR bad check bit. \n");
+		*pnbBytesToDiscard = 1; // We are only sure that the first byte can be discarded...
+		return EXIT_FAILURE;
+	}
+	*pQuality = (unsigned char)(buf[0] >> 2);
+	angle_q6 = (buf[2] << 7)|(buf[1] >> 1);
+	distance_q2 = (buf[4] << 8)|buf[3];
+	// Convert in rad.
+	*pAngle = fmod_2PI_deg2rad(-angle_q6/64.0);
+	// Convert in m.
+	*pDistance = distance_q2/4000.0;
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Return : EXIT_SUCCESS if the beginning of *pFoundScanDataResponse contains a valid data response (there might be other data
+at the end),
+EXIT_OUT_OF_MEMORY if the data response is incomplete (check *pnbBytesToRequest to know how many additional bytes
+should be requested, -1 if unknown) or EXIT_FAILURE if no compatible data response could be found.
+Data in the beginning of buf might have been discarded (check *pnbBytesDiscarded to know how many bytes were discarded).
+*/
+inline int FindScanDataResponseRPLIDAR(unsigned char* buf, int buflen, BOOL* pbNewScan, int* pQuality, double* pAngle, double* pDistance,
+	int* pnbBytesToRequest, unsigned char** pFoundScanDataResponse, int* pnbBytesDiscarded)
+{
+	int res = EXIT_FAILURE, nbBytesToRequest = -1, nbBytesToDiscard = 0;
+
+	*pnbBytesToRequest = -1;
+	*pFoundScanDataResponse = buf;
+	*pnbBytesDiscarded = 0;
+
+	for (;;)
+	{
+		res = AnalyzeScanDataResponseRPLIDAR(*pFoundScanDataResponse, buflen-(*pnbBytesDiscarded), pbNewScan, pQuality, pAngle, pDistance, &nbBytesToRequest, &nbBytesToDiscard);
+		switch (res)
+		{
+		case EXIT_SUCCESS:
+			return EXIT_SUCCESS;
+		case EXIT_OUT_OF_MEMORY:
+			(*pnbBytesToRequest) = nbBytesToRequest;
+			return EXIT_OUT_OF_MEMORY;
+		default:
+			(*pFoundScanDataResponse) += nbBytesToDiscard;
+			(*pnbBytesDiscarded) += nbBytesToDiscard;
+			if (buflen-(*pnbBytesDiscarded) <= 0)
+			{
+				*pFoundScanDataResponse = NULL;
+				return EXIT_FAILURE;
+			}
+			break;
+		}
+	}
+}
+
+/*
+Return : EXIT_SUCCESS if the beginning of buf contains a valid data response (there might be other data at the end),
+EXIT_OUT_OF_MEMORY if the data response is incomplete (check *pnbBytesToRequest to know how many additional bytes
+should be requested, -1 if unknown) or EXIT_FAILURE if there is an error (check *pnbBytesToDiscard to know how
+many bytes can be safely discarded).
+*/
+inline int AnalyzeExpressScanDataResponseRPLIDAR(unsigned char* buf, int buflen,
+	int* pnbBytesToRequest, int* pnbBytesToDiscard)
+{
+	unsigned char sync = 0, ChkSum = 0;
+
+	*pnbBytesToRequest = -1;
+	*pnbBytesToDiscard = 0;
+	if (buflen < NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR)
+	{
+		*pnbBytesToRequest = NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR-buflen;
+		return EXIT_OUT_OF_MEMORY;
+	}
+	sync = (buf[0] & 0xF0)|(buf[1] >> 4);
+	if (sync != START_FLAG1_RPLIDAR)
+	{
+		printf("Warning : RPLIDAR bad sync1 or sync2. \n");
+		*pnbBytesToDiscard = 1; // We are only sure that the first byte can be discarded...
+		return EXIT_FAILURE;
+	}
+	ChkSum = (buf[1] << 4)|(buf[0] & 0x0F);
+	// Force ComputeChecksumRPLIDAR() to compute until the last byte...
+	if (ChkSum != ComputeChecksumRPLIDAR(buf+2, NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR-1))
+	{
+		printf("Warning : RPLIDAR bad ChkSum. \n");
+		*pnbBytesToDiscard = 1; // We are only sure that the first byte can be discarded...
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Return : EXIT_SUCCESS if the beginning of *pFoundScanDataResponse contains a valid data response (there might be other data
+at the end),
+EXIT_OUT_OF_MEMORY if the data response is incomplete (check *pnbBytesToRequest to know how many additional bytes
+should be requested, -1 if unknown) or EXIT_FAILURE if no compatible data response could be found.
+Data in the beginning of buf might have been discarded (check *pnbBytesDiscarded to know how many bytes were discarded).
+*/
+inline int FindExpressScanDataResponseRPLIDAR(unsigned char* buf, int buflen,
+	int* pnbBytesToRequest, unsigned char** pFoundExpressScanDataResponse, int* pnbBytesDiscarded)
+{
+	int res = EXIT_FAILURE, nbBytesToRequest = -1, nbBytesToDiscard = 0;
+
+	*pnbBytesToRequest = -1;
+	*pFoundExpressScanDataResponse = buf;
+	*pnbBytesDiscarded = 0;
+
+	for (;;)
+	{
+		res = AnalyzeExpressScanDataResponseRPLIDAR(*pFoundExpressScanDataResponse, buflen-(*pnbBytesDiscarded), &nbBytesToRequest, &nbBytesToDiscard);
+		switch (res)
+		{
+		case EXIT_SUCCESS:
+			return EXIT_SUCCESS;
+		case EXIT_OUT_OF_MEMORY:
+			(*pnbBytesToRequest) = nbBytesToRequest;
+			return EXIT_OUT_OF_MEMORY;
+		default:
+			(*pFoundExpressScanDataResponse) += nbBytesToDiscard;
+			(*pnbBytesDiscarded) += nbBytesToDiscard;
+			if (buflen-(*pnbBytesDiscarded) <= 0)
+			{
+				*pFoundExpressScanDataResponse = NULL;
+				return EXIT_FAILURE;
+			}
+			break;
+		}
+	}
+}
+
+// unsigned char esdataresponse[NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR]
+inline int GetRawExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, unsigned char* esdataresponse)
+{
+	unsigned char recvbuf[MAX_NB_BYTES_RPLIDAR];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	unsigned char* ptr = NULL;
+	CHRONO chrono;
+
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_RPLIDAR-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired data response...
+
+	nbBytesToRequest = NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR;
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+	BytesReceived += nbBytesToRequest;
+
+	for (;;)
+	{
+		res = FindExpressScanDataResponseRPLIDAR(recvbuf, BytesReceived, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
+		{
+			nbBytesToRequest = min(NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR, nbBytesDiscarded);
+		}
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
+		{
+			printf("Error reading data from a RPLIDAR : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+		if (ReadAllRS232Port(&pRPLIDAR->RS232Port, recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a RPLIDAR. \n");
+			return EXIT_FAILURE;
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_RPLIDAR)
+		{
+			printf("Error reading data from a RPLIDAR : Data response timeout. \n");
+			return EXIT_TIMEOUT;
+		}
+	}
+
+	if (BytesReceived-nbBytesDiscarded-NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR > 0)
+	{
+		printf("Warning getting data from a RPLIDAR : Unexpected data after a data response. \n");
+	}
+
+	// Store the data...
+	memcpy(esdataresponse, recvbuf, NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR);
 
 	return EXIT_SUCCESS;
 }
@@ -764,6 +988,7 @@ inline int StartForceScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 	return EXIT_SUCCESS;
 }
 
+// *pDistance in m, *pAngle in rad.
 inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistance, double* pAngle, BOOL* pbNewScan, int* pQuality)
 {
 #ifdef ENABLE_RPLIDAR_SDK_SUPPORT
@@ -798,39 +1023,61 @@ inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistance, doub
 	// Convert in m.
 	*pDistance = nodes[0].dist_mm_q2/4000.0;
 #else
-	unsigned char databuf[5];
-	unsigned short angle_q6 = 0;
-	unsigned short distance_q2 = 0;
+	unsigned char recvbuf[MAX_NB_BYTES_RPLIDAR];
+	int BytesReceived = 0, recvbuflen = 0, res = EXIT_FAILURE, nbBytesToRequest = 0, nbBytesDiscarded = 0;
+	unsigned char* ptr = NULL;
+	CHRONO chrono;
 
-	// Receive the data response.
-	memset(databuf, 0, sizeof(databuf));
-	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
-	{ 
-		printf("A RPLIDAR is not responding correctly. \n");
-		return EXIT_FAILURE;	
+	StartChrono(&chrono);
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = MAX_NB_BYTES_RPLIDAR-1; // The last character must be a 0 to be a valid string for sscanf.
+	BytesReceived = 0;
+
+	// Suppose that there are not so many data to discard.
+	// First try to get directly the desired data response...
+
+	nbBytesToRequest = NB_BYTES_SCAN_DATA_RESPONSE_RPLIDAR;
+	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, recvbuf, nbBytesToRequest) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+	BytesReceived += nbBytesToRequest;
+	
+	for (;;)
+	{
+		res = FindScanDataResponseRPLIDAR(recvbuf, BytesReceived, pbNewScan, pQuality, pAngle, pDistance, &nbBytesToRequest, &ptr, &nbBytesDiscarded);
+		if (res == EXIT_SUCCESS) break;
+		if (res == EXIT_FAILURE)
+		{
+			nbBytesToRequest = min(NB_BYTES_SCAN_DATA_RESPONSE_RPLIDAR, nbBytesDiscarded);
+		}	
+		memmove(recvbuf, recvbuf+nbBytesDiscarded, BytesReceived-nbBytesDiscarded);
+		BytesReceived -= nbBytesDiscarded;
+		if (BytesReceived+nbBytesToRequest > recvbuflen)
+		{
+			printf("Error reading data from a RPLIDAR : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+		if (ReadAllRS232Port(&pRPLIDAR->RS232Port, recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a RPLIDAR. \n");
+			return EXIT_FAILURE;
+		}
+		BytesReceived += nbBytesToRequest;
+		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_RPLIDAR)
+		{
+			printf("Error reading data from a RPLIDAR : Data response timeout. \n");
+			return EXIT_TIMEOUT;
+		}
 	}
 
-	// Analyze the data response.
-	*pbNewScan = (START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR & databuf[0]);
-	if (*pbNewScan == ((INVERTED_START_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR & databuf[0])>>1))
-	{ 
-		printf("A RPLIDAR is not responding correctly: Bad inversed start bit. \n");
-		return EXIT_FAILURE;	
+	if (BytesReceived-nbBytesDiscarded-NB_BYTES_SCAN_DATA_RESPONSE_RPLIDAR > 0)
+	{
+		printf("Warning getting data from a RPLIDAR : Unexpected data after a data response. \n");
 	}
-	if ((CHECK_BIT_MASK_SCAN_DATA_RESPONSE_RPLIDAR & databuf[1]) != 1)
-	{ 
-		printf("A RPLIDAR is not responding correctly : Bad check bit. \n");
-		return EXIT_FAILURE;	
-	}
-	*pQuality = (unsigned char)(databuf[0]>>2);
-	angle_q6 = (databuf[2]<<7)|(databuf[1]>>1);
-	distance_q2 = (databuf[4]<<8)|databuf[3];
-
-	// Convert in rad.
-	*pAngle = fmod_2PI_deg2rad(-angle_q6/64.0);
-
-	// Convert in m.
-	*pDistance = distance_q2/4000.0;
 #endif // ENABLE_RPLIDAR_SDK_SUPPORT
 
 	return EXIT_SUCCESS;
@@ -854,7 +1101,6 @@ inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 #else
 	unsigned char reqbuf[] = {START_FLAG1_RPLIDAR,EXPRESS_SCAN_REQUEST_RPLIDAR,0x05,0,0,0,0,0,0x22};
 	int DataResponseLength = 0, SendMode = 0, DataType = 0;
-	unsigned char sync = 0, ChkSum = 0;
 
 	// Send request.
 	if (WriteAllRS232Port(&pRPLIDAR->RS232Port, reqbuf, sizeof(reqbuf)) != EXIT_SUCCESS)
@@ -887,26 +1133,9 @@ inline int StartExpressScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)
 
 	// Receive the first data response (2 data responses needed for angles computation...).
 	memset(pRPLIDAR->esdata_prev, 0, sizeof(pRPLIDAR->esdata_prev));
-	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, pRPLIDAR->esdata_prev, sizeof(pRPLIDAR->esdata_prev)) != EXIT_SUCCESS)
-	{ 
-		printf("A RPLIDAR is not responding correctly. \n");
-		return EXIT_FAILURE;	
-	}
-
-	// Analyze the first data response.
-	sync = (pRPLIDAR->esdata_prev[0] & 0xF0)|(pRPLIDAR->esdata_prev[1]>>4);
-	if (sync != START_FLAG1_RPLIDAR)
-	{ 
-		printf("A RPLIDAR is not responding correctly : Bad sync1 or sync2. \n");
-		return EXIT_FAILURE;	
-	}
-
-	ChkSum = (pRPLIDAR->esdata_prev[1]<<4)|(pRPLIDAR->esdata_prev[0] & 0x0F);
-	// Force ComputeChecksumRPLIDAR() to compute until the last byte...
-	if (ChkSum != ComputeChecksumRPLIDAR(pRPLIDAR->esdata_prev+2, sizeof(pRPLIDAR->esdata_prev)-1))
-	{ 
-		printf("A RPLIDAR is not responding correctly : Bad ChkSum. \n");
-		return EXIT_FAILURE;	
+	if (GetRawExpressScanDataResponseRPLIDAR(pRPLIDAR, pRPLIDAR->esdata_prev) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
 	}
 #endif // ENABLE_RPLIDAR_SDK_SUPPORT
 
@@ -957,8 +1186,6 @@ inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistanc
 	}
 #else
 	unsigned char databuf[NB_BYTES_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
-	unsigned char sync = 0;
-	unsigned char ChkSum = 0;
 	unsigned short start_angle_q6 = 0;
 	unsigned short start_angle_q6_prev = 0;
 	unsigned short distance1 = 0;
@@ -972,26 +1199,9 @@ inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistanc
 
 	// Receive the data response.
 	memset(databuf, 0, sizeof(databuf));
-	if (ReadAllRS232Port(&pRPLIDAR->RS232Port, databuf, sizeof(databuf)) != EXIT_SUCCESS)
-	{ 
-		printf("A RPLIDAR is not responding correctly. \n");
-		return EXIT_FAILURE;	
-	}
-
-	// Analyze the data response.
-	sync = (databuf[0] & 0xF0)|(databuf[1]>>4);
-	if (sync != START_FLAG1_RPLIDAR)
-	{ 
-		printf("A RPLIDAR is not responding correctly : Bad sync1 or sync2. \n");
-		return EXIT_FAILURE;	
-	}
-
-	ChkSum = (databuf[1]<<4)|(databuf[0] & 0x0F);
-	// Force ComputeChecksumRPLIDAR() to compute until the last byte...
-	if (ChkSum != ComputeChecksumRPLIDAR(databuf+2, sizeof(databuf)-1))
-	{ 
-		printf("A RPLIDAR is not responding correctly : Bad ChkSum. \n");
-		return EXIT_FAILURE;	
+	if (GetRawExpressScanDataResponseRPLIDAR(pRPLIDAR, databuf) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
 	}
 
 	start_angle_q6 = ((databuf[3] & 0x7F)<<8) | databuf[2];

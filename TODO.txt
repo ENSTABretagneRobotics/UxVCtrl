@@ -1,9 +1,10 @@
+RPLIDAR A3 : if wrong baudrate, GetInfoRequestRPLIDAR() with SDK causes CTD or exit()...?
+
 3 RPLIDAR, hokuyo, seanet, params deadzone, position, orientation, voir srf02, pololu...
-add param bShowSonar (maybe only for gui0), to be able to display its data easily...?
 
-#define inline static __inline__in MAVLinkProtocol.h, should be updated with what is in OSCore.h...?
+SBG : rajouter log de heave dans les dernières colonnes du fichier et vérifier si accelerations bien récupérées...
 
-UE9a semble compiler et exécuter avec mingw7, tester avec servos
+UE9A semble compiler et exécuter avec mingw7, tester avec servos
 Modify kinect headers for mingw7 if needed?
 
 cv420
@@ -14,6 +15,14 @@ terminate called after throwing an instance of 'cv::Exception'
   what():  c:/tmp/gen_x86_mingw_lib/sources/modules/core/src/matrix.cpp:387: error: (-215) 0 <= d && d <= CV_MAX_DIM && _sizes in function create
 
 16:45:10: C:/tmp/tests/build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug/UxVCtrl.exe exited with code 3
+
+remove define OPENCV420/320... in C++ code, vcxproj, Makefile (but not yet in cmake)...?
+Ideally, if cv_version < 4 iplimage and mat enabled else disable iplimage...
+Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\Latest\UE 4.5\Robotique pratique\TD4\KinectWebcamOpenCV420
+class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
+class VideoCaptureKinect : VideoCapture {grab();retrieve();}
+VideoCaptureKinect::read() ???
+remplacer cvSize() par cv::Size()?
 
 Add to device struct lastdata, bexitdevice and other necessary variables for MATLAB
 add Roboteq to MATLAB and Python and optionally support Roboteq SDK...
@@ -36,13 +45,6 @@ wait -1->infinite, and related commands...
 gestion du temps et changement d'heure...
 
 Pouvoir envoyer des trames à une sbg (e.g. gps time), voire n'importe quel périphérique un peu comme les corrections rtk
-
-Ideally, if cv_version < 4 iplimage and mat enabled else disable iplimage...
-Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\Latest\UE 4.3\Robotique pratique\TD4\KinectWebcamOpenCV412
-class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
-class VideoCaptureKinect : VideoCapture {grab();retrieve();}
-VideoCaptureKinect::read() ???
-remplacer cvSize() par cv::Size()?
 
 Initialisation de t, très grand dt initial vs dt de 0...?
 
@@ -245,15 +247,6 @@ controller pour uv drone : rajouter param u_offset, u_med_z ou il y a quelque ch
 
 Obstacle avoidance, loiter
 
-GetTelemetersPololu(tableau)...?
-ouverture angulaire des sonars, rajouter param analoginputbeam?->un peu déjà géré par alpha_max_err mais suppose que tous les télémètres sont identiques...
-rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
-
-rajouter mark/quality et/ou type (pour connaitre le capteur d'origine) pour chaque d_mes pour aider dans la fusion lidar, video(kinect), sonar?
-commande pour changer quels capteurs rentrent dans la fusion : sonarprocessing simulator seanet hokuyo rplidar pololu0 pololu1 pololu2 BlueView0 BlueView1 video0 video1 video2
-
-d_mes vs d_all_mes : s'assurer que d_mes est le min et que dans d_all_mes, la 1ère doit être la plus petite...
-
 logobstacle?
 
 %waitareaconfig area.txt bIn procid id (execute procid quand on rentre dans la zone (bIn == 1) ou sort (bIn == 0))
@@ -304,6 +297,15 @@ d, alpha, beta, rgbie, accuracy, xyz, sensor space, robot space, env
 Several views : as camera, as 2D sonar, as 2D lidar, vue sous forme de projection ou coupe...
 pouvoir afficher une image des données brutes de chaque sonar, lidar, groupe d'ultrasons, même kinect (dans différents repères, couleurs) et aussi afficher le résultat de la fusion (avec optionnellement couleur différente pour chaque point selon le capteur d'origine)
 faire fusion sonar, kinect, rplidar, etc. avec des min des distances mesurées à peu près au même angle? Mais il y a peu de distances sonar... prendre en compte l'ouverture angulaire des sonars, à rajouter en param?
+GetTelemetersPololu(tableau)...?
+ouverture angulaire des sonars, rajouter param analoginputbeam?->un peu déjà géré par alpha_max_err mais suppose que tous les télémètres sont identiques...
+rajouter param flags pour pololu un peu comme bExternal de MAVLinkDevice, pour déterminer le rôle de chaque pololu connectée
+rajouter mark/quality et/ou type (pour connaitre le capteur d'origine) pour chaque d_mes pour aider dans la fusion lidar, video(kinect), sonar?
+commande pour changer quels capteurs rentrent dans la fusion : sonarprocessing simulator seanet hokuyo rplidar pololu0 pololu1 pololu2 BlueView0 BlueView1 video0 video1 video2
+tous les sonars sont fusionnés, après les algos sélectionnent surtout les données selon les angles...?->mais on veut parfois voir données brutes de chaque capteur...->on peut faire pause device...
+bShowVideoOpenCVGUIs[0]->add DispVideoIDOpenCVGUIs[0]?
+bShowSonarOpenCVGUIs[0]->add DispSonarImageTypeOpenCVGUIs[0], DispSonarImageDistancesOpenCVGUIs[0], SonarImgCorrOpenCVGUIs[0]?
+d_mes vs d_all_mes : s'assurer que d_mes est le min et que dans d_all_mes, la 1ère doit être la plus petite...
 rajouer aussi possibilié d'utiliser es un peu comme ultrasons pololu
 Indiquer pings utilisés pour localisation
 FullImg : (webcams|sonarscreenshot|sonarwaterfall)|&(MapOverlay)|&(SonarDistancesOverlay)|&(WallTrackingOverlay)|&(VisualObstacleAvoidanceOverlay)|&(BallTrackingOverlay)|&(PipelineTrackingOverlay)
@@ -376,7 +378,6 @@ ne gère pas encore le multi-clients, faire une version tcp et une autre udp de h
 peut-être qu'il faudrait spécifier 2 ports, comme dans SDK SBG?
 bien envoyer ack quand je reçois des commandes mavlink?
 
-move recvhttpcontent, recvhtml, sendhttpreq, etc. in OSNet?
 http : add function to get address and port from url...
 GoPro sends application/json, not text/html and randomly uses \n or \r\n...->bDisableStatusCheck...
 temps-réel avec ffmpeg, délai de 0.5 s avec OpenCV, difficile de dire si c'est vraiment mieux sur l'app...
@@ -856,6 +857,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+#define inline static __inline__in MAVLinkProtocol.h, should be updated with what is in OSCore.h...?
 
 Patch cv4 to get C types and functions inline?->better to use previous OpenCV...
 

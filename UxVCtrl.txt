@@ -70,6 +70,16 @@ WMV2
 0
 % bShowVideoOpenCVGUIs[4]
 0
+% bShowSonarOpenCVGUIs[0]
+0
+% bShowSonarOpenCVGUIs[1]
+0
+% bShowSonarOpenCVGUIs[2]
+0
+% bShowSonarOpenCVGUIs[3]
+0
+% bShowSonarOpenCVGUIs[4]
+0
 % opencvguiimgwidth[0]
 320
 % opencvguiimgwidth[1]

@@ -689,7 +689,7 @@
     <ClInclude Include="Hardware\ArduinoPressureSensor.h">
       <Filter>Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="..\Extensions\Misc\httpUtils.h">
+    <ClInclude Include="..\Extensions\Net\httpUtils.h">
       <Filter>Extensions\Net</Filter>
     </ClInclude>
   </ItemGroup>
@@ -718,9 +718,6 @@
     </None>
     <None Include="restore\log\ReadMe.txt">
       <Filter>restore\log</Filter>
-    </None>
-    <None Include="ArduinoPressureSensor.txt">
-      <Filter>Input Files</Filter>
     </None>
     <None Include="BlueView0.txt">
       <Filter>Input Files</Filter>
@@ -855,6 +852,9 @@
       <Filter>Input Files</Filter>
     </None>
     <None Include="Video2.txt">
+      <Filter>Input Files</Filter>
+    </None>
+    <None Include="ArduinoPressureSensor0.txt">
       <Filter>Input Files</Filter>
     </None>
   </ItemGroup>

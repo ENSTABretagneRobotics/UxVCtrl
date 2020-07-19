@@ -349,6 +349,7 @@ extern BOOL bCropOnResize;
 extern char szVideoRecordCodec[5];
 extern BOOL bEnableOpenCVGUIs[MAX_NB_OPENCVGUI];
 extern BOOL bShowVideoOpenCVGUIs[MAX_NB_OPENCVGUI];
+extern BOOL bShowSonarOpenCVGUIs[MAX_NB_OPENCVGUI];
 extern int opencvguiimgwidth[MAX_NB_OPENCVGUI];
 extern int opencvguiimgheight[MAX_NB_OPENCVGUI];
 extern int opencvguiperiod;

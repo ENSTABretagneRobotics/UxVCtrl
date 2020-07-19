@@ -1,3 +1,8 @@
+358
+Minor corrections.
+Added bShowSonarOpenCVGUIs parameters.
+Improved RPLIDAR A3 support.
+
 357
 Updated CMakeLists.txt and added Travis build with ffmpeg.
 

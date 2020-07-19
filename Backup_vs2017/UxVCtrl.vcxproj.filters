@@ -659,7 +659,7 @@
     <ClInclude Include="Hardware\ArduinoPressureSensor.h">
       <Filter>Hardware</Filter>
     </ClInclude>
-    <ClInclude Include="..\Extensions\Misc\httpUtils.h">
+    <ClInclude Include="..\Extensions\Net\httpUtils.h">
       <Filter>Extensions\Net</Filter>
     </ClInclude>
   </ItemGroup>
@@ -804,7 +804,7 @@
     <Text Include="MS58370.txt">
       <Filter>Input Files</Filter>
     </Text>
-    <Text Include="ArduinoPressureSensor.txt">
+    <Text Include="ArduinoPressureSensor0.txt">
       <Filter>Input Files</Filter>
     </Text>
   </ItemGroup>

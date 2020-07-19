@@ -69,11 +69,27 @@
 
 #ifndef __cplusplus
 #ifndef inline
+#ifdef _MSC_VER
+#define inline __inline
+#endif // _MSC_VER
+#ifdef __BORLANDC__
+#define inline __inline
+#endif // __BORLANDC__
 #ifdef __GNUC__
 // extern __inline__ in ws2tcpip.h for GNU?
+#ifdef _WIN32
+#if (__MINGW_GNUC_PREREQ(4, 3) && __STDC_VERSION__ >= 199901L) || (defined (__clang__))
+// Problem with the use of inline in _mingw.h for WS2TCPIP_INLINE...
+#include <ws2tcpip.h>
 #define inline static __inline__
+#else
+#define inline static __inline__
+#endif // (__MINGW_GNUC_PREREQ(4, 3) && __STDC_VERSION__ >= 199901L) || (defined (__clang__))
+#else
+#define inline static __inline__
+#endif // _WIN32
 #endif // __GNUC__
-#endif // inline
+#endif // !inline
 #endif // !__cplusplus
 
 // For older versions of MAVLink headers...

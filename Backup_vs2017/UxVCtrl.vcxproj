@@ -196,8 +196,8 @@
     <ClInclude Include="..\Extensions\Img\CvKinect2SDKHook.h" />
     <ClInclude Include="..\Extensions\Img\CvProc.h" />
     <ClInclude Include="..\Extensions\Img\CvUtils.h" />
-    <ClInclude Include="..\Extensions\Misc\httpUtils.h" />
     <ClInclude Include="..\Extensions\Misc\Misc.h" />
+    <ClInclude Include="..\Extensions\Net\httpUtils.h" />
     <ClInclude Include="..\OSUtils\OSComputerI2CBus.h" />
     <ClInclude Include="Ball.h" />
     <ClInclude Include="Commands.h" />
@@ -315,7 +315,7 @@
     <ClInclude Include="Hardware\Video.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ArduinoPressureSensor.txt" />
+    <Text Include="ArduinoPressureSensor0.txt" />
     <Text Include="BlueView0.txt" />
     <Text Include="BlueView1.txt" />
     <Text Include="CMakeLists.txt" />
