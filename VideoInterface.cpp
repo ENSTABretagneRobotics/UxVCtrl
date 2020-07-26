@@ -95,6 +95,10 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 						//free(databuf);
 						return EXIT_FAILURE;
 					}
+
+					// See https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html, 
+					// https://stackoverflow.com/questions/47729941/mjpeg-over-http-specification...
+
 					//memset(httpbuf, 0, sizeof(httpbuf));
 					sprintf(httpbuf,
 						"HTTP/1.1 200 OK\r\n"
@@ -104,9 +108,10 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 						//"Expires: 0\r\n"
 						//"Cache-Control: no-cache, private, no-store, must-revalidate, pre-check = 0, post-check = 0, max-age = 0\r\n"
 						//"Pragma: no-cache\r\n"
-						"Content-Type: multipart/x-mixed-replace; boundary=--boundary\r\n"
+						"Content-Type: multipart/x-mixed-replace; boundary=boundary\r\n"
 						//"Media-type: image/jpeg\r\n"
-						"\r\n");
+						//"\r\n" // CRLF will be in the next encapsulation boundary "\r\n--boundary\r\n"...
+					);
 					if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
 					{
 						//free(databuf);
@@ -192,7 +197,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 			}
 			//memset(httpbuf, 0, sizeof(httpbuf));
 			sprintf(httpbuf,
-				"--boundary\r\n"
+				"\r\n--boundary\r\n"
 				"Content-Type: image/jpeg\r\n"
 				"Content-Length: %d\r\n"
 				"\r\n", mat->rows*mat->cols);
@@ -227,7 +232,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 			}
 			//memset(httpbuf, 0, sizeof(httpbuf));
 			sprintf(httpbuf,
-				"--boundary\r\n"
+				"\r\n--boundary\r\n"
 				"Content-Type: image/jpeg\r\n"
 				"Content-Length: %d\r\n"
 				"\r\n", (int)bufmatvector.size());

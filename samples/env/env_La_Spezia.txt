@@ -4,6 +4,8 @@
 44.095715
 9.865270
 0
+% MagneticDeclination (in decimal deg)
+0
 % AirPressure (pressure in bar)
 1
 % WaterVelocityOfSound (in m/s)

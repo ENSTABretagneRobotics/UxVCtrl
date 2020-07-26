@@ -1822,6 +1822,22 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			if (bOrientationCircle)
 			{
 				cvCircle(dispimgs[guiid], cvPoint(opencvguiimgwidth[guiid]-16, 32), 12, CV_RGB_CvScalar(255, 0, 0), 2, 8, 0);
+				//[cos(theta)		-cos(theta)*sin(phi)	sin(phi)*sin(theta)
+				//sin(phi)		cos(theta)*cos(phi)		-cos(phi)*sin(theta)
+				//0				sin(theta)				cos(theta)]
+				//y=x*sin(phi)+y*cos(theta)*cos(phi)-z*cos(phi)*sin(theta)
+				//z=y*sin(theta)+z*cos(theta)
+				rmatrix R_ai = RotationPhiThetaPsi(-Center(phihat), 0, 0)*RotationPhiThetaPsi(0, -Center(thetahat), 0);
+				box sky_l = box(16, 16, 1); box sky_r = box(16, -16, 1); box gnd_l = box(16, 16, -1); box gnd_r = box(16, -16, -1);
+				sky_l = ToBox(R_ai*sky_l); sky_r = ToBox(R_ai*sky_r); gnd_l = ToBox(R_ai*gnd_l); gnd_r = ToBox(R_ai*gnd_r); 
+				cvLine(dispimgs[guiid], 
+					cvPoint((int)(opencvguiimgwidth[guiid]-16-gnd_l[2].inf), (int)(32-gnd_l[3].inf)), 
+					cvPoint((int)(opencvguiimgwidth[guiid]-16-gnd_r[2].inf), (int)(32-gnd_r[3].inf)), 
+					CV_RGB_CvScalar(150, 75, 0), 1, 8, 0);
+				cvLine(dispimgs[guiid], 
+					cvPoint((int)(opencvguiimgwidth[guiid]-16-sky_l[2].inf), (int)(32-sky_l[3].inf)), 
+					cvPoint((int)(opencvguiimgwidth[guiid]-16-sky_r[2].inf), (int)(32-sky_r[3].inf)), 
+					CV_RGB_CvScalar(128, 192, 255), 1, 8, 0);
 				if (robid & SAILBOAT_CLASS_ROBID_MASK) 
 				{
 					angle = M_PI/2.0+Center(psitwindhat)+M_PI-Center(psihat);

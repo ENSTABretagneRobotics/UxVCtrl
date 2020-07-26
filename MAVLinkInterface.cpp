@@ -1696,7 +1696,7 @@ int handlemavlinkinterfacecli(SOCKET sockcli, void* pParam)
 				//"Expires: 0\r\n"
 				//"Cache-Control: no-cache, private, no-store, must-revalidate, pre-check = 0, post-check = 0, max-age = 0\r\n"
 				//"Pragma: no-cache\r\n"
-				"Content-Type: multipart/x-mixed-replace; boundary=--boundary\r\n"
+				"Content-Type: multipart/x-mixed-replace; boundary=boundary\r\n"
 				//"Media-type: image/jpeg\r\n"
 				"\r\n");
 				if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)

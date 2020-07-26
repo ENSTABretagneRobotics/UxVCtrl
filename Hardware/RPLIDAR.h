@@ -994,7 +994,7 @@ inline int GetScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistance, doub
 #ifdef ENABLE_RPLIDAR_SDK_SUPPORT
 	rplidar_response_measurement_node_hq_t nodes[1];
 	size_t nodesCount = sizeof(nodes)/sizeof(rplidar_response_measurement_node_hq_t);
-	int nodesRead = 0;
+	size_t nodesRead = 0;
 	int tcnt = pRPLIDAR->timeout;
 
 	while (nodesRead != sizeof(nodes)/sizeof(rplidar_response_measurement_node_hq_t))
@@ -1150,7 +1150,7 @@ inline int GetExpressScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistanc
 #ifdef ENABLE_RPLIDAR_SDK_SUPPORT
 	rplidar_response_measurement_node_hq_t nodes[NB_MEASUREMENTS_EXPRESS_SCAN_DATA_RESPONSE_RPLIDAR];
 	size_t nodesCount = sizeof(nodes)/sizeof(rplidar_response_measurement_node_hq_t);
-	int nodesRead = 0;
+	size_t nodesRead = 0;
 	int tcnt = pRPLIDAR->timeout;
 
 	while (nodesRead != sizeof(nodes)/sizeof(rplidar_response_measurement_node_hq_t))
@@ -1265,7 +1265,7 @@ inline int GetOtherScanDataResponseRPLIDAR(RPLIDAR* pRPLIDAR, double* pDistances
 	int j = 0;
 	rplidar_response_measurement_node_hq_t nodes[NB_MEASUREMENTS_OTHER_SCAN_DATA_RESPONSE_RPLIDAR];
 	size_t nodesCount = sizeof(nodes)/sizeof(rplidar_response_measurement_node_hq_t);
-	int nodesRead = 0;
+	size_t nodesRead = 0;
 	int tcnt = pRPLIDAR->timeout;
 
 	while (nodesRead != sizeof(nodes)/sizeof(rplidar_response_measurement_node_hq_t))

@@ -566,7 +566,7 @@ extern int simulatorperiod;
 
 // Environment parameters.
 extern double angle_env, lat_env, long_env, alt_env;
-extern double AirPressure, WaterVelocityOfSound, WaterFloorAltitude;
+extern double MagneticDeclination, AirPressure, WaterVelocityOfSound, WaterFloorAltitude;
 extern int nb_circles, nb_walls;
 extern vector<double> circles_x, circles_y, circles_r;
 extern vector<double> walls_xa, walls_ya, walls_xb, walls_yb;

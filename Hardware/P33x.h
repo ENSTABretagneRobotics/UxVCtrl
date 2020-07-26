@@ -121,10 +121,10 @@ inline int InitP33x(P33X* pP33x)
 	buf = readbuf[6];
 	stat = readbuf[7];
 
-	//PRINT_DEBUG_MESSAGE(("Device ID : %d.%d\n", devclass, group));
-	//PRINT_DEBUG_MESSAGE(("Firmware version : %d.%d\n", year, week));
-	//PRINT_DEBUG_MESSAGE(("Length of the internal receive buffer : %d\n", buf));
-	//PRINT_DEBUG_MESSAGE(("Status information : %d\n", stat));
+	//PRINT_DEBUG_MESSAGE_OSUTILS(("Device ID : %d.%d\n", devclass, group));
+	//PRINT_DEBUG_MESSAGE_OSUTILS(("Firmware version : %d.%d\n", year, week));
+	//PRINT_DEBUG_MESSAGE_OSUTILS(("Length of the internal receive buffer : %d\n", buf));
+	//PRINT_DEBUG_MESSAGE_OSUTILS(("Status information : %d\n", stat));
 
 	return EXIT_SUCCESS;
 }
@@ -202,8 +202,8 @@ inline int ReadChannelP33x(P33X* pP33x, uint8 Channel, float* pValue)
 
 	*pValue = value.v;
 
-	//PRINT_DEBUG_MESSAGE(("Channel value : %f\n", (double)*pValue));
-	//PRINT_DEBUG_MESSAGE(("Status information : %d\n", stat));
+	//PRINT_DEBUG_MESSAGE_OSUTILS(("Channel value : %f\n", (double)*pValue));
+	//PRINT_DEBUG_MESSAGE_OSUTILS(("Status information : %d\n", stat));
 
 	return EXIT_SUCCESS;
 }

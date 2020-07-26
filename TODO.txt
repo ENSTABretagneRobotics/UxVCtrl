@@ -1,8 +1,19 @@
+Use mag declination in env.txt, pour bien différencier HDT et HDG
+
+sbg+nmea protocol : check if talkerid/mnemonic (be careful to PD protocol compatibility...) is alphanumeric, but it will still not filter everything so need to comment print checksum error...
+NMEA : reject if first comma too far from first character...?
+
 RPLIDAR A3 : if wrong baudrate, GetInfoRequestRPLIDAR() with SDK causes CTD or exit()...?
+RPLIDAR new extended and dense express scan modes...?
+Faire la meme chose qu'expressscan en scanother pour l'instant dans le cas sans SDK...?
+Rajouter scanother dans sample et mieux le documenter...?
 
 3 RPLIDAR, hokuyo, seanet, params deadzone, position, orientation, voir srf02, pololu...
 
 SBG : rajouter log de heave dans les dernières colonnes du fichier et vérifier si accelerations bien récupérées...
+
+NMEAInterface config freq of each sentence, try to reduce latency, loop of nmeainterface should be < min(freq of each sentence)...
+plusieurs NMEAInterface pour avoir des trames différentes par port TCP?
 
 UE9A semble compiler et exécuter avec mingw7, tester avec servos
 Modify kinect headers for mingw7 if needed?
@@ -91,8 +102,6 @@ inithandlemavlinkinterface pas appelé dans le cas server TCP?
 voir comment harmoniser les connectinterface, initinterface, handleinterface pour que ça marche avec RS232Port et multiclisrv, voir aussi rapport avec les device...
 Manque peut-être des mSleep() dans LaunchTCPSrv/LaunchUDPSrv?
 
-Mission Planner MJPEG marche plus?->problème avec version 1.3.68, OK avec 1.3.63 et précédents mais seulement pour remotewebcam... Résolution trop importante?
-
 Creer fichier CurLbl.txt, supprimé si mission stop ou abort, ne pas supprimer si le programme quitte suite à une erreur, mis à jour de manière atomique a chaque commande label, lu à chaque démarrage, rajouter param pour l'ignorer
 
 ExitCode à utiliser plus souvent pour retourner un code d'erreur plus précis...
@@ -123,6 +132,7 @@ il y a aussi un coghat calculé dans observer...
 psi_dvl bizarre aussi...
 GPS_min_sat_signal not used?
 
+Run asynchonously a command or a script and get its ouput through iridium/4G
 Script powershell d'update ou pour commandes : appelé par schtasks pour updates ou par script 4G/Iridium UxVCtrl, doit vérifier si fichier avec nom du PC et vérifier l'ID de l'update pour pas la faire plusieurs fois
 
 If read timeout retry until sentence timeout, add var timeleft if the timeout needs to be checked in several parts...
@@ -134,8 +144,6 @@ ublox : add param UBX-CFG-RATE measurement period to set to e.g. to 200-500 ms, 
 Nouveau driver ublox : faut sans doute attendre avant de faire read()...?->problème seulement sur P70?
 
 Simulate cog and sog like UxVSim
-
-OpenCVGUI : Rajouter horizon artificielle sur bord de boussole
 
 Replace mSleep() by uSleep() in remotecam, for short delays...
 
@@ -462,6 +470,7 @@ préparer fonctions get_short/uint...(addr, endianness2endianness, see _swap_endi
 Faire fonction cv rotationphithetapsi et coordonnées homogènes pour éviter d'utiliser interval...
 
 bugs
+VideoInterface remote GUI : the GUI seems to be sent sometimes when it is black, due to the way it is cleared and drawn in OpenCVGUI...
 Kinect/CLEye support and USE_OPENCV_HIGHGUI_CPP_API?->Kinect/CLEye currently incompatible with OpenCV 4 due to that...
 waitforclifortcpsrv message () : select timed out. (socksrv=15, timeout=10000) : time inside the parenthesis is missing sometimes?
 si exception dans un thread (e.g. avec push_back()), tenter bExit = TRUE...?
@@ -857,6 +866,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Mission Planner MJPEG marche plus?->problème avec version 1.3.68, OK avec 1.3.63 et précédents mais seulement pour remotewebcam... Résolution trop importante?->OK Mission Planner 1.3.72 UxVCtrl V359
 
 #define inline static __inline__in MAVLinkProtocol.h, should be updated with what is in OSCore.h...?
 

@@ -197,8 +197,9 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				{
 					EnterCriticalSection(&StateVariablesCS);
 
-					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||ublox.bEnable_NMEA_HDG||
-						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_VDM||
+					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||
+						ublox.bEnable_NMEA_HDG||ublox.bEnable_NMEA_HDT||ublox.bEnable_NMEA_ROT||
+						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_DID||ublox.bEnable_NMEA_VDM||
 						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
 						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD)
 					{

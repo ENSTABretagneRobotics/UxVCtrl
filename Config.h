@@ -2411,6 +2411,7 @@ inline int LoadEnv(void)
 	lat_env = 0;
 	long_env = 0;
 	alt_env = 0;
+	MagneticDeclination = 0;
 	AirPressure = 1;
 	WaterVelocityOfSound = 1500;
 	WaterFloorAltitude = 0;
@@ -2439,6 +2440,8 @@ inline int LoadEnv(void)
 		if (sscanf(line, "%lf", &long_env) != 1) printf("Invalid parameter : long_env.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : alt_env.\n");
 		if (sscanf(line, "%lf", &alt_env) != 1) printf("Invalid parameter : alt_env.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : MagneticDeclination.\n");
+		if (sscanf(line, "%lf", &MagneticDeclination) != 1) printf("Invalid parameter : MagneticDeclination.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : AirPressure.\n");
 		if (sscanf(line, "%lf", &AirPressure) != 1) printf("Invalid parameter : AirPressure.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : WaterVelocityOfSound.\n");
@@ -2496,6 +2499,11 @@ inline int LoadEnv(void)
 		return EXIT_FAILURE;
 	}
 #pragma region Parameters check
+	if ((MagneticDeclination < -180)||(MagneticDeclination > 180))
+	{
+		printf("Invalid parameter : MagneticDeclination.\n");
+		MagneticDeclination = 0;
+	}
 	if ((AirPressure < 0)||(AirPressure > 1000))
 	{
 		printf("Invalid parameter : AirPressure.\n");
@@ -2568,6 +2576,8 @@ inline int SaveEnv(void)
 	if (fprintf(fileout, "%.10g\n", long_env) < 0) printf("Error writing parameter : long_env.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : alt_env.\n");
 	if (fprintf(fileout, "%.10g\n", alt_env) < 0) printf("Error writing parameter : alt_env.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : MagneticDeclination.\n");
+	if (fprintf(fileout, "%.10g\n", MagneticDeclination) < 0) printf("Error writing parameter : MagneticDeclination.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : AirPressure.\n");
 	if (fprintf(fileout, "%.10g\n", AirPressure) < 0) printf("Error writing parameter : AirPressure.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : WaterVelocityOfSound.\n");

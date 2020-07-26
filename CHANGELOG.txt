@@ -1,3 +1,10 @@
+359
+Corrections in ublox.
+Added simple attitude indicator to OpenCVGUI.
+Corrected bugs related to MJPEG server boundary.
+Removed CLEye from default Visual Studio project.
+Added MagneticDeclination parameter to env.txt.
+
 358
 Minor corrections.
 Added bShowSonarOpenCVGUIs parameters.

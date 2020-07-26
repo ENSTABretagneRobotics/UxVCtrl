@@ -285,8 +285,13 @@ inline int AnalyzeSentenceNMEA(char* buf, int buflen, char* talkerid, char* mnem
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
 		if ((toupper(buf[*psentencelen-2-nb_bytes_end]) != checksum[1])||(toupper(buf[*psentencelen-1-nb_bytes_end]) != checksum[2]))
 		{ 
-			PRINT_DEBUG_WARNING(("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]));
-			*pnbBytesToDiscard = *psentencelen;
+			PRINT_DEBUG_MESSAGE_OSUTILS(("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]));
+			//for (i = 0; i < buflen; i++) printf("%c", buf[i]);
+			//printf("\n");
+			//for (i = 0; i < buflen; i++) printf("0x%02x ", (unsigned)buf[i]);			
+			//printf("\n");
+			//*pnbBytesToDiscard = *psentencelen;
+			*pnbBytesToDiscard = 1; // Not sure more than the start character can be discarded...
 			return EXIT_FAILURE;	
 		}
 	}
@@ -488,8 +493,13 @@ inline int AnalyzeSentenceWithAddressNMEA(char* buf, int buflen, char* talkerid,
 		ComputeChecksumNMEA(buf, *psentencelen, checksum);
 		if ((buf[*psentencelen-2-nb_bytes_end] != checksum[1])||(buf[*psentencelen-1-nb_bytes_end] != checksum[2]))
 		{ 
-			PRINT_DEBUG_WARNING(("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]));
-			*pnbBytesToDiscard = *psentencelen;
+			PRINT_DEBUG_MESSAGE_OSUTILS(("Warning : NMEA checksum error (computed \"%.3s\", found \"*%c%c\"). \n", checksum, buf[*psentencelen-2-nb_bytes_end], buf[*psentencelen-1-nb_bytes_end]));
+			//for (i = 0; i < buflen; i++) printf("%c", buf[i]);
+			//printf("\n");
+			//for (i = 0; i < buflen; i++) printf("0x%02x ", (unsigned)buf[i]);			
+			//printf("\n");
+			//*pnbBytesToDiscard = *psentencelen;
+			*pnbBytesToDiscard = 1; // Not sure more than the start character can be discarded...
 			return EXIT_FAILURE;	
 		}
 	}

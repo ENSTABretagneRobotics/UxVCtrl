@@ -255,7 +255,7 @@ WMV2
 0
 % guiid_VideoInterface (-1 to disable)
 -1
-% videoid_VideoInterface
+% videoid_VideoInterface (-1 to disable)
 0
 % encodequality_VideoInterface (JPEG : in [0,100], the higher is the better quality, but uses more CPU and bandwidth)
 50
