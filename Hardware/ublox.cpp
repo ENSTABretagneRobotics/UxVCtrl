@@ -183,7 +183,10 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 
 				if (res == EXIT_SUCCESS) 
 				{
-					// Temp...
+					// Temporary estimation of magnetic declination, might be overwritten by the device...
+					nmeadata.deviation = fabs(MagneticDeclination);
+					nmeadata.dev_east = (MagneticDeclination < 0)? 'W': 'E';
+
 					if (ublox.bEnable_NMEA_GGA||ublox.bEnable_NMEA_RMC||ublox.bEnable_NMEA_GLL||ublox.bEnable_NMEA_VTG||
 						ublox.bEnable_NMEA_HDG||ublox.bEnable_NMEA_HDT||ublox.bEnable_NMEA_ROT||
 						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_DID||ublox.bEnable_NMEA_VDM||

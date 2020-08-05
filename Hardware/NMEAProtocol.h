@@ -815,23 +815,39 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 		pNMEAData->COG = pNMEAData->cog*M_PI/180.0;
 	}
 
-	// Heading data.
+	// Heading data (magnetic).
 	if (strstr(mnemonic, "HDG"))
 	{
 		offset = 1+(int)strlen(talkerid);
-		if (sscanf(sentence+offset, "HDG,%lf,%lf,%c,%lf,%c", 
-			&pNMEAData->heading, &pNMEAData->deviation, &pNMEAData->dev_east, &pNMEAData->variation, &pNMEAData->var_east) != 5)
+		if ((sscanf(sentence+offset, "HDG,%lf,%lf,%c,%lf,%c",
+			&pNMEAData->heading, &pNMEAData->deviation, &pNMEAData->dev_east, &pNMEAData->variation, &pNMEAData->var_east) != 5)&&
+			(sscanf(sentence+offset, "HDG,%lf,%lf,%c",
+			&pNMEAData->heading, &pNMEAData->deviation, &pNMEAData->dev_east) != 3)&&
+			(sscanf(sentence+offset, "HDG,%lf", &pNMEAData->heading) != 1))
 		{
 			//printf("Error parsing NMEA sentence : Invalid data. \n");
 			//return EXIT_FAILURE;
 		}
-		// Do other else if (sscanf() != x) if more/less complete sentence...
 
 		// Convert heading to angle in rad.
-		pNMEAData->Heading = pNMEAData->heading*M_PI/180.0;
+		pNMEAData->Heading = (pNMEAData->heading-((pNMEAData->dev_east == 'W')? -fabs(pNMEAData->deviation): fabs(pNMEAData->deviation)))*M_PI/180.0;
 	}
-	
-	// Heading data.
+
+	// Heading data (magnetic).
+	if (strstr(mnemonic, "HDM"))
+	{
+		offset = 1+(int)strlen(talkerid);
+		if (sscanf(sentence+offset, "HDM,%lf,M", &pNMEAData->heading) != 1)
+		{
+			//printf("Error parsing NMEA sentence : Invalid data. \n");
+			//return EXIT_FAILURE;
+		}
+
+		// Convert heading to angle in rad.
+		pNMEAData->Heading = (pNMEAData->heading-((pNMEAData->dev_east == 'W')? -fabs(pNMEAData->deviation): fabs(pNMEAData->deviation)))*M_PI/180.0;
+	}
+
+	// Heading data (true).
 	if (strstr(mnemonic, "HDT"))
 	{
 		offset = 1+(int)strlen(talkerid);

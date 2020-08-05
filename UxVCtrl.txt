@@ -82,22 +82,22 @@ WMV2
 0
 % opencvguiimgwidth[0]
 320
-% opencvguiimgwidth[1]
-320
-% opencvguiimgwidth[2]
-320
-% opencvguiimgwidth[3]
-320
-% opencvguiimgwidth[4]
-320
 % opencvguiimgheight[0]
 240
+% opencvguiimgwidth[1]
+320
 % opencvguiimgheight[1]
 240
+% opencvguiimgwidth[2]
+320
 % opencvguiimgheight[2]
 240
+% opencvguiimgwidth[3]
+320
 % opencvguiimgheight[3]
 240
+% opencvguiimgwidth[4]
+320
 % opencvguiimgheight[4]
 240
 % opencvguiperiod (in ms)
@@ -173,6 +173,12 @@ WMV2
 0
 % bEnable_NMEAInterface_GPVTG
 0
+% bEnable_NMEAInterface_GPHDG
+0
+% bEnable_NMEAInterface_GPHDM
+0
+% bEnable_NMEAInterface_GPHDT
+0
 % bEnable_NMEAInterface_HCHDG
 1
 % bEnable_NMEAInterface_HCHDM
@@ -197,7 +203,7 @@ WMV2
 1
 % bEnable_NMEAInterface_SDDBT
 0
-% NMEAInterfaceSendPeriod (in ms, not implemented)
+% NMEAInterfaceSendPeriod (in ms, not fully implemented)
 500
 % bDisableNMEAInterfaceIN
 0

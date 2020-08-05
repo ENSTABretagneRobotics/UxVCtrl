@@ -14,10 +14,12 @@ COM9
 1
 % bStartScanModeAtStartup
 1
-% ScanMode (0 : SCAN, 1 : EXPRESS_SCAN, 2 : FORCE_SCAN)
+% ScanMode (0 : SCAN, 1 : EXPRESS_SCAN, 2 : FORCE_SCAN, or if using GetOtherScanDataResponseRPLIDAR(), the available values and modes might be different, see https://github.com/ENSTABretagneRobotics/Hardware-MATLAB/issues/3#issuecomment-661349278)
 1
 % motordelay (in ms)
 2000
+% motorPWM (in [0..1023], 660 : default)
+660
 % maxhist (0 : try to automatically remove old data, around 180 : advised for SCAN mode, around 360 : advised for EXPRESS_SCAN mode, require associated thread)
 0
 % alpha_max_err (in rad)

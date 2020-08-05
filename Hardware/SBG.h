@@ -1251,6 +1251,8 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 	} 	  
 #endif // DISABLE_SBG_TCP
 
+	mSleep(500); // Needed sometimes to allow non-blocking sockets to be ready...
+
 	if (sbgEComInit(&pSBG->comHandle, &pSBG->sbgInterface) != SBG_NO_ERROR)
 	{
 		printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");

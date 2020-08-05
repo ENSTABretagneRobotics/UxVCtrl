@@ -144,7 +144,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			{
 				nbBytesToRequest = 0;
 
-				mSleep(500);
+				mSleep(NMEAInterfaceSendPeriod);
 
 				return EXIT_SUCCESS;
 			}
@@ -220,10 +220,6 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		{
 			bDeleteRoute = TRUE;
 		}
-
-
-
-
 /*
 
 
@@ -269,9 +265,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		}
 
 
-
 */
-
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	
@@ -438,11 +432,50 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			return EXIT_FAILURE;
 		}
 	}
+	if (bEnable_NMEAInterface_GPHDG)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPHDG,%.2f,%.2f,%c,0.0,W", headinghat+MagneticDeclination, fabs(MagneticDeclination), (MagneticDeclination < 0)? 'W': 'E');
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_GPHDM)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPHDM,%.2f,M", headinghat+MagneticDeclination);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
+	if (bEnable_NMEAInterface_GPHDT)
+	{
+		memset(sendbuf, 0, sizeof(sendbuf));
+		memset(tmpbuf, 0, sizeof(tmpbuf));
+		sprintf(tmpbuf, "$GPHDT,%.2f,T", headinghat);
+		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
+		sendbuflen = strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
 	if (bEnable_NMEAInterface_HCHDG)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$HCHDG,%.2f,0.0,E,0.0,W", headinghat);
+		sprintf(tmpbuf, "$HCHDG,%.2f,%.2f,%c,0.0,W", headinghat+MagneticDeclination, fabs(MagneticDeclination), (MagneticDeclination < 0)? 'W': 'E');
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
@@ -455,7 +488,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	{
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
-		sprintf(tmpbuf, "$HCHDM,%.2f,M", headinghat);
+		sprintf(tmpbuf, "$HCHDM,%.2f,M", headinghat+MagneticDeclination);
 		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
 		sendbuflen = strlen((char*)sendbuf);
@@ -693,7 +726,8 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 		{
 			if (connectnmeainterface(&NMEAInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 			{
-				mSleep(50);
+				mSleep(NMEAInterfacePeriod);
+				inithandlenmeainterface(&NMEAInterfacePseudoRS232Port);
 				for (;;)
 				{
 					if (handlenmeainterface(&NMEAInterfacePseudoRS232Port) != EXIT_SUCCESS)
@@ -704,11 +738,11 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 					if (bExit) break;
 				}
 				disconnectnmeainterface();
-				mSleep(50);
+				mSleep(NMEAInterfacePeriod);
 			}
 			else
 			{
-				mSleep(1000);
+				mSleep(NMEAInterfacePeriod);
 			}
 			if (bExit) break;
 		}
@@ -722,7 +756,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//mSleep(50);
+			//mSleep(NMEAInterfacePeriod);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -733,7 +767,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 			{
 				if (connectnmeainterface(&NMEAInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					mSleep(50);
+					mSleep(NMEAInterfacePeriod);
 					bConnected = TRUE; 
 
 					inithandlenmeainterface(&NMEAInterfacePseudoRS232Port);
@@ -741,7 +775,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 				else 
 				{
 					bConnected = FALSE;
-					mSleep(1000);
+					mSleep(NMEAInterfacePeriod);
 				}
 			}
 			else
@@ -758,7 +792,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 					printf("Connection to a NMEAInterface lost.\n");
 					bConnected = FALSE;
 					disconnectnmeainterface(&NMEAInterfacePseudoRS232Port);
-					mSleep(50);
+					mSleep(NMEAInterfacePeriod);
 				}
 			}
 

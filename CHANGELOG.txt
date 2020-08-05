@@ -1,3 +1,8 @@
+360
+Added bEnable_NMEAInterface_GPHDG/GPHDM/GPHDT parameters.
+Updated opencvguiimgwidth/height[guiid] parameters order.
+Updated RPLIDAR.h.
+
 359
 Corrections in ublox.
 Added simple attitude indicator to OpenCVGUI.
