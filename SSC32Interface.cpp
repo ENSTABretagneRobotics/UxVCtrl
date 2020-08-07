@@ -141,7 +141,7 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 
-	mSleep(50);
+	uSleep(1000*50);
 
 	return EXIT_SUCCESS;
 }
@@ -234,32 +234,6 @@ THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam)
 	}
 	else
 	{
-/*
-		for (;;)
-		{
-			if (connectssc32interface(&SSC32InterfacePseudoRS232Port) == EXIT_SUCCESS) 
-			{
-				mSleep(50);
-				for (;;)
-				{
-					if (handlessc32interface(&SSC32InterfacePseudoRS232Port) != EXIT_SUCCESS)
-					{
-						printf("Connection to a SSC32Interface lost.\n");
-						break;
-					}
-					if (bExit) break;
-				}
-				disconnectssc32interface();
-				mSleep(50);
-			}
-			else
-			{
-				mSleep(1000);
-			}
-			if (bExit) break;
-		}
-*/
-
 		BOOL bConnected = FALSE;
 
 		//t = 0;
@@ -268,7 +242,7 @@ THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//mSleep(50);
+			//uSleep(1000*50);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -279,7 +253,7 @@ THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam)
 			{
 				if (connectssc32interface(&SSC32InterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					mSleep(50);
+					uSleep(1000*50);
 					bConnected = TRUE; 
 
 					inithandlessc32interface(&SSC32InterfacePseudoRS232Port);
@@ -304,7 +278,7 @@ THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam)
 					printf("Connection to a SSC32Interface lost.\n");
 					bConnected = FALSE;
 					disconnectssc32interface(&SSC32InterfacePseudoRS232Port);
-					mSleep(50);
+					uSleep(1000*50);
 				}
 			}
 

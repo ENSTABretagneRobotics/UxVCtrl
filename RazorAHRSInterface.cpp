@@ -102,7 +102,7 @@ int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 		}
 	}
 
-	mSleep(50);
+	uSleep(1000*50);
 
 	return EXIT_SUCCESS;
 }
@@ -195,32 +195,6 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 	}
 	else
 	{
-/*
-		for (;;)
-		{
-			if (connectrazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port) == EXIT_SUCCESS) 
-			{
-				mSleep(50);
-				for (;;)
-				{
-					if (handlerazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port) != EXIT_SUCCESS)
-					{
-						printf("Connection to a RazorAHRSInterface lost.\n");
-						break;
-					}
-					if (bExit) break;
-				}
-				disconnectrazorahrsinterface();
-				mSleep(50);
-			}
-			else
-			{
-				mSleep(1000);
-			}
-			if (bExit) break;
-		}
-*/
-
 		BOOL bConnected = FALSE;
 
 		//t = 0;
@@ -229,7 +203,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//mSleep(50);
+			//uSleep(1000*50);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -240,7 +214,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 			{
 				if (connectrazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					mSleep(50);
+					uSleep(1000*50);
 					bConnected = TRUE; 
 
 					inithandlerazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port);
@@ -265,7 +239,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 					printf("Connection to a RazorAHRSInterface lost.\n");
 					bConnected = FALSE;
 					disconnectrazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port);
-					mSleep(50);
+					uSleep(1000*50);
 				}
 			}
 

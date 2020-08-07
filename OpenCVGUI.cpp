@@ -141,7 +141,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 		if (windowname[0] != 0)
 		{
 #ifdef ENABLE_SHARED_WAITKEY_OPENCVGUI
-			mSleep(opencvguiperiod);
+			uSleep(1000*opencvguiperiod);
 			EnterCriticalSection(&OpenCVGUICS);
 			if ((opencvguikeytargetid < 0)||(opencvguikeytargetid >= nbopencvgui)||(opencvguikeytargetid == guiid)) c = opencvguikey;
 			LeaveCriticalSection(&OpenCVGUICS);
@@ -159,7 +159,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 #endif // ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND
 #endif // ENABLE_SHARED_WAITKEY_OPENCVGUI
 		}
-		else mSleep(opencvguiperiod);
+		else uSleep(1000*opencvguiperiod);
 
 		if (bExit) break;
 #pragma region IMAGES
@@ -1725,7 +1725,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				}
 				else if (GetTimeElapsedChronoQuick(&chrono_epu) < 10.0)
 				{
-					sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", Energy_electronics, Energy_actuators);
+					sprintf(szText, "EPU1:%.1fWh, EPU2:%.1fWh", EPU1, EPU2);
 				}
 				else
 				{

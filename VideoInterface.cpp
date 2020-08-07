@@ -286,7 +286,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 			}
 			bufmatvector.clear();
 #endif // !USE_OPENCV_HIGHGUI_CPP_API
-			mSleep(captureperiod_VideoInterface);
+			uSleep(1000*captureperiod_VideoInterface);
 			break;
 		}
 

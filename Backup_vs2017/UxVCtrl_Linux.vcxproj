@@ -620,7 +620,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../Extensions/Misc;../Extensions/Net;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;/usr/local/include/rplidar_sdk/sdk/sdk/include;/usr/local/include/rplidar_sdk/sdk/sdk/src;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
       <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
@@ -639,7 +639,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../Extensions/Misc;../Extensions/Net;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;/usr/local/include/rplidar_sdk/sdk/sdk/include;/usr/local/include/rplidar_sdk/sdk/sdk/src;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
       <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>
@@ -656,7 +656,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../Extensions/Misc;../Extensions/Net;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;/usr/local/include/rplidar_sdk/sdk/sdk/include;/usr/local/include/rplidar_sdk/sdk/sdk/src;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
       <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
@@ -675,7 +675,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <AdditionalIncludeDirectories>../UxVCtrl;../OSUtils;../Extensions/Devices/LabjackUtils/liblabjackusb;../Extensions/Devices/LabjackUtils/U3Utils;../Extensions/Devices/LabjackUtils/UE9Utils;../Extensions/Img;../Extensions/Misc;../Extensions/Net;../interval;../matrix_lib;Hardware;.;..;/usr/local/include/sbgECom/src;/usr/local/include/sbgECom/common;/usr/local/include/rplidar_sdk/sdk/sdk/include;/usr/local/include/rplidar_sdk/sdk/sdk/src;$(StlIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;OPENCV2413;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_DEBUG_DISPLAY;ENABLE_OPENCV_HIGHGUI_THREADS_WORKAROUND;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_COMPUTERI2CBUS_SUPPORT;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <CAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;%(CAdditionalWarning)</CAdditionalWarning>
       <CppAdditionalWarning>no-unknown-pragmas;no-unused-parameter;extra;no-psabi;%(CppAdditionalWarning)</CppAdditionalWarning>
     </ClCompile>

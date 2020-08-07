@@ -525,6 +525,18 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 				GetTimeElapsedChrono(&chrono_power, &t_ontrak);
 
 				StartChrono(&chrono_power_disp);
+				
+				
+				//EnterCriticalSection(&StateVariablesCS);
+
+				//if (ontrak.vbat1analoginputchan != -1) vbat1_filtered = ontrak.analoginputthreshold[ontrak.vbat1analoginputchan]; else vbat1_filtered = 0;
+				//if (ontrak.vbat1analoginputchan != -1) vbat1_threshold = ontrak.analoginputthreshold[ontrak.vbat1analoginputchan]; else vbat1_threshold = 0;
+				//if (ontrak.ibat1analoginputchan != -1) ibat1_filtered = ontrak.analoginputthreshold[ontrak.ibat1analoginputchan]; else ibat1_filtered = 0;
+				//if (ontrak.vbat2analoginputchan != -1) vbat2_filtered = ontrak.analoginputthreshold[ontrak.vbat2analoginputchan]; else vbat2_filtered = 0;
+				//if (ontrak.vbat2analoginputchan != -1) vbat2_threshold = ontrak.analoginputthreshold[ontrak.vbat2analoginputchan]; else vbat2_threshold = 0;
+				//if (ontrak.ibat2analoginputchan != -1) ibat2_filtered = ontrak.analoginputthreshold[ontrak.ibat2analoginputchan]; else ibat2_filtered = 0;
+
+				//LeaveCriticalSection(&StateVariablesCS);
 
 
 				if (ontrak.pfSaveFile != NULL)
@@ -632,6 +644,16 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 			}
 
 
+			EnterCriticalSection(&StateVariablesCS);
+			vbat1 = ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw);
+			vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
+			ibat1 = ANALOG_INPUT2CURRENT_ONTRAK(current_consumption_raw);
+			ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
+			vbat2 = vbat1;
+			vbat2_filtered = vbat1_filtered;
+			ibat2 = ANALOG_INPUT2CURRENT_ONTRAK(current_generation_raw);
+			ibat2_filtered = bat_filter_coef*ibat2_filtered+(1.0-bat_filter_coef)*ibat2;
+			LeaveCriticalSection(&StateVariablesCS);
 		}
 
 		//printf("OntrakThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));

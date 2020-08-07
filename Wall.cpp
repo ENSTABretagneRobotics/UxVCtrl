@@ -68,7 +68,7 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		uSleep(1000*100);
 
 		if (bExit) break;
 		if ((!bWallDetection)&&(!bWallTrackingControl)&&(!bWallAvoidanceControl)) continue;

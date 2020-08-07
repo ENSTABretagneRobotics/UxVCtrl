@@ -820,7 +820,7 @@ inline IplImage* GetRawImgPtrVideo(VIDEO* pVideo)
 #endif // USE_FFMPEG_VIDEO
 		break;
 	default:
-		mSleep(pVideo->captureperiod);
+		uSleep(1000*pVideo->captureperiod);
 		printf("Video : Invalid device type.\n");
 		return NULL;
 	}

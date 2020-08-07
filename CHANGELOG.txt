@@ -1,3 +1,8 @@
+361
+Other minor updates.
+Renamed Energy_electronics, Energy_actuators to EPU1, EPU2.
+Updated Simulator.cpp.
+
 360
 Added bEnable_NMEAInterface_GPHDG/GPHDM/GPHDT parameters.
 Updated opencvguiimgwidth/height[guiid] parameters order.

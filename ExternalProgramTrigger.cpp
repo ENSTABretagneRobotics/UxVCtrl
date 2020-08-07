@@ -38,7 +38,7 @@ THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(period_externalprogramtrigger[id] > 0? period_externalprogramtrigger[id]: 100);
+		uSleep(1000*(period_externalprogramtrigger[id] > 0? period_externalprogramtrigger[id]: 100));
 
 		if (bExit) break;
 		if (!bExternalProgramTrigger[id]) continue;
@@ -61,7 +61,7 @@ THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 				for (i = 0; i < nbretries_externalprogramtrigger[id]; i++)
 				{
 					if (remove(ExternalProgramTriggerFileName[id]) == 0) break;
-					mSleep(retrydelay_externalprogramtrigger[id]);
+					uSleep(1000*retrydelay_externalprogramtrigger[id]);
 				}
 				if (bEcho) printf("execute %d\n", procid_externalprogramtrigger[id]);
 				ExecuteProcedure(procid_externalprogramtrigger[id]);

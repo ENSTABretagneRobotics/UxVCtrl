@@ -58,7 +58,7 @@ THREAD_PROC_RETURN_VALUE PingerThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(captureperiod);
+		uSleep(1000*captureperiod);
 
 		if (bExit) break;
 		if (!bPingerTrackingControl) continue;

@@ -122,7 +122,7 @@ THREAD_PROC_RETURN_VALUE ExternalVisualLocalizationThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(captureperiod);
+		uSleep(1000*captureperiod);
 
 		if (bExit) break;
 		if (!bExternalVisualLocalization) continue;

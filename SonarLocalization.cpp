@@ -28,7 +28,7 @@ THREAD_PROC_RETURN_VALUE SonarLocalizationThread(void* pParam)
 		StopChronoQuick(&chrono_period);
 		StartChrono(&chrono_period);
 
-		mSleep(50);
+		uSleep(1000*50);
 
 		if (bStaticSonarLocalization)
 		{

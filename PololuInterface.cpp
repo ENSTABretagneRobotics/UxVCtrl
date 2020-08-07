@@ -142,7 +142,7 @@ int handlepololuinterface(RS232PORT* pPololuInterfacePseudoRS232Port)
 		}
 	}
 
-	mSleep(50);
+	uSleep(1000*50);
 
 	return EXIT_SUCCESS;
 }
@@ -235,32 +235,6 @@ THREAD_PROC_RETURN_VALUE PololuInterfaceThread(void* pParam)
 	}
 	else
 	{
-/*
-		for (;;)
-		{
-			if (connectpololuinterface(&PololuInterfacePseudoRS232Port) == EXIT_SUCCESS) 
-			{
-				mSleep(50);
-				for (;;)
-				{
-					if (handlepololuinterface(&PololuInterfacePseudoRS232Port) != EXIT_SUCCESS)
-					{
-						printf("Connection to a PololuInterface lost.\n");
-						break;
-					}
-					if (bExit) break;
-				}
-				disconnectpololuinterface();
-				mSleep(50);
-			}
-			else
-			{
-				mSleep(1000);
-			}
-			if (bExit) break;
-		}
-*/
-
 		BOOL bConnected = FALSE;
 
 		//t = 0;
@@ -269,7 +243,7 @@ THREAD_PROC_RETURN_VALUE PololuInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//mSleep(50);
+			//uSleep(1000*50);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -280,7 +254,7 @@ THREAD_PROC_RETURN_VALUE PololuInterfaceThread(void* pParam)
 			{
 				if (connectpololuinterface(&PololuInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					mSleep(50);
+					uSleep(1000*50);
 					bConnected = TRUE; 
 
 					inithandlepololuinterface(&PololuInterfacePseudoRS232Port);
@@ -305,7 +279,7 @@ THREAD_PROC_RETURN_VALUE PololuInterfaceThread(void* pParam)
 					printf("Connection to a PololuInterface lost.\n");
 					bConnected = FALSE;
 					disconnectpololuinterface(&PololuInterfacePseudoRS232Port);
-					mSleep(50);
+					uSleep(1000*50);
 				}
 			}
 

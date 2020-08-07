@@ -3312,7 +3312,7 @@ inline int Commands(char* line)
 		printf("VFBAT1:%.1fV, VFBAT2:%.1fV\n", vbat1_filtered, vbat2_filtered);
 		printf("IBAT1:%.1fA, IBAT2:%.1fA\n", ibat1, ibat2);
 		printf("IFBAT1:%.1fA, IFBAT2:%.1fA\n", ibat1_filtered, ibat2_filtered);
-		printf("EPU1:%.1fWh, EPU2:%.1fWh\n", Energy_electronics, Energy_actuators);
+		printf("EPU1:%.1fWh, EPU2:%.1fWh\n", EPU1, EPU2);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (strncmp(line, "showswitchinfo", strlen("showswitchinfo")) == 0)

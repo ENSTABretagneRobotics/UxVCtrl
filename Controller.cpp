@@ -260,7 +260,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(controllerperiod);
+		uSleep(1000*controllerperiod);
 		t0 = t;
 		GetTimeElapsedChrono(&chrono, &t);
 		dt = t-t0;

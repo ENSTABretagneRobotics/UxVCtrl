@@ -144,7 +144,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			{
 				nbBytesToRequest = 0;
 
-				mSleep(NMEAInterfaceSendPeriod);
+				uSleep(1000*NMEAInterfaceSendPeriod);
 
 				return EXIT_SUCCESS;
 			}
@@ -473,6 +473,10 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	}
 	if (bEnable_NMEAInterface_HCHDG)
 	{
+
+		// To simulate VAIMOS (if ((robid == SAILBOAT_SIMULATOR_ROBID)&&(???))), it should be 
+		// fmod_360_pos_rad2deg(-angle_env-sailangle+M_PI/2.0) instead of headinghat...
+
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$HCHDG,%.2f,%.2f,%c,0.0,W", headinghat+MagneticDeclination, fabs(MagneticDeclination), (MagneticDeclination < 0)? 'W': 'E');
@@ -628,7 +632,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		}
 	}
 	
-	mSleep(NMEAInterfacePeriod);
+	uSleep(1000*NMEAInterfacePeriod);
 
 	return EXIT_SUCCESS;
 }
@@ -689,6 +693,71 @@ int handlenmeainterfacecli(SOCKET sockcli, void* pParam)
 	return EXIT_SUCCESS;
 }
 
+/*
+vector< deque<unsigned char> > dataoutqueue;
+vector< deque<unsigned char> > datainqueue;
+
+THREAD_PROC_RETURN_VALUE NMEAInterfaceDataThread(void* pParam)
+{
+
+
+	for (;;)
+	{
+		if (GetTimeElapsedChronoQuick() > period0)
+		{
+			EnterCriticalSection();
+			for (i in clients)
+			{
+				dataoutqueue[i].push_back(sentence0);
+				if (dataoutqueue[i].length > maxdataoutqueue) dataoutqueue[i].popfront();
+			}
+			LeaverCriticalSection();
+		}
+		if (GetTimeElapsedChronoQuick() > period1)
+		{
+			EnterCriticalSection();
+			for (i in clients)
+			{
+				dataoutqueue[i].push_back(sentence);
+				if (dataoutqueue[i].length > maxdataoutqueue) dataoutqueue[i].popfront();
+			}
+			LeaveCriticalSection();
+		}
+		mSleep(50);
+	}
+}
+
+callback handleclient(param)
+{
+	i = param;
+	for (;;)
+	{
+		EnterCriticalSection();
+		while (dataoutqueue[i].length > 0)
+		{
+			sentence = dataoutqueue[i].popfront();
+			LeaveCriticalSection();
+			send(sentence);
+			EnterCriticalSection();
+		}
+		LeaveCriticalSection();
+	}
+}
+
+callback handlenmeainterfacecli()
+{
+	EnterCriticalSection();
+	nb_clients++;
+	LeaverCriticalSection();
+
+	handleclient(nb_clients-1);
+
+	EnterCriticalSection();
+	nb_clients--;
+	LeaverCriticalSection();
+}
+*/
+
 THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 {
 	//CHRONO chrono;
@@ -726,7 +795,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 		{
 			if (connectnmeainterface(&NMEAInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 			{
-				mSleep(NMEAInterfacePeriod);
+				uSleep(1000*NMEAInterfacePeriod);
 				inithandlenmeainterface(&NMEAInterfacePseudoRS232Port);
 				for (;;)
 				{
@@ -738,11 +807,11 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 					if (bExit) break;
 				}
 				disconnectnmeainterface();
-				mSleep(NMEAInterfacePeriod);
+				uSleep(1000*NMEAInterfacePeriod);
 			}
 			else
 			{
-				mSleep(NMEAInterfacePeriod);
+				uSleep(1000*NMEAInterfacePeriod);
 			}
 			if (bExit) break;
 		}
@@ -756,7 +825,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//mSleep(NMEAInterfacePeriod);
+			//uSleep(1000*NMEAInterfacePeriod);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -767,7 +836,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 			{
 				if (connectnmeainterface(&NMEAInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					mSleep(NMEAInterfacePeriod);
+					uSleep(1000*NMEAInterfacePeriod);
 					bConnected = TRUE; 
 
 					inithandlenmeainterface(&NMEAInterfacePseudoRS232Port);
@@ -775,7 +844,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 				else 
 				{
 					bConnected = FALSE;
-					mSleep(NMEAInterfacePeriod);
+					uSleep(1000*NMEAInterfacePeriod);
 				}
 			}
 			else
@@ -792,7 +861,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 					printf("Connection to a NMEAInterface lost.\n");
 					bConnected = FALSE;
 					disconnectnmeainterface(&NMEAInterfacePseudoRS232Port);
-					mSleep(NMEAInterfacePeriod);
+					uSleep(1000*NMEAInterfacePeriod);
 				}
 			}
 

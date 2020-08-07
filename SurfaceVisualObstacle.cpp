@@ -439,7 +439,7 @@ THREAD_PROC_RETURN_VALUE SurfaceVisualObstacleThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(captureperiod);
+		uSleep(1000*captureperiod);
 
 		if (bExit) break;
 		if ((!bSurfaceVisualObstacleDetection)&&(!bSurfaceVisualObstacleAvoidanceControl)) 

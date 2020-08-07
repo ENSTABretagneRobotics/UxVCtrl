@@ -339,12 +339,12 @@ inline int LoadConfig(void)
 	observerperiod = 25;
 #pragma endregion
 #pragma region Wind, current and waves
-	vtwind_med = 0.01;
+	vtwind_med = 6;
 	vtwind_var = 0.01;
 	psitwind_med = 0.0*M_PI/2.0;
 	psitwind_var = 1.0*M_PI/8.0;
 	wind_filter_coef = 0.999;
-	vc_med = 0.01;
+	vc_med = 0;
 	vc_var = 0.01;
 	psic_med = 0.0*M_PI/2.0;
 	psic_var = 1.0*M_PI/8.0;

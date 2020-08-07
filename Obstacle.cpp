@@ -291,7 +291,7 @@ THREAD_PROC_RETURN_VALUE WaitAreaThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(period_waitarea[id] > 0? period_waitarea[id]: 100);
+		uSleep(1000*(period_waitarea[id] > 0? period_waitarea[id]: 100));
 
 		if (bExit) break;
 		if (!bWaitArea[id]) continue;
@@ -316,7 +316,7 @@ THREAD_PROC_RETURN_VALUE WaitAreaThread(void* pParam)
 				for (i = 0; i < nbretries_waitarea[id]; i++)
 				{
 					if (remove(WaitAreaFileName[id]) == 0) break;
-					mSleep(retrydelay_waitarea[id]);
+					uSleep(1000*retrydelay_waitarea[id]);
 				}
 				if (bEcho) printf("execute %d\n", procid_waitarea[id]);
 				ExecuteProcedure(procid_waitarea[id]);

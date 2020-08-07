@@ -16,8 +16,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 	double dt = 0, t = 0, t0 = 0, t_epoch = 0;
 	struct timeval tv;
 
-	double d1 = 0, d2 = 0;
-
+	// Wind, current and waves.
+	double psitwind_sim = 0, vtwind_sim = 0;
 	double vc = 0, psic = 0, hw = 0;
 	
 	// Motorboat simulator...
@@ -25,9 +25,9 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	// Sailboat simulator...
 	double deltas = 0, phidot = 0;
-	double V = 6;
 
 	// Simulated sonar...
+	double d1 = 0, d2 = 0;
 	double t_last_stepangles = 0;
 	// Temporary...
 	double stepangles = (simulatorperiod/1000.0)*omegas;// 0.6;
@@ -53,7 +53,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
 		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
 		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
-		"Energy_electronics;Energy_actuators;\n"
+		"EPU1;EPU2;\n"
 	);
 	fflush(logsimufile);
 
@@ -71,7 +71,7 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(simulatorperiod);
+		uSleep(1000*simulatorperiod);
 		t0 = t;
 		GetTimeElapsedChrono(&chrono, &t);
 		dt = t-t0;
@@ -84,15 +84,17 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 		EnterCriticalSection(&StateVariablesCS);
 
+		// Simulated environnement evolution (wind, current and waves).
+		vtwind_sim = vtwind_med+vtwind_var*(2.0*rand()/(double)RAND_MAX-1.0);
+		psitwind_sim = psitwind_med+psitwind_var*(2.0*rand()/(double)RAND_MAX-1.0);
+		vc = vc_med+vc_var*(2.0*rand()/(double)RAND_MAX-1.0);
+		psic = psic_med+psic_var*(2.0*rand()/(double)RAND_MAX-1.0);
+		hw = hw_var*(2.0*rand()/(double)RAND_MAX-1.0);
+
 		if (robid == SUBMARINE_SIMULATOR_ROBID)
 		{
 			// z_sim should change when at the surface because of waves, but not underwater...
 			// z_mes should change underwater because of waves, but not at the surface...
-
-			// Simulated environnement evolution (current and waves).
-			vc = vc_med+vc_var*(2.0*rand()/(double)RAND_MAX-1.0);
-			psic = psic_med+psic_var*(2.0*rand()/(double)RAND_MAX-1.0);
-			hw = hw_var*(2.0*rand()/(double)RAND_MAX-1.0);
 
 			// Simulated state evolution.
 			double xdot = vrx_sim*cos(psi_sim)+vc*cos(psic);
@@ -130,6 +132,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
 				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+				sog = sqrt(sqr(xdot)+sqr(ydot));
+				cog_gps = atan2(ydot, xdot)+interval(-M_PI, M_PI);
 			}
 			else
 			{
@@ -182,6 +186,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
 				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+				sog = sqrt(sqr(xdot)+sqr(ydot));
+				cog_gps = atan2(ydot, xdot)+interval(-M_PI, M_PI);
 			}
 			else
 			{
@@ -209,16 +215,20 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			double deltar = alphaomegaz*uw;
 			double deltasmaxsimu = deltasminreal+u*(deltasmaxreal-deltasminreal);
 
-			double gamma = cos(theta_sim-psi_sim)+cos(deltasmaxsimu);
-			if (gamma<0) deltas = M_PI-theta_sim+psi_sim; // Voile en drapeau.
-			else if (sin(theta_sim-psi_sim)>0) deltas = deltasmaxsimu; else deltas = -deltasmaxsimu;
+			double gamma = cos(psi_sim-psitwind_sim)+cos(deltasmaxsimu);
+			if (gamma<0) deltas = M_PI-psi_sim+psitwind_sim; // Voile en drapeau.
+			else if (sin(psi_sim-psitwind_sim)>0) deltas = deltasmaxsimu; else deltas = -deltasmaxsimu;
 			double fg = alphaz*vrx_sim*sin(deltar);
-			double fv = alphavrx*V*sin(theta_sim+deltas-psi_sim);
-			x_sim += (vrx_sim*cos(theta_sim)+beta*V*cos(psi_sim)+vc*cos(psic))*dt;
-			y_sim += (vrx_sim*sin(theta_sim)+beta*V*sin(psi_sim)+vc*sin(psic))*dt;
-			theta_sim += omegaz_sim*dt;
+			double fv = alphavrx*vtwind_sim*sin(psi_sim+deltas-psitwind_sim);
+
+			double xdot = vrx_sim*cos(psi_sim)+beta*vtwind_sim*cos(psitwind_sim)+vc*cos(psic);
+			double ydot = vrx_sim*sin(psi_sim)+beta*vtwind_sim*sin(psitwind_sim)+vc*sin(psic);
+			double vrxdot = (1/m)*(sin(deltas)*fv-sin(deltar)*fg-alphafvrx*vrx_sim*vrx_sim);
+			x_sim = x_sim+dt*xdot;
+			y_sim = y_sim+dt*ydot;
+			vrx_sim = vrx_sim+dt*vrxdot;
+			psi_sim += omegaz_sim*dt;
 			omegaz_sim += (1/Jz)*((l-rs*cos(deltas))*fv-rr*cos(deltar)*fg-alphafomegaz*omegaz_sim+alphaw*hw)*dt;
-			vrx_sim += (1/m)*(sin(deltas)*fv-sin(deltar)*fg-alphafvrx*vrx_sim*vrx_sim)*dt;
 			phidot += (-alphaomegax*phidot/Jx+fv*h*cos(deltas)*cos(phi_sim)/Jx-m*9.81*leq*sin(phi_sim)/Jx)*dt;
 			phi_sim += phidot*dt;
 
@@ -238,6 +248,11 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
 				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+				sog = sqrt(sqr(xdot)+sqr(ydot));
+				cog_gps = atan2(ydot, xdot)+interval(-M_PI, M_PI);
+				sailangle = fmod_360_pos_rad2deg(-angle_env-(psi_sim+deltas)+M_PI/2.0); // Specific to VAIMOS...
+				psitwind = psitwind_sim+sensor_err(0, psitwind_var);
+				vtwind = vtwind_sim+sensor_err(0, psitwind_var);
 			}
 			else
 			{
@@ -269,6 +284,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
 				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+				sog = sqrt(sqr(xdot)+sqr(ydot));
+				cog_gps = atan2(ydot, xdot)+interval(-M_PI, M_PI);
 			}
 			else
 			{
@@ -303,6 +320,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
 				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+				sog = sqrt(sqr(xdot)+sqr(ydot));
+				cog_gps = atan2(ydot, xdot)+interval(-M_PI, M_PI);
 			}
 			else
 			{
@@ -403,6 +422,8 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 				double lat_gps_mes = 0, lon_gps_mes = 0, alt_gps_mes = 0;
 				EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_gps_mes, y_gps_mes, z_gps_mes, &lat_gps_mes, &lon_gps_mes, &alt_gps_mes);
 				ComputeGNSSPosition(lat_gps_mes, lon_gps_mes, alt_gps_mes, GNSSqualitySimulator, 0, 0);
+				sog = sqrt(sqr(xdot)+sqr(ydot));
+				cog_gps = atan2(ydot, xdot)+interval(-M_PI, M_PI);
 			}
 			else
 			{

@@ -1627,7 +1627,7 @@ REQ_DATA_STREAM...
 		fflush(tlogfile);
 	}
 
-	mSleep(50);
+	uSleep(1000*50);
 
 	return EXIT_SUCCESS;
 }
@@ -1772,32 +1772,6 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 	}
 	else
 	{
-/*
-		for (;;)
-		{
-			if (connectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
-			{
-				mSleep(50);
-				for (;;)
-				{
-					if (handlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port) != EXIT_SUCCESS)
-					{
-						printf("Connection to a MAVLinkInterface lost.\n");
-						break;
-					}
-					if (bExit) break;
-				}
-				disconnectmavlinkinterface();
-				mSleep(50);
-			}
-			else
-			{
-				mSleep(1000);
-			}
-			if (bExit) break;
-		}
-*/
-
 		BOOL bConnected = FALSE;
 
 		//t = 0;
@@ -1806,7 +1780,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//mSleep(50);
+			//uSleep(1000*50);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -1817,7 +1791,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 			{
 				if (connectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					mSleep(50);
+					uSleep(1000*50);
 					bConnected = TRUE; 
 
 					inithandlemavlinkinterface(&MAVLinkInterfacePseudoRS232Port);
@@ -1842,7 +1816,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkInterfaceThread(void* pParam)
 					printf("Connection to a MAVLinkInterface lost.\n");
 					bConnected = FALSE;
 					disconnectmavlinkinterface(&MAVLinkInterfacePseudoRS232Port);
-					mSleep(50);
+					uSleep(1000*50);
 				}
 			}
 

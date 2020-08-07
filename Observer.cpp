@@ -41,7 +41,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
 		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
 		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
-		"Energy_electronics;Energy_actuators;\n"
+		"EPU1;EPU2;\n"
 		); 
 	fflush(logstatefile);
 
@@ -70,7 +70,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(observerperiod);
+		uSleep(1000*observerperiod);
 		t0 = t;
 		GetTimeElapsedChrono(&chrono, &t);
 		dt = t-t0;
@@ -376,43 +376,51 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 		headinghat = fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
 		coghat = fmod_360_pos_rad2deg(-angle_env-Center(cog_gps)+M_PI/2.0);
 
-		// Should be different if V and I are measured...
-
 		switch (robid)
 		{
 		case SUBMARINE_SIMULATOR_ROBID:
 		case SAUCISSE_ROBID:
 		case SARDINE_ROBID:
 		case CISCREA_ROBID:
-			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*((u1+u2+u3)*P_actuators_1+P_actuators_4)/3600.0;
+			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;
+			else EPU1 += dt*(P_electronics_4)/3600.0;
+			if (vbat2 != 0) EPU2 += dt*(vbat2_filtered*ibat2_filtered)/3600.0;
+			else EPU2 += dt*((u1+u2+u3)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
 		case SAILBOAT_SIMULATOR_ROBID:
 		case VAIMOS_ROBID:
 		case SAILBOAT_ROBID:
 		case SAILBOAT2_ROBID:
-			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*(P_actuators_4)/3600.0;
+			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;
+			else EPU1 += dt*(P_electronics_4)/3600.0;
+			if (vbat2 != 0) EPU2 += dt*(vbat2_filtered*ibat2_filtered)/3600.0;
+			else EPU2 += dt*(P_actuators_4)/3600.0;
 			break;
 		case MOTORBOAT_SIMULATOR_ROBID:
 		case MOTORBOAT_ROBID:
 		case BUGGY_SIMULATOR_ROBID:
 		case BUGGY_ROBID:
-			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*(u_f*P_actuators_1+uw_f*P_actuators_2+P_actuators_4)/3600.0;
+			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;
+			else EPU1 += dt*(P_electronics_4)/3600.0;
+			if (vbat2 != 0) EPU2 += dt*(vbat2_filtered*ibat2_filtered)/3600.0;
+			else EPU2 += dt*(u_f*P_actuators_1+uw_f*P_actuators_2+P_actuators_4)/3600.0;
 			break;
 		case BUBBLE_ROBID:
 		case TANK_SIMULATOR_ROBID:
 		case ETAS_WHEEL_ROBID:
-			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*((u1+u2)*P_actuators_1+P_actuators_4)/3600.0;
+			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;
+			else EPU1 += dt*(P_electronics_4)/3600.0;
+			if (vbat2 != 0) EPU2 += dt*(vbat2_filtered*ibat2_filtered)/3600.0;
+			else EPU2 += dt*((u1+u2)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
 		case QUADRO_SIMULATOR_ROBID:
 		case COPTER_ROBID:
 		case ARDUCOPTER_ROBID:
 		default:
-			Energy_electronics += dt*(P_electronics_4)/3600.0;
-			Energy_actuators += dt*((u_f+uw_f+uv_f+ul_f)*P_actuators_1+P_actuators_4)/3600.0;
+			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;
+			else EPU1 += dt*(P_electronics_4)/3600.0;
+			if (vbat2 != 0) EPU2 += dt*(vbat2_filtered*ibat2_filtered)/3600.0;
+			else EPU2 += dt*((u_f+uw_f+uv_f+ul_f)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
 		}
 
@@ -452,7 +460,7 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0), Width(accrxhat/2.0), Width(accryhat/2.0), Width(accrzhat/2.0),
 			wx, wy, wz, wphi, wtheta, wpsi, wd, wu, wagl, 
 			u_f, ul_f, uv_f, ur_f, up_f, uw_f, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
-			Energy_electronics, Energy_actuators);
+			EPU1, EPU2);
 		fflush(logstatefile);
 
 		LeaveCriticalSection(&StateVariablesCS);

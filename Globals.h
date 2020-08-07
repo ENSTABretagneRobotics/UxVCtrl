@@ -338,7 +338,7 @@ extern BOOL rc_rud_sw;
 
 extern double rudderminangle, ruddermidangle, ruddermaxangle;
 
-extern double Energy_electronics, Energy_actuators;
+extern double EPU1, EPU2;
 
 #pragma region General parameters
 extern int robid;

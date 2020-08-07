@@ -97,7 +97,7 @@ BOOL rc_rud_sw = FALSE;
 
 double rudderminangle = 0, ruddermidangle = 0, ruddermaxangle = 0;
 
-double Energy_electronics = 0, Energy_actuators = 0;
+double EPU1 = 0, EPU2 = 0;
 
 #pragma region General parameters
 int robid = 0;

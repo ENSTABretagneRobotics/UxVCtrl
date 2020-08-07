@@ -1,10 +1,13 @@
-
-Simulate cog and sog like UxVSim in Simulator.cpp
+params max nb ball lancés au démarrage, err msg please increase dans command correspondante
+rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
+params estimation vent...
 
 RPLIDAR A3 : if wrong baudrate, GetInfoRequestRPLIDAR() with SDK causes CTD or exit()...?
 RPLIDAR new extended and dense express scan modes...?
 
 3 RPLIDAR, hokuyo, seanet, params deadzone, position, orientation, voir srf02, pololu...
+
+params useful for SAILBOAT_SIMULATOR_ROBID...
 
 $PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
 
@@ -23,7 +26,6 @@ terminate called after throwing an instance of 'cv::Exception'
 
 16:45:10: C:/tmp/tests/build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug/UxVCtrl.exe exited with code 3
 
-remove define OPENCV420/320... in C++ code, vcxproj, Makefile (but not yet in cmake)...?
 Ideally, if cv_version < 4 iplimage and mat enabled else disable iplimage...
 Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\Latest\UE 4.5\Robotique pratique\TD4\KinectWebcamOpenCV420
 class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
@@ -96,22 +98,15 @@ rajouter des XXXInterfacePeriod (in ms)...
 Manque peut-être des mSleep() dans LaunchTCPSrv/LaunchUDPSrv?
 
 Creer fichier CurLbl.txt, supprimé si mission stop ou abort, ne pas supprimer si le programme quitte suite à une erreur, mis à jour de manière atomique a chaque commande label, lu à chaque démarrage, rajouter param pour l'ignorer
-
+watchdog : essayer de déterminer intelligement si le programme fonctionne bien ou pas, e.g. un ou des threads bloqués trop longtemps, déconnections/reconnexions en boucle...
 ExitCode à utiliser plus souvent pour retourner un code d'erreur plus précis...
 
 UxVCtrl prend trop de processeur pi0w (10%) même avec observer, controller ralentis, pas de GUI, pas de device, peut-être à cause des threads inutilisés de détection...
-Tester options de compilation -O3 UXVCtrl...
-params max nb ball lancés au démarrage, err msg please increase dans command correspondante
-rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
-
-convert v4log to update for sbp
-enable 2 seanet...
+Tester options de compilation -O3 UxVCtrl...
 
 param pour le calcul vent vrai, apparent, etc., voir plus bas...
 
 Line following control PID
-
-Faire programme de récupération des données SBP
 
 VAIMOS avec juste vent apparent si station capte pas GPS...->MWV, rajouter prise en compte de sog si dispo
 
@@ -134,8 +129,6 @@ RS232Port.h : add non-blocking support...
 
 ublox : add param UBX-CFG-RATE measurement period to set to e.g. to 200-500 ms, check bandwidth...
 Nouveau driver ublox : faut sans doute attendre avant de faire read()...?->problème seulement sur P70?
-
-Replace mSleep() by uSleep() in remotecam, for short delays...
 
 quitte pas toujours sans taper ENTER si ESC sur opencvgui?->en debug OK, pas en release?->Terminate commands thread in the end after some time in release, or change some timings...?
 https://stackoverflow.com/questions/21123499/how-to-break-out-of-fgets
@@ -346,7 +339,6 @@ check critical sections in interfaces...
 missing BOATBOT robid...
 terme intégral line following (attention à le limiter, remettre à 0...), ne plus faire l'approximation repère local pour les commandes xxxwgs?
 wzcontrolconfig mettre à jour les noms des coefs et utiliser le Kd2 pour voir si on utilise la formule spéciale...
-ComputeNMEAchecksum %X code VAIMOS, Iridium...
 
 1er waypoint envoyé par opencpn : c'est aussi différent si on fait un suivi de waypoint, mais ce serait pas disponible pour les voiliers car ils ne font que du suivi de ligne
 Message rte permettrait de rajouter wps sans tout recommencer (rtemsgmode)?
@@ -562,7 +554,7 @@ envoyer fluiddir pour voilier, voir comment c'est fait sur ArduSail (WIND_COV?),
 pouvoir envoyer wind_dir, wind_vel dans mp...
 Pouvoir renvoyer les rcout mavlinkinterface pour tester avec px dans les mains
 Faire passer en option certains messages mavlink de mavlinkinterface à mavlinkdevice (ou même par défaut en option tous ceux qui sont pas gérés)
-Affichage tension batterie depuis mavlink, avec Energy_actuators...?
+Affichage tension batterie depuis mavlink, avec EPU2...?
 delay/wait, waypoint validation, fly to here wp not displayed on mp, how to display altitude, flight planner set home does not work, ack needed for MISSION_START, how to handle thrust...?
 MAV_FRAME_GLOBAL frame : altitude AMSL
 MAV_FRAME_GLOBAL_RELATIVE_ALT frame : altitude as relative to the home position (home altitude = 0).
@@ -852,6 +844,11 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Replace mSleep() by uSleep() in remotecam, for short delays...
+remove define OPENCV420/320... in C++ code, vcxproj, Makefile (but not corresponding cmake options)...
+
+ComputeNMEAchecksum %X code VAIMOS...
 
 bNMEAInterfaceHighPrec pour nombre de décimales dans trames (voir ce que fait ublox : 7 dp for minutes (instead of 5, but most others are 4...?), and 3 dp for altitude (instead of 1))->probablement inutile, déjà en high prec et pas vu de problèmes...
 

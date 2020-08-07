@@ -54,7 +54,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(captureperiod);
+		uSleep(1000*captureperiod);
 
 		EnterCriticalSection(&VideoRecordRequestsCS[videoid]);
 		if (bVideoRecordRestart[videoid])
@@ -75,7 +75,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					LeaveCriticalSection(&strtimeCS);
 					fclose(endvideorecordfiles[videoid]);
 				}
-				mSleep(2*captureperiod);
+				uSleep(1000*(2*captureperiod));
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvReleaseVideoWriter(&videorecordfiles[videoid]);
@@ -171,7 +171,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 					LeaveCriticalSection(&strtimeCS);
 					fclose(endvideorecordfiles[videoid]);
 				}
-				mSleep(2*captureperiod);
+				uSleep(1000*(2*captureperiod));
 				EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 				cvReleaseVideoWriter(&videorecordfiles[videoid]);
@@ -200,7 +200,7 @@ THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 			LeaveCriticalSection(&strtimeCS);
 			fclose(endvideorecordfiles[videoid]);
 		}
-		mSleep(2*captureperiod);
+		uSleep(1000*(2*captureperiod));
 		EnterCriticalSection(&OpenCVVideoRecordCS);
 #ifndef USE_OPENCV_HIGHGUI_CPP_API
 		cvReleaseVideoWriter(&videorecordfiles[videoid]);

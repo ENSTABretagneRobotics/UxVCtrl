@@ -149,7 +149,7 @@ THREAD_PROC_RETURN_VALUE BallThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(captureperiod);
+		uSleep(1000*captureperiod);
 
 		if (bExit) break;
 		if (!bBallTrackingControl[id]) continue;

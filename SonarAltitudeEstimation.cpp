@@ -27,7 +27,7 @@ THREAD_PROC_RETURN_VALUE SonarAltitudeEstimationThread(void* pParam)
 
 	for (;;)
 	{
-		mSleep(100);
+		uSleep(1000*100);
 
 		if (bExit) break;
 		if (!bSonarAltitudeEstimation) continue;
