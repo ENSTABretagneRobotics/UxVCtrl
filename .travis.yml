@@ -28,7 +28,7 @@ jobs:
      script: 
        - cmd //c "cmake . & cmake --build . --config Release --target UxVCtrl & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt"
    
-   - name: "Ubuntu 18.04 amd64 with default OpenCV 3.2.0 without Kinect v2, CLEye support"
+   - name: "Ubuntu 18.04 amd64 with default OpenCV 3.2.0"
      os: linux
      arch: amd64
      dist: bionic
@@ -37,7 +37,7 @@ jobs:
      before_install: 
        - sudo apt-get -q update || true
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl
        # Virtual memory exhausted with --parallel...?
  
    - name: "Mac OS"
@@ -45,7 +45,7 @@ jobs:
      osx_image: xcode10.1
      script: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl 
 
-   - name: "Mac OS Xcode 10.1 with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Mac OS Xcode 10.1 with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: osx
      osx_image: xcode10.1
      before_install:
@@ -55,7 +55,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_MacOS
 
-   - name: "Ubuntu 16.04 i386 Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Ubuntu 16.04 i386 Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: linux
      dist: xenial
      compiler: gcc
@@ -67,7 +67,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_compat_Ubuntu32
 
-   - name: "Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: linux
      dist: bionic
      compiler: gcc
@@ -81,7 +81,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_compat_pi
  
-   - name: "Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: linux
      dist: bionic
      compiler: gcc
@@ -104,18 +104,23 @@ jobs:
      script: 
        - cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
-   - name: "Ubuntu 12.04 amd64 with default OpenCV 2.3.1 without Kinect v2, CLEye support"
+   #- name: "Ubuntu 12.04 amd64 with default OpenCV 2.3.1 without Kinect v2 support"
+   - name: "Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support"
      os: linux
      arch: amd64
-     dist: precise
+     #dist: precise
+     dist: trusty
      compiler: gcc
      services: xvfb
      before_install: 
        - sudo apt-get -q update || true
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl 
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_old_Ubuntu64
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_old_Ubuntu64
         
-   - name: "Ubuntu 20.04 amd64 with default OpenCV 4.2.0 without Kinect v2, CLEye support"
+   - name: "Ubuntu 20.04 amd64 with default OpenCV 4.2.0"
      os: linux
      arch: amd64
      dist: focal
@@ -124,9 +129,12 @@ jobs:
      before_install: 
        - sudo apt-get -q update || true
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_focal_Ubuntu64
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_focal_Ubuntu64
 
-   - name: "Ubuntu 16.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Ubuntu 16.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: linux
      arch: amd64
      dist: xenial
@@ -139,7 +147,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_compat_Ubuntu64
    
-   - name: "Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, Kinect v2, CLEye support"
+   - name: "Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support"
      os: linux
      arch: amd64
      dist: bionic
@@ -151,12 +159,12 @@ jobs:
        - wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-Ubuntu64-static.zip
        - wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.2.0-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-Ubuntu64-static.tar.gz
        - df
-     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
+     script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
      deploy:
        <<: *deploy_base
        file: UxVCtrl_Ubuntu64
 
-   - name: "Mac OS Xcode 10.1 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Mac OS Xcode 10.1 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: osx
      osx_image: xcode10.1
      script: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_MacOS
@@ -164,7 +172,7 @@ jobs:
        <<: *deploy_base
        file: UxVCtrl_compat_MacOS
 
-#   - name: "Mac OS Xcode 10.1 static with OpenCV 4.2.0 without BlueView, Kinect v2, CLEye support"
+#   - name: "Mac OS Xcode 10.1 static with OpenCV 4.2.0 without BlueView, Kinect v2 support"
 #     os: osx
 #     osx_image: xcode10.1
 #     before_install:
@@ -176,7 +184,7 @@ jobs:
 #       <<: *deploy_base
 #       file: UxVCtrl_MacOS
 
-   - name: "Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 (Kinect v2, CLEye currently incompatible) without LabJack, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support"
      os: windows
      compiler: gcc
      before_install: 
@@ -185,6 +193,12 @@ jobs:
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
+         # For LabJack
+         # https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
+       - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
 #         # Lighter version of OpenCV, instead of the one that would be downloaded automatically by CMakeLists.txt...
 #       - wget http://www.ensta-bretagne.fr/lebars/Share/OpenCV4.2.0_mini.zip --no-check-certificate -nv
 #       - cmd //c "7z x OpenCV4.2.0_mini.zip -o"%SystemDrive%" -y"
@@ -193,9 +207,13 @@ jobs:
 #       - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
 #       - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV4.2.0\x64\mingw\bin"
      script: 
-       - cmd //c "cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+         # refreshenv.cmd in the beginning causes problems...
+       - cmd //c "cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt & copy .\UxVCtrl.exe .\UxVCtrl_mingw8_x64.exe"
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_mingw8_x64.exe
 
-   - name: "Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support"
      os: windows
      before_install: 
          # Test alternate CMake version...
@@ -211,6 +229,7 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
        - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
          # For XP support
 #       - wget "https://aka.ms/vs/15/release/vs_buildtools.exe" -O vs_buildtools.exe
 #       - ./vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
@@ -224,7 +243,7 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl_compat.exe
 
-   - name: "Windows Visual Studio 2017 x86 static with OpenCV 4.2.0 (Kinect v2, CLEye currently incompatible) without SBG SDK, RPLIDAR SDK, CLEye support"
+   - name: "Windows Visual Studio 2017 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support"
      os: windows
      before_install: 
 #       - powerShell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned"
@@ -254,16 +273,7 @@ jobs:
 #       - powershell -Command "Install-WindowsFeature NET-Framework-Core"
 #       - cmd //c "DISM /online /enable-feature /featurename:NetFx3 /all"
 #       - choco install -y dotnet3.5 
-         # For Kinect v2
-       - choco install -y vcredist2012
-       - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
-       - 7z x KinectSDK-v2.0.zip -o/C/ -y
-       - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
-       - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
-       - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
-       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
 #       - choco install -y vcredist-all
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
@@ -276,7 +286,7 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl.exe
 
-   - name: "Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg without SBG SDK, RPLIDAR SDK, CLEye support"
+   - name: "Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support"
      os: windows
      before_install: 
          # Need to free up disk space...
@@ -294,27 +304,18 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
        - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
-         # For Kinect v2
-       - choco install -y vcredist2012
-       - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
-       - 7z x KinectSDK-v2.0.zip -o/C/ -y
-       - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
-       - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
-       - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
-       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin"
      script: 
-       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D USE_FFMPEG_VIDEO=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_cv320_ffmpeg.exe"
+       - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=OFF -D USE_FFMPEG_VIDEO=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_cv320_ffmpeg.exe"
      deploy:
        <<: *deploy_base
        file: Release\UxVCtrl_cv320_ffmpeg.exe
 
-   - name: "Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK, CLEye support"
+   - name: "Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support"
      os: windows
      before_install: 
          # Need to free up disk space...
@@ -333,16 +334,7 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
        - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
-         # For Kinect v2
-       - choco install -y vcredist2012
-       - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
-       - 7z x KinectSDK-v2.0.zip -o/C/ -y
-       - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
-       - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
-       - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
-       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
@@ -354,7 +346,7 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl_cv2413.exe
 
-   - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.2.0 (Kinect v2, CLEye currently incompatible) without BlueView, CLEye support"
+   - name: "Windows Visual Studio 2017 x64 static with OpenCV 4.2.0 without BlueView support"
      os: windows
      before_install: 
          # Need to free up disk space...
@@ -368,16 +360,7 @@ jobs:
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
        - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
-         # For Kinect v2
-       - choco install -y vcredist2012
-       - wget http://www.ensta-bretagne.fr/lebars/Share/KinectSDK-v2.0.zip --no-check-certificate -nv
-       - 7z x KinectSDK-v2.0.zip -o/C/ -y
-       - mkdir -p "/C/Program Files/Microsoft SDKs/Kinect"
-       - 7z x /C/KinectSDK-v2.0/v2.0_1409.zip -o"/C/Program Files/Microsoft SDKs/Kinect" -y
-       - cmd //c "setx KINECTSDK20_DIR C:\Progra~1\Microsoft" "SDKs\Kinect\v2.0_1409 /m"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x64\Kinect20.dll %SystemRoot%\System32\Kinect20.dll"
-       - cmd //c "copy /Y /B %SystemDrive%\KinectSDK-v2.0\x86\Kinect20.dll %SystemRoot%\SysWOW64\Kinect20.dll"
-       - cmd //c "del /f /q KinectSDK-v2.0.zip %SystemDrive%\KinectSDK-v2.0"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
        - df
      script: 
        - cmd //c "refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\Release\UxVCtrl.exe < run_test.txt & copy .\Release\UxVCtrl.exe .\Release\UxVCtrl_x64.exe"
@@ -385,7 +368,7 @@ jobs:
        <<: *deploy_base
        file: Release\UxVCtrl_x64.exe
 
-   - name: "Windows Qt 2010.05 MinGW 4.4.0 x86 with OpenCV 2.4.13 without LabJack, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Windows Qt 2010.05 MinGW 4.4.0 x86 with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK, Kinect v2 support"
      os: windows
      before_install: 
        - choco uninstall -y mingw
@@ -399,17 +382,24 @@ jobs:
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
-         # For BlueView
-       - choco install -y vcredist2010
+         # For LabJack
+         # https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
+       - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin"
        - df
      script: 
-       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt & copy .\UxVCtrl.exe .\UxVCtrl_mingw.exe"
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_mingw.exe
 
-   - name: "Windows Qt 5.12.6 MinGW 7.3.0 x86 with OpenCV 4.2.0 without LabJack, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2, CLEye support"
+   - name: "Windows Qt 5.12.6 MinGW 7.3.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support"
      os: windows
      before_install: 
        - choco uninstall -y mingw
@@ -441,12 +431,19 @@ jobs:
        - powershell -Command "Install-WindowsFeature Server-Media-Foundation"
        - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
        - cmd //c "7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y"
-         # For BlueView
-       - choco install -y vcredist2010
+         # For LabJack
+         # https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+       - wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+       - cmd //c "7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y"
+       - cmd //c "Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart"
+       - cmd //c "del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs"
          # PATH
        - wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
        - cmd //c "7z x cmake_extra_tools.zip -o"%SystemDrive%" -y"
        - cmd //c "%SystemDrive%\cmake_extra_tools\pathman /as C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin"
        - df
      script: 
-       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt"
+       - cmd //c "refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & .\UxVCtrl.exe < run_test.txt & copy .\UxVCtrl.exe .\UxVCtrl_mingw7.exe"
+     deploy:
+       <<: *deploy_base
+       file: UxVCtrl_mingw7.exe

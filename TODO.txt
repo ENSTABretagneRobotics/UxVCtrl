@@ -1,6 +1,8 @@
 params max nb ball lancés au démarrage, err msg please increase dans command correspondante
 rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
 params estimation vent...
+warnings in 64 bit...
+Pouvoir utiliser ffmpeg et kinect...
 
 RPLIDAR A3 : if wrong baudrate, GetInfoRequestRPLIDAR() with SDK causes CTD or exit()...?
 RPLIDAR new extended and dense express scan modes...?
@@ -15,7 +17,6 @@ angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, surge, sw
 SBG : rajouter log de heave dans les dernières colonnes du fichier et vérifier si accelerations bien récupérées...
 
 UE9A semble compiler et exécuter avec mingw7, tester avec servos
-Modify kinect headers for mingw7 if needed?
 
 cv420
 16:45:08: Starting C:\tmp\tests\build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug\UxVCtrl.exe ...
@@ -27,10 +28,7 @@ terminate called after throwing an instance of 'cv::Exception'
 16:45:10: C:/tmp/tests/build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug/UxVCtrl.exe exited with code 3
 
 Ideally, if cv_version < 4 iplimage and mat enabled else disable iplimage...
-Kinect : freenect2 (Windows aussi?), cleye, P:\Personal data\Work\TD-cours\Latest\UE 4.5\Robotique pratique\TD4\KinectWebcamOpenCV420
-class VideoCapture {grab();retrieve();read(){grab();retrieve();}}
-class VideoCaptureKinect : VideoCapture {grab();retrieve();}
-VideoCaptureKinect::read() ???
+cvdisp pour cv::Mat et WinForms, Qt...
 remplacer cvSize() par cv::Size()?
 
 Add to device struct lastdata, bexitdevice and other necessary variables for MATLAB
@@ -43,7 +41,7 @@ Pi internal PWM, software PWM, GPIO, with dedicated boards, with ADC...->soft pw
 uInt, uint32, etc. should be more correctly defined for all platforms...->should now use _t types
 SPI...
 
-travis : add test of old versions of vsbuildtools, e.g. vc9, 10, 11, ubuntu focal...
+travis : add test of old versions of vsbuildtools, e.g. vc9, 10, 11...
 
 Add params to wallfollowing, see obstacleavoidance notes...
 
@@ -505,17 +503,16 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
-OPENCV/BLUEVIEW/FFMPEG_PKG_PREFIX... (also for -L...)
+Refreshenv mingw8...?
+Ubuntu Travis : sudo: cmake: command not found...?
 SBG build for mingw(8) x64, mingw/mingw5/7 x86...
+OPENCV/BLUEVIEW/FFMPEG_PKG_PREFIX... (also for -L...)
 cmake check better gcc version, compatibility with cross compilation, PREFIX variable for dependencies...
 Faire en sorte que cmake trouve bien cv sous Windows? set OPENCV_DIR for cmake find_package Windows?
 USE_FIND_PACKAGE_OPENCV/MODBUS/SBG and message to advise it when needed (maybe not for SBG since it is modified, or should change version number of the modified version to be able to disable TCP automatically if needed...)
 set cmake var OpenCV_VERSION even when not using find, use vars set to 2413, 2.4.13 to simplify for vs libs...?
-Tester Hardware-MATLAB MAVLink et SBG support : 
-export CMAKE_C_FLAGS=${CMAKE_C_FLAGS} -fPIC
-Pour compilation SBG MATLAB Linux et Mac OS
 cmake : faire copier ce qu'il faut du dossier source dans build si différents...?
-cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}
+cmake64 detects only sbg and opencv...->should check better $ENV{ProgramFiles}, $ENV{ProgramFiles\(x86\)}, $ENV{ProgramW6432}...?
 Update makefile fileconversions->remplacer par des cmakelists.txt?->peut-être pas prioritaire
 Repo opencv travis cmake --build --target package notamment en static et avec contrib pour vc15, vc16, mingw, Ubuntu, mac, pi, x86, x64...
 check inline and timegm in a small program
@@ -609,7 +606,6 @@ afficher temps depuis début mission
 Rampe etas quand on accélère, en option...?
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
-cv400 : tout changer en cv::Mat vu que tout est basé sur les IplImage, désactiver temporairement les include de fonctions C pour voir quel code utilise encore du C...
 Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
 tester touches en nomachine, ssh -X...
 Afficher tension, direction vent, affichage des infos du waypoint courant mission planner
@@ -629,6 +625,8 @@ Mettre en var globale les périphériques?
 détection quand il y a quelque chose de visible à la caméra pour détecter quand on est près du fond
 intercepter 1er CTRL+C pour faire bExit puis ne plus les intercepter?
 multiple gpcontrol...->not easy because of its static IP address...
+freeenect2 : il y a des freeze sous Ubuntu si on augmente la fréquence de capture, il faudrait peut-être un mutex sur le listener...
+in cleyehook : if filename.find(kinect) else filename.find(cleye) to be able to handle both together, assuming ENABLE_CVKINECT2SDKHOOK is defined first...?
 Appli gps qui affiche sog à partir des logs?
 Faire programme pour aider à la mag calib
 fournir simple couche d'adaptation pour pouvoir traiter webcam sans opencv
@@ -844,6 +842,9 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+cls & g++ -std=c++11 -I. -IC:\OpenCV4.2.0\include -I"%KINECTSDK20_DIR%inc" -LC:\OpenCV4.2.0\x86\mingw\lib -L"%KINECTSDK20_DIR%Lib\x86" Main.cpp -l:Kinect20.lib -lopencv_world420
+Kinect : P:\Personal data\Work\TD-cours\Latest\UE 4.5\Robotique pratique\TD4\KinectWebcamOpenCV420
 
 Replace mSleep() by uSleep() in remotecam, for short delays...
 remove define OPENCV420/320... in C++ code, vcxproj, Makefile (but not corresponding cmake options)...

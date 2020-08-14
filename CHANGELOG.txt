@@ -1,3 +1,7 @@
+362
+Removed mentions to CLEye.
+Updated Kinect v2 support.
+
 361
 Other minor updates.
 Renamed Energy_electronics, Energy_actuators to EPU1, EPU2.
