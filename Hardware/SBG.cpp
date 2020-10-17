@@ -110,13 +110,14 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						"PacketCounter;SampleTimeFine;"
 						"UTC_Nano;UTC_Year;UTC_Month;UTC_Day;UTC_Hour;UTC_Minute;UTC_Second;UTC_Valid;"
 						"StatusWord;"
-						"Acc_X;Acc_Y;Acc_Z;"
-						"Gyr_X;Gyr_Y;Gyr_Z;"
+						"Acc_X (in m/s2);Acc_Y (in m/s2);Acc_Z (in m/s2);"
+						"Gyr_X (in rad/s);Gyr_Y (in rad/s);Gyr_Z (in rad/s);"
 						"Mag_X;Mag_Y;Mag_Z;"
-						"Roll;Pitch;Yaw;"
-						"Latitude;Longitude;Altitude;"
-						"Vel_X;Vel_Y;Vel_Z;"
-						"tv_sec;tv_usec;\n"
+						"Roll (in deg);Pitch (in deg);Yaw (in deg);"
+						"Latitude (in deg);Longitude (in deg);Altitude (in m);"
+						"Vel_X (in m/s);Vel_Y (in m/s);Vel_Z (in m/s);"
+						"tv_sec;tv_usec;"
+						"heave_period (in s);surge (in m);sway (in m);heave (in m);\n"
 						); 
 					fflush(sbg.pfSaveFile);
 				}
@@ -182,7 +183,8 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						"%f;%f;%f;"
 						"%.8f;%.8f;%f;"
 						"%f;%f;%f;"
-						"%d;%d;\n", 
+						"%d;%d;"
+						"%f;%f;%f;%f;\n", 
 						(int)sbgdata.TS, (int)0, 
 						(int)sbgdata.UTCTime.Nanoseconds, (int)sbgdata.UTCTime.Year, (int)sbgdata.UTCTime.Month, (int)sbgdata.UTCTime.Day, (int)sbgdata.UTCTime.Hour, (int)sbgdata.UTCTime.Minute, (double)sbgdata.UTCTime.Seconds, (int)sbgdata.UTCTime.Valid, 
 						(int)sbgdata.Status, 
@@ -192,7 +194,8 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 						sbgdata.roll, sbgdata.pitch, sbgdata.yaw, 
 						sbgdata.Lat, sbgdata.Long, sbgdata.Alt, 
 						sbgdata.Vel_X, sbgdata.Vel_Y, sbgdata.Vel_Z, 
-						(int)tv.tv_sec, (int)tv.tv_usec
+						(int)tv.tv_sec, (int)tv.tv_usec, 
+						sbgdata.heave_period, sbgdata.surge, sbgdata.sway, sbgdata.heave
 						);
 					fflush(sbg.pfSaveFile);
 				}

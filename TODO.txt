@@ -1,8 +1,11 @@
+Commande sailcontrol en parallèle de headingcontrol, qui ne change pas la consigne de heading…?
+SBG : Vérifier log de heave (seulement heave valide pour Ellipse) avec/sans SDK...
+
 params max nb ball lancés au démarrage, err msg please increase dans command correspondante
 rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
 params estimation vent...
 warnings in 64 bit...
-Pouvoir utiliser ffmpeg et kinect...
+Ffmpeg : if strcmp("Kinect2Color" or "Kinect2Depth" or name starts with"opencv://"...) call opencv else if (strcmp("ffmpeg://...")) call ffmpgopen() else if ffmpegopen() fails call opencv...
 
 RPLIDAR A3 : if wrong baudrate, GetInfoRequestRPLIDAR() with SDK causes CTD or exit()...?
 RPLIDAR new extended and dense express scan modes...?
@@ -11,10 +14,8 @@ RPLIDAR new extended and dense express scan modes...?
 
 params useful for SAILBOAT_SIMULATOR_ROBID...
 
-$PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave acceleration in ms-2, c is 'U' if going up, 'O' if going down
-
-angles et pillonement à envoyer à Seanet Pro, seule SBG renvoie heave, surge, sway, peut-être le récupérer quand même, rajouter colonnes correspondantes dans log SBG, $PHTRH...
-SBG : rajouter log de heave dans les dernières colonnes du fichier et vérifier si accelerations bien récupérées...
+https://www.igp.de/manuals/7-INS-InterfaceLibrary_MU-INSIII-AN-001-O.pdf
+$PHTRH,x.xx,a,y.yy,b,z.zz,c*kk<cr><lf> where x.xx is pitch in degrees, a is 'M' for bow up, 'P' for bow down, y.yy is roll in degres b is 'B' for port down, 'T' for port up, z.zz is heave absolute value in meters, c is 'U' if going up, 'O' if going down
 
 UE9A semble compiler et exécuter avec mingw7, tester avec servos
 
@@ -679,6 +680,7 @@ commande pour régulation en vitesse?
 configdistancecomputation
 distancecomputation
 commande waitdistanceless/more/wgs x y d
+Régulation autour d'un cercle
 param friendly name
 Commande vocale : robot, thrust 0.5, stop, direction -90, utiliser cortana?
 
@@ -842,6 +844,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+SBG accelerations (avec ou sans SBG SDK) bien loggués dans logstate...
 
 cls & g++ -std=c++11 -I. -IC:\OpenCV4.2.0\include -I"%KINECTSDK20_DIR%inc" -LC:\OpenCV4.2.0\x86\mingw\lib -L"%KINECTSDK20_DIR%Lib\x86" Main.cpp -l:Kinect20.lib -lopencv_world420
 Kinect : P:\Personal data\Work\TD-cours\Latest\UE 4.5\Robotique pratique\TD4\KinectWebcamOpenCV420

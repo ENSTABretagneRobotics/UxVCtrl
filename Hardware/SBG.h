@@ -941,11 +941,6 @@ inline int GetFrameSBG(SBG* pSBG, SBGDATA* pSBGData)
 		printf("Error reading data from a SBG. \n");
 		return EXIT_FAILURE;
 	}
-	if ((pSBG->bSaveRawData)&&(pSBG->pfSaveFile))
-	{
-		fwrite(recvbuf, nbBytesToRequest, 1, pSBG->pfSaveFile);
-		fflush(pSBG->pfSaveFile);
-	}
 	BytesReceived += nbBytesToRequest;
 	
 	for (;;)
@@ -967,11 +962,6 @@ inline int GetFrameSBG(SBG* pSBG, SBGDATA* pSBGData)
 		{
 			printf("Error reading data from a SBG. \n");
 			return EXIT_FAILURE;
-		}
-		if ((pSBG->bSaveRawData)&&(pSBG->pfSaveFile))
-		{
-			fwrite(recvbuf+BytesReceived, nbBytesToRequest, 1, pSBG->pfSaveFile);
-			fflush(pSBG->pfSaveFile);
 		}
 		BytesReceived += nbBytesToRequest;
 		if (GetTimeElapsedChronoQuick(&chrono) > TIMEOUT_MESSAGE_SBG)

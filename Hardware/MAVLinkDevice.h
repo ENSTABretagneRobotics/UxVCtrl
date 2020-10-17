@@ -141,11 +141,6 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 		printf("Error reading data from a MAVLinkDevice. \n");
 		return EXIT_FAILURE;
 	}
-	//if ((pMAVLinkDevice->bSaveRawData)&&(pMAVLinkDevice->pfSaveFile))
-	//{
-	//	fwrite(recvbuf, Bytes, 1, pMAVLinkDevice->pfSaveFile);
-	//	fflush(pMAVLinkDevice->pfSaveFile);
-	//}
 	BytesReceived += Bytes;
 
 	if (BytesReceived >= recvbuflen)
@@ -165,11 +160,6 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 				printf("Error reading data from a MAVLinkDevice. \n");
 				return EXIT_FAILURE;
 			}
-			//if ((pMAVLinkDevice->bSaveRawData)&&(pMAVLinkDevice->pfSaveFile)) 
-			//{
-			//	fwrite(recvbuf, Bytes, 1, pMAVLinkDevice->pfSaveFile);
-			//	fflush(pMAVLinkDevice->pfSaveFile);
-			//}
 			BytesReceived += Bytes;
 		}
 
@@ -213,11 +203,6 @@ inline int GetLatestDataMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, MAVLINKDATA
 	//		printf("Error reading data from a MAVLinkDevice. \n");
 	//		return EXIT_FAILURE;
 	//	}
-	//	//if ((pMAVLinkDevice->bSaveRawData)&&(pMAVLinkDevice->pfSaveFile)) 
-	//	//{
-	//	//	fwrite((unsigned char*)recvbuf+BytesReceived, Bytes, 1, pMAVLinkDevice->pfSaveFile);
-	//	//	fflush(pMAVLinkDevice->pfSaveFile);
-	//	//}
 	//	BytesReceived += Bytes;
 	//	if (pMAVLinkDevice->bEnableGPGGA) ptr_GPGGA = FindLatestNMEASentence("$GPGGA", recvbuf);
 	//}

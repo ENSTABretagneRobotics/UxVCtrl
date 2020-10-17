@@ -108,12 +108,12 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 						"PacketCounter;SampleTimeFine;"
 						"UTC_Nano;UTC_Year;UTC_Month;UTC_Day;UTC_Hour;UTC_Minute;UTC_Second;UTC_Valid;"
 						"StatusWord;"
-						"Acc_X;Acc_Y;Acc_Z;"
-						"Gyr_X;Gyr_Y;Gyr_Z;"
+						"Acc_X (in m/s2);Acc_Y (in m/s2);Acc_Z (in m/s2);"
+						"Gyr_X (in rad/s);Gyr_Y (in rad/s);Gyr_Z (in rad/s);"
 						"Mag_X;Mag_Y;Mag_Z;"
-						"Roll;Pitch;Yaw;"
-						"Latitude;Longitude;Altitude;"
-						"Vel_X;Vel_Y;Vel_Z;"
+						"Roll (in deg);Pitch (in deg);Yaw (in deg);"
+						"Latitude (in deg);Longitude (in deg);Altitude (in m);"
+						"Vel_X (in m/s);Vel_Y (in m/s);Vel_Z (in m/s);"
 						"tv_sec;tv_usec;\n"
 						); 
 					fflush(mt.pfSaveFile);
