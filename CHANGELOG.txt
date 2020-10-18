@@ -1,3 +1,7 @@
+364
+Added GAMMA_INFINITE and ZETA MAVLinkInterface parameters.
+Added linefollowingrelativestation, linefollowingrelativerobotstation, enable/disablesailreg commands.
+
 363
 Added heave_period, surge, sway, heave in the last columns of SBG log file.
 Corrected bug with binary data in SBG log file.

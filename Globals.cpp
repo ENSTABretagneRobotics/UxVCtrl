@@ -830,6 +830,7 @@ BOOL bWaypointControl = FALSE;
 BOOL bGuidedControl = FALSE;
 BOOL bDistanceControl = FALSE;
 BOOL bBrakeControl = FALSE;
+BOOL bSailControl = FALSE;
 BOOL bRollControl = FALSE;
 BOOL bPitchControl = FALSE;
 BOOL bHeadingControl = FALSE;

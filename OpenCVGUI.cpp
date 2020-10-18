@@ -789,14 +789,25 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			}
 			break;
 		case 'y':
-			if (!bDepthControl)
+			switch (robid)
 			{
-				bDepthControl = TRUE;
-				wz = Center(zhat);
-			}
-			else
-			{
-				bDepthControl = FALSE;
+			case SAILBOAT_SIMULATOR_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
+				if (!bSailControl) bSailControl = TRUE; else bSailControl = FALSE;
+				break;
+			default:
+				if (!bDepthControl)
+				{
+					bDepthControl = TRUE;
+					wz = Center(zhat);
+				}
+				else
+				{
+					bDepthControl = FALSE;
+				}
+				break;
 			}
 			break;
 		case 'Y':
@@ -849,6 +860,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			break;
 		case 'w':
 			bBrakeControl = TRUE;
+			bSailControl = FALSE;
 			bDistanceControl = FALSE;
 			u = 0;
 			break;

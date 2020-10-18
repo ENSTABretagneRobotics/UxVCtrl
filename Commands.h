@@ -30,6 +30,7 @@ inline void DisableAllHorizontalControls(void)
 	bGuidedControl = FALSE;
 	bDistanceControl = FALSE;
 	bBrakeControl = FALSE;
+	bSailControl = FALSE;
 	bHeadingControl = FALSE;
 	u = 0; uw = 0; ul = 0;
 	LeaveCriticalSection(&StateVariablesCS);
@@ -59,6 +60,7 @@ inline void DisableAllControls(void)
 	bGuidedControl = FALSE;
 	bDistanceControl = FALSE;
 	bBrakeControl = FALSE;
+	bSailControl = FALSE;
 	bHeadingControl = FALSE;
 	bPitchControl = FALSE;
 	bRollControl = FALSE;
@@ -1777,11 +1779,70 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "linefollowingstation %lf %lf %lf %lf", &dval1, &dval2, &delay_station, &delay) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		// Special situation : should follow the line between its current position and the waypoint specified.
+		// Therefore, the robot should remain near the waypoint specified.
+		wxa = Center(xhat); wya = Center(yhat); wxb = dval1; wyb = dval2;
+		bLineFollowingControl = TRUE;
+		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the perpendicular to the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				// Wait a little bit after reaching the waypoint.
+				bLineFollowingControl = FALSE;
+				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
+				bHeadingControl = FALSE;
+				StartChrono(&chrono_station);
+				for (;;)
+				{
+					if (GetTimeElapsedChronoQuick(&chrono_station) > delay_station) break;
+					if (!bWaiting) break;
+					if (bExit) break;
+					// Wait at least delay/10 and at most around 100 ms for each loop.
+					mSleep((long)min(delay_station*100.0, 100.0));
+				}
+				StopChronoQuick(&chrono_station);
+				// Special situation : should follow the line between its current position and the waypoint specified.
+				// Therefore, the robot should remain near the waypoint specified.
+				EnterCriticalSection(&StateVariablesCS);
+				wxa = Center(xhat); wya = Center(yhat);
+				bLineFollowingControl = TRUE;
+				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
+				bHeadingControl = TRUE;
+				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
 			{
@@ -1821,11 +1882,70 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
 				break;
+			}
+			else
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "linefollowingrelativestation %lf %lf %lf %lf", &dval1, &dval2, &delay_station, &delay) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		// Special situation : should follow the line between its current position and the waypoint specified.
+		// Therefore, the robot should remain near the waypoint specified.
+		wxa = Center(xhat); wya = Center(yhat); wxb = Center(xhat)+dval1; wyb = Center(yhat)+dval2;
+		bLineFollowingControl = TRUE;
+		bWaypointControl = FALSE;
+		bGuidedControl = FALSE;
+		bHeadingControl = TRUE;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			// Check if the perpendicular to the destination waypoint of the line was reached.
+			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
+			{
+				LeaveCriticalSection(&StateVariablesCS);
+				// Wait a little bit after reaching the waypoint.
+				bLineFollowingControl = FALSE;
+				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
+				bHeadingControl = FALSE;
+				StartChrono(&chrono_station);
+				for (;;)
+				{
+					if (GetTimeElapsedChronoQuick(&chrono_station) > delay_station) break;
+					if (!bWaiting) break;
+					if (bExit) break;
+					// Wait at least delay/10 and at most around 100 ms for each loop.
+					mSleep((long)min(delay_station*100.0, 100.0));
+				}
+				StopChronoQuick(&chrono_station);
+				// Special situation : should follow the line between its current position and the waypoint specified.
+				// Therefore, the robot should remain near the waypoint specified.
+				EnterCriticalSection(&StateVariablesCS);
+				wxa = Center(xhat); wya = Center(yhat);
+				bLineFollowingControl = TRUE;
+				bWaypointControl = FALSE;
+				bGuidedControl = FALSE;
+				bHeadingControl = TRUE;
+				LeaveCriticalSection(&StateVariablesCS);
 			}
 			else
 			{
@@ -1867,7 +1987,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -1886,12 +2006,13 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "linefollowingstation %lf %lf %lf %lf", &dval1, &dval2, &delay_station, &delay) == 4)
+	else if (sscanf(line, "linefollowingrelativerobotstation %lf %lf %lf %lf", &dval1, &dval2, &delay_station, &delay) == 4)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		// Special situation : should follow the line between its current position and the waypoint specified.
 		// Therefore, the robot should remain near the waypoint specified.
-		wxa = Center(xhat); wya = Center(yhat); wxb = dval1; wyb = dval2;
+		wxa = Center(xhat); wya = Center(yhat);
+		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval1, dval2, 0, &wxb, &wyb, &dval);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1903,7 +2024,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -1972,7 +2093,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -2009,7 +2130,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -2236,7 +2357,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -2266,7 +2387,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -2297,7 +2418,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -2328,7 +2449,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
@@ -2393,7 +2514,7 @@ inline int Commands(char* line)
 		for (;;)
 		{
 			EnterCriticalSection(&StateVariablesCS);
-			// Check if the destination waypoint of the line was reached.
+			// Check if the perpendicular to the destination waypoint of the line was reached.
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				if (CurWP >= nbWPs-1)
@@ -4030,6 +4151,14 @@ inline int Commands(char* line)
 	{
 		bPitchControl = FALSE;
 	}
+	else if (strncmp(line, "enablesailreg", strlen("enablesailreg")) == 0)
+	{
+		bSailControl = TRUE;
+	}
+	else if (strncmp(line, "disablesailreg", strlen("disablesailreg")) == 0)
+	{
+		bSailControl = FALSE;
+	}
 	else if (strncmp(line, "enableheadingreg", strlen("enableheadingreg")) == 0)
 	{
 		bHeadingControl = TRUE;
@@ -4063,6 +4192,7 @@ inline int Commands(char* line)
 		u = dval;
 		bDistanceControl = FALSE;
 		bBrakeControl = FALSE;
+		bSailControl = FALSE;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "turn %lf", &dval) == 1)
@@ -4129,6 +4259,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		bDistanceControl = FALSE;
 		bBrakeControl = TRUE;
+		bSailControl = FALSE;
 		u = 0;
 		LeaveCriticalSection(&StateVariablesCS);
 	}

@@ -120,21 +120,25 @@
 %
 %linefollowing xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line)
 %
-%linefollowingt xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%linefollowingt xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached)
 %
 %linefollowingstation xb yb t_station t (xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
 %linefollowingrelative xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line)
 %
-%linefollowingtrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%linefollowingtrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached)
+%
+%linefollowingrelativestation xb yb t_station t (xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
 %linefollowingrelativerobot xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line)
 %
-%linefollowingtrelativerobot xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%linefollowingtrelativerobot xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached)
+%
+%linefollowingrelativerobotstation xb yb t_station t (xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
 %linefollowingwgs lata longa latb longb (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line)
 %
-%linefollowingtwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached)
+%linefollowingtwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached)
 %
 %linefollowingwgsstation latb longb t_station t (latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
@@ -150,13 +154,13 @@
 %
 %waitztwgs alt acc t (alt : double ]-oo,oo[ altitude in m in WGS, acc : double ]0,oo[ accuracy in m, t : double [0,oo[ timeout in s, the function blocks until the destination altitude or the timeout is reached, without control)
 %
-%waitlinet xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
+%waitlinet xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached, without control)
 %
-%waitlinetrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
+%waitlinetrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached, without control)
 %
-%waitlinetrelativerobot xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
+%waitlinetrelativerobot xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the robot coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached, without control)
 %
-%waitlinetwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the destination waypoint or the timeout is reached, without control)
+%waitlinetwgs lata longa latb longb t (lata, longa, latb, longb : double ]-oo,oo[ position in decimal deg in WGS of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached, without control)
 %
 %waypointslist bGenerateLineToFirst bStation delay_wait_new t_station t (bGenerateLineToFirst : int [0,1] 0 to start directly to follow the first line (useful e.g. when we are already on it and we do not want to go back to its beginning) or 1 to generate a preliminary line from the current position to the beginning of the first line, bStation : int [0,1], delay_wait_new : double [0,oo[ time to wait when the list is probably being changed in s, t_station : double [0,oo[ time to wait when the last waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function waits for a waypoints list from OpenCPN (through NMEAInterface) and blocks until the timeout is reached or the last waypoint is reached with bStation set to 0)
 %
@@ -482,7 +486,7 @@
 %
 %wxcontrolconfig Kp_wx Kd_wx Ki_z up_max_wx ud_max_wx ui_max_wx u_min_wx u_max_wx error_min_wx error_max_wx omega_max_wx
 %
-%sailboatconfig betatrav betaarr zeta check_strategy_period sail_update_period sailboattacktype sailformulatype (betatrav : double ]-oo,oo[ sail angle when the wind comes from the side in rad, betaarr : double ]-oo,oo[ sail angle when the wind comes from the rear in rad, zeta : double ]-oo,oo[ close-hauled angle in rad, check_strategy_period : double [0,oo[ in s, sail_update_period : double [0,oo[ in s, sailboattacktype : int [0,2], sailformulatype : int [0,2])
+%sailboatconfig betaside betarear zeta check_strategy_period sail_update_period sailboattacktype sailformulatype (betaside : double ]-oo,oo[ sail angle when the wind comes from the side in rad, betarear : double ]-oo,oo[ sail angle when the wind comes from the rear in rad, zeta : double ]-oo,oo[ close-hauled angle in rad, check_strategy_period : double [0,oo[ in s, sail_update_period : double [0,oo[ in s, sailboattacktype : int [0,2], sailformulatype : int [0,2])
 %
 % SIMPLE MOVING COMMANDS
 %
@@ -519,6 +523,10 @@
 %enablepitchreg
 %
 %disablepitchreg
+%
+%enablesailreg
+%
+%disablesailreg
 %
 %enableheadingreg
 %

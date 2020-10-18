@@ -2752,7 +2752,7 @@ inline int TranslateKeys(int c)
 inline int DisplayKeys(void)
 {
 	printf("On OpenCVGUI : \n");
-	printf("%c%c%c%c(horizontal control),fvB(vertical control or thrust limit),%c%c(lateral),%c(brake),space(stop),g(generalstop),t%c%cUHT(heading, depth, alt_agl, pitch, roll, obstacle avoidance control),"
+	printf("%c%c%c%c(horizontal control),fvB(vertical control or thrust limit),%c%c(lateral),%c(brake),space(stop),g(generalstop),t%c%cUHT(heading, depth or sail, alt_agl, pitch, roll, obstacle avoidance control),"
 		"o(toggle OSD),c(toggle North and control),"
 		"m(toggle map),M(toggle Map),*(rotate map),i(toggle image),$(toggle sonar),;(other overlays),X(disableopencvgui),+-(coordspace zoom),"
 		"O(gpssetenvcoordposition),G(gpslocalization),J(enable/disableautogpslocalization),V(enable/disableautodvllocalization),"

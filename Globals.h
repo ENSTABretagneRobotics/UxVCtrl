@@ -1062,6 +1062,7 @@ extern BOOL bWaypointControl;
 extern BOOL bGuidedControl;
 extern BOOL bDistanceControl;
 extern BOOL bBrakeControl;
+extern BOOL bSailControl;
 extern BOOL bRollControl;
 extern BOOL bPitchControl;
 extern BOOL bHeadingControl;

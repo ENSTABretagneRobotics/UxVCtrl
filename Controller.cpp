@@ -277,6 +277,41 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		// The order here gives some kind of priority...
 
+#pragma region SailControl
+		if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bSailControl)&&(!bLineFollowingControl))//||(!bWaypointControl)||(!bGuidedControl)
+		{
+			double psiw = Center(psitwindhat);
+			double psi = Center(psihat);
+
+			q1 = betarear;
+			q2 = (log(betarear)-log(betaside))/log(2.0);
+
+			// Sail command.
+			switch (sailformulatype)
+			{
+			default:
+			case 0:
+				if (bHeadingControl) deltasmax = q1*pow((cos(psiw-wpsi)+1.0)/2.0, q2); else deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0, q2);
+				break;
+			case 1:
+				deltasmax = q1*pow((cos(psiw-psi)+1.0)/2.0, q2);
+				break;
+			case 2:
+				deltasmax = q1*pow((cos(psiawind)+1.0)/2.0, q2);
+				break;
+			}
+
+			if ((GetTimeElapsedChronoQuick(&chrono_sail_update) > sail_update_period)||bForceSailUpdate)
+			{
+				if (bStdOutDetailedInfo) printf("Sail update.\n");
+				u = deltasmax/q1;
+				bForceSailUpdate = 0;
+				StopChronoQuick(&chrono_sail_update);
+				StartChrono(&chrono_sail_update);
+			}
+		}
+#pragma endregion
+
 		if (bLineFollowingControl)
 		{
 			// Check if the line changed.
