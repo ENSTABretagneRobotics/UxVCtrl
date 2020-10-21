@@ -44,6 +44,7 @@
 #include "mavlink/common/mavlink.h"
 #include "mavlink/ardupilotmega/mavlink_msg_rangefinder.h"
 #include "mavlink/ardupilotmega/mavlink_msg_hwstatus.h"
+#include "mavlink/ardupilotmega/mavlink_msg_wind.h"
 
 #ifdef __GNUC__
 // Restore the GCC warnings previously disabled.

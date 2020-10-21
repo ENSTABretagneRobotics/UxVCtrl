@@ -161,6 +161,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_gps_raw_int_t gps_raw_int;
 	mavlink_attitude_t attitude;
 	mavlink_vfr_hud_t vfr_hud;
+	mavlink_nav_controller_output_t nav_controller_output;
+	mavlink_wind_t wind;
 	mavlink_mission_current_t mission_current;
 	mavlink_servo_output_raw_t servo_output_raw;
 	mavlink_param_value_t param_value;
@@ -1063,6 +1065,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						if (bForceOverrideInputs)
 						{
 							u_ovrid = 0; uw_ovrid = 0; ul_ovrid = 0;
+							LeaveCriticalSection(&StateVariablesCS);
 						}
 						else
 						{
@@ -1070,10 +1073,10 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						//bBrakeControl = TRUE;
 						//u = 0;
 
+						LeaveCriticalSection(&StateVariablesCS);
 						DisableAllHorizontalControls();
 
 						}
-						LeaveCriticalSection(&StateVariablesCS);
 					}
 					memset(&command_ack, 0, sizeof(mavlink_command_ack_t));
 					command_ack.command = MAVLINK_MSG_ID_SET_MODE;
@@ -1331,15 +1334,16 @@ REQ_DATA_STREAM...
 						bMissionPaused = FALSE; // Force to restart from beginning...
 						if (bMissionRunning)
 						{
+							LeaveCriticalSection(&StateVariablesCS);
 							AbortMission();
 							unlink(LOG_FOLDER"CurLbl.txt");
 							unlink(LOG_FOLDER"CurWp.txt");
 						}
 						else
 						{
+							LeaveCriticalSection(&StateVariablesCS);
 							CallMission("mission.txt");
 						}
-						LeaveCriticalSection(&StateVariablesCS);
 						break;
 					case MAV_CMD_DO_DIGICAM_CONTROL:
 						mavlink_msg_command_long_decode(&msg, &command);
@@ -1573,6 +1577,24 @@ REQ_DATA_STREAM...
 	vfr_hud.heading = (int16_t)fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
 	vfr_hud.throttle = (uint16_t)fabs(u_f*100);
 
+	memset(&nav_controller_output, 0, sizeof(mavlink_nav_controller_output_t));
+	if ((bWaypointControl)||(bGuidedControl))
+	{
+		nav_controller_output.wp_dist = (uint16_t)sqrt(pow(wx-Center(xhat), 2)+pow(wy-Center(yhat), 2));
+	}
+	if (bLineFollowingControl)
+	{
+		nav_controller_output.wp_dist = (uint16_t)sqrt(pow(wxb-Center(xhat), 2)+pow(wyb-Center(yhat), 2));
+		nav_controller_output.xtrack_error = (float)xte;
+	}
+	if (bHeadingControl) nav_controller_output.nav_bearing = (int16_t)fmod_360_pos_rad2deg(-angle_env-wpsi+M_PI/2.0);
+	if (bPitchControl) nav_controller_output.nav_pitch = (float)fmod_360_rad2deg(-wtheta);
+	if (bRollControl) nav_controller_output.nav_roll = (float)fmod_360_rad2deg(wphi);
+
+	memset(&wind, 0, sizeof(mavlink_wind_t));
+	wind.direction = (float)fmod_360_pos_rad2deg(-angle_env-Center(psitwindhat)+3.0*M_PI/2.0);
+	wind.speed = (float)Center(vtwindhat);
+
 	memset(&mission_current, 0, sizeof(mavlink_mission_current_t));
 	mission_current.seq = (uint16_t)CurWP+1;
 
@@ -1657,6 +1679,35 @@ REQ_DATA_STREAM...
 	{
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
+	}
+
+	mavlink_msg_nav_controller_output_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &nav_controller_output);
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (tlogfile)
+	{
+		fwrite_tlog(msg, tlogfile);
+		fflush(tlogfile);
+	}
+
+	if (robid & SAILBOAT_CLASS_ROBID_MASK)
+	{
+		mavlink_msg_wind_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &wind);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
 	}
 
 	mavlink_msg_mission_current_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_current);

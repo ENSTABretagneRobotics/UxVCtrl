@@ -1531,7 +1531,7 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 				case DIRECT_TRAJECTORY: s = 'D'; break;
 				case STARBOARD_TACK_TRAJECTORY: s = 'S'; break;
 				case PORT_TACK_TRAJECTORY: s = 'P'; break;
-				default: s = 'I'; break;
+				default: s = (bSailControl)? 'C': 'I'; break;
 				}
 				sprintf(szText, "%c %c %d%% %d%%%s VBAT1:%.1fV",
 					(vswitch*vswitchcoef > vswitchthreshold? 'A': 'M'), s, (int)floor(uw_f*100.0+0.05), (int)floor(u_f*100.0+0.05), ((robid == VAIMOS_ROBID)&&(!bSailCalibrated))? "?" : "", vbat1);
@@ -1622,8 +1622,8 @@ THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 			{
 				sprintf(szText, "%.1f/%.1f", 
 					// Apparent wind for Sailboat, true wind for VAIMOS for unfiltered value.
-					(robid == SAILBOAT_ROBID)? (fmod_2PI(-psiawind+M_PI+M_PI)+M_PI)*180.0/M_PI: (fmod_2PI(-angle_env-psitwind+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI, 
-					(fmod_2PI(-angle_env-Center(psitwindhat)+M_PI+3.0*M_PI/2.0)+M_PI)*180.0/M_PI);
+					(robid == SAILBOAT_ROBID)? fmod_360_pos_rad2deg(-psiawind+M_PI): fmod_360_pos_rad2deg(-angle_env-psitwind+3.0*M_PI/2.0), 
+					fmod_360_pos_rad2deg(-angle_env-Center(psitwindhat)+3.0*M_PI/2.0));
 				offset += 16;
 				cvPutText(dispimgs[guiid], szText, cvPoint(0,offset), &font, colortext);
 			}

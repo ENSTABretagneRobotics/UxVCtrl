@@ -1,3 +1,9 @@
+365
+Updated MAVLinkInterface.
+Corrected angles in bStdOutDetailedInfo. 
+Corrected deadlocks in MAVLink MISSION_START and SET_MODE.
+Corrected ignored 0 in IM483I. 
+
 364
 Added GAMMA_INFINITE and ZETA MAVLinkInterface parameters.
 Added linefollowingrelativestation, linefollowingrelativerobotstation, enable/disablesailreg commands.
