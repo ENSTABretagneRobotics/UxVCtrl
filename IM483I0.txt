@@ -18,7 +18,7 @@
 % NormalTorque
 100
 % ThresholdRval
-5000
+0
 % MinAngle (in rad)
 0.0
 % MaxAngle (in rad)

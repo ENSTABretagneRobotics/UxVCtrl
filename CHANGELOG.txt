@@ -1,3 +1,6 @@
+366
+Corrected missing space in IM483I initialization.
+
 365
 Updated MAVLinkInterface.
 Corrected angles in bStdOutDetailedInfo. 

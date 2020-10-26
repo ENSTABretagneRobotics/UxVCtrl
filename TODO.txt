@@ -1,8 +1,16 @@
+
 Check when to disable bSailControl...
 nav_controller_output.target_bearing, altitude dans mission planner...? 
 Angle voile dans OpenCPN?
 
+valeurs de vrxhat de temps en temps dans logstate pour VAIMOS?->c'est à cause du GPS qui ne se met à jour que rarement, voir comment estimer au mieux la vitesse...
+
 mettre les cartes d'OpenCPN dans Mission Planner?
+
+Rajouter message UxVCtrl VXXX...?
+Se tirer des blocages face au vent quand on doit faire demi-tour...?
+
+Pnputil (kinect) sur les différents travis...
 
 params max nb ball lancés au démarrage, err msg please increase dans command correspondante
 rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
@@ -847,6 +855,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Zone morte commande voile?->désactivé ThresholdRval
+bSailCalibrated if disconnect...?->OK
+bug deleted space in IM483I.h->pourquoi le space a pu être enlevé?->semble être une faute de frappe datant de 2015 lors de la copie du code dans UxVCtrl...
 
 si space ou touche g, sail est indiquée à 0% dans gui mais il semblerait que la commande ne soit pas réellement envoyée ou prise en compte par VAIMOS...->if (u_f > 0) angle = u_f*(im483i.MaxAngle-im483i.MinAngle)+im483i.MinAngle; else u_f = 0; (else à vérifier/corriger...)
 

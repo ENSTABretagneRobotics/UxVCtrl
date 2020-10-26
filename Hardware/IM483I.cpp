@@ -69,6 +69,10 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 				bConnected = TRUE; 
 				threadperiod = im483i.threadperiod;
 
+				//EnterCriticalSection(&StateVariablesCS);
+				bSailCalibrated = FALSE;
+				//LeaveCriticalSection(&StateVariablesCS);
+
 				if (im483i.pfSaveFile != NULL)
 				{
 					fclose(im483i.pfSaveFile); 
@@ -124,6 +128,7 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 					if (CalibrateMotorIM483I(&im483i) != EXIT_SUCCESS)
 					{
 						printf("Connection to a IM483I lost.\n");
+						bSailCalibrated = FALSE;
 						bConnected = FALSE;
 						DisconnectIM483I(&im483i);
 						break;
@@ -140,6 +145,7 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 				if (SetMaxAngleIM483I(&im483i, angle) != EXIT_SUCCESS)
 				{
 					printf("Connection to a IM483I lost.\n");
+					bSailCalibrated = FALSE;
 					bConnected = FALSE;
 					DisconnectIM483I(&im483i);
 				}

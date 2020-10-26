@@ -355,7 +355,7 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 	// Initialization.
 	// Prepare data to send to device.
 	memset(sendbuf, 0, sizeof(sendbuf));
-	sprintf(sendbuf, "\r");
+	sprintf(sendbuf, " \r");
 	sendbuflen = (int)strlen(sendbuf);
 
 	if (WriteAllRS232Port(&pIM483I->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
