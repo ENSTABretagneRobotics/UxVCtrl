@@ -1,9 +1,10 @@
 
 Check when to disable bSailControl...
-nav_controller_output.target_bearing, altitude dans mission planner...? 
+dans mission planner avec sitl model sailboat, wind_vel est probablement vent vrai, airspeed est vent apparent et groundspeed probablement SOG
+Points, lignes dans mission planner->peut-être que la logique de ce qui s'appelle home dans mes waypoints est pas bonne...->en attendant de comprendre toujours faire un read après un write de waypoints...
 Angle voile dans OpenCPN?
 
-valeurs de vrxhat de temps en temps dans logstate pour VAIMOS?->c'est à cause du GPS qui ne se met à jour que rarement, voir comment estimer au mieux la vitesse...
+valeurs de vrxhat de temps en temps dans logstate pour VAIMOS?->c'est à cause du GPS qui ne se met à jour que rarement, voir comment estimer au mieux la vitesse...->should probably use euler angles for its estimation...
 
 mettre les cartes d'OpenCPN dans Mission Planner?
 
@@ -17,6 +18,7 @@ rajouter params/commands pour CorrectImageBordersRawBGR de Ball...
 params estimation vent...
 warnings in 64 bit...
 Ffmpeg : if strcmp("Kinect2Color" or "Kinect2Depth" or name starts with"opencv://"...) call opencv else if (strcmp("ffmpeg://...")) call ffmpgopen() else if ffmpegopen() fails call opencv...
+rajouter des Error writing data to a XXX dans les device.h...
 
 RPLIDAR A3 : if wrong baudrate, GetInfoRequestRPLIDAR() with SDK causes CTD or exit()...?
 RPLIDAR new extended and dense express scan modes...?
@@ -855,6 +857,8 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+SITL sailboat ch1 1600 tourne sens horaire
 
 Zone morte commande voile?->désactivé ThresholdRval
 bSailCalibrated if disconnect...?->OK

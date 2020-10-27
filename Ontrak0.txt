@@ -9,5 +9,7 @@
 100
 % bSaveRawData (require associated thread)
 1
+% bCheckState
+0
 % disp_period (in s)
 30

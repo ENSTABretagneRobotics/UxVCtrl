@@ -9,6 +9,8 @@
 50
 % bSaveRawData (require associated thread)
 1
+% bCheckState
+0
 % CalibrationSpeed
 2000
 % CalibrationTime (in ms)

@@ -830,6 +830,12 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 		switch (robid)
 		{
+		case SAILBOAT_ROBID:
+		case SAILBOAT2_ROBID:
+		case VAIMOS_ROBID:
+			u1 = -uw_f;
+			u3 = uv_f;
+			break;
 		case QUADRO_SIMULATOR_ROBID:
 		case COPTER_ROBID:
 			u1 = 1.0*uv_f+0.2*uw_f+0.4*up_f;

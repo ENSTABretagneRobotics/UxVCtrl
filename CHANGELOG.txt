@@ -1,3 +1,7 @@
+367
+Updated MAVLinkInterface.
+Added bCheckState parameter to IM483I and Ontrak.
+
 366
 Corrected missing space in IM483I initialization.
 

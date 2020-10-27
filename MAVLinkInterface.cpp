@@ -1575,16 +1575,20 @@ REQ_DATA_STREAM...
 	memset(&vfr_hud, 0, sizeof(mavlink_vfr_hud_t));
 	vfr_hud.alt = (float)Center(zhat);
 	vfr_hud.heading = (int16_t)fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
+	vfr_hud.groundspeed = (float)sog;
+	vfr_hud.airspeed = (float)fluidspeeda;
 	vfr_hud.throttle = (uint16_t)fabs(u_f*100);
 
 	memset(&nav_controller_output, 0, sizeof(mavlink_nav_controller_output_t));
 	if ((bWaypointControl)||(bGuidedControl))
 	{
 		nav_controller_output.wp_dist = (uint16_t)sqrt(pow(wx-Center(xhat), 2)+pow(wy-Center(yhat), 2));
+		nav_controller_output.target_bearing = (int16_t)fmod_360_pos_rad2deg(-angle_env-atan2(wy-Center(yhat), wx-Center(xhat))+M_PI/2.0);
 	}
 	if (bLineFollowingControl)
 	{
 		nav_controller_output.wp_dist = (uint16_t)sqrt(pow(wxb-Center(xhat), 2)+pow(wyb-Center(yhat), 2));
+		nav_controller_output.target_bearing = (int16_t)fmod_360_pos_rad2deg(-angle_env-atan2(wyb-Center(yhat), wxb-Center(xhat))+M_PI/2.0);
 		nav_controller_output.xtrack_error = (float)xte;
 	}
 	if (bHeadingControl) nav_controller_output.nav_bearing = (int16_t)fmod_360_pos_rad2deg(-angle_env-wpsi+M_PI/2.0);

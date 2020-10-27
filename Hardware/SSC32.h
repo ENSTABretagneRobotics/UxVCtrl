@@ -103,6 +103,7 @@ inline int SetDigitalOutputSSC32(SSC32* pSSC32, int channel, int value)
 
 	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -150,6 +151,7 @@ inline int GetDigitalInputSSC32(SSC32* pSSC32, int channel, int* pValue)
 
 	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -164,6 +166,7 @@ inline int GetDigitalInputSSC32(SSC32* pSSC32, int channel, int* pValue)
 
 	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error reading data from a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -214,6 +217,7 @@ inline int GetVoltageSSC32(SSC32* pSSC32, int channel, double* pVoltage)
 
 	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -228,6 +232,7 @@ inline int GetVoltageSSC32(SSC32* pSSC32, int channel, double* pVoltage)
 
 	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error reading data from a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -266,6 +271,7 @@ inline int GetPWMSSC32(SSC32* pSSC32, int channel, int* pPw)
 
 	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -280,6 +286,7 @@ inline int GetPWMSSC32(SSC32* pSSC32, int channel, int* pPw)
 
 	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error reading data from a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -338,6 +345,7 @@ inline int SetPWMSSC32(SSC32* pSSC32, int channel, int pw)
 
 	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
@@ -420,6 +428,7 @@ inline int SetAllPWMsSSC32(SSC32* pSSC32, int* selectedchannels, int* pws)
 
 	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
 	{
+		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
 	}
 	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
