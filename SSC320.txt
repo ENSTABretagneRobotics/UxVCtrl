@@ -9,6 +9,8 @@ COM6
 50
 % bSaveRawData (require associated thread)
 1
+% bytedelayus (in us, -1 to disable)
+-1
 % channel 0
 % MinPW (in us)
 1000

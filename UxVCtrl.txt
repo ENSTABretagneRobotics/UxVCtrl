@@ -187,6 +187,8 @@ WMV2
 0
 % bEnable_NMEAInterface_HEROT
 0
+% bEnable_NMEAInterface_TIROT
+0
 % bEnable_NMEAInterface_WIMWV
 0
 % bEnable_NMEAInterface_WIMWD

@@ -156,6 +156,7 @@ BOOL bEnable_NMEAInterface_HCHDG = FALSE;
 BOOL bEnable_NMEAInterface_HCHDM = FALSE;
 BOOL bEnable_NMEAInterface_HEHDT = FALSE;
 BOOL bEnable_NMEAInterface_HEROT = FALSE;
+BOOL bEnable_NMEAInterface_TIROT = FALSE;
 BOOL bEnable_NMEAInterface_WIMWV = FALSE;
 BOOL bEnable_NMEAInterface_WIMWD = FALSE;
 BOOL bEnable_NMEAInterface_WIMDA = FALSE;

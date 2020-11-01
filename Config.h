@@ -110,6 +110,7 @@ inline int LoadConfig(void)
 	bEnable_NMEAInterface_HCHDM = FALSE;
 	bEnable_NMEAInterface_HEHDT = FALSE;
 	bEnable_NMEAInterface_HEROT = FALSE;
+	bEnable_NMEAInterface_TIROT = FALSE;
 	bEnable_NMEAInterface_WIMWV = FALSE;
 	bEnable_NMEAInterface_WIMWD = FALSE;
 	bEnable_NMEAInterface_WIMDA = FALSE;
@@ -554,6 +555,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_HEHDT) != 1) printf("Invalid parameter : bEnable_NMEAInterface_HEHDT.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bEnable_NMEAInterface_HEROT.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_HEROT) != 1) printf("Invalid parameter : bEnable_NMEAInterface_HEROT.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bEnable_NMEAInterface_TIROT.\n");
+		if (sscanf(line, "%d", &bEnable_NMEAInterface_TIROT) != 1) printf("Invalid parameter : bEnable_NMEAInterface_TIROT.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bEnable_NMEAInterface_WIMWV.\n");
 		if (sscanf(line, "%d", &bEnable_NMEAInterface_WIMWV) != 1) printf("Invalid parameter : bEnable_NMEAInterface_WIMWV.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bEnable_NMEAInterface_WIMWD.\n");
@@ -1719,6 +1722,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_HEHDT) < 0) printf("Error writing parameter : bEnable_NMEAInterface_HEHDT.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bEnable_NMEAInterface_HEROT.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_HEROT) < 0) printf("Error writing parameter : bEnable_NMEAInterface_HEROT.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bEnable_NMEAInterface_TIROT.\n");
+	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_TIROT) < 0) printf("Error writing parameter : bEnable_NMEAInterface_TIROT.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bEnable_NMEAInterface_WIMWV.\n");
 	if (fprintf(fileout, "%d\n", bEnable_NMEAInterface_WIMWV) < 0) printf("Error writing parameter : bEnable_NMEAInterface_WIMWV.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bEnable_NMEAInterface_WIMWD.\n");

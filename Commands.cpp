@@ -15,7 +15,7 @@ THREAD_PROC_RETURN_VALUE CommandsThread(void* pParam)
 
 	UNREFERENCED_PARAMETER(pParam);
 
-	printf("Type a command or exit to terminate the program.\n");
+	printf("Type a command (e.g. help) or exit to terminate the program.\n");
 
 	// Read and execute commands from stdin.
 	for (;;)

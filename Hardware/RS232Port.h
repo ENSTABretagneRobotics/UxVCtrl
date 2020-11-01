@@ -698,6 +698,49 @@ inline int WriteAllRS232Port(RS232PORT* pRS232Port, uint8* writebuf, int writebu
 }
 
 /*
+Write data to a RS232 port with a delay between each byte. Retry automatically if all 
+the bytes were not written.
+
+RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
+a RS232 port.
+uint8* writebuf : (IN) Valid pointer to the data to write.
+int writebuflen : (IN) Number of bytes to write.
+int bytedelayus : (IN) Delay in us between each byte.
+
+Return : EXIT_SUCCESS if all the bytes are written, EXIT_TIMEOUT if a timeout occurs or 
+EXIT_FAILURE if there is an error.
+*/
+inline int WriteAllWithByteDelayRS232Port(RS232PORT* pRS232Port, uint8* writebuf, int writebuflen, int bytedelayus)
+{
+	int i = 0;
+
+	for (;;)
+	{
+		switch (WriteAllRS232Port(pRS232Port, &(writebuf[i]), 1))
+		{
+		case EXIT_SUCCESS:
+			i++;
+			if (i < writebuflen) uSleep(bytedelayus); else return EXIT_SUCCESS;
+			break;
+		case EXIT_TIMEOUT:
+			PRINT_DEBUG_WARNING_RS232PORT(("WriteAllWithByteDelayRS232Port warning (%s) : %s"
+				"(pRS232Port=%#x, writebuf=%#x, writebuflen=%d, bytedelayus=%d)\n",
+				strtime_m(),
+				szOSUtilsErrMsgs[EXIT_TIMEOUT],
+				pRS232Port, writebuf, writebuflen, bytedelayus));
+			return EXIT_TIMEOUT;
+		default:
+			PRINT_DEBUG_ERROR_RS232PORT(("WriteAllWithByteDelayRS232Port error (%s) : %s"
+				"(pRS232Port=%#x, writebuf=%#x, writebuflen=%d, bytedelayus=%d)\n",
+				strtime_m(),
+				"WriteAllRS232Port failed. ",
+				pRS232Port, writebuf, writebuflen, bytedelayus));
+			return EXIT_FAILURE;
+		}
+	}
+}
+
+/*
 Read data from a RS232 port. Retry automatically if all the bytes were not read.
 
 RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 

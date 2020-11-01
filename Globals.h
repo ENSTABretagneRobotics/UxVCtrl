@@ -397,6 +397,7 @@ extern BOOL bEnable_NMEAInterface_HCHDG;
 extern BOOL bEnable_NMEAInterface_HCHDM;
 extern BOOL bEnable_NMEAInterface_HEHDT;
 extern BOOL bEnable_NMEAInterface_HEROT;
+extern BOOL bEnable_NMEAInterface_TIROT;
 extern BOOL bEnable_NMEAInterface_WIMWV;
 extern BOOL bEnable_NMEAInterface_WIMWD;
 extern BOOL bEnable_NMEAInterface_WIMDA;

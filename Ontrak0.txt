@@ -9,6 +9,8 @@
 100
 % bSaveRawData (require associated thread)
 1
+% bytedelayus (in us, -1 to disable)
+200
 % bCheckState
 0
 % disp_period (in s)

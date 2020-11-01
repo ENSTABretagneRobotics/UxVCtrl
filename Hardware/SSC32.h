@@ -61,6 +61,7 @@ struct SSC32
 	int timeout;
 	int threadperiod;
 	BOOL bSaveRawData;
+	int bytedelayus;
 	int MinPWs[NB_CHANNELS_PWM_SSC32];
 	int MidPWs[NB_CHANNELS_PWM_SSC32];
 	int MaxPWs[NB_CHANNELS_PWM_SSC32];
@@ -78,6 +79,12 @@ struct SSC32
 	double MaxAngle;
 };
 typedef struct SSC32 SSC32;
+
+inline int WriteDataSSC32(SSC32* pSSC32, uint8* writebuf, int writebuflen, int bytedelayus)
+{
+	if (bytedelayus < 0) return WriteAllRS232Port(&pSSC32->RS232Port, writebuf, writebuflen);
+	else return WriteAllWithByteDelayRS232Port(&pSSC32->RS232Port, writebuf, writebuflen, bytedelayus);
+}
 
 /*
 Set a digital output channel.
@@ -101,7 +108,7 @@ inline int SetDigitalOutputSSC32(SSC32* pSSC32, int channel, int value)
 		sprintf(sendbuf, "#%dL\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
@@ -149,7 +156,7 @@ inline int GetDigitalInputSSC32(SSC32* pSSC32, int channel, int* pValue)
 	sprintf(sendbuf, "%c\r", c);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
@@ -215,7 +222,7 @@ inline int GetVoltageSSC32(SSC32* pSSC32, int channel, double* pVoltage)
 	sprintf(sendbuf, "V%c\r", c);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
@@ -269,7 +276,7 @@ inline int GetPWMSSC32(SSC32* pSSC32, int channel, int* pPw)
 	sprintf(sendbuf, "#%dPI\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
@@ -343,7 +350,7 @@ inline int SetPWMSSC32(SSC32* pSSC32, int channel, int pw)
 	sprintf(sendbuf, "#%dP%d\r", channel, pw);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
@@ -426,7 +433,7 @@ inline int SetAllPWMsSSC32(SSC32* pSSC32, int* selectedchannels, int* pws)
 
 	//printf("%s\n", sendbuf);
 
-	if (WriteAllRS232Port(&pSSC32->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a SSC32. \n");
 		return EXIT_FAILURE;
@@ -691,6 +698,7 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 		pSSC32->timeout = 1000;
 		pSSC32->threadperiod = 50;
 		pSSC32->bSaveRawData = 1;
+		pSSC32->bytedelayus = -1;
 		for (channel = 0; channel < NB_CHANNELS_PWM_SSC32; channel++)
 		{
 			pSSC32->MinPWs[channel] = 1000;
@@ -724,6 +732,8 @@ inline int ConnectSSC32(SSC32* pSSC32, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pSSC32->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pSSC32->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pSSC32->bytedelayus) != 1) printf("Invalid configuration file.\n");
 
 			for (channel = 0; channel < NB_CHANNELS_PWM_SSC32; channel++)
 			{

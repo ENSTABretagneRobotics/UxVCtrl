@@ -1,3 +1,9 @@
+368
+Added startup message UxVCtrl VXXX.
+Added bytedelayus parameter to IM483I, Ontrak, SSC32.
+Added bEnable_NMEAInterface_TIROT parameter.
+Updated IM483I.
+
 367
 Updated MAVLinkInterface.
 Added bCheckState parameter to IM483I and Ontrak.

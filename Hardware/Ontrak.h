@@ -66,10 +66,17 @@ struct ONTRAK
 	int timeout;
 	int threadperiod;
 	BOOL bSaveRawData;
+	int bytedelayus;
 	BOOL bCheckState;
 	int disp_period;
 };
 typedef struct ONTRAK ONTRAK;
+
+inline int WriteDataOntrak(ONTRAK* pOntrak, uint8* writebuf, int writebuflen, int bytedelayus)
+{
+	if (bytedelayus < 0) return WriteAllRS232Port(&pOntrak->RS232Port, writebuf, writebuflen);
+	else return WriteAllWithByteDelayRS232Port(&pOntrak->RS232Port, writebuf, writebuflen, bytedelayus);
+}
 
 inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 {
@@ -91,7 +98,7 @@ inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 	}
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a Ontrak. \n");
 		return EXIT_FAILURE;
@@ -113,7 +120,7 @@ inline int SetRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 		sprintf(sendbuf, "1RPK%d\r", channel);
 		sendbuflen = (int)strlen(sendbuf);
 
-		if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+		if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a Ontrak. \n");
 			return EXIT_FAILURE;
@@ -177,7 +184,7 @@ inline int SetDigitalRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 	}
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a Ontrak. \n");
 		return EXIT_FAILURE;
@@ -199,7 +206,7 @@ inline int SetDigitalRelayOntrak(ONTRAK* pOntrak, int channel, int bOpen)
 		sprintf(sendbuf, "0RPA%d\r", channel);
 		sendbuflen = (int)strlen(sendbuf);
 
-		if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+		if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 		{
 			printf("Error writing data to a Ontrak. \n");
 			return EXIT_FAILURE;
@@ -255,7 +262,7 @@ inline int GetAnalogInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 	sprintf(sendbuf, "0RD%d\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a Ontrak. \n");
 		return EXIT_FAILURE;
@@ -304,7 +311,7 @@ inline int GetDigitalInputOntrak(ONTRAK* pOntrak, int channel, int* pValue)
 	sprintf(sendbuf, "1RPA%d\r", channel);
 	sendbuflen = (int)strlen(sendbuf);
 
-	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Error writing data to a Ontrak. \n");
 		return EXIT_FAILURE;
@@ -365,6 +372,7 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 		pOntrak->timeout = 2000;
 		pOntrak->threadperiod = 100;
 		pOntrak->bSaveRawData = 1;
+		pOntrak->bytedelayus = -1;
 		pOntrak->bCheckState = 0;
 		pOntrak->disp_period = 30;
 
@@ -382,6 +390,8 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pOntrak->threadperiod) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pOntrak->bSaveRawData) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->bytedelayus) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pOntrak->bCheckState) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -422,7 +432,7 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "0SPA00000000\r");
 	sendbuflen = (int)strlen(sendbuf);
-	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a Ontrak : Failed to reset the digital port to avoid the relays turning on unexpectedly when the port is configured.\n");
 		CloseRS232Port(&pOntrak->RS232Port);
@@ -438,7 +448,7 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "0CPA00000000\r");
 	sendbuflen = (int)strlen(sendbuf);
-	if (WriteAllRS232Port(&pOntrak->RS232Port, (unsigned char*)sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
 	{
 		printf("Unable to connect to a Ontrak : Failed to configure the digital port as output.\n");
 		CloseRS232Port(&pOntrak->RS232Port);
