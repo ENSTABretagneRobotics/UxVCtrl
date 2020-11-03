@@ -17,9 +17,13 @@
 2000
 % CalibrationTime (in ms)
 65000
-% CalibrationTorque
+% CalibrationHoldTorque (in %)
+1
+% CalibrationRunTorque (in %)
 60
-% NormalTorque
+% NormalHoldTorque (in %)
+1
+% NormalRunTorque (in %)
 100
 % ThresholdRval
 0

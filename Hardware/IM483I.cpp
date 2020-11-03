@@ -142,12 +142,19 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 				//angle = deltasmax;
 				if (u_f > 0) angle = u_f*(im483i.MaxAngle-im483i.MinAngle)+im483i.MinAngle; else angle = im483i.MinAngle;
 				LeaveCriticalSection(&StateVariablesCS);
-				if (SetMaxAngleIM483I(&im483i, angle) != EXIT_SUCCESS)
+				i = 0;
+				while (SetMaxAngleIM483I(&im483i, angle) != EXIT_SUCCESS)
 				{
-					printf("Connection to a IM483I lost.\n");
-					bSailCalibrated = FALSE;
-					bConnected = FALSE;
-					DisconnectIM483I(&im483i);
+					if (i > 4)
+					{
+						printf("Connection to a IM483I lost.\n");
+						bSailCalibrated = FALSE;
+						bConnected = FALSE;
+						DisconnectIM483I(&im483i);
+						break;
+					}
+					mSleep(im483i.timeout);
+					i++;
 				}
 				break;
 			default:

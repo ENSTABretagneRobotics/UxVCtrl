@@ -42,8 +42,10 @@
 #define MAX_ANGLE_IM483I (M_PI/2.0)
 #define CALIBRATION_SPEED_IM483I 2000
 #define CALIBRATION_TIME_IM483I 65000 // In ms.
-#define CALIBRATION_TORQUE_IM483I 60
-#define NORMAL_TORQUE_IM483I 100
+#define CALIBRATION_HOLD_TORQUE_IM483I 1
+#define CALIBRATION_RUN_TORQUE_IM483I 60
+#define NORMAL_HOLD_TORQUE_IM483I 1
+#define NORMAL_RUN_TORQUE_IM483I 100
 
 struct IM483I
 {
@@ -61,8 +63,10 @@ struct IM483I
 	BOOL bCheckState;
 	int CalibrationSpeed;
 	int CalibrationTime;
-	int CalibrationTorque;
-	int NormalTorque;
+	int CalibrationHoldTorque;
+	int CalibrationRunTorque;
+	int NormalHoldTorque;
+	int NormalRunTorque;
 	int ThresholdRval;
 	double MinAngle;
 	double MaxAngle;
@@ -332,7 +336,7 @@ inline int SetMaxAngleIM483I(IM483I* pIM483I, double angle)
 
 inline int CalibrateMotorIM483I(IM483I* pIM483I)
 {
-	if (SetMotorTorqueIM483I(pIM483I, 1, pIM483I->CalibrationTorque) != EXIT_SUCCESS)
+	if (SetMotorTorqueIM483I(pIM483I, pIM483I->CalibrationHoldTorque, pIM483I->CalibrationRunTorque) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -352,7 +356,7 @@ inline int CalibrateMotorIM483I(IM483I* pIM483I)
 		return EXIT_FAILURE;
 	}
 	mSleep(1000);
-	if (SetMotorTorqueIM483I(pIM483I, 1, pIM483I->NormalTorque) != EXIT_SUCCESS)
+	if (SetMotorTorqueIM483I(pIM483I, pIM483I->NormalHoldTorque, pIM483I->NormalRunTorque) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
 	}
@@ -391,8 +395,10 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 		pIM483I->bCheckState = 0;
 		pIM483I->CalibrationSpeed = CALIBRATION_SPEED_IM483I;
 		pIM483I->CalibrationTime = CALIBRATION_TIME_IM483I;
-		pIM483I->CalibrationTorque = CALIBRATION_TORQUE_IM483I;
-		pIM483I->NormalTorque = NORMAL_TORQUE_IM483I;
+		pIM483I->CalibrationHoldTorque = CALIBRATION_HOLD_TORQUE_IM483I;
+		pIM483I->CalibrationRunTorque = CALIBRATION_RUN_TORQUE_IM483I;
+		pIM483I->NormalHoldTorque = NORMAL_HOLD_TORQUE_IM483I;
+		pIM483I->NormalRunTorque = NORMAL_RUN_TORQUE_IM483I;
 		pIM483I->ThresholdRval = 0;
 		pIM483I->MinAngle = MIN_ANGLE_IM483I;
 		pIM483I->MaxAngle = MAX_ANGLE_IM483I;
@@ -420,9 +426,13 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pIM483I->CalibrationTime) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pIM483I->CalibrationTorque) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pIM483I->CalibrationHoldTorque) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &pIM483I->NormalTorque) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pIM483I->CalibrationRunTorque) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pIM483I->NormalHoldTorque) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pIM483I->NormalRunTorque) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pIM483I->ThresholdRval) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -452,10 +462,25 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 		printf("Invalid parameter : CalibrationTime.\n");
 		pIM483I->CalibrationTime = CALIBRATION_TIME_IM483I;
 	}
-	if ((pIM483I->CalibrationTorque < 0)||(pIM483I->CalibrationTorque > 100))
+	if ((pIM483I->CalibrationHoldTorque < 0)||(pIM483I->CalibrationHoldTorque > 100))
 	{
-		printf("Invalid parameter : CalibrationTorque.\n");
-		pIM483I->CalibrationTorque = CALIBRATION_TORQUE_IM483I;
+		printf("Invalid parameter : CalibrationHoldTorque.\n");
+		pIM483I->CalibrationHoldTorque = CALIBRATION_HOLD_TORQUE_IM483I;
+	}
+	if ((pIM483I->CalibrationRunTorque < 0)||(pIM483I->CalibrationRunTorque > 100))
+	{
+		printf("Invalid parameter : CalibrationRunTorque.\n");
+		pIM483I->CalibrationRunTorque = CALIBRATION_RUN_TORQUE_IM483I;
+	}
+	if ((pIM483I->NormalHoldTorque < 0)||(pIM483I->NormalHoldTorque > 100))
+	{
+		printf("Invalid parameter : NormalHoldTorque.\n");
+		pIM483I->NormalHoldTorque = NORMAL_HOLD_TORQUE_IM483I;
+	}
+	if ((pIM483I->NormalRunTorque < 0)||(pIM483I->NormalRunTorque > 100))
+	{
+		printf("Invalid parameter : NormalRunTorque.\n");
+		pIM483I->NormalRunTorque = NORMAL_RUN_TORQUE_IM483I;
 	}
 
 	// Used to save raw data, should be handled specifically...

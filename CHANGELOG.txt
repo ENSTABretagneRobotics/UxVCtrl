@@ -1,3 +1,6 @@
+369
+Added CalibrationHoldTorque and NormalHoldTorque parameters to IM483I.
+
 368
 Added startup message UxVCtrl VXXX.
 Added bytedelayus parameter to IM483I, Ontrak, SSC32.
