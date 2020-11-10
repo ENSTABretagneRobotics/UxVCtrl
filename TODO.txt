@@ -1,7 +1,9 @@
 
-Points, lignes dans mission planner->peut-être que la logique de ce qui s'appelle home dans mes waypoints est pas bonne...->en attendant de comprendre toujours faire un read après un write de waypoints...
+Mission Planner : le mission protocol semble avoir changé, mieux interpréter ce qui est envoyé en premier (avant c'était Home), si c'est un waypoint il faut le prendre en compte...
 Check when to disable bSailControl...
+pouvoir avoir 2 ssc32 et im483i pour HIL...
 dans mission planner avec sitl model sailboat, wind_vel est probablement vent vrai, airspeed est vent apparent et groundspeed probablement SOG
+add PID params to mission planner...
 Angle voile dans OpenCPN?
 
 valeurs de vrxhat de temps en temps dans logstate pour VAIMOS?->c'est à cause du GPS qui ne se met à jour que rarement, voir comment estimer au mieux la vitesse...->should probably use euler angles for its estimation...
@@ -622,7 +624,7 @@ zoom pas fait au bon endroit
 Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
 tester touches en nomachine, ssh -X...
 Afficher tension, affichage des infos du waypoint courant mission planner
-modify waypoints/heading commands so that they do a line following in the case of a sailboat?
+modify waypoints/heading commands so that they do a line following in the case of a sailboat? bWaypointControl, bGuidedControl?
 Copier implémentation launchtcpsrv pour la modifier et stopper correctement?
 Move MAVLinkInterface in Hardware with its own config file?
 use cvGetCaptureProperty(capture, CV_CAP_PROP_FPS) when reading video file in Video.cpp, modify also in remotewebcamsrv?
@@ -856,6 +858,19 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Should be t_app in lognav instead of t...?->t_app est pas global, c'est le t de Observer.cpp...
+
+IM483I
+Add params hold/runNormal/CalibrationTorque
+From doc : check echoed data, insert small delay between characters->mais il y a un sign-on message "xxxx xxxx ADVANCED MICROSYSTEMS. INC MAX-2000 vX.XXi\r#"->vérifier le # après le premier \r, puis echo + \n pour autres commandes?
+Écrire caractère par caractère avec CharDelay 200 us...?
+Zone morte : quand R0, toujours mettre à 0?
+MAX_IM483I, MIN_IM483I to put in params?->trop particulier et defines utilisés dans UxVSim sans le fichier de config...
+Y, M, O, R
+Ordres ignorés si moteur en train de tourner?->selon la doc p15, c'est juste delayed dans le pire cas...->peut-être que depuis toujours il y a quand même parfois des ordres ignorés et que pour gérer cela il vaut mieux forcer des ordres régulièrement...
+bSailCalibrated if disconnect...?->OK
+bug deleted space in IM483I.h->pourquoi le space a pu être enlevé?->semble être une faute de frappe datant de 2015 lors de la copie du code dans UxVCtrl...
 
 SITL sailboat ch1 1600 tourne sens horaire
 

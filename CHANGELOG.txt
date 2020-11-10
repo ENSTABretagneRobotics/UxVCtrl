@@ -1,3 +1,7 @@
+370
+Updated MAVLinkInterface.
+Added SetDefaultDevicesState parameter to Ontrak.
+
 369
 Added CalibrationHoldTorque and NormalHoldTorque parameters to IM483I.
 

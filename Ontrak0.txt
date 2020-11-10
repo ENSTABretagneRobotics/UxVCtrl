@@ -13,5 +13,7 @@
 200
 % bCheckState
 0
-% disp_period (in s)
-30
+% disp_period (in s, -1 to disable)
+-1
+% SetDefaultDevicesState
+1

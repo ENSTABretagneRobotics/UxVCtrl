@@ -69,6 +69,7 @@ struct ONTRAK
 	int bytedelayus;
 	BOOL bCheckState;
 	int disp_period;
+	BOOL bSetDefaultDevicesState;
 };
 typedef struct ONTRAK ONTRAK;
 
@@ -375,6 +376,7 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 		pOntrak->bytedelayus = -1;
 		pOntrak->bCheckState = 0;
 		pOntrak->disp_period = 30;
+		pOntrak->bSetDefaultDevicesState = 1;
 
 		// Load data from a file.
 		file = fopen(szCfgFilePath, "r");
@@ -396,6 +398,8 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pOntrak->bCheckState) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pOntrak->disp_period) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->bSetDefaultDevicesState) != 1) printf("Invalid configuration file.\n");
 			if (fclose(file) != EXIT_SUCCESS) printf("fclose() failed.\n");
 		}
 		else

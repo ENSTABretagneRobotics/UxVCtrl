@@ -387,8 +387,11 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			if (vbat2 != 0) EPU2 += dt*(vbat2_filtered*ibat2_filtered)/3600.0;
 			else EPU2 += dt*((u1+u2+u3)*P_actuators_1+P_actuators_4)/3600.0;
 			break;
-		case SAILBOAT_SIMULATOR_ROBID:
 		case VAIMOS_ROBID:
+			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;
+			else EPU1 += dt*(P_electronics_4+P_actuators_4)/3600.0;
+			break;
+		case SAILBOAT_SIMULATOR_ROBID:
 		case SAILBOAT_ROBID:
 		case SAILBOAT2_ROBID:
 			if (vbat1 != 0) EPU1 += dt*(vbat1_filtered*ibat1_filtered)/3600.0;

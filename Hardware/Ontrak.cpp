@@ -108,6 +108,50 @@ int SetDeviceCurrentState(char* szFilename, int bON)
 	return EXIT_SUCCESS;
 }
 
+int GetDefaultDevicesState(void)
+{
+	if (GetDeviceCurrentState("CurArmadeusState.txt", &bArmadeusON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (GetDeviceCurrentState("CurBottomPumpState.txt", &bBottomPumpON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (GetDeviceCurrentState("CurSurfacePumpState.txt", &bSurfacePumpON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (GetDeviceCurrentState("CurProbeState.txt", &bProbeON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (GetDeviceCurrentState("CurWifiState.txt", &bWifiON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (GetDeviceCurrentState("CurIridiumState.txt", &bIridiumON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if (GetDeviceCurrentState("CurSailMotorState.txt", &bSailMotorON) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	printf("Devices default state : \n");
+	printf("   Armadeus : %s\n", bArmadeusON? "ON": "OFF");
+	printf("   Bottom pump : %s\n", bBottomPumpON? "ON": "OFF");
+	printf("   Surface pump : %s\n", bSurfacePumpON? "ON": "OFF");
+	printf("   Probe : %s\n", bProbeON? "ON": "OFF");
+	printf("   Wi-Fi : %s\n", bWifiON? "ON": "OFF");
+	printf("   Iridium : %s\n", bIridiumON? "ON": "OFF");
+	printf("   Sail motor : %s\n", bSailMotorON? "ON": "OFF");
+	fflush(stdout);
+
+	return EXIT_SUCCESS;
+}
+
 int SetDefaultDevicesState(void)
 {
 	// Switch on the Armadeus (active-low).
@@ -150,7 +194,7 @@ int SetDefaultDevicesState(void)
 	{
 		return EXIT_FAILURE;
 	}
-	// Switch on the Wifi (active-low).
+	// Switch on the Wi-Fi (active-low).
 	if (SetRelayOntrak(&ontrak, WIFI_CHANNEL_ONTRAK, 1) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
@@ -186,7 +230,7 @@ int SetDefaultDevicesState(void)
 	printf("   Bottom pump : OFF\n");
 	printf("   Surface pump : OFF\n");
 	printf("   Probe : ON\n");
-	printf("   Wifi : ON\n");
+	printf("   Wi-Fi : ON\n");
 	printf("   Iridium : ON\n");
 	printf("   Sail motor : ON\n");
 	fflush(stdout);
@@ -312,7 +356,7 @@ int CheckDevicesState(void)
 			{
 				return EXIT_FAILURE;
 			}
-			printf("Wifi : ON.\n"); fflush(stdout);
+			printf("Wi-Fi : ON.\n"); fflush(stdout);
 		}
 		else
 		{
@@ -320,7 +364,7 @@ int CheckDevicesState(void)
 			{
 				return EXIT_FAILURE;
 			}
-			printf("Wifi : OFF.\n"); fflush(stdout);
+			printf("Wi-Fi : OFF.\n"); fflush(stdout);
 		}
 		bWifiON = bON;
 	}
@@ -577,13 +621,57 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 		}
 		else
 		{
-
-
-			// From VAIMOS VPower...
-
-			if (bFirstLoop)
+			switch (robid)
 			{
-				if (GetAnalogInputOntrak(&ontrak, BATTERY_VOLTAGE_CHANNEL_ONTRAK, &battery_voltage_raw) != EXIT_SUCCESS)
+			case VAIMOS_ROBID:
+			default:
+
+				// From VAIMOS VPower...
+
+				if (bFirstLoop)
+				{
+					if (GetAnalogInputOntrak(&ontrak, BATTERY_VOLTAGE_CHANNEL_ONTRAK, &battery_voltage_raw) != EXIT_SUCCESS)
+					{
+						printf("Connection to a Ontrak lost.\n");
+						bConnected = FALSE;
+						CleanUp_ontrak();
+						DisconnectOntrak(&ontrak);
+						break;
+					}
+					if (ontrak.disp_period >= 0) printf("Serial IO interface test : battery voltage=%f V.\n", ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw));
+					fflush(stdout);
+
+					if (ontrak.bSetDefaultDevicesState)
+					{
+						if (SetDefaultDevicesState() != EXIT_SUCCESS)
+						{
+							printf("Connection to a Ontrak lost.\n");
+							bConnected = FALSE;
+							CleanUp_ontrak();
+							DisconnectOntrak(&ontrak);
+							break;
+						}
+					}
+					else
+					{
+						if (GetDefaultDevicesState() != EXIT_SUCCESS)
+						{
+							printf("Connection to a Ontrak lost.\n");
+							bConnected = FALSE;
+							CleanUp_ontrak();
+							DisconnectOntrak(&ontrak);
+							break;
+						}
+					}
+					bFirstLoop = FALSE;
+				}
+
+				counter++;
+				t0_ontrak = t_ontrak;
+				GetTimeElapsedChrono(&chrono_power, &t_ontrak);
+
+				// Check if the files indicating the devices state have changed.
+				if (CheckDevicesState() != EXIT_SUCCESS)
 				{
 					printf("Connection to a Ontrak lost.\n");
 					bConnected = FALSE;
@@ -591,10 +679,9 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 					DisconnectOntrak(&ontrak);
 					break;
 				}
-				printf("Serial IO interface test : battery voltage=%f V.\n", ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw));
-				fflush(stdout);
 
-				if (SetDefaultDevicesState() != EXIT_SUCCESS)
+				// Get power measurements.
+				if (GetPowerMeasurements() != EXIT_SUCCESS)
 				{
 					printf("Connection to a Ontrak lost.\n");
 					bConnected = FALSE;
@@ -602,58 +689,35 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 					DisconnectOntrak(&ontrak);
 					break;
 				}
-				bFirstLoop = FALSE;
-			}
 
-			counter++;
-			t0_ontrak = t_ontrak;
-			GetTimeElapsedChrono(&chrono_power, &t_ontrak);
+				// Display information regularly.
+				if ((ontrak.disp_period >= 0)&&(GetTimeElapsedChronoQuick(&chrono_power_disp) > ontrak.disp_period))
+				{
+					StopChronoQuick(&chrono_power_disp);
+					printf("-------------------------------------------------------------------\n");
+					printf("Current consumption is %f A.\n", ANALOG_INPUT2CURRENT_ONTRAK(current_consumption_raw));
+					printf("Battery voltage is %f V.\n", ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw));
+					printf("Current generation is %f A.\n", ANALOG_INPUT2CURRENT_ONTRAK(current_generation_raw));
+					printf("Estimated energy consumption since program startup is %f Wh.\n", estimated_energy_consumption);
+					printf("-------------------------------------------------------------------\n");
+					fflush(stdout);
+					StartChrono(&chrono_power_disp);
+				}
 
-			// Check if the files indicating the devices state have changed.
-			if (CheckDevicesState() != EXIT_SUCCESS)
-			{
-				printf("Connection to a Ontrak lost.\n");
-				bConnected = FALSE;
-				CleanUp_ontrak();
-				DisconnectOntrak(&ontrak);
+
+				EnterCriticalSection(&StateVariablesCS);
+				vbat1 = ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw);
+				vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
+				ibat1 = ANALOG_INPUT2CURRENT_ONTRAK(current_consumption_raw);
+				ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
+				vbat2 = vbat1;
+				vbat2_filtered = vbat1_filtered;
+				ibat2 = ANALOG_INPUT2CURRENT_ONTRAK(current_generation_raw);
+				ibat2_filtered = bat_filter_coef*ibat2_filtered+(1.0-bat_filter_coef)*ibat2;
+				LeaveCriticalSection(&StateVariablesCS);
+
 				break;
 			}
-
-			// Get power measurements.
-			if (GetPowerMeasurements() != EXIT_SUCCESS)
-			{
-				printf("Connection to a Ontrak lost.\n");
-				bConnected = FALSE;
-				CleanUp_ontrak();
-				DisconnectOntrak(&ontrak);
-				break;
-			}
-
-			// Display information regularly.
-			if (GetTimeElapsedChronoQuick(&chrono_power_disp) > ontrak.disp_period)
-			{
-				StopChronoQuick(&chrono_power_disp);
-				printf("-------------------------------------------------------------------\n");
-				printf("Current consumption is %f A.\n", ANALOG_INPUT2CURRENT_ONTRAK(current_consumption_raw));
-				printf("Battery voltage is %f V.\n", ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw));
-				printf("Current generation is %f A.\n", ANALOG_INPUT2CURRENT_ONTRAK(current_generation_raw));
-				printf("Estimated energy consumption since program startup is %f Wh.\n", estimated_energy_consumption);
-				printf("-------------------------------------------------------------------\n");
-				fflush(stdout);
-				StartChrono(&chrono_power_disp);
-			}
-
-
-			EnterCriticalSection(&StateVariablesCS);
-			vbat1 = ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw);
-			vbat1_filtered = bat_filter_coef*vbat1_filtered+(1.0-bat_filter_coef)*vbat1;
-			ibat1 = ANALOG_INPUT2CURRENT_ONTRAK(current_consumption_raw);
-			ibat1_filtered = bat_filter_coef*ibat1_filtered+(1.0-bat_filter_coef)*ibat1;
-			vbat2 = vbat1;
-			vbat2_filtered = vbat1_filtered;
-			ibat2 = ANALOG_INPUT2CURRENT_ONTRAK(current_generation_raw);
-			ibat2_filtered = bat_filter_coef*ibat2_filtered+(1.0-bat_filter_coef)*ibat2;
-			LeaveCriticalSection(&StateVariablesCS);
 		}
 
 		//printf("OntrakThread period : %f s.\n", GetTimeElapsedChronoQuick(&chrono_period));
