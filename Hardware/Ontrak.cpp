@@ -108,7 +108,7 @@ int SetDeviceCurrentState(char* szFilename, int bON)
 	return EXIT_SUCCESS;
 }
 
-int GetDefaultDevicesState(void)
+int GetInitialDevicesState(void)
 {
 	if (GetDeviceCurrentState("CurArmadeusState.txt", &bArmadeusON) != EXIT_SUCCESS)
 	{
@@ -476,16 +476,18 @@ int GetPowerMeasurements(void)
 	return EXIT_SUCCESS;
 }
 
-void CleanUp_ontrak(void)
+void CleanUp_ontrak(BOOL bSetDefaultDevicesState)
 {
-	// Reset to default state.
-	SetDigitalRelayOntrak(&ontrak, SAIL_MOTOR_CHANNEL_ONTRAK, 0);
-	SetDigitalRelayOntrak(&ontrak, IRIDIUM_CHANNEL_ONTRAK, 0);
-	SetRelayOntrak(&ontrak, WIFI_CHANNEL_ONTRAK, 1); // Active-low.
-	SetRelayOntrak(&ontrak, PROBE_CHANNEL_ONTRAK, 0);
-	SetRelayOntrak(&ontrak, SURFACE_PUMP_CHANNEL_ONTRAK, 1);
-	SetRelayOntrak(&ontrak, BOTTOM_PUMP_CHANNEL_ONTRAK, 1);
-	SetRelayOntrak(&ontrak, ARMADEUS_CHANNEL_ONTRAK, 1); // Active-low.
+	if (bSetDefaultDevicesState)
+	{
+		SetDigitalRelayOntrak(&ontrak, SAIL_MOTOR_CHANNEL_ONTRAK, 0);
+		SetDigitalRelayOntrak(&ontrak, IRIDIUM_CHANNEL_ONTRAK, 0);
+		SetRelayOntrak(&ontrak, WIFI_CHANNEL_ONTRAK, 1); // Active-low.
+		SetRelayOntrak(&ontrak, PROBE_CHANNEL_ONTRAK, 0);
+		SetRelayOntrak(&ontrak, SURFACE_PUMP_CHANNEL_ONTRAK, 1);
+		SetRelayOntrak(&ontrak, BOTTOM_PUMP_CHANNEL_ONTRAK, 1);
+		SetRelayOntrak(&ontrak, ARMADEUS_CHANNEL_ONTRAK, 1); // Active-low.
+	}
 	fclose(logpowerfile_ontrak);
 	StopChrono(&chrono_power, &t_ontrak);
 }
@@ -634,12 +636,14 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 					{
 						printf("Connection to a Ontrak lost.\n");
 						bConnected = FALSE;
-						CleanUp_ontrak();
+						CleanUp_ontrak(ontrak.bSetDefaultDevicesState);
 						DisconnectOntrak(&ontrak);
 						break;
 					}
 					if (ontrak.disp_period >= 0) printf("Serial IO interface test : battery voltage=%f V.\n", ANALOG_INPUT2VOLTAGE_ONTRAK(battery_voltage_raw));
 					fflush(stdout);
+
+					mSleep(ontrak.StartupDelay); // To give some time to the relays and their loads in case their state would change...
 
 					if (ontrak.bSetDefaultDevicesState)
 					{
@@ -647,18 +651,18 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 						{
 							printf("Connection to a Ontrak lost.\n");
 							bConnected = FALSE;
-							CleanUp_ontrak();
+							CleanUp_ontrak(ontrak.bSetDefaultDevicesState);
 							DisconnectOntrak(&ontrak);
 							break;
 						}
 					}
 					else
 					{
-						if (GetDefaultDevicesState() != EXIT_SUCCESS)
+						if (GetInitialDevicesState() != EXIT_SUCCESS)
 						{
 							printf("Connection to a Ontrak lost.\n");
 							bConnected = FALSE;
-							CleanUp_ontrak();
+							CleanUp_ontrak(ontrak.bSetDefaultDevicesState);
 							DisconnectOntrak(&ontrak);
 							break;
 						}
@@ -675,7 +679,7 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 				{
 					printf("Connection to a Ontrak lost.\n");
 					bConnected = FALSE;
-					CleanUp_ontrak();
+					CleanUp_ontrak(ontrak.bSetDefaultDevicesState);
 					DisconnectOntrak(&ontrak);
 					break;
 				}
@@ -685,7 +689,7 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 				{
 					printf("Connection to a Ontrak lost.\n");
 					bConnected = FALSE;
-					CleanUp_ontrak();
+					CleanUp_ontrak(ontrak.bSetDefaultDevicesState);
 					DisconnectOntrak(&ontrak);
 					break;
 				}
@@ -728,7 +732,7 @@ THREAD_PROC_RETURN_VALUE OntrakThread(void* pParam)
 
 	StopChronoQuick(&chrono_power_disp);
 
-	CleanUp_ontrak();
+	CleanUp_ontrak(ontrak.bSetDefaultDevicesState);
 
 
 	StopChronoQuick(&chrono_period);

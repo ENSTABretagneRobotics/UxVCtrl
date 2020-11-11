@@ -1,3 +1,6 @@
+371
+Updated MAVLinkInterface, IM483I and Ontrak.
+
 370
 Updated MAVLinkInterface.
 Added SetDefaultDevicesState parameter to Ontrak.

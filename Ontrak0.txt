@@ -13,6 +13,10 @@
 200
 % bCheckState
 0
+% bResetDigitalPort
+1
+% StartupDelay (in ms)
+2000
 % disp_period (in s, -1 to disable)
 -1
 % SetDefaultDevicesState

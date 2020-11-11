@@ -142,6 +142,7 @@ THREAD_PROC_RETURN_VALUE IM483IThread(void* pParam)
 				//angle = deltasmax;
 				if (u_f > 0) angle = u_f*(im483i.MaxAngle-im483i.MinAngle)+im483i.MinAngle; else angle = im483i.MinAngle;
 				LeaveCriticalSection(&StateVariablesCS);
+				//if ((!im483i.bNoContinuousUpdateMaxAngle)||(bUpdateMaxAngleIM483I)) { ... bUpdateMaxAngleIM483I = FALSE; }
 				i = 0;
 				while (SetMaxAngleIM483I(&im483i, angle) != EXIT_SUCCESS)
 				{

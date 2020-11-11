@@ -1601,52 +1601,61 @@ REQ_DATA_STREAM...
 	wind.direction = (float)fmod_360_pos_rad2deg(-angle_env-Center(psitwindhat)+3.0*M_PI/2.0);
 	wind.speed = (float)Center(vtwindhat);
 
-	memset(&sys_status, 0, sizeof(mavlink_sys_status_t));
-	sys_status.onboard_control_sensors_present = (uint32_t)(MAV_SYS_STATUS_PREARM_CHECK|MAV_SYS_STATUS_LOGGING|MAV_SYS_STATUS_SENSOR_BATTERY|MAV_SYS_STATUS_AHRS|MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS);
-	sys_status.onboard_control_sensors_enabled = (uint32_t)(MAV_SYS_STATUS_PREARM_CHECK|MAV_SYS_STATUS_LOGGING|MAV_SYS_STATUS_SENSOR_BATTERY|MAV_SYS_STATUS_AHRS|MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS);
-	sys_status.onboard_control_sensors_health = (uint32_t)(MAV_SYS_STATUS_PREARM_CHECK|MAV_SYS_STATUS_LOGGING|MAV_SYS_STATUS_SENSOR_BATTERY|MAV_SYS_STATUS_AHRS|MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS);
-	sys_status.voltage_battery = (uint16_t)(vbat1*1000);
-	sys_status.current_battery = (int16_t)(ibat1*100);
-	sys_status.battery_remaining = -1;
+	if (vbat1 != 0)
+	{
+		memset(&sys_status, 0, sizeof(mavlink_sys_status_t));
+		sys_status.onboard_control_sensors_present = (uint32_t)(MAV_SYS_STATUS_PREARM_CHECK|MAV_SYS_STATUS_LOGGING|MAV_SYS_STATUS_SENSOR_BATTERY|MAV_SYS_STATUS_AHRS|MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS);
+		sys_status.onboard_control_sensors_enabled = (uint32_t)(MAV_SYS_STATUS_PREARM_CHECK|MAV_SYS_STATUS_LOGGING|MAV_SYS_STATUS_SENSOR_BATTERY|MAV_SYS_STATUS_AHRS|MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS);
+		sys_status.onboard_control_sensors_health = (uint32_t)(MAV_SYS_STATUS_PREARM_CHECK|MAV_SYS_STATUS_LOGGING|MAV_SYS_STATUS_SENSOR_BATTERY|MAV_SYS_STATUS_AHRS|MAV_SYS_STATUS_SENSOR_MOTOR_OUTPUTS);
+		sys_status.voltage_battery = (uint16_t)(vbat1*1000);
+		sys_status.current_battery = (int16_t)(ibat1*100);
+		sys_status.battery_remaining = -1;
+	}
 
-	memset(&battery_status1, 0, sizeof(mavlink_battery_status_t));
-	battery_status1.id = 0;
-	battery_status1.current_battery = (int16_t)(ibat1*100);
-	battery_status1.voltages[0] = (uint16_t)(vbat1*1000);
-	battery_status1.voltages[1] = UINT16_MAX;
-	battery_status1.voltages[2] = UINT16_MAX;
-	battery_status1.voltages[3] = UINT16_MAX;
-	battery_status1.voltages[4] = UINT16_MAX;
-	battery_status1.voltages[5] = UINT16_MAX;
-	battery_status1.voltages[6] = UINT16_MAX;
-	battery_status1.voltages[7] = UINT16_MAX;
-	battery_status1.voltages[8] = UINT16_MAX;
-	battery_status1.voltages[9] = UINT16_MAX;
-	battery_status1.current_consumed = -1;
-	battery_status1.energy_consumed = -1;
-	battery_status1.battery_remaining = -1;
+	if (vbat1 != 0) 
+	{
+		memset(&battery_status1, 0, sizeof(mavlink_battery_status_t));
+		battery_status1.id = 0;
+		battery_status1.current_battery = (int16_t)(ibat1*100);
+		battery_status1.voltages[0] = (uint16_t)(vbat1*1000);
+		battery_status1.voltages[1] = UINT16_MAX;
+		battery_status1.voltages[2] = UINT16_MAX;
+		battery_status1.voltages[3] = UINT16_MAX;
+		battery_status1.voltages[4] = UINT16_MAX;
+		battery_status1.voltages[5] = UINT16_MAX;
+		battery_status1.voltages[6] = UINT16_MAX;
+		battery_status1.voltages[7] = UINT16_MAX;
+		battery_status1.voltages[8] = UINT16_MAX;
+		battery_status1.voltages[9] = UINT16_MAX;
+		battery_status1.current_consumed = -1;
+		battery_status1.energy_consumed = -1;
+		battery_status1.battery_remaining = -1;
+	}
 
 	switch (robid)
 	{
 	case VAIMOS_ROBID:
 		break;
 	default:
-		memset(&battery_status2, 0, sizeof(mavlink_battery_status_t));
-		battery_status2.id = 1;
-		battery_status2.current_battery = (int16_t)(ibat2*100);
-		battery_status2.voltages[0] = (uint16_t)(vbat2*1000);
-		battery_status2.voltages[1] = UINT16_MAX;
-		battery_status2.voltages[2] = UINT16_MAX;
-		battery_status2.voltages[3] = UINT16_MAX;
-		battery_status2.voltages[4] = UINT16_MAX;
-		battery_status2.voltages[5] = UINT16_MAX;
-		battery_status2.voltages[6] = UINT16_MAX;
-		battery_status2.voltages[7] = UINT16_MAX;
-		battery_status2.voltages[8] = UINT16_MAX;
-		battery_status2.voltages[9] = UINT16_MAX;
-		battery_status2.current_consumed = -1;
-		battery_status2.energy_consumed = -1;
-		battery_status2.battery_remaining = -1;
+		if (vbat2 != 0)
+		{
+			memset(&battery_status2, 0, sizeof(mavlink_battery_status_t));
+			battery_status2.id = 1;
+			battery_status2.current_battery = (int16_t)(ibat2*100);
+			battery_status2.voltages[0] = (uint16_t)(vbat2*1000);
+			battery_status2.voltages[1] = UINT16_MAX;
+			battery_status2.voltages[2] = UINT16_MAX;
+			battery_status2.voltages[3] = UINT16_MAX;
+			battery_status2.voltages[4] = UINT16_MAX;
+			battery_status2.voltages[5] = UINT16_MAX;
+			battery_status2.voltages[6] = UINT16_MAX;
+			battery_status2.voltages[7] = UINT16_MAX;
+			battery_status2.voltages[8] = UINT16_MAX;
+			battery_status2.voltages[9] = UINT16_MAX;
+			battery_status2.current_consumed = -1;
+			battery_status2.energy_consumed = -1;
+			battery_status2.battery_remaining = -1;
+		}
 		break;
 	}
 
@@ -1765,38 +1774,9 @@ REQ_DATA_STREAM...
 		}
 	}
 
-	mavlink_msg_sys_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &sys_status);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	if (vbat1 != 0)
 	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
-
-	mavlink_msg_battery_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &battery_status1);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
-
-	switch (robid)
-	{
-	case VAIMOS_ROBID:
-		break;
-	default:
-		mavlink_msg_battery_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &battery_status2);
+		mavlink_msg_sys_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &sys_status);
 		memset(sendbuf, 0, sizeof(sendbuf));
 		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
 		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
@@ -1807,6 +1787,44 @@ REQ_DATA_STREAM...
 		{
 			fwrite_tlog(msg, tlogfile);
 			fflush(tlogfile);
+		}
+	}
+
+	if (vbat1 != 0)
+	{
+		mavlink_msg_battery_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &battery_status1);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
+	}
+
+	switch (robid)
+	{
+	case VAIMOS_ROBID:
+		break;
+	default:
+		if (vbat2 != 0)
+		{
+			mavlink_msg_battery_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &battery_status2);
+			memset(sendbuf, 0, sizeof(sendbuf));
+			sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+			if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+			{
+				return EXIT_FAILURE;
+			}
+			if (tlogfile)
+			{
+				fwrite_tlog(msg, tlogfile);
+				fflush(tlogfile);
+			}
 		}
 		break;
 	}

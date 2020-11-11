@@ -305,6 +305,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			{
 				if (bStdOutDetailedInfo) printf("Sail update.\n");
 				u = deltasmax/q1;
+				//bUpdateMaxAngleIM483I = TRUE;
 				bForceSailUpdate = 0;
 				StopChronoQuick(&chrono_sail_update);
 				StartChrono(&chrono_sail_update);
@@ -598,6 +599,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 				{
 					if (bStdOutDetailedInfo) printf("Sail update.\n");
 					u = deltasmax/q1;
+					//bUpdateMaxAngleIM483I = TRUE;
 					bForceSailUpdate = 0;
 					StopChronoQuick(&chrono_sail_update);
 					StartChrono(&chrono_sail_update);

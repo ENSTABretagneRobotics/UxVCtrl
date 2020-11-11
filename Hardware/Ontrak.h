@@ -68,6 +68,8 @@ struct ONTRAK
 	BOOL bSaveRawData;
 	int bytedelayus;
 	BOOL bCheckState;
+	BOOL bResetDigitalPort;
+	int StartupDelay;
 	int disp_period;
 	BOOL bSetDefaultDevicesState;
 };
@@ -375,6 +377,8 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 		pOntrak->bSaveRawData = 1;
 		pOntrak->bytedelayus = -1;
 		pOntrak->bCheckState = 0;
+		pOntrak->bResetDigitalPort = 0;
+		pOntrak->StartupDelay = 1000;
 		pOntrak->disp_period = 30;
 		pOntrak->bSetDefaultDevicesState = 1;
 
@@ -396,6 +400,10 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pOntrak->bytedelayus) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pOntrak->bCheckState) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->bResetDigitalPort) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &pOntrak->StartupDelay) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pOntrak->disp_period) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -433,21 +441,24 @@ inline int ConnectOntrak(ONTRAK* pOntrak, char* szCfgFilePath)
 		return EXIT_FAILURE;
 	}
 
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sprintf(sendbuf, "0SPA00000000\r");
-	sendbuflen = (int)strlen(sendbuf);
-	if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
+	if (pOntrak->bResetDigitalPort)
 	{
-		printf("Unable to connect to a Ontrak : Failed to reset the digital port to avoid the relays turning on unexpectedly when the port is configured.\n");
-		CloseRS232Port(&pOntrak->RS232Port);
-		return EXIT_FAILURE;
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sprintf(sendbuf, "0SPA00000000\r");
+		sendbuflen = (int)strlen(sendbuf);
+		if (WriteDataOntrak(pOntrak, (unsigned char*)sendbuf, sendbuflen, pOntrak->bytedelayus) != EXIT_SUCCESS)
+		{
+			printf("Unable to connect to a Ontrak : Failed to reset the digital port to avoid the relays turning on unexpectedly when the port is configured.\n");
+			CloseRS232Port(&pOntrak->RS232Port);
+			return EXIT_FAILURE;
+		}
+		if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
+		{
+			fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
+			fflush(pOntrak->pfSaveFile);
+		}
+		mSleep(50);
 	}
-	if ((pOntrak->bSaveRawData)&&(pOntrak->pfSaveFile))
-	{
-		fwrite(sendbuf, sendbuflen, 1, pOntrak->pfSaveFile);
-		fflush(pOntrak->pfSaveFile);
-	}
-	mSleep(50);
 
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sprintf(sendbuf, "0CPA00000000\r");

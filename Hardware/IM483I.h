@@ -34,7 +34,8 @@
 
 #define MIN_MOTOR_SPEED_IM483I 20
 #define MAX_MOTOR_SPEED_IM483I 20000
-#define MAX_RELATIVE_INDEX_IM483I 8388607
+#define MIN_INDEX_IM483I 0.01
+#define MAX_INDEX_IM483I 8388607
 #define MAX_CALIBRATION_TIME_IM483I 600000 // In ms.
 #define MIN_IM483I 0
 #define MAX_IM483I 116000
@@ -77,6 +78,66 @@ inline int WriteDataIM483I(IM483I* pIM483I, uint8* writebuf, int writebuflen, in
 {
 	if (bytedelayus < 0) return WriteAllRS232Port(&pIM483I->RS232Port, writebuf, writebuflen);
 	else return WriteAllWithByteDelayRS232Port(&pIM483I->RS232Port, writebuf, writebuflen, bytedelayus);
+}
+
+inline int StepsIM483I(IM483I* pIM483I, double val)
+{
+	char sendbuf[MAX_NB_BYTES_IM483I];
+	int sendbuflen = 0;
+	char recvbuf[MAX_NB_BYTES_IM483I];
+	int recvbuflen = 0;
+
+	if (fabs(val) < MIN_INDEX_IM483I) val = sign(val, 0)*MIN_INDEX_IM483I;
+	else if (val > MAX_INDEX_IM483I) val = MAX_INDEX_IM483I;
+	else if (val < -MAX_INDEX_IM483I) val = -MAX_INDEX_IM483I;
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "+%.2f\r", val);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteDataIM483I(pIM483I, (unsigned char*)sendbuf, sendbuflen, pIM483I->bytedelayus) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a IM483I. \n");
+		return EXIT_FAILURE;
+	}
+	if ((pIM483I->bSaveRawData)&&(pIM483I->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pIM483I->pfSaveFile);
+		fflush(pIM483I->pfSaveFile);
+	}
+
+	mSleep(20);
+
+	if (pIM483I->bCheckState)
+	{
+		// Should echo and add \n...
+
+		// Prepare the buffer that should receive data from the device.
+		memset(recvbuf, 0, sizeof(recvbuf));
+		recvbuflen = sendbuflen+1; // The last character must be a 0 to be a valid string for sscanf.
+
+		if (ReadAllRS232Port(&pIM483I->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+		{
+			printf("Error reading data from a IM483I. \n");
+			return EXIT_FAILURE;
+		}
+		if ((pIM483I->bSaveRawData)&&(pIM483I->pfSaveFile))
+		{
+			fwrite(recvbuf, recvbuflen, 1, pIM483I->pfSaveFile);
+			fflush(pIM483I->pfSaveFile);
+		}
+
+		// Display and analyze received data.
+		//printf("Received : \"%s\"\n", recvbuf);
+		if ((strncmp(recvbuf, sendbuf, sendbuflen) != 0)||(recvbuf[recvbuflen-1] != '\n'))
+		{
+			printf("Error reading data from a IM483I : Invalid data. \n");
+			return EXIT_INVALID_DATA;
+		}
+	}
+
+	return EXIT_SUCCESS;
 }
 
 inline int SetMotorTorqueIM483I(IM483I* pIM483I, int holdpercent, int runpercent)
@@ -261,6 +322,8 @@ inline int SetMotorRelativeIM483I(IM483I* pIM483I, int val, BOOL bForce)
 	int sendbuflen = 0;
 	char recvbuf[MAX_NB_BYTES_IM483I];
 	int recvbuflen = 0;
+
+	val = max(min(val, (int)MAX_INDEX_IM483I), -(int)MAX_INDEX_IM483I);
 
 	// The requested value is only applied if it is slightly different from the current value.
 	if ((!bForce)&&(abs(val-pIM483I->LastRval) < abs(pIM483I->ThresholdRval))) return EXIT_SUCCESS;
@@ -486,7 +549,7 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 	// Used to save raw data, should be handled specifically...
 	//pIM483I->pfSaveFile = NULL;
 
-	pIM483I->LastRval = 4*(MAX_RELATIVE_INDEX_IM483I+2);
+	pIM483I->LastRval = 4*((int)MAX_INDEX_IM483I+2);
 
 	if (OpenRS232Port(&pIM483I->RS232Port, pIM483I->szDevPath) != EXIT_SUCCESS)
 	{
@@ -524,7 +587,12 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 
 	if (pIM483I->bCheckState)
 	{
-		// Should reply "xxxx xxxx ADVANCED MICROSYSTEMS. INC MAX-2000 vX.XXi\r#"...
+		// Should reply 
+		// "xxxx xxxx ADVANCED MICRO SYSTEMS. INC\r\nMAX-2000 vX.XXi\r\n#"...
+		// e.g.
+		// "     4038 ADVANCED MICRO SYSTEMS, INC\r\nMAX-2000 v1.15i\r\n#"...
+		// If already initialized
+		// " #"?
 
 		// Prepare the buffer that should receive data from the device.
 		memset(recvbuf, 0, sizeof(recvbuf));
