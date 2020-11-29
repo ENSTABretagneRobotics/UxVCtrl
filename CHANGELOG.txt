@@ -1,3 +1,7 @@
+372
+Updated betarear to 1.57 for sailboats.
+Updated controller for sailboats.
+
 371
 Updated MAVLinkInterface, IM483I and Ontrak.
 

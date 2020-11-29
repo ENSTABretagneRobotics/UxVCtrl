@@ -471,7 +471,7 @@ WMV2
 % omega_max_wx (in rad/s)
 0.8
 % gamma_infinite (in rad, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
-1.3
+0.79
 % r (accuracy of line/waypoint following in m, can be overwritten, see http://www.ensta-bretagne.fr/jaulin/paper_jaulin_irsc12.pdf)
 5
 % betaside (sail angle when the wind comes from the side (in rad))

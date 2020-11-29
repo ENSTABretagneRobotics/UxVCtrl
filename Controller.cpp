@@ -470,25 +470,42 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 			// Not sure of the behavior for sailboat when there is an obstacle...
 
 			if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bLineFollowingControl))//||(bWaypointControl)||(bGuidedControl)||(bHeadingControl)
-			{
+		{
 				double theta_star = wpsi_obs;
 				double psiw = Center(psitwindhat);
 				double psi = Center(psihat);
 
 				q1 = betarear;
 				q2 = (log(betarear)-log(betaside))/log(2.0);
-
+			
+			switch (sailboattacktype)
+			{
+			default:
+			case 0:
+				if (q != 0)
+				{
+					if (fabs(e) > radius/2.0) bForceCheckStrategy = 1;
+				}
+				else
+				{
+					if (fabs(e) <= radius/2.0) bForceCheckStrategy = 1;
+				}
+				break;
+			case 1:
 				// If the distance to the line becomes too high when against the wind, the strategy needs to be checked.
 				if (((state == STARBOARD_TACK_TRAJECTORY)&&(e > radius/2.0))||
 					((state == PORT_TACK_TRAJECTORY)&&(e < -radius/2.0)))
 				{
 					bForceCheckStrategy = 1;
 				}
+				break;
+			}
 
 				// Check regularly if the strategy needs to be changed.
 				if ((GetTimeElapsedChronoQuick(&chrono_check_strategy) > check_strategy_period)||bForceCheckStrategy)
 				{
 					prevstate = state;
+					// Should add params to enable one condition or the other...
 #ifndef ALT_SAILBOAT_CONTROLLER
 					if ((cos(psiw-theta_star)+cos(zeta) < 0)||
 						((cos(psiw-phil)+cos(zeta) < 0)&&(fabs(e) < radius)))
@@ -500,17 +517,17 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 						{
 						default:
 						case 0:
-							if ((fabs(e) > radius/2.0)||((state != STARBOARD_TACK_TRAJECTORY)&&(state != PORT_TACK_TRAJECTORY)))
+							if ((fabs(e) > radius/2.0)||(q == 0))
 							{
-								q = sign(sin(psi-theta_star), 0);
-								if (q < 0)
-								{
-									state = STARBOARD_TACK_TRAJECTORY; // Bateau au près avec vent de tribord.
-								}
-								else
-								{
-									state = PORT_TACK_TRAJECTORY; // Bateau au près avec vent de babord.
-								}
+								double qdir = sign(sin(phil-psiw), 0);
+								double qline = -sign(e, 0)*sign(cos(psiw-phil), 0);
+								//q = (fabs(cos(psiw-phil)) < sin(zeta/4.0))? qdir: qline; // Optim dir...
+								//q = ((-sin(2*psitwind_var) < cos(psiw-phil))&&(cos(psiw-phil) <= 0))? qdir: qline; // Optim dir...
+								//q = ((fabs(cos(psiw-phil)) < sin(2*psitwind_var))&&(q != qline))? q: qline; // To prevent unstabilities of q...
+								//q = ((q != 0)&&(-sin(2*psitwind_var) < cos(psiw-phil))&&(cos(psiw-phil) <= 0))? q: qline; // To prevent unstabilities of q, optim dir...
+								q = ((-sin(psitwind_var) < cos(psiw-phil))&&(cos(psiw-phil) <= 0))? qdir: (((q != 0)&&(-sin(2*psitwind_var) < cos(psiw-phil))&&(cos(psiw-phil) <= -sin(psitwind_var)))? q: qline); // To prevent unstabilities of q, with bias to best dir...
+								if (q < 0) state = STARBOARD_TACK_TRAJECTORY;
+								else state = PORT_TACK_TRAJECTORY;
 							}
 							break;
 						case 1:
@@ -541,6 +558,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					}
 					else
 					{
+						q = 0;
 						state = DIRECT_TRAJECTORY; // Suivi direct.
 					}
 					if (state != prevstate)
@@ -604,7 +622,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					StopChronoQuick(&chrono_sail_update);
 					StartChrono(&chrono_sail_update);
 				}
-			}
+		}
 #pragma endregion
 
 		// Low-level controls.
