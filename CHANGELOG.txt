@@ -1,3 +1,7 @@
+373
+Corrected some warnings in 64 bit.
+Corrected minor bug in IM483I.
+
 372
 Updated betarear to 1.57 for sailboats.
 Updated controller for sailboats.

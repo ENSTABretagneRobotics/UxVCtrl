@@ -515,7 +515,7 @@ inline int ConnectIM483I(IM483I* pIM483I, char* szCfgFilePath)
 		printf("Invalid parameter : threadperiod.\n");
 		pIM483I->threadperiod = 50;
 	}
-	if ((abs(pIM483I->CalibrationSpeed) < MIN_MOTOR_SPEED_IM483I)||abs((pIM483I->CalibrationSpeed) > MAX_MOTOR_SPEED_IM483I))
+	if ((abs(pIM483I->CalibrationSpeed) < MIN_MOTOR_SPEED_IM483I)||(abs(pIM483I->CalibrationSpeed) > MAX_MOTOR_SPEED_IM483I))
 	{
 		printf("Invalid parameter : CalibrationSpeed.\n");
 		pIM483I->CalibrationSpeed = CALIBRATION_SPEED_IM483I;

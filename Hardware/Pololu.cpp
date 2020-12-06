@@ -122,7 +122,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	CHRONO chrono_period;
 	int threadperiod = 50;
 	int errcount = 0;
-	int deviceid = (intptr_t)pParam;
+	int deviceid = (int)(intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
@@ -220,7 +220,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						sprintf(szTemp, "pololu");
 					}
 					// Remove the extension.
-					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
+					for (i = (int)strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);

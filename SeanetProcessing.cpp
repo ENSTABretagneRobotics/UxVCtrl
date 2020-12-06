@@ -26,7 +26,8 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 {
 	CHRONO chrono_period;
 	int nbnew = 0;
-	int i = 0, j = 0, k = 0, nb_alpha_mes_total = 0;
+	int i = 0, j = 0, k = 0;
+	size_t nb_alpha_mes_total = 0;
 #ifndef DISABLE_OPENCV_SUPPORT
 	COORDSYSTEM2IMG csMap2Img;
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -275,7 +276,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			yhat_history_vector.push_back(yhat_simulator_history_vector[i]);
 			psihat_history_vector.push_back(psihat_simulator_history_vector[i]);
 			vrxhat_history_vector.push_back(vrxhat_simulator_history_vector[i]);
-			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			if (alpha_mes_vector.size() > nb_alpha_mes_total)
 			{
 				alpha_mes_vector.pop_front();
 				d_mes_vector.pop_front();
@@ -306,7 +307,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			yhat_history_vector.push_back(yhat_seanet_history_vector[i]);
 			psihat_history_vector.push_back(psihat_seanet_history_vector[i]);
 			vrxhat_history_vector.push_back(vrxhat_seanet_history_vector[i]);
-			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			if (alpha_mes_vector.size() > nb_alpha_mes_total)
 			{
 				alpha_mes_vector.pop_front();
 				d_mes_vector.pop_front();
@@ -337,7 +338,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			yhat_history_vector.push_back(yhat_hokuyo_history_vector[i]);
 			psihat_history_vector.push_back(psihat_hokuyo_history_vector[i]);
 			vrxhat_history_vector.push_back(vrxhat_hokuyo_history_vector[i]);
-			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			if (alpha_mes_vector.size() > nb_alpha_mes_total)
 			{
 				alpha_mes_vector.pop_front();
 				d_mes_vector.pop_front();
@@ -368,7 +369,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			yhat_history_vector.push_back(yhat_rplidar_history_vector[i]);
 			psihat_history_vector.push_back(psihat_rplidar_history_vector[i]);
 			vrxhat_history_vector.push_back(vrxhat_rplidar_history_vector[i]);
-			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			if (alpha_mes_vector.size() > nb_alpha_mes_total)
 			{
 				alpha_mes_vector.pop_front();
 				d_mes_vector.pop_front();
@@ -399,7 +400,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 			yhat_history_vector.push_back(yhat_srf02_history_vector[i]);
 			psihat_history_vector.push_back(psihat_srf02_history_vector[i]);
 			vrxhat_history_vector.push_back(vrxhat_srf02_history_vector[i]);
-			if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+			if (alpha_mes_vector.size() > nb_alpha_mes_total)
 			{
 				alpha_mes_vector.pop_front();
 				d_mes_vector.pop_front();
@@ -432,7 +433,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				yhat_history_vector.push_back(yhat_pololu_history_vector[k][i]);
 				psihat_history_vector.push_back(psihat_pololu_history_vector[k][i]);
 				vrxhat_history_vector.push_back(vrxhat_pololu_history_vector[k][i]);
-				if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+				if (alpha_mes_vector.size() > nb_alpha_mes_total)
 				{
 					alpha_mes_vector.pop_front();
 					d_mes_vector.pop_front();
@@ -466,7 +467,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				yhat_history_vector.push_back(yhat_blueview_history_vector[k][i]);
 				psihat_history_vector.push_back(psihat_blueview_history_vector[k][i]);
 				vrxhat_history_vector.push_back(vrxhat_blueview_history_vector[k][i]);
-				if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+				if (alpha_mes_vector.size() > nb_alpha_mes_total)
 				{
 					alpha_mes_vector.pop_front();
 					d_mes_vector.pop_front();
@@ -500,7 +501,7 @@ THREAD_PROC_RETURN_VALUE SeanetProcessingThread(void* pParam)
 				yhat_history_vector.push_back(yhat_video_history_vector[k][i]);
 				psihat_history_vector.push_back(psihat_video_history_vector[k][i]);
 				vrxhat_history_vector.push_back(vrxhat_video_history_vector[k][i]);
-				if ((int)alpha_mes_vector.size() > nb_alpha_mes_total)
+				if (alpha_mes_vector.size() > nb_alpha_mes_total)
 				{
 					alpha_mes_vector.pop_front();
 					d_mes_vector.pop_front();

@@ -265,7 +265,7 @@ void set_kinect_d_vectors_Video(int deviceid)
 #ifdef DEVEL_WAITAREA
 THREAD_PROC_RETURN_VALUE WaitAreaThread(void* pParam)
 {
-	int id = (intptr_t)pParam;
+	int id = (int)(intptr_t)pParam;
 
 	//FILE* logwaitareafile = NULL;
 	//char logwaitareafilename[MAX_BUF_LEN];

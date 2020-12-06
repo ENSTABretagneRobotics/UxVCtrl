@@ -81,25 +81,19 @@ int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 
 	LeaveCriticalSection(&StateVariablesCS);
 
+	memset(sendbuf, 0, sizeof(sendbuf));
 	if (bROSMode_RazorAHRSInterface)
 	{
-		memset(sendbuf, 0, sizeof(sendbuf));
 		sprintf((char*)sendbuf, "#YPRAG=%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", yaw, pitch, roll, accx, accy, accz, gyrx, gyry, gyrz);
-		sendbuflen = strlen((char*)sendbuf);
-		if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-		{
-			return EXIT_FAILURE;
-		}
 	}
 	else
 	{
-		memset(sendbuf, 0, sizeof(sendbuf));
 		sprintf((char*)sendbuf, "#YPR=%.2f,%.2f,%.2f\r\n", yaw, pitch, roll);
-		sendbuflen = strlen((char*)sendbuf);
-		if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-		{
-			return EXIT_FAILURE;
-		}
+	}
+	sendbuflen = (int)strlen((char*)sendbuf);
+	if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
 	}
 
 	uSleep(1000*50);

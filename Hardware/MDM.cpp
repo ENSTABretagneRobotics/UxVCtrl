@@ -151,7 +151,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 						sprintf(szTemp, "mdm");
 					}
 					// Remove the extension.
-					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
+					for (i = (int)strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);
@@ -228,7 +228,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				strcpy((char*)buf, "rng\n");
 				for (i = 0; i < 1; i++)
 				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
+					if (SendAllDataMDM(&mdm, buf, (int)strlen((char*)buf)) != EXIT_SUCCESS)
 					{
 						bError = TRUE;
 						break;
@@ -392,7 +392,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				memcpy(buf+strlen((char*)buf), &sendxy, sizeof(sendxy));
 				for (i = 0; i < 2; i++)
 				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)+sizeof(sendxy)) != EXIT_SUCCESS)
+					if (SendAllDataMDM(&mdm, buf, (int)(strlen((char*)buf)+sizeof(sendxy))) != EXIT_SUCCESS)
 					{
 						bError = TRUE;
 						break;
@@ -551,7 +551,7 @@ THREAD_PROC_RETURN_VALUE MDMThread(void* pParam)
 				strcpy((char*)buf, "rng\n");
 				for (i = 0; i < 1; i++)
 				{
-					if (SendAllDataMDM(&mdm, buf, strlen((char*)buf)) != EXIT_SUCCESS)
+					if (SendAllDataMDM(&mdm, buf, (int)strlen((char*)buf)) != EXIT_SUCCESS)
 					{
 						bError = TRUE;
 						break;

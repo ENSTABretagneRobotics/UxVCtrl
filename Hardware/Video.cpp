@@ -20,7 +20,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 	CHRONO chrono_period;
 	int threadperiod = captureperiod;
 	int errcount = 0;
-	int videoid = (intptr_t)pParam;
+	int videoid = (int)(intptr_t)pParam;
 	char szCfgFilePath[256];
 
 	sprintf(szCfgFilePath, "Video%d.txt", videoid);

@@ -22,7 +22,7 @@
 
 THREAD_PROC_RETURN_VALUE OpenCVGUIThread(void* pParam)
 {
-	int guiid = (intptr_t)pParam;
+	int guiid = (int)(intptr_t)pParam;
 	int videoid = -1;
 	int ballid = -1;
 	int c = 0, i = 0, offset = 0;

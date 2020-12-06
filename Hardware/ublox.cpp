@@ -26,7 +26,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	CHRONO chrono_period;
 	int threadperiod = 100;
 	int errcount = 0;
-	int deviceid = (intptr_t)pParam;
+	int deviceid = (int)(intptr_t)pParam;
 	char szCfgFilePath[256];
 	int i = 0;
 	char szSaveFilePath[256];
@@ -108,7 +108,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						sprintf(szTemp, "ublox");
 					}
 					// Remove the extension.
-					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
+					for (i = (int)strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);
@@ -170,7 +170,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				// This ublox is a RTK rover, that should receive any available RTCM corrections...
 
 				EnterCriticalSection(&StateVariablesCS);
-				int rtcmdatalen = min(RTCMuserslist[deviceid].size(), sizeof(rtcmdata));
+				int rtcmdatalen = min((int)RTCMuserslist[deviceid].size(), (int)sizeof(rtcmdata));
 				for (int k = 0; k < rtcmdatalen; k++)
 				{
 					unsigned char rtcmbyte = RTCMuserslist[deviceid][0];

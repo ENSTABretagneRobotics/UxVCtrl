@@ -44,7 +44,7 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 	vector<bound> V;
 	if (x.isEmpty) return;
 	if (q <= 0) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -63,20 +63,20 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 	int sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		if (V[i].opening < 0)
 		{
-			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]++;
+			if (V[i].mark >= 0) Vgroup[(size_t)V[i].mark]++;
 			if ((sum >= q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 			{
-				imax = i;			
+				imax = (int)i;			
 			}
 		}
-		if (V[i].mark >= 0) if (Vgroup[(unsigned int)V[i].mark] >= 0) sum = sum + V[i].opening;
+		if (V[i].mark >= 0) if (Vgroup[(size_t)V[i].mark] >= 0) sum = sum + V[i].opening;
 		if (V[i].opening > 0)
 		{
-			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]--;
+			if (V[i].mark >= 0) Vgroup[(size_t)V[i].mark]--;
 			if ((sum >= q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 			{
 				imin = min(imin, (int)i);
@@ -91,14 +91,14 @@ inline void C_q_in_group(interval& x, int q, vector<interval>& y, vector<int>& y
 inline void C_q_in_group(box& x, int q, vector<box>& yj, vector<int>& ygroup, int nbgroups)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_q_in_group(x[i], q, yi, ygroup, nbgroups);
 	}
@@ -106,10 +106,10 @@ inline void C_q_in_group(box& x, int q, vector<box>& yj, vector<int>& ygroup, in
 
 inline void C_acc_group(interval& x, vector<interval>& y, vector<int>& ygroup, int nbgroups)
 {
-	for (unsigned int qi = y.size(); qi >= 1; qi--)
+	for (size_t qi = y.size(); qi >= 1; qi--)
 	{
 		interval xi = x;
-		C_q_in_group(xi, qi, y, ygroup, nbgroups);
+		C_q_in_group(xi, (int)qi, y, ygroup, nbgroups);
 		if (!xi.isEmpty) 
 		{
 			x = xi;
@@ -121,14 +121,14 @@ inline void C_acc_group(interval& x, vector<interval>& y, vector<int>& ygroup, i
 inline void C_acc_group(box& x, vector<box>& yj, vector<int>& ygroup, int nbgroups)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc_group(x[i], yi, ygroup, nbgroups);
 	}
@@ -140,7 +140,7 @@ inline void C_acc_group_opt(interval& x, vector<interval>& y, vector<int>& ygrou
 	vector<int> Vgroup(nbgroups); // >=0 when the group is allowed to add to the sum.
 	vector<bound> V;
 	if (x.isEmpty) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -160,24 +160,24 @@ inline void C_acc_group_opt(interval& x, vector<interval>& y, vector<int>& ygrou
 	int sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		if (V[i].opening < 0)
 		{
-			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]++;
+			if (V[i].mark >= 0) Vgroup[(size_t)V[i].mark]++;
 			if ((sum >= q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 			{
-				imax = i;			
+				imax = (int)i;			
 			}
 		}
-		if (V[i].mark >= 0) if (Vgroup[(unsigned int)V[i].mark] >= 0) sum = sum + V[i].opening;
+		if (V[i].mark >= 0) if (Vgroup[(size_t)V[i].mark] >= 0) sum = sum + V[i].opening;
 		if (V[i].opening > 0)
 		{
-			if (V[i].mark >= 0) Vgroup[(unsigned int)V[i].mark]--;
+			if (V[i].mark >= 0) Vgroup[(size_t)V[i].mark]--;
 			if ((sum > q)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 			{
 				q = sum;
-				imin = i;
+				imin = (int)i;
 			}
 		}
 	}
@@ -189,14 +189,14 @@ inline void C_acc_group_opt(interval& x, vector<interval>& y, vector<int>& ygrou
 inline void C_acc_group_opt(box& x, vector<box>& yj, vector<int>& ygroup, int nbgroups)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc_group_opt(x[i], yi, ygroup, nbgroups);
 	}
@@ -219,8 +219,8 @@ inline int dzeta_box(box& x, box& z)
 inline double mu_q_in_mark_box(box& X, vector<box>& Z, void* pData)
 {
 	vector<double> zmark = *((vector<double>*)pData);
-	unsigned int m = Z.size();
-	unsigned int k = 0;
+	size_t m = Z.size();
+	size_t k = 0;
 	double res = 0;
 
 	for (k = 0; k < m; k++)
@@ -234,8 +234,8 @@ inline double mu_q_in_mark_box(box& X, vector<box>& Z, void* pData)
 inline double mu_q_in_mark(double x, vector<interval>& z, void* pData, int curdim)
 {
 	vector<double> zmark = *((vector<double>*)pData);
-	unsigned int m = z.size();
-	unsigned int k = 0;
+	size_t m = z.size();
+	size_t k = 0;
 	double res = 0;
 
 	UNREFERENCED_PARAMETER(curdim);
@@ -251,8 +251,8 @@ inline double mu_q_in_mark(double x, vector<interval>& z, void* pData, int curdi
 
 inline double mu_q_in_box(box& X, vector<box>& Z, void* pData)
 {
-	unsigned int m = Z.size();
-	unsigned int k = 0;
+	size_t m = Z.size();
+	size_t k = 0;
 	double res = 0;
 
 	UNREFERENCED_PARAMETER(pData);
@@ -268,8 +268,8 @@ inline double mu_q_in_box(box& X, vector<box>& Z, void* pData)
 
 inline double mu_q_in(double x, vector<interval>& z, void* pData, int curdim)
 {
-	unsigned int m = z.size();
-	unsigned int k = 0;
+	size_t m = z.size();
+	size_t k = 0;
 	double res = 0;
 
 	UNREFERENCED_PARAMETER(pData);
@@ -290,7 +290,7 @@ inline void C_mu(interval& x, vector<interval>& y, double (*mu)(double, vector<i
 	vector<bound> V;
 	if (x.isEmpty) return;
 	if (mu0 <= 0) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -309,7 +309,7 @@ inline void C_mu(interval& x, vector<interval>& y, double (*mu)(double, vector<i
 	double mu_res = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		mu_res = mu(V[i].val, y, pData, curdim);
 		if ((mu_res >= mu0)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
@@ -318,7 +318,7 @@ inline void C_mu(interval& x, vector<interval>& y, double (*mu)(double, vector<i
 		}
 		if ((mu_res >= mu0)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = i;
+			imax = (int)i;
 		}
 	}
 	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
@@ -328,14 +328,14 @@ inline void C_mu(interval& x, vector<interval>& y, double (*mu)(double, vector<i
 inline void C_mu(box& x, vector<box>& yj, double (*mu)(double, vector<interval>&, void*, int), double mu0, void* pData)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_mu(x[i], yi, mu, mu0, pData, i);
 	}
@@ -345,7 +345,7 @@ inline void C_acc_mu(interval& x, vector<interval>& y, double (*mu)(double, vect
 {
 	vector<bound> V;
 	if (x.isEmpty) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -365,17 +365,17 @@ inline void C_acc_mu(interval& x, vector<interval>& y, double (*mu)(double, vect
 	double mu_res = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		mu_res = mu(V[i].val, y, pData, curdim);
 		if ((mu_res > mu0)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
 			mu0 = mu_res;
-			imin = i;
+			imin = (int)i;
 		}
 		if ((mu_res >= mu0)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = i;
+			imax = (int)i;
 		}
 	}
 	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
@@ -385,14 +385,14 @@ inline void C_acc_mu(interval& x, vector<interval>& y, double (*mu)(double, vect
 inline void C_acc_mu(box& x, vector<box>& yj, double (*mu)(double, vector<interval>&, void*, int), void* pData)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc_mu(x[i], yi, mu, pData, i);
 	}
@@ -405,7 +405,7 @@ inline void C_q_in_mark(interval& x, double qmark, vector<interval>& y, vector<d
 	vector<bound> V;
 	if (x.isEmpty) return;
 	if (qmark <= 0) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -424,11 +424,11 @@ inline void C_q_in_mark(interval& x, double qmark, vector<interval>& y, vector<d
 	double sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		if ((sum >= qmark)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = i;
+			imax = (int)i;
 		}
 		sum = sum + V[i].opening*V[i].mark;
 		if ((sum >= qmark)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
@@ -443,14 +443,14 @@ inline void C_q_in_mark(interval& x, double qmark, vector<interval>& y, vector<d
 inline void C_q_in_mark(box& x, double qmark, vector<box>& yj, vector<double>& ymark)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_q_in_mark(x[i], qmark, yi, ymark);
 	}
@@ -460,7 +460,7 @@ inline void C_acc_mark(interval& x, vector<interval>& y, vector<double>& ymark)
 {
 	vector<bound> V;
 	if (x.isEmpty) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -480,17 +480,17 @@ inline void C_acc_mark(interval& x, vector<interval>& y, vector<double>& ymark)
 	double sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		if ((sum >= qmark)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = i;
+			imax = (int)i;
 		}
 		sum = sum + V[i].opening*V[i].mark;
 		if ((sum > qmark)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
 			qmark = sum;
-			imin = i;
+			imin = (int)i;
 		}
 	}
 	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
@@ -500,14 +500,14 @@ inline void C_acc_mark(interval& x, vector<interval>& y, vector<double>& ymark)
 inline void C_acc_mark(box& x, vector<box>& yj, vector<double>& ymark)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc_mark(x[i], yi, ymark);
 	}
@@ -519,7 +519,7 @@ inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>
 	vector<bound> V;
 	if (x.isEmpty) return;
 	if (qmark <= 0) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -538,11 +538,11 @@ inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>
 	int sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		if ((sum >= qmark)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = i;
+			imax = (int)i;
 		}
 		sum = sum + V[i].opening*(int)V[i].mark;
 		if ((sum >= qmark)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
@@ -557,14 +557,14 @@ inline void C_q_in_mark(interval& x, int qmark, vector<interval>& y, vector<int>
 inline void C_q_in_mark(box& x, int qmark, vector<box>& yj, vector<int>& ymark)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_q_in_mark(x[i], qmark, yi, ymark);
 	}
@@ -574,7 +574,7 @@ inline void C_acc_mark(interval& x, vector<interval>& y, vector<int>& ymark)
 {
 	int qmark_max = std::accumulate(ymark.begin(), ymark.end(), 0);
 
-	for (unsigned int qmarki = qmark_max; qmarki >= 1; qmarki--)
+	for (int qmarki = qmark_max; qmarki >= 1; qmarki--)
 	{
 		interval xi = x;
 		C_q_in_mark(xi, qmarki, y, ymark);
@@ -589,14 +589,14 @@ inline void C_acc_mark(interval& x, vector<interval>& y, vector<int>& ymark)
 inline void C_acc_mark(box& x, vector<box>& yj, vector<int>& ymark)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc_mark(x[i], yi, ymark);
 	}
@@ -605,10 +605,10 @@ inline void C_acc_mark(box& x, vector<box>& yj, vector<int>& ymark)
 #pragma region C_ACC
 inline void C_acc(interval& x, vector<interval>& y)
 {
-	for (unsigned int qi = y.size(); qi >= 1; qi--)
+	for (size_t qi = y.size(); qi >= 1; qi--)
 	{
 		interval xi = x;
-		C_q_in(xi, qi, y);
+		C_q_in(xi, (int)qi, y);
 		if (!xi.isEmpty) 
 		{
 			x = xi;
@@ -620,14 +620,14 @@ inline void C_acc(interval& x, vector<interval>& y)
 inline void C_acc(box& x, vector<box>& yj)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc(x[i], yi);
 	}
@@ -635,10 +635,10 @@ inline void C_acc(box& x, vector<box>& yj)
 
 inline void C_acc_alternate(box& x, vector<box>& yj)
 {
-	for (unsigned int qi = yj.size(); qi >= 1; qi--)
+	for (size_t qi = yj.size(); qi >= 1; qi--)
 	{
 		box xi = x;
-		C_q_in(xi, qi, yj);
+		C_q_in(xi, (int)qi, yj);
 		if (!xi.IsEmpty()) 
 		{
 			x = xi;
@@ -651,7 +651,7 @@ inline void C_acc_opt(interval& x, vector<interval>& y)
 {
 	vector<bound> V;
 	if (x.isEmpty) return;
-	for (unsigned int i = 0; i < y.size(); i++)
+	for (size_t i = 0; i < y.size(); i++)
 	{
 		if (!y[i].isEmpty)
 		{
@@ -671,17 +671,17 @@ inline void C_acc_opt(interval& x, vector<interval>& y)
 	int sum = 0;
 	int imin = (int)(V.size());
 	int imax = -1;
-	for (unsigned int i = 0; i < V.size(); i++)
+	for (size_t i = 0; i < V.size(); i++)
 	{
 		if ((sum >= q)&&(V[i].opening < 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
-			imax = i;
+			imax = (int)i;
 		}
 		sum = sum + V[i].opening*(int)V[i].mark;
 		if ((sum > q)&&(V[i].opening > 0)&&(V[i].val >= x.inf)&&(V[i].val <= x.sup))
 		{
 			q = sum;
-			imin = i;
+			imin = (int)i;
 		}
 	}
 	if ((imax == -1)||(imin == (int)(V.size()))) x = interval();
@@ -691,14 +691,14 @@ inline void C_acc_opt(interval& x, vector<interval>& y)
 inline void C_acc_opt(box& x, vector<box>& yj)
 {
 	vector<box> y(yj.size());
-	for (unsigned int j = 0; j < y.size(); j++)
+	for (size_t j = 0; j < y.size(); j++)
 	{
 		y[j] = x&yj[j];
 	}
 	vector<interval> yi(y.size());
 	for (int i = 1; i <= x.dim; i++)
 	{
-		for (unsigned int j = 0; j < y.size(); j++)
+		for (size_t j = 0; j < y.size(); j++)
 			yi[j] = y[j][i];
 		C_acc_opt(x[i], yi);
 	}

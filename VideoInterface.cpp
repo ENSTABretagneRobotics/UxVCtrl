@@ -112,7 +112,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 						//"Media-type: image/jpeg\r\n"
 						//"\r\n" // CRLF will be in the next encapsulation boundary "\r\n--boundary\r\n"...
 					);
-					if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
+					if (sendall(sockcli, httpbuf, (int)strlen(httpbuf)) != EXIT_SUCCESS)
 					{
 						//free(databuf);
 						return EXIT_FAILURE;
@@ -201,7 +201,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 				"Content-Type: image/jpeg\r\n"
 				"Content-Length: %d\r\n"
 				"\r\n", mat->rows*mat->cols);
-			if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
+			if (sendall(sockcli, httpbuf, (int)strlen(httpbuf)) != EXIT_SUCCESS)
 			{
 				//free(databuf);
 				return EXIT_FAILURE;
@@ -236,7 +236,7 @@ int handlevideointerfacecli(SOCKET sockcli, void* pParam)
 				"Content-Type: image/jpeg\r\n"
 				"Content-Length: %d\r\n"
 				"\r\n", (int)bufmatvector.size());
-			if (sendall(sockcli, httpbuf, strlen(httpbuf)) != EXIT_SUCCESS)
+			if (sendall(sockcli, httpbuf, (int)strlen(httpbuf)) != EXIT_SUCCESS)
 			{
 				//free(databuf);
 				return EXIT_FAILURE;

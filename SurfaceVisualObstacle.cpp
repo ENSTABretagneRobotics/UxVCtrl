@@ -130,7 +130,7 @@ vector <Point> cannyHough(cv::Mat src, int line_length, int difference){
     for(size_t j = 0; j < houghCompare.size(); j++){
         tmpAdd = tmpAdd + houghCompare[j];
     }
-    int meanHough = tmpAdd/ houghCompare.size();
+    int meanHough = tmpAdd/(int)houghCompare.size();
 
     /*Suppression des lignes trop eloigne par rapport a la moyenne */
     size_t iEr = 0;

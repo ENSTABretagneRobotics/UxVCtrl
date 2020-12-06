@@ -136,7 +136,7 @@ THREAD_PROC_RETURN_VALUE SRF02Thread(void* pParam)
 						sprintf(szTemp, "srf02");
 					}
 					// Remove the extension.
-					for (i = strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
+					for (i = (int)strlen(szTemp)-1; i >= 0; i--) { if (szTemp[i] == '.') break; }
 					if ((i > 0)&&(i < (int)strlen(szTemp))) memset(szTemp+i, 0, strlen(szTemp)-i);
 					//if (strlen(szTemp) > 4) memset(szTemp+strlen(szTemp)-4, 0, 4);
 					EnterCriticalSection(&strtimeCS);

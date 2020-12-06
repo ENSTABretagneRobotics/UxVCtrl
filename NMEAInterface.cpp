@@ -377,9 +377,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			nmeadata.hour, nmeadata.minute, nmeadata.second, 
 			nmeadata.latdeg, latdecmin, nmeadata.north, nmeadata.longdeg, longdecmin, nmeadata.east, 
 			nmeadata.GPS_quality_indicator, nmeadata.nbsat, nmeadata.hdop, althat);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -395,9 +395,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			nmeadata.sog, nmeadata.cog, 
 			nmeadata.day, nmeadata.month, nmeadata.year, 
 			nmeadata.posMode);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -411,9 +411,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			nmeadata.latdeg, latdecmin, nmeadata.north, nmeadata.longdeg, longdecmin, nmeadata.east, 
 			nmeadata.hour, nmeadata.minute, nmeadata.second, 
 			nmeadata.status, nmeadata.posMode);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -424,9 +424,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$GPVTG,%06.2f,T,,,%06.2f,N,,,%c", nmeadata.cog, nmeadata.sog, nmeadata.posMode);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -437,9 +437,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$GPHDG,%.2f,%.2f,%c,0.0,W", headinghat+MagneticDeclination, fabs(MagneticDeclination), (MagneticDeclination < 0)? 'W': 'E');
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -450,9 +450,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$GPHDM,%.2f,M", headinghat+MagneticDeclination);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -463,9 +463,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$GPHDT,%.2f,T", headinghat);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -480,9 +480,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$HCHDG,%.2f,%.2f,%c,0.0,W", headinghat+MagneticDeclination, fabs(MagneticDeclination), (MagneticDeclination < 0)? 'W': 'E');
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -493,9 +493,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$HCHDM,%.2f,M", headinghat+MagneticDeclination);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -506,9 +506,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$HEHDT,%.2f,T", headinghat);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -519,9 +519,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$HEROT,%.2f,A", rateofturn);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -532,9 +532,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$TIROT,%.2f,A", rateofturn);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -545,9 +545,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$WIMWV,%.2f,R,%.2f,M,A", awinddir, awindspeed);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -558,9 +558,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$WIMWD,%.1f,T,%.1f,M,%.1f,N,%.1f,M", winddir, winddir, windspeed*1.94, windspeed);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -571,9 +571,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$WIMDA,30.0000,I,1.0000,B,15.5,C,,,,,,,%.1f,T,%.1f,M,%.1f,N,%.1f,M", winddir, winddir, windspeed*1.94, windspeed);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -584,9 +584,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$PRDID,%+07.2f,%+07.2f,%06.2f", pitchhat, rollhat, headinghat);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -597,9 +597,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$PHTRO,%.2f,%c,%.2f,%c", pitchhat, 'M', rollhat, 'T');
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -610,9 +610,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$PHTRH,%.2f,%c,%.2f,%c,%.2f,%c", pitchhat, 'M', rollhat, 'T', 0.0, 'O');
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -623,9 +623,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$IIRSA,%.2f,A,,,", singlerudder);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;
@@ -636,9 +636,9 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 		memset(sendbuf, 0, sizeof(sendbuf));
 		memset(tmpbuf, 0, sizeof(tmpbuf));
 		sprintf(tmpbuf, "$SDDBT,%.2f,f,%.2f,M,%.2f,F", dbt, 3.280839895*dbt, 0.5464480874*dbt);
-		ComputeChecksumNMEA(tmpbuf, strlen(tmpbuf), checksum);
+		ComputeChecksumNMEA(tmpbuf, (int)strlen(tmpbuf), checksum);
 		sprintf((char*)sendbuf, "%s%s\r\n", tmpbuf, checksum);
-		sendbuflen = strlen((char*)sendbuf);
+		sendbuflen = (int)strlen((char*)sendbuf);
 		if (WriteAllRS232Port(pNMEAInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
 		{
 			return EXIT_FAILURE;

@@ -11,7 +11,7 @@
 
 TIMERCALLBACK_RETURN_VALUE VideoRecordCallbackFunction(void* pParam, BOOLEAN b)
 {
-	int videoid = (intptr_t)pParam;
+	int videoid = (int)(intptr_t)pParam;
 	BOOL bRestart = FALSE;
 
 	UNREFERENCED_PARAMETER(b);
@@ -45,7 +45,7 @@ TIMERCALLBACK_RETURN_VALUE VideoRecordCallbackFunction(void* pParam, BOOLEAN b)
 
 THREAD_PROC_RETURN_VALUE VideoRecordThread(void* pParam)
 {
-	int videoid = (intptr_t)pParam;
+	int videoid = (int)(intptr_t)pParam;
 	TIMER timer;
 	BOOL bVideoRecording = FALSE;
 	char videorecordextension[16];

@@ -11,7 +11,7 @@
 
 THREAD_PROC_RETURN_VALUE ExternalProgramTriggerThread(void* pParam)
 {
-	int id = (intptr_t)pParam;
+	int id = (int)(intptr_t)pParam;
 
 	FILE* logexternalprogramtriggerfile = NULL;
 	char logexternalprogramtriggerfilename[MAX_BUF_LEN];
