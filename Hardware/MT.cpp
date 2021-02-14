@@ -29,6 +29,9 @@ THREAD_PROC_RETURN_VALUE MTThread(void* pParam)
 
 	memset(&mt, 0, sizeof(MT));
 
+	memset(&tv, 0, sizeof(tv));
+	memset(&mtdata, 0, sizeof(mtdata));
+
 	GNSSqualityMT = GNSS_NO_FIX;
 
 	StartChrono(&chrono_period);

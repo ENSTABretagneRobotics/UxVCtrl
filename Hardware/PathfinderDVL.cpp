@@ -26,6 +26,8 @@ THREAD_PROC_RETURN_VALUE PathfinderDVLThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	memset(&pathfinderdvl, 0, sizeof(PATHFINDERDVL));
+	
+	memset(&nmeadata, 0, sizeof(nmeadata));
 
 	StartChrono(&chrono_period);
 

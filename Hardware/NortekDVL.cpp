@@ -27,6 +27,8 @@ THREAD_PROC_RETURN_VALUE NortekDVLThread(void* pParam)
 
 	memset(&nortekdvl, 0, sizeof(NORTEKDVL));
 
+	memset(&nmeadata, 0, sizeof(nmeadata));
+
 	StartChrono(&chrono_period);
 
 	for (;;)

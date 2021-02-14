@@ -87,9 +87,12 @@
 
 #define NAV_DGPS_ID_UBX 0x31
 #define NAV_DOP_ID_UBX 0x04
+#define NAV_HPOSECEF_ID_UBX 0x13
+#define NAV_HPOSLLH_ID_UBX 0x14
 #define NAV_POSECEF_ID_UBX 0x01
 #define NAV_POSLLH_ID_UBX 0x02
 #define NAV_PVT_ID_UBX 0x07
+#define NAV_RELPOSNED_ID_UBX 0x3C
 #define NAV_SOL_ID_UBX 0x06
 #define NAV_STATUS_ID_UBX 0x03
 #define NAV_SVIN_ID_UBX 0x3B
@@ -114,9 +117,16 @@
 //#define NMEA_STD_TXT_ID_UBX 0x41
 
 #define RTCM_1005_ID_UBX 0x05
+#define RTCM_1074_ID_UBX 0x4A
 #define RTCM_1077_ID_UBX 0x4D
+#define RTCM_1084_ID_UBX 0x54
 #define RTCM_1087_ID_UBX 0x57
+#define RTCM_1094_ID_UBX 0x5E
+#define RTCM_1097_ID_UBX 0x61
 #define RTCM_1127_ID_UBX 0x7F
+#define RTCM_1230_ID_UBX 0xE6
+#define RTCM_4072_0_ID_UBX 0xFE
+#define RTCM_4072_1_ID_UBX 0xFD
 
 union uShort_UBX
 {
@@ -260,6 +270,31 @@ struct CFG_NMEA_PL_UBX
 	unsigned char reserved1[6];
 	//unsigned char padding[4];
 };
+// 8 bits = 1*sizeof(unsigned char).
+struct flags_NAV_HPOSLLH_PL_UBX
+{
+	unsigned char invalidLlh : 1;
+	unsigned char reserved1 : 7;
+};
+#define LEN_NAV_HPOSLLH_PL_UBX 36
+struct NAV_HPOSLLH_PL_UBX
+{
+	unsigned char version;
+	unsigned char reserved0[2];
+	struct flags_NAV_HPOSLLH_PL_UBX flags;
+	unsigned int iTOW; // In ms.
+	int lon; // In 1e-7 deg.
+	int lat; // In 1e-7 deg.
+	int height; // In mm.
+	int hMSL; // In mm.
+	char lonHp; // In 1e-9 deg.
+	char latHp; // In 1e-9 deg.
+	char heightHp; // In 0.1 mm.
+	char hMSLHp; // In 0.1 mm.
+	unsigned int hAcc; // In 0.1 mm.
+	unsigned int vAcc; // In 0.1 mm.
+	//unsigned char padding[4];
+};
 #define LEN_NAV_POSLLH_PL_UBX 28
 struct NAV_POSLLH_PL_UBX
 {
@@ -332,6 +367,45 @@ struct NAV_PVT_PL_UBX
 	int headVeh; // In 1e-5 deg.
 	unsigned char reserved2[4];
 	//unsigned char padding[4];
+};
+// 32 bits = 1*sizeof(unsigned int).
+struct flags_NAV_RELPOSNED_PL_UBX
+{
+	unsigned int gnssFixOK : 1;
+	unsigned int diffSoln : 1;
+	unsigned int relPosValid : 1;
+	unsigned int carrSoln : 2;
+	unsigned int isMoving : 1;
+	unsigned int refPosMiss : 1;
+	unsigned int refObsMiss : 1;
+	unsigned int relPosHeadingValid : 1;
+	unsigned int relPosNormalized : 1;
+	unsigned int reserved1 : 22;
+};
+#define LEN_NAV_RELPOSNED_PL_UBX 64
+struct NAV_RELPOSNED_PL_UBX
+{
+	unsigned char version;
+	unsigned char reserved0;
+	unsigned short refStationId;
+	unsigned int iTOW; // In ms.
+	int relPosN; // In cm.
+	int relPosE; // In cm.
+	int relPosD; // In cm.
+	int relPosLength; // In cm.
+	int relPosHeading; // In 1e-5 deg.
+	unsigned char reserved1[4];
+	char relPosHPN; // In 0.1 mm.
+	char relPosHPE; // In 0.1 mm.
+	char relPosHPD; // In 0.1 mm.
+	char relPosHPPLength; // In 0.1 mm.
+	unsigned int accN; // In 0.1 mm.
+	unsigned int accE; // In 0.1 mm.
+	unsigned int accD; // In 0.1 mm.
+	unsigned int accLength; // In 0.1 mm.
+	unsigned int accHeading; // In 1e-5 deg.
+	unsigned char reserved2[4];
+	struct flags_NAV_RELPOSNED_PL_UBX flags;
 };
 // 8 bits = 1*sizeof(unsigned char).
 struct flags_NAV_SOL_PL_UBX
@@ -437,8 +511,10 @@ struct NAV_VELNED_PL_UBX
 
 struct UBXDATA
 {
+	struct NAV_HPOSLLH_PL_UBX nav_hposllh_pl;
 	struct NAV_POSLLH_PL_UBX nav_posllh_pl;
 	struct NAV_PVT_PL_UBX nav_pvt_pl;
+	struct NAV_RELPOSNED_PL_UBX nav_relposned_pl;
 	struct NAV_SOL_PL_UBX nav_sol_pl;
 	struct NAV_STATUS_PL_UBX nav_status_pl;
 	struct NAV_SVIN_PL_UBX nav_svin_pl;
@@ -817,6 +893,13 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 	case NAV_CLASS_UBX:
 		switch (mid)
 		{
+		case NAV_HPOSLLH_ID_UBX:
+			memcpy(&pUBXData->nav_hposllh_pl, payload, LEN_NAV_HPOSLLH_PL_UBX);
+			//memcpy(&pUBXData->nav_hposllh_pl, payload, sizeof(pUBXData->nav_hposllh_pl));
+			pUBXData->Latitude = (pUBXData->nav_hposllh_pl.lat+pUBXData->nav_hposllh_pl.latHp*0.01)*0.0000001; // In decimal degrees.
+			pUBXData->Longitude = (pUBXData->nav_hposllh_pl.lon+pUBXData->nav_hposllh_pl.lonHp*0.01)*0.0000001; // In decimal degrees.
+			pUBXData->Altitude = (pUBXData->nav_hposllh_pl.height+pUBXData->nav_hposllh_pl.heightHp*0.1)*1000; // In m.
+			break;
 		case NAV_POSLLH_ID_UBX:
 			memcpy(&pUBXData->nav_posllh_pl, payload, LEN_NAV_POSLLH_PL_UBX);
 			//memcpy(&pUBXData->nav_posllh_pl, payload, sizeof(pUBXData->nav_posllh_pl));
@@ -838,6 +921,11 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 			pUBXData->second = pUBXData->nav_pvt_pl.sec+0.000000001*pUBXData->nav_pvt_pl.nano;	
 			pUBXData->SOG = pUBXData->nav_pvt_pl.gSpeed/1000.0; // In m/s.
 			pUBXData->COG = pUBXData->nav_pvt_pl.headMot*0.00001*M_PI/180.0; // In rad.
+			break;
+		case NAV_RELPOSNED_ID_UBX:
+			memcpy(&pUBXData->nav_relposned_pl, payload, LEN_NAV_RELPOSNED_PL_UBX);
+			//memcpy(&pUBXData->nav_relposned_pl, payload, sizeof(pUBXData->nav_relposned_pl));
+			pUBXData->Heading = pUBXData->nav_relposned_pl.relPosHeading*0.00001*M_PI/180.0; // In rad
 			break;
 		case NAV_SOL_ID_UBX:
 			memcpy(&pUBXData->nav_sol_pl, payload, LEN_NAV_SOL_PL_UBX);

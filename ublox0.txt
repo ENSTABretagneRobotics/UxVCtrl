@@ -75,9 +75,13 @@ $GPS_STOP
 0
 % bEnable_NMEA_PD6_BD
 0
+% bEnable_UBX_NAV_HPOSLLH
+0
 % bEnable_UBX_NAV_POSLLH
 1
 % bEnable_UBX_NAV_PVT
+0
+% bEnable_UBX_NAV_RELPOSNED
 0
 % bEnable_UBX_NAV_SOL
 1

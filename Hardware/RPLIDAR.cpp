@@ -34,6 +34,10 @@ THREAD_PROC_RETURN_VALUE RPLIDARThread(void* pParam)
 
 	memset(&rplidar, 0, sizeof(RPLIDAR));
 
+	memset(&tv, 0, sizeof(tv));
+	memset(angles, 0, sizeof(angles));
+	memset(distances, 0, sizeof(distances));
+
 	StartChrono(&chrono_period);
 
 	for (;;)

@@ -666,18 +666,37 @@ inline int GetStartupMessageRPLIDAR(RPLIDAR* pRPLIDAR)
 
 	if (PurgeRS232Port(&pRPLIDAR->RS232Port) != EXIT_SUCCESS)
 	{
-		printf("Warning : A RPLIDAR might not be responding correctly. \n");
+		printf("Error purging data from a RPLIDAR. \n");
 		return EXIT_FAILURE;
 	}
 	// Need to purge twice on Mac OS otherwise next read() would fail...?
 	if (PurgeRS232Port(&pRPLIDAR->RS232Port) != EXIT_SUCCESS)
 	{
-		printf("Warning : A RPLIDAR might not be responding correctly. \n");
+		printf("Error purging data from a RPLIDAR. \n");
 		return EXIT_FAILURE;
 	}
 #endif // ENABLE_RPLIDAR_SDK_SUPPORT
 
 	return EXIT_SUCCESS;
+}
+
+inline int ClearCacheRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+#ifdef ENABLE_RPLIDAR_SDK_SUPPORT
+	if (IS_FAIL(pRPLIDAR->drv->clearNetSerialRxCache()))
+	{
+		printf("A RPLIDAR is not responding correctly : clearNetSerialRxCache() failed. \n");
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+#else
+	if (PurgeRS232Port(&pRPLIDAR->RS232Port) != EXIT_SUCCESS)
+	{
+		printf("Error purging data from a RPLIDAR. \n");
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+#endif // ENABLE_RPLIDAR_SDK_SUPPORT
 }
 
 inline int GetHealthRequestRPLIDAR(RPLIDAR* pRPLIDAR, BOOL* pbProtectionStop)
@@ -1010,6 +1029,38 @@ inline int SetLidarSpinSpeedRequestRPLIDAR(RPLIDAR* pRPLIDAR, int rpm)
 #endif // ENABLE_RPLIDAR_SDK_SUPPORT
 
 	return EXIT_SUCCESS;
+}
+
+inline int StartMotorRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+#ifdef ENABLE_RPLIDAR_SDK_SUPPORT
+	if (IS_FAIL(pRPLIDAR->drv->startMotor()))
+	{
+		printf("A RPLIDAR is not responding correctly : startMotor() failed. \n");
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+#else
+	UNREFERENCED_PARAMETER(pRPLIDAR);
+	printf("RPLIDAR : Not implemented. \n");
+	return EXIT_NOT_IMPLEMENTED;
+#endif // ENABLE_RPLIDAR_SDK_SUPPORT
+}
+
+inline int StopMotorRPLIDAR(RPLIDAR* pRPLIDAR)
+{
+#ifdef ENABLE_RPLIDAR_SDK_SUPPORT
+	if (IS_FAIL(pRPLIDAR->drv->stopMotor()))
+	{
+		printf("A RPLIDAR is not responding correctly : stopMotor() failed. \n");
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+#else
+	UNREFERENCED_PARAMETER(pRPLIDAR);
+	printf("RPLIDAR : Not implemented. \n");
+	return EXIT_NOT_IMPLEMENTED;
+#endif // ENABLE_RPLIDAR_SDK_SUPPORT
 }
 
 inline int StartScanRequestRPLIDAR(RPLIDAR* pRPLIDAR)

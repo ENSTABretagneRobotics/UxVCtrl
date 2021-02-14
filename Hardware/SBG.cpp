@@ -29,6 +29,9 @@ THREAD_PROC_RETURN_VALUE SBGThread(void* pParam)
 
 	memset(&sbg, 0, sizeof(SBG));
 
+	memset(&tv, 0, sizeof(tv));
+	memset(&sbgdata, 0, sizeof(sbgdata));
+
 	GNSSqualitySBG = GNSS_NO_FIX;
 
 	StartChrono(&chrono_period);

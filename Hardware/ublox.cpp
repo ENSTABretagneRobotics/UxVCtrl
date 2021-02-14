@@ -39,6 +39,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 	memset(&nmeadata, 0, sizeof(nmeadata));
 	memset(&ubxdata, 0, sizeof(ubxdata));
 	memset(rtcmdata, 0, sizeof(rtcmdata));
+	memset(&tv, 0, sizeof(tv));
 
 	GNSSqualityublox[deviceid] = GNSS_NO_FIX;
 
@@ -89,6 +90,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 				memset(&nmeadata, 0, sizeof(nmeadata));
 				memset(&ubxdata, 0, sizeof(ubxdata));
 				memset(rtcmdata, 0, sizeof(rtcmdata));
+				memset(&tv, 0, sizeof(tv));
 				StopChronoQuick(&chrono_svin);
 				StartChrono(&chrono_svin);
 
@@ -192,8 +194,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_DID||ublox.bEnable_NMEA_VDM||
 						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
 						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD) res = GetNMEASentenceublox(&ublox, &nmeadata);
-					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||
-						ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
+					if (ublox.bEnable_UBX_NAV_HPOSLLH||ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_RELPOSNED||
+						ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
 				}
 
 				if (res == EXIT_SUCCESS)
@@ -401,8 +403,8 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						}
 					}
 
-					if (ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||
-						ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
+					if (ublox.bEnable_UBX_NAV_HPOSLLH||ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_RELPOSNED||
+						ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
 					{
 						// GNSS quality determination...
 						if (ublox.bEnable_UBX_NAV_SOL)
@@ -512,14 +514,23 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						if ((GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX)||
 							(GNSSqualityublox[deviceid] == RTK_FIXED)||(GNSSqualityublox[deviceid] == RTK_FLOAT))
 						{
-							if (ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_POSLLH)
+							if (ublox.bEnable_UBX_NAV_HPOSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_POSLLH)
 							{
 
 								// Should only provide the number of satellites that are above GPS_min_sat_signal...?
 
 								// Position accuracy depending on the GNSS quality...
 								ComputeGNSSPosition(ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, GNSSqualityublox[deviceid], ubxdata.nav_pvt_pl.numSV, 0);
-								if ((ublox.bEnable_UBX_NAV_PVT)&&(Width(x_gps)/2 < ubxdata.nav_pvt_pl.hAcc*1000.0))
+								if ((ublox.bEnable_UBX_NAV_HPOSLLH)&&(Width(x_gps)/2 < ubxdata.nav_hposllh_pl.hAcc*10000.0))
+								{
+									// We were too optimistic...
+									double x = 0, y = 0, z = 0;
+									GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, &x, &y, &z);
+									x_gps = interval(x-ubxdata.nav_hposllh_pl.hAcc*10000.0, x+ubxdata.nav_hposllh_pl.hAcc*10000.0);
+									y_gps = interval(y-ubxdata.nav_hposllh_pl.hAcc*10000.0, y+ubxdata.nav_hposllh_pl.hAcc*10000.0);
+									z_gps = interval(z-ubxdata.nav_hposllh_pl.vAcc*10000.0, z+ubxdata.nav_hposllh_pl.vAcc*10000.0);
+								}
+								else if ((ublox.bEnable_UBX_NAV_PVT)&&(Width(x_gps)/2 < ubxdata.nav_pvt_pl.hAcc*1000.0))
 								{
 									// We were too optimistic...
 									double x = 0, y = 0, z = 0;
@@ -551,6 +562,11 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 								t.tm_hour = ubxdata.hour; t.tm_min = ubxdata.minute; t.tm_sec = 0; t.tm_isdst = 0;
 								tt = timegm(&t);
 								utc = tt*1000.0+ubxdata.second*1000.0;
+							}
+							if (ublox.bEnable_UBX_NAV_RELPOSNED)
+							{
+								//psi_gps = fmod_2PI(M_PI/2.0-ubxdata.Heading-angle_env)+interval(-psi_gps_acc,psi_gps_acc);
+								psi_ahrs = fmod_2PI(M_PI/2.0-ubxdata.Heading-angle_env)+interval(-psi_ahrs_acc,psi_ahrs_acc); // Temp...
 							}
 						}
 					}

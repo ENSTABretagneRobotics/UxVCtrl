@@ -27,6 +27,9 @@ THREAD_PROC_RETURN_VALUE RazorAHRSThread(void* pParam)
 
 	memset(&razorahrs, 0, sizeof(RAZORAHRS));
 
+	memset(&tv, 0, sizeof(tv));
+	memset(&razorahrsdata, 0, sizeof(razorahrsdata));
+
 	StartChrono(&chrono_period);
 
 	for (;;)

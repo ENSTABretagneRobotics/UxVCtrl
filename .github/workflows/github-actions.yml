@@ -1,0 +1,553 @@
+on:
+    push:
+        branches: '**'
+        tags: '' # Restrict to blank tags
+    pull_request:
+
+jobs:
+ # This job may be commented if a new release should not be created...
+ deploy:
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        draft: true
+        tag_name: autotagname
+        release_name: autotagname
+
+# jtestlj:
+#    name: Windows
+#    runs-on: windows-latest
+#    steps: 
+#    - uses: actions/checkout@v2
+#    - run: |
+#        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+#        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+#      shell: pwsh
+#    - run: |
+#        rem For LabJack
+#        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2020-07-30.zip --no-check-certificate -nv
+#        7z x LabJack-2020-07-30.zip -o"%SystemDrive%" -y
+#        regedit /s %SystemDrive%\LabJack-2020-07-30\Certificates.reg
+##        start %SystemDrive%\LabJack-2020-07-30\LabJack-2020-07-30-beta.exe /S
+##        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+##        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+##        %SystemDrive%\cmake_extra_tools\sleep 60
+##        TASKKILL /F /IM LVRunTimeEng.exe /T
+#      shell: cmd
+#    - run: |
+#        rem For LabJack
+#        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
+#        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
+#        regedit /s %SystemDrive%\LabJack-2019-05-20\Certificates.reg
+#        start %SystemDrive%\LabJack-2019-05-20\LabJack-2019-05-20.exe /S
+#        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+#        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+#        %SystemDrive%\cmake_extra_tools\sleep 60
+#        TASKKILL /F /IM LVRunTimeEng.exe /T
+#      shell: cmd
+#    - run: |
+#        rem For LabJack
+#        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+#        rem wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+#        rem 7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+#        rem Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+#        rem Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /LimitAccess /NoRestart
+#        rem powerShell -Command "Add-WindowsCapability -Online -Name NetFX3*"
+#        rem powershell -Command "Install-WindowsFeature NET-Framework-Features"
+#        rem powershell -Command "Install-WindowsFeature NET-Framework-Core"
+#        rem DISM /online /enable-feature /featurename:NetFx3 /all
+#        rem choco install -y dotnet3.5 
+#        rem rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+#        rem choco install -y vcredist-all
+#      shell: cmd
+#    - run: cmake -D ENABLE_LABJACK_SUPPORT=ON . & cmake --build . --config Release --target UxVCtrl & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt
+#      shell: cmd
+
+ j1:
+    name: Ubuntu
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+
+ j2:
+    name: Windows
+    runs-on: windows-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake . & cmake --build . --config Release --target UxVCtrl & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt
+      shell: cmd
+
+ j3:
+    name: macOS
+    runs-on: macos-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+
+ j4:
+    name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
+    runs-on: ubuntu-18.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl
+    # Virtual memory exhausted with --parallel...?
+
+ j5:
+    name: macOS Catalina 10.15 with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-10.15
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macOS
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_macOS"
+        overwrite: true
+        tag_name: autotagname
+ 
+ j6:
+    name: Ubuntu 16.04 x86
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." i386/ubuntu:xenial /bin/bash -c "linux32 --32bit i386 uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_Ubuntu32"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_Ubuntu32"
+        overwrite: true
+        tag_name: autotagname
+ 
+ j7:
+    name: Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update && apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_pi"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_pi"
+        overwrite: true
+        tag_name: autotagname
+ 
+ j8:
+    name: Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update && apt-get -y install xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_pi"
+        overwrite: true
+        tag_name: autotagname
+
+ j9:
+    name: Windows MinGW 8.1.0 x64
+    runs-on: windows-2019
+    steps: 
+    - uses: actions/checkout@v2
+#    - run: choco install -y make
+    - run: cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
+      shell: bash
+ 
+ j10:
+    #name: Ubuntu 12.04 amd64 with default OpenCV 2.3.1 without Kinect v2 support
+    name: Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." ubuntu:trusty /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_old_Ubuntu64"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_old_Ubuntu64"
+        overwrite: true
+        tag_name: autotagname
+
+ j11:
+    name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
+    runs-on: ubuntu-20.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_focal_Ubuntu64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_focal_Ubuntu64"
+        overwrite: true
+        tag_name: autotagname
+
+ j12:
+    name: Ubuntu 16.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-16.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_Ubuntu64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_Ubuntu64"
+        overwrite: true
+        tag_name: autotagname
+
+ j13:
+    name: Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
+    runs-on: ubuntu-18.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        sudo apt-get -q update || true
+        sudo apt-get install -y libopencv-dev libgtk2.0
+        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-Ubuntu64-static.zip
+        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.2.0-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-Ubuntu64-static.tar.gz
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_Ubuntu64"
+        overwrite: true
+        tag_name: autotagname
+
+ j14:
+    name: macOS Catalina 10.15 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-10.15
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macOS
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_macOS"
+        overwrite: true
+        tag_name: autotagname
+
+# j15:
+#    name: macOS Catalina 10.15 static with OpenCV 4.2.0 without BlueView, Kinect v2 support
+#    runs-on: macos-10.15
+#    steps: 
+#    - uses: actions/checkout@v2
+#    - run: |
+#        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
+#        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-mac-static.tar.gz && tar xfz OpenCV-4.2.0-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-mac-static.tar.gz
+#    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macOS
+#    - uses: xresloader/upload-to-github-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        file: "UxVCtrl_macOS"
+#        overwrite: true
+#        tag_name: autotagname
+
+ j16:
+    name: Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
+    runs-on: windows-2019
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+        rem Lighter version of OpenCV, instead of the one that would be downloaded automatically by CMakeLists.txt...
+        rem wget http://www.ensta-bretagne.fr/lebars/Share/OpenCV4.2.0_mini.zip --no-check-certificate -nv
+        rem 7z x OpenCV4.2.0_mini.zip -o"%SystemDrive%" -y
+        rem PATH
+        rem wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+        rem 7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+        rem %SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV4.2.0\x64\mingw\bin & cd. & rem Non-zero exit code...?
+      shell: cmd
+    - run: cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8_x64.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_mingw8_x64.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j17:
+    name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: windows-2016
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem Test alternate CMake version...
+        choco uninstall -y cmake.install
+        choco install -y cmake.install --version=3.12.0
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+        rem For XP support
+        rem wget "https://aka.ms/vs/15/release/vs_buildtools.exe" --no-check-certificate -nv -O vs_buildtools.exe
+        rem vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
+        rem PATH
+        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+        %SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin & cd. & rem Non-zero exit code...?
+      shell: cmd
+    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_compat.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j18:
+    name: Windows Visual Studio 2017 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
+    runs-on: windows-2016
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name Tools.Graphics.DirectX*"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name Media.WindowsMediaPlayer*"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name Browser.InternetExplorer*"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name ServerCore.AppCompatibility*"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /LimitAccess /NoRestart
+        rem powerShell -Command "Add-WindowsCapability -Online -Name NetFX3*"
+        rem powershell -Command "Install-WindowsFeature NET-Framework-Features"
+        rem powershell -Command "Install-WindowsFeature NET-Framework-Core"
+        rem DISM /online /enable-feature /featurename:NetFx3 /all
+        rem choco install -y dotnet3.5 
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+        rem choco install -y vcredist-all
+      shell: cmd
+    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j19:
+    name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
+    runs-on: windows-2016
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+      shell: cmd
+    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=OFF -D USE_FFMPEG_VIDEO=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv320_ffmpeg.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_cv320_ffmpeg.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j20:
+    name: Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
+    runs-on: windows-2016
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+      shell: cmd
+    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv2413.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_cv2413.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j21:
+    name: Windows Visual Studio 2017 x64 static with OpenCV 4.2.0 without BlueView support
+    runs-on: windows-2016
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+      shell: cmd
+    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_x64.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_x64.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j22:
+    name: Windows Qt 2010.05 MinGW 4.4.0 x86 with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK, Kinect v2 support
+    runs-on: windows-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem Take 8 min...
+        rem choco uninstall -y mingw strawberryperl
+        wget http://www.ensta-bretagne.fr/lebars/Share/qt-sdk-win-opensource-2010.05.exe --no-check-certificate -nv
+        move /Y qt-sdk-win-opensource-2010.05.exe %SystemDrive%\
+        rem Take 5 min...
+        %SystemDrive%\qt-sdk-win-opensource-2010.05.exe /S
+        del /f /q %SystemDrive%\qt-sdk-win-opensource-2010.05.exe
+        rem echo C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin>>%GITHUB_PATH%
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        rem https://dirteam.com/sander/2018/11/20/important-issues-in-windows-server-2019-build-10-0-17763-1-release-notes/
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_2019_sxs.zip --no-check-certificate -nv
+        7z x windows_server_2019_sxs.zip -o"%SystemDrive%" -y
+        Dism /online /enable-feature /featurename:NetFx3 /All /Source:%SystemDrive%\sxs /NoRestart
+        rem del /f /q windows_server_2019_sxs.zip %SystemDrive%\sxs
+      shell: cmd
+    - run: refreshenv.cmd & set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=OFF -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_mingw.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j23:
+    name: Windows Qt 5.12.6 MinGW 7.3.0 x86
+    runs-on: windows-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem Take 8 min...
+        rem choco uninstall -y mingw strawberryperl
+        wget http://download.qt.io/archive/qt/5.12/5.12.6/qt-opensource-windows-x86-5.12.6.exe --no-check-certificate -nv
+        move /Y qt-opensource-windows-x86-5.12.6.exe %SystemDrive%\
+        wget http://www.ensta-bretagne.fr/lebars/Share/qt-installer-5.12.6-mingw73_32.qs --no-check-certificate -nv
+        move /Y qt-installer-5.12.6-mingw73_32.qs %SystemDrive%\
+        netsh advfirewall set allprofiles state on
+        netsh advfirewall firewall add rule name="Qt offline installer" dir=out action=block program="%SystemDrive%\qt-opensource-windows-x86-5.12.6.exe" enable=yes
+        rem Take several min...
+        %SystemDrive%\qt-opensource-windows-x86-5.12.6.exe --script %SystemDrive%\qt-installer-5.12.6-mingw73_32.qs
+        netsh advfirewall firewall del rule name="Qt offline installer"
+        netsh advfirewall set allprofiles state off
+        del /f /q %SystemDrive%\qt-opensource-windows-x86-5.12.6.exe
+        rem echo C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin>>%GITHUB_PATH%
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & rem ksuser.dll already on windows-2016...?
+      shell: cmd
+    - run: refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw7.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_mingw7.exe"
+        overwrite: true
+        tag_name: autotagname

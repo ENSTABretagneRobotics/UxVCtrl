@@ -92,8 +92,10 @@ struct UBLOX
 	BOOL bEnable_NMEA_PD6_BS;
 	BOOL bEnable_NMEA_PD6_BE;
 	BOOL bEnable_NMEA_PD6_BD;
+	BOOL bEnable_UBX_NAV_HPOSLLH;
 	BOOL bEnable_UBX_NAV_POSLLH;
 	BOOL bEnable_UBX_NAV_PVT;
+	BOOL bEnable_UBX_NAV_RELPOSNED;
 	BOOL bEnable_UBX_NAV_SOL;
 	BOOL bEnable_UBX_NAV_STATUS;
 	BOOL bEnable_UBX_NAV_SVIN;
@@ -790,7 +792,22 @@ inline int SetBaseCfgublox(UBLOX* publox)
 	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
 	offset += packetlen;
+	cfg_msg_pl[1] = RTCM_1097_ID_UBX; // Not available for M8P...
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
 	cfg_msg_pl[1] = RTCM_1127_ID_UBX;
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = RTCM_1230_ID_UBX; // Not available for M8P...
+	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
+	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
+	memcpy(sendbuf+offset, packet, packetlen);
+	offset += packetlen;
+	cfg_msg_pl[1] = RTCM_4072_0_ID_UBX; // For moving base, not available for M8P...
 	EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, LEN_CFG_MSG_PL_UBX);
 	//EncodePacketUBX(packet, &packetlen, CFG_CLASS_UBX, CFG_MSG_ID_UBX, (unsigned char*)&cfg_msg_pl, sizeof(cfg_msg_pl));
 	memcpy(sendbuf+offset, packet, packetlen);
@@ -1046,8 +1063,10 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->bEnable_NMEA_PD6_BS = 0;
 		publox->bEnable_NMEA_PD6_BE = 0;
 		publox->bEnable_NMEA_PD6_BD = 0;
+		publox->bEnable_UBX_NAV_HPOSLLH = 0;
 		publox->bEnable_UBX_NAV_POSLLH = 1;
 		publox->bEnable_UBX_NAV_PVT = 1;
+		publox->bEnable_UBX_NAV_RELPOSNED = 0;
 		publox->bEnable_UBX_NAV_SOL = 0;
 		publox->bEnable_UBX_NAV_STATUS = 1;
 		publox->bEnable_UBX_NAV_SVIN = 0;
@@ -1136,9 +1155,13 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_BD) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_HPOSLLH) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_POSLLH) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_PVT) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_RELPOSNED) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_SOL) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

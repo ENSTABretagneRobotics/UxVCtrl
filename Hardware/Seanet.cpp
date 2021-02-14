@@ -33,6 +33,12 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 
 	memset(&seanet, 0, sizeof(SEANET));
 
+	memset(&tv, 0, sizeof(tv));
+	angle = 0;
+	memset(scanline, 0, sizeof(scanline));
+	memset(auxbuf, 0, sizeof(auxbuf));
+	nbauxbytes = 0;
+
 	StartChrono(&chrono_period);
 
 	for (;;)

@@ -43,6 +43,9 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 	memset(&mavlinkdevice, 0, sizeof(MAVLINKDEVICE));
 
+	memset(&tv, 0, sizeof(tv));
+	memset(&mavlinkdata, 0, sizeof(mavlinkdata));
+
 	GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
 
 	StartChrono(&chrono_heartbeat);
@@ -90,6 +93,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 				threadperiod = mavlinkdevice.threadperiod;
 				uSleep(1000*threadperiod);
 
+				memset(&tv, 0, sizeof(tv));
 				memset(&mavlinkdata, 0, sizeof(mavlinkdata));
 				StartChrono(&chrono_GPSOK);
 

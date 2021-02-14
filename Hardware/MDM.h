@@ -242,7 +242,7 @@ inline int SendDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pSentBytes)
 		printf("SendDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error sending data with the device. ", 
+			"Error sending data with a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
@@ -296,7 +296,7 @@ inline int RecvDataMDM(MDM* pMDM, uint8* buf, int buflen, int* pReceivedBytes)
 		printf("RecvDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error receiving data with the device. ", 
+			"Error receiving data with a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
@@ -332,7 +332,7 @@ inline int PurgeDataMDM(MDM* pMDM)
 		printf("PurgeDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error purging data from the device. ", 
+			"Error purging data from a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
@@ -371,7 +371,7 @@ inline int SendAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 		printf("SendAllDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error sending data with the device. ", 
+			"Error sending data with a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
@@ -426,7 +426,7 @@ inline int RecvAllDataMDM(MDM* pMDM, uint8* buf, int buflen)
 		printf("RecvAllDataMDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error receiving data with the device. ", 
+			"Error receiving data with a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		return EXIT_FAILURE;
 	}
@@ -499,7 +499,7 @@ inline int SendDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 		printf("SendDataCRC16MDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error sending data with the device. ", 
+			"Error sending data with a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		free(writebuf);
 		return EXIT_FAILURE;
@@ -572,7 +572,7 @@ inline int RecvDataCRC16MDM(MDM* pMDM, uint8* buf, int buflen)
 		printf("RecvDataCRC16MDM error (%s) : %s"
 			"(pMDM=%#x)\n", 
 			strtime_m(), 
-			"Error receiving data with the device. ", 
+			"Error receiving data with a MDM. ", 
 			(unsigned int)(intptr_t)pMDM);
 		free(readbuf);
 		return EXIT_FAILURE;
@@ -641,7 +641,7 @@ inline int EchoByteMDM(MDM* pMDM, uint8* pb)
 			printf("EchoMDM error (%s) : %s"
 				"(pMDM=%#x)\n", 
 				strtime_m(), 
-				"Error sending data with the device. ", 
+				"Error sending data with a MDM. ", 
 				(unsigned int)(intptr_t)pMDM);
 			return EXIT_FAILURE;
 		}
