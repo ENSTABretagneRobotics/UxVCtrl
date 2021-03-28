@@ -1,3 +1,6 @@
+376
+Updated CMakeLists.txt.
+
 375
 Added setfromfileseanet and nextlinesfromfileseanet commands.
 
