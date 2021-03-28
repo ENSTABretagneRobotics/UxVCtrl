@@ -552,6 +552,9 @@ deque<interval> xhat_seanet_history_vector;
 deque<interval> yhat_seanet_history_vector;
 deque<interval> psihat_seanet_history_vector;
 deque<interval> vrxhat_seanet_history_vector;
+BOOL bSeanetFromFile = FALSE;
+FILE* seanetfile = NULL;
+int seanetfilenextlinecmd = 0;
 BOOL bPauseSeanet = FALSE, bRestartSeanet = FALSE;
 
 // BlueView variables.

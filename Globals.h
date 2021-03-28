@@ -793,6 +793,9 @@ extern deque<interval> xhat_seanet_history_vector;
 extern deque<interval> yhat_seanet_history_vector;
 extern deque<interval> psihat_seanet_history_vector;
 extern deque<interval> vrxhat_seanet_history_vector;
+extern BOOL bSeanetFromFile;
+extern FILE* seanetfile;
+extern int seanetfilenextlinecmd;
 extern BOOL bPauseSeanet, bRestartSeanet;
 
 // BlueView variables.
@@ -1406,6 +1409,8 @@ inline int InitGlobals(void)
 	int i = 0;
 
 	// Missing error checking...
+
+	seanetfilenextlinecmd = -1;
 
 	for (i = 0; i < MAX_NB_BLUEVIEW; i++)
 	{

@@ -1,3 +1,6 @@
+375
+Added setfromfileseanet and nextlinesfromfileseanet commands.
+
 374
 Added bEnable_UBX_NAV_HPOSLLH and bEnable_UBX_NAV_RELPOSNED parameters to ublox.
 Updated SetBaseCfgublox().

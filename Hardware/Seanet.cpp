@@ -11,6 +11,147 @@
 #include "Seanet.h"
 #include "SeanetProcessing.h"
 
+int ConnectSeanetEx(SEANET* pSeanet, char* szCfgFilePath)
+{
+	if (!bSeanetFromFile) return ConnectSeanet(pSeanet, szCfgFilePath);
+	else
+	{
+		seanetfile = fopen(LOG_FOLDER"SeanetFromFile.csv", "r");
+		if (seanetfile == NULL)
+		{
+			printf("Unable to open Seanet CSV file.\n");
+			return EXIT_FAILURE;
+		}
+		return EXIT_SUCCESS;
+	}
+}
+
+int DisconnectSeanetEx(SEANET* pSeanet)
+{
+	if (!bSeanetFromFile) return DisconnectSeanet(pSeanet); 
+	else { fclose(seanetfile); return EXIT_SUCCESS; }
+}
+
+int GetHeadDataSeanetEx(SEANET* pSeanet, unsigned char* scanline, double* pAngle)
+{
+	if (!bSeanetFromFile) return GetHeadDataSeanet(pSeanet, scanline, pAngle);
+	else
+	{
+		char line[4*MAX_NB_BYTES_SEANET+1];
+		int i = 0;
+
+		int Hour = 0, Min = 0, Node = 0, Bearing = 0;
+		double Seconds = 0;
+		char SOf[3+1];
+		char data[4*MAX_NB_BYTES_SEANET+1];
+		char* str = NULL;
+		int byte = 0;
+
+		mSleep(pSeanet->threadperiod);
+
+		EnterCriticalSection(&StateVariablesCS);
+		if (seanetfilenextlinecmd > 0) seanetfilenextlinecmd--;
+		else if (seanetfilenextlinecmd == 0) { LeaveCriticalSection(&StateVariablesCS); return EXIT_SUCCESS; }
+		LeaveCriticalSection(&StateVariablesCS);
+
+		// Get a sonar scanline from the file.
+		if (fgets3(seanetfile, line, sizeof(line)) == NULL)
+		{
+			printf("Error reading Seanet CSV file.\n");
+			return EXIT_FAILURE;
+		}
+
+		memset(SOf, 0, sizeof(SOf));
+		//memset(data, 0, sizeof(data));
+		data[sizeof(data)-1] = 0; // The last character must be a 0 to be a valid string for sscanf.
+		Hdctrl.i = 0;
+
+		if (sscanf(line, "%03s,%d:%d:%lf,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%8192s",
+			SOf, &Hour, &Min, &Seconds, &Node, &pSeanet->HeadStatus, &pSeanet->HeadHdCtrl.i, &pSeanet->HeadRangescale, &pSeanet->HeadIGain, &pSeanet->HeadSlope,
+			&pSeanet->HeadADLow, &pSeanet->HeadADSpan, &pSeanet->HeadLeftLim, &pSeanet->HeadRightLim, &pSeanet->HeadSteps, &Bearing, &pSeanet->Dbytes, data) != 18)
+		{
+			printf("Skipping an invalid line in the CSV file.\n");
+			return EXIT_SUCCESS;
+		}
+
+		if (strcmp(SOf, "DIG") == 0) pSeanet->bDST = TRUE; else pSeanet->bDST = FALSE;
+		pSeanet->adc8on = (BOOL)pSeanet->HeadHdCtrl.bits.adc8on;
+		pSeanet->HeadNBins = pSeanet->HeadHdCtrl.bits.adc8on?pSeanet->Dbytes:2*pSeanet->Dbytes;
+		pSeanet->NSteps = RESOLUTION2NUMBER_OF_STEPS(pSeanet->HeadSteps);
+		pSeanet->StepAngleSize = RESOLUTION2STEP_ANGLE_SIZE_IN_DEGREES(pSeanet->HeadSteps);
+		pSeanet->RangeScale = pSeanet->HeadRangescale/10;
+
+
+		// To check and put in common code (change return with break, etc.)...?
+
+		EnterCriticalSection(&SeanetConnectingCS);
+		if ((AdLow != pSeanet->HeadADLow)||(AdSpan != pSeanet->HeadADSpan)||(Steps != pSeanet->HeadSteps)||(Hdctrl.u != pSeanet->HeadHdCtrl.u)||(NBins != pSeanet->HeadNBins)||
+			(NSteps != pSeanet->NSteps)||(StepAngleSize != pSeanet->StepAngleSize)||(rangescale != pSeanet->RangeScale))
+		{
+			AdLow = pSeanet->HeadADLow; AdSpan = pSeanet->HeadADSpan; Steps = pSeanet->HeadSteps; Hdctrl.u = pSeanet->HeadHdCtrl.u; NBins = pSeanet->HeadNBins;
+			NSteps = pSeanet->NSteps; StepAngleSize = pSeanet->StepAngleSize; rangescale = pSeanet->RangeScale;
+
+			index_scanlines_prev = 0;
+			index_scanlines = 0;
+
+			free(tvs); free(angles); free(scanlines);
+			tvs = NULL; angles = NULL; scanlines = NULL;
+			tvs = (struct timeval*)calloc(NSteps, sizeof(struct timeval));
+			angles = (double*)calloc(NSteps, sizeof(double));
+			scanlines = (unsigned char*)calloc(NSteps*MAX_NB_BYTES_SEANET, sizeof(unsigned char));
+			if ((tvs == NULL)||(angles == NULL)||(scanlines == NULL))
+			{
+				printf("Unable to allocate Seanet data.\n");
+				LeaveCriticalSection(&SeanetConnectingCS);
+				return EXIT_FAILURE;
+			}
+		}
+		LeaveCriticalSection(&SeanetConnectingCS);
+
+
+		//tv.tv_sec = Hour*3600+Min*60+(long)Seconds;
+		//tv.tv_usec = (long)((Seconds-(long)Seconds)*1000000.0);
+		*pAngle = ((Bearing-3200+6400)%6400)*0.05625; // Angle of the transducer in degrees (0.05625 = (1/16)*(9/10)).
+
+		// We should take into account ADLow and ADSpan here?
+
+		str = data;
+		if (!Hdctrl.bits.adc8on)
+		{
+			for (i = 0; i < pSeanet->Dbytes; i++)
+			{
+				(void)sscanf(str, "%d", &byte);
+				scanline[2*i+0] = (unsigned char)((byte>>4)*16);
+				scanline[2*i+1] = (unsigned char)(((byte<<4)>>4)*16);
+				str = strchr(str, ',');
+				if (!str) break;
+				str++;
+			}
+		}
+		else
+		{
+			for (i = 0; i < pSeanet->Dbytes; i++)
+			{
+				(void)sscanf(str, "%d", &byte);
+				scanline[i] = (unsigned char)byte;
+				str = strchr(str, ',');
+				if (!str) break;
+				str++;
+			}
+		}
+
+		return EXIT_SUCCESS;
+	}
+}
+
+int GetHeadDataAndAuxDataSeanetEx(SEANET* pSeanet,
+	unsigned char* scanline, double* pAngle,
+	unsigned char* strippedauxdatabuf, int* pNbstrippedauxdatabytes)
+{
+	if (!bSeanetFromFile) return GetHeadDataAndAuxDataSeanet(pSeanet, scanline, pAngle, strippedauxdatabuf, pNbstrippedauxdatabytes);
+	else return GetHeadDataSeanetEx(pSeanet, scanline, pAngle);
+}
+
 THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 {
 	SEANET seanet;
@@ -54,7 +195,7 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 			{
 				printf("Seanet paused.\n");
 				bConnected = FALSE;
-				DisconnectSeanet(&seanet);
+				DisconnectSeanetEx(&seanet);
 			}
 			if (bExit) break;
 			mSleep(100);
@@ -67,14 +208,14 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 			{
 				printf("Restarting a Seanet.\n");
 				bConnected = FALSE;
-				DisconnectSeanet(&seanet);
+				DisconnectSeanetEx(&seanet);
 			}
 			bRestartSeanet = FALSE;
 		}
 
 		if (!bConnected)
 		{
-			if (ConnectSeanet(&seanet, "Seanet0.txt") == EXIT_SUCCESS) 
+			if (ConnectSeanetEx(&seanet, "Seanet0.txt") == EXIT_SUCCESS) 
 			{
 				bConnected = TRUE; 
 				threadperiod = seanet.threadperiod;
@@ -160,8 +301,8 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 		{
 			nbauxbytes = 0;
 			// Swap commented line to enable/disable Aux device support...
-			//if (GetHeadDataSeanet(&seanet, scanline, &angle) == EXIT_SUCCESS)
-			if (GetHeadDataAndAuxDataSeanet(&seanet, scanline, &angle, auxbuf, &nbauxbytes) == EXIT_SUCCESS)
+			//if (GetHeadDataSeanetEx(&seanet, scanline, &angle) == EXIT_SUCCESS)
+			if (GetHeadDataAndAuxDataSeanetEx(&seanet, scanline, &angle, auxbuf, &nbauxbytes) == EXIT_SUCCESS)
 			{
 				time_t tt = 0;
 				struct tm* timeptr = NULL;
@@ -261,7 +402,7 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 			{
 				printf("Connection to a Seanet lost.\n");
 				bConnected = FALSE;
-				DisconnectSeanet(&seanet);
+				DisconnectSeanetEx(&seanet);
 				mSleep(threadperiod);
 			}
 		}
@@ -288,7 +429,7 @@ THREAD_PROC_RETURN_VALUE SeanetThread(void* pParam)
 	tvs = NULL;
 	LeaveCriticalSection(&SeanetConnectingCS);
 
-	if (bConnected) DisconnectSeanet(&seanet);
+	if (bConnected) DisconnectSeanetEx(&seanet);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

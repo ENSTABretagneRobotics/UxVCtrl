@@ -232,6 +232,10 @@
 %
 %kinectto2dlidar nbpixhborder nbpixvborder minkinectrange maxkinectrange videoid bEnable debug (minkinectrange, maxkinectrange in m, uses also Horizontal/VerticalBeamVideo and z from the selected Video)
 %
+%setfromfileseanet bFromFile (Seanet needs to be paused using seanetconfig command when changing bFromFile)
+%
+%nextlinesfromfileseanet cmd (cmd : < 0 for every threadperiod, 0 to wait, > 0 to go to next lines every threadperiod and then wait)
+%
 %showgetpositionmaestro deviceid channel (channel : int [0,24])
 %
 %setpositionmaestro deviceid channel pwm (channel : int [0,24], pwm : int [500,2500] PWM in us)

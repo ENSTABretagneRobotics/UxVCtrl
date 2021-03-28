@@ -2962,6 +2962,18 @@ inline int Commands(char* line)
 		}
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
+	else if (sscanf(line, "setfromfileseanet %d", &ival1) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		bSeanetFromFile = (ival1 != 0)? TRUE: FALSE;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
+	else if (sscanf(line, "nextlinesfromfileseanet %d", &ival1) == 1)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		seanetfilenextlinecmd = ival1;
+		LeaveCriticalSection(&StateVariablesCS);
+	}
 	else if (sscanf(line, "showgetpositionmaestro %d %d", &ival, &ival1) == 2)
 	{
 		if ((ival >= 0)&&(ival < MAX_NB_POLOLU))
