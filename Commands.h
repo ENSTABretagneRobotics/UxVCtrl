@@ -1756,7 +1756,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "linefollowing %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4;
+		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4; wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1766,7 +1766,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "linefollowingt %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4;
+		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4; wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1802,7 +1802,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		// Special situation : should follow the line between its current position and the waypoint specified.
 		// Therefore, the robot should remain near the waypoint specified.
-		wxa = Center(xhat); wya = Center(yhat); wxb = dval1; wyb = dval2;
+		wxa = Center(xhat); wya = Center(yhat); wxb = dval1; wyb = dval2; wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1859,7 +1859,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "linefollowingrelative %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4) == 4)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4;
+		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4; wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1869,7 +1869,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "linefollowingtrelative %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4;
+		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4; wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1905,7 +1905,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		// Special situation : should follow the line between its current position and the waypoint specified.
 		// Therefore, the robot should remain near the waypoint specified.
-		wxa = Center(xhat); wya = Center(yhat); wxb = Center(xhat)+dval1; wyb = Center(yhat)+dval2;
+		wxa = Center(xhat); wya = Center(yhat); wxb = Center(xhat)+dval1; wyb = Center(yhat)+dval2; wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1964,6 +1964,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval1, dval2, 0, &wxa, &wya, &dval);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval3, dval4, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -1975,6 +1976,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval1, dval2, 0, &wxa, &wya, &dval);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval3, dval4, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -2012,6 +2014,7 @@ inline int Commands(char* line)
 		// Therefore, the robot should remain near the waypoint specified.
 		wxa = Center(xhat); wya = Center(yhat);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval1, dval2, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -2070,6 +2073,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxa, &wya, &dval);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval3, dval4, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -2081,6 +2085,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxa, &wya, &dval);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval3, dval4, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -2118,6 +2123,7 @@ inline int Commands(char* line)
 		// Therefore, the robot should remain near the waypoint specified.
 		wxa = Center(xhat); wya = Center(yhat);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
@@ -2348,7 +2354,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "waitlinet %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4;
+		wxa = dval1; wya = dval2; wxb = dval3; wyb = dval4; wx = wxb; wy = wyb;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
 		bWaiting = TRUE;
@@ -2378,7 +2384,7 @@ inline int Commands(char* line)
 	else if (sscanf(line, "waitlinetrelative %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4;
+		wxa = Center(xhat)+dval1; wya = Center(yhat)+dval2; wxb = Center(xhat)+dval3; wyb = Center(yhat)+dval4; wx = wxb; wy = wyb;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
 		bWaiting = TRUE;
@@ -2410,6 +2416,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval1, dval2, 0, &wxa, &wya, &dval);
 		Robot2EnvCoordSystem(Center(xhat), Center(yhat), Center(zhat), Center(psihat), dval3, dval4, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
 		bWaiting = TRUE;
@@ -2441,6 +2448,7 @@ inline int Commands(char* line)
 		EnterCriticalSection(&StateVariablesCS);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval2, 0, &wxa, &wya, &dval);
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval3, dval4, 0, &wxb, &wyb, &dval);
+		wx = wxb; wy = wyb;
 		LeaveCriticalSection(&StateVariablesCS);
 		delay = fabs(delay);
 		bWaiting = TRUE;
@@ -2477,18 +2485,21 @@ inline int Commands(char* line)
 			// Special situation...
 			wxa = Center(xhat); wya = Center(yhat);
 			wxb = Center(xhat)+0.01; wyb = Center(yhat);
+			wx = wxb; wy = wyb;
 		}
 		else if ((nbWPs == 1)||(bGenerateLineToFirst))
 		{
 			// Special situation : should follow the line between its current position and the waypoint specified.
 			wxa = Center(xhat); wya = Center(yhat);
 			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+			wx = wxb; wy = wyb;
 		}
 		else
 		{
 			CurWP++;
 			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
 			GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+			wx = wxb; wy = wyb;
 		}
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
@@ -2575,6 +2586,7 @@ inline int Commands(char* line)
 					CurWP++;
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
 					GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+					wx = wxb; wy = wyb;
 				}
 			}
 			// Check if the waypoints changed.
@@ -2593,12 +2605,14 @@ inline int Commands(char* line)
 						// Special situation : should follow the line between its current position and the waypoint specified.
 						wxa = Center(xhat); wya = Center(yhat);
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+						wx = wxb; wy = wyb;
 					}
 					else
 					{
 						CurWP++;
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP-1], wpslong[CurWP-1], 0, &wxa, &wya, &dval);
 						GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, wpslat[CurWP], wpslong[CurWP], 0, &wxb, &wyb, &dval);
+						wx = wxb; wy = wyb;
 					}
 				}
 				LeaveCriticalSection(&StateVariablesCS);

@@ -1167,8 +1167,8 @@ REQ_DATA_STREAM...
 */
 #pragma endregion
 #pragma region MISSION PROTOCOL
-				// See https://mavlink.io/en/services/mission.html
-				// Home seems to be the first element of the sequence...
+				// See https://mavlink.io/en/services/mission.html				
+				// Not clear wether Home should be sent first or not depending on the versions of Mission Planner...
 				case MAVLINK_MSG_ID_MISSION_COUNT:
 					mavlink_msg_mission_count_decode(&msg, &mission_count);
 					EnterCriticalSection(&StateVariablesCS);
@@ -1182,7 +1182,7 @@ REQ_DATA_STREAM...
 					memset(&mission_request, 0, sizeof(mavlink_mission_request_t));
 					mission_request.target_system = msg.sysid;
 					mission_request.target_component = msg.compid;
-					mission_request.seq = (uint16_t)0;
+					mission_request.seq = (uint16_t)0; // Ask for the first element of the sequence...
 					LeaveCriticalSection(&StateVariablesCS);
 					mavlink_msg_mission_request_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_request);
 					memset(sendbuf, 0, sizeof(sendbuf));
@@ -1203,7 +1203,7 @@ REQ_DATA_STREAM...
 					EnterCriticalSection(&StateVariablesCS);
 					mission_count.target_system = msg.sysid;
 					mission_count.target_component = msg.compid;
-					mission_count.count = (uint16_t)(nbWPs+1);
+					mission_count.count = (uint16_t)(nbWPs+1); // Will always begin by sending Home...
 					LeaveCriticalSection(&StateVariablesCS);
 					mavlink_msg_mission_count_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_count);
 					memset(sendbuf, 0, sizeof(sendbuf));
@@ -1222,7 +1222,6 @@ REQ_DATA_STREAM...
 					mavlink_msg_mission_request_decode(&msg, &mission_request);
 					memset(&mission_item, 0, sizeof(mavlink_mission_item_t));
 					EnterCriticalSection(&StateVariablesCS);
-					//if ((mission_request.seq >= 0)&&(mission_request.seq < nbWPs+1))
 					if (mission_request.seq < nbWPs+1)
 					{
 						if (mission_request.seq == 0)
@@ -1231,6 +1230,7 @@ REQ_DATA_STREAM...
 							mission_item.x = (float)lat_home;
 							mission_item.y = (float)long_home;
 							mission_item.z = (float)alt_home;
+							mission_item.param4 = 0; // Yaw?
 							mission_item.frame = MAV_FRAME_GLOBAL;
 							mission_item.command = MAV_CMD_DO_SET_HOME;
 							mission_item.param1 = 0; // 1=use current location, 0=use specified location
@@ -1269,84 +1269,94 @@ REQ_DATA_STREAM...
 				case MAVLINK_MSG_ID_MISSION_ITEM:
 					mavlink_msg_mission_item_decode(&msg, &mission_item);
 					EnterCriticalSection(&StateVariablesCS);
-					//if ((mission_item.seq >= 0)&&(mission_item.seq < MAX_NB_WP+1))
-					if (mission_item.seq < MAX_NB_WP+1)
+
+					// Assume the mission_item.seq are sent in the correct order...
+
+					if ((mission_item.seq == 0)&&(mission_item.frame == MAV_FRAME_GLOBAL)) // Seem a weird way to guess that it is Home...
 					{
-						if (mission_item.seq == 0)
+						switch (mission_item.frame)
 						{
-							switch (mission_item.frame)
-							{
-							case MAV_FRAME_GLOBAL_RELATIVE_ALT:
-								lat_home = (double)mission_item.x;
-								long_home = (double)mission_item.y;
-								alt_home = (double)mission_item.z+alt_home;
-								break;
-							case MAV_FRAME_GLOBAL:
-							default:
-								lat_home = (double)mission_item.x;
-								long_home = (double)mission_item.y;
-								alt_home = (double)mission_item.z;
-								break;
-							}
-						}
-						else
-						{
-							switch (mission_item.frame)
-							{
-							case MAV_FRAME_GLOBAL_RELATIVE_ALT:
-								wpslat[mission_item.seq-1] = (double)mission_item.x;
-								wpslong[mission_item.seq-1] = (double)mission_item.y;
-								wpsalt[mission_item.seq-1] = (double)mission_item.z+alt_home;
-								break;
-							case MAV_FRAME_GLOBAL:
-							default:
-								wpslat[mission_item.seq-1] = (double)mission_item.x;
-								wpslong[mission_item.seq-1] = (double)mission_item.y;
-								wpsalt[mission_item.seq-1] = (double)mission_item.z;
-								break;
-							}
-							if (mission_item.seq-1 >= nbWPs) nbWPs++;
+						case MAV_FRAME_GLOBAL_RELATIVE_ALT:
+							lat_home = (double)mission_item.x;
+							long_home = (double)mission_item.y;
+							alt_home = (double)mission_item.z+alt_home;
+							break;
+						case MAV_FRAME_GLOBAL:
+						default:
+							lat_home = (double)mission_item.x;
+							long_home = (double)mission_item.y;
+							alt_home = (double)mission_item.z;
+							break;
 						}
 					}
-					if (nbWPs+1 < gcs_mission_count)
+					else if (mission_item.seq < MAX_NB_WP)
 					{
-						memset(&mission_request, 0, sizeof(mavlink_mission_request_t));
-						mission_request.target_system = msg.sysid;
-						mission_request.target_component = msg.compid;
-						mission_request.seq = (uint16_t)(nbWPs+1);
-						LeaveCriticalSection(&StateVariablesCS);
-						mavlink_msg_mission_request_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_request);
-						memset(sendbuf, 0, sizeof(sendbuf));
-						sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-						if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+						switch (mission_item.frame)
 						{
-							return EXIT_FAILURE;
-						}
-						if (tlogfile)
-						{
-							fwrite_tlog(msg, tlogfile);
-							fflush(tlogfile);
+						case MAV_FRAME_GLOBAL_RELATIVE_ALT:
+							// Avoid duplicates...
+							if ((nbWPs == 0)||
+								((nbWPs > 0)&&((wpslat[nbWPs-1] != (double)mission_item.x)||(wpslong[nbWPs-1] != (double)mission_item.y))||(wpsalt[nbWPs-1] != (double)mission_item.z+alt_home)))
+							{
+								wpslat[nbWPs] = (double)mission_item.x;
+								wpslong[nbWPs] = (double)mission_item.y;
+								wpsalt[nbWPs] = (double)mission_item.z+alt_home;
+								nbWPs++;
+							}
+							break;
+						case MAV_FRAME_GLOBAL:
+						default:
+							// Avoid duplicates...
+							if ((nbWPs == 0)||
+								((nbWPs > 0)&&((wpslat[nbWPs-1] != (double)mission_item.x)||(wpslong[nbWPs-1] != (double)mission_item.y))||(wpsalt[nbWPs-1] != (double)mission_item.z)))
+							{
+								wpslat[nbWPs] = (double)mission_item.x;
+								wpslong[nbWPs] = (double)mission_item.y;
+								wpsalt[nbWPs] = (double)mission_item.z;
+								nbWPs++;
+							}
+							break;
 						}
 					}
 					else
 					{
-						LeaveCriticalSection(&StateVariablesCS);
+						// Should refuse the mission...
+					}
+					LeaveCriticalSection(&StateVariablesCS);
+					if (mission_item.seq+1 < gcs_mission_count) // Should ask for more mission items...
+					{
+						memset(&mission_request, 0, sizeof(mavlink_mission_request_t));
+						mission_request.target_system = msg.sysid;
+						mission_request.target_component = msg.compid;
+						mission_request.seq = (uint16_t)(mission_item.seq+1);
+						mavlink_msg_mission_request_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_request);
+					}
+					else if (mission_item.seq >= MAX_NB_WP) // Should refuse the mission...
+					{
+						memset(&mission_ack, 0, sizeof(mavlink_mission_ack_t));
+						mission_ack.target_system = msg.sysid;
+						mission_ack.target_component = msg.compid;
+						mission_ack.type = MAV_MISSION_NO_SPACE;
+						mavlink_msg_mission_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_ack);
+					} 
+					else // Should notify that the mission is accepted...
+					{
 						memset(&mission_ack, 0, sizeof(mavlink_mission_ack_t));
 						mission_ack.target_system = msg.sysid;
 						mission_ack.target_component = msg.compid;
 						mission_ack.type = MAV_MISSION_ACCEPTED;
 						mavlink_msg_mission_ack_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_ack);
-						memset(sendbuf, 0, sizeof(sendbuf));
-						sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-						if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-						{
-							return EXIT_FAILURE;
-						}
-						if (tlogfile)
-						{
-							fwrite_tlog(msg, tlogfile);
-							fflush(tlogfile);
-						}
+					}
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
 					}
 					break;
 				case MAVLINK_MSG_ID_MISSION_CLEAR_ALL:
@@ -1495,6 +1505,7 @@ REQ_DATA_STREAM...
 					case MAV_CMD_DO_SET_HOME:
 						mavlink_msg_command_long_decode(&msg, &command);
 						Current = (int)command.param1; // 1=use current location, 0=use specified location.
+						//command.param4; // Yaw?
 						Lat = command.param5;
 						Lon = command.param6;
 						Alt = command.param7;

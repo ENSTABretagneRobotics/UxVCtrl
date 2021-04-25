@@ -1,3 +1,7 @@
+378
+Attempt to correct MAVLink mission protocol problems related to Home.
+wx and wy variables now also set in line following.
+
 377
 Added GEN_LN_TO_FIRST and AUTO_STATION MAVLinkInterface parameters.
 Renamed UBX_NAV_HPOSLLH to UBX_NAV_HPPOSLLH.
