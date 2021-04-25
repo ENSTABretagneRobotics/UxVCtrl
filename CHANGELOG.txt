@@ -1,3 +1,7 @@
+377
+Added GEN_LN_TO_FIRST and AUTO_STATION MAVLinkInterface parameters.
+Renamed UBX_NAV_HPOSLLH to UBX_NAV_HPPOSLLH.
+
 376
 Updated CMakeLists.txt.
 

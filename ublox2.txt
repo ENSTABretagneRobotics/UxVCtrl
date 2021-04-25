@@ -75,7 +75,7 @@ $GPS_STOP
 0
 % bEnable_NMEA_PD6_BD
 0
-% bEnable_UBX_NAV_HPOSLLH
+% bEnable_UBX_NAV_HPPOSLLH
 0
 % bEnable_UBX_NAV_POSLLH
 0

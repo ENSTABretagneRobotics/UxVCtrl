@@ -279,6 +279,7 @@ extern double wpslat[MAX_NB_WP];
 extern double wpslong[MAX_NB_WP];
 extern double wpsalt[MAX_NB_WP];
 extern int nbWPs, CurWP;
+extern BOOL bGenerateLineToFirst, bAutoStation;
 
 // Measurements.
 extern interval x_gps, y_gps, z_gps, cog_gps;

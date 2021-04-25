@@ -324,7 +324,7 @@ inline int ArmMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, BOOL bArm)
 	return EXIT_SUCCESS;
 }
 
-// See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+// See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h (e.g. 0 : Stabilize, 2 : AltHold, 3: Auto, 4 : Guided, 5 : Loiter, 6 : RTL, 9 : Land, 15 : Autotune, 16 : PosHold, 20 : Guided_NoGPS, 21 : Smart_RTL, 23 : Follow), https://github.com/ArduPilot/ardupilot/blob/master/Rover/mode.h (e.g. 0 : Manual, 4 : Hold, 5 : Loiter, 10 : Auto, 11 : RTL, 12 : Smart_RTL, 15 : Guided), https://github.com/ArduPilot/ardupilot/blob/master/ArduSub/defines.h (e.g. 0 : Stabilize, 2 : AltHold, 3: Auto, 4 : Guided, 9 : Surface, 16 : PosHold, 19 : Manual).
 inline int SetModeMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int custom_mode)
 {
 	unsigned char sendbuf[256];
@@ -335,15 +335,14 @@ inline int SetModeMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int custom_mode)
 
 	// https://discuss.ardupilot.org/t/setting-guided-mode-and-waypoint-by-mavlink/17363/4
 	// Regarding changing mode, I see you are using a MAV_MODE enum value in the first parameter, but that doesn't apply to ArduPilot. 
-	// You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
+	// You need to be using param 2 (custom mode), with the value matching the mode number in Copter: https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h
 	// Regarding changing mode, Ardupilot supports SET_MODE and not command_long message
-	// https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h#L88-L105
 
 	// Try to force mode using deprecated command...
 	memset(&set_mode, 0, sizeof(set_mode));
 	set_mode.target_system = (uint8_t)pMAVLinkDevice->target_system;
 	set_mode.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
-	set_mode.custom_mode = custom_mode; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+	set_mode.custom_mode = custom_mode; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/Rover/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/ArduSub/defines.h.
 	mavlink_msg_set_mode_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &set_mode);
 
 	memset(sendbuf, 0, sizeof(sendbuf));
@@ -361,7 +360,7 @@ inline int SetModeMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int custom_mode)
 	mode_command.command = MAV_CMD_DO_SET_MODE;
 	mode_command.confirmation = 0;
 	mode_command.param1 = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
-	mode_command.param2 = (float)custom_mode; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+	mode_command.param2 = (float)custom_mode; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/Rover/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/ArduSub/defines.h.
 	mavlink_msg_command_long_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &mode_command);
 
 	memset(sendbuf, 0, sizeof(sendbuf));
@@ -1293,7 +1292,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		set_mode.target_system = (uint8_t)pMAVLinkDevice->target_system;
 		//set_mode.base_mode = MAV_MODE_FLAG_STABILIZE_ENABLED; // Not sure it is correct...
 		set_mode.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
-		set_mode.custom_mode = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+		set_mode.custom_mode = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/Rover/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/ArduSub/defines.h.
 		mavlink_msg_set_mode_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &set_mode);
 
 		memset(sendbuf, 0, sizeof(sendbuf));
@@ -1313,7 +1312,7 @@ inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePa
 		mode_command.command = MAV_CMD_DO_SET_MODE;
 		mode_command.confirmation = 0;
 		mode_command.param1 = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;//MAV_MODE_MANUAL_ARMED;//MAV_MODE_STABILIZE_ARMED; // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk
-		mode_command.param2 = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+		mode_command.param2 = 0; // See enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/Rover/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/ArduSub/defines.h.
 		mavlink_msg_command_long_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &mode_command);
 
 		memset(sendbuf, 0, sizeof(sendbuf));

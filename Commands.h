@@ -817,7 +817,6 @@ inline int Commands(char* line)
 #ifndef DISABLE_OPENCV_SUPPORT
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
-	BOOL bGenerateLineToFirst = FALSE, bStation = FALSE;
 	int id = 0, videoid = 0, guiid = 0, procid = 0;
 	double delay = 0, delay_station = 0, delay_wait_new = 0;
 	double u_prev = 0;
@@ -2468,7 +2467,7 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "waypointslist %d %d %lf %lf %lf", &bGenerateLineToFirst, &bStation, &delay_wait_new, &delay_station, &delay) == 5)
+	else if (sscanf(line, "waypointslist %d %d %lf %lf %lf", &bGenerateLineToFirst, &bAutoStation, &delay_wait_new, &delay_station, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
 		bWaypointsChanged = FALSE;
@@ -2519,7 +2518,7 @@ inline int Commands(char* line)
 			{
 				if (CurWP >= nbWPs-1)
 				{
-					if (!bStation)
+					if (!bAutoStation)
 					{
 						LeaveCriticalSection(&StateVariablesCS);
 						break;

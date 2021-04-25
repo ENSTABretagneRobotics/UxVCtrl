@@ -40,6 +40,7 @@ double wpslat[MAX_NB_WP];
 double wpslong[MAX_NB_WP];
 double wpsalt[MAX_NB_WP];
 int nbWPs = 0, CurWP = 0;
+BOOL bGenerateLineToFirst = FALSE, bAutoStation = FALSE;
 
 // Measurements.
 interval x_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), y_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), z_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), cog_gps(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);

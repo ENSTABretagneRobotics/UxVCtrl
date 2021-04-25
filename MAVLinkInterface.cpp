@@ -24,6 +24,8 @@ enum MAVLINKINTERFACE_PARAM_ID
 	WPNAV_RADIUS_PARAM_ID,
 	GAMMA_INFINITE_PARAM_ID,
 	ZETA_PARAM_ID,
+	GEN_LN_TO_FIRST_PARAM_ID,
+	AUTO_STATION_PARAM_ID,
 	GUIID_VID_IF_PARAM_ID,
 	VIDID_VID_IF_PARAM_ID,
 	MAVLINKINTERFACE_PARAM_COUNT
@@ -341,6 +343,18 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						zeta = (double)param_set.param_value;
 						LeaveCriticalSection(&StateVariablesCS);
 					}
+					else if (strncmp(param_set.param_id, "GEN_LN_TO_FIRST", strlen("GEN_LN_TO_FIRST")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						bGenerateLineToFirst = (fabs(param_set.param_value) < 0.001)? FALSE: TRUE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
+					else if (strncmp(param_set.param_id, "AUTO_STATION", strlen("AUTO_STATION")) == 0)
+					{
+						EnterCriticalSection(&StateVariablesCS);
+						bAutoStation = (fabs(param_set.param_value) < 0.001)? FALSE: TRUE;
+						LeaveCriticalSection(&StateVariablesCS);
+					}
 					else if (strncmp(param_set.param_id, "GUIID_VID_IF", strlen("GUIID_VID_IF")) == 0)
 					{
 						EnterCriticalSection(&idsCS);
@@ -542,6 +556,50 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					param_value.param_type = MAV_PARAM_TYPE_REAL32;
 					param_value.param_count = (uint16_t)nbparams;
 					param_value.param_index = (uint16_t)ZETA_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "GEN_LN_TO_FIRST");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)(bGenerateLineToFirst? 1: 0);
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)GEN_LN_TO_FIRST_PARAM_ID;// (uint16_t)(-1) to ignore...?
+					LeaveCriticalSection(&StateVariablesCS);
+					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+					if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					if (tlogfile)
+					{
+						fwrite_tlog(msg, tlogfile);
+						fflush(tlogfile);
+					}
+					EnterCriticalSection(&StateVariablesCS);
+					memset(Name, 0, sizeof(Name));
+					memset(&param_value, 0, sizeof(mavlink_param_value_t));
+					sprintf(Name, "AUTO_STATION");
+					memcpy(param_value.param_id, Name, sizeof(param_value.param_id)); // Not always NULL-terminated...
+					param_value.param_value = (float)(bAutoStation? 1: 0);
+					param_value.param_type = MAV_PARAM_TYPE_REAL32;
+					param_value.param_count = (uint16_t)nbparams;
+					param_value.param_index = (uint16_t)AUTO_STATION_PARAM_ID;// (uint16_t)(-1) to ignore...?
 					LeaveCriticalSection(&StateVariablesCS);
 					mavlink_msg_param_value_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &param_value);
 					memset(sendbuf, 0, sizeof(sendbuf));
@@ -850,6 +908,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					LeaveCriticalSection(&StateVariablesCS);
 					break;
 #pragma endregion
+#pragma region SET MESSAGES
 				case MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:
 					mavlink_msg_set_attitude_target_decode(&msg, &set_attitude_target);
 					EnterCriticalSection(&StateVariablesCS);
@@ -985,7 +1044,8 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 					break;
 				case MAVLINK_MSG_ID_SET_MODE:
 					mavlink_msg_set_mode_decode(&msg, &set_mode);
-					 // See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk and enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/defines.h
+					// See https://groups.google.com/forum/#!topic/mavlink/tOpXBGBGfyk and enum control_mode_t in https://github.com/ArduPilot/ardupilot/blob/master/ArduCopter/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/Rover/mode.h, https://github.com/ArduPilot/ardupilot/blob/master/ArduSub/defines.h.
+					// Rover, Sub, Copter modes number are not always the same, try to act as a Copter...?
 					if ((set_mode.base_mode == MAV_MODE_FLAG_CUSTOM_MODE_ENABLED)&&(set_mode.custom_mode == 0))
 					{
 						// Stabilize.
@@ -1101,6 +1161,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 						fflush(tlogfile);
 					}
 					break;
+#pragma endregion
 /*
 REQ_DATA_STREAM...
 */

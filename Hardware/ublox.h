@@ -92,7 +92,7 @@ struct UBLOX
 	BOOL bEnable_NMEA_PD6_BS;
 	BOOL bEnable_NMEA_PD6_BE;
 	BOOL bEnable_NMEA_PD6_BD;
-	BOOL bEnable_UBX_NAV_HPOSLLH;
+	BOOL bEnable_UBX_NAV_HPPOSLLH;
 	BOOL bEnable_UBX_NAV_POSLLH;
 	BOOL bEnable_UBX_NAV_PVT;
 	BOOL bEnable_UBX_NAV_RELPOSNED;
@@ -1063,7 +1063,7 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 		publox->bEnable_NMEA_PD6_BS = 0;
 		publox->bEnable_NMEA_PD6_BE = 0;
 		publox->bEnable_NMEA_PD6_BD = 0;
-		publox->bEnable_UBX_NAV_HPOSLLH = 0;
+		publox->bEnable_UBX_NAV_HPPOSLLH = 0;
 		publox->bEnable_UBX_NAV_POSLLH = 1;
 		publox->bEnable_UBX_NAV_PVT = 1;
 		publox->bEnable_UBX_NAV_RELPOSNED = 0;
@@ -1155,7 +1155,7 @@ inline int Connectublox(UBLOX* publox, char* szCfgFilePath)
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_NMEA_PD6_BD) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
-			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_HPOSLLH) != 1) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_HPPOSLLH) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &publox->bEnable_UBX_NAV_POSLLH) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");

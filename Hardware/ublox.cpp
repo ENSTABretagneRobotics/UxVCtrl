@@ -194,7 +194,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						ublox.bEnable_NMEA_MWV||ublox.bEnable_NMEA_MWD||ublox.bEnable_NMEA_MDA||ublox.bEnable_NMEA_DID||ublox.bEnable_NMEA_VDM||
 						ublox.bEnable_NMEA_PD6_SA||ublox.bEnable_NMEA_PD6_TS||ublox.bEnable_NMEA_PD6_BI||ublox.bEnable_NMEA_PD6_BS||
 						ublox.bEnable_NMEA_PD6_BE||ublox.bEnable_NMEA_PD6_BD) res = GetNMEASentenceublox(&ublox, &nmeadata);
-					if (ublox.bEnable_UBX_NAV_HPOSLLH||ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_RELPOSNED||
+					if (ublox.bEnable_UBX_NAV_HPPOSLLH||ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_RELPOSNED||
 						ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED) res = GetUBXPacketublox(&ublox, &ubxdata);
 				}
 
@@ -403,7 +403,7 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						}
 					}
 
-					if (ublox.bEnable_UBX_NAV_HPOSLLH||ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_RELPOSNED||
+					if (ublox.bEnable_UBX_NAV_HPPOSLLH||ublox.bEnable_UBX_NAV_POSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_RELPOSNED||
 						ublox.bEnable_UBX_NAV_SOL||ublox.bEnable_UBX_NAV_STATUS||ublox.bEnable_UBX_NAV_SVIN||ublox.bEnable_UBX_NAV_VELNED)
 					{
 						// GNSS quality determination...
@@ -514,14 +514,14 @@ THREAD_PROC_RETURN_VALUE ubloxThread(void* pParam)
 						if ((GNSSqualityublox[deviceid] == AUTONOMOUS_GNSS_FIX)||(GNSSqualityublox[deviceid] == DIFFERENTIAL_GNSS_FIX)||
 							(GNSSqualityublox[deviceid] == RTK_FIXED)||(GNSSqualityublox[deviceid] == RTK_FLOAT))
 						{
-							if (ublox.bEnable_UBX_NAV_HPOSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_POSLLH)
+							if (ublox.bEnable_UBX_NAV_HPPOSLLH||ublox.bEnable_UBX_NAV_PVT||ublox.bEnable_UBX_NAV_POSLLH)
 							{
 
 								// Should only provide the number of satellites that are above GPS_min_sat_signal...?
 
 								// Position accuracy depending on the GNSS quality...
 								ComputeGNSSPosition(ubxdata.Latitude, ubxdata.Longitude, ubxdata.Altitude, GNSSqualityublox[deviceid], ubxdata.nav_pvt_pl.numSV, 0);
-								if ((ublox.bEnable_UBX_NAV_HPOSLLH)&&(Width(x_gps)/2 < ubxdata.nav_hposllh_pl.hAcc*10000.0))
+								if ((ublox.bEnable_UBX_NAV_HPPOSLLH)&&(Width(x_gps)/2 < ubxdata.nav_hposllh_pl.hAcc*10000.0))
 								{
 									// We were too optimistic...
 									double x = 0, y = 0, z = 0;
