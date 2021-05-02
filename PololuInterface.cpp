@@ -68,7 +68,7 @@ int handlepololuinterface(RS232PORT* pPololuInterfacePseudoRS232Port)
 	//double angle = 0.0;
 
 	// Get data...
-	if (CheckAvailableBytesRS232Port(pPololuInterfacePseudoRS232Port) == EXIT_SUCCESS)
+	if (CheckAvailBytesRS232Port(pPololuInterfacePseudoRS232Port, NULL) == EXIT_SUCCESS)
 	{
 		// Prepare the buffers.
 		memset(recvbuf, 0, sizeof(recvbuf));

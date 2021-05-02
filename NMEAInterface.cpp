@@ -82,8 +82,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 	uint8 sendbuf[MAX_NB_BYTES_UBLOX];
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, pitchhat = 0, rollhat = 0, rateofturn = 0, 
 		awinddir = 0, awindspeed = 0, winddir = 0, windspeed = 0, singlerudder = 0, dbt = 0;
-	
-	if ((!bDisableNMEAInterfaceIN)&&(CheckAvailableBytesRS232Port(pNMEAInterfacePseudoRS232Port) == EXIT_SUCCESS))
+#pragma region DATA RECEIVED
+	if ((!bDisableNMEAInterfaceIN)&&(CheckAvailBytesRS232Port(pNMEAInterfacePseudoRS232Port, NULL) == EXIT_SUCCESS))
 	{
 		memset(&nmeadata, 0, sizeof(nmeadata));
 		
@@ -127,7 +127,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 				printf("Error reading data from a NMEAInterface : Invalid data. \n");
 				return EXIT_INVALID_DATA;
 			}
-			if (CheckAvailableBytesRS232Port(pNMEAInterfacePseudoRS232Port) == EXIT_SUCCESS)
+			if (CheckAvailBytesRS232Port(pNMEAInterfacePseudoRS232Port, NULL) == EXIT_SUCCESS)
 			{
 				if (ReadAllRS232Port(pNMEAInterfacePseudoRS232Port, (uint8*)recvbuf+BytesReceived, nbBytesToRequest) != EXIT_SUCCESS)
 				{
@@ -268,7 +268,8 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 */
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-	
+#pragma endregion
+#pragma region DATA SENT PERIODICALLY
 	memset(&nmeadata, 0, sizeof(nmeadata));
 		
 	EnterCriticalSection(&StateVariablesCS);
@@ -644,7 +645,7 @@ int handlenmeainterface(RS232PORT* pNMEAInterfacePseudoRS232Port)
 			return EXIT_FAILURE;
 		}
 	}
-	
+#pragma endregion	
 	uSleep(1000*NMEAInterfacePeriod);
 
 	return EXIT_SUCCESS;
@@ -857,7 +858,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 				else 
 				{
 					bConnected = FALSE;
-					uSleep(1000*NMEAInterfacePeriod);
+					mSleep(1000);
 				}
 			}
 			else

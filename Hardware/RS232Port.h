@@ -429,10 +429,46 @@ Check for any data available to read on a RS232 port.
 
 RS232PORT* pRS232Port : (INOUT) Valid pointer to a structure corresponding to 
 a RS232 port.
+int* pNbBytesAvail : (INOUT) Valid pointer that will receive the number of bytes currently 
+available. Ignored if NULL.
 
 Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is currently no data
  available or EXIT_FAILURE if there is an error.
 */
+inline int CheckAvailBytesRS232Port(RS232PORT* pRS232Port, int* pNbBytesAvail)
+{
+#ifdef DISABLE_IOCTLSOCKET
+	int ret = EXIT_FAILURE;
+	struct timeval tv;
+
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+#endif // DISABLE_IOCTLSOCKET
+	switch (pRS232Port->DevType)
+	{
+	case TCP_CLIENT_TYPE_RS232PORT:
+	case TCP_SERVER_TYPE_RS232PORT:
+	case UDP_CLIENT_TYPE_RS232PORT:
+	case UDP_SERVER_TYPE_RS232PORT:
+#ifdef DISABLE_IOCTLSOCKET
+		ret = waitforsocket(pRS232Port->s, tv);
+		if ((ret == EXIT_SUCCESS)&&(pNbBytesAvail)) *pNbBytesAvail = 1;
+		return ret;
+#else
+		return checkavailbytessocket(pRS232Port->s, pNbBytesAvail);
+#endif // DISABLE_IOCTLSOCKET
+	case LOCAL_TYPE_RS232PORT:
+		return CheckAvailBytesComputerRS232Port(pRS232Port->hDev, pNbBytesAvail);
+	default:
+		PRINT_DEBUG_ERROR_RS232PORT(("CheckAvailableBytesRS232Port error (%s) : %s(pRS232Port=%#x)\n", 
+			strtime_m(), 
+			"Invalid device type. ", 
+			pRS232Port));
+		return EXIT_FAILURE;
+	}
+}
+
+// Deprecated, kept for compatibility...
 inline int CheckAvailableBytesRS232Port(RS232PORT* pRS232Port)
 {
 #ifdef DISABLE_IOCTLSOCKET
@@ -471,8 +507,8 @@ a RS232 port.
 int timeout : (IN) Max time to wait before returning in ms.
 int checkingperiod : (IN) Checking period in ms.
 
-Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if there is currently no data
- available or EXIT_FAILURE if there is an error.
+Return : EXIT_SUCCESS if there is data to read, EXIT_TIMEOUT if a timeout occurs or 
+EXIT_FAILURE if there is an error.
 */
 inline int WaitForRS232Port(RS232PORT* pRS232Port, int timeout, int checkingperiod)
 {

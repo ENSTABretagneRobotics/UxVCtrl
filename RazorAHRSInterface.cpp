@@ -15,6 +15,8 @@
 
 // Temp...
 RS232PORT RazorAHRSInterfacePseudoRS232Port;
+BOOL RazorAHRSInterface_bSend = TRUE;
+BOOL RazorAHRSInterface_bSendOnce = FALSE;
 
 int connectrazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 {
@@ -63,40 +65,117 @@ int inithandlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 
 int handlerazorahrsinterface(RS232PORT* pRazorAHRSInterfacePseudoRS232Port)
 {
+	uint8 recvbuf[MAX_NB_BYTES_RAZORAHRS];
+	int Bytes = 0, BytesReceived = 0, nbBytesAvail = 0;
 	double yaw = 0, pitch = 0, roll = 0, accx = 0, accy = 0, accz = 0, gyrx = 0, gyry = 0, gyrz = 0;
 	int sendbuflen = 0;
-	uint8 sendbuf[MAX_NB_BYTES_RAZORAHRS];
-
-	EnterCriticalSection(&StateVariablesCS);
-
-	yaw = fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0)*180.0/M_PI;
-	pitch = fmod_2PI(-Center(thetahat))*180.0/M_PI;
-	roll = fmod_2PI(Center(phihat))*180.0/M_PI;
-	accx = Center(accrxhat)*256.0/9.8;
-	accy = -Center(accryhat)*256.0/9.8;
-	accz = -Center(accrzhat)*256.0/9.8;
-	gyrx = Center(omegaxhat);
-	gyry = -Center(omegayhat);
-	gyrz = -Center(omegazhat);
-
-	LeaveCriticalSection(&StateVariablesCS);
-
-	memset(sendbuf, 0, sizeof(sendbuf));
-	if (bROSMode_RazorAHRSInterface)
+	uint8 sendbuf[2048];
+#pragma region DATA RECEIVED
+	if ((CheckAvailBytesRS232Port(pRazorAHRSInterfacePseudoRS232Port, &nbBytesAvail) == EXIT_SUCCESS)&&(nbBytesAvail >= 2))
 	{
-		sprintf((char*)sendbuf, "#YPRAG=%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", yaw, pitch, roll, accx, accy, accz, gyrx, gyry, gyrz);
-	}
-	else
-	{
-		sprintf((char*)sendbuf, "#YPR=%.2f,%.2f,%.2f\r\n", yaw, pitch, roll);
-	}
-	sendbuflen = (int)strlen((char*)sendbuf);
-	if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
+		memset(recvbuf, 0, sizeof(recvbuf));
+		if ((ReadRS232Port(pRazorAHRSInterfacePseudoRS232Port, recvbuf, 1, &Bytes) == EXIT_SUCCESS)&&(Bytes == 1)&&((char)recvbuf[0] == '#'))
+		{
+			BytesReceived += Bytes;
+			if ((ReadRS232Port(pRazorAHRSInterfacePseudoRS232Port, (uint8*)(recvbuf+BytesReceived), 1, &Bytes) == EXIT_SUCCESS)&&(Bytes == 1))
+			{
+				BytesReceived += Bytes;
+				switch ((char)recvbuf[BytesReceived-1])
+				{
+				case 'o':
+					if ((ReadRS232Port(pRazorAHRSInterfacePseudoRS232Port, (uint8*)(recvbuf+BytesReceived), 1, &Bytes) == EXIT_SUCCESS)&&(Bytes == 1))
+					{
+						BytesReceived += Bytes;
+						switch ((char)recvbuf[BytesReceived-1])
+						{
+						case 'f': RazorAHRSInterface_bSendOnce = TRUE; break;
+						case '0': RazorAHRSInterface_bSend = FALSE; break;
+						case '1': RazorAHRSInterface_bSend = TRUE; break;
+						case 't': bROSMode_RazorAHRSInterface = FALSE; break;
+						case 'x': bROSMode_RazorAHRSInterface = TRUE; break;
+						default: break;
+						}
+					}
+					break;
+				case 'p':
+					memset(sendbuf, 0, sizeof(sendbuf));
+					sprintf((char*)sendbuf,
+						"ACCEL_X_MIN:%f\r\n"
+						"ACCEL_X_MAX:%f\r\n"
+						"ACCEL_Y_MIN:%f\r\n"
+						"ACCEL_Y_MAX:%f\r\n"
+						"ACCEL_Z_MIN:%f\r\n"
+						"ACCEL_Z_MAX:%f\r\n"
+						"\r\n"
+						"MAGN_X_MIN:%f\r\n"
+						"MAGN_X_MAX:%f\r\n"
+						"MAGN_Y_MIN:%f\r\n"
+						"MAGN_Y_MAX:%f\r\n"
+						"MAGN_Z_MIN:%f\r\n"
+						"MAGN_Z_MAX:%f\r\n"
+						"\r\n"
+						"MAGN_USE_EXTENDED:false\r\n"
+						"magn_ellipsoid_center:[%f,%f,%f]\r\n"
+						"magn_ellipsoid_transform:[[%f,%f,%f],[%f,%f,%f],[%f,%f,%f]]\r\n"
+						"\r\n"
+						"GYRO_AVERAGE_OFFSET_X:%f\r\n"
+						"GYRO_AVERAGE_OFFSET_Y:%f\r\n"
+						"GYRO_AVERAGE_OFFSET_Z:%f\r\n",
+						-250.0, 250.0, -250.0, 250.0, -250.0, 250.0,
+						-600.0, 600.0, -600.0, 600.0, -600.0, 600.0,
+						0.0, 0.0, 0.0,
+						1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0,
+						0.0, 0.0, 0.0);
+					sendbuflen = (int)strlen((char*)sendbuf);
+					if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+					{
+						return EXIT_FAILURE;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
 
-	uSleep(1000*50);
+		return EXIT_SUCCESS;
+	}
+#pragma endregion
+#pragma region DATA SENT PERIODICALLY
+	if ((RazorAHRSInterface_bSend)||(RazorAHRSInterface_bSendOnce))
+	{
+		RazorAHRSInterface_bSendOnce = FALSE;
+		EnterCriticalSection(&StateVariablesCS);
+
+		yaw = fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0)*180.0/M_PI;
+		pitch = fmod_2PI(-Center(thetahat))*180.0/M_PI;
+		roll = fmod_2PI(Center(phihat))*180.0/M_PI;
+		accx = Center(accrxhat)*256.0/9.8;
+		accy = -Center(accryhat)*256.0/9.8;
+		accz = -Center(accrzhat)*256.0/9.8;
+		gyrx = Center(omegaxhat);
+		gyry = -Center(omegayhat);
+		gyrz = -Center(omegazhat);
+
+		LeaveCriticalSection(&StateVariablesCS);
+
+		memset(sendbuf, 0, sizeof(sendbuf));
+		if (bROSMode_RazorAHRSInterface)
+		{
+			sprintf((char*)sendbuf, "#YPRAG=%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\r\n", yaw, pitch, roll, accx, accy, accz, gyrx, gyry, gyrz);
+		}
+		else
+		{
+			sprintf((char*)sendbuf, "#YPR=%.2f,%.2f,%.2f\r\n", yaw, pitch, roll);
+		}
+		sendbuflen = (int)strlen((char*)sendbuf);
+		if (WriteAllRS232Port(pRazorAHRSInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+	}
+#pragma endregion
+	uSleep(1000*15);
 
 	return EXIT_SUCCESS;
 }
@@ -197,7 +276,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//uSleep(1000*50);
+			//uSleep(1000*15);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -208,7 +287,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 			{
 				if (connectrazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					uSleep(1000*50);
+					uSleep(1000*15);
 					bConnected = TRUE; 
 
 					inithandlerazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port);
@@ -233,7 +312,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 					printf("Connection to a RazorAHRSInterface lost.\n");
 					bConnected = FALSE;
 					disconnectrazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port);
-					uSleep(1000*50);
+					uSleep(1000*15);
 				}
 			}
 

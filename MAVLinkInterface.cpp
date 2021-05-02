@@ -181,9 +181,9 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	int Dir = 0, rel = 0, Current = 0;
 	double roll = 0, pitch = 0, yaw = 0;
 	double lat_sim = 0, long_sim = 0, alt_sim = 0, heading_sim = 0;
-
+#pragma region DATA RECEIVED
 	// Get data from GCS...
-	if ((!bDisableMAVLinkInterfaceIN)&&(CheckAvailableBytesRS232Port(pMAVLinkInterfacePseudoRS232Port) == EXIT_SUCCESS))
+	if ((!bDisableMAVLinkInterfaceIN)&&(CheckAvailBytesRS232Port(pMAVLinkInterfacePseudoRS232Port, NULL) == EXIT_SUCCESS))
 	{	
 #pragma region READ DATA
 		StartChrono(&chrono);
@@ -1576,7 +1576,8 @@ REQ_DATA_STREAM...
 			}
 		}
 	}
-
+#pragma endregion
+#pragma region DATA SENT PERIODICALLY
 	EnterCriticalSection(&StateVariablesCS);
 
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
@@ -1926,7 +1927,7 @@ REQ_DATA_STREAM...
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
 	}
-
+#pragma endregion
 	uSleep(1000*50);
 
 	return EXIT_SUCCESS;

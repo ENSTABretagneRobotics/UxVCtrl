@@ -1,3 +1,6 @@
+379
+Updated RazorAHRSInterface.
+
 378
 Attempt to correct MAVLink mission protocol problems related to Home.
 wx and wy variables now also set in line following.

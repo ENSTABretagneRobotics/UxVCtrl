@@ -69,7 +69,7 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 	char* tmp = NULL;
 
 	// Get data...
-	if (CheckAvailableBytesRS232Port(pSSC32InterfacePseudoRS232Port) == EXIT_SUCCESS)
+	if (CheckAvailBytesRS232Port(pSSC32InterfacePseudoRS232Port, NULL) == EXIT_SUCCESS)
 	{
 		// Prepare the buffers.
 		memset(recvbuf, 0, sizeof(recvbuf));
