@@ -84,6 +84,7 @@
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRSInterface.h"
 #include "SBGInterface.h"
+#include "VectorNavInterface.h"
 #include "SSC32Interface.h"
 #include "PololuInterface.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -189,6 +190,7 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER NMEAInterfaceThreadId;
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
 	THREAD_IDENTIFIER SBGInterfaceThreadId;
+	THREAD_IDENTIFIER VectorNavInterfaceThreadId;
 	THREAD_IDENTIFIER SSC32InterfaceThreadId;
 	THREAD_IDENTIFIER PololuInterfaceThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -219,7 +221,7 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
-	printf("\nUxVCtrl V379\n");
+	printf("\nUxVCtrl V380\n");
 	fflush(stdout);
 
 	// Will launch a mission file if specified as argument.
@@ -402,6 +404,8 @@ int main(int argc, char* argv[])
 	if (bRazorAHRSInterface) DetachThread(RazorAHRSInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSBGInterface) CreateDefaultThread(SBGInterfaceThread, NULL, &SBGInterfaceThreadId);
 	if (bSBGInterface) DetachThread(SBGInterfaceThreadId); // Not easy to stop it correctly...
+	if (bVectorNavInterface) CreateDefaultThread(VectorNavInterfaceThread, NULL, &VectorNavInterfaceThreadId);
+	if (bVectorNavInterface) DetachThread(VectorNavInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSSC32Interface) CreateDefaultThread(SSC32InterfaceThread, NULL, &SSC32InterfaceThreadId);
 	if (bSSC32Interface) DetachThread(SSC32InterfaceThreadId); // Not easy to stop it correctly...
 	if (bPololuInterface) CreateDefaultThread(PololuInterfaceThread, NULL, &PololuInterfaceThreadId);
@@ -569,6 +573,9 @@ int main(int argc, char* argv[])
 	// Not easy to stop it correctly...
 	//if (bSSC32Interface) WaitForThread(SSC32InterfaceThreadId);
 	if (bSSC32Interface) mSleep(100);
+	// Not easy to stop it correctly...
+	//if (bVectorNavInterface) WaitForThread(VectorNavInterfaceThreadId);
+	if (bVectorNavInterface) mSleep(100);
 	// Not easy to stop it correctly...
 	//if (bSBGInterface) WaitForThread(SBGInterfaceThreadId);
 	if (bSBGInterface) mSleep(100);

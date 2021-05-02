@@ -352,7 +352,7 @@ int handlesbginterface(RS232PORT* pSBGInterfacePseudoRS232Port)
 		return EXIT_FAILURE;
 	}
 
-	uSleep(1000*50);
+	uSleep(1000*20);
 
 	return EXIT_SUCCESS;
 }
@@ -453,7 +453,7 @@ THREAD_PROC_RETURN_VALUE SBGInterfaceThread(void* pParam)
 
 		for (;;)
 		{
-			//uSleep(1000*50);
+			//uSleep(1000*20);
 			//t0 = t;
 			//GetTimeElapsedChrono(&chrono, &t);
 			//dt = t-t0;
@@ -464,7 +464,7 @@ THREAD_PROC_RETURN_VALUE SBGInterfaceThread(void* pParam)
 			{
 				if (connectsbginterface(&SBGInterfacePseudoRS232Port) == EXIT_SUCCESS) 
 				{
-					uSleep(1000*50);
+					uSleep(1000*20);
 					bConnected = TRUE; 
 
 					inithandlesbginterface(&SBGInterfacePseudoRS232Port);
@@ -489,7 +489,7 @@ THREAD_PROC_RETURN_VALUE SBGInterfaceThread(void* pParam)
 					printf("Connection to a SBGInterface lost.\n");
 					bConnected = FALSE;
 					disconnectsbginterface(&SBGInterfacePseudoRS232Port);
-					uSleep(1000*50);
+					uSleep(1000*20);
 				}
 			}
 

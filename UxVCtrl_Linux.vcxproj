@@ -117,6 +117,7 @@
     <ClCompile Include="SonarLocalization.cpp" />
     <ClCompile Include="SSC32Interface.cpp" />
     <ClCompile Include="SurfaceVisualObstacle.cpp" />
+    <ClCompile Include="VectorNavInterface.cpp" />
     <ClCompile Include="VideoInterface.cpp" />
     <ClCompile Include="VideoRecord.cpp" />
     <ClCompile Include="Wall.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="SonarLocalization.h" />
     <ClInclude Include="SSC32Interface.h" />
     <ClInclude Include="SurfaceVisualObstacle.h" />
+    <ClInclude Include="VectorNavInterface.h" />
     <ClInclude Include="VideoInterface.h" />
     <ClInclude Include="VideoRecord.h" />
     <ClInclude Include="Wall.h" />

@@ -1,3 +1,6 @@
+380
+Added VectorNavInterface (preliminary).
+
 379
 Updated RazorAHRSInterface.
 

@@ -1296,7 +1296,7 @@ REQ_DATA_STREAM...
 						case MAV_FRAME_GLOBAL_RELATIVE_ALT:
 							// Avoid duplicates...
 							if ((nbWPs == 0)||
-								((nbWPs > 0)&&((wpslat[nbWPs-1] != (double)mission_item.x)||(wpslong[nbWPs-1] != (double)mission_item.y))||(wpsalt[nbWPs-1] != (double)mission_item.z+alt_home)))
+								((nbWPs > 0)&&((wpslat[nbWPs-1] != (double)mission_item.x)||(wpslong[nbWPs-1] != (double)mission_item.y)||(wpsalt[nbWPs-1] != (double)mission_item.z+alt_home))))
 							{
 								wpslat[nbWPs] = (double)mission_item.x;
 								wpslong[nbWPs] = (double)mission_item.y;
@@ -1308,7 +1308,7 @@ REQ_DATA_STREAM...
 						default:
 							// Avoid duplicates...
 							if ((nbWPs == 0)||
-								((nbWPs > 0)&&((wpslat[nbWPs-1] != (double)mission_item.x)||(wpslong[nbWPs-1] != (double)mission_item.y))||(wpsalt[nbWPs-1] != (double)mission_item.z)))
+								((nbWPs > 0)&&((wpslat[nbWPs-1] != (double)mission_item.x)||(wpslong[nbWPs-1] != (double)mission_item.y)||(wpsalt[nbWPs-1] != (double)mission_item.z))))
 							{
 								wpslat[nbWPs] = (double)mission_item.x;
 								wpslong[nbWPs] = (double)mission_item.y;
