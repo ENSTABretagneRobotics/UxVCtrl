@@ -232,7 +232,7 @@ WMV2
 % szVectorNavInterfacePath (server TCP port (e.g. :5007), client IP address and TCP port (e.g. 127.0.0.1:5007) or local RS232 port)
 :5007
 % VectorNavInterfaceBaudRate
-115200
+230400
 % VectorNavInterfaceTimeout (in ms)
 2000
 % bSSC32Interface

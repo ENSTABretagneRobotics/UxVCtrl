@@ -7,7 +7,6 @@
 #	undef _MSC_VER
 #endif // defined(__GNUC__) || defined(__BORLANDC__)
 
-#include "NMEAProtocol.h"
 #include "VectorNavInterface.h"
 
 // Inspired from https://github.com/ArduPilot/ardupilot...
@@ -17,6 +16,13 @@
 
 // Temp...
 RS232PORT VectorNavInterfacePseudoRS232Port;
+
+//#pragma pack(show)
+
+// Check for potential paddings in bitfields and structs, check their size and the sum of the size of their fields!
+
+// To prevent unexpected padding in struct...
+#pragma pack(push,1) 
 
 /*
  * Copyright (C) 2010 Swift Navigation Inc.
@@ -128,6 +134,8 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
         start_us = tv.tv_usec * 1000;
     }
 
+	memset(&pkt, 0, sizeof(struct VN_packet1));
+
 	EnterCriticalSection(&StateVariablesCS);
 	
     pkt.timeStartup = start_us;
@@ -139,7 +147,7 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.uncompAngRate[1] = (float)-Center(omegayhat);
     pkt.uncompAngRate[2] = (float)-Center(omegazhat);
 
-    pkt.pressure = (float)AirPressure;
+	pkt.pressure = (float)(AirPressure*100+sensor_err(0,1)); // (float)(Height2Pressure(althat, AirPressure, 1.292)*100); // ArduPilot needs varying values to avoid Bad Baro Health message...?
 
     pkt.mag[0] = 0;
     pkt.mag[1] = 0;
@@ -159,7 +167,7 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.ypr[1] = (float)fmod_360_rad2deg(-Center(thetahat));
     pkt.ypr[2] = (float)fmod_360_rad2deg(Center(phihat));
 
-	euler2quaternion((double)pkt.ypr[2], (double)pkt.ypr[1], (double)pkt.ypr[0], &qw, &qx, &qy, &qz);
+	euler2quaternion((double)pkt.ypr[2]*M_PI/180.0, (double)pkt.ypr[1]*M_PI/180.0, (double)pkt.ypr[0]*M_PI/180.0, &qw, &qx, &qy, &qz);
 
     pkt.quaternion[0] = (float)qx;
     pkt.quaternion[1] = (float)qy;
@@ -221,6 +229,8 @@ int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     struct timeval tv;
 	if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 	
+	memset(&pkt, 0, sizeof(struct VN_packet2));
+
 	EnterCriticalSection(&StateVariablesCS);
 	
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
@@ -524,3 +534,6 @@ THREAD_PROC_RETURN_VALUE VectorNavInterfaceThread(void* pParam)
 
 	return 0;
 }
+
+// Restore default alignment settings.
+#pragma pack(pop) 

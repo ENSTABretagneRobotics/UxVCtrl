@@ -1,3 +1,6 @@
+381
+Updated VectorNavInterface.
+
 380
 Added VectorNavInterface (preliminary).
 

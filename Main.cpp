@@ -84,7 +84,9 @@
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRSInterface.h"
 #include "SBGInterface.h"
+#ifdef ENABLE_MAVLINK_SUPPORT
 #include "VectorNavInterface.h"
+#endif // ENABLE_MAVLINK_SUPPORT
 #include "SSC32Interface.h"
 #include "PololuInterface.h"
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -190,7 +192,9 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER NMEAInterfaceThreadId;
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
 	THREAD_IDENTIFIER SBGInterfaceThreadId;
+#ifdef ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER VectorNavInterfaceThreadId;
+#endif // ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER SSC32InterfaceThreadId;
 	THREAD_IDENTIFIER PololuInterfaceThreadId;
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
@@ -221,7 +225,7 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
-	printf("\nUxVCtrl V380\n");
+	printf("\nUxVCtrl V381\n");
 	fflush(stdout);
 
 	// Will launch a mission file if specified as argument.
@@ -404,8 +408,10 @@ int main(int argc, char* argv[])
 	if (bRazorAHRSInterface) DetachThread(RazorAHRSInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSBGInterface) CreateDefaultThread(SBGInterfaceThread, NULL, &SBGInterfaceThreadId);
 	if (bSBGInterface) DetachThread(SBGInterfaceThreadId); // Not easy to stop it correctly...
+#ifdef ENABLE_MAVLINK_SUPPORT
 	if (bVectorNavInterface) CreateDefaultThread(VectorNavInterfaceThread, NULL, &VectorNavInterfaceThreadId);
 	if (bVectorNavInterface) DetachThread(VectorNavInterfaceThreadId); // Not easy to stop it correctly...
+#endif // ENABLE_MAVLINK_SUPPORT
 	if (bSSC32Interface) CreateDefaultThread(SSC32InterfaceThread, NULL, &SSC32InterfaceThreadId);
 	if (bSSC32Interface) DetachThread(SSC32InterfaceThreadId); // Not easy to stop it correctly...
 	if (bPololuInterface) CreateDefaultThread(PololuInterfaceThread, NULL, &PololuInterfaceThreadId);
@@ -574,8 +580,10 @@ int main(int argc, char* argv[])
 	//if (bSSC32Interface) WaitForThread(SSC32InterfaceThreadId);
 	if (bSSC32Interface) mSleep(100);
 	// Not easy to stop it correctly...
+#ifdef ENABLE_MAVLINK_SUPPORT
 	//if (bVectorNavInterface) WaitForThread(VectorNavInterfaceThreadId);
 	if (bVectorNavInterface) mSleep(100);
+#endif // ENABLE_MAVLINK_SUPPORT
 	// Not easy to stop it correctly...
 	//if (bSBGInterface) WaitForThread(SBGInterfaceThreadId);
 	if (bSBGInterface) mSleep(100);

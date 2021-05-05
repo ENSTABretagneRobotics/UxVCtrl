@@ -135,7 +135,7 @@ inline int LoadConfig(void)
 	bVectorNavInterface = FALSE;
 	memset(szVectorNavInterfacePath, 0, sizeof(szVectorNavInterfacePath));
 	sprintf(szVectorNavInterfacePath, ":5007");
-	VectorNavInterfaceBaudRate = 115200;
+	VectorNavInterfaceBaudRate = 230400;
 	VectorNavInterfaceTimeout = 2000;
 	bSSC32Interface = TRUE;
 	memset(szSSC32InterfacePath, 0, sizeof(szSSC32InterfacePath));
