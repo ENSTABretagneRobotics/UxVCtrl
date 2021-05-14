@@ -1,3 +1,6 @@
+382
+Updated MAVLinkDevice.
+
 381
 Updated VectorNavInterface.
 
