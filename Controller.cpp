@@ -467,16 +467,16 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 
 #pragma region Sailboat supervisor
 
-			// Not sure of the behavior for sailboat when there is an obstacle...
+		// Not sure of the behavior for sailboat when there is an obstacle...
 
-			if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bLineFollowingControl))//||(bWaypointControl)||(bGuidedControl)||(bHeadingControl)
+		if ((robid & SAILBOAT_CLASS_ROBID_MASK)&&(bLineFollowingControl))//||(bWaypointControl)||(bGuidedControl)||(bHeadingControl)
 		{
-				double theta_star = wpsi_obs;
-				double psiw = Center(psitwindhat);
-				double psi = Center(psihat);
+			double theta_star = wpsi_obs;
+			double psiw = Center(psitwindhat);
+			double psi = Center(psihat);
 
-				q1 = betarear;
-				q2 = (log(betarear)-log(betaside))/log(2.0);
+			q1 = betarear;
+			q2 = (log(betarear)-log(betaside))/log(2.0);
 			
 			switch (sailboattacktype)
 			{
@@ -613,15 +613,15 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 					break;
 				}
 
-				if ((GetTimeElapsedChronoQuick(&chrono_sail_update) > sail_update_period)||bForceSailUpdate)
-				{
-					if (bStdOutDetailedInfo) printf("Sail update.\n");
-					u = deltasmax/q1;
-					//bUpdateMaxAngleIM483I = TRUE;
-					bForceSailUpdate = 0;
-					StopChronoQuick(&chrono_sail_update);
-					StartChrono(&chrono_sail_update);
-				}
+			if ((GetTimeElapsedChronoQuick(&chrono_sail_update) > sail_update_period)||bForceSailUpdate)
+			{
+				if (bStdOutDetailedInfo) printf("Sail update.\n");
+				u = deltasmax/q1;
+				//bUpdateMaxAngleIM483I = TRUE;
+				bForceSailUpdate = 0;
+				StopChronoQuick(&chrono_sail_update);
+				StartChrono(&chrono_sail_update);
+			}
 		}
 #pragma endregion
 

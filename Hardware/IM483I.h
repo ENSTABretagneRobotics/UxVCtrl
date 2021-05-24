@@ -93,7 +93,7 @@ inline int StepsIM483I(IM483I* pIM483I, double val)
 
 	// Prepare data to send to device.
 	memset(sendbuf, 0, sizeof(sendbuf));
-	sprintf(sendbuf, "+%.2f\r", val);
+	sprintf(sendbuf, "%+.2f\r", val);
 	sendbuflen = (int)strlen(sendbuf);
 
 	if (WriteDataIM483I(pIM483I, (unsigned char*)sendbuf, sendbuflen, pIM483I->bytedelayus) != EXIT_SUCCESS)

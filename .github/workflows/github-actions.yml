@@ -213,6 +213,43 @@ jobs:
 #        tag_name: autotagname
 
  j16:
+    name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
+    runs-on: windows-2019
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        choco install -y -r --no-progress mingw --version=8.1.0 --force --x86
+        choco install -y -r --no-progress make --force --x86
+        rem echo C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin>>%GITHUB_PATH%
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
+        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
+        regedit /s %SystemDrive%\Certificates.reg
+        cmd /c "start %SystemDrive%\LabJack-2019-05-20.exe /S"
+        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+        %SystemDrive%\cmake_extra_tools\sleep 60
+        TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
+      shell: cmd
+    - run: set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_mingw8.exe"
+        overwrite: true
+        tag_name: autotagname
+
+ j17:
     name: Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
     runs-on: windows-2019
     steps: 
@@ -253,7 +290,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j17:
+ j18:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: windows-2016
     steps: 
@@ -297,7 +334,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j18:
+ j19:
     name: Windows Visual Studio 2017 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2016
     steps: 
@@ -336,7 +373,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j19:
+ j20:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
     runs-on: windows-2016
     steps: 
@@ -370,7 +407,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j20:
+ j21:
     name: Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2016
     steps: 
@@ -404,7 +441,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j21:
+ j22:
     name: Windows Visual Studio 2017 x64 static with OpenCV 4.2.0 without BlueView support
     runs-on: windows-2016
     steps: 
@@ -438,7 +475,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j22:
+ j23:
     name: Windows Qt 2010.05 MinGW 4.4.0 x86 with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK, Kinect v2 support
     runs-on: windows-latest
     steps: 
@@ -480,7 +517,7 @@ jobs:
         overwrite: true
         tag_name: autotagname
 
- j23:
+ j24:
     name: Windows Qt 5.12.6 MinGW 7.3.0 x86
     runs-on: windows-latest
     steps: 

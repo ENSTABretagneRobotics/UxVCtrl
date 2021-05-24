@@ -1,3 +1,6 @@
+383
+Corrected bug in IM483I.
+
 382
 Updated MAVLinkDevice.
 
