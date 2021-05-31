@@ -197,18 +197,42 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 				if (mavlinkdevice.bExternal)
 				{
-					if (((target_followme == MAVLINKDEVICE0_TARGET)&&(deviceid == 0))||((target_followme == MAVLINKDEVICE1_TARGET)&&(deviceid == 1)))
+					if (((target_followme == MAVLINKDEVICE0_TARGET)&&(deviceid == 0))||
+						((target_followme == MAVLINKDEVICE1_TARGET)&&(deviceid == 1))||
+						((target_followme == MAVLINKDEVICE2_TARGET)&&(deviceid == 2)))
 					{
 						// GNSSqualityMAVLinkDevice[deviceid] should not be set in that case...
 						if (mavlinkdata.gps_raw_int.fix_type >= GPS_FIX_TYPE_2D_FIX) // To check...
 						{
 							GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, mavlinkdata.gps_raw_int.lat/10000000.0, mavlinkdata.gps_raw_int.lon/10000000.0, mavlinkdata.gps_raw_int.alt/1000.0, &xtarget_followme, &ytarget_followme, &ztarget_followme);
 						}
-					}
 
-					LeaveCriticalSection(&StateVariablesCS);
-			
-					uSleep(1000*threadperiod/2);
+						LeaveCriticalSection(&StateVariablesCS);
+
+						uSleep(1000*threadperiod);
+					}
+					else
+					{
+						double latitude = 0, longitude = 0, altitude = 0, yaw = 0;
+
+						EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &latitude, &longitude, &altitude);
+						yaw = fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
+
+						LeaveCriticalSection(&StateVariablesCS);
+
+						uSleep(1000*threadperiod/2);
+
+						if (GPSInputMAVLinkDevice(&mavlinkdevice, latitude, longitude, altitude, yaw) != EXIT_SUCCESS)
+						{
+							printf("Connection to a MAVLinkDevice lost.\n");
+							GNSSqualityMAVLinkDevice[deviceid] = GNSS_NO_FIX;
+							bConnected = FALSE;
+							DisconnectMAVLinkDevice(&mavlinkdevice);
+							uSleep(1000*threadperiod);
+							break;
+						}
+						uSleep(1000*threadperiod/2);
+					}
 				}
 				else
 				{

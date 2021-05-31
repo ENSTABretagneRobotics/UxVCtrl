@@ -1,3 +1,6 @@
+384
+When bExternal is set to 1 without Follow Me, a MAVLinkDevice will receive GPS_INPUT MAVLink message (with data from e.g. an SBG).
+
 383
 Corrected bug in IM483I.
 

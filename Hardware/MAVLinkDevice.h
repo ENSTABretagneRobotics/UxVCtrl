@@ -664,6 +664,46 @@ inline int SetAllPWMsMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, int* selectedc
 	return EXIT_SUCCESS;
 }
 
+inline int GPSInputMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, double gps_lat, double gps_lon, double gps_alt, double yaw)
+{
+	unsigned char sendbuf[256];
+	int sendbuflen = 0;
+	mavlink_message_t msg;
+	mavlink_gps_input_t gps_input;
+
+	memset(&gps_input, 0, sizeof(gps_input));
+	gps_input.ignore_flags = (uint16_t)(0);
+	gps_input.fix_type = 5;
+	gps_input.lat = (int32_t)(gps_lat*10000000.0);
+	gps_input.lon = (int32_t)(gps_lon*10000000.0);
+	gps_input.alt = (float)gps_alt;
+	gps_input.hdop = (float)1.0;
+	gps_input.vdop = (float)1.0;
+	gps_input.vn = (float)0;
+	gps_input.ve = (float)0;
+	gps_input.vd = (float)0;
+	gps_input.speed_accuracy = (float)0.2;
+	gps_input.horiz_accuracy = (float)1.0;
+	gps_input.vert_accuracy = (float)1.0;
+	gps_input.satellites_visible = (uint8_t)15;
+	// MAVLINK_STATUS_FLAG_IN_MAVLINK1 should not be defined if using MAVLink v1 headers...
+#ifdef MAVLINK_STATUS_FLAG_IN_MAVLINK1
+	gps_input.yaw = (uint16_t)(((fmod_360_pos(yaw) == 0)? 360: fmod_360_pos(yaw))*100);
+#else
+	UNREFERENCED_PARAMETER(yaw);
+#endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
+	mavlink_msg_gps_input_encode((uint8_t)pMAVLinkDevice->system_id, (uint8_t)pMAVLinkDevice->component_id, &msg, &gps_input);
+
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sendbuflen = mavlink_msg_to_send_buffer(sendbuf, &msg);
+	if (WriteAllRS232Port(&pMAVLinkDevice->RS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+
+	return EXIT_SUCCESS;
+}
+
 // MAVLINKDEVICE must be initialized to 0 before (e.g. MAVLINKDEVICE mavlinkdevice; memset(&mavlinkdevice, 0, sizeof(MAVLINKDEVICE));)!
 inline int ConnectMAVLinkDevice(MAVLINKDEVICE* pMAVLinkDevice, char* szCfgFilePath)
 {

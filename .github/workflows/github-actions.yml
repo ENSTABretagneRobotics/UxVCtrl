@@ -30,7 +30,7 @@ jobs:
     runs-on: windows-latest
     steps: 
     - uses: actions/checkout@v2
-    - run: cmake . & cmake --build . --config Release --target UxVCtrl & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt
+    - run: cmake . && cmake --build . --config Release --target UxVCtrl && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt
       shell: cmd
 
  j3:
@@ -169,7 +169,8 @@ jobs:
     - uses: actions/checkout@v2
     - run: |
         sudo apt-get -q update || true
-        sudo apt-get install -y libopencv-dev libgtk2.0
+        sudo apt-get remove -y libgtk2.0-cil ; sudo apt-get autoremove -y # libgtk2.0 cannot be installed due to incompatible packages already installed...?
+        sudo apt-get install -y libopencv-dev libgtk2.0 # libgtk2.0 cannot be installed due to another version already installed...?
         wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-Ubuntu64-static.zip
         wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.2.0-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-Ubuntu64-static.tar.gz
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
@@ -213,7 +214,7 @@ jobs:
 #        tag_name: autotagname
 
  j16:
-    name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
+    name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 
     - uses: actions/checkout@v2
@@ -239,7 +240,7 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8.exe
+    - run: set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -280,7 +281,7 @@ jobs:
         rem 7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
         rem %SystemDrive%\cmake_extra_tools\pathman /as C:\OpenCV4.2.0\x64\mingw\bin & cd. & rem Non-zero exit code...?
       shell: cmd
-    - run: cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8_x64.exe
+    - run: cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt && copy UxVCtrl.exe UxVCtrl_mingw8_x64.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -324,7 +325,7 @@ jobs:
         7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
         %SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin & cd. & rem Non-zero exit code...?
       shell: cmd
-    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_compat.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_compat.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -363,7 +364,7 @@ jobs:
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
         rem choco install -y -r --no-progress vcredist-all
       shell: cmd
-    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -397,7 +398,7 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=OFF -D USE_FFMPEG_VIDEO=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv320_ffmpeg.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=OFF -D USE_FFMPEG_VIDEO=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_cv320_ffmpeg.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -431,7 +432,7 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv2413.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv2413.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -465,7 +466,7 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: refreshenv.cmd & cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . --config Release --target UxVCtrl & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_x64.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_x64.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -507,7 +508,7 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: refreshenv.cmd & set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw.exe
+    - run: refreshenv.cmd && set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -546,7 +547,7 @@ jobs:
         wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
         7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
       shell: cmd
-    - run: refreshenv.cmd & set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin;%PATH% & cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . & cmake --build . & refreshenv.cmd & @echo wait 10 > run_test.txt & @echo exit >> run_test.txt & UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw7.exe
+    - run: refreshenv.cmd && set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw7.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
