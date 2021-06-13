@@ -141,6 +141,8 @@ WMV2
 0
 % MAVLinkInterface_target_component (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
 0
+% MAVLinkInterface_data_stream (see enum MAV_DATA_STREAM)
+0
 % bForceDefaultMAVLink1MAVLinkInterface (0 to enable default MAVLink v2 protocol, 1 to force to default MAVLink v1)
 1
 % bDisableMAVLinkInterfaceIN

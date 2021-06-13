@@ -134,6 +134,7 @@ int MAVLinkInterface_system_id = 0;
 int MAVLinkInterface_component_id = 0;
 int MAVLinkInterface_target_system = 0;
 int MAVLinkInterface_target_component = 0;
+int MAVLinkInterface_data_stream = 0;
 BOOL bForceDefaultMAVLink1MAVLinkInterface = FALSE;
 BOOL bDisableMAVLinkInterfaceIN = FALSE;
 int MAVLinkInterface_rc_override_time = 0;

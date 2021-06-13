@@ -1,3 +1,4 @@
+Tuto vectornav, gps_input UxVCtrl...
 
 Tester avec et sans option gotofirstwp via mavlink quand on change les waypoints
 Revérifier si corrigé temporairement donner un 1er waypoint de Home (pas vu de problème mais à approfondir)

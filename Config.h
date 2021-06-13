@@ -86,6 +86,7 @@ inline int LoadConfig(void)
 	MAVLinkInterface_component_id = 1;
 	MAVLinkInterface_target_system = 0;
 	MAVLinkInterface_target_component = 0;
+	MAVLinkInterface_data_stream = 0;
 	bForceDefaultMAVLink1MAVLinkInterface = TRUE;
 	bDisableMAVLinkInterfaceIN = FALSE;
 	MAVLinkInterface_rc_override_time = 3;
@@ -514,6 +515,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &MAVLinkInterface_target_system) != 1) printf("Invalid parameter : MAVLinkInterface_target_system.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : MAVLinkInterface_target_component.\n");
 		if (sscanf(line, "%d", &MAVLinkInterface_target_component) != 1) printf("Invalid parameter : MAVLinkInterface_target_component.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : MAVLinkInterface_data_stream.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_data_stream) != 1) printf("Invalid parameter : MAVLinkInterface_data_stream.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bForceDefaultMAVLink1MAVLinkInterface.\n");
 		if (sscanf(line, "%d", &bForceDefaultMAVLink1MAVLinkInterface) != 1) printf("Invalid parameter : bForceDefaultMAVLink1MAVLinkInterface.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableMAVLinkInterfaceIN.\n");
@@ -1689,6 +1692,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", MAVLinkInterface_target_system) < 0) printf("Error writing parameter : MAVLinkInterface_target_system.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : MAVLinkInterface_target_component.\n");
 	if (fprintf(fileout, "%d\n", MAVLinkInterface_target_component) < 0) printf("Error writing parameter : MAVLinkInterface_target_component.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : MAVLinkInterface_data_stream.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_data_stream) < 0) printf("Error writing parameter : MAVLinkInterface_data_stream.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bForceDefaultMAVLink1MAVLinkInterface.\n");
 	if (fprintf(fileout, "%d\n", bForceDefaultMAVLink1MAVLinkInterface) < 0) printf("Error writing parameter : bForceDefaultMAVLink1MAVLinkInterface.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableMAVLinkInterfaceIN.\n");

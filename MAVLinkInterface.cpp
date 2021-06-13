@@ -1779,6 +1779,8 @@ REQ_DATA_STREAM...
 		fflush(tlogfile);
 	}
 
+	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RAW_SENSORS))
+	{
 	mavlink_msg_gps_raw_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_raw_int);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
@@ -1790,6 +1792,7 @@ REQ_DATA_STREAM...
 	{
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
+	}
 	}
 
 	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
@@ -1818,6 +1821,8 @@ REQ_DATA_STREAM...
 		fflush(tlogfile);
 	}
 
+	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RAW_CONTROLLER))
+	{
 	mavlink_msg_nav_controller_output_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &nav_controller_output);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
@@ -1830,9 +1835,12 @@ REQ_DATA_STREAM...
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
 	}
+	}
 
 	if (robid & SAILBOAT_CLASS_ROBID_MASK)
 	{
+		if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_EXTRA2))
+		{
 		mavlink_msg_wind_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &wind);
 		memset(sendbuf, 0, sizeof(sendbuf));
 		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
@@ -1845,9 +1853,10 @@ REQ_DATA_STREAM...
 			fwrite_tlog(msg, tlogfile);
 			fflush(tlogfile);
 		}
+		}
 	}
 
-	if (vbat1 != 0)
+	if ((vbat1 != 0)&&((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_EXTRA1)))
 	{
 		mavlink_msg_sys_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &sys_status);
 		memset(sendbuf, 0, sizeof(sendbuf));
@@ -1863,7 +1872,7 @@ REQ_DATA_STREAM...
 		}
 	}
 
-	if (vbat1 != 0)
+	if ((vbat1 != 0)&&((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_EXTRA1)))
 	{
 		mavlink_msg_battery_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &battery_status1);
 		memset(sendbuf, 0, sizeof(sendbuf));
@@ -1884,7 +1893,7 @@ REQ_DATA_STREAM...
 	case VAIMOS_ROBID:
 		break;
 	default:
-		if (vbat2 != 0)
+		if ((vbat2 != 0)&&((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_EXTRA1)))
 		{
 			mavlink_msg_battery_status_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &battery_status2);
 			memset(sendbuf, 0, sizeof(sendbuf));
@@ -1902,6 +1911,8 @@ REQ_DATA_STREAM...
 		break;
 	}
 
+	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RAW_CONTROLLER))
+	{
 	mavlink_msg_mission_current_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_current);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
@@ -1914,7 +1925,10 @@ REQ_DATA_STREAM...
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
 	}
+	}
 
+	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RC_CHANNELS))
+	{
 	mavlink_msg_servo_output_raw_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &servo_output_raw);
 	memset(sendbuf, 0, sizeof(sendbuf));
 	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
@@ -1926,6 +1940,7 @@ REQ_DATA_STREAM...
 	{
 		fwrite_tlog(msg, tlogfile);
 		fflush(tlogfile);
+	}
 	}
 #pragma endregion
 	uSleep(1000*50);

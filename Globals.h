@@ -376,6 +376,7 @@ extern int MAVLinkInterface_system_id;
 extern int MAVLinkInterface_component_id;
 extern int MAVLinkInterface_target_system;
 extern int MAVLinkInterface_target_component;
+extern int MAVLinkInterface_data_stream;
 extern BOOL bForceDefaultMAVLink1MAVLinkInterface;
 extern BOOL bDisableMAVLinkInterfaceIN;
 extern int MAVLinkInterface_rc_override_time;
