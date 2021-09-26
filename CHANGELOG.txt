@@ -1,3 +1,6 @@
+386
+Corrected altitude of waypoints bug in MAVLinkInterface.
+
 385
 Added MAVLinkInterface_data_stream parameter.
 

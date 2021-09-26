@@ -94,6 +94,7 @@
 #define LIRMIA3_ROBID                 0x00000080
 #define BUBBLE_ROBID                  0x00000200
 #define MOTORBOAT_ROBID               0x00000400
+#define SPEBOT_ROBID                  0x00000800
 #define VAIMOS_ROBID                  0x00002000
 #define SAILBOAT_ROBID                0x00004000
 #define SAILBOAT2_ROBID               0x00008000

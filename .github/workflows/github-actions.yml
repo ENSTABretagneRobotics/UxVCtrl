@@ -15,8 +15,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         draft: true
-        tag_name: autotagname
-        release_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+        release_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j1:
     name: Ubuntu
@@ -61,8 +62,9 @@ jobs:
       with:
         file: "UxVCtrl_macOS"
         overwrite: true
-        tag_name: autotagname
- 
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
  j6:
     name: Ubuntu 16.04 x86
     runs-on: ubuntu-latest
@@ -75,8 +77,9 @@ jobs:
       with:
         file: "UxVCtrl_compat_Ubuntu32"
         overwrite: true
-        tag_name: autotagname
- 
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
  j7:
     name: Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
@@ -91,8 +94,9 @@ jobs:
       with:
         file: "UxVCtrl_compat_pi"
         overwrite: true
-        tag_name: autotagname
- 
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
  j8:
     name: Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
@@ -106,7 +110,8 @@ jobs:
       with:
         file: "UxVCtrl_pi"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j9:
     name: Windows MinGW 8.1.0 x64
@@ -130,7 +135,8 @@ jobs:
       with:
         file: "UxVCtrl_old_Ubuntu64"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j11:
     name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
@@ -145,11 +151,12 @@ jobs:
       with:
         file: "UxVCtrl_focal_Ubuntu64"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j12:
-    name: Ubuntu 16.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: ubuntu-16.04
+    name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-18.04
     steps: 
     - uses: actions/checkout@v2
     - run: sudo apt-get -q update || true
@@ -160,7 +167,8 @@ jobs:
       with:
         file: "UxVCtrl_compat_Ubuntu64"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j13:
     name: Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
@@ -180,7 +188,8 @@ jobs:
       with:
         file: "UxVCtrl_Ubuntu64"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j14:
     name: macOS Catalina 10.15 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
@@ -194,7 +203,8 @@ jobs:
       with:
         file: "UxVCtrl_compat_macOS"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
 # j15:
 #    name: macOS Catalina 10.15 static with OpenCV 4.2.0 without BlueView, Kinect v2 support
@@ -211,7 +221,8 @@ jobs:
 #      with:
 #        file: "UxVCtrl_macOS"
 #        overwrite: true
-#        tag_name: autotagname
+#        tag_name: autotagname-${{ github.sha }}
+#      if: github.event_name != 'pull_request'
 
  j16:
     name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
@@ -248,7 +259,8 @@ jobs:
       with:
         file: "UxVCtrl_mingw8.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j17:
     name: Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
@@ -289,7 +301,8 @@ jobs:
       with:
         file: "UxVCtrl_mingw8_x64.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j18:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
@@ -333,7 +346,8 @@ jobs:
       with:
         file: "UxVCtrl_compat.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j19:
     name: Windows Visual Studio 2017 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
@@ -372,7 +386,8 @@ jobs:
       with:
         file: "UxVCtrl.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j20:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
@@ -406,7 +421,8 @@ jobs:
       with:
         file: "UxVCtrl_cv320_ffmpeg.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j21:
     name: Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
@@ -440,7 +456,8 @@ jobs:
       with:
         file: "UxVCtrl_cv2413.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j22:
     name: Windows Visual Studio 2017 x64 static with OpenCV 4.2.0 without BlueView support
@@ -474,7 +491,8 @@ jobs:
       with:
         file: "UxVCtrl_x64.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j23:
     name: Windows Qt 2010.05 MinGW 4.4.0 x86 with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK, Kinect v2 support
@@ -516,7 +534,8 @@ jobs:
       with:
         file: "UxVCtrl_mingw.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
 
  j24:
     name: Windows Qt 5.12.6 MinGW 7.3.0 x86
@@ -555,4 +574,5 @@ jobs:
       with:
         file: "UxVCtrl_mingw7.exe"
         overwrite: true
-        tag_name: autotagname
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'

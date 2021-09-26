@@ -28,7 +28,7 @@ enum MAVLINKINTERFACE_PARAM_ID
 	AUTO_STATION_PARAM_ID,
 	GUIID_VID_IF_PARAM_ID,
 	VIDID_VID_IF_PARAM_ID,
-	MAVLINKINTERFACE_PARAM_COUNT
+	MAVLINKINTERFACE_PARAM_COUNT // Should correspond to the number of parameters...
 };
 typedef enum MAVLINKINTERFACE_PARAM_ID MAVLINKINTERFACE_PARAM_ID;
 
@@ -99,6 +99,8 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	if (robid & SUBMARINE_ROBID_MASK) heartbeat.type = MAV_TYPE_SUBMARINE;
 	if (robid & SURFACE_ROBID_MASK) heartbeat.type = MAV_TYPE_SURFACE_BOAT;
 	if (robid & GROUND_ROBID_MASK) heartbeat.type = MAV_TYPE_GROUND_ROVER;
+	if (robid & COPTER_CLASS_ROBID_MASK) heartbeat.type = MAV_TYPE_QUADROTOR;
+	if (robid & PLANE_CLASS_ROBID_MASK) heartbeat.type = MAV_TYPE_FIXED_WING;
 	switch (robid)
 	{
 	case COPTER_ROBID:
@@ -111,7 +113,7 @@ int inithandlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 		break;
 	}
 	heartbeat.autopilot = MAV_AUTOPILOT_INVALID;
-	heartbeat.base_mode = MAV_MODE_FLAG_SAFETY_ARMED;
+	heartbeat.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED|MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
 	heartbeat.custom_mode = 0;
 	heartbeat.system_status = MAV_STATE_ACTIVE;
 
@@ -172,7 +174,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_param_value_t param_value;
 	mavlink_command_ack_t command_ack;
 	//uint8_t result = MAV_RESULT_FAILED;
-	char Name[17];
+	char Name[17]; // sizeof(mavlink_param_value_t.param_id).
 	int nbparams = MAVLINKINTERFACE_PARAM_COUNT;
 	BOOL bForceOverrideInputs_prev = bForceOverrideInputs;
 	uint16_t chan_tmp = 0;
@@ -262,7 +264,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 				}
 #endif // MAVLINK_STATUS_FLAG_IN_MAVLINK1
 
-				// Packet received
+				// Packet received.
 				//printf("\nReceived packet: SYS: %d, COMP: %d, LEN: %d, MSG ID: %d\n", msg.sysid, msg.compid, msg.len, msg.msgid);
 				if (tlogfile)
 				{
@@ -1178,7 +1180,7 @@ REQ_DATA_STREAM...
 					CurWP = 0;
 					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 					memset(wpslong, 0, MAX_NB_WP*sizeof(double));
-					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+					memset(wpsalt, 0, MAX_NB_WP*sizeof(double));
 					memset(&mission_request, 0, sizeof(mavlink_mission_request_t));
 					mission_request.target_system = msg.sysid;
 					mission_request.target_component = msg.compid;
@@ -1368,7 +1370,7 @@ REQ_DATA_STREAM...
 					CurWP = 0;
 					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
 					memset(wpslong, 0, MAX_NB_WP*sizeof(double));
-					memset(wpslat, 0, MAX_NB_WP*sizeof(double));
+					memset(wpsalt, 0, MAX_NB_WP*sizeof(double));
 					LeaveCriticalSection(&StateVariablesCS);
 					memset(&mission_ack, 0, sizeof(mavlink_mission_ack_t));
 					mission_ack.target_system = msg.sysid;
@@ -1602,7 +1604,7 @@ REQ_DATA_STREAM...
 		break;
 	}
 	heartbeat.autopilot = MAV_AUTOPILOT_INVALID;
-	heartbeat.base_mode = MAV_MODE_FLAG_SAFETY_ARMED;
+	heartbeat.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED|MAV_MODE_FLAG_MANUAL_INPUT_ENABLED;
 	heartbeat.custom_mode = 0;
 	heartbeat.system_status = MAV_STATE_ACTIVE;
 
