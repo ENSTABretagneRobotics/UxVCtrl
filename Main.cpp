@@ -83,6 +83,7 @@
 #include "NMEAInterface.h"
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #include "RazorAHRSInterface.h"
+#include "RoboteqInterface.h"
 #include "SBGInterface.h"
 #ifdef ENABLE_MAVLINK_SUPPORT
 #include "VectorNavInterface.h"
@@ -191,6 +192,7 @@ int main(int argc, char* argv[])
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 	THREAD_IDENTIFIER NMEAInterfaceThreadId;
 	THREAD_IDENTIFIER RazorAHRSInterfaceThreadId;
+	THREAD_IDENTIFIER RoboteqInterfaceThreadId;
 	THREAD_IDENTIFIER SBGInterfaceThreadId;
 #ifdef ENABLE_MAVLINK_SUPPORT
 	THREAD_IDENTIFIER VectorNavInterfaceThreadId;
@@ -225,7 +227,7 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
-	printf("\nUxVCtrl V386\n");
+	printf("\nUxVCtrl V387\n");
 	fflush(stdout);
 
 	// Will launch a mission file if specified as argument.
@@ -406,6 +408,8 @@ int main(int argc, char* argv[])
 	if (bNMEAInterface) DetachThread(NMEAInterfaceThreadId); // Not easy to stop it correctly...
 	if (bRazorAHRSInterface) CreateDefaultThread(RazorAHRSInterfaceThread, NULL, &RazorAHRSInterfaceThreadId);
 	if (bRazorAHRSInterface) DetachThread(RazorAHRSInterfaceThreadId); // Not easy to stop it correctly...
+	if (bRoboteqInterface) CreateDefaultThread(RoboteqInterfaceThread, NULL, &RoboteqInterfaceThreadId);
+	if (bRoboteqInterface) DetachThread(RoboteqInterfaceThreadId); // Not easy to stop it correctly...
 	if (bSBGInterface) CreateDefaultThread(SBGInterfaceThread, NULL, &SBGInterfaceThreadId);
 	if (bSBGInterface) DetachThread(SBGInterfaceThreadId); // Not easy to stop it correctly...
 #ifdef ENABLE_MAVLINK_SUPPORT
@@ -587,6 +591,9 @@ int main(int argc, char* argv[])
 	// Not easy to stop it correctly...
 	//if (bSBGInterface) WaitForThread(SBGInterfaceThreadId);
 	if (bSBGInterface) mSleep(100);
+	// Not easy to stop it correctly...
+	//if (bRoboteqInterface) WaitForThread(RoboteqInterfaceThreadId);
+	if (bRoboteqInterface) mSleep(100);
 	// Not easy to stop it correctly...
 	//if (bRazorAHRSInterface) WaitForThread(RazorAHRSInterfaceThreadId);
 	if (bRazorAHRSInterface) mSleep(100);

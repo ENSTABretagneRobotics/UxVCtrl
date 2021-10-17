@@ -1,3 +1,6 @@
+387
+Added RoboteqInterface.
+
 386
 Corrected altitude of waypoints bug in MAVLinkInterface.
 

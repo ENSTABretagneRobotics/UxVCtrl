@@ -309,6 +309,9 @@
     <ClCompile Include="VectorNavInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RoboteqInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h">
@@ -696,6 +699,9 @@
       <Filter>Extensions\Net</Filter>
     </ClInclude>
     <ClInclude Include="VectorNavInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RoboteqInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

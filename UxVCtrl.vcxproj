@@ -139,6 +139,7 @@
     <ClCompile Include="Pinger.cpp" />
     <ClCompile Include="PololuInterface.cpp" />
     <ClCompile Include="RazorAHRSInterface.cpp" />
+    <ClCompile Include="RoboteqInterface.cpp" />
     <ClCompile Include="SBGInterface.cpp" />
     <ClCompile Include="SeanetProcessing.cpp" />
     <ClCompile Include="Simulator.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="Pinger.h" />
     <ClInclude Include="PololuInterface.h" />
     <ClInclude Include="RazorAHRSInterface.h" />
+    <ClInclude Include="RoboteqInterface.h" />
     <ClInclude Include="SBGInterface.h" />
     <ClInclude Include="SeanetProcessing.h" />
     <ClInclude Include="Simulator.h" />

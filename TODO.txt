@@ -1,3 +1,9 @@
+
+message Disarmed dans Mission Planner pour VAIMOS, probablement à cause de changement f11993dd71320aeec08db67ca7e7cc55555de383 (heartbeat.base_mode = MAV_MODE_FLAG_CUSTOM_MODE_ENABLED|MAV_MODE_FLAG_MANUAL_INPUT_ENABLED; vs MAV_MODE_FLAG_SAFETY_ARMED, à cause de compatibilité avec qgc...?)
+Regarder données VAIMOS->valeurs de wpnav_radius dans tlog, check mavlink inspector?
+
+roboteq : vérifier min/max pour commandes moteur...
+
 Conversions de fichiers : ne pas lire une ligne supplémentaire du 2ème fichier avant d'avoir regardé le dernier temps récupéré, voir SBG2logstate
 HSVLInterval to convert to OpenCV CPP...
 WGS2LocalWaypoints to update to take any number of points and name of input file...
@@ -108,6 +114,7 @@ Pouvoir envoyer des trames à une sbg (e.g. gps time), voire n'importe quel périp
 Initialisation de t, très grand dt initial vs dt de 0...?
 
 
+Compter le nb de params pour supposer que le format d'un fichier de params n'a pas changé?
 Parse files "param=" or " \t  \t  param \t  \t  =" a bit like commands, to be more compatible between different versions of the program, prepare unused code for that?
 Attention aux params un peu spéciaux dans env.txt, Video0.txt...
 New config parsing : essayer de pouvoir remplacer le code existant automatiquement...
@@ -190,6 +197,8 @@ update rate SBG?->compare with and without SDK...
 Add sleep at end connect sbg and try in serial with condition on not_ready and prev errcode error to try to be able to detect disconnect in tcp
 Tcp non block sample SBG
 Check more errcode recv sdk tcp
+
+SBG and Razor interfaces : 9.81 for accel z...
 
 update rate OpenCVGUI thread?
 

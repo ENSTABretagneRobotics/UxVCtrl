@@ -261,14 +261,15 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		}
 		else if (robid == TANK_SIMULATOR_ROBID)
 		{
-			psi_sim = alphaomegaz*uw;
 			vrx_sim = alphavrx*u;
 
 			// Simulated state evolution.
 			double xdot = vrx_sim*cos(psi_sim);
 			double ydot = vrx_sim*sin(psi_sim);
+			double psidot = uw*alphaomegaz;
 			x_sim = x_sim+dt*xdot;
 			y_sim = y_sim+dt*ydot;
+			psi_sim = psi_sim+dt*psidot;
 
 			// Simulated sensors measurements.
 			// Compass.

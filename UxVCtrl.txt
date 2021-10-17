@@ -257,6 +257,14 @@ WMV2
 1
 % DeviceNumber_PololuInterface (default is 12 for Maestro (not implemented), 11 for Jrk)
 11
+% bRoboteqInterface
+0
+% szRoboteqInterfacePath (server TCP port (e.g. :5004), client IP address and TCP port (e.g. 127.0.0.1:5004) or local RS232 port)
+:5004
+% RoboteqInterfaceBaudRate
+115200
+% RoboteqInterfaceTimeout (in ms)
+1000
 % bVideoInterface
 1
 % szVideoInterfacePath (server TCP port (e.g. :4014))

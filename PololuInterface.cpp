@@ -141,8 +141,10 @@ int handlepololuinterface(RS232PORT* pPololuInterfacePseudoRS232Port)
 			}
 		}
 	}
-
-	uSleep(1000*50);
+	else
+	{
+		uSleep(1000*50);
+	}
 
 	return EXIT_SUCCESS;
 }

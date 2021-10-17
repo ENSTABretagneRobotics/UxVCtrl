@@ -140,8 +140,10 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 
 		LeaveCriticalSection(&StateVariablesCS);
 	}
-
-	uSleep(1000*50);
+	else
+	{
+		uSleep(1000*50);
+	}
 
 	return EXIT_SUCCESS;
 }
