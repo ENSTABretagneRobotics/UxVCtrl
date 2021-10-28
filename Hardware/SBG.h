@@ -27,15 +27,13 @@
 #endif // ENABLE_SBG_SDK_SUPPORT
 
 // Need to be undefined at the end of the file...
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // !min
-#endif // !_MSC_VER
 
 #define TIMEOUT_MESSAGE_SBG 4.0 // In s.
 // Should be at least 2 * number of bytes to be sure to contain entirely the biggest desired message (or group of messages) + 1.
@@ -1547,14 +1545,12 @@ inline int DisconnectSBG(SBG* pSBG)
 THREAD_PROC_RETURN_VALUE SBGThread(void* pParam);
 #endif // !DISABLE_SBGTHREAD
 
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
-#endif // !_MSC_VER
 
 #endif // !SBG_H

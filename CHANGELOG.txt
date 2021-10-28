@@ -1,3 +1,6 @@
+388
+Improved compatibility with ROS for Windows.
+
 387
 Added RoboteqInterface.
 

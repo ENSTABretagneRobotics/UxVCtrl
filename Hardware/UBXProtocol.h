@@ -13,15 +13,13 @@
 #include "OSMisc.h"
 
 // Need to be undefined at the end of the file...
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // !min
-#endif // !_MSC_VER
 
 //#pragma pack(show)
 
@@ -961,14 +959,12 @@ inline int ProcessPacketUBX(unsigned char* packet, int packetlen, int mclass, in
 // Restore default alignment settings.
 #pragma pack(pop) 
 
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
-#endif // !_MSC_VER
 
 #endif // !UBXPROTOCOL_H

@@ -51,15 +51,13 @@
 #include <deque>
 
 // Need to be undefined at the end of the file...
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // !min
-#endif // !_MSC_VER
 
 #ifdef _MSC_VER
 // Disable some Visual Studio warnings.
@@ -1396,7 +1394,7 @@ inline double CheckInsideObstacle(double x, double y, bool measureDist)
 	if ((x < Xmin)||(x > Xmax)||(y < Ymin)||(y > Ymax))
 	{
 		// Approximation...
-		result = max(-1, result);
+		result = max(-1.0, result);
 	}
 	else
 	{
@@ -1409,7 +1407,7 @@ inline double CheckInsideObstacle(double x, double y, bool measureDist)
 				(x < (vertx[j]-vertx[i]) * (y-verty[i]) / (verty[j]-verty[i]) + vertx[i]))
 				c = !c;
 		}
-		if (c) result = max(1, result); else result = max(-1, result);
+		if (c) result = max(1.0, result); else result = max(-1.0, result);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
 
@@ -1891,14 +1889,12 @@ inline int ReleaseGlobals(void)
 	return EXIT_SUCCESS;
 }
 
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
-#endif // !_MSC_VER
 
 #endif // !GLOBALS_H

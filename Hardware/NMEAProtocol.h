@@ -18,15 +18,13 @@
 #endif // defined(__cplusplus) && !defined(DISABLE_AIS_SUPPORT)
 
 // Need to be undefined at the end of the file...
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifndef max
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 #endif // !max
 #ifndef min
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif // !min
-#endif // !_MSC_VER
 
 #pragma region NMEA-SPECIFIC DEFINITIONS
 // A NMEA sentence begins with a '$' and ends with a carriage return/line feed sequence and can 
@@ -1162,14 +1160,12 @@ inline int ProcessSentenceNMEA(char* sentence, int sentencelen, char* talkerid, 
 	return EXIT_SUCCESS;
 }
 
-// min and max might cause incompatibilities with GCC...
-#ifndef _MSC_VER
+// min and max might cause incompatibilities...
 #ifdef max
 #undef max
 #endif // max
 #ifdef min
 #undef min
 #endif // min
-#endif // !_MSC_VER
 
 #endif // !NMEAPROTOCOL_H
