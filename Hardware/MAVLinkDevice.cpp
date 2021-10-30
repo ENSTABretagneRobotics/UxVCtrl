@@ -354,7 +354,7 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 						case BUGGY_SIMULATOR_ROBID:
 						case BUGGY_ROBID:
 							if ((mavlinkdata.rc_channels.chan3_raw)&&(mavlinkdata.rc_channels.chan3_raw != 65535)) u = (mavlinkdata.rc_channels.chan3_raw-1500.0)/500.0;
-							if ((mavlinkdata.rc_channels.chan1_raw)&&(mavlinkdata.rc_channels.chan1_raw != 65535)) uw = (mavlinkdata.rc_channels.chan1_raw-1500.0)/500.0;
+							if ((mavlinkdata.rc_channels.chan1_raw)&&(mavlinkdata.rc_channels.chan1_raw != 65535)) uw = -(mavlinkdata.rc_channels.chan1_raw-1500.0)/500.0;
 							break;
 						case BLUEROV_ROBID:
 							if ((mavlinkdata.rc_channels.chan1_raw)&&(mavlinkdata.rc_channels.chan1_raw != 65535)) up = (mavlinkdata.rc_channels.chan1_raw-1500.0)/500.0;
@@ -993,7 +993,11 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 #pragma endregion								
 					uSleep(1000*threadperiod/2);
 				}
-			
+
+				// Temp...
+				if ((mavlinkdata.servo_output_raw.servo3_raw)&&(mavlinkdata.servo_output_raw.servo3_raw != 65535)) u_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo3_raw-1500.0)/500.0;
+				if ((mavlinkdata.servo_output_raw.servo1_raw)&&(mavlinkdata.servo_output_raw.servo1_raw != 65535)) uw_servo_out_MAVLinkDevice[deviceid] = -(mavlinkdata.servo_output_raw.servo1_raw-1500.0)/500.0;
+
 				if (mavlinkdevice.bSaveRawData)
 				{
 					fprintf(mavlinkdevice.pfSaveFile, 

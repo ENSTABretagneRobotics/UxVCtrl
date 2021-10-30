@@ -1,3 +1,6 @@
+389
+Updated VectorNavInterface.
+
 388
 Improved compatibility with ROS for Windows.
 

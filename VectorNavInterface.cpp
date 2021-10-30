@@ -146,12 +146,6 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.uncompAngRate[0] = (float)Center(omegaxhat);
     pkt.uncompAngRate[1] = (float)-Center(omegayhat);
     pkt.uncompAngRate[2] = (float)-Center(omegazhat);
-
-	pkt.pressure = (float)(AirPressure*100+sensor_err(0,1)); // (float)(Height2Pressure(althat, AirPressure, 1.292)*100); // ArduPilot needs varying values to avoid Bad Baro Health message...?
-
-    pkt.mag[0] = 0;
-    pkt.mag[1] = 0;
-    pkt.mag[2] = 0;
 	
 	pkt.accel[0] = (float)Center(accrxhat);
     pkt.accel[1] = (float)-Center(accryhat);
@@ -174,23 +168,33 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.quaternion[2] = (float)qz;
     pkt.quaternion[3] = (float)qw;
 
+	// In Gauss?
+    pkt.mag[0] = 0.5f*(cos(pkt.ypr[0])*cos(pkt.ypr[2])-sin(pkt.ypr[0])*cos(pkt.ypr[1])*sin(pkt.ypr[2]));
+    pkt.mag[1] = 0.5f*(sin(pkt.ypr[0])*cos(pkt.ypr[2])+cos(pkt.ypr[0])*cos(pkt.ypr[1])*sin(pkt.ypr[2]));
+    pkt.mag[2] = 0.5f*(sin(pkt.ypr[1])*sin(pkt.ypr[2]));
+    //pkt.mag[0] = 0;
+    //pkt.mag[1] = 0;
+    //pkt.mag[2] = 0;
+
     pkt.linAccBody[0] = (float)Center(accrxhat);
     pkt.linAccBody[1] = (float)-Center(accryhat);
     pkt.linAccBody[2] = (float)-Center(accrzhat);
 
-	pkt.yprU[3] = 0; //attitude uncertainty
+	pkt.yprU[0] = pkt.yprU[1] = pkt.yprU[2] = 0; //attitude uncertainty
 
 	pkt.INSStatus = 0;
 	
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 	_sog = sog*1.94;
-	_cog = fmod_360_pos(-angle_env-Center(cog_gps)+M_PI/2.0);
+	_cog = fmod_360_pos_rad2deg(-angle_env-Center(cog_gps)+M_PI/2.0);
+
+	pkt.pressure = (float)(Height2Pressure(althat, AirPressure, 1.292)*100); // (float)(AirPressure*100+sensor_err(0,1)); // ArduPilot needs varying values to avoid Bad Baro Health message...?
 
     pkt.positionLLA[0] = lathat;
     pkt.positionLLA[1] = longhat;
     pkt.positionLLA[2] = althat;
-    pkt.velNED[0] = (float)(_sog*sin(_cog));
-    pkt.velNED[1] = (float)(_sog*cos(_cog));
+    pkt.velNED[0] = (float)(_sog*cos(_cog*M_PI/180.0));
+    pkt.velNED[1] = (float)(_sog*sin(_cog*M_PI/180.0));
     pkt.velNED[2] = 0.0f;
     pkt.posU = 0.5f;
     pkt.velU = 0.25f;
@@ -213,6 +217,8 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     uint16_t crc2 = 0;
     swab((char*)&crc, (char*)&crc2, 2);
 
+	//printf("pkt.ypr[0] = %f, pkt.ypr[1] = %f, pkt.ypr[2] = %f\n", (double)pkt.ypr[0], (double)pkt.ypr[1], (double)pkt.ypr[2]);
+
 	if (WriteAllRS232Port(pVectorNavInterfacePseudoRS232Port, (uint8*)&crc2, sizeof(crc2)) != EXIT_SUCCESS)
 	{
 		return EXIT_FAILURE;
@@ -223,7 +229,7 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 
 int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 {
-	double lathat = 0, longhat = 0, althat = 0, _sog = 0, _cog = 0;
+	double lathat = 0, longhat = 0, althat = 0, _sog = 0, _cog = 0, _hdop = 0;
     struct VN_packet2 pkt;
 
     struct timeval tv;
@@ -241,47 +247,47 @@ int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 		case GNSS_ACC_LEVEL_GNSS_FIX_LOW:
 			pkt.GPS2Fix = pkt.GPS1Fix = 2;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = (uint8_t)GPS_low_acc_nbsat;
-			//GPS_low_acc_HDOP;
+			_hdop = GPS_low_acc_HDOP;
 			break;
 		case GNSS_ACC_LEVEL_GNSS_FIX_MED:
 			pkt.GPS2Fix = pkt.GPS1Fix = 3;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = (uint8_t)GPS_med_acc_nbsat;
-			//GPS_med_acc_HDOP;
+			_hdop = GPS_med_acc_HDOP;
 			break;
 		case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
 			pkt.GPS2Fix = pkt.GPS1Fix = 3;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = (uint8_t)GPS_high_acc_nbsat;
-			//GPS_high_acc_HDOP;
+			_hdop = GPS_high_acc_HDOP;
 			break;
 		case GNSS_ACC_LEVEL_RTK_UNREL:
 			pkt.GPS2Fix = pkt.GPS1Fix = 3;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = (uint8_t)GPS_low_acc_nbsat;
-			//GPS_low_acc_HDOP;
+			_hdop = GPS_low_acc_HDOP;
 			break;
 		case GNSS_ACC_LEVEL_RTK_FLOAT:
 			pkt.GPS2Fix = pkt.GPS1Fix = 5;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = (uint8_t)GPS_med_acc_nbsat;
-			//GPS_med_acc_HDOP;
+			_hdop = GPS_med_acc_HDOP;
 			break;
 		case GNSS_ACC_LEVEL_RTK_FIXED:
 			pkt.GPS2Fix = pkt.GPS1Fix = 6;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = (uint8_t)GPS_med_acc_nbsat;
-			//GPS_med_acc_HDOP;
+			_hdop = GPS_med_acc_HDOP;
 			break;
 		default:
 			pkt.GPS2Fix = pkt.GPS1Fix = 0;
 			pkt.numGPS2Sats = pkt.numGPS1Sats = 0;
-			//hdop = 0;
+			_hdop = 0;
 			break;
 		}
 		_sog = sog*1.94;
-		_cog = fmod_360_pos(-angle_env-Center(cog_gps)+M_PI/2.0);
+		_cog = fmod_360_pos_rad2deg(-angle_env-Center(cog_gps)+M_PI/2.0);
 	}
 	else
 	{
 		pkt.GPS2Fix = pkt.GPS1Fix = 1;
 		pkt.numGPS2Sats = pkt.numGPS1Sats = 0;
-		//hdop = 0;
+		_hdop = 0;
 		_sog = 0;
 		_cog = 0;
 	}
@@ -291,15 +297,18 @@ int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.GPS1posLLA[0] = lathat;
     pkt.GPS1posLLA[1] = longhat;
     pkt.GPS1posLLA[2] = althat;
-    pkt.GPS1velNED[0] = (float)(_sog*sin(_cog));
-    pkt.GPS1velNED[1] = (float)(_sog*cos(_cog));
+    pkt.GPS1velNED[0] = (float)(_sog*cos(_cog*M_PI/180.0));
+    pkt.GPS1velNED[1] = (float)(_sog*sin(_cog*M_PI/180.0));
     pkt.GPS1velNED[2] = 0.0f;
-    // pkt.GPS1DOP =
-    // pkt.GPS2DOP =
+	pkt.GPS1DOP[0] = pkt.GPS1DOP[1] = pkt.GPS1DOP[2] = pkt.GPS1DOP[3] = pkt.GPS1DOP[4] = pkt.GPS1DOP[5] = pkt.GPS1DOP[6] = (float)_hdop;
+	pkt.GPS2DOP[0] = pkt.GPS2DOP[1] = pkt.GPS2DOP[2] = pkt.GPS2DOP[3] = pkt.GPS2DOP[4] = pkt.GPS2DOP[5] = pkt.GPS2DOP[6] = (float)_hdop;
 
 	LeaveCriticalSection(&StateVariablesCS);
 
     const uint8_t header[] = VN_PKT2_HEADER;
+
+	//printf("pkt.GPS1Fix = %d, pkt.numGPS1Sats = %d, pkt.GPS1DOP[4] = %f, lathat = %f, longhat = %f, althat = %f\n", 
+	//	(int)pkt.GPS1Fix, (int)pkt.numGPS1Sats, (double)pkt.GPS1DOP[4], lathat, longhat, althat);
 
 	if (WriteAllRS232Port(pVectorNavInterfacePseudoRS232Port, (uint8*)&header, sizeof(header)) != EXIT_SUCCESS)
 	{

@@ -915,6 +915,8 @@ extern double land_yawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern double land_latitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern double land_longitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern double land_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double u_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+extern double uw_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 extern BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
@@ -1465,6 +1467,8 @@ inline int InitGlobals(void)
 		land_latitudeMAVLinkDevice[i] = 0;
 		land_longitudeMAVLinkDevice[i] = 0;
 		land_altitudeMAVLinkDevice[i] = 0;
+		u_servo_out_MAVLinkDevice[i] = 0;
+		uw_servo_out_MAVLinkDevice[i] = 0;
 		GNSSqualityMAVLinkDevice[i] = 0;
 		bPauseMAVLinkDevice[i] = FALSE;
 		bRestartMAVLinkDevice[i] = FALSE;

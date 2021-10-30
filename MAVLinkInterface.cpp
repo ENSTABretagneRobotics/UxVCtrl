@@ -857,12 +857,12 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 								if (bForceOverrideInputs)
 								{
 									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) u_ovrid = (rc_channels_override.chan3_raw-1500.0)/500.0;
-									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw_ovrid = (rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw_ovrid = -(rc_channels_override.chan1_raw-1500.0)/500.0;
 								}
 								else
 								{
 									if ((rc_channels_override.chan3_raw)&&(rc_channels_override.chan3_raw != 65535)) u = (rc_channels_override.chan3_raw-1500.0)/500.0;
-									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw = (rc_channels_override.chan1_raw-1500.0)/500.0;
+									if ((rc_channels_override.chan1_raw)&&(rc_channels_override.chan1_raw != 65535)) uw = -(rc_channels_override.chan1_raw-1500.0)/500.0;
 								}
 								break;
 							case BLUEROV_ROBID:

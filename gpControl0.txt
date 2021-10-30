@@ -10,6 +10,8 @@ udp://10.5.5.9:8554
 1
 % streamingstarthttpreq
 http://10.5.5.9/gp/gpControl/execute?p1=gpStream&a1=proto_v2&c1=restart
+% For Hero 8 Black
+%http://10.5.5.9/gp/gpControl/execute?p1=gpStream&c1=restart
 % streamingbitratehttpreq
 http://10.5.5.9/gp/gpControl/setting/62/2000000
 % streamingresolutionhttpreq

@@ -683,6 +683,8 @@ double land_yawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double land_latitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double land_longitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double land_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double uw_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
