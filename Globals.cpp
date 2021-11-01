@@ -49,6 +49,7 @@ omegax_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), omegay_ahrs(-MAX_UNCERTAINTY, MA
 accrx_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accry_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), accrz_ahrs(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval psi_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrx_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_dvl(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval vrx_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vry_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vrz_of(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
+interval vx_ned(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vy_ned(-MAX_UNCERTAINTY, MAX_UNCERTAINTY), vz_ned(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 interval z_pressure(-MAX_UNCERTAINTY, MAX_UNCERTAINTY);
 // Objects to track, distance control...
 double dist = 0;
@@ -683,8 +684,14 @@ double land_yawMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double land_latitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double land_longitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 double land_altitudeMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
-double u_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
-double uw_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u1_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u2_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u3_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u4_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u5_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u6_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u7_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
+double u8_servo_out_MAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 int GNSSqualityMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bPauseMAVLinkDevice[MAX_NB_MAVLINKDEVICE];
 BOOL bRestartMAVLinkDevice[MAX_NB_MAVLINKDEVICE];

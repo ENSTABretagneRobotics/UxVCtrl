@@ -78,8 +78,6 @@ uint16_t crc16_ccitt(const uint8_t *buf, uint32_t len, uint16_t crc)
     }
     return crc;
 }
-//uint32_t last_pkt1_us;
-//uint32_t last_pkt2_us;
 
 uint64_t start_us;
 
@@ -123,6 +121,7 @@ struct VN_packet2 {
 
 int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 {
+	double y = 0, p = 0, r = 0;
 	double qw = 0, qx = 0, qy = 0, qz = 0;
 	double lathat = 0, longhat = 0, althat = 0, _sog = 0, _cog = 0;
     struct VN_packet1 pkt;
@@ -157,24 +156,27 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.sensSat = 0;
     pkt.AHRSStatus = 0;
 
-    pkt.ypr[0] = (float)fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0);
-    pkt.ypr[1] = (float)fmod_360_rad2deg(-Center(thetahat));
-    pkt.ypr[2] = (float)fmod_360_rad2deg(Center(phihat));
+	y = fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
+	p = fmod_2PI(-Center(thetahat));
+	r = fmod_2PI(Center(phihat));
+	euler2quaternion(r, p, y, &qw, &qx, &qy, &qz);
 
-	euler2quaternion((double)pkt.ypr[2]*M_PI/180.0, (double)pkt.ypr[1]*M_PI/180.0, (double)pkt.ypr[0]*M_PI/180.0, &qw, &qx, &qy, &qz);
+	pkt.ypr[0] = (float)fmod_360_pos_rad2deg(y);
+	pkt.ypr[1] = (float)fmod_360_rad2deg(p);
+	pkt.ypr[2] = (float)fmod_360_rad2deg(r);
 
-    pkt.quaternion[0] = (float)qx;
-    pkt.quaternion[1] = (float)qy;
-    pkt.quaternion[2] = (float)qz;
-    pkt.quaternion[3] = (float)qw;
+	pkt.quaternion[0] = (float)qx;
+	pkt.quaternion[1] = (float)qy;
+	pkt.quaternion[2] = (float)qz;
+	pkt.quaternion[3] = (float)qw;
 
 	// In Gauss?
-    pkt.mag[0] = 0.5f*(cos(pkt.ypr[0])*cos(pkt.ypr[2])-sin(pkt.ypr[0])*cos(pkt.ypr[1])*sin(pkt.ypr[2]));
-    pkt.mag[1] = 0.5f*(sin(pkt.ypr[0])*cos(pkt.ypr[2])+cos(pkt.ypr[0])*cos(pkt.ypr[1])*sin(pkt.ypr[2]));
-    pkt.mag[2] = 0.5f*(sin(pkt.ypr[1])*sin(pkt.ypr[2]));
-    //pkt.mag[0] = 0;
-    //pkt.mag[1] = 0;
-    //pkt.mag[2] = 0;
+	pkt.mag[0] = (float)(0.3*(cos(p)*cos(y)));
+	pkt.mag[1] = (float)(0.3*(sin(r)*sin(p)*cos(y)-cos(r)*sin(y)));
+	pkt.mag[2] = (float)(0.3*(cos(r)*sin(p)*cos(y)+sin(r)*sin(y)));
+	//pkt.mag[0] = 0;
+	//pkt.mag[1] = 0;
+	//pkt.mag[2] = 0;
 
     pkt.linAccBody[0] = (float)Center(accrxhat);
     pkt.linAccBody[1] = (float)-Center(accryhat);
@@ -195,7 +197,8 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.positionLLA[2] = althat;
     pkt.velNED[0] = (float)(_sog*cos(_cog*M_PI/180.0));
     pkt.velNED[1] = (float)(_sog*sin(_cog*M_PI/180.0));
-    pkt.velNED[2] = 0.0f;
+    //pkt.velNED[2] = (float)(-Center(vrxhat)*sin(p)+Center(-vryhat)*sin(r)*cos(p)+Center(-vrzhat)*cos(r)*cos(p));
+    pkt.velNED[2] = (float)Center(vz_ned);
     pkt.posU = 0.5f;
     pkt.velU = 0.25f;
 
@@ -229,6 +232,7 @@ int VectorNav_send_packet1(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 
 int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 {
+	double y = 0, p = 0, r = 0;
 	double lathat = 0, longhat = 0, althat = 0, _sog = 0, _cog = 0, _hdop = 0;
     struct VN_packet2 pkt;
 
@@ -238,7 +242,11 @@ int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
 	memset(&pkt, 0, sizeof(struct VN_packet2));
 
 	EnterCriticalSection(&StateVariablesCS);
-	
+
+	y = fmod_2PI(-angle_env-Center(psihat)+M_PI/2.0);
+	p = fmod_2PI(-Center(thetahat));
+	r = fmod_2PI(Center(phihat));
+
 	EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, Center(xhat), Center(yhat), Center(zhat), &lathat, &longhat, &althat);
 	if (bCheckGNSSOK())
 	{
@@ -299,7 +307,8 @@ int VectorNav_send_packet2(RS232PORT* pVectorNavInterfacePseudoRS232Port)
     pkt.GPS1posLLA[2] = althat;
     pkt.GPS1velNED[0] = (float)(_sog*cos(_cog*M_PI/180.0));
     pkt.GPS1velNED[1] = (float)(_sog*sin(_cog*M_PI/180.0));
-    pkt.GPS1velNED[2] = 0.0f;
+    //pkt.GPS1velNED[2] = (float)(-Center(vrxhat)*sin(p)+Center(-vryhat)*sin(r)*cos(p)+Center(-vrzhat)*cos(r)*cos(p));
+    pkt.GPS1velNED[2] = (float)Center(vz_ned);
 	pkt.GPS1DOP[0] = pkt.GPS1DOP[1] = pkt.GPS1DOP[2] = pkt.GPS1DOP[3] = pkt.GPS1DOP[4] = pkt.GPS1DOP[5] = pkt.GPS1DOP[6] = (float)_hdop;
 	pkt.GPS2DOP[0] = pkt.GPS2DOP[1] = pkt.GPS2DOP[2] = pkt.GPS2DOP[3] = pkt.GPS2DOP[4] = pkt.GPS2DOP[5] = pkt.GPS2DOP[6] = (float)_hdop;
 

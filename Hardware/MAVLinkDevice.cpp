@@ -195,6 +195,19 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 
 				EnterCriticalSection(&StateVariablesCS);
 
+				// Temp...
+				if (mavlinkdata.servo_output_raw.port == 0)
+				{
+					if ((mavlinkdata.servo_output_raw.servo1_raw)&&(mavlinkdata.servo_output_raw.servo1_raw != 65535)) u1_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo1_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo2_raw)&&(mavlinkdata.servo_output_raw.servo2_raw != 65535)) u2_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo2_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo3_raw)&&(mavlinkdata.servo_output_raw.servo3_raw != 65535)) u3_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo3_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo4_raw)&&(mavlinkdata.servo_output_raw.servo4_raw != 65535)) u4_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo4_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo5_raw)&&(mavlinkdata.servo_output_raw.servo5_raw != 65535)) u5_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo5_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo6_raw)&&(mavlinkdata.servo_output_raw.servo6_raw != 65535)) u6_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo6_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo7_raw)&&(mavlinkdata.servo_output_raw.servo7_raw != 65535)) u7_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo7_raw-1500.0)/500.0;
+					if ((mavlinkdata.servo_output_raw.servo8_raw)&&(mavlinkdata.servo_output_raw.servo8_raw != 65535)) u8_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo8_raw-1500.0)/500.0;
+				}
+
 				if (mavlinkdevice.bExternal)
 				{
 					if (((target_followme == MAVLINKDEVICE0_TARGET)&&(deviceid == 0))||
@@ -993,10 +1006,6 @@ THREAD_PROC_RETURN_VALUE MAVLinkDeviceThread(void* pParam)
 #pragma endregion								
 					uSleep(1000*threadperiod/2);
 				}
-
-				// Temp...
-				if ((mavlinkdata.servo_output_raw.servo3_raw)&&(mavlinkdata.servo_output_raw.servo3_raw != 65535)) u_servo_out_MAVLinkDevice[deviceid] = (mavlinkdata.servo_output_raw.servo3_raw-1500.0)/500.0;
-				if ((mavlinkdata.servo_output_raw.servo1_raw)&&(mavlinkdata.servo_output_raw.servo1_raw != 65535)) uw_servo_out_MAVLinkDevice[deviceid] = -(mavlinkdata.servo_output_raw.servo1_raw-1500.0)/500.0;
 
 				if (mavlinkdevice.bSaveRawData)
 				{

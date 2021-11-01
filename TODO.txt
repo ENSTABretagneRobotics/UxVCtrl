@@ -114,11 +114,11 @@ Pouvoir envoyer des trames à une sbg (e.g. gps time), voire n'importe quel périp
 Initialisation de t, très grand dt initial vs dt de 0...?
 
 
-Compter le nb de params pour supposer que le format d'un fichier de params n'a pas changé?
+Compter le nb de params pour supposer que le format d'un fichier de params n'a pas changé?->essayer de parse dans l'ordre, si le prochain param n'est pas celui attendu (% param_name), continuer la recherche et reboucler si on le trouve pas, afficher warning et prendre la valeur qui suit si jamais ce n'est pas un param connu (% param_name n'est pas reconnu), sinon garder valeur hardcoded?
 Parse files "param=" or " \t  \t  param \t  \t  =" a bit like commands, to be more compatible between different versions of the program, prepare unused code for that?
 Attention aux params un peu spéciaux dans env.txt, Video0.txt...
 New config parsing : essayer de pouvoir remplacer le code existant automatiquement...
-En profiter pour changer la logique bDisable/bEnableDevice...
+En profiter pour changer la logique bDisable/bEnableDevice...?
 
 
 Invalid configuration file.\\n\"\);\s?\r?\n\s\sif \(sscanf\(line, (?<paramformat>.*), &(?<paramname>.*)\) != 1\) printf\(\"Invalid configuration file
