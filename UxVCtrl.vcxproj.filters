@@ -822,5 +822,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Makefile" />
+    <None Include=".github\workflows\github-actions.yml" />
   </ItemGroup>
 </Project>

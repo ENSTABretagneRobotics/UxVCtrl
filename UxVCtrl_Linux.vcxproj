@@ -292,6 +292,7 @@
     <ClInclude Include="Hardware\Video.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".github\workflows\github-actions.yml" />
     <None Include="BlueView0.txt">
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">true</RemoteCopyFile>
       <RemoteCopyFile Condition="'$(Configuration)|$(Platform)'=='Release|x86'">true</RemoteCopyFile>

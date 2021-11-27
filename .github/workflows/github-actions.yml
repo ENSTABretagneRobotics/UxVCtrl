@@ -19,14 +19,8 @@ jobs:
         release_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
+ # Default configurations
  j1:
-    name: Ubuntu
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
-
- j2:
     name: Windows
     runs-on: windows-latest
     steps: 
@@ -34,85 +28,7 @@ jobs:
     - run: cmake . && cmake --build . --config Release --target UxVCtrl && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt
       shell: cmd
 
- j3:
-    name: macOS
-    runs-on: macos-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
-
- j4:
-    name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
-    runs-on: ubuntu-18.04
-    steps: 
-    - uses: actions/checkout@v2
-    - run: sudo apt-get -q update || true
-    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl
-    # Virtual memory exhausted with --parallel...?
-
- j5:
-    name: macOS Catalina 10.15 with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: macos-10.15
-    steps: 
-    - uses: actions/checkout@v2
-    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macOS
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_macOS"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j6:
-    name: Ubuntu 16.04 x86
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: docker run -i -v "${PWD}/..:${PWD}/.." i386/ubuntu:xenial /bin/bash -c "linux32 --32bit i386 uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_Ubuntu32"
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_compat_Ubuntu32"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j7:
-    name: Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
-    - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; apt-get -y install sudo lsb-release wget unzip && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_pi"
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_compat_pi"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j8:
-    name: Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
-    - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; apt-get -y install xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_pi"
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_pi"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j9:
+ j2:
     name: Windows MinGW 8.1.0 x64
     runs-on: windows-2019
     steps: 
@@ -120,111 +36,24 @@ jobs:
 #    - run: choco install -y -r --no-progress make
     - run: cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
       shell: bash
- 
- j10:
-    #name: Ubuntu 12.04 amd64 with default OpenCV 2.3.1 without Kinect v2 support
-    name: Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support
+
+ j3:
+    name: Ubuntu
     runs-on: ubuntu-latest
     steps: 
     - uses: actions/checkout@v2
-    - run: docker run -i -v "${PWD}/..:${PWD}/.." ubuntu:trusty /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_old_Ubuntu64"
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_old_Ubuntu64"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
+    - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
- j11:
-    name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
-    runs-on: ubuntu-20.04
+ j4:
+    name: macOS
+    runs-on: macos-latest
     steps: 
     - uses: actions/checkout@v2
-    - run: sudo apt-get -q update || true
-    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_focal_Ubuntu64
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_focal_Ubuntu64"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
+    - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
- j12:
-    name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: ubuntu-18.04
-    steps: 
-    - uses: actions/checkout@v2
-    - run: sudo apt-get -q update || true
-    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_Ubuntu64
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_compat_Ubuntu64"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j13:
-    name: Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
-    runs-on: ubuntu-18.04
-    steps: 
-    - uses: actions/checkout@v2
-    - run: |
-        sudo apt-get -q update || true
-        sudo apt-get remove -y libgtk2.0-cil ; sudo apt-get autoremove -y # libgtk2.0 cannot be installed due to incompatible packages already installed...?
-        sudo apt-get install -y libopencv-dev libgtk2.0 # libgtk2.0 cannot be installed due to another version already installed...?
-        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-Ubuntu64-static.zip
-        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.2.0-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-Ubuntu64-static.tar.gz
-    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_Ubuntu64"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j14:
-    name: macOS Catalina 10.15 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: macos-10.15
-    steps: 
-    - uses: actions/checkout@v2
-    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macOS
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_compat_macOS"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
-# j15:
-#    name: macOS Catalina 10.15 static with OpenCV 4.2.0 without BlueView, Kinect v2 support
-#    runs-on: macos-10.15
-#    steps: 
-#    - uses: actions/checkout@v2
-#    - run: |
-#        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
-#        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-mac-static.tar.gz && tar xfz OpenCV-4.2.0-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-mac-static.tar.gz
-#    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macOS
-#    - uses: xresloader/upload-to-github-release@v1
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      with:
-#        file: "UxVCtrl_macOS"
-#        overwrite: true
-#        tag_name: autotagname-${{ github.sha }}
-#      if: github.event_name != 'pull_request'
-
- j16:
-    name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
+ # Compatibility configurations
+ j5:
+    name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: windows-2019
     steps: 
     - uses: actions/checkout@v2
@@ -233,9 +62,130 @@ jobs:
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
       shell: pwsh
     - run: |
-        choco install -y -r --no-progress mingw --version=8.1.0 --force --x86
-        choco install -y -r --no-progress make --force --x86
-        rem echo C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin>>%GITHUB_PATH%
+        rem Test alternate CMake version...
+        rem choco uninstall -y cmake.install
+        rem choco install -y -r --no-progress cmake.install --version=3.16.0
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
+        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
+        regedit /s %SystemDrive%\Certificates.reg
+        cmd /c "start %SystemDrive%\LabJack-2019-05-20.exe /S"
+        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+        %SystemDrive%\cmake_extra_tools\sleep 60
+        TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
+        rem For XP support
+        rem wget "https://aka.ms/vs/15/release/vs_buildtools.exe" --no-check-certificate -nv -O vs_buildtools.exe
+        rem vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
+        rem PATH
+        rem wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+        rem 7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+        rem %SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin & cd. & rem Non-zero exit code...?
+      shell: cmd
+    - run: refreshenv.cmd && cmake -G "Visual Studio 16" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_compat.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat.exe"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j6:
+    name: Ubuntu 20.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-20.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_focal
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_ubuntu_focal"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j7:
+    name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-18.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_bionic
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_ubuntu_bionic"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j8:
+    name: Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; apt-get -y install sudo lsb-release wget unzip && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_buster_pi"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_buster_pi"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j9:
+    name: macOS Big Sur static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-11
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macos_bigsur
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_macos_bigsur"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j10:
+    name: macOS Catalina static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-10.15
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macos_catalina
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_macos_catalina"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ # Full configurations
+ j11:
+    name: Windows Visual Studio 2019 x64 static with OpenCV 4.2.0 without BlueView support
+    runs-on: windows-2019
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
         rem For OpenCV
         powershell -Command "Install-WindowsFeature Server-Media-Foundation"
         wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
@@ -250,18 +200,58 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 16" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_x64.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "UxVCtrl_mingw8.exe"
+        file: "UxVCtrl_x64.exe"
         overwrite: true
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j17:
+ j12:
+    name: Windows Visual Studio 2019 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
+    runs-on: windows-2019
+    steps: 
+    - uses: actions/checkout@v2
+    - run: |
+        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+      shell: pwsh
+    - run: |
+        rem For OpenCV
+        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name Tools.Graphics.DirectX*"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name Media.WindowsMediaPlayer*"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name Browser.InternetExplorer*"
+        rem powerShell -Command "Add-WindowsCapability -Online -Name ServerCore.AppCompatibility*"
+        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
+        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
+        rem For LabJack
+        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
+        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
+        regedit /s %SystemDrive%\Certificates.reg
+        cmd /c "start %SystemDrive%\LabJack-2019-05-20.exe /S"
+        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
+        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
+        %SystemDrive%\cmake_extra_tools\sleep 60
+        TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
+        rem choco install -y -r --no-progress vcredist-all
+      shell: cmd
+    - run: refreshenv.cmd && cmake -G "Visual Studio 16" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl.exe
+      shell: cmd
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl.exe"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j13:
     name: Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
     runs-on: windows-2019
     steps: 
@@ -303,9 +293,9 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j18:
-    name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: windows-2016
+ j14:
+    name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
+    runs-on: windows-2019
     steps: 
     - uses: actions/checkout@v2
     - run: |
@@ -313,9 +303,9 @@ jobs:
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
       shell: pwsh
     - run: |
-        rem Test alternate CMake version...
-        choco uninstall -y cmake.install
-        choco install -y -r --no-progress cmake.install --version=3.12.0
+        choco install -y -r --no-progress mingw --version=8.1.0 --force --x86
+        choco install -y -r --no-progress make --force --x86
+        rem echo C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin>>%GITHUB_PATH%
         rem For OpenCV
         powershell -Command "Install-WindowsFeature Server-Media-Foundation"
         wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
@@ -329,68 +319,169 @@ jobs:
         7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
-        rem For XP support
-        rem wget "https://aka.ms/vs/15/release/vs_buildtools.exe" --no-check-certificate -nv -O vs_buildtools.exe
-        rem vs_buildtools.exe modify --installPath "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise" --passive --norestart --wait --includeRecommended --add Microsoft.VisualStudio.ComponentGroup.NativeDesktop.WinXP --add Microsoft.VisualStudio.Component.WinXP
-        rem PATH
-        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
-        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
-        %SystemDrive%\cmake_extra_tools\pathman /as C:\Progra~2\CMake\bin & cd. & rem Non-zero exit code...?
       shell: cmd
-    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -T v141_xp -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_compat.exe
+    - run: set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw8_x86.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "UxVCtrl_compat.exe"
+        file: "UxVCtrl_mingw8_x86.exe"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j15:
+    name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
+    runs-on: ubuntu-20.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_focal
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_ubuntu_focal"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+ 
+ j16:
+    name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
+    runs-on: ubuntu-18.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_bionic
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_ubuntu_bionic"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j17:
+    name: Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; apt-get -y install xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_buster_pi"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_buster_pi"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j18:
+    name: macOS Big Sur with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-11
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macos_bigsur
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_macos_bigsur"
         overwrite: true
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
  j19:
-    name: Windows Visual Studio 2017 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
-    runs-on: windows-2016
+    name: macOS Catalina with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-10.15
     steps: 
     - uses: actions/checkout@v2
-    - run: |
-        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
-        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
-      shell: pwsh
-    - run: |
-        rem For OpenCV
-        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-        rem powerShell -Command "Add-WindowsCapability -Online -Name Tools.Graphics.DirectX*"
-        rem powerShell -Command "Add-WindowsCapability -Online -Name Media.WindowsMediaPlayer*"
-        rem powerShell -Command "Add-WindowsCapability -Online -Name Browser.InternetExplorer*"
-        rem powerShell -Command "Add-WindowsCapability -Online -Name ServerCore.AppCompatibility*"
-        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
-        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
-        rem For LabJack
-        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
-        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
-        regedit /s %SystemDrive%\Certificates.reg
-        cmd /c "start %SystemDrive%\LabJack-2019-05-20.exe /S"
-        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
-        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
-        %SystemDrive%\cmake_extra_tools\sleep 60
-        TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
-        rem choco install -y -r --no-progress vcredist-all
-      shell: cmd
-    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl.exe
-      shell: cmd
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macos_catalina
     - uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        file: "UxVCtrl.exe"
+        file: "UxVCtrl_macos_catalina"
         overwrite: true
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
+ # Alternate configurations
  j20:
+    name: Ubuntu 16.04 xenial i386
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." i386/ubuntu:xenial /bin/bash -c "linux32 --32bit i386 uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_xenial_i386"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_ubuntu_xenial_i386"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j21:
+    name: Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support
+    runs-on: ubuntu-latest
+    steps: 
+    - uses: actions/checkout@v2
+    - run: docker run -i -v "${PWD}/..:${PWD}/.." ubuntu:trusty /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_trusty_amd64"
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_ubuntu_trusty_amd64"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+# j22:
+#    name: Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
+#    runs-on: ubuntu-18.04
+#    steps: 
+#    - uses: actions/checkout@v2
+#    - run: |
+#        sudo apt-get -q update || true
+#        sudo apt-get remove -y libgtk2.0-cil ; sudo apt-get autoremove -y # libgtk2.0 cannot be installed due to incompatible packages already installed...?
+#        sudo apt-get install -y libopencv-dev libgtk2.0 # libgtk2.0 cannot be installed due to another version already installed...?
+#        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-Ubuntu64-static.zip && unzip -q -o libmodbus-3.0.6-Ubuntu64-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-Ubuntu64-static.zip
+#        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-Ubuntu64-static.tar.gz && tar xfz OpenCV-4.2.0-Ubuntu64-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-Ubuntu64-static.tar.gz
+#    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_Ubuntu64
+#    - uses: xresloader/upload-to-github-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        file: "UxVCtrl_Ubuntu64"
+#        overwrite: true
+#        tag_name: autotagname-${{ github.sha }}
+#      if: github.event_name != 'pull_request'
+
+# j23:
+#    name: macOS Catalina static with OpenCV 4.2.0 without BlueView, Kinect v2 support
+#    runs-on: macos-10.15
+#    steps: 
+#    - uses: actions/checkout@v2
+#    - run: |
+#        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
+#        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-mac-static.tar.gz && tar xfz OpenCV-4.2.0-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-mac-static.tar.gz
+#    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macOS
+#    - uses: xresloader/upload-to-github-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        file: "UxVCtrl_macOS"
+#        overwrite: true
+#        tag_name: autotagname-${{ github.sha }}
+#      if: github.event_name != 'pull_request'
+
+ j24:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
-    runs-on: windows-2016
+    runs-on: windows-2019
     steps: 
     - uses: actions/checkout@v2
     - run: |
@@ -412,7 +503,7 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=OFF -D USE_FFMPEG_VIDEO=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_cv320_ffmpeg.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 16" -A Win32 -T v141 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=ON -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=OFF -D USE_FFMPEG_VIDEO=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_cv320_ffmpeg.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -423,9 +514,9 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j21:
-    name: Windows Visual Studio 2017 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
-    runs-on: windows-2016
+ j25:
+    name: Windows Visual Studio 2019 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
+    runs-on: windows-2019
     steps: 
     - uses: actions/checkout@v2
     - run: |
@@ -447,131 +538,13 @@ jobs:
         %SystemDrive%\cmake_extra_tools\sleep 60
         TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
       shell: cmd
-    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv2413.exe
+    - run: refreshenv.cmd && cmake -G "Visual Studio 16" -A Win32 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt & copy Release\UxVCtrl.exe UxVCtrl_cv2413.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         file: "UxVCtrl_cv2413.exe"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j22:
-    name: Windows Visual Studio 2017 x64 static with OpenCV 4.2.0 without BlueView support
-    runs-on: windows-2016
-    steps: 
-    - uses: actions/checkout@v2
-    - run: |
-        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
-        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
-      shell: pwsh
-    - run: |
-        rem For OpenCV
-        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
-        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
-        rem For LabJack
-        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
-        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
-        regedit /s %SystemDrive%\Certificates.reg
-        cmd /c "start %SystemDrive%\LabJack-2019-05-20.exe /S"
-        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
-        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
-        %SystemDrive%\cmake_extra_tools\sleep 60
-        TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
-      shell: cmd
-    - run: refreshenv.cmd && cmake -G "Visual Studio 15" -A x64 -D ENABLE_STATIC=ON -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . --config Release --target UxVCtrl && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt && copy Release\UxVCtrl.exe UxVCtrl_x64.exe
-      shell: cmd
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_x64.exe"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j23:
-    name: Windows Qt 2010.05 MinGW 4.4.0 x86 with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK, Kinect v2 support
-    runs-on: windows-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: |
-        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
-        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
-      shell: pwsh
-    - run: |
-        rem Take 8 min...
-        rem choco uninstall -y mingw strawberryperl
-        wget http://www.ensta-bretagne.fr/lebars/Share/qt-sdk-win-opensource-2010.05.exe --no-check-certificate -nv
-        move /Y qt-sdk-win-opensource-2010.05.exe %SystemDrive%\
-        rem Take 5 min...
-        %SystemDrive%\qt-sdk-win-opensource-2010.05.exe /S
-        del /f /q %SystemDrive%\qt-sdk-win-opensource-2010.05.exe
-        rem echo C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin>>%GITHUB_PATH%
-        rem For OpenCV
-        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
-        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
-        rem For LabJack
-        wget http://www.ensta-bretagne.fr/lebars/Share/LabJack-2019-05-20.zip --no-check-certificate -nv
-        7z x LabJack-2019-05-20.zip -o"%SystemDrive%" -y
-        regedit /s %SystemDrive%\Certificates.reg
-        cmd /c "start %SystemDrive%\LabJack-2019-05-20.exe /S"
-        wget http://www.ensta-bretagne.fr/lebars/Share/cmake_extra_tools.zip --no-check-certificate -nv
-        7z x cmake_extra_tools.zip -o"%SystemDrive%" -y
-        %SystemDrive%\cmake_extra_tools\sleep 60
-        TASKKILL /F /IM LVRunTimeEng.exe /T & cd. & rem Non-zero exit code...
-      shell: cmd
-    - run: refreshenv.cmd && set PATH=C:\Qt\2010.05\qt\bin;C:\Qt\2010.05\bin;C:\Qt\2010.05\mingw\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=ON -D OPENCV320=OFF -D OPENCV420=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw.exe
-      shell: cmd
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_mingw.exe"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
-
- j24:
-    name: Windows Qt 5.12.6 MinGW 7.3.0 x86
-    runs-on: windows-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: |
-        (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
-        7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
-      shell: pwsh
-    - run: |
-        rem Take 8 min...
-        rem choco uninstall -y mingw strawberryperl
-        wget http://download.qt.io/archive/qt/5.12/5.12.6/qt-opensource-windows-x86-5.12.6.exe --no-check-certificate -nv
-        move /Y qt-opensource-windows-x86-5.12.6.exe %SystemDrive%\
-        wget http://www.ensta-bretagne.fr/lebars/Share/qt-installer-5.12.6-mingw73_32.qs --no-check-certificate -nv
-        move /Y qt-installer-5.12.6-mingw73_32.qs %SystemDrive%\
-        netsh advfirewall set allprofiles state on
-        netsh advfirewall firewall add rule name="Qt offline installer" dir=out action=block program="%SystemDrive%\qt-opensource-windows-x86-5.12.6.exe" enable=yes
-        rem Take several min...
-        %SystemDrive%\qt-opensource-windows-x86-5.12.6.exe --script %SystemDrive%\qt-installer-5.12.6-mingw73_32.qs
-        netsh advfirewall firewall del rule name="Qt offline installer"
-        netsh advfirewall set allprofiles state off
-        del /f /q %SystemDrive%\qt-opensource-windows-x86-5.12.6.exe
-        rem echo C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin>>%GITHUB_PATH%
-        rem For OpenCV
-        powershell -Command "Install-WindowsFeature Server-Media-Foundation"
-        wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
-        7z x windows_server_core_prereq.zip -o"%SystemRoot%" -y & cd. & rem ksuser.dll already on windows-2016...?
-      shell: cmd
-    - run: refreshenv.cmd && set PATH=C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin;%PATH% && cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & copy UxVCtrl.exe UxVCtrl_mingw7.exe
-      shell: cmd
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_mingw7.exe"
         overwrite: true
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'

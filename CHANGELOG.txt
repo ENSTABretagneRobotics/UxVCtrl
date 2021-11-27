@@ -1,3 +1,6 @@
+391
+Updated CMakeLists.txt and Video.
+
 390
 Updated VectorNavInterface and MAVLinkDevice.
 

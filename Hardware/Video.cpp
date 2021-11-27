@@ -25,7 +25,7 @@ THREAD_PROC_RETURN_VALUE VideoThread(void* pParam)
 
 	sprintf(szCfgFilePath, "Video%d.txt", videoid);
 	
-	memset(&video, 0, sizeof(VIDEO));
+	//memset(&video, 0, sizeof(VIDEO)); // Some OpenCV fields might have class type...
 
 	StartChrono(&chrono_period);
 

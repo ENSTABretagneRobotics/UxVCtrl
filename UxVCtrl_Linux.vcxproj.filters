@@ -869,5 +869,6 @@
     <None Include="ArduinoPressureSensor0.txt">
       <Filter>Input Files</Filter>
     </None>
+    <None Include=".github\workflows\github-actions.yml" />
   </ItemGroup>
 </Project>
