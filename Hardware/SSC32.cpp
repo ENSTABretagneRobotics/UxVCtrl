@@ -122,7 +122,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 			case SAILBOAT2_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				rudder = -uw_f*max(fabs(ssc32.MinAngle), fabs(ssc32.MaxAngle));
 				thrust = u_f;
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderThrusterSSC32(&ssc32, rudder, thrust) != EXIT_SUCCESS)
@@ -147,7 +147,7 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				rudder = -uw_f*max(fabs(ssc32.MinAngle), fabs(ssc32.MaxAngle));
 				LeaveCriticalSection(&StateVariablesCS);
 				if (SetRudderSSC32(&ssc32, rudder) != EXIT_SUCCESS)
 				{
@@ -158,10 +158,11 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 				}
 				break;
 			case MOTORBOAT_ROBID:
-#ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				rudder = -uw_f*max(fabs(ssc32.MinAngle), fabs(ssc32.MaxAngle));
+				if (bEnableFluxMotorboat)
+				{
 				thrust = fabs(u_f);
 				if (bEnableBackwardsMotorboat)
 				{
@@ -179,12 +180,10 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
 					break;
-				}		
-#else
-				UNREFERENCED_PARAMETER(flux);
-				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = ssc32.MinAngle; ruddermidangle = ssc32.MidAngle; ruddermaxangle = ssc32.MaxAngle;
-				rudder = -uw_f*max(fabs(ssc32.MinAngle),fabs(ssc32.MaxAngle));
+				}
+				}
+				else
+				{
 				thrust = u_f;
 				if (!bEnableBackwardsMotorboat)
 				{
@@ -197,8 +196,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 					bConnected = FALSE;
 					DisconnectSSC32(&ssc32);
 					break;
-				}		
-#endif // USE_MOTORBOAT_WITH_FLUX
+				}
+				}
 				break;
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
@@ -234,13 +233,8 @@ THREAD_PROC_RETURN_VALUE SSC32Thread(void* pParam)
 	case VAIMOS_ROBID:
 		break;
 	case MOTORBOAT_ROBID:
-#ifdef USE_MOTORBOAT_WITH_FLUX
-		SetRudderThrustersFluxSSC32(&ssc32, 0, 0, 0, 0, 0);
+		if (bEnableFluxMotorboat) SetRudderThrustersFluxSSC32(&ssc32, 0, 0, 0, 0, 0); else SetRudderThrusterSSC32(&ssc32, 0, 0);
 		mSleep(threadperiod);
-#else
-		SetRudderThrusterSSC32(&ssc32, 0, 0);
-		mSleep(threadperiod);
-#endif // USE_MOTORBOAT_WITH_FLUX
 		break;
 	case BUBBLE_ROBID:
 	case ETAS_WHEEL_ROBID:

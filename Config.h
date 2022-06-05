@@ -288,6 +288,8 @@ inline int LoadConfig(void)
 	amplitude_avoid = 5;
 	etalement_avoid = 1;
 	bLat_avoid = TRUE;
+	bEnableFluxMotorboat = FALSE;
+	bEnableBackwardsMotorboat = FALSE;
 	controllerperiod = 25;
 #pragma endregion
 #pragma region Observer parameters
@@ -909,6 +911,10 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%lf", &etalement_avoid) != 1) printf("Invalid parameter : etalement_avoid.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bLat_avoid.\n");
 		if (sscanf(line, "%d", &bLat_avoid) != 1) printf("Invalid parameter : bLat_avoid.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bEnableFluxMotorboat.\n");
+		if (sscanf(line, "%d", &bEnableFluxMotorboat) != 1) printf("Invalid parameter : bEnableFluxMotorboat.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bEnableBackwardsMotorboat.\n");
+		if (sscanf(line, "%d", &bEnableBackwardsMotorboat) != 1) printf("Invalid parameter : bEnableBackwardsMotorboat.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : controllerperiod.\n");
 		if (sscanf(line, "%d", &controllerperiod) != 1) printf("Invalid parameter : controllerperiod.\n");
 #pragma endregion
@@ -2094,6 +2100,10 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%.10g\n", etalement_avoid) < 0) printf("Error writing parameter : etalement_avoid.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bLat_avoid.\n");
 	if (fprintf(fileout, "%d\n", bLat_avoid) < 0) printf("Error writing parameter : bLat_avoid.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bEnableFluxMotorboat.\n");
+	if (fprintf(fileout, "%d\n", bEnableFluxMotorboat) < 0) printf("Error writing parameter : bEnableFluxMotorboat.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bEnableBackwardsMotorboat.\n");
+	if (fprintf(fileout, "%d\n", bEnableBackwardsMotorboat) < 0) printf("Error writing parameter : bEnableBackwardsMotorboat.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : controllerperiod.\n");
 	if (fprintf(fileout, "%d\n", controllerperiod) < 0) printf("Error writing parameter : controllerperiod.\n");
 #pragma endregion

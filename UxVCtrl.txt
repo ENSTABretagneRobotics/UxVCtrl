@@ -524,6 +524,10 @@ WMV2
 1
 % bLat_avoid
 1
+% bEnableFluxMotorboat
+0
+% bEnableBackwardsMotorboat
+0
 % controllerperiod (in ms)
 25
 % Observer parameters

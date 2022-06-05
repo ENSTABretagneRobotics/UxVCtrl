@@ -98,6 +98,22 @@ jobs:
       if: github.event_name != 'pull_request'
 
  j6:
+    name: Ubuntu 22.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-22.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_jammy
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_ubuntu_jammy"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j7:
     name: Ubuntu 20.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-20.04
     steps: 
@@ -113,7 +129,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j7:
+ j8:
     name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-18.04
     steps: 
@@ -129,7 +145,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j8:
+ j9:
     name: Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
     steps: 
@@ -145,7 +161,22 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j9:
+ j10:
+    name: macOS Monterey static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-12
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macos_monterey
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_macos_monterey"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j11:
     name: macOS Big Sur static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-11
     steps: 
@@ -160,7 +191,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j10:
+ j12:
     name: macOS Catalina static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-10.15
     steps: 
@@ -176,7 +207,7 @@ jobs:
       if: github.event_name != 'pull_request'
 
  # Full configurations
- j11:
+ j13:
     name: Windows Visual Studio 2019 x64 static with OpenCV 4.2.0 without BlueView support
     runs-on: windows-2019
     steps: 
@@ -211,7 +242,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j12:
+ j14:
     name: Windows Visual Studio 2019 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 
@@ -251,7 +282,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j13:
+ j15:
     name: Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
     runs-on: windows-2019
     steps: 
@@ -293,7 +324,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j14:
+ j16:
     name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 
@@ -331,7 +362,23 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j15:
+ j17:
+    name: Ubuntu 22.04 amd64 with default OpenCV 4.2.0
+    runs-on: ubuntu-22.04
+    steps: 
+    - uses: actions/checkout@v2
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_jammy
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_ubuntu_jammy"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+ 
+ j18:
     name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
     runs-on: ubuntu-20.04
     steps: 
@@ -347,7 +394,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
  
- j16:
+ j19:
     name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
     runs-on: ubuntu-18.04
     steps: 
@@ -363,7 +410,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j17:
+ j20:
     name: Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
     steps: 
@@ -379,7 +426,22 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j18:
+ j21:
+    name: macOS Monterey with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: macos-12
+    steps: 
+    - uses: actions/checkout@v2
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macos_monterey
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_macos_monterey"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j22:
     name: macOS Big Sur with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-11
     steps: 
@@ -394,7 +456,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j19:
+ j23:
     name: macOS Catalina with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-10.15
     steps: 
@@ -410,7 +472,7 @@ jobs:
       if: github.event_name != 'pull_request'
 
  # Alternate configurations
- j20:
+ j24:
     name: Ubuntu 16.04 xenial i386
     runs-on: ubuntu-latest
     steps: 
@@ -425,22 +487,22 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j21:
-    name: Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support
-    runs-on: ubuntu-latest
-    steps: 
-    - uses: actions/checkout@v2
-    - run: docker run -i -v "${PWD}/..:${PWD}/.." ubuntu:trusty /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_trusty_amd64"
-    - uses: xresloader/upload-to-github-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        file: "UxVCtrl_ubuntu_trusty_amd64"
-        overwrite: true
-        tag_name: autotagname-${{ github.sha }}
-      if: github.event_name != 'pull_request'
+# j25:
+#    name: Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support
+#    runs-on: ubuntu-latest
+#    steps: 
+#    - uses: actions/checkout@v2
+#    - run: docker run -i -v "${PWD}/..:${PWD}/.." ubuntu:trusty /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_trusty_amd64"
+#    - uses: xresloader/upload-to-github-release@v1
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      with:
+#        file: "UxVCtrl_ubuntu_trusty_amd64"
+#        overwrite: true
+#        tag_name: autotagname-${{ github.sha }}
+#      if: github.event_name != 'pull_request'
 
-# j22:
+# j26:
 #    name: Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
 #    runs-on: ubuntu-18.04
 #    steps: 
@@ -461,7 +523,7 @@ jobs:
 #        tag_name: autotagname-${{ github.sha }}
 #      if: github.event_name != 'pull_request'
 
-# j23:
+# j27:
 #    name: macOS Catalina static with OpenCV 4.2.0 without BlueView, Kinect v2 support
 #    runs-on: macos-10.15
 #    steps: 
@@ -479,7 +541,7 @@ jobs:
 #        tag_name: autotagname-${{ github.sha }}
 #      if: github.event_name != 'pull_request'
 
- j24:
+ j28:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
     runs-on: windows-2019
     steps: 
@@ -514,7 +576,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j25:
+ j29:
     name: Windows Visual Studio 2019 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 

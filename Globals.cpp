@@ -272,6 +272,8 @@ double min_distance_around_full_speed = 0;
 double amplitude_avoid = 0;
 double etalement_avoid = 0;
 BOOL bLat_avoid = FALSE;
+BOOL bEnableFluxMotorboat = FALSE;
+BOOL bEnableBackwardsMotorboat = FALSE;
 int controllerperiod = 0;
 #pragma endregion
 #pragma region Observer parameters
@@ -840,7 +842,6 @@ BOOL bForceSailCalibration = FALSE;
 BOOL bDisableAllAlarms = FALSE;
 BOOL bForceOverrideInputs = FALSE;
 BOOL bDisableRollWindCorrectionSailboat = FALSE;
-BOOL bEnableBackwardsMotorboat = FALSE;
 BOOL bExit = FALSE;
 int ExitCode = EXIT_FAILURE;
 BOOL bWaiting = FALSE;

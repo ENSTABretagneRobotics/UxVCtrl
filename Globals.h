@@ -513,6 +513,8 @@ extern double min_distance_around_full_speed;
 extern double amplitude_avoid;
 extern double etalement_avoid;
 extern BOOL bLat_avoid;
+extern BOOL bEnableFluxMotorboat;
+extern BOOL bEnableBackwardsMotorboat;
 extern int controllerperiod;
 #pragma endregion
 #pragma region Observer parameters
@@ -1072,7 +1074,6 @@ extern BOOL bForceSailCalibration;
 extern BOOL bDisableAllAlarms;
 extern BOOL bForceOverrideInputs;
 extern BOOL bDisableRollWindCorrectionSailboat;
-extern BOOL bEnableBackwardsMotorboat;
 extern BOOL bExit;
 extern int ExitCode;
 extern BOOL bWaiting;

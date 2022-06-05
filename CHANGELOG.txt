@@ -1,3 +1,6 @@
+392
+Added bEnableFluxMotorboat and bEnableBackwardsMotorboat parameters.
+
 391
 Updated CMakeLists.txt and Video.
 

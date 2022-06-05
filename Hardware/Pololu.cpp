@@ -245,7 +245,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 			case BUGGY_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				rudder = -uw_f*max(fabs(pololu.MinAngle), fabs(pololu.MaxAngle));
 				thrust = u_f;
 				showgetposition = ShowGetPositionMaestroPololu[deviceid];
 				setposition = SetPositionMaestroPololu[deviceid];
@@ -265,7 +265,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				counter_modulo = 11;
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				rudder = -uw_f*max(fabs(pololu.MinAngle), fabs(pololu.MaxAngle));
 				thrust = u_f;
 				showgetposition = ShowGetPositionMaestroPololu[deviceid];
 				setposition = SetPositionMaestroPololu[deviceid];
@@ -294,12 +294,12 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					winddir = fmod_360(ivalue*pololu.analoginputcoef[pololu.winddiranaloginputchan]+pololu.analoginputoffset[pololu.winddiranaloginputchan]+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
-					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
+					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI);
 					// True wind must be computed from apparent wind.
 					if (bDisableRollWindCorrectionSailboat)
 						psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
 					else
-						psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(phi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
+						psitwind = fmod_2PI(atan2(sin(psiawind), cos(Center(phi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
@@ -343,7 +343,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				counter_modulo = 16;
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				rudder = -uw_f*max(fabs(pololu.MinAngle), fabs(pololu.MaxAngle));
 				thrust = u_f;
 				showgetposition = ShowGetPositionMaestroPololu[deviceid];
 				setposition = SetPositionMaestroPololu[deviceid];
@@ -372,12 +372,12 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					winddir = fmod_360(ivalue*pololu.analoginputcoef[pololu.winddiranaloginputchan]+pololu.analoginputoffset[pololu.winddiranaloginputchan]+180.0)+180.0;
 					//printf("%f\n", winddir);
 					// Apparent wind (in robot coordinate system).
-					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI); 
+					psiawind = fmod_2PI(-winddir*M_PI/180.0+M_PI);
 					// True wind must be computed from apparent wind.
 					if (bDisableRollWindCorrectionSailboat)
 						psitwind = fmod_2PI(psiawind+Center(psi_ahrs)); // Robot speed and roll not taken into account...
 					else
-						psitwind = fmod_2PI(atan2(sin(psiawind),cos(Center(phi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
+						psitwind = fmod_2PI(atan2(sin(psiawind), cos(Center(phi_ahrs))*cos(psiawind))+Center(psi_ahrs)); // Robot speed not taken into account, but with roll correction...
 					LeaveCriticalSection(&StateVariablesCS);
 				}
 				else mSleep(20);
@@ -488,7 +488,7 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 			case VAIMOS_ROBID:
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				rudder = -uw_f*max(fabs(pololu.MinAngle), fabs(pololu.MaxAngle));
 				showgetposition = ShowGetPositionMaestroPololu[deviceid];
 				setposition = SetPositionMaestroPololu[deviceid];
 				LeaveCriticalSection(&StateVariablesCS);
@@ -504,10 +504,11 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			case MOTORBOAT_ROBID:
-#ifdef USE_MOTORBOAT_WITH_FLUX
 				EnterCriticalSection(&StateVariablesCS);
 				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				rudder = -uw_f*max(fabs(pololu.MinAngle), fabs(pololu.MaxAngle));
+				if (bEnableFluxMotorboat)
+				{
 				thrust = fabs(u_f);
 				if (bEnableBackwardsMotorboat)
 				{
@@ -529,12 +530,9 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 					mSleep(threadperiod);
 					break;
 				}
-				mSleep(threadperiod);
-#else
-				UNREFERENCED_PARAMETER(flux);
-				EnterCriticalSection(&StateVariablesCS);
-				rudderminangle = pololu.MinAngle; ruddermidangle = pololu.MidAngle; ruddermaxangle = pololu.MaxAngle;
-				rudder = -uw_f*max(fabs(pololu.MinAngle),fabs(pololu.MaxAngle));
+				}
+				else
+				{
 				thrust = u_f;
 				if (!bEnableBackwardsMotorboat)
 				{
@@ -568,8 +566,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 						break;
 					}
 				}
+				}
 				mSleep(threadperiod);
-#endif // USE_MOTORBOAT_WITH_FLUX
 				if (showgetposition_setposition_Pololu(showgetposition, setposition, bConnected, threadperiod, pololu, deviceid) != EXIT_SUCCESS) break;
 				break;
 			case COPTER_ROBID:
@@ -795,13 +793,8 @@ THREAD_PROC_RETURN_VALUE PololuThread(void* pParam)
 	case VAIMOS_ROBID:
 		break;
 	case MOTORBOAT_ROBID:
-#ifdef USE_MOTORBOAT_WITH_FLUX
-		SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0);
+		if (bEnableFluxMotorboat) SetRudderThrustersFluxPololu(&pololu, 0, 0, 0, 0, 0); else SetRudderThrusterPololu(&pololu, 0, 0);
 		mSleep(threadperiod);
-#else
-		SetRudderThrusterPololu(&pololu, 0, 0);
-		mSleep(threadperiod);
-#endif // USE_MOTORBOAT_WITH_FLUX
 		break;
 	case COPTER_ROBID:
 	case SAUCISSE_ROBID:

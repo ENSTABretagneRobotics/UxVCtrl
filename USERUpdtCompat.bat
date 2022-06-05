@@ -11,17 +11,21 @@ move /Y %USERPROFILE%\Downloads\UxVCtrl_cv2413.exe "%UDK_USER_PATH%\Compatibilit
 move /Y %USERPROFILE%\Downloads\UxVCtrl_x64.exe "%UDK_USER_PATH%\Compatibility mode\Windows_x64\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_mingw8_x64.exe "%UDK_USER_PATH%\Compatibility mode\Windows_x64\"
 
+move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_jammy "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
+move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_jammy "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_focal "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_focal "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_bionic "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_bionic "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
-move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_trusty_amd64 "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
+rem move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_trusty_amd64 "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_xenial_i386 "%UDK_USER_PATH%\Compatibility mode\Ubuntu_i386\"
 
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_buster_pi "%UDK_USER_PATH%\Compatibility mode\pi\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_buster_pi "%UDK_USER_PATH%\Compatibility mode\pi\"
 
+move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_macos_monterey "%UDK_USER_PATH%\Compatibility mode\macOS\"
+move /Y %USERPROFILE%\Downloads\UxVCtrl_macos_monterey "%UDK_USER_PATH%\Compatibility mode\macOS\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_macos_bigsur "%UDK_USER_PATH%\Compatibility mode\macOS\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_macos_bigsur "%UDK_USER_PATH%\Compatibility mode\macOS\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_macos_catalina "%UDK_USER_PATH%\Compatibility mode\macOS\"
