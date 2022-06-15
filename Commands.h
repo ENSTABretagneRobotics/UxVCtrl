@@ -818,7 +818,7 @@ inline int Commands(char* line)
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
 	int id = 0, videoid = 0, guiid = 0, procid = 0;
-	double delay = 0, delay_station = 0, delay_wait_new = 0, circle_r = 0, arc_limit = 0, arc_current = 0;
+	double delay = 0, delay_station = 0, delay_wait_new = 0, circle_r = 0, arc_limit = 0, line_length_coef = 0, arc_current = 0;
 	double u_prev = 0;
 	CHRONO chrono, chrono_station;
 
@@ -1856,34 +1856,34 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
-	else if (sscanf(line, "linefollowingcircletarget %d %lf %lf %lf", &ival1, &dval1, &dval2, &delay) == 4)
+	else if (sscanf(line, "linefollowingcircletarget %d %lf %lf %lf %lf", &ival1, &dval1, &dval2, &dval3, &delay) == 5)
 	{
+		double dx = 0, dy = 0, d_angle = 0, dir = 0, d_line_angle = 0, d_line_angle_prev = 0;
+
 		EnterCriticalSection(&StateVariablesCS);
 
 		target_followme = ival1; //////
 		circle_r = dval1;
 		arc_limit = dval2;
-
-		arc_current = 0;
+		line_length_coef = dval3;
 			   
 		// Special situation: should follow a line defined by...
-
-//d=c-p;
-//angle=atan2(d(2),d(1)); % dir to the circle center
-//%dir=cross([d;0], [cos(x(3));sin(x(3));0]); % gives direction of the line to gen
-//dir(3)=d(1)*sin(x(3))-d(2)*cos(x(3));
-//
-//rr=c-r*[cos(angle);sin(angle)]; % start of line
-//plot([rr(1);c(1)],[rr(2,:);c(2)],'b');
-//ll=rr+0.5*r*[cos(angle+sign(dir(3))*pi/2);sin(angle+sign(dir(3))*pi/2)]; % end of line
-//plot([rr(1);ll(1)],[rr(2,:);ll(2)],'g');
-
-		wxa = xtarget_followme-radius; wya = ytarget_followme-radius; wxb = xtarget_followme+radius; wyb = ytarget_followme-radius; wx = wxb; wy = wyb;
+		dx = xtarget_followme-Center(xhat); dy = ytarget_followme-Center(yhat);
+		d_angle = atan2(dy, dx); // Direction towards the circle center (i.e. the target position).
+		dir = dx*sin(Center(psihat))-dy*cos(Center(psihat)); // Gives the direction of the line to generate to avoid U-turns.
+		wxa = xtarget_followme-radius*cos(d_angle); wya = ytarget_followme-radius*sin(d_angle); 
+		wxb = wxa+line_length_coef*radius*cos(d_angle+sign(dir,0)*M_PI/2); wyb = wya+line_length_coef*radius*sin(d_angle+sign(dir,0)*M_PI/2); 
+		wx = wxb; wy = wyb;
+		d_line_angle = atan2(wyb-wya, wxb-wxa);
 		bLineFollowingControl = TRUE;
 		bWaypointControl = FALSE;
 		bGuidedControl = FALSE;
 		bHeadingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
+		
+		arc_current = 0; 
+		d_line_angle_prev = d_line_angle;
+
 		delay = fabs(delay);
 		bWaiting = TRUE;
 		StartChrono(&chrono);
@@ -1894,30 +1894,22 @@ inline int Commands(char* line)
 			if ((wxb-wxa)*(Center(xhat)-wxb)+(wyb-wya)*(Center(yhat)-wyb) >= 0)
 			{
 				LeaveCriticalSection(&StateVariablesCS);
-				// Wait a little bit after reaching the waypoint.
 				bLineFollowingControl = FALSE;
 				bWaypointControl = FALSE;
 				bGuidedControl = FALSE;
 				bHeadingControl = FALSE;
-				StartChrono(&chrono_station);
-				for (;;)
-				{
-					if (GetTimeElapsedChronoQuick(&chrono_station) > delay_station) break;
-					if (!bWaiting) break;
-					if (bExit) break;
-					// Wait at least delay/10 and at most around 100 ms for each loop.
-					mSleep((long)min(delay_station*100.0, 100.0));
-				}
-				StopChronoQuick(&chrono_station);
 				// Special situation: should follow a line defined by...
 				EnterCriticalSection(&StateVariablesCS);
-
-				arc_current += M_PI/2;
-				if (fmod_2PI_pos(arc_current) <= M_PI/2+0.001) { wxa = xtarget_followme+radius; wya = ytarget_followme-radius; wxb = xtarget_followme+radius; wyb = ytarget_followme+radius; wx = wxb; wy = wyb; }
-				else if (fmod_2PI_pos(arc_current) <= M_PI+0.001) { wxa = xtarget_followme+radius; wya = ytarget_followme+radius; wxb = xtarget_followme-radius; wyb = ytarget_followme+radius; wx = wxb; wy = wyb; }
-				else if (fmod_2PI_pos(arc_current) <= 3*M_PI/2+0.001) { wxa = xtarget_followme-radius; wya = ytarget_followme+radius; wxb = xtarget_followme-radius; wyb = ytarget_followme-radius; wx = wxb; wy = wyb; }
-				else { wxa = xtarget_followme-radius; wya = ytarget_followme-radius; wxb = xtarget_followme+radius; wyb = ytarget_followme-radius; wx = wxb; wy = wyb; }
-
+				arc_current += fabs(fmod_2PI(d_line_angle-d_line_angle_prev)); 
+				//printf("arc_current = %f\n", arc_current);
+				d_line_angle_prev = d_line_angle;
+				dx = xtarget_followme-Center(xhat); dy = ytarget_followme-Center(yhat);
+				d_angle = atan2(dy, dx); // Direction towards the circle center (i.e. the target position).
+				dir = dx*sin(Center(psihat))-dy*cos(Center(psihat)); // Gives the direction of the line to generate to avoid U-turns.
+				wxa = xtarget_followme-radius*cos(d_angle); wya = ytarget_followme-radius*sin(d_angle); 
+				wxb = wxa+line_length_coef*radius*cos(d_angle+sign(dir,0)*M_PI/2); wyb = wya+line_length_coef*radius*sin(d_angle+sign(dir,0)*M_PI/2); 
+				wx = wxb; wy = wyb;
+				d_line_angle = atan2(wyb-wya, wxb-wxa);
 				bLineFollowingControl = TRUE;
 				bWaypointControl = FALSE;
 				bGuidedControl = FALSE;

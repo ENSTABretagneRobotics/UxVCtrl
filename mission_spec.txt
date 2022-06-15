@@ -124,7 +124,7 @@
 %
 %linefollowingstation xb yb t_station t (xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the destination waypoint defining the line (starting waypoint is the current position), t_station : double [0,oo[ time to wait when the waypoint is reached in s (before generating a new line from the current position), t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
-%linefollowingcircletarget target circle_r arc_limit t (target : int [0,4] 0 to follow from SwarmonDevice0 data, 1 to follow from MAVLinkDevice0 data, 2 to follow from MAVLinkDevice1 data, 3 to follow from MAVLinkDevice2 data, 4 to follow from MDM0 data, circle_r : double ]0,oo[ circle radius in m, arc_limit : double ]0,oo[ angle in rad, t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
+%linefollowingcircletarget target circle_r arc_limit line_length_coef t (target : int [0,4] 0 to follow from SwarmonDevice0 data, 1 to follow from MAVLinkDevice0 data, 2 to follow from MAVLinkDevice1 data, 3 to follow from MAVLinkDevice2 data, 4 to follow from MDM0 data, circle_r : double ]0,oo[ circle radius in m, arc_limit : double ]0,oo[ angle in rad, line_length_coef : double ]0,oo[ the generated lines to approximate the circle will be of line_length_coef*circle_r length, t : double [0,oo[ timeout in s, the function blocks until the timeout is reached)
 %
 %linefollowingrelative xa ya xb yb (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line)
 %
