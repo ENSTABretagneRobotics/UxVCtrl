@@ -352,7 +352,7 @@ box box_env;
 COORDSYSTEM csMap;
 
 // Simulator variables.
-double x_sim = 0, y_sim = 0, z_sim = 0, phi_sim = 0, theta_sim = 0, psi_sim = 0, vrx_sim = 0, vry_sim = 0, vrz_sim = 0, omegax_sim = 0, omegay_sim = 0, omegaz_sim = 0;
+double x_sim = 0, y_sim = 0, z_sim = 0, phi_sim = 0, theta_sim = 0, psi_sim = 0, vrx_sim = 0, vry_sim = 0, vrz_sim = 0, vx_sim = 0, vy_sim = 0, vz_sim = 0, omegax_sim = 0, omegay_sim = 0, omegaz_sim = 0;
 double alpha_sim = 0, d_sim = 0;
 
 // SonarAltitudeEstimation variables.

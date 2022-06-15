@@ -164,11 +164,27 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 			double psidot = vrx_sim*sin(alphaomegaz*uw)/alphaz;
 			double vrxdot = u*alphavrx-vrx_sim*alphafvrx;
 			double vrydot = -vry_sim*alphafvry;
+			//double xdot = vx_sim;
+			//double ydot = vy_sim;
+			//double psidot = ;
+			//double vrxdot = ;
+			//double vrydot = ;
 			x_sim = x_sim+dt*xdot;
 			y_sim = y_sim+dt*ydot;
 			psi_sim = psi_sim+dt*psidot;
 			vrx_sim = vrx_sim+dt*vrxdot;
 			vry_sim = vry_sim+dt*vrydot;
+			//vx_sim = vx_sim+dt*vxdot;
+			//vy_sim = vy_sim+dt*vydot;
+
+			//delta = beta*u(2);
+			//theta = x(3);
+			//vx = x(4);
+			//vy = x(5);
+			//xdot = [vx;vy;
+			//        (vx*cos(theta)+vy*sin(theta))*sin(delta)/(L/2);
+			//        alpha*u(1)*cos(theta)-alphaf*vx;
+			//        alpha*u(1)*sin(theta)-alphaf*vy];
 
 			// Simulated sensors measurements.
 			// AHRS.

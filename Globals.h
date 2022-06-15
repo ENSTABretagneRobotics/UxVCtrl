@@ -593,7 +593,7 @@ extern box box_env;
 extern COORDSYSTEM csMap;
 
 // Simulator variables.
-extern double x_sim, y_sim, z_sim, phi_sim, theta_sim, psi_sim, vrx_sim, vry_sim, vrz_sim, omegax_sim, omegay_sim, omegaz_sim;
+extern double x_sim, y_sim, z_sim, phi_sim, theta_sim, psi_sim, vrx_sim, vry_sim, vrz_sim, vx_sim, vy_sim, vz_sim, omegax_sim, omegay_sim, omegaz_sim;
 extern double alpha_sim, d_sim;
 
 // SonarAltitudeEstimation variables.

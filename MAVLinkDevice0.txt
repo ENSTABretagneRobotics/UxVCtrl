@@ -31,10 +31,10 @@ COM12
 0
 % bArmAtStartup
 0
-% mavlink_comm (from 0 to 4)
+% mavlink_comm (MAVLink channel, from 0 to 16)
 0
 % system_id (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
-255
+100
 % component_id (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
 1
 % target_system (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)

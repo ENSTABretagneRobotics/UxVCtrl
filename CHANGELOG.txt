@@ -1,3 +1,6 @@
+393
+Added preliminary linefollowingcircletarget command.
+
 392
 Added bEnableFluxMotorboat and bEnableBackwardsMotorboat parameters.
 

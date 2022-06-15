@@ -131,10 +131,10 @@ WMV2
 115200
 % MAVLinkInterfaceTimeout (in ms)
 1500
-% MAVLinkInterface_mavlink_comm (from 0 to 4)
-4
+% MAVLinkInterface_mavlink_comm (MAVLink channel, from 0 to 16)
+16
 % MAVLinkInterface_system_id (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
-1
+100
 % MAVLinkInterface_component_id (0 : all, 1 : autopilot, 50 : PX4FLOW, 190 : Mission Planner, see also enum MAV_COMPONENT)
 1
 % MAVLinkInterface_target_system (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
