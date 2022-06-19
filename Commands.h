@@ -837,6 +837,7 @@ inline int Commands(char* line)
 	if (sscanf(line, "wallconfig %lf %lf %lf %lf %lf %lf %lf %d %d %d", 
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &ival1, &ival2, &procid) == 10)
 	{
+		if (bDisableWall) printf("Error : Toggle bDisableWall and restart the program.");
 		EnterCriticalSection(&WallCS);
 		d0_wall = dval1; beta_wall = dval2; delta_wall = dval3; dmin_wall = dval4; dmax_wall = dval5; 
 		gamma_infinite_wall = dval6; r_wall = dval7; bLat_wall = ival1; bBrake_wall = ival2; procid_wall = procid; 
@@ -844,6 +845,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "walldetection %lf", &delay) == 1)
 	{
+		if (bDisableWall) printf("Error : Toggle bDisableWall and restart the program.");
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_wall = u;
@@ -871,6 +873,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "startwalltracking", strlen("startwalltracking")) == 0)
 	{
+		if (bDisableWall) printf("Error : Toggle bDisableWall and restart the program.");
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_wall = u;
@@ -880,6 +883,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "stopwalltracking", strlen("stopwalltracking")) == 0)
 	{
+		if (bDisableWall) printf("Error : Toggle bDisableWall and restart the program.");
 		EnterCriticalSection(&WallCS);
 		bWallTrackingControl = FALSE;
 		bHeadingControl = FALSE;
@@ -887,6 +891,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "startwallavoidance", strlen("startwallavoidance")) == 0)
 	{
+		if (bDisableWall) printf("Error : Toggle bDisableWall and restart the program.");
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_wall = u;
@@ -896,6 +901,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "stopwallavoidance", strlen("stopwallavoidance")) == 0)
 	{
+		if (bDisableWall) printf("Error : Toggle bDisableWall and restart the program.");
 		EnterCriticalSection(&WallCS);
 		bWallAvoidanceControl = FALSE;
 		bDistanceControl = FALSE;
@@ -920,6 +926,7 @@ inline int Commands(char* line)
 		&videoid, &id
 		) == 32)
 	{
+		if (bDisableBall) printf("Error : Toggle bDisableBall and restart the program.");
 		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
 			EnterCriticalSection(&BallCS[id]);
@@ -947,6 +954,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "startballtracking %d", &id) == 1)
 	{
+		if (bDisableBall) printf("Error : Toggle bDisableBall and restart the program.");
 		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
 			EnterCriticalSection(&BallCS[id]);
@@ -965,7 +973,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "stopballtracking %d", &id) == 1)
 	{
-
+		if (bDisableBall) printf("Error : Toggle bDisableBall and restart the program.");
 		if ((id >= 0)&&(id < MAX_NB_BALL))
 		{
 			EnterCriticalSection(&BallCS[id]);
@@ -1056,6 +1064,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "pingerconfig %lf %lf %lf %lf %lf %lf %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &ival) == 7)
 	{
+		if (bDisablePinger) printf("Error : Toggle bDisablePinger and restart the program.");
 		EnterCriticalSection(&PingerCS);
 		pulsefreq_pinger = dval1; pulselen_pinger = dval2; pulsepersec_pinger = dval3; hyddist_pinger = dval4; hydorient_pinger = dval5; preferreddir_pinger = dval6; bUseFile_pinger = ival; 
 		bPingerFound = FALSE;
@@ -1063,6 +1072,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "startpingertracking", strlen("startpingertracking")) == 0)
 	{
+		if (bDisablePinger) printf("Error : Toggle bDisablePinger and restart the program.");
 		EnterCriticalSection(&PingerCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_pinger = u;
@@ -1072,6 +1082,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "stoppingertracking", strlen("stoppingertracking")) == 0)
 	{
+		if (bDisablePinger) printf("Error : Toggle bDisablePinger and restart the program.");
 		EnterCriticalSection(&PingerCS);
 		bPingerTrackingControl = FALSE;
 		//bDistanceControl = FALSE;
@@ -1085,6 +1096,7 @@ inline int Commands(char* line)
 #endif // !DISABLE_OPENCV_SUPPORT
 	if (sscanf(line, "externalprogramtriggerconfig %255s %d %d %d %d %d", str, &ival1, &ival2, &ival3, &procid, &ival) == 6)
 	{
+		if (bDisableExternalProgramTrigger) printf("Error : Toggle bDisableExternalProgramTrigger and restart the program.");
 		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
 		{
 			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
@@ -1101,6 +1113,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "enableexternalprogramtrigger %d", &ival) == 1)
 	{
+		if (bDisableExternalProgramTrigger) printf("Error : Toggle bDisableExternalProgramTrigger and restart the program.");
 		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
 		{
 			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
@@ -1114,6 +1127,7 @@ inline int Commands(char* line)
 	}
 	else if (sscanf(line, "disableexternalprogramtrigger %d", &ival) == 1)
 	{
+		if (bDisableExternalProgramTrigger) printf("Error : Toggle bDisableExternalProgramTrigger and restart the program.");
 		if ((ival >= 0)&&(ival < MAX_NB_EXTERNALPROGRAMTRIGGER))
 		{
 			EnterCriticalSection(&ExternalProgramTriggerCS[ival]);
@@ -1201,12 +1215,14 @@ inline int Commands(char* line)
 #endif // DEVEL_WAITAREA
 	else if (sscanf(line, "followmeconfig %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %d %d %d", &dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &ival1, &ival2, &ival3) == 13)
 	{
+		if (bDisableFollowMe) printf("Error : Toggle bDisableFollowMe and restart the program.");
 		EnterCriticalSection(&FollowMeCS);
 		dmin_followme = dval1; dmax_followme = dval2; uidle_followme = dval3; umin_followme = dval4; umax_followme = dval5; spaceperiod_followme = dval6; forbidlat_followme = dval7; forbidlong_followme = dval8; forbidalt_followme = dval9; forbidradius_followme = dval10; target_followme = ival1; mode_followme = ival2; bDepth_followme = ival3;
 		LeaveCriticalSection(&FollowMeCS);
 	}
 	else if (strncmp(line, "startfollowmetracking", strlen("startfollowmetracking")) == 0)
 	{
+		if (bDisableFollowMe) printf("Error : Toggle bDisableFollowMe and restart the program.");
 		EnterCriticalSection(&FollowMeCS);
 		EnterCriticalSection(&StateVariablesCS);
 		wxa = 0; wya = 0; wza = 0; wxb = 0; wyb = 0; wzb = 0; 
@@ -1218,6 +1234,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "stopfollowmetracking", strlen("stopfollowmetracking")) == 0)
 	{
+		if (bDisableFollowMe) printf("Error : Toggle bDisableFollowMe and restart the program.");
 		EnterCriticalSection(&FollowMeCS);
 		bFollowMeTrackingControl = FALSE;
 		bLineFollowingControl = FALSE;
@@ -1494,6 +1511,7 @@ inline int Commands(char* line)
 		&ival15
 		) == 40)
 	{
+		if (bDisableExternalVisualLocalization) printf("Error : Toggle bDisableExternalVisualLocalization and restart the program.");
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 		hmin_externalvisuallocalization = ival1; hmax_externalvisuallocalization = ival2; smin_externalvisuallocalization = ival3; smax_externalvisuallocalization = ival4; vlmin_externalvisuallocalization = ival5; vlmax_externalvisuallocalization = ival6; 
 		bHExclusive_externalvisuallocalization = ival7; bSExclusive_externalvisuallocalization = ival8; bVLExclusive_externalvisuallocalization = ival9; r_selpix_externalvisuallocalization = ival10; g_selpix_externalvisuallocalization = ival11; b_selpix_externalvisuallocalization = ival12; 
@@ -1518,6 +1536,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "enableexternalvisuallocalization", strlen("enableexternalvisuallocalization")) == 0)
 	{
+		if (bDisableExternalVisualLocalization) printf("Error : Toggle bDisableExternalVisualLocalization and restart the program.");
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 		detectratio_externalvisuallocalization = 0;
 		bExternalVisualLocalization = TRUE;
@@ -1525,6 +1544,7 @@ inline int Commands(char* line)
 	}
 	else if (strncmp(line, "disableexternalvisuallocalization", strlen("disableexternalvisuallocalization")) == 0)
 	{
+		if (bDisableExternalVisualLocalization) printf("Error : Toggle bDisableExternalVisualLocalization and restart the program.");
 		EnterCriticalSection(&ExternalVisualLocalizationCS);
 		bExternalVisualLocalization = FALSE;
 		detectratio_externalvisuallocalization = 0;

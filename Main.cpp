@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
-	printf("\nUxVCtrl V395\n");
+	printf("\nUxVCtrl V396\n");
 	fflush(stdout);
 
 	// Will launch a mission file if specified as argument.
@@ -286,27 +286,27 @@ int main(int argc, char* argv[])
 	CreateDefaultThread(SonarLocalizationThread, NULL, &SonarLocalizationThreadId);
 	CreateDefaultThread(SonarAltitudeEstimationThread, NULL, &SonarAltitudeEstimationThreadId);
 #ifndef DISABLE_OPENCV_SUPPORT
-	CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
-	CreateDefaultThread(WallThread, NULL, &WallThreadId);
+	if (!bDisableExternalVisualLocalization) CreateDefaultThread(ExternalVisualLocalizationThread, NULL, &ExternalVisualLocalizationThreadId);
+	if (!bDisableWall) CreateDefaultThread(WallThread, NULL, &WallThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 #endif // !ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < MAX_NB_BALL; i++)
 	{
-		CreateDefaultThread(BallThread, (void*)(intptr_t)i, &BallThreadId[i]);
+		if (!bDisableBall) CreateDefaultThread(BallThread, (void*)(intptr_t)i, &BallThreadId[i]);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
 	CreateDefaultThread(SurfaceVisualObstacleThread, NULL, &SurfaceVisualObstacleThreadId);
 	CreateDefaultThread(ObstacleThread, NULL, &ObstacleThreadId);
-	CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
+	if (!bDisablePinger) CreateDefaultThread(PingerThread, NULL, &PingerThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 	for (i = 0; i < MAX_NB_EXTERNALPROGRAMTRIGGER; i++)
 	{
-		CreateDefaultThread(ExternalProgramTriggerThread, (void*)(intptr_t)i, &ExternalProgramTriggerThreadId[i]);
+		if (!bDisableExternalProgramTrigger) CreateDefaultThread(ExternalProgramTriggerThread, (void*)(intptr_t)i, &ExternalProgramTriggerThreadId[i]);
 	}
-	CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
+	if (!bDisableFollowMe) CreateDefaultThread(FollowMeThread, NULL, &FollowMeThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) CreateDefaultThread(SimulatorThread, NULL, &SimulatorThreadId);
 	if (!bDisablePathfinderDVL) CreateDefaultThread(PathfinderDVLThread, NULL, &PathfinderDVLThreadId);
 	if (!bDisableNortekDVL) CreateDefaultThread(NortekDVLThread, NULL, &NortekDVLThreadId);
@@ -669,13 +669,13 @@ int main(int argc, char* argv[])
 	if (!bDisableNortekDVL) WaitForThread(NortekDVLThreadId);
 	if (!bDisablePathfinderDVL) WaitForThread(PathfinderDVLThreadId);
 	if (robid & SIMULATOR_ROBID_MASK) WaitForThread(SimulatorThreadId);
-	WaitForThread(FollowMeThreadId);
+	if (!bDisableFollowMe) WaitForThread(FollowMeThreadId);
 	for (i = MAX_NB_EXTERNALPROGRAMTRIGGER-1; i >= 0; i--)
 	{
-		WaitForThread(ExternalProgramTriggerThreadId[i]);
+		if (!bDisableExternalProgramTrigger) WaitForThread(ExternalProgramTriggerThreadId[i]);
 	}
 #ifndef DISABLE_OPENCV_SUPPORT
-	WaitForThread(PingerThreadId);
+	if (!bDisablePinger) WaitForThread(PingerThreadId);
 	WaitForThread(ObstacleThreadId);
 	WaitForThread(SurfaceVisualObstacleThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
@@ -683,13 +683,13 @@ int main(int argc, char* argv[])
 #ifndef DISABLE_OPENCV_SUPPORT
 	for (i = MAX_NB_BALL-1; i >= 0; i--)
 	{
-		WaitForThread(BallThreadId[i]);
+		if (!bDisableBall) WaitForThread(BallThreadId[i]);
 	}
 #endif // !DISABLE_OPENCV_SUPPORT
 #ifndef ENABLE_BUILD_OPTIMIZATION_SAILBOAT
 #ifndef DISABLE_OPENCV_SUPPORT
-	WaitForThread(WallThreadId);
-	WaitForThread(ExternalVisualLocalizationThreadId);
+	if (!bDisableWall) WaitForThread(WallThreadId);
+	if (!bDisableExternalVisualLocalization) WaitForThread(ExternalVisualLocalizationThreadId);
 #endif // !DISABLE_OPENCV_SUPPORT
 	WaitForThread(SonarAltitudeEstimationThreadId);
 	WaitForThread(SonarLocalizationThreadId);

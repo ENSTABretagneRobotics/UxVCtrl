@@ -124,6 +124,12 @@ BOOL bDetachCommandsThread = FALSE;
 int WaitForGNSSLevel = 0;
 int WaitForGNSSTimeout = 0;
 BOOL bSetEnvOriginFromGNSS = FALSE;
+BOOL bDisableExternalVisualLocalization = FALSE;
+BOOL bDisableWall = FALSE;
+BOOL bDisableBall = FALSE;
+BOOL bDisablePinger = FALSE;
+BOOL bDisableExternalProgramTrigger = FALSE;
+BOOL bDisableFollowMe = FALSE;
 #pragma endregion
 #pragma region Interfaces parameters
 BOOL bMAVLinkInterface = FALSE;

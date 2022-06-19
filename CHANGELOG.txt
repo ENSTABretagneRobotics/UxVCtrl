@@ -1,3 +1,6 @@
+396
+Added bDisableExternalVisualLocalization, bDisableWall, bDisableBall, bDisablePinger, bDisableExternalProgramTrigger, bDisableFollowMe parameters.
+
 395
 Increased MAVLINK_COMM_NUM_BUFFERS.
 

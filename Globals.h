@@ -365,6 +365,12 @@ extern BOOL bDetachCommandsThread;
 extern int WaitForGNSSLevel;
 extern int WaitForGNSSTimeout;
 extern BOOL bSetEnvOriginFromGNSS;
+extern BOOL bDisableExternalVisualLocalization;
+extern BOOL bDisableWall;
+extern BOOL bDisableBall;
+extern BOOL bDisablePinger;
+extern BOOL bDisableExternalProgramTrigger;
+extern BOOL bDisableFollowMe;
 #pragma endregion
 #pragma region Interfaces parameters
 extern BOOL bMAVLinkInterface;

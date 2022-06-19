@@ -122,6 +122,18 @@ WMV2
 0
 % bSetEnvOriginFromGNSS
 0
+% bDisableExternalVisualLocalization
+0
+% bDisableWall
+0
+% bDisableBall
+0
+% bDisablePinger
+0
+% bDisableExternalProgramTrigger
+0
+% bDisableFollowMe
+0
 % Interfaces parameters
 % bMAVLinkInterface
 1

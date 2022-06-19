@@ -74,6 +74,12 @@ inline int LoadConfig(void)
 	WaitForGNSSLevel = 0;
 	WaitForGNSSTimeout = 0;
 	bSetEnvOriginFromGNSS = FALSE;
+	bDisableExternalVisualLocalization = FALSE;
+	bDisableWall = FALSE;
+	bDisableBall = FALSE;
+	bDisablePinger = FALSE;
+	bDisableExternalProgramTrigger = FALSE;
+	bDisableFollowMe = FALSE;
 #pragma endregion
 #pragma region Interfaces parameters
 	bMAVLinkInterface = TRUE;
@@ -502,6 +508,18 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &WaitForGNSSTimeout) != 1) printf("Invalid parameter : WaitForGNSSTimeout.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bSetEnvOriginFromGNSS.\n");
 		if (sscanf(line, "%d", &bSetEnvOriginFromGNSS) != 1) printf("Invalid parameter : bSetEnvOriginFromGNSS.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableExternalVisualLocalization.\n");
+		if (sscanf(line, "%d", &bDisableExternalVisualLocalization) != 1) printf("Invalid parameter : bDisableExternalVisualLocalization.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableWall.\n");
+		if (sscanf(line, "%d", &bDisableWall) != 1) printf("Invalid parameter : bDisableWall.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableBall.\n");
+		if (sscanf(line, "%d", &bDisableBall) != 1) printf("Invalid parameter : bDisableBall.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisablePinger.\n");
+		if (sscanf(line, "%d", &bDisablePinger) != 1) printf("Invalid parameter : bDisablePinger.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableExternalProgramTrigger.\n");
+		if (sscanf(line, "%d", &bDisableExternalProgramTrigger) != 1) printf("Invalid parameter : bDisableExternalProgramTrigger.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisableFollowMe.\n");
+		if (sscanf(line, "%d", &bDisableFollowMe) != 1) printf("Invalid parameter : bDisableFollowMe.\n");
 #pragma endregion
 #pragma region Interfaces parameters
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bMAVLinkInterface.\n");
@@ -1691,6 +1709,18 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", WaitForGNSSTimeout) < 0) printf("Error writing parameter : WaitForGNSSTimeout.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bSetEnvOriginFromGNSS.\n");
 	if (fprintf(fileout, "%d\n", bSetEnvOriginFromGNSS) < 0) printf("Error writing parameter : bSetEnvOriginFromGNSS.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableExternalVisualLocalization.\n");
+	if (fprintf(fileout, "%d\n", bDisableExternalVisualLocalization) < 0) printf("Error writing parameter : bDisableExternalVisualLocalization.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableWall.\n");
+	if (fprintf(fileout, "%d\n", bDisableWall) < 0) printf("Error writing parameter : bDisableWall.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableBall.\n");
+	if (fprintf(fileout, "%d\n", bDisableBall) < 0) printf("Error writing parameter : bDisableBall.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisablePinger.\n");
+	if (fprintf(fileout, "%d\n", bDisablePinger) < 0) printf("Error writing parameter : bDisablePinger.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableExternalProgramTrigger.\n");
+	if (fprintf(fileout, "%d\n", bDisableExternalProgramTrigger) < 0) printf("Error writing parameter : bDisableExternalProgramTrigger.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisableFollowMe.\n");
+	if (fprintf(fileout, "%d\n", bDisableFollowMe) < 0) printf("Error writing parameter : bDisableFollowMe.\n");
 #pragma endregion
 #pragma region Interfaces parameters
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bMAVLinkInterface.\n");
