@@ -12,6 +12,9 @@
 
 #include "OSMisc.h"
 
+// See mavlink_types.h...
+#define MAVLINK_COMM_NUM_BUFFERS 32
+
 #ifndef __cplusplus
 #ifdef inline
 #ifdef __GNUC__

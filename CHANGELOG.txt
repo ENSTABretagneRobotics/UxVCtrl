@@ -1,3 +1,6 @@
+395
+Increased MAVLINK_COMM_NUM_BUFFERS.
+
 394
 Updated linefollowingcircletarget command.
 

@@ -31,7 +31,7 @@ COM12
 0
 % bArmAtStartup
 0
-% mavlink_comm (MAVLink channel, from 0 to MAVLINK_COMM_NUM_BUFFERS i.e. usually 15)
+% mavlink_comm (MAVLink channel, from 0 to MAVLINK_COMM_NUM_BUFFERS, overwritten to 31 in this program)
 0
 % system_id (0 : all, 1 : vehicle, 81 : PX4FLOW, 255 : GCS)
 100

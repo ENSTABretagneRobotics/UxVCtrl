@@ -1,0 +1,5 @@
+thrust 1
+linefollowingcircletarget 1 15 6.28 0.5 3600
+linefollowingcircletarget 2 15 6.28 0.5 3600
+linefollowingcircletarget 3 15 6.28 0.5 3600
+generalstop
