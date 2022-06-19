@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
-	printf("\nUxVCtrl V396\n");
+	printf("\nUxVCtrl V397\n");
 	fflush(stdout);
 
 	// Will launch a mission file if specified as argument.

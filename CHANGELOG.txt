@@ -1,3 +1,6 @@
+397
+Updated project files to use OpenCV 4.2.0 as default.
+
 396
 Added bDisableExternalVisualLocalization, bDisableWall, bDisableBall, bDisablePinger, bDisableExternalProgramTrigger, bDisableFollowMe parameters.
 
