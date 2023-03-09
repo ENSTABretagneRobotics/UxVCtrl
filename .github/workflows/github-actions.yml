@@ -9,14 +9,13 @@ jobs:
  deploy:
     runs-on: ubuntu-latest
     steps: 
-    - uses: actions/create-release@v1
+    - uses: softprops/action-gh-release@v1
       id: create_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         draft: true
         tag_name: autotagname-${{ github.sha }}
-        release_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
  # Default configurations
@@ -24,7 +23,7 @@ jobs:
     name: Windows
     runs-on: windows-latest
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake . && cmake --build . --config Release --target UxVCtrl && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && Release\UxVCtrl.exe < run_test.txt
       shell: cmd
 
@@ -32,7 +31,7 @@ jobs:
     name: Windows MinGW 8.1.0 x64
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 #    - run: choco install -y -r --no-progress make
     - run: cmake -G "MSYS Makefiles" -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
       shell: bash
@@ -41,14 +40,14 @@ jobs:
     name: Ubuntu
     runs-on: ubuntu-latest
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
  j4:
     name: macOS
     runs-on: macos-latest
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl
 
  # Compatibility configurations
@@ -56,7 +55,7 @@ jobs:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
@@ -101,7 +100,7 @@ jobs:
     name: Ubuntu 22.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-22.04
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -q update || true
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_jammy
     - uses: xresloader/upload-to-github-release@v1
@@ -117,7 +116,7 @@ jobs:
     name: Ubuntu 20.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-20.04
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -q update || true
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_focal
     - uses: xresloader/upload-to-github-release@v1
@@ -133,7 +132,7 @@ jobs:
     name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-18.04
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -q update || true
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_bionic
     - uses: xresloader/upload-to-github-release@v1
@@ -149,7 +148,7 @@ jobs:
     name: Raspbian Buster pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; apt-get -y install sudo lsb-release wget unzip && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_buster_pi"
     - uses: xresloader/upload-to-github-release@v1
@@ -165,7 +164,7 @@ jobs:
     name: macOS Monterey static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-12
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macos_monterey
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -180,7 +179,7 @@ jobs:
     name: macOS Big Sur static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-11
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macos_bigsur
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -195,7 +194,7 @@ jobs:
     name: macOS Catalina static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-10.15
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_macos_catalina
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -211,7 +210,7 @@ jobs:
     name: Windows Visual Studio 2019 x64 static with OpenCV 4.2.0 without BlueView support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
@@ -246,7 +245,7 @@ jobs:
     name: Windows Visual Studio 2019 x86 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
@@ -286,7 +285,7 @@ jobs:
     name: Windows MinGW 8.1.0 x64 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
@@ -328,7 +327,7 @@ jobs:
     name: Windows MinGW 8.1.0 x86 with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
@@ -366,7 +365,7 @@ jobs:
     name: Ubuntu 22.04 amd64 with default OpenCV 4.2.0
     runs-on: ubuntu-22.04
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -q update || true
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_jammy
     - uses: xresloader/upload-to-github-release@v1
@@ -382,7 +381,7 @@ jobs:
     name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
     runs-on: ubuntu-20.04
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -q update || true
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_focal
     - uses: xresloader/upload-to-github-release@v1
@@ -398,7 +397,7 @@ jobs:
     name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
     runs-on: ubuntu-18.04
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: sudo apt-get -q update || true
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_bionic
     - uses: xresloader/upload-to-github-release@v1
@@ -414,7 +413,7 @@ jobs:
     name: Raspbian Buster pi Docker static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:buster /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; apt-get -y install xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_buster_pi"
     - uses: xresloader/upload-to-github-release@v1
@@ -430,7 +429,7 @@ jobs:
     name: macOS Monterey with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-12
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macos_monterey
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -445,7 +444,7 @@ jobs:
     name: macOS Big Sur with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-11
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macos_bigsur
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -460,7 +459,7 @@ jobs:
     name: macOS Catalina with latest OpenCV without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-10.15
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_macos_catalina
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -476,7 +475,7 @@ jobs:
     name: Ubuntu 16.04 xenial i386
     runs-on: ubuntu-latest
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: docker run -i -v "${PWD}/..:${PWD}/.." i386/ubuntu:xenial /bin/bash -c "linux32 --32bit i386 uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_xenial_i386"
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -491,7 +490,7 @@ jobs:
 #    name: Ubuntu 14.04 amd64 with default OpenCV 2.4.8 without Kinect v2 support
 #    runs-on: ubuntu-latest
 #    steps: 
-#    - uses: actions/checkout@v2
+#    - uses: actions/checkout@v3
 #    - run: docker run -i -v "${PWD}/..:${PWD}/.." ubuntu:trusty /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; apt-get -y install sudo lsb-release wget unzip build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_trusty_amd64"
 #    - uses: xresloader/upload-to-github-release@v1
 #      env:
@@ -506,7 +505,7 @@ jobs:
 #    name: Ubuntu 18.04 amd64 static with OpenCV 4.2.0 without SBG SDK, RPLIDAR SDK support
 #    runs-on: ubuntu-18.04
 #    steps: 
-#    - uses: actions/checkout@v2
+#    - uses: actions/checkout@v3
 #    - run: |
 #        sudo apt-get -q update || true
 #        sudo apt-get remove -y libgtk2.0-cil ; sudo apt-get autoremove -y # libgtk2.0 cannot be installed due to incompatible packages already installed...?
@@ -527,7 +526,7 @@ jobs:
 #    name: macOS Catalina static with OpenCV 4.2.0 without BlueView, Kinect v2 support
 #    runs-on: macos-10.15
 #    steps: 
-#    - uses: actions/checkout@v2
+#    - uses: actions/checkout@v3
 #    - run: |
 #        wget https://www.ensta-bretagne.fr/lebars/Share/libmodbus-3.0.6-mac-static.zip && unzip -q -o libmodbus-3.0.6-mac-static.zip && sudo cp -Rf libmodbus-3.0.6-static/* /usr/local/ && rm -Rf libmodbus-3.0.6-static libmodbus-3.0.6-mac-static.zip
 #        wget https://www.ensta-bretagne.fr/lebars/Share/OpenCV-4.2.0-mac-static.tar.gz && tar xfz OpenCV-4.2.0-mac-static.tar.gz && sudo cp -Rf OpenCV-unknown-x86_64/* /usr/local/ && rm -Rf OpenCV-unknown-x86_64 OpenCV-4.2.0-mac-static.tar.gz
@@ -545,7 +544,7 @@ jobs:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
@@ -580,7 +579,7 @@ jobs:
     name: Windows Visual Studio 2019 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2019
     steps: 
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: |
         (New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y

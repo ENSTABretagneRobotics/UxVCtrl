@@ -60,12 +60,12 @@ inline int InitP33x(P33X* pP33x)
 	uint8 writebuf[4];
 	uint8 crc_h = 0;
 	uint8 crc_l = 0;
-	int devclass = 0;
-	int group = 0;
-	int year = 0;
-	int week = 0;
-	int buf = 0;
-	int stat = 0;
+	//int devclass = 0;
+	//int group = 0;
+	//int year = 0;
+	//int week = 0;
+	//int buf = 0;
+	//int stat = 0;
 
 	writebuf[0] = (uint8)0xfa; // device address = 250
 	writebuf[1] = (uint8)0x30; // function 48
@@ -114,12 +114,12 @@ inline int InitP33x(P33X* pP33x)
 		return EXIT_FAILURE;	
 	}
 
-	devclass = readbuf[2];
-	group = readbuf[3];
-	year = readbuf[4];
-	week = readbuf[5];
-	buf = readbuf[6];
-	stat = readbuf[7];
+	//devclass = readbuf[2];
+	//group = readbuf[3];
+	//year = readbuf[4];
+	//week = readbuf[5];
+	//buf = readbuf[6];
+	//stat = readbuf[7];
 
 	//PRINT_DEBUG_MESSAGE_OSUTILS(("Device ID : %d.%d\n", devclass, group));
 	//PRINT_DEBUG_MESSAGE_OSUTILS(("Firmware version : %d.%d\n", year, week));
@@ -144,7 +144,7 @@ inline int ReadChannelP33x(P33X* pP33x, uint8 Channel, float* pValue)
 	uint8 crc_h = 0;
 	uint8 crc_l = 0;
 	uFloat_P33X value;
-	int stat = 0;
+	//int stat = 0;
 
 	writebuf[0] = (uint8)0xfa; // device address = 250
 	writebuf[1] = (uint8)0x49; // function 73
@@ -198,7 +198,7 @@ inline int ReadChannelP33x(P33X* pP33x, uint8 Channel, float* pValue)
 	value.c[2] = readbuf[3];
 	value.c[1] = readbuf[4];
 	value.c[0] = readbuf[5];
-	stat = readbuf[6];
+	//stat = readbuf[6];
 
 	*pValue = value.v;
 
