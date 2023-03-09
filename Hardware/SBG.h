@@ -389,9 +389,9 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 	case SBG_ECOM_LOG_EKF_EULER:
 		EnterCriticalSection(&pSBG->CallbackCS);
 		pSBG->LastSBGData.TS = pLogData->ekfEulerData.timeStamp;
-		pSBG->LastSBGData.roll = sbgRadToDegF(pLogData->ekfEulerData.euler[0]);
-		pSBG->LastSBGData.pitch = sbgRadToDegF(pLogData->ekfEulerData.euler[1]);
-		pSBG->LastSBGData.yaw = sbgRadToDegF(pLogData->ekfEulerData.euler[2]);
+		pSBG->LastSBGData.roll = (pLogData->ekfEulerData.euler[0])*180.0f/SBG_PI_F;
+		pSBG->LastSBGData.pitch = (pLogData->ekfEulerData.euler[1])*180.0f/SBG_PI_F;
+		pSBG->LastSBGData.yaw = (pLogData->ekfEulerData.euler[2])*180.0f/SBG_PI_F;
 		pSBG->LastSBGData.eulerStdDev[0] = pLogData->ekfEulerData.eulerStdDev[0];
 		pSBG->LastSBGData.eulerStdDev[1] = pLogData->ekfEulerData.eulerStdDev[1];
 		pSBG->LastSBGData.eulerStdDev[2] = pLogData->ekfEulerData.eulerStdDev[2];
@@ -420,9 +420,9 @@ inline SbgErrorCode OnLogReceivedSBG(SbgEComHandle *pHandle, SbgEComClass msgCla
 		yaw = atan2(2*pSBG->LastSBGData.q1*pSBG->LastSBGData.q2+2*pSBG->LastSBGData.q0*pSBG->LastSBGData.q3,2*sqr(pSBG->LastSBGData.q0)+2*sqr(pSBG->LastSBGData.q1)-1);
 		
 		// If raw Euler angles were not sent, ensure that they would still be in the log file.
-		pSBG->LastSBGData.roll = sbgRadToDegF((float)roll);
-		pSBG->LastSBGData.pitch = sbgRadToDegF((float)pitch);
-		pSBG->LastSBGData.yaw = sbgRadToDegF((float)yaw);
+		pSBG->LastSBGData.roll = ((float)roll)*180.0f/SBG_PI_F;
+		pSBG->LastSBGData.pitch = ((float)pitch)*180.0f/SBG_PI_F;
+		pSBG->LastSBGData.yaw = ((float)yaw)*180.0f/SBG_PI_F;
 
 		// Apply corrections (magnetic, orientation of the sensor w.r.t. coordinate system...).
 		pSBG->LastSBGData.Roll = fmod_2PI(roll+pSBG->rollorientation+pSBG->rollp1*cos(roll+pSBG->rollp2));
@@ -1243,27 +1243,9 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 
 	if (sbgEComInit(&pSBG->comHandle, &pSBG->sbgInterface) != SBG_NO_ERROR)
 	{
+#if (SBG_E_COM_VERSION_MAJOR >= 3)
 		printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");
-#ifndef DISABLE_SBG_TCP
-		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-		{
-			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");
-			sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-		{
-			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");
-			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
-		{
-			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");
-			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
-		}
-		else
-		{
-			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library and wrong interface type.\n");
-		}
+		sbgInterfaceDestroy(&pSBG->sbgInterface);
 #else
 		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
 		{
@@ -1275,38 +1257,27 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");
 			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
 		}
-		else
+#ifndef DISABLE_SBG_TCP
+		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
 		{
-			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library and wrong interface type.\n");
+			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library.\n");
+			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
 		}
 #endif // DISABLE_SBG_TCP
+		else
+		{
+			printf("Unable to connect to a SBG : Unable to initialize the sbgECom library and unsupported interface type.\n");
+		}
+#endif // (SBG_E_COM_VERSION_MAJOR >= 3)
 		return EXIT_FAILURE;
 	}
 
 	if (sbgEComCmdGetInfo(&pSBG->comHandle, &pSBG->deviceInfo) != SBG_NO_ERROR)
 	{
-		printf("Unable to connect to a SBG : Unable to get device information.\n");
 		sbgEComClose(&pSBG->comHandle);
-#ifndef DISABLE_SBG_TCP
-		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-		{
-			printf("Unable to connect to a SBG : Unable to get device information.\n");
-			sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-		{
-			printf("Unable to connect to a SBG : Unable to get device information.\n");
-			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
-		{
-			printf("Unable to connect to a SBG : Unable to get device information.\n");
-			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
-		}
-		else
-		{
-			printf("Unable to connect to a SBG : Unable to get device information and wrong interface type.\n");
-		}
+#if (SBG_E_COM_VERSION_MAJOR >= 3)
+		printf("Unable to connect to a SBG : Unable to get device information.\n");
+		sbgInterfaceDestroy(&pSBG->sbgInterface);
 #else
 		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
 		{
@@ -1318,80 +1289,29 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 			printf("Unable to connect to a SBG : Unable to get device information.\n");
 			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
 		}
-		else
+#ifndef DISABLE_SBG_TCP
+		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
 		{
-			printf("Unable to connect to a SBG : Unable to get device information and wrong interface type.\n");
+			printf("Unable to connect to a SBG : Unable to get device information.\n");
+			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
 		}
 #endif // DISABLE_SBG_TCP
+		else
+		{
+			printf("Unable to connect to a SBG : Unable to get device information and unsupported interface type.\n");
+		}
+#endif // (SBG_E_COM_VERSION_MAJOR >= 3)
 		return EXIT_FAILURE;
 	}
 
-	if (sbgEComSetReceiveLogCallback(&pSBG->comHandle, OnLogReceivedSBG, (void*)pSBG) != SBG_NO_ERROR)
-	{
-		printf("Unable to connect to a SBG : Unable to set callback.\n");
-		sbgEComClose(&pSBG->comHandle);
-#ifndef DISABLE_SBG_TCP
-		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-		{
-			printf("Unable to connect to a SBG : Unable to set callback.\n");
-			sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-		{
-			printf("Unable to connect to a SBG : Unable to set callback.\n");
-			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
-		{
-			printf("Unable to connect to a SBG : Unable to set callback.\n");
-			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
-		}
-		else
-		{
-			printf("Unable to connect to a SBG : Unable to set callback and wrong interface type.\n");
-		}
-#else
-		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-		{
-			printf("Unable to connect to a SBG : Unable to set callback.\n");
-			sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-		{
-			printf("Unable to connect to a SBG : Unable to set callback.\n");
-			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
-		}
-		else
-		{
-			printf("Unable to connect to a SBG : Unable to set callback and wrong interface type.\n");
-		}
-#endif // DISABLE_SBG_TCP
-		return EXIT_FAILURE;
-	}
+	sbgEComSetReceiveLogCallback(&pSBG->comHandle, OnLogReceivedSBG, (void*)pSBG);
 
 	if (InitCriticalSection(&pSBG->CallbackCS) != EXIT_SUCCESS)
 	{
 		sbgEComClose(&pSBG->comHandle);
-#ifndef DISABLE_SBG_TCP
-		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-		{
-			printf("Unable to connect to a SBG : InitCriticalSection() failed.\n");
-			sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-		{
-			printf("Unable to connect to a SBG : InitCriticalSection() failed.\n");
-			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
-		{
-			printf("Unable to connect to a SBG : InitCriticalSection() failed.\n");
-			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
-		}
-		else
-		{
-			printf("Unable to connect to a SBG : InitCriticalSection() failed and wrong interface type.\n");
-		}
+#if (SBG_E_COM_VERSION_MAJOR >= 3)
+		printf("Unable to connect to a SBG : InitCriticalSection() failed.\n");
+		sbgInterfaceDestroy(&pSBG->sbgInterface);
 #else
 		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
 		{
@@ -1403,11 +1323,18 @@ inline int ConnectSBG(SBG* pSBG, char* szCfgFilePath)
 			printf("Unable to connect to a SBG : InitCriticalSection() failed.\n");
 			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
 		}
-		else
+#ifndef DISABLE_SBG_TCP
+		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
 		{
-			printf("Unable to connect to a SBG : InitCriticalSection() failed and wrong interface type.\n");
+			printf("Unable to connect to a SBG : InitCriticalSection() failed.\n");
+			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
 		}
 #endif // DISABLE_SBG_TCP
+		else
+		{
+			printf("Unable to connect to a SBG : InitCriticalSection() failed and unsupported interface type.\n");
+		}
+#endif // (SBG_E_COM_VERSION_MAJOR >= 3)
 		return EXIT_FAILURE;
 	}
 #else
@@ -1437,26 +1364,9 @@ inline int DisconnectSBG(SBG* pSBG)
 	DeleteCriticalSection(&pSBG->CallbackCS);
 	if (sbgEComClose(&pSBG->comHandle) != SBG_NO_ERROR)
 	{
-#ifndef DISABLE_SBG_TCP
-		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-		{
-			printf("Error while disconnecting a SBG.\n");
-			sbgInterfaceSerialDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-		{
-			printf("Error while disconnecting a SBG.\n");
-			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
-		}
-		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
-		{
-			printf("Error while disconnecting a SBG.\n");
-			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
-		}
-		else
-		{
-			printf("SBG disconnection failed.\n");
-		}
+#if (SBG_E_COM_VERSION_MAJOR >= 3)
+		printf("Error while disconnecting a SBG.\n");
+		sbgInterfaceDestroy(&pSBG->sbgInterface);
 #else
 		if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
 		{
@@ -1468,14 +1378,27 @@ inline int DisconnectSBG(SBG* pSBG)
 			printf("Error while disconnecting a SBG.\n");
 			sbgInterfaceUdpDestroy(&pSBG->sbgInterface);
 		}
-		else
+#ifndef DISABLE_SBG_TCP
+		else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
 		{
-			printf("SBG disconnection failed.\n");
+			printf("Error while disconnecting a SBG.\n");
+			sbgInterfaceTcpDestroy(&pSBG->sbgInterface);
 		}
 #endif // DISABLE_SBG_TCP
+		else
+		{
+			printf("SBG disconnection failed and unsupported interface type.\n");
+		}
+#endif // (SBG_E_COM_VERSION_MAJOR >= 3)
 		return EXIT_FAILURE;
 	}
-#ifndef DISABLE_SBG_TCP
+#if (SBG_E_COM_VERSION_MAJOR >= 3)
+	if (sbgInterfaceDestroy(&pSBG->sbgInterface) != SBG_NO_ERROR)
+	{
+		printf("SBG disconnection failed.\n");
+		return EXIT_FAILURE;
+	}
+#else
 	if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
 	{
 		if (sbgInterfaceSerialDestroy(&pSBG->sbgInterface) != SBG_NO_ERROR)
@@ -1492,6 +1415,7 @@ inline int DisconnectSBG(SBG* pSBG)
 			return EXIT_FAILURE;
 		}
 	}
+#ifndef DISABLE_SBG_TCP
 	else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_TCP_IP)
 	{
 		if (sbgInterfaceTcpDestroy(&pSBG->sbgInterface) != SBG_NO_ERROR)
@@ -1500,34 +1424,13 @@ inline int DisconnectSBG(SBG* pSBG)
 			return EXIT_FAILURE;
 		}
 	}
-	else
-	{
-		printf("SBG disconnection failed.\n");
-		return EXIT_FAILURE;
-	}
-#else
-	if (pSBG->sbgInterface.type == SBG_IF_TYPE_SERIAL)
-	{
-		if (sbgInterfaceSerialDestroy(&pSBG->sbgInterface) != SBG_NO_ERROR)
-		{
-			printf("SBG disconnection failed.\n");
-			return EXIT_FAILURE;
-		}
-	}
-	else if (pSBG->sbgInterface.type == SBG_IF_TYPE_ETH_UDP)
-	{
-		if (sbgInterfaceUdpDestroy(&pSBG->sbgInterface) != SBG_NO_ERROR)
-		{
-			printf("SBG disconnection failed.\n");
-			return EXIT_FAILURE;
-		}
-	}
-	else
-	{
-		printf("SBG disconnection failed.\n");
-		return EXIT_FAILURE;
-	}
 #endif // DISABLE_SBG_TCP
+	else
+	{
+		printf("SBG disconnection failed and unsupported interface type.\n");
+		return EXIT_FAILURE;
+	}
+#endif // (SBG_E_COM_VERSION_MAJOR >= 3)
 #else
 	if (CloseRS232Port(&pSBG->RS232Port) != EXIT_SUCCESS)
 	{

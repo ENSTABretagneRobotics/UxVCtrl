@@ -1,3 +1,6 @@
+398
+Improved latest SBG SDK support.
+
 397
 Updated project files to use OpenCV 4.2.0 as default.
 
