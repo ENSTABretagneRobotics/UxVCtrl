@@ -6,6 +6,7 @@ COM9
 % BaudRate
 115200
 %256000
+%1000000
 % Timeout (in ms)
 2500
 % threadperiod (in ms, require associated thread)
@@ -14,13 +15,13 @@ COM9
 1
 % bStartScanModeAtStartup
 1
-% ScanMode (0 : SCAN, 1 : EXPRESS_SCAN, 2 : FORCE_SCAN, or if using GetOtherScanDataResponseRPLIDAR(), the available values and modes might be different, see https://github.com/ENSTABretagneRobotics/Hardware-MATLAB/issues/3#issuecomment-661349278)
+% ScanMode (0 : SCAN (to be used with GetScanDataResponseRPLIDAR()), 254 : LEGACY_EXPRESS_SCAN (to be used with GetExpressScanDataResponseRPLIDAR()), 255 : FORCE_SCAN (to be used with GetScanDataResponseRPLIDAR()), other available values and modes might vary depending on the device (to be used with GetOtherScanDataResponseRPLIDAR()), see e.g. https://github.com/ENSTABretagneRobotics/Hardware-MATLAB/issues/3#issuecomment-661349278)
 1
 % motordelay (in ms)
 2000
 % motorPWM (in [0..1023], 660 : default)
 660
-% maxhist (0 : try to automatically remove old data, around 180 : advised for SCAN mode, around 360 : advised for EXPRESS_SCAN mode, require associated thread)
+% maxhist (0 : try to automatically remove old data, around 180 : advised for SCAN mode, around 360 : advised for LEGACY_EXPRESS_SCAN mode, require associated thread)
 0
 % alpha_max_err (in rad)
 0.01
