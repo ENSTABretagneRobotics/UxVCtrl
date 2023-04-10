@@ -221,19 +221,19 @@
 
 @echo Disabling OpenCV 
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SystemDrive)\OpenCV4.2.0\include" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SystemDrive)\OpenCV4.5.4\include" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SystemDrive)\OpenCV4.2.0\x86\vc15\lib" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SystemDrive)\OpenCV4.5.4\x86\vc15\lib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SystemDrive)\OpenCV4.2.0\x86\vc15\staticlib" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";$(SystemDrive)\OpenCV4.5.4\x86\vc15\staticlib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";opencv_world420d.lib" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";opencv_world454d.lib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";opencv_calib3d420.lib;opencv_dnn420.lib;opencv_gapi420.lib;opencv_core420.lib;opencv_features2d420.lib;opencv_flann420.lib;opencv_highgui420.lib;opencv_videoio420.lib;opencv_imgcodecs420.lib;opencv_imgproc420.lib;opencv_ml420.lib;opencv_objdetect420.lib;opencv_photo420.lib;opencv_stitching420.lib;opencv_video420.lib;libwebp.lib;ippicvmt.lib;ippiw.lib;ittnotify.lib;libprotobuf.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg-turbo.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib" /replacestr ""
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr ";opencv_calib3d454.lib;opencv_dnn454.lib;opencv_gapi454.lib;opencv_core454.lib;opencv_features2d454.lib;opencv_flann454.lib;opencv_highgui454.lib;opencv_videoio454.lib;opencv_imgcodecs454.lib;opencv_imgproc454.lib;opencv_ml454.lib;opencv_objdetect454.lib;opencv_photo454.lib;opencv_stitching454.lib;opencv_video454.lib;libwebp.lib;ippicvmt.lib;ippiw.lib;ittnotify.lib;libprotobuf.lib;IlmImf.lib;zlib.lib;libjasper.lib;libjpeg-turbo.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib" /replacestr ""
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<ClCompile Include=""Ball.cpp"" />" /replacestr "<ClCompile Include=""Ball.cpp""><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Debug|Win32'"">true</ExcludedFromBuild><ExcludedFromBuild Condition=""'$(Configuration)|$(Platform)'=='Release|Win32'"">true</ExcludedFromBuild></ClCompile>"
@@ -319,19 +319,19 @@
 @replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "<PreprocessorDefinitions>" /replacestr "<PreprocessorDefinitions>USE_FFMPEG_VIDEO;"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "$(SystemDrive)\OpenCV4.2.0\include" /replacestr "$(ProgramFiles)\ffmpeg-msvc\include;$(SystemDrive)\OpenCV4.2.0\include"
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "$(SystemDrive)\OpenCV4.5.4\include" /replacestr "$(ProgramFiles)\ffmpeg-msvc\include;$(SystemDrive)\OpenCV4.5.4\include"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "$(SystemDrive)\OpenCV4.2.0\x86\vc15\lib" /replacestr "$(ProgramFiles)\ffmpeg-msvc\x86\vc15\lib;$(SystemDrive)\OpenCV4.2.0\x86\vc15\lib"
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "$(SystemDrive)\OpenCV4.5.4\x86\vc15\lib" /replacestr "$(ProgramFiles)\ffmpeg-msvc\x86\vc15\lib;$(SystemDrive)\OpenCV4.5.4\x86\vc15\lib"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "$(SystemDrive)\OpenCV4.2.0\x86\vc15\staticlib" /replacestr "$(ProgramFiles)\ffmpeg-msvc\x86\vc15\lib;$(SystemDrive)\OpenCV4.2.0\x86\vc15\staticlib"
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "$(SystemDrive)\OpenCV4.5.4\x86\vc15\staticlib" /replacestr "$(ProgramFiles)\ffmpeg-msvc\x86\vc15\lib;$(SystemDrive)\OpenCV4.5.4\x86\vc15\staticlib"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "opencv_world420d.lib" /replacestr "avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;opencv_world420d.lib"
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "opencv_world454d.lib" /replacestr "avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;opencv_world454d.lib"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 
-@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "opencv_calib3d420.lib" /replacestr "avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;opencv_calib3d420.lib"
+@replaceinfile /infile UxVCtrl.vcxproj /outfile "%TMP%\UxVCtrl\UxVCtrl.vcxproj" /searchstr "opencv_calib3d454.lib" /replacestr "avcodec.lib;avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;postproc.lib;swresample.lib;swscale.lib;opencv_calib3d454.lib"
 @copy /Y /B "%TMP%\UxVCtrl\UxVCtrl.vcxproj" UxVCtrl.vcxproj
 )
 

@@ -2,10 +2,10 @@ This folder ( https://github.com/ENSTABretagneRobotics/UxVCtrl ) contains a prog
 
 Quick start:
 *** USER and DEVELOPER ***
-_ Use Windows 10 Professional 64 bit or Ubuntu 18.04 64 bit and see https://github.com/ENSTABretagneRobotics/UxVCtrl/releases 
+_ Use Windows 10 Professional 64 bit or Ubuntu 22.04 64 bit and see https://github.com/ENSTABretagneRobotics/UxVCtrl/releases 
 *** DEVELOPER ***
 _ Connect to the Internet
-_ Install a C/C++ compiler (see e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf to install Visual Studio 2017 for Windows or alternatively e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_qt5.12.6_opencv420.pdf and add C:\Qt\Qt5.12.6\5.12.6\mingw73_32\bin;C:\Qt\Qt5.12.6\Tools\mingw730_32\bin to your PATH environment variable to install Qt 5.12.6 with MinGW 7.3.0 32 bit, sudo apt-get install build-essential for Ubuntu)
+_ Install a C/C++ compiler (see e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf to install Visual Studio 2017 for Windows or alternatively e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_qt_opencv.pdf to install MinGW, sudo apt-get install build-essential for Ubuntu)
 _ Install cmake-gui (preferably 32 bit version for Windows (e.g. https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi ) and ensure it is added to the PATH environment variable, sudo apt-get install cmake cmake-gui for Ubuntu)
 _ Reboot
 _ Launch cmake-gui, choose UxVCtrl as build and source folder, click Configure, choose the compiler (check if it outputs other messages requesting an action), click Generate, and open the generate .sln file to build UxVCtrl if you have Visual Studio, or open a terminal in the folder and run mingw32-make or make. UxVCtrl.exe should be generated (move it from the Release folder to the UxVCtrl folder to test it if needed). You might want also to change some options in cmake-gui to enable/disable specific features, and try to rebuild.
@@ -42,9 +42,9 @@ _ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.e
 *** DEVELOPER ***
 _ Visual Studio 2017
 [_ cmake-gui (see https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi )]
-_ OpenCV 3.2.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
+_ OpenCV 4.5.4 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2022_opencv454.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
 _ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip , can be disabled using Compat_vs20XX.bat script or cmake)
-_ SBG Systems Inertial SDK v3.5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script or cmake)
+_ SBG Systems Inertial SDK v5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 _ ..\OSUtils: Windows/Linux abstraction layer (threads, network, serial port, time management...) as well as other useful functions (see https://github.com/ENSTABretagneRobotics/OSUtils )
 _ ..\Extensions: Labjack and some image functions (see https://github.com/ENSTABretagneRobotics/Extensions )
 _ ..\interval: interval library (see https://github.com/ENSTABretagneRobotics/interval )

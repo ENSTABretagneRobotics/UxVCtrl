@@ -1,3 +1,7 @@
+400
+Improved support of OpenCV 4.5.4.
+Added bDisablelogstate, bDisablelogsimu and MAVLinkInterface_bDisabletlog.
+
 399
 Updated RPLIDAR.
 
