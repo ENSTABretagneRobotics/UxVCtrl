@@ -34,28 +34,34 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	double lat = 0, lon = 0, alt = 0, hdg = 0;
 
+	FILE* logsimufile = NULL;
+	char logsimufilename[MAX_BUF_LEN];
+
 	UNREFERENCED_PARAMETER(pParam);
 
-	EnterCriticalSection(&strtimeCS);
-	sprintf(logsimufilename, LOG_FOLDER"logsimu_%.64s.csv", strtimeex_fns());
-	LeaveCriticalSection(&strtimeCS);
-	logsimufile = fopen(logsimufilename, "w");
-	if (logsimufile == NULL)
+	if (!bDisablelogsimu)
 	{
-		printf("Unable to create log file.\n");
-		if (!bExit) bExit = TRUE; // Unexpected program exit...
-		return 0;
-	}
+		EnterCriticalSection(&strtimeCS);
+		sprintf(logsimufilename, LOG_FOLDER"logsimu_%.64s.csv", strtimeex_fns());
+		LeaveCriticalSection(&strtimeCS);
+		logsimufile = fopen(logsimufilename, "w");
+		if (logsimufile == NULL)
+		{
+			printf("Unable to create log file.\n");
+			if (!bExit) bExit = TRUE; // Unexpected program exit...
+			return 0;
+		}
 
-	fprintf(logsimufile,
-		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
-		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;accrxhat;accryhat;accrzhat;"
-		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
-		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
-		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
-		"EPU1;EPU2;\n"
-	);
-	fflush(logsimufile);
+		fprintf(logsimufile,
+			"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
+			"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;accrxhat;accryhat;accrzhat;"
+			"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
+			"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
+			"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
+			"EPU1;EPU2;\n"
+		);
+		fflush(logsimufile);
+	}
 
 	GNSSqualitySimulator = GNSS_NO_FIX;
 
@@ -517,25 +523,27 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat, &lon, &alt);
 		hdg = (fmod_2PI(-angle_env-psi_sim+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
-		// Log.
-		fprintf(logsimufile, 			
-			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%.3f;%.3f;\n",
-			t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d_sim, fmod_360_rad2deg(alpha_sim), 0.0, utc,
-			t, x_sim, y_sim, z_sim, 0.0, 0.0, psi_sim,
-			vrx_sim, 0.0, 0.0, 0.0, 0.0, omegaz_sim, 0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, u1, u2, u3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			0.0, 0.0);
-		fflush(logsimufile);
+		if (logsimufile)
+		{
+			fprintf(logsimufile,
+				"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%.3f;%.3f;%.3f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%.3f;%.3f;\n",
+				t_epoch, lat, lon, alt, hdg, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, d_sim, fmod_360_rad2deg(alpha_sim), 0.0, utc,
+				t, x_sim, y_sim, z_sim, 0.0, 0.0, psi_sim,
+				vrx_sim, 0.0, 0.0, 0.0, 0.0, omegaz_sim, 0.0, 0.0, 0.0,
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				0.0, 0.0, 0.0, 0.0, 0.0, 0.0, u1, u2, u3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				0.0, 0.0);
+			fflush(logsimufile);
+		}
 
 		LeaveCriticalSection(&StateVariablesCS);
 
@@ -546,7 +554,10 @@ THREAD_PROC_RETURN_VALUE SimulatorThread(void* pParam)
 
 	GNSSqualitySimulator = GNSS_NO_FIX;
 
-	fclose(logsimufile);
+	if (logsimufile)
+	{
+		fclose(logsimufile);
+	}
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

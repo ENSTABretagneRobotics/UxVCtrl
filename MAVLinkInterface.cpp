@@ -36,6 +36,9 @@ typedef enum MAVLINKINTERFACE_PARAM_ID MAVLINKINTERFACE_PARAM_ID;
 RS232PORT MAVLinkInterfacePseudoRS232Port;
 BOOL MAVLinkInterface_bDisablePWMOverride = FALSE;
 
+FILE* tlogfile = NULL;
+char tlogfilename[MAX_BUF_LEN];
+
 int connectmavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 {
 	if (OpenRS232Port(pMAVLinkInterfacePseudoRS232Port, szMAVLinkInterfacePath) != EXIT_SUCCESS) 

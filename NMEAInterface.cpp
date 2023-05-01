@@ -781,12 +781,12 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(nmeainterfacefilename, LOG_FOLDER"tlog_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//nmeainterfacefile = fopen(nmeainterfacefilename, "w");
+	//if (nmeainterfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create nmeainterface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -887,7 +887,7 @@ THREAD_PROC_RETURN_VALUE NMEAInterfaceThread(void* pParam)
 		if (bConnected) disconnectnmeainterface(&NMEAInterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(nmeainterfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

@@ -213,12 +213,12 @@ THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(ssc32interfacefilename, LOG_FOLDER"ssc32interface_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//ssc32interfacefile = fopen(ssc32interfacefilename, "w");
+	//if (ssc32interfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create ssc32interface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -292,7 +292,7 @@ THREAD_PROC_RETURN_VALUE SSC32InterfaceThread(void* pParam)
 		if (bConnected) disconnectssc32interface(&SSC32InterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(ssc32interfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

@@ -357,6 +357,7 @@ extern int opencvguiimgheight[MAX_NB_OPENCVGUI];
 extern int opencvguiperiod;
 extern int ExitOnErrorCount;
 extern int AutoResumeMissionMode;
+extern BOOL bDisablelogstate;
 extern BOOL bDisablelognav;
 extern BOOL bStdOutDetailedInfo;
 extern BOOL bCommandPrompt;
@@ -390,6 +391,7 @@ extern int MAVLinkInterface_overridechan;
 extern BOOL MAVLinkInterface_bDefaultDisablePWMOverride;
 extern int MAVLinkInterface_forceoverrideinputschan;
 extern BOOL MAVLinkInterface_bDefaultForceOverrideInputs;
+extern BOOL MAVLinkInterface_bDisabletlog;
 extern BOOL bNMEAInterface;
 extern char szNMEAInterfacePath[MAX_BUF_LEN];
 extern int NMEAInterfaceBaudRate;
@@ -584,6 +586,7 @@ alphas, omegas;
 extern double outliers_ratio;
 extern BOOL bNoSimGNSSInsideObstacles;
 extern BOOL bRawSimStateInMAVLinkInterface;
+extern BOOL bDisablelogsimu;
 extern int simulatorperiod;
 #pragma endregion
 
@@ -1118,17 +1121,8 @@ extern char keys[NB_CONFIGURABLE_KEYS];
 
 extern FILE* missionfile;
 
-extern FILE* logsimufile;
-extern char logsimufilename[MAX_BUF_LEN];
-
-extern FILE* logstatefile;
-extern char logstatefilename[MAX_BUF_LEN];
-
 extern FILE* logmissionfile;
 extern char logmissionfilename[MAX_BUF_LEN];
-
-extern FILE* tlogfile;
-extern char tlogfilename[MAX_BUF_LEN];
 
 inline int GetGNSSlevel(void)
 {

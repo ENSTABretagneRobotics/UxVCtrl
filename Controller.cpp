@@ -206,8 +206,8 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 	double latitude = 0, longitude = 0, altitude = 0;
 
 #pragma region lognav
-	char lognavfilename[MAX_BUF_LEN];
 	FILE* lognavfile = NULL;
+	char lognavfilename[MAX_BUF_LEN];
 #pragma endregion
 
 #pragma region Sailboat supervisor
@@ -1013,7 +1013,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma endregion
 
 #pragma region lognav
-		if (!bDisablelognav)
+		if (lognavfile)
 		{
 			fprintf(lognavfile, "%d;%f;%.8f;%.8f;%.3f;%.3f;%.3f;"
 				"%.3f;%.1f;%.3f;%.1f;%.3f;%.3f;%.3f;"
@@ -1045,7 +1045,7 @@ THREAD_PROC_RETURN_VALUE ControllerThread(void* pParam)
 #pragma endregion
 
 #pragma region lognav
-	if (!bDisablelognav)
+	if (lognavfile)
 	{
 		fclose(lognavfile);
 	}

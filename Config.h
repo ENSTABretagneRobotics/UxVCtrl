@@ -66,6 +66,7 @@ inline int LoadConfig(void)
 	opencvguiperiod = 100;
 	ExitOnErrorCount = 0;
 	AutoResumeMissionMode = 0;
+	bDisablelogstate = FALSE;
 	bDisablelognav = FALSE;
 	bStdOutDetailedInfo = FALSE;
 	bCommandPrompt = TRUE;
@@ -100,6 +101,7 @@ inline int LoadConfig(void)
 	MAVLinkInterface_bDefaultDisablePWMOverride = TRUE;
 	MAVLinkInterface_forceoverrideinputschan = 6;
 	MAVLinkInterface_bDefaultForceOverrideInputs = FALSE;
+	MAVLinkInterface_bDisabletlog = FALSE;
 	bNMEAInterface = TRUE;
 	memset(szNMEAInterfacePath, 0, sizeof(szNMEAInterfacePath));
 	sprintf(szNMEAInterfacePath, ":5001");
@@ -403,6 +405,7 @@ inline int LoadConfig(void)
 	outliers_ratio = 0.5;
 	bNoSimGNSSInsideObstacles = FALSE;
 	bRawSimStateInMAVLinkInterface = FALSE;
+	bDisablelogsimu = FALSE;
 	simulatorperiod = 70;
 #pragma endregion
 
@@ -492,6 +495,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &ExitOnErrorCount) != 1) printf("Invalid parameter : ExitOnErrorCount.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : AutoResumeMissionMode.\n");
 		if (sscanf(line, "%d", &AutoResumeMissionMode) != 1) printf("Invalid parameter : AutoResumeMissionMode.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisablelogstate.\n");
+		if (sscanf(line, "%d", &bDisablelogstate) != 1) printf("Invalid parameter : bDisablelogstate.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisablelognav.\n");
 		if (sscanf(line, "%d", &bDisablelognav) != 1) printf("Invalid parameter : bDisablelognav.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bStdOutDetailedInfo.\n");
@@ -556,6 +561,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &MAVLinkInterface_forceoverrideinputschan) != 1) printf("Invalid parameter : MAVLinkInterface_forceoverrideinputschan.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : MAVLinkInterface_bDefaultForceOverrideInputs.\n");
 		if (sscanf(line, "%d", &MAVLinkInterface_bDefaultForceOverrideInputs) != 1) printf("Invalid parameter : MAVLinkInterface_bDefaultForceOverrideInputs.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : MAVLinkInterface_bDisabletlog.\n");
+		if (sscanf(line, "%d", &MAVLinkInterface_bDisabletlog) != 1) printf("Invalid parameter : MAVLinkInterface_bDisabletlog.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bNMEAInterface.\n");
 		if (sscanf(line, "%d", &bNMEAInterface) != 1) printf("Invalid parameter : bNMEAInterface.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : szNMEAInterfacePath.\n");
@@ -1291,6 +1298,8 @@ inline int LoadConfig(void)
 		if (sscanf(line, "%d", &bNoSimGNSSInsideObstacles) != 1) printf("Invalid parameter : bNoSimGNSSInsideObstacles.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bRawSimStateInMAVLinkInterface.\n");
 		if (sscanf(line, "%d", &bRawSimStateInMAVLinkInterface) != 1) printf("Invalid parameter : bRawSimStateInMAVLinkInterface.\n");
+		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : bDisablelogsimu.\n");
+		if (sscanf(line, "%d", &bDisablelogsimu) != 1) printf("Invalid parameter : bDisablelogsimu.\n");
 		if (fgets3(file, line, sizeof(line)) == NULL) printf("Error reading parameter : simulatorperiod.\n");
 		if (sscanf(line, "%d", &simulatorperiod) != 1) printf("Invalid parameter : simulatorperiod.\n");
 #pragma endregion
@@ -1693,6 +1702,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", ExitOnErrorCount) < 0) printf("Error writing parameter : ExitOnErrorCount.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : AutoResumeMissionMode.\n");
 	if (fprintf(fileout, "%d\n", AutoResumeMissionMode) < 0) printf("Error writing parameter : AutoResumeMissionMode.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisablelogstate.\n");
+	if (fprintf(fileout, "%d\n", bDisablelogstate) < 0) printf("Error writing parameter : bDisablelogstate.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisablelognav.\n");
 	if (fprintf(fileout, "%d\n", bDisablelognav) < 0) printf("Error writing parameter : bDisablelognav.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bStdOutDetailedInfo.\n");
@@ -1757,6 +1768,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", MAVLinkInterface_forceoverrideinputschan) < 0) printf("Error writing parameter : MAVLinkInterface_forceoverrideinputschan.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : MAVLinkInterface_bDefaultForceOverrideInputs.\n");
 	if (fprintf(fileout, "%d\n", MAVLinkInterface_bDefaultForceOverrideInputs) < 0) printf("Error writing parameter : MAVLinkInterface_bDefaultForceOverrideInputs.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : MAVLinkInterface_bDisabletlog.\n");
+	if (fprintf(fileout, "%d\n", MAVLinkInterface_bDisabletlog) < 0) printf("Error writing parameter : MAVLinkInterface_bDisabletlog.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bNMEAInterface.\n");
 	if (fprintf(fileout, "%d\n", bNMEAInterface) < 0) printf("Error writing parameter : bNMEAInterface.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : szNMEAInterfacePath.\n");
@@ -2472,6 +2485,8 @@ inline int SaveConfig(void)
 	if (fprintf(fileout, "%d\n", bNoSimGNSSInsideObstacles) < 0) printf("Error writing parameter : bNoSimGNSSInsideObstacles.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bRawSimStateInMAVLinkInterface.\n");
 	if (fprintf(fileout, "%d\n", bRawSimStateInMAVLinkInterface) < 0) printf("Error writing parameter : bRawSimStateInMAVLinkInterface.\n");
+	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : bDisablelogsimu.\n");
+	if (fprintf(fileout, "%d\n", bDisablelogsimu) < 0) printf("Error writing parameter : bDisablelogsimu.\n");
 	if (fgetscopy3(filein, fileout, line, sizeof(line)) == NULL) printf("Invalid parameter : simulatorperiod.\n");
 	if (fprintf(fileout, "%d\n", simulatorperiod) < 0) printf("Error writing parameter : simulatorperiod.\n");
 #pragma endregion

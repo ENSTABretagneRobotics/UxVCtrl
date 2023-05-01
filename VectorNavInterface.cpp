@@ -467,12 +467,12 @@ THREAD_PROC_RETURN_VALUE VectorNavInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(vectornavinterfacefilename, LOG_FOLDER"vectornavinterface_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//vectornavinterfacefile = fopen(vectornavinterfacefilename, "w");
+	//if (vectornavinterfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create vectornavinterface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -546,7 +546,7 @@ THREAD_PROC_RETURN_VALUE VectorNavInterfaceThread(void* pParam)
 		if (bConnected) disconnectvectornavinterface(&VectorNavInterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(vectornavinterfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

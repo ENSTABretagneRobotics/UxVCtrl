@@ -22,28 +22,34 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	double cosfilteredwinddir = 0, sinfilteredwinddir = 0;
 	double lathat = 0, longhat = 0, althat = 0, headinghat = 0, coghat = 0;
 
+	FILE* logstatefile = NULL;
+	char logstatefilename[MAX_BUF_LEN];
+
 	UNREFERENCED_PARAMETER(pParam);
 
-	EnterCriticalSection(&strtimeCS);
-	sprintf(logstatefilename, LOG_FOLDER"logstate_%.64s.csv", strtimeex_fns());
-	LeaveCriticalSection(&strtimeCS);
-	logstatefile = fopen(logstatefilename, "w");
-	if (logstatefile == NULL)
+	if (!bDisablelogstate)
 	{
-		printf("Unable to create log file.\n");
-		if (!bExit) bExit = TRUE; // Unexpected program exit...
-		return 0;
-	}
+		EnterCriticalSection(&strtimeCS);
+		sprintf(logstatefilename, LOG_FOLDER"logstate_%.64s.csv", strtimeex_fns());
+		LeaveCriticalSection(&strtimeCS);
+		logstatefile = fopen(logstatefilename, "w");
+		if (logstatefile == NULL)
+		{
+			printf("Unable to create log file.\n");
+			if (!bExit) bExit = TRUE; // Unexpected program exit...
+			return 0;
+		}
 
-	fprintf(logstatefile,
-		"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
-		"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;accrxhat;accryhat;accrzhat;"
-		"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
-		"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
-		"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
-		"EPU1;EPU2;\n"
-		); 
-	fflush(logstatefile);
+		fprintf(logstatefile,
+			"t_epoch (in s);lat;lon;alt_amsl;hdg;cog;sog;alt_agl;pressure (in bar);fluiddira (in deg);fluidspeeda;fluiddir (in deg);fluidspeed;range;bearing (in deg);elevation (in deg);utc (in ms);"
+			"t_app (in s);xhat;yhat;zhat;phihat;thetahat;psihat;vrxhat;vryhat;vrzhat;omegaxhat;omegayhat;omegazhat;accrxhat;accryhat;accrzhat;"
+			"xhat_err;yhat_err;zhat_err;phihat_err;thetahat_err;psihat_err;vrxhat_err;vryhat_err;vrzhat_err;omegaxhat_err;omegayhat_err;omegazhat_err;accrxhat_err;accryhat_err;accrzhat_err;"
+			"wx;wy;wz;wphi;wtheta;wpsi;wd;wu;wagl;"
+			"uvx;uvy;uvz;uwx;uwy;uwz;u1;u2;u3;u4;u5;u6;u7;u8;u9;u10;u11;u12;u13;u14;"
+			"EPU1;EPU2;\n"
+		);
+		fflush(logstatefile);
+	}
 
 	EnterCriticalSection(&StateVariablesCS);
 	psitwind = psitwind_med;
@@ -446,25 +452,27 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 			break;
 		}
 
-		// Log.
-		fprintf(logstatefile,
-			"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%.3f;%.3f;%.3f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
-			"%.3f;%.3f;\n",
-			t_epoch, lathat, longhat, althat, headinghat, coghat, sog, altitude_AGL, pressure_mes, fluiddira, fluidspeeda, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
-			t, Center(xhat), Center(yhat), Center(zhat), Center(phihat), Center(thetahat), Center(psihat),
-			Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat), Center(accrxhat), Center(accryhat), Center(accrzhat), 
-			Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
-			Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0), Width(accrxhat/2.0), Width(accryhat/2.0), Width(accrzhat/2.0),
-			wx, wy, wz, wphi, wtheta, wpsi, wd, wu, wagl, 
-			u_f, ul_f, uv_f, ur_f, up_f, uw_f, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
-			EPU1, EPU2);
-		fflush(logstatefile);
+		if (logstatefile)
+		{
+			fprintf(logstatefile,
+				"%f;%.8f;%.8f;%.3f;%.2f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%f;%.3f;%.3f;%.3f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%.3f;%.3f;%.3f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;"
+				"%.3f;%.3f;\n",
+				t_epoch, lathat, longhat, althat, headinghat, coghat, sog, altitude_AGL, pressure_mes, fluiddira, fluidspeeda, fluiddir, fluidspeed, d_mes, fmod_360_rad2deg(alpha_mes), 0.0, utc,
+				t, Center(xhat), Center(yhat), Center(zhat), Center(phihat), Center(thetahat), Center(psihat),
+				Center(vrxhat), Center(vryhat), Center(vrzhat), Center(omegaxhat), Center(omegayhat), Center(omegazhat), Center(accrxhat), Center(accryhat), Center(accrzhat),
+				Width(xhat/2.0), Width(yhat/2.0), Width(zhat/2.0), Width(phihat/2.0), Width(thetahat/2.0), Width(psihat/2.0),
+				Width(vrxhat/2.0), Width(vryhat/2.0), Width(vrzhat/2.0), Width(omegaxhat/2.0), Width(omegayhat/2.0), Width(omegazhat/2.0), Width(accrxhat/2.0), Width(accryhat/2.0), Width(accrzhat/2.0),
+				wx, wy, wz, wphi, wtheta, wpsi, wd, wu, wagl,
+				u_f, ul_f, uv_f, ur_f, up_f, uw_f, u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12, u13, u14,
+				EPU1, EPU2);
+			fflush(logstatefile);
+		}
 
 		LeaveCriticalSection(&StateVariablesCS);
 
@@ -475,7 +483,10 @@ THREAD_PROC_RETURN_VALUE ObserverThread(void* pParam)
 	StopChronoQuick(&chrono_v);
 	StopChrono(&chrono, &t);
 
-	fclose(logstatefile);
+	if (logstatefile)
+	{
+		fclose(logstatefile);
+	}
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

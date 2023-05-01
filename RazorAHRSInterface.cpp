@@ -245,12 +245,12 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(razorahrsinterfacefilename, LOG_FOLDER"razorahrsinterface_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//razorahrsinterfacefile = fopen(razorahrsinterfacefilename, "w");
+	//if (razorahrsinterfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create razorahrsinterface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -324,7 +324,7 @@ THREAD_PROC_RETURN_VALUE RazorAHRSInterfaceThread(void* pParam)
 		if (bConnected) disconnectrazorahrsinterface(&RazorAHRSInterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(razorahrsinterfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

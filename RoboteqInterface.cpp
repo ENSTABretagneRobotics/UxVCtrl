@@ -199,12 +199,12 @@ THREAD_PROC_RETURN_VALUE RoboteqInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(roboteqinterfacefilename, LOG_FOLDER"roboteqinterface_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//roboteqinterfacefile = fopen(roboteqinterfacefilename, "w");
+	//if (roboteqinterfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create roboteqinterface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -278,7 +278,7 @@ THREAD_PROC_RETURN_VALUE RoboteqInterfaceThread(void* pParam)
 		if (bConnected) disconnectroboteqinterface(&RoboteqInterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(roboteqinterfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

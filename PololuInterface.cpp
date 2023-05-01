@@ -214,12 +214,12 @@ THREAD_PROC_RETURN_VALUE PololuInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(pololuinterfacefilename, LOG_FOLDER"pololuinterface_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//pololuinterfacefile = fopen(pololuinterfacefilename, "w");
+	//if (pololuinterfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create pololuinterface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -293,7 +293,7 @@ THREAD_PROC_RETURN_VALUE PololuInterfaceThread(void* pParam)
 		if (bConnected) disconnectpololuinterface(&PololuInterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(pololuinterfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 

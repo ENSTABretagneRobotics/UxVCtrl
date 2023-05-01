@@ -116,6 +116,7 @@ int opencvguiimgheight[MAX_NB_OPENCVGUI];
 int opencvguiperiod = 0;
 int ExitOnErrorCount = 0;
 int AutoResumeMissionMode = 0;
+BOOL bDisablelogstate = FALSE;
 BOOL bDisablelognav = FALSE;
 BOOL bStdOutDetailedInfo = FALSE;
 BOOL bCommandPrompt = FALSE;
@@ -149,6 +150,7 @@ int MAVLinkInterface_overridechan = 0;
 BOOL MAVLinkInterface_bDefaultDisablePWMOverride = FALSE;
 int MAVLinkInterface_forceoverrideinputschan = 0;
 BOOL MAVLinkInterface_bDefaultForceOverrideInputs = FALSE;
+BOOL MAVLinkInterface_bDisabletlog = FALSE;
 BOOL bNMEAInterface = FALSE;
 char szNMEAInterfacePath[MAX_BUF_LEN];
 int NMEAInterfaceBaudRate = 0;
@@ -343,6 +345,7 @@ alphas = 0, omegas = 0;
 double outliers_ratio = 0;
 BOOL bNoSimGNSSInsideObstacles = FALSE;
 BOOL bRawSimStateInMAVLinkInterface = FALSE;
+BOOL bDisablelogsimu = FALSE;
 int simulatorperiod = 0;
 #pragma endregion
 
@@ -886,14 +889,5 @@ char keys[NB_CONFIGURABLE_KEYS];
 
 FILE* missionfile = NULL;
 
-FILE* logsimufile = NULL;
-char logsimufilename[MAX_BUF_LEN];
-
-FILE* logstatefile = NULL;
-char logstatefilename[MAX_BUF_LEN];
-
 FILE* logmissionfile = NULL;
 char logmissionfilename[MAX_BUF_LEN];
-
-FILE* tlogfile = NULL;
-char tlogfilename[MAX_BUF_LEN];

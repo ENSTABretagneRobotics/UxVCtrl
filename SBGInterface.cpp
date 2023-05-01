@@ -422,12 +422,12 @@ THREAD_PROC_RETURN_VALUE SBGInterfaceThread(void* pParam)
 	UNREFERENCED_PARAMETER(pParam);
 
 	//EnterCriticalSection(&strtimeCS);
-	//sprintf(tlogfilename, LOG_FOLDER"tlog_%.64s.tlog", strtimeex_fns());
+	//sprintf(sbginterfacefilename, LOG_FOLDER"sbginterface_%.64s.txt", strtimeex_fns());
 	//LeaveCriticalSection(&strtimeCS);
-	//tlogfile = fopen(tlogfilename, "w");
-	//if (tlogfile == NULL)
+	//sbginterfacefile = fopen(sbginterfacefilename, "w");
+	//if (sbginterfacefile == NULL)
 	//{
-	//	printf("Unable to create tlog file.\n");
+	//	printf("Unable to create sbginterface file.\n");
 	//	if (!bExit) bExit = TRUE; // Unexpected program exit...
 	//	return 0;
 	//}
@@ -501,7 +501,7 @@ THREAD_PROC_RETURN_VALUE SBGInterfaceThread(void* pParam)
 		if (bConnected) disconnectsbginterface(&SBGInterfacePseudoRS232Port);
 	}
 
-	//fclose(tlogfile);
+	//fclose(sbginterfacefile);
 
 	if (!bExit) bExit = TRUE; // Unexpected program exit...
 
