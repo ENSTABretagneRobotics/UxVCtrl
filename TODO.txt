@@ -1,6 +1,10 @@
 SBG latest SDK: sbgInterfaceDestroy() changes, hardware matlab cmakelists.txt to update...
 Remove ciscrea, lirmia3, libmodbus to simplify?
+enable more robid, simulators (riptide)...
+add spartan m1 simulator compatible with ros node
 Logguer ubx-rawx? 
+
+Wgs2local, waypoints2gpx à faire marcher pour grands fichiers 
 
 M1 remotewebcam->crash related to cv windows
 M1 uxvctrl->vaut mieux recompiler si besoin de cv ou autres libs
