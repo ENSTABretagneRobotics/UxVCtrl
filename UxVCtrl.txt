@@ -711,7 +711,7 @@ WMV2
 10
 % GPS_low_acc_HDOP (<=)
 2
-% GPS_low_acc_nbsat (in m, >=)
+% GPS_low_acc_nbsat (>=)
 4
 % GPS_min_sat_signal (in [0;99])
 20

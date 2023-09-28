@@ -156,6 +156,8 @@
 %
 %waitztwgs alt acc t (alt : double ]-oo,oo[ altitude in m in WGS, acc : double ]0,oo[ accuracy in m, t : double [0,oo[ timeout in s, the function blocks until the destination altitude or the timeout is reached, without control)
 %
+%waitaglt agl acc cmp t (z : double ]-oo,oo[ Altitude Above Ground in m in the environment coordinate system, acc : double ]0,oo[ accuracy in m for the equality comparison, cmp : 0 if the comparison is an equality, -1 if should be lower, 1 if should be greater, t : double [0,oo[ timeout in s, the function blocks until the destination Altitude Above Ground or the timeout is reached, without control)
+%
 %waitlinet xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached, without control)
 %
 %waitlinetrelative xa ya xb yb t (xa, ya, xb, yb : double ]-oo,oo[ position in m from the current position in the environment coordinate system of the 2 waypoints defining the line, t : double [0,oo[ timeout in s, the function blocks until the perpendicular to the destination waypoint or the timeout is reached, without control)
@@ -419,6 +421,8 @@
 %regsettoy regid (regid : int [0,32[)
 %
 %regsettoz regid (regid : int [0,32[)
+%
+%regsettoagl regid (regid : int [0,32[)
 %
 %regprint regid (regid : int [0,32[)
 %

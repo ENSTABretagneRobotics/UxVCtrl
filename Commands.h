@@ -2445,6 +2445,59 @@ inline int Commands(char* line)
 		StopChronoQuick(&chrono);
 		bWaiting = FALSE;
 	}
+	else if (sscanf(line, "waitaglt %lf %lf %d %lf", &dval1, &dval2, &ival, &delay) == 4)
+	{
+		EnterCriticalSection(&StateVariablesCS);
+		wagl = dval1;
+		LeaveCriticalSection(&StateVariablesCS);
+		delay = fabs(delay);
+		bWaiting = TRUE;
+		StartChrono(&chrono);
+		for (;;)
+		{
+			EnterCriticalSection(&StateVariablesCS);
+			if (ival > 0) {
+				if (wagl > altitude_AGL)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					break;
+				}
+				else
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+			}
+			else if (ival < 0) {
+				if (wagl < altitude_AGL)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					break;
+				}
+				else
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+			}
+			else {
+				if (fabs(wagl-altitude_AGL) < dval2)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					break;
+				}
+				else
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+				}
+			}
+			if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
+		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
 	else if (sscanf(line, "waitlinet %lf %lf %lf %lf %lf", &dval1, &dval2, &dval3, &dval4, &delay) == 5)
 	{
 		EnterCriticalSection(&StateVariablesCS);
@@ -3853,6 +3906,19 @@ inline int Commands(char* line)
 		{
 			EnterCriticalSection(&RegistersCS);
 			registers[ival] = Center(zhat);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+	else if (sscanf(line, "regsettoagl %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = altitude_AGL;
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}

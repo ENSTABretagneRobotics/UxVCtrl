@@ -1,8 +1,21 @@
+mavlinkinterface 
+devrait envoyer RC_CHANNELS (entrées commandes) en même temps que SERVO_OUTPUT_RAW...
+mavlinkinterface
+gps_raw_int.satellites_visible should be set more correctly...
+mavlinkinterface_GPS_prefix: GP, GN, GL, GA
+mavlinkinterface_GPS_mode: 0 for raw GPS data, 1 for emulated, 2 for sim (to check for sim vs emulated)
+
+
+
 SBG latest SDK: sbgInterfaceDestroy() changes, hardware matlab cmakelists.txt to update...
 Remove ciscrea, lirmia3, libmodbus to simplify?
 enable more robid, simulators (riptide)...
 add spartan m1 simulator compatible with ros node
 Logguer ubx-rawx? 
+
+robid: do not modify much, instead add other params to modify the behavior of existing...
+
+Mavlink, rplidar pas détecté auto par uxvctrl? Il dit aussi que pas sbg_tcp? À cause de programfilesx86 vs pas x86 (rajouter une option dans cmake force prgm86 ou force prgm?)?
 
 Wgs2local, waypoints2gpx à faire marcher pour grands fichiers 
 

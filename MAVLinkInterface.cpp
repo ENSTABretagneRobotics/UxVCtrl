@@ -165,6 +165,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_mission_clear_all_t mission_clear_all;
 	mavlink_command_long_t command;
 	mavlink_home_position_t home_position;
+	mavlink_global_position_int_t global_position_int;
 	mavlink_gps_raw_int_t gps_raw_int;
 	mavlink_attitude_t attitude;
 	mavlink_vfr_hud_t vfr_hud;
@@ -174,6 +175,7 @@ int handlemavlinkinterface(RS232PORT* pMAVLinkInterfacePseudoRS232Port)
 	mavlink_battery_status_t battery_status1, battery_status2;
 	mavlink_mission_current_t mission_current;
 	mavlink_servo_output_raw_t servo_output_raw;
+	//mavlink_rc_channels_t rc_channels;
 	mavlink_param_value_t param_value;
 	mavlink_command_ack_t command_ack;
 	//uint8_t result = MAV_RESULT_FAILED;
@@ -1611,6 +1613,16 @@ REQ_DATA_STREAM...
 	heartbeat.custom_mode = 0;
 	heartbeat.system_status = MAV_STATE_ACTIVE;
 
+	memset(&global_position_int, 0, sizeof(mavlink_global_position_int_t));
+	global_position_int.lat = (int32_t)(lathat*10000000.0);
+	global_position_int.lon = (int32_t)(longhat*10000000.0);
+	global_position_int.alt = (int32_t)(althat*1000.0);
+	global_position_int.relative_alt = (int32_t)(altitude_AGL*1000.0);
+	global_position_int.vx = (int16_t)(Center(vx_ned)*100.0);
+	global_position_int.vy = (int16_t)(Center(vy_ned)*100.0);
+	global_position_int.vz = (int16_t)(Center(vz_ned)*100.0);
+	global_position_int.hdg = (uint16_t)(fmod_360_pos_rad2deg(-angle_env-Center(psihat)+M_PI/2.0)*100.0);
+
 	memset(&gps_raw_int, 0, sizeof(mavlink_gps_raw_int_t));
 	if (bCheckGNSSOK())
 	{
@@ -1620,15 +1632,19 @@ REQ_DATA_STREAM...
 		case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
 		case GNSS_ACC_LEVEL_RTK_UNREL:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_3D_FIX;
+			gps_raw_int.satellites_visible = GPS_med_acc_nbsat;
 			break;
 		case GNSS_ACC_LEVEL_RTK_FLOAT:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FLOAT;
+			gps_raw_int.satellites_visible = GPS_high_acc_nbsat;
 			break;
 		case GNSS_ACC_LEVEL_RTK_FIXED:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FIXED;
+			gps_raw_int.satellites_visible = GPS_high_acc_nbsat;
 			break;
 		default:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_2D_FIX;
+			gps_raw_int.satellites_visible = GPS_low_acc_nbsat;
 			break;
 		}
 		gps_raw_int.vel = (uint16_t)(sog*100);
@@ -1637,6 +1653,7 @@ REQ_DATA_STREAM...
 	else
 	{
 		gps_raw_int.fix_type = GPS_FIX_TYPE_NO_FIX;
+		gps_raw_int.satellites_visible = 255;
 		gps_raw_int.vel = 65535;
 		gps_raw_int.cog = 65535;
 	}
@@ -1645,7 +1662,6 @@ REQ_DATA_STREAM...
 	gps_raw_int.alt = (int32_t)(althat*1000.0);
 	gps_raw_int.eph = 65535;
 	gps_raw_int.epv = 65535;
-	gps_raw_int.satellites_visible = 255;
 
 	memset(&attitude, 0, sizeof(mavlink_attitude_t));
 	attitude.roll = (float)fmod_2PI(Center(phihat));
@@ -1755,7 +1771,13 @@ REQ_DATA_STREAM...
 		EnvCoordSystem2GPS(lat_env, long_env, alt_env, angle_env, x_sim, y_sim, z_sim, &lat_sim, &long_sim, &alt_sim);
 		heading_sim = (fmod_2PI(-angle_env-psi_sim+3.0*M_PI/2.0)+M_PI)*180.0/M_PI;
 
+		global_position_int.lat = (int32_t)(lat_sim*10000000.0);
+		global_position_int.lon = (int32_t)(long_sim*10000000.0);
+		global_position_int.alt = (int32_t)(alt_sim*1000.0);
+		global_position_int.hdg = (uint16_t)(fmod_360_pos_rad2deg(-angle_env-psi_sim+M_PI/2.0)*100.0);
+
 		gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FIXED;
+		gps_raw_int.satellites_visible = GPS_high_acc_nbsat;
 
 		gps_raw_int.lat = (int32_t)(lat_sim*10000000.0);
 		gps_raw_int.lon = (int32_t)(long_sim*10000000.0);
@@ -1784,20 +1806,36 @@ REQ_DATA_STREAM...
 		fflush(tlogfile);
 	}
 
+	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_POSITION))
+	{
+		mavlink_msg_global_position_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &global_position_int);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
+	}
+
 	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RAW_SENSORS))
 	{
-	mavlink_msg_gps_raw_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_raw_int);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
+		mavlink_msg_gps_raw_int_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &gps_raw_int);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
 	}
 
 	mavlink_msg_attitude_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &attitude);
@@ -1828,18 +1866,18 @@ REQ_DATA_STREAM...
 
 	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RAW_CONTROLLER))
 	{
-	mavlink_msg_nav_controller_output_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &nav_controller_output);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
+		mavlink_msg_nav_controller_output_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &nav_controller_output);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
 	}
 
 	if (robid & SAILBOAT_CLASS_ROBID_MASK)
@@ -1918,34 +1956,47 @@ REQ_DATA_STREAM...
 
 	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RAW_CONTROLLER))
 	{
-	mavlink_msg_mission_current_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_current);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
+		mavlink_msg_mission_current_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &mission_current);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
 	}
 
 	if ((MAVLinkInterface_data_stream == MAV_DATA_STREAM_ALL)||(MAVLinkInterface_data_stream >= MAV_DATA_STREAM_RC_CHANNELS))
 	{
-	mavlink_msg_servo_output_raw_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &servo_output_raw);
-	memset(sendbuf, 0, sizeof(sendbuf));
-	sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
-	if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
-	{
-		return EXIT_FAILURE;
-	}
-	if (tlogfile)
-	{
-		fwrite_tlog(msg, tlogfile);
-		fflush(tlogfile);
-	}
+		mavlink_msg_servo_output_raw_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &servo_output_raw);
+		memset(sendbuf, 0, sizeof(sendbuf));
+		sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		{
+			return EXIT_FAILURE;
+		}
+		if (tlogfile)
+		{
+			fwrite_tlog(msg, tlogfile);
+			fflush(tlogfile);
+		}
+		// TODO
+		//mavlink_msg_rc_channels_encode((uint8_t)MAVLinkInterface_system_id, (uint8_t)MAVLinkInterface_component_id, &msg, &rc_channels);
+		//memset(sendbuf, 0, sizeof(sendbuf));
+		//sendbuflen = mavlink_msg_to_send_buffer((uint8_t*)sendbuf, &msg);
+		//if (WriteAllRS232Port(pMAVLinkInterfacePseudoRS232Port, sendbuf, sendbuflen) != EXIT_SUCCESS)
+		//{
+		//	return EXIT_FAILURE;
+		//}
+		//if (tlogfile)
+		//{
+		//	fwrite_tlog(msg, tlogfile);
+		//	fflush(tlogfile);
+		//}
 	}
 #pragma endregion
 	uSleep(1000*50);

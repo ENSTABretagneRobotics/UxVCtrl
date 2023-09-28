@@ -1,0 +1,47 @@
+generalstop
+depthreg -0.25
+%%%%%%%%%%
+% initial heading
+headingreg 0
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+% rotate to go back
+headingreg 180
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+%%%%%
+% change heading
+headingreg 90
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+% rotate to go back
+headingreg 270
+wait 10
+% forward
+thrust 0.1
+wait 10
+% stop
+thrust -0.1
+wait 3
+stop
+%%%%%%%%%%
+% end
+generalstop
