@@ -1340,6 +1340,12 @@ inline int LoadConfig(void)
 		robid = SUBMARINE_SIMULATOR_ROBID;
 		break;
 	}
+#ifdef DISABLE_OPENCV_SUPPORT
+	if (nbopencvgui > 0)
+	{
+		printf("Warning : nbopencvgui parameter is not 0 while the program is built without OpenCV support, please check DISABLE_OPENCV_SUPPORT and related CMake options if the GUI is needed.\n");
+	}
+#endif // DISABLE_OPENCV_SUPPORT
 #ifndef FORCE_SINGLE_THREAD_OPENCVGUI
 	if ((nbopencvgui < 0)||(nbopencvgui > MAX_NB_OPENCVGUI))
 	{

@@ -1632,19 +1632,19 @@ REQ_DATA_STREAM...
 		case GNSS_ACC_LEVEL_GNSS_FIX_HIGH:
 		case GNSS_ACC_LEVEL_RTK_UNREL:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_3D_FIX;
-			gps_raw_int.satellites_visible = GPS_med_acc_nbsat;
+			gps_raw_int.satellites_visible = (uint8_t)GPS_med_acc_nbsat;
 			break;
 		case GNSS_ACC_LEVEL_RTK_FLOAT:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FLOAT;
-			gps_raw_int.satellites_visible = GPS_high_acc_nbsat;
+			gps_raw_int.satellites_visible = (uint8_t)GPS_high_acc_nbsat;
 			break;
 		case GNSS_ACC_LEVEL_RTK_FIXED:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FIXED;
-			gps_raw_int.satellites_visible = GPS_high_acc_nbsat;
+			gps_raw_int.satellites_visible = (uint8_t)GPS_high_acc_nbsat;
 			break;
 		default:
 			gps_raw_int.fix_type = GPS_FIX_TYPE_2D_FIX;
-			gps_raw_int.satellites_visible = GPS_low_acc_nbsat;
+			gps_raw_int.satellites_visible = (uint8_t)GPS_low_acc_nbsat;
 			break;
 		}
 		gps_raw_int.vel = (uint16_t)(sog*100);
@@ -1777,7 +1777,7 @@ REQ_DATA_STREAM...
 		global_position_int.hdg = (uint16_t)(fmod_360_pos_rad2deg(-angle_env-psi_sim+M_PI/2.0)*100.0);
 
 		gps_raw_int.fix_type = GPS_FIX_TYPE_RTK_FIXED;
-		gps_raw_int.satellites_visible = GPS_high_acc_nbsat;
+		gps_raw_int.satellites_visible = (uint8_t)GPS_high_acc_nbsat;
 
 		gps_raw_int.lat = (int32_t)(lat_sim*10000000.0);
 		gps_raw_int.lon = (int32_t)(long_sim*10000000.0);
