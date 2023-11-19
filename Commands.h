@@ -849,6 +849,8 @@ inline int Commands(char* line)
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_wall = u;
+		d_wall = 0;
+		psi_wall = 0;
 		bWallDetection = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&WallCS);
@@ -877,6 +879,8 @@ inline int Commands(char* line)
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_wall = u;
+		d_wall = 0;
+		psi_wall = 0;
 		bWallTrackingControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&WallCS);
@@ -895,6 +899,8 @@ inline int Commands(char* line)
 		EnterCriticalSection(&WallCS);
 		EnterCriticalSection(&StateVariablesCS);
 		u_wall = u;
+		d_wall = 0;
+		psi_wall = 0;
 		bWallAvoidanceControl = TRUE;
 		LeaveCriticalSection(&StateVariablesCS);
 		LeaveCriticalSection(&WallCS);
@@ -3866,7 +3872,9 @@ inline int Commands(char* line)
 		else
 		{
 			EnterCriticalSection(&RegistersCS);
+			EnterCriticalSection(&StateVariablesCS);
 			registers[ival] = Center(psihat);
+			LeaveCriticalSection(&StateVariablesCS);
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
@@ -3879,7 +3887,9 @@ inline int Commands(char* line)
 		else
 		{
 			EnterCriticalSection(&RegistersCS);
+			EnterCriticalSection(&StateVariablesCS);
 			registers[ival] = Center(xhat);
+			LeaveCriticalSection(&StateVariablesCS);
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
@@ -3892,7 +3902,9 @@ inline int Commands(char* line)
 		else
 		{
 			EnterCriticalSection(&RegistersCS);
+			EnterCriticalSection(&StateVariablesCS);
 			registers[ival] = Center(yhat);
+			LeaveCriticalSection(&StateVariablesCS);
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
@@ -3905,7 +3917,9 @@ inline int Commands(char* line)
 		else
 		{
 			EnterCriticalSection(&RegistersCS);
+			EnterCriticalSection(&StateVariablesCS);
 			registers[ival] = Center(zhat);
+			LeaveCriticalSection(&StateVariablesCS);
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
@@ -3918,10 +3932,30 @@ inline int Commands(char* line)
 		else
 		{
 			EnterCriticalSection(&RegistersCS);
+			EnterCriticalSection(&StateVariablesCS);
 			registers[ival] = altitude_AGL;
+			LeaveCriticalSection(&StateVariablesCS);
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
+#ifndef DISABLE_OPENCV_SUPPORT
+	else if (sscanf(line, "regsettowall %d %d", &ival1, &ival2) == 2)
+	{
+		if ((ival1 < 0)||(ival1 >= MAX_NB_REGISTERS)||(ival2 < 0)||(ival2 >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			EnterCriticalSection(&WallCS);
+			registers[ival1] = d_wall;
+			registers[ival2] = psi_wall;
+			LeaveCriticalSection(&WallCS);
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
+#endif // !DISABLE_OPENCV_SUPPORT
 	else if (sscanf(line, "regprint %d", &ival) == 1)
 	{
 		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))

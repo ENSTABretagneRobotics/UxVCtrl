@@ -414,6 +414,7 @@ int bLat_wall = 0;
 int bBrake_wall = 0;
 int procid_wall = 0;
 double u_wall = 0;
+double d_wall = 0, psi_wall = 0;
 
 // Ball variables.
 BOOL bBallTrackingControl[MAX_NB_BALL];

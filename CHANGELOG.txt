@@ -1,3 +1,6 @@
+402 
+Added regsettowall command.
+
 401
 Updated MAVLinkInterface to improve compatibility with TBS Crossfire receiver.
 Added regsettoagl and waitaglt commands.

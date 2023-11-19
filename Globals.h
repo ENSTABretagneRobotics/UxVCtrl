@@ -655,6 +655,7 @@ extern int bLat_wall;
 extern int bBrake_wall;
 extern int procid_wall;
 extern double u_wall;
+extern double d_wall, psi_wall;
 
 // Ball variables.
 extern BOOL bBallTrackingControl[MAX_NB_BALL];

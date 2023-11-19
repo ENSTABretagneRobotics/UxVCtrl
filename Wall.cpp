@@ -161,6 +161,9 @@ THREAD_PROC_RETURN_VALUE WallThread(void* pParam)
 
 		delta_psi = LineFollowing(phi, e, gamma_infinite_wall, r_wall);
 
+		d_wall = distance;
+		psi_wall = Center(psihat)+phi;
+
 		char szText[256];
 		sprintf(szText, "RNG=%.2fm,ORN=%ddeg", distance, (int)((fmod_2PI(-angle_env-(Center(psihat)+phi)+3.0*M_PI/2.0)+M_PI)*180.0/M_PI));
 		cvPutText(overlayimage, szText, cvPoint(10,videoimgheight-20), &font, CV_RGB_CvScalar(255,0,128));

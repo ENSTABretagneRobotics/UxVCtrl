@@ -424,6 +424,8 @@
 %
 %regsettoagl regid (regid : int [0,32[)
 %
+%regsettowall regid1 regid2 (regid1 : int [0,32[, regid2 : int [0,32[, set regid1 to the current distance to the wall in m and regid2 to the current orientation of the wall in rad (a command running the wall detection needs to be currently running))
+%
 %regprint regid (regid : int [0,32[)
 %
 %regadd regid1 regid2 (regid1 : int [0,32[, regid2 : int [0,32[, set regid1 to regid1+regid2)
