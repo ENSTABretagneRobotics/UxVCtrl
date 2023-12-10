@@ -112,6 +112,8 @@
 #endif // _MSC_VER
 #endif // _WIN32
 
+int UxVCtrl_version = 403;
+
 int main(int argc, char* argv[])
 {
 	int i = 0;
@@ -215,6 +217,12 @@ int main(int argc, char* argv[])
 	THREAD_IDENTIFIER MissionArgThreadId;
 #endif // !DISABLE_MISSIONARG_THREAD
 	CHRONO chrono_GNSS;
+#ifndef DISABLE_LOGAPP
+	FILE* logappfile = NULL;
+	char logappfilename[MAX_BUF_LEN];
+	char* username = NULL;
+	char hostname[MAX_BUF_LEN];
+#endif // !DISABLE_LOGAPP
 
 	INIT_DEBUG;
 
@@ -227,8 +235,25 @@ int main(int argc, char* argv[])
 
 	srand(GetTickCount());
 
-	printf("\nUxVCtrl V402\n");
+	printf("\nUxVCtrl V%d\n", UxVCtrl_version);
 	fflush(stdout);
+
+#ifndef DISABLE_LOGAPP
+	sprintf(logappfilename, LOG_FOLDER"logapp_%.64s.log", strtimeex_fns());
+	logappfile = fopen(logappfilename, "w");
+	if (logappfile == NULL)
+	{
+		printf("Unable to create log file.\n");
+	}
+	else
+	{
+		username = getenv("USERNAME");
+		memset(hostname, 0, sizeof(hostname));
+		gethostname(hostname, sizeof(hostname));
+		fprintf(logappfile, "UxVCtrl V%d (%.255s on %.255s)\n", UxVCtrl_version, username, hostname);
+		fflush(logappfile);
+	}
+#endif // !DISABLE_LOGAPP
 
 	// Will launch a mission file if specified as argument.
 	if (argc == 2) bMissionAtStartup = TRUE;
@@ -711,6 +736,10 @@ int main(int argc, char* argv[])
 
 	ReleaseGlobals();
 	UnloadEnv();
+
+#ifndef DISABLE_LOGAPP
+	if (logappfile) fclose(logappfile);
+#endif // !DISABLE_LOGAPP
 
 	if (ExitCode == EXIT_SUCCESS)
 	{
