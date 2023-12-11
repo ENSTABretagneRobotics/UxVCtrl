@@ -72,6 +72,7 @@ int handleroboteqinterface(RS232PORT* pRoboteqInterfacePseudoRS232Port)
 	int Bytes = 0, BytesReceived = 0, maxrecvbuflen = MAX_NB_BYTES_ROBOTEQ, chan = 0, spd = 0;
 	char endchar = '\r';
 	char* tmp = NULL;
+	char* tmp2 = NULL;
 
 	// Get data...
 	if (CheckAvailBytesRS232Port(pRoboteqInterfacePseudoRS232Port, NULL) == EXIT_SUCCESS)
@@ -107,18 +108,83 @@ int handleroboteqinterface(RS232PORT* pRoboteqInterfacePseudoRS232Port)
 
 		EnterCriticalSection(&StateVariablesCS);
 
+		// To improve...
+
+		tmp = strstr(recvbuf, "?");
+		while (tmp)
+		{
+			if (strncmp(tmp, "?FID", strlen("?FID")) == 0)
+			{
+				tmp2 = strstr(tmp, "\r");
+				if (!tmp2)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					return EXIT_FAILURE;
+				}
+				// Echo...
+				if (WriteAllRS232Port(pRoboteqInterfacePseudoRS232Port, (uint8*)(tmp), tmp2-tmp+1) != EXIT_SUCCESS)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					return EXIT_FAILURE;
+				}
+				if (WriteAllRS232Port(pRoboteqInterfacePseudoRS232Port, (uint8*)("FID=Roboteq v0.0 EMULATED 12/12/2023\r"), strlen("FID=Roboteq v0.0 EMULATED 12/12/2023\r")) != EXIT_SUCCESS)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					return EXIT_FAILURE;
+				}
+			}
+			if (recvbuf-tmp >= MAX_NB_BYTES_ROBOTEQ-2) break;
+			tmp = strstr(tmp+1, "?");
+		}
+
 		tmp = strstr(recvbuf, "!");
 		while (tmp)
 		{
-			if (sscanf(tmp, "!G %d %d", &chan, &spd) == 2)
+			if ((sscanf(tmp, "!G %d %d", &chan, &spd) == 2)||(sscanf(tmp, "!$00 %d %d", &chan, &spd) == 2))
 			{
+				tmp2 = strstr(tmp, "\r");
+				if (!tmp2)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					return EXIT_FAILURE;
+				}
+				// Echo...
+				if (WriteAllRS232Port(pRoboteqInterfacePseudoRS232Port, (uint8*)(tmp), tmp2-tmp+1) != EXIT_SUCCESS)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					return EXIT_FAILURE;
+				}
+				if (WriteAllRS232Port(pRoboteqInterfacePseudoRS232Port, (uint8*)("+\r"), strlen("+\r")) != EXIT_SUCCESS)
+				{
+					LeaveCriticalSection(&StateVariablesCS);
+					return EXIT_FAILURE;
+				}
 	
 				// Not thread-safe...
 
-				if (chan == 1) roboteq_u1 = spd/1000.0;
-				if (chan == 2) roboteq_u2 = spd/1000.0;
-				u = (roboteq_u1+roboteq_u2)/2;
-				uw = (roboteq_u2-roboteq_u1)/2;
+				switch (robid)
+				{
+				case BUGGY_SIMULATOR_ROBID:
+				case BUGGY_ROBID:
+				case SAILBOAT_SIMULATOR_ROBID:
+				case VAIMOS_ROBID:
+				case SAILBOAT_ROBID:
+				case SAILBOAT2_ROBID:
+					if (chan == 1) roboteq_u1 = spd/1000.0;
+					if (chan == 2) roboteq_u2 = spd/1000.0;
+					u = roboteq_u2;
+					uw = roboteq_u1;
+					break;
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+				default:
+					if (chan == 1) roboteq_u1 = spd/1000.0;
+					if (chan == 2) roboteq_u2 = spd/1000.0;
+					u = (roboteq_u1+roboteq_u2)/2;
+					uw = (roboteq_u2-roboteq_u1)/2;
+					break;
+				}
+
 			}
 			if (recvbuf-tmp >= MAX_NB_BYTES_ROBOTEQ-2) break;
 			tmp = strstr(tmp+1, "!");

@@ -620,11 +620,10 @@ inline int GetValueRoboteq(ROBOTEQ* pRoboteq, int operatingItem, int index, int*
 
 /*
 Set selected PWM channels.
-For example, if a servomotor is connected to channel 2, set pws[2] to 1500 to put it at a neutral state, 1000 in 
-one side or 2000 in the other side, and set selectedchannels[2] to 1. The channel needs to be configured as servo 
-output in Maestro Control Center. If it is configured as digital output, bit = (pws[2] >= 1500)? 1 : 0;.
+For example, if a motor is connected to channel 2, set pws[2] to 1500 to put it at a neutral state, 1000 in 
+one direction or 2000 in the other direction, and set selectedchannels[2] to 1.
 
-ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq Maestro.
+ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq.
 int* selectedchannels : (IN) Valid pointer to a table of NB_CHANNELS_PWM_ROBOTEQ elements to indicate which channels 
 should be considered in pws (0 to ignore the channel or 1 to select it).
 int* pws : (IN) Valid pointer to a table of NB_CHANNELS_PWM_ROBOTEQ elements with the desired pulse width for each 
@@ -670,7 +669,7 @@ inline int SetAllPWMsRoboteq(ROBOTEQ* pRoboteq, int* selectedchannels, int* pws)
 
 		//printf("%d %d %d %d %d\n", channel, pws_tmp[channel], pRoboteq->LastPWs[channel], abs(pws_tmp[channel]-pRoboteq->LastPWs[channel]), pRoboteq->ThresholdPWs[channel]);
 		
-		res = (res || SetCommandRoboteq(pRoboteq, _GO_ROBOTEQ, channel+1, (pws_tmp[channel]-DEFAULT_MID_PW_ROBOTEQ)*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/1000));
+		res = (res || SetCommandRoboteq(pRoboteq, _GO_ROBOTEQ, channel+1, 2*(pws_tmp[channel]-DEFAULT_MID_PW_ROBOTEQ)*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/1000));
 
 		nbselectedchannels++;
 	}
@@ -696,7 +695,7 @@ inline int SetAllPWMsRoboteq(ROBOTEQ* pRoboteq, int* selectedchannels, int* pws)
 /*
 Set rightthrusterchan and leftthrusterchan PWM channels as thrusters inputs.
 
-ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq Maestro.
+ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq.
 double urt : (IN) Desired right thruster input (in [-1;1]).
 double ult : (IN) Desired left thruster input (in [-1;1]).
 
@@ -719,6 +718,96 @@ inline int SetThrustersRoboteq(ROBOTEQ* pRoboteq, double urt, double ult)
 
 	selectedchannels[pRoboteq->rightthrusterchan] = 1;
 	selectedchannels[pRoboteq->leftthrusterchan] = 1;
+
+	return SetAllPWMsRoboteq(pRoboteq, selectedchannels, pws);
+}
+
+/*
+Set 1 actuator
+
+ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq.
+double u_1 : (IN) Desired actuator input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int Set1ActuatorRoboteq(ROBOTEQ* pRoboteq, double u_1)
+{
+	int selectedchannels[NB_CHANNELS_PWM_ROBOTEQ];
+	int pws[NB_CHANNELS_PWM_ROBOTEQ];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert u (in [-1;1]) into Roboteq pulse width (in us).
+	pws[0] = DEFAULT_MID_PW_ROBOTEQ+(int)(u_1*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/2.0);
+
+	pws[0] = max(min(pws[0], DEFAULT_MAX_PW_ROBOTEQ), DEFAULT_MIN_PW_ROBOTEQ);
+
+	selectedchannels[0] = 1;
+
+	return SetAllPWMsRoboteq(pRoboteq, selectedchannels, pws);
+}
+
+/*
+Set 2 actuators. Warning: not all Roboteq boards can handle 2 actuators.
+
+ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq.
+double u_1 : (IN) Desired actuator input (in [-1;1]).
+double u_2 : (IN) Desired actuator input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int Set2ActuatorsRoboteq(ROBOTEQ* pRoboteq, double u_1, double u_2)
+{
+	int selectedchannels[NB_CHANNELS_PWM_ROBOTEQ];
+	int pws[NB_CHANNELS_PWM_ROBOTEQ];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert u (in [-1;1]) into Roboteq pulse width (in us).
+	pws[0] = DEFAULT_MID_PW_ROBOTEQ+(int)(u_1*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/2.0);
+	pws[1] = DEFAULT_MID_PW_ROBOTEQ+(int)(u_2*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/2.0);
+
+	pws[0] = max(min(pws[0], DEFAULT_MAX_PW_ROBOTEQ), DEFAULT_MIN_PW_ROBOTEQ);
+	pws[1] = max(min(pws[1], DEFAULT_MAX_PW_ROBOTEQ), DEFAULT_MIN_PW_ROBOTEQ);
+
+	selectedchannels[0] = 1;
+	selectedchannels[1] = 1;
+
+	return SetAllPWMsRoboteq(pRoboteq, selectedchannels, pws);
+}
+
+/*
+Set 3 actuators. Warning: not all Roboteq boards can handle 3 actuators.
+
+ROBOTEQ* pRoboteq : (INOUT) Valid pointer to a structure corresponding to a Roboteq.
+double u_1 : (IN) Desired actuator input (in [-1;1]).
+double u_2 : (IN) Desired actuator input (in [-1;1]).
+double u_3 : (IN) Desired actuator input (in [-1;1]).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int Set3ActuatorsRoboteq(ROBOTEQ* pRoboteq, double u_1, double u_2, double u_3)
+{
+	int selectedchannels[NB_CHANNELS_PWM_ROBOTEQ];
+	int pws[NB_CHANNELS_PWM_ROBOTEQ];
+
+	memset(selectedchannels, 0, sizeof(selectedchannels));
+	memset(pws, 0, sizeof(pws));
+
+	// Convert u (in [-1;1]) into Roboteq pulse width (in us).
+	pws[0] = DEFAULT_MID_PW_ROBOTEQ+(int)(u_1*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/2.0);
+	pws[1] = DEFAULT_MID_PW_ROBOTEQ+(int)(u_2*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/2.0);
+	pws[2] = DEFAULT_MID_PW_ROBOTEQ+(int)(u_3*(DEFAULT_MAX_PW_ROBOTEQ-DEFAULT_MIN_PW_ROBOTEQ)/2.0);
+
+	pws[0] = max(min(pws[0], DEFAULT_MAX_PW_ROBOTEQ), DEFAULT_MIN_PW_ROBOTEQ);
+	pws[1] = max(min(pws[1], DEFAULT_MAX_PW_ROBOTEQ), DEFAULT_MIN_PW_ROBOTEQ);
+	pws[2] = max(min(pws[2], DEFAULT_MAX_PW_ROBOTEQ), DEFAULT_MIN_PW_ROBOTEQ);
+
+	selectedchannels[0] = 1;
+	selectedchannels[1] = 1;
+	selectedchannels[2] = 1;
 
 	return SetAllPWMsRoboteq(pRoboteq, selectedchannels, pws);
 }

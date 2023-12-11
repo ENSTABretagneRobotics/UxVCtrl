@@ -22,7 +22,7 @@
 THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 {
 	ROBOTEQ roboteq;
-	double thrust1 = 0, thrust2 = 0;
+	double rudder = 0, thrust = 0, thrust1 = 0, thrust2 = 0;
 	//int counter = 0, counter_modulo = 0;
 	int res = EXIT_SUCCESS;
 	BOOL bConnected = FALSE;
@@ -134,6 +134,18 @@ THREAD_PROC_RETURN_VALUE RoboteqThread(void* pParam)
 
 			switch (robid)
 			{
+			case BUGGY_SIMULATOR_ROBID:
+			case BUGGY_ROBID:
+			case SAILBOAT_SIMULATOR_ROBID:
+			case VAIMOS_ROBID:
+			case SAILBOAT_ROBID:
+			case SAILBOAT2_ROBID:
+				EnterCriticalSection(&StateVariablesCS);
+				rudder = uw_f;
+				thrust = u_f;
+				LeaveCriticalSection(&StateVariablesCS);
+				res = Set2ActuatorsRoboteq(&roboteq, rudder, thrust);
+				break;
 			case BUBBLE_ROBID:
 			case ETAS_WHEEL_ROBID:
 			default:
