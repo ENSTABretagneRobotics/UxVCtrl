@@ -1,3 +1,5 @@
+Improved warning messages related to nbopencvgui parameter.
+
 404
 Updated Roboteq and RoboteqInterface.
 

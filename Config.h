@@ -1362,7 +1362,7 @@ inline int LoadConfig(void)
 #else
 	if ((nbopencvgui < 0)||(nbopencvgui > 1))
 	{
-		printf("Invalid parameter : nbopencvgui (only 1 OpenCVGUI can be used if FORCE_SINGLE_THREAD_OPENCVGUI is defined).\n");
+		printf("Warning : nbopencvgui parameter forced to 1 (only 1 OpenCVGUI can be used if FORCE_SINGLE_THREAD_OPENCVGUI is defined).\n");
 		nbopencvgui = 1;
 	}
 #endif // ENABLE_SHARED_WAITKEY_OPENCVGUI
@@ -1394,27 +1394,27 @@ inline int LoadConfig(void)
 	}
 	if (bEnableOpenCVGUIs[0]&&(nbopencvgui <= 0))
 	{
-		printf("Invalid parameter : bEnableOpenCVGUIs[0].\n");
+		printf("Warning : bEnableOpenCVGUIs[0] parameter is inconsistent with nbopencvgui parameter.\n");
 		bEnableOpenCVGUIs[0] = FALSE;
 	}
 	if (bEnableOpenCVGUIs[1]&&(nbopencvgui <= 1))
 	{
-		printf("Invalid parameter : bEnableOpenCVGUIs[1].\n");
+		printf("Warning : bEnableOpenCVGUIs[1] parameter is inconsistent with nbopencvgui parameter.\n");
 		bEnableOpenCVGUIs[1] = FALSE;
 	}
 	if (bEnableOpenCVGUIs[2]&&(nbopencvgui <= 2))
 	{
-		printf("Invalid parameter : bEnableOpenCVGUIs[2].\n");
+		printf("Warning : bEnableOpenCVGUIs[2] parameter is inconsistent with nbopencvgui parameter.\n");
 		bEnableOpenCVGUIs[2] = FALSE;
 	}
 	if (bEnableOpenCVGUIs[3]&&(nbopencvgui <= 3))
 	{
-		printf("Invalid parameter : bEnableOpenCVGUIs[3].\n");
+		printf("Warning : bEnableOpenCVGUIs[3] parameter is inconsistent with nbopencvgui parameter.\n");
 		bEnableOpenCVGUIs[3] = FALSE;
 	}
 	if (bEnableOpenCVGUIs[4]&&(nbopencvgui <= 4))
 	{
-		printf("Invalid parameter : bEnableOpenCVGUIs[4].\n");
+		printf("Warning : bEnableOpenCVGUIs[4] parameter is inconsistent with nbopencvgui parameter.\n");
 		bEnableOpenCVGUIs[4] = FALSE;
 	}
 	if ((WaitForGNSSLevel < 0)||(WaitForGNSSLevel >= 8))
