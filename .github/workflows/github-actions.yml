@@ -28,7 +28,7 @@ jobs:
       shell: cmd
 
  j2:
-    name: Windows MinGW 11.2.0 x64
+    name: Windows MinGW x64
     runs-on: windows-2022
     steps: 
     - uses: actions/checkout@v3
@@ -249,6 +249,7 @@ jobs:
         7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
       shell: pwsh
     - run: |
+        choco upgrade -y -r --no-progress mingw --version=11.2.0.07112021 --force
         rem For OpenCV
         powershell -Command "Install-WindowsFeature Server-Media-Foundation"
         wget http://www.ensta-bretagne.fr/lebars/Share/windows_server_core_prereq.zip --no-check-certificate -nv
@@ -268,7 +269,7 @@ jobs:
         rem mingw v11.2.0 Chocolatey package might not set this...
         %SystemDrive%\cmake_extra_tools\pathman /as C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin & cd. & rem Non-zero exit code...?
       shell: cmd
-    - run: refreshenv.cmd && cmake -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=OFF -D OPENCV454=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & set & copy UxVCtrl.exe UxVCtrl_mingw11_x64.exe
+    - run: refreshenv.cmd && set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw64\bin;%PATH% && cmake -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D OPENCV2413=OFF -D OPENCV320=OFF -D OPENCV420=OFF -D OPENCV454=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON -D ENABLE_MINGW64_STDCALL_FIX=ON . && cmake --build . && refreshenv.cmd && @echo wait 10 > run_test.txt && @echo exit >> run_test.txt && UxVCtrl.exe < run_test.txt & set & copy UxVCtrl.exe UxVCtrl_mingw11_x64.exe
       shell: cmd
     - uses: xresloader/upload-to-github-release@v1
       env:
