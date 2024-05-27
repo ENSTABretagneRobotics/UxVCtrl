@@ -225,6 +225,7 @@ inline size_t fwrite_tlog_unix(uint64_t unix_time_us, mavlink_message_t msg, FIL
 	return fwrite(sendbuf, 1, sendbuflen, file);
 }
 
+#if (defined(_WIN32) && (defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32))) || (!defined(_WIN32))
 inline size_t fwrite_tlog(mavlink_message_t msg, FILE* file)
 {
 	uint64_t unix_time_us = 0;
@@ -242,5 +243,6 @@ inline size_t fwrite_tlog(mavlink_message_t msg, FILE* file)
 	sendbuflen += mavlink_msg_to_send_buffer(sendbuf+sendbuflen, &msg);
 	return fwrite(sendbuf, 1, sendbuflen, file);
 }
+#endif // (defined(_WIN32) && (defined(ENABLE_GETTIMEOFDAY_WIN32) || defined(ENABLE_SYS_TIME_H_WIN32))) || (!defined(_WIN32))
 
 #endif // !MAVLINKPROTOCOL_H
