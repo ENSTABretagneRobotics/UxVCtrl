@@ -1,3 +1,32 @@
+Velodyne
+Vérifier signe de ses angles...->ca a l'air pas mal
+Process(bwithallchecks) because we might make all check just at connect, some of the checks anyway only available in debug
+Lidarview could simulate UDP data transfer from a pcap...->could not get it to work, use pcapudpredir.py instead...
+Faire un hardware-cpp-gui
+Azimut ofs, élévation ofs
+Param sort angles
+if pcap fail, suggestion pcapng convert
+Pcapreadspdfactor
+Should check Velodyne-VLP-16-master also...
+Demander à faire fonctions pour gérer problèmes de padding?
+Detect 1 laser loop: median of a[i+ii]-a[i-ii] for 10 (depends on angular resolution and number of different angles in data...) ii ->ask copilot how it is usually detected robustly despite the UDP packets sometimes in wrong order...
+
+Support Arduino à rajouter à OSSerialPort, voir projet UTAC...
+Arduino functions equivalent for PC?
+
+support topdon tc001 (besoin de faire cap.set(cv2.CAP_PROP_CONVERT_RGB, 0.0) sinon changerait les données+éventuellement faire aussi quand même le traitement d'interprétation de la température, attention au codec d'enregistrement vidéo qui dégraderait les données, XVID semblait bien...?)
+
+Add topics to git projects
+
+PWM pi
+Pi : simul analog out avec PWM haute freq (pigpioDevice avec option pigpio ou pigpiod), sbus
+
+Ardupilot2ros branche ros2
+
+Exemple C/C++ standard pour communiquer avec velodyne->s'inspirer de https://github.com/valgur/velodyne_decoder ?
+d,alpha,beta surrounding (dernier tour sonar, avoir aussi global surrounding_pts_x/y/z) brute < corrigé avec position du capteur par rapport à repère robot (parfois déjà fait via params internes dans capteur) < corrigé avec juste angles du robot dans repère de env.txt (en supposant position fixe) < corrigé avec position du robot
+Cartographer.cpp/.h qui dessine la carte (jusqu'à un certain historique) dans le repère défini dans env.txt, carto_pts_x/y/z en global?
+
 mavlinkinterface devrait envoyer RC_CHANNELS (entrées commandes) en même temps que SERVO_OUTPUT_RAW...
 mavlinkinterface gps_raw_int.satellites_visible should be set more correctly...
 mavlinkinterface_GPS_prefix: GP, GN, GL, GA
@@ -534,18 +563,18 @@ surfaceobstacleavoidance needs to be debugged (corrupted memory...)...
 Maestro bloquée si on ne récupère pas en continu les données envoyées par la Razor sur son port série!
 
 build and install
+UxVCtrl actions: 2 MinGW s'exécutent pas, peut-être mediafeatures inconnues nécessaires pour kinect...?
+CMake detect target arch : see CMAKE_SYSTEM_PROCESSOR, CMAKE_SIZEOF_VOID_P, maybe merge https://github.com/Amber-MD/cmake-buildscripts/blob/master/TargetArch.cmake with latest https://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/global/qprocessordetection.h, see also https://gist.github.com/webmaster128/e08067641df1dd784eb195282fd0912f...
+UxVCtrl and hardwarex: check if ((NOT DEFINED ARCH) OR (NOT DEFINED RUNTIME)), ((NOT DEFINED ARCH) OR (NOT DEFINED USR_LIB_ARCH_DIR)) should be better with AND (maybe with other modifications), especially it does not work correctly for armhf/armv6hf (/usr/lib/arm-linux-gnueabihf), arm64/aarch64...->try to display what are the values for CMAKE_SYSTEM_PROCESSOR...?
 add possibility to use codac to the build system...
-cmake test build and run (but GUI support) opencv simple prog to détecté and enable auto opencv...?
+cmake test build and run (but GUI support) opencv simple prog to detect and enable auto opencv...?
 les téléchargements faits dans ${PROJECT_SOURCE_DIR} devraient plutôt être dans le dossier de build...
 Utilité de VC Linux?
 Tuto vectornav, gps_input UxVCtrl...
 Write info in readme about simulating a razor, SBG, MAVLink, VectorNav from other sensor types (add info also in GPS_INPUT_pymavlink.py)...
 mingw8 32, voir aussi issues Logiciels salles infos...
-Cmake detect target arch : see CMAKE_SYSTEM_PROCESSOR, CMAKE_SIZEOF_VOID_P, maybe merge https://github.com/Amber-MD/cmake-buildscripts/blob/master/TargetArch.cmake with latest https://code.qt.io/cgit/qt/qtbase.git/tree/src/corelib/global/qprocessordetection.h, see also https://gist.github.com/webmaster128/e08067641df1dd784eb195282fd0912f...
 check vs2019 64 bit intellisense warnings, mingw-w64 warning _stdcall redefined...
 voir plus précisément où désactiver -Wno-deprecated-copy (gcc9) -Wno-class-memaccess (gcc8)
-UxVCtrl actions : plusieurs en fait s'exécutent pas... Essayer de disable bv, lj, libmodbus, kinect partout, afficher dependencies uxvctrl.exe, peut-être mediafeatures inconnues nécessaires pour kinect32...? Reenable bv pour full config x86->c'est pas la faute de bv dans cette config, essayer sans kinect...->c'est la faute à kinect...->tester dans clean vm...->arrive pas à reproduire le pb dans vm
-UxVCtrl and hardwarex : check if ((NOT DEFINED ARCH) OR (NOT DEFINED RUNTIME)), ((NOT DEFINED ARCH) OR (NOT DEFINED USR_LIB_ARCH_DIR)) should be better with AND (maybe with other modifications), especially it does not work correctly for armhf/armv6hf (/usr/lib/arm-linux-gnueabihf), arm64/aarch64...->try to display what are the values for CMAKE_SYSTEM_PROCESSOR...?
 UE9A semble compiler et exécuter avec mingw7, tester avec servos
 cv420
 16:45:08: Starting C:\tmp\tests\build-UxVCtrl-master-Desktop_Qt_5_12_6_MinGW_32_bit-Debug\UxVCtrl.exe ...
@@ -679,6 +708,7 @@ afficher temps depuis début mission
 Rampe etas quand on accélère, en option...?
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
+if needed to display buttons, https://learnopencv.com/cvui-gui-lib-built-on-top-of-opencv-drawing-primitives/ ...?
 Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
 tester touches en nomachine, ssh -X...
 Afficher tension, affichage des infos du waypoint courant mission planner
@@ -921,6 +951,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+Check for multiple calls to target_link_libraries...->maybe only problem for cmake_minimum_required(VERSION 2.8...
+
+cv::waitkey: call cancel in a thread, then check period (display fps) with std time functions if they are in c++11...? Check if cvui proposes something->pas cvui mais il y a un pollKey() pour win32 backend depuis cv452 (c'était win32 le moins précis avec waitKey(), waitKey(1) semble proche de vraiment 1 ms sous Ubuntu...)...
 
 msvc runtime dependency->installés par cmakelist pour bv et kinect...
 Des fois mingw x86 trouve bien cv, des fois non?->besoin de set PATH=C:\ProgramData\chocolatey\lib\mingw\tools\install\mingw32\bin;%PATH% sinon c'est le mauvais mingw appelé par cmake...?
