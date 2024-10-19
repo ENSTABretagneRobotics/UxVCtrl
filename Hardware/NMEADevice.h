@@ -574,12 +574,12 @@ inline int GetLatestDataNMEADevice(NMEADEVICE* pNMEADevice, NMEADATA* pNMEAData)
 		}
 		// Do other else if (sscanf() != x) if more/less complete sentence...
 
-		// Only the most simples AIS messages are handled...
+		// Only the most simple AIS messages are handled...
 		if ((pNMEAData->nbsentences == 1)&&(pNMEAData->sentence_number == 1))
 		{
 			i = 0;
 			// Search for the end of the AIS data payload.
-			while ((i < (int)sizeof(aisbuf)-1)&&(aisbuf+i))
+			while ((i < (int)sizeof(aisbuf)-1)&&(aisbuf[i] != 0))
 			{
 				if (sscanf(aisbuf+i, ",%d", &pNMEAData->nbfillbits) == 1) 
 				{
