@@ -1,4 +1,7 @@
 405
+Attempt to solve some confusions between host and target processor architecture.
+Correct minor bug in AIS data processing.
+Improve compatibility with Ubuntu 24.04.
 Improved warning messages related to nbopencvgui parameter.
 
 404
