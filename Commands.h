@@ -1252,9 +1252,10 @@ inline int Commands(char* line)
 		}
 		LeaveCriticalSection(&FollowMeCS);
 	}
+	else bContinueElseIf1 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #pragma endregion
 #pragma region LOCALIZATION AND ADVANCED MOVING COMMANDS
-	else bContinueElseIf1 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+//	else bContinueElseIf1 = TRUE; // If put here, GCC may give error: 'else' without a previous 'if'...
 #ifdef __GNUC__
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
@@ -2797,9 +2798,10 @@ inline int Commands(char* line)
 		else printf("Obstacle avoidance control disabled.\n");
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else bContinueElseIf2 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #pragma endregion
 #pragma region DEVICES COMMANDS
-	else bContinueElseIf2 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+//	else bContinueElseIf2 = TRUE; // If put here, GCC may give error: 'else' without a previous 'if'...
 #ifdef __GNUC__
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
@@ -3275,9 +3277,10 @@ inline int Commands(char* line)
 	{
 		bForceSailCalibration = TRUE;
 	}
+	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #pragma endregion
 #pragma region ACOUSTIC COMMANDS
-	else bContinueElseIf3 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+//	else bContinueElseIf3 = TRUE; // If put here, GCC may give error: 'else' without a previous 'if'...
 #ifdef __GNUC__
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
@@ -3546,9 +3549,10 @@ inline int Commands(char* line)
 		AcousticCommandMDM = 0;
 		LeaveCriticalSection(&MDMCS);
 	}
+	else bContinueElseIf4 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #pragma endregion
 #pragma region GENERAL COMMANDS
-	else bContinueElseIf4 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+//	else bContinueElseIf4 = TRUE; // If put here, GCC may give error: 'else' without a previous 'if'...
 #ifdef __GNUC__
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
@@ -4269,9 +4273,10 @@ inline int Commands(char* line)
 		betaside = dval1; betarear = dval2; zeta = dval3; check_strategy_period = dval4; sail_update_period = dval5; sailboattacktype = ival1; sailformulatype = ival2;
 		LeaveCriticalSection(&StateVariablesCS);
 	}
+	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
 #pragma endregion
 #pragma region SIMPLE MOVING COMMANDS
-	else bContinueElseIf5 = TRUE; // To solve fatal error C1061: compiler limit : blocks nested too deeply...
+//	else bContinueElseIf5 = TRUE; // If put here, GCC may give error: 'else' without a previous 'if'...
 #ifdef __GNUC__
 // Disable some GCC warnings.
 #if (((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4) || defined(__clang__))
@@ -4490,8 +4495,9 @@ inline int Commands(char* line)
 	{
 		DisableAllControls();
 	}
-#pragma endregion
 	else
+#pragma endregion
+//	else // If put here, GCC may give error: 'else' without a previous 'if'...
 	{
 		printf("Invalid command.\n");
 	}
