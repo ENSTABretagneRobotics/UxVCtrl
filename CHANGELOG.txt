@@ -1,3 +1,6 @@
+406
+Updated SSC32Interface.
+
 405
 Attempt to solve some confusions between host and target processor architecture.
 Correct minor bug in AIS data processing.

@@ -15,6 +15,11 @@
 
 // Temp...
 RS232PORT SSC32InterfacePseudoRS232Port;
+double ssc32_u1 = 0;
+double ssc32_u2 = 0;
+double ssc32_u3 = 0;
+double ssc32_u4 = 0;
+double ssc32_u5 = 0;
 
 int connectssc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 {
@@ -107,21 +112,31 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 		{
 			if (sscanf(tmp, "#%dP%d", &chan, &pw) == 2)
 			{
+				if (chan == 0) ssc32_u1 = (pw-1500.0)/500.0;
+				if (chan == 1) ssc32_u2 = (pw-1500.0)/500.0;
+				if (chan == 2) ssc32_u3 = (pw-1500.0)/500.0;
+				if (chan == 3) ssc32_u4 = (pw-1500.0)/500.0;
+				if (chan == 4) ssc32_u5 = (pw-1500.0)/500.0;
 				switch (robid)
 				{
-				case TANK_SIMULATOR_ROBID:
-				case ETAS_WHEEL_ROBID:
+				case SAILBOAT_SIMULATOR_ROBID:
+				case VAIMOS_ROBID:
+				case SAILBOAT_ROBID:
 				case BUGGY_SIMULATOR_ROBID:
 				case BUGGY_ROBID:
 					if (chan == 2) u = (pw-1500.0)/500.0;
 					if (chan == 0) uw = (pw-1500.0)/500.0;
 					break;
-				case SAILBOAT_SIMULATOR_ROBID:
-				case VAIMOS_ROBID:
-				case SAILBOAT_ROBID:
 				case SAILBOAT2_ROBID:
+					if (chan == 0) uw = (pw-1500.0)/500.0;
 					if (chan == 1) u = (pw-1500.0)/500.0;
-					if (chan == 2) uw = (pw-1500.0)/500.0;
+					break;
+				case BUBBLE_ROBID:
+				case ETAS_WHEEL_ROBID:
+				case TANK_SIMULATOR_ROBID:
+					// To be compatible with default parameters of SSC320.txt...
+					u = (ssc32_u2+ssc32_u3)/2;
+					uw = (ssc32_u2-ssc32_u3)/2;
 					break;
 				case QUADRO_SIMULATOR_ROBID:
 				case COPTER_ROBID:
