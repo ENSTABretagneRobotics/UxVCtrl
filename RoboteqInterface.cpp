@@ -177,6 +177,7 @@ int handleroboteqinterface(RS232PORT* pRoboteqInterfacePseudoRS232Port)
 					break;
 				case BUBBLE_ROBID:
 				case ETAS_WHEEL_ROBID:
+				case TANK_SIMULATOR_ROBID:
 				default:
 					if (chan == 1) roboteq_u1 = spd/1000.0;
 					if (chan == 2) roboteq_u2 = spd/1000.0;
