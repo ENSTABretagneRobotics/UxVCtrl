@@ -1,3 +1,5 @@
+add docker ubuntu arm...
+
 Velodyne
 Vérifier signe de ses angles...->ca a l'air pas mal
 Process(bwithallchecks) because we might make all check just at connect, some of the checks anyway only available in debug
