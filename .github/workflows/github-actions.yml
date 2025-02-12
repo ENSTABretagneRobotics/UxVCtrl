@@ -134,11 +134,43 @@ jobs:
       if: github.event_name != 'pull_request'
 
  j8:
-    name: Raspbian Bookworm pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: ubuntu-latest
+    name: Ubuntu 24.04 arm64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-24.04-arm
     steps: 
     - uses: actions/checkout@v4
-    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_noble_arm64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_ubuntu_noble_arm64"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j9:
+    name: Ubuntu 22.04 arm64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-22.04-arm
+    steps: 
+    - uses: actions/checkout@v4
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_jammy_arm64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_compat_ubuntu_jammy_arm64"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j10:
+    name: Raspbian Bookworm pi Docker static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-24.04-arm
+    steps: 
+    - uses: actions/checkout@v4
+    #- run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:bookworm /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_bookworm_pi"
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -149,7 +181,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j9:
+ j11:
     name: macOS Ventura static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: macos-13
     steps: 
@@ -165,7 +197,7 @@ jobs:
       if: github.event_name != 'pull_request'
 
  # Main full configurations
- j10:
+ j12:
     name: Windows Visual Studio 2022 x64 static with OpenCV 4.5.4 without BlueView support
     runs-on: windows-2022
     steps: 
@@ -202,7 +234,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j11:
+ j13:
     name: Windows Visual Studio 2022 x86 static with OpenCV 4.5.4
     runs-on: windows-2022
     steps: 
@@ -239,7 +271,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j12:
+ j14:
     name: Windows MinGW 11.2.0 x64 with OpenCV 4.5.4 without SBG SDK, RPLIDAR SDK, BlueView support
     runs-on: windows-2022
     steps: 
@@ -280,7 +312,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j13:
+ j15:
     name: Windows MinGW 11.2.0 x86 with OpenCV 4.5.4 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2022
     steps: 
@@ -321,7 +353,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j14:
+ j16:
     name: Ubuntu 24.04 amd64 with default OpenCV 4.6.0
     runs-on: ubuntu-24.04
     steps: 
@@ -337,7 +369,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j15:
+ j17:
     name: Ubuntu 22.04 amd64 with default OpenCV 4.5.4
     runs-on: ubuntu-22.04
     steps: 
@@ -353,12 +385,44 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j16:
-    name: Raspbian Bookworm pi Docker static with OpenCV 4.6.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
-    runs-on: ubuntu-latest
+ j18:
+    name: Ubuntu 24.04 arm64 with default OpenCV 4.6.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-24.04-arm
     steps: 
     - uses: actions/checkout@v4
-    - run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_noble_arm64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_ubuntu_noble_arm64"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j19:
+    name: Ubuntu 22.04 arm64 with default OpenCV 4.5.4 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-22.04-arm
+    steps: 
+    - uses: actions/checkout@v4
+    - run: sudo apt-get -q update || true
+    - run: cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_jammy_arm64
+    - uses: xresloader/upload-to-github-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: "UxVCtrl_ubuntu_jammy_arm64"
+        overwrite: true
+        tag_name: autotagname-${{ github.sha }}
+      if: github.event_name != 'pull_request'
+
+ j20:
+    name: Raspbian Bookworm pi Docker with default OpenCV 4.6.0 without SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
+    runs-on: ubuntu-24.04-arm
+    steps: 
+    - uses: actions/checkout@v4
+    #- run: docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - run: docker run -i -v "${PWD}/..:${PWD}/.." lebarsfa/pi:bookworm /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; export DEBIAN_FRONTEND=noninteractive && export UCF_FORCE_CONFFOLD=1 && apt-get -y install xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && { Xvfb :99 & echo X_starting && sleep 3 ; } && export DISPLAY=:99 && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_bookworm_pi"
     - uses: xresloader/upload-to-github-release@v1
       env:
@@ -369,7 +433,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j17:
+ j21:
     name: macOS Ventura with latest OpenCV without BlueView, Kinect v2 support
     runs-on: macos-13
     steps: 
@@ -385,7 +449,7 @@ jobs:
       if: github.event_name != 'pull_request'
 
  # Other compatibility configurations
- j18:
+ j22:
     name: Ubuntu 20.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-20.04
     steps: 
@@ -401,7 +465,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
  
- j19:
+ j23:
     name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
     steps: 
@@ -416,7 +480,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
  
- j20:
+ j24:
     name: Ubuntu 16.04 xenial i386 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
     runs-on: ubuntu-latest
     steps: 
@@ -432,7 +496,7 @@ jobs:
       if: github.event_name != 'pull_request'
 
  # Other full configurations
- j21:
+ j25:
     name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
     runs-on: ubuntu-20.04
     steps: 
@@ -449,7 +513,7 @@ jobs:
       if: github.event_name != 'pull_request'
  
  # Block on "Configuring tzdata [...] Please select the geographic area in which you live"...
- # j22:
+ # j26:
  #    name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
  #    runs-on: ubuntu-latest
  #    steps: 
@@ -465,7 +529,7 @@ jobs:
  #      if: github.event_name != 'pull_request'
 
  # Alternate configurations
- j23:
+ j27:
     name: Windows Visual Studio 2022 x86 static with OpenCV 4.5.4 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2022
     steps: 
@@ -502,7 +566,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j24:
+ j28:
     name: Windows Visual Studio 2017 x86 static with OpenCV 3.2.0 and FFmpeg (Kinect v2 currently incompatible) without SBG SDK, RPLIDAR SDK, Kinect v2 support
     runs-on: windows-2019
     steps: 
@@ -542,7 +606,7 @@ jobs:
         tag_name: autotagname-${{ github.sha }}
       if: github.event_name != 'pull_request'
 
- j25:
+ j29:
     name: Windows Visual Studio 2019 x86 static with OpenCV 2.4.13 without SBG SDK, RPLIDAR SDK support
     runs-on: windows-2022
     steps: 

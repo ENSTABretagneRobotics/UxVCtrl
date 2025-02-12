@@ -20,6 +20,12 @@ move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_jammy "%UDK_USER_PATH%\Compatibil
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_focal "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_focal "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_bionic "%UDK_USER_PATH%\Compatibility mode\Ubuntu\"
+
+move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_noble_arm64 "%UDK_USER_PATH%\Compatibility mode\Ubuntu_arm64\"
+move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_noble_arm64 "%UDK_USER_PATH%\Compatibility mode\Ubuntu_arm64\"
+move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_jammy_arm64 "%UDK_USER_PATH%\Compatibility mode\Ubuntu_arm64\"
+move /Y %USERPROFILE%\Downloads\UxVCtrl_ubuntu_jammy_arm64 "%UDK_USER_PATH%\Compatibility mode\Ubuntu_arm64\"
+
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_ubuntu_xenial_i386 "%UDK_USER_PATH%\Compatibility mode\Ubuntu_i386\"
 
 move /Y %USERPROFILE%\Downloads\UxVCtrl_compat_bookworm_pi "%UDK_USER_PATH%\Compatibility mode\pi\"

@@ -1,4 +1,7 @@
-add docker ubuntu arm...
+
+waitKeyEx (for uppercase key commands)
+
+/MP4, -j 4, test windows-2025...?
 
 Velodyne
 Vérifier signe de ses angles...->ca a l'air pas mal
@@ -711,7 +714,7 @@ Rampe etas quand on accélère, en option...?
 en plus des touches + et -, pouvoir se déplacer à droite et gauche dans le zoom avec les touches, comme dans UxVDataViewer ou Ecrazor...->manque de touches sur le clavier...
 zoom pas fait au bon endroit
 if needed to display buttons, https://learnopencv.com/cvui-gui-lib-built-on-top-of-opencv-drawing-primitives/ ...?
-Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3?
+Utiliser waitKeyEx() pour avoir full key code? Uniquement dispo en cv3.2.0?
 tester touches en nomachine, ssh -X...
 Afficher tension, affichage des infos du waypoint courant mission planner
 modify waypoints/heading commands so that they do a line following in the case of a sailboat? bWaypointControl, bGuidedControl?
