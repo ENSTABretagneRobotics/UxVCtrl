@@ -1,4 +1,4 @@
-% camid (0..9) or a video filename or IP address and TCP port
+% camid (0..9999, on Windows some camera backends might start at 700...) or a video filename or IP address and TCP port
 %1
 %test1.wmv
 test2.wmv
@@ -10,6 +10,8 @@ test2.wmv
 240
 % captureperiod (in ms)
 100
+% szVideoCodec (MJPG, H264, YUY2, RGB3, etc., see OpenCV FOURCC codecs, 0 to keep default)
+0
 % timeout for remote mode, otherwise estimation of delay due to computations (in ms)
 5
 % bForceSoftwareResize

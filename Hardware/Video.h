@@ -104,6 +104,7 @@ struct VIDEO
 	char szDevPath[256];
 	int videoimgwidth;
 	int videoimgheight;
+	char szVideoCodec[5];
 	int captureperiod;
 	int timeout;
 	BOOL bForceSoftwareResize;
@@ -907,6 +908,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 		pVideo->videoimgwidth = 320; 
 		pVideo->videoimgheight = 240; 
 		pVideo->captureperiod = 100;
+		memset(pVideo->szVideoCodec, 0, sizeof(pVideo->szVideoCodec));
 		pVideo->timeout = 0;
 		pVideo->bForceSoftwareResize = 1;
 		pVideo->hcenter = 0;//+videoimgwidth/2
@@ -940,6 +942,8 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			if (sscanf(line, "%d", &pVideo->videoimgheight) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->captureperiod) != 1) printf("Invalid configuration file.\n");
+			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
+			if (sscanf(line, "%[^\r\n]4s", pVideo->szVideoCodec) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
 			if (sscanf(line, "%d", &pVideo->timeout) != 1) printf("Invalid configuration file.\n");
 			if (fgets3(file, line, sizeof(line)) == NULL) printf("Invalid configuration file.\n");
@@ -1051,7 +1055,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	memset(pVideo->address, 0, sizeof(pVideo->address));
 	memset(pVideo->port, 0, sizeof(pVideo->port));
 
-	// Try to determine whether it is an IP address and TCP port (e.g. 127.0.0.1:4001), a filename or a local camera (single digit or 2 digits).
+	// Try to determine whether it is an IP address and TCP port (e.g. 127.0.0.1:4001), a filename or a local camera (number with up to 4 digits).
 	ptr = strchr(pVideo->szDevPath, ':');
 	if ((ptr != NULL)&&(atoi(ptr+1) > 0)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
 	{
@@ -1091,7 +1095,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 	}
 	else 
 	{
-		if ((strlen(pVideo->szDevPath) >= 1)&&(strlen(pVideo->szDevPath) <= 2)&&(isdigit((unsigned char)pVideo->szDevPath[0])))
+		if ((strlen(pVideo->szDevPath) >= 1)&&(strlen(pVideo->szDevPath) <= 4)&&(strspn(pVideo->szDevPath, "0123456789") == strlen(pVideo->szDevPath)))
 		{
 			pVideo->DevType = LOCAL_TYPE_VIDEO;
 
@@ -1106,6 +1110,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 			if (pVideo->captureperiod) cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (strlen(pVideo->szVideoCodec) == 4) cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FOURCC, CV_FOURCC(pVideo->szVideoCodec[0], pVideo->szVideoCodec[1], pVideo->szVideoCodec[2], pVideo->szVideoCodec[3]));
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
 			//if ((!pVideo->bForceSoftwareResize)&&
@@ -1160,10 +1165,14 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 			if (pVideo->captureperiod) pVideo->pCapture->set(CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (strlen(pVideo->szVideoCodec) == 4) pVideo->pCapture->set(CV_CAP_PROP_FOURCC, cv::VideoWriter::fourcc(pVideo->szVideoCodec[0], pVideo->szVideoCodec[1], pVideo->szVideoCodec[2], pVideo->szVideoCodec[3]));
+
 #else
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 			if (pVideo->captureperiod) pVideo->pCapture->set(cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (strlen(pVideo->szVideoCodec) == 4) pVideo->pCapture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(pVideo->szVideoCodec[0], pVideo->szVideoCodec[1], pVideo->szVideoCodec[2], pVideo->szVideoCodec[3]));
+
 #endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
@@ -1237,6 +1246,7 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 			if (pVideo->captureperiod) cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (strlen(pVideo->szVideoCodec) == 4) cvSetCaptureProperty(pVideo->pCapture, CV_CAP_PROP_FOURCC, CV_FOURCC(pVideo->szVideoCodec[0], pVideo->szVideoCodec[1], pVideo->szVideoCodec[2], pVideo->szVideoCodec[3]));
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...
 			//if ((!pVideo->bForceSoftwareResize)&&
@@ -1291,10 +1301,12 @@ inline int ConnectVideo(VIDEO* pVideo, char* szCfgFilePath)
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(CV_CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 			if (pVideo->captureperiod) pVideo->pCapture->set(CV_CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (strlen(pVideo->szVideoCodec) == 4) pVideo->pCapture->set(CV_CAP_PROP_FOURCC, cv::VideoWriter::fourcc(pVideo->szVideoCodec[0], pVideo->szVideoCodec[1], pVideo->szVideoCodec[2], pVideo->szVideoCodec[3]));
 #else
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_WIDTH, pVideo->videoimgwidth);
 			pVideo->pCapture->set(cv::CAP_PROP_FRAME_HEIGHT, pVideo->videoimgheight);
 			if (pVideo->captureperiod) pVideo->pCapture->set(cv::CAP_PROP_FPS, 1000/pVideo->captureperiod);
+			if (strlen(pVideo->szVideoCodec) == 4) pVideo->pCapture->set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(pVideo->szVideoCodec[0], pVideo->szVideoCodec[1], pVideo->szVideoCodec[2], pVideo->szVideoCodec[3]));
 #endif // (CV_MAJOR_VERSION < 3)
 
 			// Commented because sometimes CV_CAP_PROP_FRAME_WIDTH and CV_CAP_PROP_FRAME_HEIGHT might not be reliable...

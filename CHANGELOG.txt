@@ -1,3 +1,7 @@
+407
+Add szVideoCodec parameter to Video.
+Add the possibility to choose the OpenCV backend for Video.
+
 406
 Updated SSC32Interface.
 
