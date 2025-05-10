@@ -187,6 +187,76 @@ inline int GetDigitalInputSSC32(SSC32* pSSC32, int channel, int* pValue)
 }
 
 /*
+Get a digital input channel value (for Arduino code on the Lotus car for UTAC Challenge 2025).
+
+SSC32* pSSC32 : (INOUT) Valid pointer to a structure corresponding to a SSC-32.
+int channel : (IN) Channel number.
+int* pValue : (INOUT) Valid pointer that will receive the digital value (0 or 1).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int GetDigitalInputAltSSC32(SSC32* pSSC32, int channel, int* pValue)
+{
+	char sendbuf[MAX_NB_BYTES_SSC32];
+	int sendbuflen = 0;
+	char recvbuf[4]; // 1 digit+CR+LF, +'\0' for strlen() to work.
+	int recvbuflen = 0;
+	char c = 0;
+	char v = 0;
+
+	switch (channel)
+	{
+	case 0: c = 'A'; break;
+	case 1: c = 'B'; break;
+	case 2: c = 'C'; break;
+	case 3: c = 'D'; break;
+	default:
+		printf("Invalid parameter : channel %d.\n", channel);
+		return EXIT_FAILURE;
+	}
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "%c\r", c);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a SSC32. \n");
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 3;
+
+	if (ReadAllRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, recvbuflen) != EXIT_SUCCESS)
+	{
+		printf("Error reading data from a SSC32. \n");
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(recvbuf, recvbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	if (sscanf(recvbuf, "%c\r\n", &v) != 1)
+	{
+		printf("Error reading data from a SSC32 : Invalid data. \n");
+		return EXIT_FAILURE;
+	}
+	*pValue = (v == '0')? 0: 1;
+
+	return EXIT_SUCCESS;
+}
+
+/*
 Get an analog input channel voltage.
 
 SSC32* pSSC32 : (INOUT) Valid pointer to a structure corresponding to a SSC-32.
@@ -248,6 +318,80 @@ inline int GetVoltageSSC32(SSC32* pSSC32, int channel, double* pVoltage)
 
 	v = (unsigned char)recvbuf[0];
 	*pVoltage = v*5.0/256.0;
+
+	return EXIT_SUCCESS;
+}
+
+/*
+Get an analog input channel voltage (for Arduino code on the Lotus car for UTAC Challenge 2025).
+
+SSC32* pSSC32 : (INOUT) Valid pointer to a structure corresponding to a SSC-32.
+int channel : (IN) Channel number.
+int* pVoltage : (INOUT) Valid pointer that will receive the voltage (in V).
+
+Return : EXIT_SUCCESS or EXIT_FAILURE if there is an error.
+*/
+inline int GetVoltageAltSSC32(SSC32* pSSC32, int channel, double* pVoltage)
+{
+	char sendbuf[MAX_NB_BYTES_SSC32];
+	int sendbuflen = 0;
+	char recvbuf[7]; // Up to 4 digits+CR+LF, +'\0' for strlen() to work.
+	int recvbuflen = 0;
+	char c = 0;
+	unsigned int v = 0;
+
+	switch (channel)
+	{
+	case 0: c = 'A'; break;
+	case 1: c = 'B'; break;
+	case 2: c = 'C'; break;
+	case 3: c = 'D'; break;
+	default:
+		printf("Invalid parameter : channel %d.\n", channel);
+		return EXIT_FAILURE;
+	}
+
+	// Prepare data to send to device.
+	memset(sendbuf, 0, sizeof(sendbuf));
+	sprintf(sendbuf, "V%c\r", c);
+	sendbuflen = (int)strlen(sendbuf);
+
+	if (WriteDataSSC32(pSSC32, (unsigned char*)sendbuf, sendbuflen, pSSC32->bytedelayus) != EXIT_SUCCESS)
+	{
+		printf("Error writing data to a SSC32. \n");
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(sendbuf, sendbuflen, 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	// Prepare the buffers.
+	memset(recvbuf, 0, sizeof(recvbuf));
+	recvbuflen = 6;
+
+	if (ReadUntilRS232Port(&pSSC32->RS232Port, (unsigned char*)recvbuf, '\n', recvbuflen) != EXIT_SUCCESS)
+	{
+		return EXIT_FAILURE;
+	}
+	if ((pSSC32->bSaveRawData)&&(pSSC32->pfSaveFile))
+	{
+		fwrite(recvbuf, strlen(recvbuf), 1, pSSC32->pfSaveFile);
+		fflush(pSSC32->pfSaveFile);
+	}
+
+	if (strlen(recvbuf) < 3)
+	{
+		printf("Error reading data from a SSC32. \n");
+		return EXIT_FAILURE;
+	}
+	if (sscanf(recvbuf, "%u\r\n", &v) != 1)
+	{
+		printf("Error reading data from a SSC32 : Invalid data. \n");
+		return EXIT_FAILURE;
+	}
+	*pVoltage = v*5.0/1023.0;
 
 	return EXIT_SUCCESS;
 }
