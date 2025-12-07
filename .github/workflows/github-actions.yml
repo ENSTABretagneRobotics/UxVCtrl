@@ -449,88 +449,8 @@ jobs:
       if: github.event_name != 'pull_request'
 
  # Other compatibility configurations
- # Too old CMake version...
- # j22:
- #    name: Ubuntu 20.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
- #    runs-on: ubuntu-latest
- #    steps: 
- #    - uses: actions/checkout@v5
- #    - run: sudo apt-get -q update || true
- #    - run: docker run -i -v "${PWD}/..:${PWD}/.." amd64/ubuntu:bionic /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; export  #DEBIAN_FRONTEND=noninteractive && export UCF_FORCE_CONFFOLD=1 && apt-get -y install sudo lsb-release build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D  #ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && #cat  run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_focal"
- #    - uses: xresloader/upload-to-github-release@v1
- #      env:
- #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- #      with:
- #        file: "UxVCtrl_compat_ubuntu_focal"
- #        overwrite: true
- #        tag_name: autotagname-${{ github.sha }}
- #      if: github.event_name != 'pull_request'
- # 
- # Too old CMake version...
- # j23:
- #    name: Ubuntu 18.04 amd64 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
- #    runs-on: ubuntu-latest
- #    steps: 
- #    - uses: actions/checkout@v5
- #    - run: docker run -i -v "${PWD}/..:${PWD}/.." amd64/ubuntu:bionic /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; export  #DEBIAN_FRONTEND=noninteractive && export UCF_FORCE_CONFFOLD=1 && apt-get -y install sudo lsb-release build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D  #ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && #cat  run_test.txt | ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_bionic"
- #    - uses: xresloader/upload-to-github-release@v1
- #      env:
- #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- #      with:
- #        file: "UxVCtrl_compat_ubuntu_bionic"
- #        overwrite: true
- #        tag_name: autotagname-${{ github.sha }}
- #      if: github.event_name != 'pull_request'
- # 
- # Too old CMake version...
- # j24:
- #    name: Ubuntu 16.04 xenial i386 static without OpenCV, libmodbus, SBG SDK, RPLIDAR SDK, BlueView, Kinect v2 support
- #    runs-on: ubuntu-latest
- #    steps: 
- #    - uses: actions/checkout@v5
- #    - run: docker run -i -v "${PWD}/..:${PWD}/.." i386/ubuntu:xenial /bin/bash -c "linux32 --32bit i386 uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update ; export DEBIAN_FRONTEND=#noninteractive  && export UCF_FORCE_CONFFOLD=1 && apt-get -y install sudo lsb-release build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D ENABLE_STATIC=ON -D #ENABLE_MAVLINK_SUPPORT=ON -D  ENABLE_LABJACK_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=OFF -D ENABLE_RPLIDAR_SDK_SUPPORT=OFF . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && #cat run_test.txt | ./UxVCtrl &&  cp ./UxVCtrl ./UxVCtrl_compat_ubuntu_xenial_i386"
- #    - uses: xresloader/upload-to-github-release@v1
- #      env:
- #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- #      with:
- #        file: "UxVCtrl_compat_ubuntu_xenial_i386"
- #        overwrite: true
- #        tag_name: autotagname-${{ github.sha }}
- #      if: github.event_name != 'pull_request'
 
  # Other full configurations
- # Too old CMake version...
- # j25:
- #    name: Ubuntu 20.04 amd64 with default OpenCV 4.2.0
- #    runs-on: ubuntu-latest
- #    steps: 
- #    - uses: actions/checkout@v5
- #    - run: sudo apt-get -q update || true
- #    - run: docker run -i -v "${PWD}/..:${PWD}/.." amd64/ubuntu:bionic /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; export  #DEBIAN_FRONTEND=noninteractive && export UCF_FORCE_CONFFOLD=1 && apt-get -y install sudo lsb-release build-essential cmake && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D #DISABLE_OPENCV_SUPPORT=OFF  -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D #ENABLE_BLUEVIEW_SUPPORT=ON -D  ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./#UxVCtrl_ubuntu_focal"
- #    - uses: xresloader/upload-to-github-release@v1
- #      env:
- #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- #      with:
- #        file: "UxVCtrl_ubuntu_focal"
- #        overwrite: true
- #        tag_name: autotagname-${{ github.sha }}
- #      if: github.event_name != 'pull_request'
- 
- # Block on "Configuring tzdata [...] Please select the geographic area in which you live"...
- # j26:
- #    name: Ubuntu 18.04 amd64 with default OpenCV 3.2.0
- #    runs-on: ubuntu-latest
- #    steps: 
- #    - uses: actions/checkout@v5
- #    - run: docker run -i -v "${PWD}/..:${PWD}/.." amd64/ubuntu:bionic /bin/bash -c "uname -a && cat /etc/os-release && cd ${PWD} && apt-get -q update --allow-releaseinfo-change ; export DEBIAN_FRONTEND=noninteractive && export UCF_FORCE_CONFFOLD=1 && apt-get -y install sudo lsb-release build-essential cmake xvfb xauth && lsb_release -a && cmake -D CMAKE_BUILD_TYPE=Release -D DISABLE_OPENCV_SUPPORT=OFF -D ENABLE_MAVLINK_SUPPORT=ON -D ENABLE_LABJACK_SUPPORT=ON -D ENABLE_LIBMODBUS_SUPPORT=ON -D ENABLE_SBG_SDK_SUPPORT=ON -D ENABLE_RPLIDAR_SDK_SUPPORT=ON -D ENABLE_BLUEVIEW_SUPPORT=ON -D ENABLE_CVKINECT2SDKHOOK=ON . && cmake --build . && echo wait 10 > run_test.txt && echo exit >> run_test.txt && cat run_test.txt | xvfb-run -a ./UxVCtrl && cp ./UxVCtrl ./UxVCtrl_ubuntu_bionic"
- #    - uses: xresloader/upload-to-github-release@v1
- #      env:
- #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- #      with:
- #        file: "UxVCtrl_ubuntu_bionic"
- #        overwrite: true
- #        tag_name: autotagname-${{ github.sha }}
- #      if: github.event_name != 'pull_request'
 
  # Alternate configurations
  j27:
