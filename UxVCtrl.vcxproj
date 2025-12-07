@@ -86,6 +86,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgECom.lib;rplidar_driver.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;opencv_calib3d460.lib;opencv_dnn460.lib;opencv_gapi460.lib;opencv_core460.lib;opencv_features2d460.lib;opencv_flann460.lib;opencv_highgui460.lib;opencv_videoio460.lib;opencv_imgcodecs460.lib;opencv_imgproc460.lib;opencv_ml460.lib;opencv_objdetect460.lib;opencv_photo460.lib;opencv_stitching460.lib;opencv_video460.lib;libwebp.lib;ippicvmt.lib;ippiw.lib;ittnotify.lib;libprotobuf.lib;IlmImf.lib;zlib.lib;libopenjp2.lib;libjpeg-turbo.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
