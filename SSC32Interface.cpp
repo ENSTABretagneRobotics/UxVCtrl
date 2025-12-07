@@ -122,6 +122,8 @@ int handlessc32interface(RS232PORT* pSSC32InterfacePseudoRS232Port)
 				case SAILBOAT_SIMULATOR_ROBID:
 				case VAIMOS_ROBID:
 				case SAILBOAT_ROBID:
+				case MOTORBOAT_SIMULATOR_ROBID:
+				case MOTORBOAT_ROBID:
 				case BUGGY_SIMULATOR_ROBID:
 				case BUGGY_ROBID:
 					if (chan == 2) u = (pw-1500.0)/500.0;
