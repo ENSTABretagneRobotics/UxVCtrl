@@ -1,3 +1,10 @@
+408
+Default project files are now with Visual Studio 2022 and OpenCV 4.6.0.
+Updated SSC32Interface.
+Improved support of OpenCV 4.6.0.
+Improved support of CMake 4.
+Updated SSC32.
+
 407
 Add szVideoCodec parameter to Video.
 Add the possibility to choose the OpenCV backend for Video.
