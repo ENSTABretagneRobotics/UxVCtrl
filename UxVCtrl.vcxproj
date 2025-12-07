@@ -14,18 +14,18 @@
     <ProjectGuid>{30A6807A-5214-4E51-9ECA-AAFA08F9F6D8}</ProjectGuid>
     <RootNamespace>UxVCtrl</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\Extensions\Net;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV4.5.4\include;$(KINECTSDK20_DIR)\inc;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(RPLIDAR_SDK_DIR)\sdk\include;$(RPLIDAR_SDK_DIR)\sdk\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\Extensions\Net;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV4.6.0\include;$(KINECTSDK20_DIR)\inc;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(RPLIDAR_SDK_DIR)\sdk\include;$(RPLIDAR_SDK_DIR)\sdk\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_DEBUG_WARNINGS;BVTSDK_VERSION=4;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -66,8 +66,8 @@
       </DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgEComd.lib;rplidar_driver.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;opencv_world454d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV4.5.4\x86\vc15\lib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\lib;$(SBG_SDK_DIR)\x86\vc15\lib;$(RPLIDAR_SDK_DIR)\output\win32\Debug;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgEComd.lib;rplidar_driver.lib;libmodbus-3.0.6-msvcd.lib;labjackud.lib;Kinect20.lib;opencv_world460d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV4.6.0\x86\vc17\lib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc17\lib;$(SBG_SDK_DIR)\x86\vc17\lib;$(RPLIDAR_SDK_DIR)\output\win32\Debug;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -78,7 +78,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\Extensions\Net;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV4.5.4\include;$(KINECTSDK20_DIR)\inc;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(RPLIDAR_SDK_DIR)\sdk\include;$(RPLIDAR_SDK_DIR)\sdk\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Hardware;..\Extensions\Devices\LabjackUtils\UE9Utils;..\Extensions\Img;..\Extensions\Misc;..\Extensions\Net;..\OSUtils;..\interval;..\matrix_lib;.;..;$(SystemDrive)\OpenCV4.6.0\include;$(KINECTSDK20_DIR)\inc;$(MAVLINK_SDK_DIR);$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\include;$(SBG_SDK_DIR)\common;$(SBG_SDK_DIR)\src;$(RPLIDAR_SDK_DIR)\sdk\include;$(RPLIDAR_SDK_DIR)\sdk\src;$(BVTSDK_DIR)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;BVTSDK_VERSION=4;ENABLE_CVKINECT2SDKHOOK;ENABLE_MAVLINK_SUPPORT;ENABLE_LABJACK_SUPPORT;ENABLE_LIBMODBUS_SUPPORT;ENABLE_SBG_SDK_SUPPORT;ENABLE_RPLIDAR_SDK_SUPPORT;ENABLE_BLUEVIEW_SUPPORT;ENABLE_GETTIMEOFDAY_WIN32;DISABLE_TIMEZONE_STRUCT_REDEFINITION;ENABLE_CANCEL_THREAD;ENABLE_KILL_THREAD;SIMULATED_INTERNET_SWARMONDEVICE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -88,8 +88,8 @@
       </DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgECom.lib;rplidar_driver.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;opencv_calib3d454.lib;opencv_dnn454.lib;opencv_gapi454.lib;opencv_core454.lib;opencv_features2d454.lib;opencv_flann454.lib;opencv_highgui454.lib;opencv_videoio454.lib;opencv_imgcodecs454.lib;opencv_imgproc454.lib;opencv_ml454.lib;opencv_objdetect454.lib;opencv_photo454.lib;opencv_stitching454.lib;opencv_video454.lib;libwebp.lib;ippicvmt.lib;ippiw.lib;ittnotify.lib;libprotobuf.lib;IlmImf.lib;zlib.lib;libopenjp2.lib;libjpeg-turbo.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV4.5.4\x86\vc15\staticlib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc15\staticlib;$(SBG_SDK_DIR)\x86\vc15\staticlib;$(RPLIDAR_SDK_DIR)\output\win32\Release;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>WinMM.lib;WS2_32.lib;bvtsdk4.lib;sbgECom.lib;rplidar_driver.lib;libmodbus-3.0.6-msvc.lib;labjackud.lib;Kinect20.lib;opencv_calib3d460.lib;opencv_dnn460.lib;opencv_gapi460.lib;opencv_core460.lib;opencv_features2d460.lib;opencv_flann460.lib;opencv_highgui460.lib;opencv_videoio460.lib;opencv_imgcodecs460.lib;opencv_imgproc460.lib;opencv_ml460.lib;opencv_objdetect460.lib;opencv_photo460.lib;opencv_stitching460.lib;opencv_video460.lib;libwebp.lib;ippicvmt.lib;ippiw.lib;ittnotify.lib;libprotobuf.lib;IlmImf.lib;zlib.lib;libopenjp2.lib;libjpeg-turbo.lib;libpng.lib;libtiff.lib;Vfw32.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SystemDrive)\OpenCV4.6.0\x86\vc17\staticlib;$(KINECTSDK20_DIR)\Lib\x86;$(ProgramFiles)\LabJack\Drivers;$(ProgramFiles)\libmodbus-3.0.6-msvc\x86\vc17\staticlib;$(SBG_SDK_DIR)\x86\vc17\staticlib;$(RPLIDAR_SDK_DIR)\output\win32\Release;$(BVTSDK_DIR)\x86\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
