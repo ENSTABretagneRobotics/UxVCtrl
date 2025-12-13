@@ -1,62 +1,58 @@
+UxVCtrl
+=======
 This folder ( https://github.com/ENSTABretagneRobotics/UxVCtrl ) contains a program used to control and configure UGVs, USVs, UUVs, UAVs used in WRSC, SAUC-E and euRathlon/ERL competitions. See corresponding GitHub releases for examples of configurations provided for several robots.
 
 Quick start:
 *** USER and DEVELOPER ***
-_ Use Windows 10 Professional 64 bit or Ubuntu 22.04 64 bit and see https://github.com/ENSTABretagneRobotics/UxVCtrl/releases 
+- Use Windows 10 Professional 64 bit or Ubuntu 24.04 64 bit and see https://github.com/ENSTABretagneRobotics/UxVCtrl/releases 
 *** DEVELOPER ***
-_ Connect to the Internet
-_ Install a C/C++ compiler (see e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf to install Visual Studio 2017 for Windows or alternatively e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_qt_opencv.pdf to install MinGW, sudo apt-get install build-essential for Ubuntu)
-_ Install cmake-gui (preferably 32 bit version for Windows (e.g. https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi ) and ensure it is added to the PATH environment variable, sudo apt-get install cmake cmake-gui for Ubuntu)
-_ Reboot
-_ Launch cmake-gui, choose UxVCtrl as build and source folder, click Configure, choose the compiler (check if it outputs other messages requesting an action), click Generate, and open the generate .sln file to build UxVCtrl if you have Visual Studio, or open a terminal in the folder and run mingw32-make or make. UxVCtrl.exe should be generated (move it from the Release folder to the UxVCtrl folder to test it if needed). You might want also to change some options in cmake-gui to enable/disable specific features, and try to rebuild.
+- Connect to the Internet
+- Install a C/C++ compiler (see e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_vs2017_opencv320.pdf to install Visual Studio 2017 for Windows or alternatively e.g. http://www.ensta-bretagne.fr/lebars/Share/setup_qt_opencv.pdf to install MinGW, sudo apt-get install build-essential for Ubuntu)
+- Install cmake-gui (preferably 32 bit version for Windows (e.g. https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi ) and ensure it is added to the PATH environment variable, sudo apt-get install cmake cmake-gui for Ubuntu)
+- Reboot
+- Launch cmake-gui, choose UxVCtrl as build and source folder, click Configure, choose the compiler (check if it outputs other messages requesting an action), click Generate, and open the generate .sln file to build UxVCtrl if you have Visual Studio, or open a terminal in the folder and run mingw32-make or make. UxVCtrl.exe should be generated (move it from the Release folder to the UxVCtrl folder to test it if needed). You might want also to change some options in cmake-gui to enable/disable specific features, and try to rebuild.
 
-It is recommended to be connected with an administrator account, run the different programs by right-clicking on Run as administrator, disable any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189, 40XX, 5XXX, 14550, 1235 TCP/UDP network ports. Choose Work/Private for the network type if asked when connecting to the different networks (avoid Public type, to check and change go to Network and Sharing Center and click on Public to be able to change to Work/Private, or go to PC Settings\Network, select the desired network and enable the option Find devices and content/Make this PC discoverable).
 In Windows Explorer Folder Options, View tab, activate hidden files display, known files extensions display, protected system files and folders display.
 Check and change if needed Control Panel\Regional and Language Options\Customize\Numbers so that '.' is in Decimal symbol and ';' in List separator.
-Check also proxy settings of Internet Explorer, and any other installed browser, as well as FileZilla if necessary.
 
 It should work with the following software:
 *** USER and DEVELOPER ***
-_ Windows 10 Professional 64 bit
-_ Microsoft Visual C++ 2017 Redistributable Package (see https://go.microsoft.com/fwlink/?LinkId=746571 )
-_ Microsoft .NET Framework 4.7 (see http://go.microsoft.com/fwlink/?LinkId=825303 )
-[_ 7-Zip]
-[_ Google Earth]
-[_ MinGW and MSYS]
-[_ GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
-[_ Look@LAN (lalsetup250)]
-_ LabJack UD driver (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.zip , can be disabled using Compat_vs20XX.bat script or cmake)]
-[_ MT SDK 2.7/3.3/4.2.1/4.3 (recommended if using a Xsens MTi device)]
-[_ Maestro Control Center (recommended if using a Pololu Maestro device)]
-[_ Jrk Configuration Utility (recommended if using a Pololu Jrk device)]
-[_ MAVProxy (see e.g. http://firmware.ardupilot.org/Tools/MAVProxy/MAVProxySetup-1.6.2.exe , recommended if using a BlueROV2)]
-[_ OpenAL SDK 1.1]
-[_ freealut 1.1.0]
-[_ fftw 3.3.2 32 bit]
-[_ ffmpeg 32 bit (might be useful if using a SJCAM through Wi-Fi, see http://www.ensta-bretagne.fr/lebars/utilities/ffmpeg-msvc.zip , to enable using ffmpeg_vs2017.bat script or cmake)]
-_ Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP, can be disabled using Compat_vs20XX.bat script or cmake)
-_ CL-Eye driver and SDK (see https://codelaboratories.com/products/eye/driver/ , you might also want to create an environment variable similar to CLEYESDK_DIR=C:\Users\Administrator\Documents\CL-Eye Platform SDK depending on where it is installed, can be disabled using Compat_vs20XX.bat script or cmake, not compatible with Kinect v2 support)
-_ ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt , can be disabled using Compat_vs20XX.bat script or cmake)
-[_ Microsoft Office Excel (or equivalent .csv and .xls editor)]
-_ The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip , can be disabled using Compat_vs20XX.bat script or cmake)
+- Windows 10 Professional 64 bit
+- Microsoft Visual C++ 2017 Redistributable Package (see https://go.microsoft.com/fwlink/?LinkId=746571 )
+- Microsoft .NET Framework 4.7 (see http://go.microsoft.com/fwlink/?LinkId=825303 )
+[- 7-Zip]
+[- Google Earth]
+[- MinGW and MSYS]
+[- GPS data conversions (see http://www.ensta-bretagne.fr/lebars/utilities/GPSDataConverter.zip )]
+[- Look@LAN (lalsetup250)]
+- LabJack UD driver (see http://www.ensta-bretagne.fr/lebars/Share/LabJack-2013.3.5.zip , can be disabled using Compat_vs20XX.bat script or cmake)]
+[- MT SDK 2.7/3.3/4.2.1/4.3 (recommended if using a Xsens MTi device)]
+[- Maestro Control Center (recommended if using a Pololu Maestro device)]
+[- Jrk Configuration Utility (recommended if using a Pololu Jrk device)]
+[- MAVProxy (see e.g. http://firmware.ardupilot.org/Tools/MAVProxy/MAVProxySetup-1.6.2.exe , recommended if using a BlueROV2)]
+[- OpenAL SDK 1.1]
+[- freealut 1.1.0]
+[- fftw 3.3.2 32 bit]
+[- ffmpeg 32 bit (might be useful if using a SJCAM through Wi-Fi, see http://www.ensta-bretagne.fr/lebars/utilities/ffmpeg-msvc.zip , to enable using ffmpeg_vs2017.bat script or cmake)]
+- Kinect v2 SDK (not compatible with Visual Studio 2008 and Windows XP, can be disabled using Compat_vs20XX.bat script or cmake)
+- CL-Eye driver and SDK (see https://codelaboratories.com/products/eye/driver/ , you might also want to create an environment variable similar to CLEYESDK_DIR=C:\Users\Administrator\Documents\CL-Eye Platform SDK depending on where it is installed, can be disabled using Compat_vs20XX.bat script or cmake, not compatible with Kinect v2 support)
+- ProViewer SDK 3.5/4.0 (see http://www.ensta-bretagne.fr/lebars/Share/bv.txt , can be disabled using Compat_vs20XX.bat script or cmake)
+[- Microsoft Office Excel (or equivalent .csv and .xls editor)]
+- The specific prerequisites for CISSAU (libmodbus-3.0.3/3.0.6, see http://www.ensta-bretagne.fr/lebars/Share/CISSAU_prereq.zip , can be disabled using Compat_vs20XX.bat script or cmake)
 *** DEVELOPER ***
-_ Visual Studio 2017
-[_ cmake-gui (see https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi )]
-_ OpenCV 4.5.4 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs2022_opencv454.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
-_ MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip , can be disabled using Compat_vs20XX.bat script or cmake)
-_ SBG Systems Inertial SDK v5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script or cmake)
-_ ..\OSUtils: Windows/Linux abstraction layer (threads, network, serial port, time management...) as well as other useful functions (see https://github.com/ENSTABretagneRobotics/OSUtils )
-_ ..\Extensions: Labjack and some image functions (see https://github.com/ENSTABretagneRobotics/Extensions )
-_ ..\interval: interval library (see https://github.com/ENSTABretagneRobotics/interval )
-_ ..\matrix_lib: matrix library compatible with interval (see https://github.com/ENSTABretagneRobotics/matrix_lib )
+- Visual Studio 2017
+[- cmake-gui (see https://cmake.org/files/v3.15/cmake-3.15.5-win32-x86.msi )]
+- OpenCV 4.6.0 (see http://www.ensta-bretagne.fr/lebars/Share/setup_vs_opencv.pdf , can be disabled using Compat_vs20XX.bat script or cmake)
+- MAVLink (not compatible with Visual Studio 2008, see http://www.ensta-bretagne.fr/lebars/Share/MAVLinkSDK.zip , can be disabled using Compat_vs20XX.bat script or cmake)
+- SBG Systems Inertial SDK v5.0 (see http://www.ensta-bretagne.fr/lebars/Share/SBG.zip , can be disabled using Compat_vs20XX.bat script or cmake)
+- ..\OSUtils: Windows/Linux abstraction layer (threads, network, serial port, time management...) as well as other useful functions (see https://github.com/ENSTABretagneRobotics/OSUtils )
+- ..\Extensions: Labjack and some image functions (see https://github.com/ENSTABretagneRobotics/Extensions )
+- ..\interval: interval library (see https://github.com/ENSTABretagneRobotics/interval )
+- ..\matrix_lib: matrix library compatible with interval (see https://github.com/ENSTABretagneRobotics/matrix_lib )
 
 Restart the computer after prerequisites installation. Ensure that the folders UxVCtrl, OSUtils, Extensions, interval, matrix_lib are at the same directory level. To disable the need of any unnecessary prerequisites, run Compat_vs20XX.bat and follow its instructions. To use a specific version of the Visual Studio solution, copy the project files from the Backup_vs20XX folder to the UxVCtrl folder to replace the default. You might also need to adapt some paths in Visual Studio Project Properties (C/C++\Additional Include Directories, Linker\Additional Library Directories) and in Windows PATH if some required dependencies are not found correctly on your system. The program is also supposed to be compatible with Linux with equivalent prerequisites (see http://www.ensta-bretagne.fr/lebars/Share/Ubuntu.txt for installation information about some of them). See provided Makefile or Visual Studio 2017 VC Linux project (set Pre-Launch Command to export DISPLAY=:0.0 and Working Directory to $(RemoteProjectDir)/UxVCtrl). Alternatively, you can use cmake-gui/cmake (only 32 bit version is currently supported on Windows 64 bit, run as administrator if needed, check if the command prompt is asking for a password if cmake-gui appears to hang, build and run UxVCtrl with the generated project files) to configure your project files or makefiles. On some versions of Linux or OpenCV, set nbvideo to 1 (or 0) in UxVCtrl.txt if the OpenCV windows created by the program have problems. Reboot or change the TCP ports of the XXXInterface in UxVCtrl.txt if you see error messages similar to "Error launching the XXXInterface server" since it might be due to other programs using temporarily the same TCP ports.
 
-Please do not try to build the program in a directory that contains commas or other unusual characters! Mind the line endings in the configuration files depending on the OS (use e.g. the command dos2unix *.txt to convert line endings for Linux)!
-
 The principle of execution of the program is the following: main() launches all the devices, controller, observer, missions, GUI and the command interpreter threads depending on the UxVCtrl.txt configuration file. After all initializations, the program should be waiting for user input through the GUI and/or the command interpreter, or run the mission specified as argument if any. The program should exit depending on GUI interaction, commands typed or mission scripts. Type 'h' on an OpenCVGUI window to get the list of available keyboard controls, e.g. z,q,s,d keys are used to control the horizontal movement of most of the robots, f,v keys the vertical movement or thrust limit, space key stops horizontal movement and g key stops all movements. Run the mission specified in mission.txt (check if it is safe to run the mission before!) using the p key and abort it with x. Available commands are described in mission_spec.txt. A lot of parameters can be modified in the UxVCtrl.txt configuration file, as well as in the other device-specific configuration files to modify the behavior of the program. You might need to modify also env.txt so that it describes correctly the robot environment. Configuration files for various existing robots are provided in the GitHub releases. 
-
-Warning: The configuration file formats might vary between the releases of the program, check for any changes before mixing different versions of the program and configuration files!
 
 Robot coordinate system: x is towards the nose and y towards the left of the robot, the origin is the center of the robot.
 Environment coordinate system: a local coordinate system defined in env.txt.
@@ -102,5 +98,13 @@ Hardware support:
 - ublox: ublox GPS, Furuno WS200 weather station, AIS Receiver dAISy, or other NMEA-compatible devices with supported NMEA sentences.
 - UE9A: LabJack UE9.
 - Video: USB webcam, GoPro Hero 5 through Wi-Fi (need to enable also gpControl), SJCAM M10+ through Wi-Fi, Kinect v2, CL-Eye (Kinect v2 and CL-Eye are mutually exclusive).
+
+Known issues:
+- Warning: the configuration file formats might vary between the releases of the program, check for any changes before mixing different versions of the program and configuration files!
+- It is recommended to be connected with an administrator account, deactivate any antivirus, firewall or other settings that would block 21 (FTP), 22 (SSH/SFTP), 23 (TELNET), 80, 443, 3189, 40XX, 5XXX, 14550, 1235 TCP/UDP, etc. network ports, for Work/Private and Public network types if asked.
+- Mind the line endings in the configuration files depending on the OS (use e.g. the command `dos2unix *.txt` to convert line endings for Linux).
+- Please avoid building or run the program in a directory that contains commas or other unusual characters.
+- Check the web browser, system, FileZilla proxy settings if your network uses a proxy, if necessary.
+- If recording does not work, try to specify another codec for the parameter `szVideoRecordCodec` in `UxVCtrl.txt`.
 
 See also https://github.com/ENSTABretagneRobotics/Hardware-CPP , https://github.com/ENSTABretagneRobotics/Hardware-MATLAB , https://github.com/ENSTABretagneRobotics/Hardware-Java , https://github.com/ENSTABretagneRobotics/Android .
