@@ -69,6 +69,9 @@ Makefile eol=lf
 *.launch eol=lf
 *.yaml eol=lf
 
+# Docker
+Dockerfile eol=lf
+
 #
 *.kml eol=crlf
 *.KML eol=crlf

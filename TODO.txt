@@ -1,5 +1,14 @@
+Uxvctrl et cv460...: quand il trouve la bonne version de cv mais sans les binaires compatibles avec le compilateur, il n'y a pas de message d'erreur...
 
-waitKeyEx (for uppercase key commands)
+gestion des GPS qui ne fournissent pas d'indicateur de qualité...?
+
+find_package(Threads REQUIRED)
+target_link_libraries(Test_devices rt m Threads::Threads)
+->peut-être manière la plus portable de gérer threads c++11, voir depuis quand c'est possible... Même chose pour libm?
+
+Dans logapp UxVCtrl affiche (null) pour nom d'utilisateur et peut-être hostname donné par réseau de l'école (et pas celui défini localement…) sous macOS? Pb aussi de nom d'utilisateur à (null) pour gaspard sous ubuntu, pas de pb en dehors du réseau de l'école…?
+
+waitKeyEx (for uppercase key commands on recent Ubuntu, related to qt backend...)
 
 /MP4, -j 4, test windows-2025...?
 
@@ -956,6 +965,10 @@ peut-être pas trop s'embêter à faire un programme qui fait tout pour récupérer e
 
 
 OLD
+
+(New-Object System.Net.WebClient).DownloadFile("http://www.ensta-bretagne.fr/lebars/Share/windows_extra_tools.zip", "C:\Windows\Temp\windows_extra_tools.zip") 
+7z x C:\Windows\Temp\windows_extra_tools.zip -o"C:\Windows" -y
+à remplacer partout par choco install -y wget car erreur de certificat et vaut peut-être mieux garder à jour wget, à l'origine c'était juste une optimisation (n'installe que wget), ou peut-être pour éviter de passer par choco...?
 
 Check for multiple calls to target_link_libraries...->maybe only problem for cmake_minimum_required(VERSION 2.8...
 
