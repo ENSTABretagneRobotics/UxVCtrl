@@ -818,7 +818,8 @@ inline int Commands(char* line)
 	double T11 = 0, T21 = 0, T31 = 0, T41 = 0, T12 = 0, T22 = 0, T32 = 0, T42 = 0, T13 = 0, T23 = 0, T33 = 0, T43 = 0, T14 = 0, T24 = 0, T34 = 0, T44 = 0;
 #endif // !DISABLE_OPENCV_SUPPORT
 	int id = 0, videoid = 0, guiid = 0, procid = 0;
-	double delay = 0, delay_station = 0, delay_wait_new = 0, circle_r = 0, arc_limit = 0, line_length_coef = 0, arc_current = 0;
+	struct timeval tv;
+	double delay = 0, delay_station = 0, delay_wait_new = 0, t_epoch = 0, circle_r = 0, arc_limit = 0, line_length_coef = 0, arc_current = 0;
 	double u_prev = 0;
 	CHRONO chrono, chrono_station;
 
@@ -3867,6 +3868,21 @@ inline int Commands(char* line)
 			LeaveCriticalSection(&RegistersCS);
 		}
 	}
+	else if (sscanf(line, "regsettodate %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+			t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
+			EnterCriticalSection(&RegistersCS);
+			registers[ival] = t_epoch;
+			LeaveCriticalSection(&RegistersCS);
+		}
+	}
 	else if (sscanf(line, "regsettoheading %d", &ival) == 1)
 	{
 		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
@@ -4121,6 +4137,21 @@ inline int Commands(char* line)
 			mSleep((long)min(delay*100.0, 100.0));
 		}
 		StopChronoQuick(&chrono);
+		bWaiting = FALSE;
+	}
+	else if (sscanf(line, "waitdate %lf", &dval) == 1)
+	{
+		bWaiting = TRUE;
+		for (;;)
+		{
+			if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+			t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
+			if (t_epoch > dval) break;
+			if (!bWaiting) break;
+			if (bExit) break;
+			// Wait at least delay/10 and at most around 100 ms for each loop.
+			mSleep((long)min(delay*100.0, 100.0));
+		}
 		bWaiting = FALSE;
 	}
 	else if (sscanf(line, "system %[^\r\n]255s", str) == 1)

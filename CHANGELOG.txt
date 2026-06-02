@@ -1,3 +1,6 @@
+409
+Add waitdate, regsettodate commands.
+
 408
 Default project files are now with Visual Studio 2022 and OpenCV 4.6.0.
 Updated SSC32Interface.

@@ -414,6 +414,8 @@
 %
 %regsetrand regid minvalue maxvalue (regid : int [0,32[, minvalue : double ]-oo,oo[, maxvalue : double ]-oo,oo[)
 %
+%regsettodate regid (regid : int [0,32[, date stored as an epoch time in s)
+%
 %regsettoheading regid (regid : int [0,32[)
 %
 %regsettox regid (regid : int [0,32[)
@@ -445,6 +447,8 @@
 %setmissionaction name (string representing the current action name to store in the mission log file)
 %
 %wait t (double [0,oo[ timeout in s, the function blocks until the timeout is reached)
+%
+%waitdate t_epoch (double [0,oo[ date as an epoch time in s, the function blocks until the date is reached)
 %
 %system cmd (string representing the command or script file to run)
 %
