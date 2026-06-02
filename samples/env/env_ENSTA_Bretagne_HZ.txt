@@ -1,9 +1,9 @@
 % Angle of the x axis of the environment coordinate system to the North, should be set to 90 if no specific environment (i.e. an East - North - Up coordinate system) is used as reference (in deg in North - East - Down coordinate system)
 87
 % Latitude, longitude, altitude of the environment coordinate system (in decimal deg and m)
-48.419205
--4.469341
-92
+48.419209290
+-4.469344008
+93.0960
 % MagneticDeclination (in decimal deg)
 -1.01
 % AirPressure (pressure in bar)
