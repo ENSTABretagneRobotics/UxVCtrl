@@ -4115,6 +4115,57 @@ inline int Commands(char* line)
 			}
 		}
 	}
+	else if (sscanf(line, "regwait %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			delay = fabs(registers[ival]);
+			LeaveCriticalSection(&RegistersCS);
+			bWaiting = TRUE;
+			StartChrono(&chrono);
+			for (;;)
+			{
+				if (GetTimeElapsedChronoQuick(&chrono) > delay) break;
+				if (!bWaiting) break;
+				if (bExit) break;
+				// Wait at least delay/10 and at most around 100 ms for each loop.
+				mSleep((long)min(delay*100.0, 100.0));
+			}
+			StopChronoQuick(&chrono);
+			bWaiting = FALSE;
+		}
+	}
+	else if (sscanf(line, "regwaitdate %d", &ival) == 1)
+	{
+		if ((ival < 0)||(ival >= MAX_NB_REGISTERS))
+		{
+			printf("Invalid parameter.\n");
+		}
+		else
+		{
+			EnterCriticalSection(&RegistersCS);
+			dval = fabs(registers[ival]);
+			LeaveCriticalSection(&RegistersCS);
+			bWaiting = TRUE;
+			for (;;)
+			{
+				if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
+				t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
+				delay = fabs(dval-t_epoch);
+				if (t_epoch > dval) break;
+				if (!bWaiting) break;
+				if (bExit) break;
+				// Wait at least delay/10 and at most around 100 ms for each loop.
+				mSleep((long)min(delay*100.0, 100.0));
+			}
+			bWaiting = FALSE;
+		}
+	}
 	else if (strncmp(line, "help", strlen("help")) == 0)
 	{
 		DisplayHelp();
@@ -4146,6 +4197,7 @@ inline int Commands(char* line)
 		{
 			if (gettimeofday(&tv, NULL) != EXIT_SUCCESS) { tv.tv_sec = 0; tv.tv_usec = 0; }
 			t_epoch = tv.tv_sec+0.000001*tv.tv_usec;
+			delay = fabs(dval-t_epoch);
 			if (t_epoch > dval) break;
 			if (!bWaiting) break;
 			if (bExit) break;

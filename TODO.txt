@@ -1,12 +1,20 @@
 Uxvctrl et cv460...: quand il trouve la bonne version de cv mais sans les binaires compatibles avec le compilateur, il n'y a pas de message d'erreur...
 
+peut-être depuis cv460 ou une version avant, rester appuyé sur une touche bloque tout OpenCVGUI window...
+
+"GPS in use" un peu bizarre à 1 m sous l'eau
+Peut-être parce que les dernière trames étaient correctes et brutalement on a 
+$GPRMC,151508.008,V,,,,,,,030626,,,N*4C
+$GPGGA,151509.008,,,,,0,00,,,M,0.0,M,,0000*57
+qui sont pas pris en compte vu qu'elles sont vides, il faudrait donc que si on n'a pas reçu de trame correcte depuis e.g. 2 s, on considère qu'il n'y a plus de GPS fix...
+
 gestion des GPS qui ne fournissent pas d'indicateur de qualité...?
 
 find_package(Threads REQUIRED)
 target_link_libraries(Test_devices rt m Threads::Threads)
 ->peut-être manière la plus portable de gérer threads c++11, voir depuis quand c'est possible... Même chose pour libm?
 
-Dans logapp UxVCtrl affiche (null) pour nom d'utilisateur et peut-être hostname donné par réseau de l'école (et pas celui défini localement…) sous macOS? Pb aussi de nom d'utilisateur à (null) pour gaspard sous ubuntu, pas de pb en dehors du réseau de l'école…?
+Dans logapp UxVCtrl affiche (null) pour nom d'utilisateur et peut-être hostname donné par réseau de l'école (et pas celui défini localement...) sous macOS? Pb aussi de nom d'utilisateur à (null) pour gaspard sous ubuntu, pas de pb en dehors du réseau de l'école...?
 
 waitKeyEx (for uppercase key commands on recent Ubuntu, related to qt backend...)
 

@@ -874,7 +874,7 @@ WMV2
 0.01
 % alphas
 0
-%3.14
+%3.1415926
 % omegas
 2.3562
 % outliers_ratio
