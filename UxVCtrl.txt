@@ -586,15 +586,19 @@ WMV2
 % d_max_err (in m, modified by Seanet)
 0.1
 % alphavrxhat.inf
-0.09
-%0.09 for SARDINE
-%0.24 for SAUCISSE
+0.24
+%0.09 for SARDINE without buoy
+%0.09 for SARDINE with buoy
+%0.24 for SAUCISSE without buoy
+%0.24 for SAUCISSE with buoy
 %2.4 for Buggy
 %0.49 for Catamaran
 % alphavrxhat.sup
-0.10
-%0.10 for SARDINE
-%0.26 for SAUCISSE
+0.26
+%0.10 for SARDINE without buoy
+%0.10 for SARDINE with buoy
+%0.26 for SAUCISSE without buoy
+%0.26 for SAUCISSE with buoy
 %2.6 for Buggy
 %0.50 for Catamaran
 % alphaomegazhat.inf
@@ -606,14 +610,18 @@ WMV2
 %0.8 for submarines
 %0.8 for Buggy
 % alphafvrxhat.inf
-0.725
-%0.725 for SARDINE
-%0.475 for SAUCISSE
+0.675
+%0.725 for SARDINE without buoy
+%0.725 for SARDINE with buoy
+%0.475 for SAUCISSE without buoy
+%0.675 for SAUCISSE with buoy
 %0.275 for Catamaran
 % alphafvrxhat.sup
-0.775
-%0.775 for SARDINE
-%0.525 for SAUCISSE
+0.725
+%0.775 for SARDINE without buoy
+%0.775 for SARDINE with buoy
+%0.525 for SAUCISSE without buoy
+%0.725 for SAUCISSE with buoy
 %0.325 for Catamaran
 % alphafomegazhat.inf
 0.20
@@ -633,12 +641,12 @@ WMV2
 0.015
 % alphashat.inf
 -0.1
-%-0.1 for Simulator, SARDINE and CISCREA
-%3.04 for SAUCISSE
+%-0.1 for Simulator, SARDINE with MiniKing, SAUCISSE with Micron
+%3.04 for SAUCISSE with MiniKing
 % alphashat.sup
 0.1
-%0.1 for Simulator, SARDINE and CISCREA
-%3.24 for SAUCISSE
+%0.1 for Simulator, SARDINE with MiniKing, SAUCISSE with Micron
+%3.24 for SAUCISSE with MiniKing
 % omegashat.inf
 2.3
 % omegashat.sup
@@ -723,8 +731,8 @@ WMV2
 10
 % sdir
 1
-%1 for Simulator and CISCREA
-%-1 for SAUCISSE and SARDINE
+%1 for Simulator, sonar or lidar head up (without its internal invert parameter set to change that)
+%-1 for sonar or lidar head down (without its internal invert parameter set to change that)
 % nb_outliers
 25
 % dynamicsonarlocalization_period (in s)
@@ -850,9 +858,11 @@ WMV2
 % d_bias_err (in m)
 -0.1
 % alphavrx
-0.1
-%0.10 for SARDINE
-%0.25 for SAUCISSE
+0.25
+%0.10 for SARDINE without buoy
+%0.10 for SARDINE with buoy
+%0.25 for SAUCISSE without buoy
+%0.25 for SAUCISSE with buoy
 %2.5 for Buggy
 %0.5 for Catamaran
 % alphaomegaz
@@ -860,9 +870,11 @@ WMV2
 %0.7 for submarines
 %0.7 for Buggy
 % alphafvrx
-0.75
-%0.75 for SARDINE
-%0.5 for SAUCISSE
+0.7
+%0.75 for SARDINE without buoy
+%0.75 for SARDINE with buoy
+%0.5 for SAUCISSE without buoy
+%0.7 for SAUCISSE with buoy
 %0.3 for Catamaran
 % alphafomegaz
 0.21
@@ -876,7 +888,10 @@ WMV2
 0
 %3.1415926
 % omegas
-2.3562
+0.5168
+%0.5168 to simulate the rotating speed of Seanet0_HZ_Micron.txt with range of 20 m
+%0.4134 to simulate the rotating speed of Seanet0_HZ_Micron.txt with range of 25 m
+%2.3562 to simulate the rotating speed of Seanet0_M014_MiniKing.txt
 % outliers_ratio
 0.5
 % bNoSimGNSSInsideObstacles
