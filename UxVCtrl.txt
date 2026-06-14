@@ -412,9 +412,9 @@ WMV2
 %0.78
 % wdradius (accuracy of the distance control in m)
 0.25
-% vrxmax (0.4 : simu, 0.4 : SAUC'ISSE, 0.4 : SARDINE, 1.5 : CISCREA, Hovecraft : 2)
+% vrxmax (0.4 : simu, 0.4 : SAUC'ISSE, 0.4 : SARDINE, 1.5 : CISCREA, Hovercraft : 2)
 0.4
-% omegazmax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovecraft : 1)
+% omegazmax (0.8 : simu, 0.8 : SAUC'ISSE, 0.8 : SARDINE, 6.0 : CISCREA, Hovercraft : 1)
 0.8
 % Kp_z
 0
