@@ -112,7 +112,7 @@
 #endif // _MSC_VER
 #endif // _WIN32
 
-int UxVCtrl_version = 410;
+int UxVCtrl_version = 411;
 
 int main(int argc, char* argv[])
 {

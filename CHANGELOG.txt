@@ -1,3 +1,6 @@
+411
+Update setstateestimation, setstateestimationwgs commands to be able to leave some variables unchanged.
+
 410
 Add regwait, regwaitdate commands.
 

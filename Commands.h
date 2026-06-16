@@ -1362,24 +1362,24 @@ inline int Commands(char* line)
 	{
 		EnterCriticalSection(&StateVariablesCS);				
 		GPS2EnvCoordSystem(lat_env, long_env, alt_env, angle_env, dval1, dval3, dval5, &dval1, &dval3, &dval5);
-		xhat = interval(dval1-dval2,dval1+dval2);
-		yhat = interval(dval3-dval4,dval3+dval4);
-		zhat = interval(dval5-dval6,dval5+dval6);
-		psihat = fmod_2PI(M_PI/2.0-dval7*M_PI/180.0-angle_env)+interval(-dval8,dval8);
-		vrxhat = interval(dval9-dval10,dval9+dval10);
-		omegazhat = -dval11*M_PI/180.0+interval(-dval12,dval12);
+		if (dval2 >= 0) xhat = interval(dval1-dval2,dval1+dval2);
+		if (dval4 >= 0) yhat = interval(dval3-dval4,dval3+dval4);
+		if (dval6 >= 0) zhat = interval(dval5-dval6,dval5+dval6);
+		if (dval8 >= 0) psihat = fmod_2PI(M_PI/2.0-dval7*M_PI/180.0-angle_env)+interval(-dval8,dval8);
+		if (dval10 >= 0) vrxhat = interval(dval9-dval10,dval9+dval10);
+		if (dval12 >= 0) omegazhat = -dval11*M_PI/180.0+interval(-dval12,dval12);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "setstateestimation %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf", 
 		&dval1, &dval2, &dval3, &dval4, &dval5, &dval6, &dval7, &dval8, &dval9, &dval10, &dval11, &dval12) == 12)
 	{
 		EnterCriticalSection(&StateVariablesCS);
-		xhat = interval(dval1-dval2,dval1+dval2);
-		yhat = interval(dval3-dval4,dval3+dval4);
-		zhat = interval(dval5-dval6,dval5+dval6);
-		psihat = interval(dval7-dval8,dval7+dval8);
-		vrxhat = interval(dval9-dval10,dval9+dval10);
-		omegazhat = interval(dval11-dval12,dval11+dval12);
+		if (dval2 >= 0) xhat = interval(dval1-dval2,dval1+dval2);
+		if (dval4 >= 0) yhat = interval(dval3-dval4,dval3+dval4);
+		if (dval6 >= 0) zhat = interval(dval5-dval6,dval5+dval6);
+		if (dval8 >= 0) psihat = interval(dval7-dval8,dval7+dval8);
+		if (dval10 >= 0) vrxhat = interval(dval9-dval10,dval9+dval10);
+		if (dval12 >= 0) omegazhat = interval(dval11-dval12,dval11+dval12);
 		LeaveCriticalSection(&StateVariablesCS);
 	}
 	else if (sscanf(line, "setwindestimationwgs %lf %lf", &dval1, &dval2) == 2)
